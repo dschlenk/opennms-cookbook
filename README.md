@@ -259,6 +259,7 @@ Or maybe you don't have any Dell gear:
      }
    }
 ```
+
 You can also remove one of the default snmp-collections, or change the step and RRA definitions.
 
 #### etc/discovery-configuration.xml
@@ -270,6 +271,148 @@ Attributes are available in `node['opennms']['discovery']` to change global sett
 * restart-sleep-time (`restart_sleep_ms`)
 * retries (`retries`)
 * timeout (`timeout`)
+
+#### etc/eventd-configuration.xml
+
+Attributes are available in `node['opennms']['eventd']` to change global settings:
+* TCPAddress (`tcp_address`)
+* TCPPort (`tcp_port`)
+* UDPAddress (`udp_address`)
+* UDPPort (`udp_port`)
+* receivers (`receivers`)
+* socketSoTimeoutRequired (`sock_so_timeout_req` to true or false)
+* socketSoTimeoutPeriod (`socket_so_timeout_period`)
+
+#### etc/events-archiver-configuration.xml
+
+Attributes are available in `node['opennms']['events_archiver']` to change global settings:
+* archiveAge (`age`)
+* separator (`separator`)
+
+#### etc/javamail-configuration.properties
+
+This file controls how OpenNMS sends email. This is not where you configure the mail monitor.
+Attributes available in `node['opennms']['javamail_props']`. They follow the config file but with ruby style because the kids hate camel case I guess.
+* org.opennms.core.utils.fromAddress (`from_address`) 
+* org.opennms.core.utils.mailHost (`mail_host`)
+* ...and so on.
+
+#### etc/javamail-configuration.xml
+
+This is where you configure the mail monitor.
+Attributes available in `node['opennms']['javamail_config'`. Unlike most of the templates, you can change every attribute and element in the default sendmail and receivemail elements since the defaults are useful to no one. Here's a list of the defaults which you definitely need to override if you want a mail monitor to work: 
+
+```
+default['opennms']['javamail_config']['default_read_config_name'] = "localhost"
+default['opennms']['javamail_config']['default_send_config_name'] = "localhost"
+default['opennms']['javamail_config']['default_read']['attempt_interval'] = 1000
+default['opennms']['javamail_config']['default_read']['delete_all_mail']  = false
+default['opennms']['javamail_config']['default_read']['mail_folder']      = "INBOX"
+default['opennms']['javamail_config']['default_read']['debug']            = true
+default['opennms']['javamail_config']['default_read']['properties']       = {'mail.pop3.apop.enable' => false, 'mail.pop3.rsetbeforequit' => false}
+default['opennms']['javamail_config']['default_read']['host']             = "127.0.0.1"
+default['opennms']['javamail_config']['default_read']['port']             = 110
+default['opennms']['javamail_config']['default_read']['ssl_enable']       = false
+default['opennms']['javamail_config']['default_read']['start_tls']        = false
+default['opennms']['javamail_config']['default_read']['transport']        = "pop3"
+default['opennms']['javamail_config']['default_read']['user']             = "opennms"
+default['opennms']['javamail_config']['default_read']['password']         = "opennms"
+default['opennms']['javamail_config']['default_send']['attempt_interval']   = 3000
+default['opennms']['javamail_config']['default_send']['use_authentication'] = false
+default['opennms']['javamail_config']['default_send']['use_jmta']           = true
+default['opennms']['javamail_config']['default_send']['debug']              = true
+default['opennms']['javamail_config']['default_send']['host']               = "127.0.0.1"
+default['opennms']['javamail_config']['default_send']['port']               = 25
+default['opennms']['javamail_config']['default_send']['char_set']           = "us-ascii"
+default['opennms']['javamail_config']['default_send']['mailer']             = "smtpsend"
+default['opennms']['javamail_config']['default_send']['content_type']       = "text/plain"
+default['opennms']['javamail_config']['default_send']['encoding']           = "7-bit"
+default['opennms']['javamail_config']['default_send']['quit_wait']          = true
+default['opennms']['javamail_config']['default_send']['ssl_enable']         = false
+default['opennms']['javamail_config']['default_send']['start_tls']          = false
+default['opennms']['javamail_config']['default_send']['transport']          = "smtp"
+default['opennms']['javamail_config']['default_send']['to']                 = "root@localhost"
+default['opennms']['javamail_config']['default_send']['from']               = "root@[localhost]"
+default['opennms']['javamail_config']['default_send']['subject']            = "OpenNMS Test Message"
+default['opennms']['javamail_config']['default_send']['body']               = "This is an OpenNMS test message."
+default['opennms']['javamail_config']['default_send']['user']               = "opennms"
+default['opennms']['javamail_config']['default_send']['password']           = "opennms"
+```
+
+#### jcifs.properties
+
+This is useful for something I'm sure, but I don't know what. See the template or default attributes file for hints.
+
+#### etc/jdbc-datacollection-config.xml 
+
+TODO: Finish this template!!!
+Similar to other datacollection-config.xml files, you can change the RRD repository, step, RRA definitions and disable default collections.
+
+#### etc/jmx-datacollection-config.xml 
+
+TODO: Finish this template!!!
+Similar to other datacollection-config.xml files, you can change the RRD repository, step, RRA definitions and disable default collections.
+
+#### etc/linkd-configuration.xml
+
+Attributes available in `node['opennms']['linkd']` that allow you change global settings like:
+* threads
+* initial_sleep_time
+* snmp_poll_interval
+* discovery_link_interval
+
+You can also turn off various kinds of detection, like for `iproutes`, set any of these to false to remove them from the file:
+* netscreen
+* cisco
+* darwin
+
+Finally there's the package element at the end of the file that you can configure with these attributes:
+```
+default['opennms']['linkd']['package']                      = "example1"
+default['opennms']['linkd']['filter']                       = "IPADDR != '0.0.0.0'"
+default['opennms']['linkd']['range_begin']                  = "1.1.1.1"
+default['opennms']['linkd']['range_end']                    = "254.254.254.254"
+```
+
+#### etc/log4j.properties
+
+This one is a little different. If you want to turn up logging for collectd, for instance, you'd set these override attributes:
+```
+{
+  "opennms":
+  {
+    "log4j":
+    {
+      "collectd":
+      {
+        "level": "DEBUG"
+      }
+    }
+  }
+}
+```
+But you could also change the appender class, the max file size, the max number of files (assuming the use of RollingFileAppender), the layout class and the layout conversion pattern (assuming the use of PatternLayout) using `appender`, `max_file_size`, `max_backup_index`, `layout`, and `conversion_pattern`.
+
+#### magic-users.properties
+
+The rtc username and password are populated from the values set in `node['opennms']['properties']['rtc']['username']` and `node['opennms']['properties']['rtc']['password']`. TODO: Generate passwords during install! Other attributes available for configuration are:
+```
+default['opennms']['magic_users']['admin_users']     = "admin"
+default['opennms']['magic_users']['ro_users']        = ""
+default['opennms']['magic_users']['dashboard_users'] = ""
+default['opennms']['magic_users']['provision_users'] = ""
+default['opennms']['magic_users']['remoting_users']  = ""
+default['opennms']['magic_users']['rest_users']      = "iphone"
+```
+
+#### etc/map.properties
+
+Do you love maps but are a contrarian when it comes to color schemes? Have we got the template for you! I guess also useful for translating labels?  Check out the default attributes for details on what you can change.
+
+#### etec/microblog-configuration.xml
+
+Join twitter and tell the public about your broken network! Set `node['opennms']['microblog']['default_profile']['name']` to `twitter` or `identica` and then set `['opennms']['microblog']['default_profile']['authen_username']` and `['opennms']['microblog']['default_profile']['authen_password']` to use those services, or use a different service by setting `node['opennms']['microblog']['default_profile']['service_url']` as well (assuming OpenNMS supports it). This only sets up the profile. You'll still need to define a destination path and set events and alarms to use it the normal way as described at http://www.opennms.org/wiki/Microblog_Notifications until the notification and destination path LWRPs are written.
+
 
 License
 =======

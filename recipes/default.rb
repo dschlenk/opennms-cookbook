@@ -421,6 +421,307 @@ template "#{onms_home}/etc/discovery-configuration.xml" do
   )
 end
 
+template "#{onms_home}/etc/eventd-configuration.xml" do
+  source "eventd-configuration.xml.erb"
+  mode 00664
+  owner "root"
+  group "root"
+  notifies :restart, "service[opennms]"
+  variables(
+    :tcp_address            => node['opennms']['eventd']['tcp_address'],
+    :tcp_port               => node['opennms']['eventd']['tcp_port'],
+    :udp_address            => node['opennms']['eventd']['udp_address'],
+    :udp_port               => node['opennms']['eventd']['udp_port'],
+    :receivers              => node['opennms']['eventd']['receivers'],
+    :get_next_eventid       => node['opennms']['eventd']['get_next_eventid'],
+    :sock_so_timeout_req    => node['opennms']['eventd']['sock_so_timeout_req'],
+    :socket_so_timeout_period => node['opennms']['eventd']['socket_so_timeout_period']
+  )
+end
+
+template "#{onms_home}/etc/events-archiver-configuration.xml" do
+  source "events-archiver-configuration.xml.erb"
+  mode 00664
+  owner "root"
+  group "root"
+  notifies :restart, "service[opennms]"
+  variables(
+    :age       => node['opennms']['events_archiver']['age'],
+    :separator => node['opennms']['events_archiver']['separator']
+  )
+end
+
+template "#{onms_home}/etc/javamail-configuration.properties" do
+  source "javamail-configuration.properties.erb"
+  mode 00664
+  owner "root"
+  group "root"
+  variables(
+    :from_address          => node[:opennms][:javamail_props][:from_address],
+    :mail_host             => node[:opennms][:javamail_props][:mail_host],
+    :mailer                => node[:opennms][:javamail_props][:mailer],
+    :transport             => node[:opennms][:javamail_props][:transport],
+    :debug                 => node[:opennms][:javamail_props][:debug],
+    :smtpport              => node[:opennms][:javamail_props][:smtpport],
+    :smtpssl               => node[:opennms][:javamail_props][:smtpssl],
+    :quitwait              => node[:opennms][:javamail_props][:quitwait],
+    :use_JMTA              => node[:opennms][:javamail_props][:use_JMTA],
+    :authenticate          => node[:opennms][:javamail_props][:authenticate],
+    :authenticate_user     => node[:opennms][:javamail_props][:authenticate_user],
+    :authenticate_password => node[:opennms][:javamail_props][:authenticate_password],
+    :starttls              => node[:opennms][:javamail_props][:starttls],
+    :message_content_type  => node[:opennms][:javamail_props][:message_content_type],
+    :charset               => node[:opennms][:javamail_props][:charset]
+  )
+end
+
+template "#{onms_home}/etc/javamail-configuration.xml" do
+  source "javamail-configuration.xml.erb"
+  mode 00664
+  owner "root"
+  group "root"
+  notifies :restart, "service[opennms]"
+  variables(
+    :default_read_config_name        => node[:opennms][:javamail_config][:default_read_config_name],
+    :default_send_config_name        => node[:opennms][:javamail_config][:default_send_config_name],
+    :dr_attempt_interval             => node[:opennms][:javamail_config][:default_read][:attempt_interval],
+    :dr_delete_all_mail              => node[:opennms][:javamail_config][:default_read][:delete_all_mail],
+    :dr_mail_folder                  => node[:opennms][:javamail_config][:default_read][:mail_folder],
+    :dr_debug                        => node[:opennms][:javamail_config][:default_read][:debug],
+    :dr_properties                   => node[:opennms][:javamail_config][:default_read][:properties],
+    :dr_host                         => node[:opennms][:javamail_config][:default_read][:host],
+    :dr_port                         => node[:opennms][:javamail_config][:default_read][:port],
+    :dr_ssl_enable                   => node[:opennms][:javamail_config][:default_read][:ssl_enable],
+    :dr_start_tls                    => node[:opennms][:javamail_config][:default_read][:start_tls],
+    :dr_transport                    => node[:opennms][:javamail_config][:default_read][:transport],
+    :dr_user                         => node[:opennms][:javamail_config][:default_read][:user],
+    :dr_password                     => node[:opennms][:javamail_config][:default_read][:password],
+    :ds_attempt_interval             => node[:opennms][:javamail_config][:default_send][:attempt_interval],
+    :ds_use_authentication           => node[:opennms][:javamail_config][:default_send][:use_authentication],
+    :ds_use_jmta                     => node[:opennms][:javamail_config][:default_send][:use_jmta],
+    :ds_debug                        => node[:opennms][:javamail_config][:default_send][:debug],
+    :ds_host                         => node[:opennms][:javamail_config][:default_send][:host],
+    :ds_port                         => node[:opennms][:javamail_config][:default_send][:port],
+    :ds_char_set                     => node[:opennms][:javamail_config][:default_send][:char_set],
+    :ds_mailer                       => node[:opennms][:javamail_config][:default_send][:mailer],
+    :ds_content_type                 => node[:opennms][:javamail_config][:default_send][:content_type],
+    :ds_encoding                     => node[:opennms][:javamail_config][:default_send][:encoding],
+    :ds_quit_wait                    => node[:opennms][:javamail_config][:default_send][:quit_wait],
+    :ds_ssl_enable                   => node[:opennms][:javamail_config][:default_send][:ssl_enable],
+    :ds_start_tls                    => node[:opennms][:javamail_config][:default_send][:start_tls],
+    :ds_transport                    => node[:opennms][:javamail_config][:default_send][:transport],
+    :ds_to                           => node[:opennms][:javamail_config][:default_send][:to],
+    :ds_from                         => node[:opennms][:javamail_config][:default_send][:from],
+    :ds_subject                      => node[:opennms][:javamail_config][:default_send][:subject],
+    :ds_body                         => node[:opennms][:javamail_config][:default_send][:body],
+    :ds_user                         => node[:opennms][:javamail_config][:default_send][:user],
+    :ds_password                     => node[:opennms][:javamail_config][:default_send][:password]
+  )
+end
+
+template "#{onms_home}/etc/jcifs.properties" do
+  source "jcifs.properties.erb"
+  mode 00664
+  owner "root"
+  group "root"
+  notifies :restart, "service[opennms]"
+  variables(
+    :loglevel      => node[:opennms][:jcifs][:loglevel],
+    :wins          => node[:opennms][:jcifs][:wins],
+    :lmhosts       => node[:opennms][:jcifs][:lmhosts],
+    :resolve_order => node[:opennms][:jcifs][:resolve_order],
+    :hostname      => node[:opennms][:jcifs][:hostname],
+    :retry_count   => node[:opennms][:jcifs][:retry_count],
+    :username      => node[:opennms][:jcifs][:username],
+    :password      => node[:opennms][:jcifs][:password],
+    :client_laddr  => node[:opennms][:jcifs][:client_laddr]
+  )
+end
+
+template "#{onms_home}/etc/jdbc-datacollection-config.xml" do
+  source "jdbc-datacollection-config.xml.erb"
+  mode 00664
+  owner "root"
+  group "root"
+  notifies :restart, "service[opennms]"
+  variables(
+    :enable_default     => node[:opennms][:jdbc_dc][:enable_default],
+    :enable_mysql_stats => node[:opennms][:jdbc_dc][:enable_mysql_stats],
+    :enable_pgsql_stats => node[:opennms][:jdbc_dc][:enable_pgsql_stats]
+  )
+end
+
+template "#{onms_home}/etc/jmx-datacollection-config.xml" do
+  source "jmx-datacollection-config.xml.erb"
+  mode 00664
+  owner "root"
+  group "root"
+  notifies :restart, "service[opennms]"
+  variables(
+    :enable_jboss   => node[:opennms][:jdbc_dc][:enable_default],
+    :enable_opennms => node[:opennms][:jdbc_dc][:enable_mysql_stats]
+  )
+end
+
+template "#{onms_home}/etc/linkd-configuration.xml" do
+  source "linkd-configuration.xml.erb"
+  mode 00664
+  owner "root"
+  group "root"
+  notifies :restart, "service[opennms]"
+  variables(
+    :threads                      => node[:opennms][:linkd][:threads],
+    :initial_sleep_time           => node[:opennms][:linkd][:initial_sleep_time],
+    :snmp_poll_interval           => node[:opennms][:linkd][:snmp_poll_interval],
+    :discovery_link_interval      => node[:opennms][:linkd][:discovery_link_interval],
+    :package                      => node[:opennms][:linkd][:package],
+    :filter                       => node[:opennms][:linkd][:filter],
+    :range_begin                  => node[:opennms][:linkd][:range_begin],
+    :range_end                    => node[:opennms][:linkd][:range_end],
+    :netscreen                    => node[:opennms][:linkd][:iproutes][:enable_netscreen],
+    :iproute_cisco                => node[:opennms][:linkd][:iproutes][:enable_cisco],
+    :darwin                       => node[:opennms][:linkd][:iproutes][:enable_darwin],
+    :vlan_3com                    => node[:opennms][:linkd][:vlan][:enable_3com],
+    :vlan_3com3870                => node[:opennms][:linkd][:vlan][:enable_3com3870],
+    :vlan_nortel                  => node[:opennms][:linkd][:vlan][:enable_nortel],
+    :vlan_intel                   => node[:opennms][:linkd][:vlan][:enable_intel],
+    :vlan_hp                      => node[:opennms][:linkd][:vlan][:enable_hp],
+    :vlan_cisco                   => node[:opennms][:linkd][:vlan][:enable_cisco],
+    :vlan_extreme                 => node[:opennms][:linkd][:vlan][:enable_extreme]
+  )
+end
+
+template "#{onms_home}/etc/log4j.properties" do
+  source "log4j.properties.erb"
+  mode 00664
+  owner "root"
+  group "root"
+  notifies :restart, "service[opennms]"
+  variables(
+    :stds                => node[:opennms][:log4j][:stds],
+    :uncategorized       => node[:opennms][:log4j][:uncategorized],
+    :misc                => node[:opennms][:log4j][:misc],
+    :hibernate           => node[:opennms][:log4j][:hibernate],
+    :spring              => node[:opennms][:log4j][:spring],
+    :provisiond          => node[:opennms][:log4j][:provisiond],
+    :pinger              => node[:opennms][:log4j][:pinger],
+    :reportd             => node[:opennms][:log4j][:reportd],
+    :ticketer            => node[:opennms][:log4j][:ticketer],
+    :eventd              => node[:opennms][:log4j][:eventd],
+    :alarmd              => node[:opennms][:log4j][:alarmd],
+    :ackd                => node[:opennms][:log4j][:ackd],
+    :discovery           => node[:opennms][:log4j][:discovery],
+    :capsd               => node[:opennms][:log4j][:capsd],
+    :notifd              => node[:opennms][:log4j][:notifd],
+    :poller              => node[:opennms][:log4j][:poller],
+    :snmpinterfacepoller => node[:opennms][:log4j][:snmpinterfacepoller],
+    :collectd            => node[:opennms][:log4j][:collectd],
+    :correlation         => node[:opennms][:log4j][:correlation],
+    :drools              => node[:opennms][:log4j][:drools],
+    :passive             => node[:opennms][:log4j][:passive],
+    :threshd             => node[:opennms][:log4j][:threshd],
+    :trapd               => node[:opennms][:log4j][:trapd],
+    :actiond             => node[:opennms][:log4j][:actiond],
+    :scriptd             => node[:opennms][:log4j][:scriptd],
+    :rtc                 => node[:opennms][:log4j][:rtc],
+    :rtcdata             => node[:opennms][:log4j][:rtcdata],
+    :outage              => node[:opennms][:log4j][:outage],
+    :translator          => node[:opennms][:log4j][:translator],
+    :vacuum              => node[:opennms][:log4j][:vacuum],
+    :manager             => node[:opennms][:log4j][:manager],
+    :queued              => node[:opennms][:log4j][:queued],
+    :jetty               => node[:opennms][:log4j][:jetty],
+    :web                 => node[:opennms][:log4j][:web],
+    :webauth             => node[:opennms][:log4j][:webauth],
+    :web_rtc             => node[:opennms][:log4j][:web_rtc],
+    :tomcat_internal     => node[:opennms][:log4j][:tomcat_internal],
+    :dhcpd               => node[:opennms][:log4j][:dhcpd],
+    :vulnscand           => node[:opennms][:log4j][:vulnscand],
+    :syslogd             => node[:opennms][:log4j][:syslogd],
+    :xmlrpcd             => node[:opennms][:log4j][:xmlrpcd],
+    :report              => node[:opennms][:log4j][:report],
+    :vmware              => node[:opennms][:log4j][:vmware],
+    :rancid              => node[:opennms][:log4j][:rancid],
+    :jmx                 => node[:opennms][:log4j][:jmx],
+    :linkd               => node[:opennms][:log4j][:linkd],
+    :web_map             => node[:opennms][:log4j][:web_map],
+    :statsd              => node[:opennms][:log4j][:statsd],
+    :instrumentation     => node[:opennms][:log4j][:instrumentation],
+    :snmp4j_internal     => node[:opennms][:log4j][:snmp4j_internal],
+    :tl1d                => node[:opennms][:log4j][:tl1d],
+    :asterisk            => node[:opennms][:log4j][:asterisk],
+    :insproxy            => node[:opennms][:log4j][:insproxy],
+    :accesspointmonitor  => node[:opennms][:log4j][:accesspointmonitor]
+  )
+end
+
+template "#{onms_home}/etc/magic-users.properties" do
+  source "magic-users.properties.erb"
+  mode 00664
+  owner "root"
+  group "root"
+  notifies :restart, "service[opennms]"
+  variables(
+    :rtc_username    => node[:opennms][:properties][:rtc][:username],
+    :rtc_password    => node[:opennms][:properties][:rtc][:password],
+    :admin_users     => node[:opennms][:magic_users][:admin_users],
+    :ro_users        => node[:opennms][:magic_users][:ro_users],
+    :dashboard_users => node[:opennms][:magic_users][:dashboard_users],
+    :provision_users => node[:opennms][:magic_users][:provision_users],
+    :remoting_users  => node[:opennms][:magic_users][:remoting_users],
+    :rest_users      => node[:opennms][:magic_users][:rest_users]
+  )
+end
+
+template "#{onms_home}/etc/map.properties" do
+  source "map.properties.erb"
+  mode 00664
+  owner "root"
+  group "root"
+  notifies :restart, "service[opennms]"
+  variables(
+    :critical           => node[:opennms][:map][:severity][:critical],
+    :major              => node[:opennms][:map][:severity][:major],
+    :minor              => node[:opennms][:map][:severity][:minor],
+    :warning            => node[:opennms][:map][:severity][:warning],
+    :normal             => node[:opennms][:map][:severity][:normal],
+    :cleared            => node[:opennms][:map][:severity][:cleared],
+    :indeterminate      => node[:opennms][:map][:severity][:indeterminate],
+    :default            => node[:opennms][:map][:severity][:default],
+    :ethernet_text      => node[:opennms][:map][:link][:ethernet][:text],
+    :fastethernet_text  => node[:opennms][:map][:link][:fastethernet][:text],
+    :fastethernet2_text => node[:opennms][:map][:link][:fastethernet2][:text],
+    :gigaethernet_text  => node[:opennms][:map][:link][:gigaethernet][:text],
+    :gigaethernet2_text => node[:opennms][:map][:link][:gigaethernet2][:text],
+    :serial_text        => node[:opennms][:map][:link][:serial][:text],
+    :framerelay_text    => node[:opennms][:map][:link][:framerelay][:text],
+    :ieee80211_text     => node[:opennms][:map][:link][:ieee80211][:text],
+    :unknown_text       => node[:opennms][:map][:link][:unknown][:text],
+    :dwo_text           => node[:opennms][:map][:link][:dwo][:text],
+    :summary_text       => node[:opennms][:map][:link][:summary][:text],
+    :link_default       => node[:opennms][:map][:link][:default],
+    :multilink          => node[:opennms][:map][:multilink],
+    :linkstatus         => node[:opennms][:map][:linkstatus],
+    :status             => node[:opennms][:map][:status],
+    :avail              => node[:opennms][:map][:avail],
+    :icon               => node[:opennms][:map][:icon],
+    :cmenu              => node[:opennms][:map][:cmenu],
+    :severity           => node[:opennms][:map][:severity],
+    :enable             => node[:opennms][:map][:enable]
+  )
+end
+
+template "#{onms_home}/etc/microblog-configuration.xml" do
+  source "microblog-configuration.xml.erb"
+  mode 00664
+  owner "root"
+  group "root"
+  notifies :restart, "service[opennms]"
+  variables(
+    :default_profile => node[:opennms][:microblog][:default_profile]
+  )
+end
+
 service "opennms" do
   supports :status => true, :restart => true
   action [ :enable, :start ]

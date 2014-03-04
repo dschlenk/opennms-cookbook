@@ -554,3 +554,274 @@ default['opennms']['discovery']['init_sleep_ms']    = 30000
 default['opennms']['discovery']['restart_sleep_ms'] = 86400000
 default['opennms']['discovery']['retries']          = 1
 default['opennms']['discovery']['timeout']          = 2000
+# eventd-configuration.xml
+default['opennms']['eventd']['tcp_address']            = "127.0.0.1"
+default['opennms']['eventd']['tcp_port']               = 5817
+default['opennms']['eventd']['udp_address']            = "127.0.0.1"
+default['opennms']['eventd']['udp_port']               = 5817
+default['opennms']['eventd']['receivers']              = 5
+default['opennms']['eventd']['get_next_eventid']       = "SELECT nextval('eventsNxtId')"
+default['opennms']['eventd']['sock_so_timeout_req']    = true
+default['opennms']['eventd']['socket_so_timeout_period'] = 3000
+# events-archiver-configuration.xml
+default['opennms']['events_archiver']['age']        = "7d"
+default['opennms']['events_archiver']['separator'] = "#"
+# javamail-configuration.properties
+default['opennms']['javamail_props']['from_address']          = nil
+default['opennms']['javamail_props']['mail_host']             = nil
+default['opennms']['javamail_props']['mailer']                = nil
+default['opennms']['javamail_props']['transport']             = nil
+default['opennms']['javamail_props']['debug']                 = nil
+default['opennms']['javamail_props']['smtpport']              = nil
+default['opennms']['javamail_props']['smtpssl']               = nil
+default['opennms']['javamail_props']['quitwait']              = nil
+default['opennms']['javamail_props']['use_JMTA']              = nil
+default['opennms']['javamail_props']['authenticate']          = nil
+default['opennms']['javamail_props']['authenticate_user']     = nil
+default['opennms']['javamail_props']['authenticate_password'] = nil
+default['opennms']['javamail_props']['starttls']              = nil
+default['opennms']['javamail_props']['message_content_type']  = nil
+default['opennms']['javamail_props']['charset']               = nil
+# javamail-configuration.xml
+default['opennms']['javamail_config']['default_read_config_name'] = "localhost"
+default['opennms']['javamail_config']['default_send_config_name'] = "localhost"
+default['opennms']['javamail_config']['default_read']['attempt_interval'] = 1000
+default['opennms']['javamail_config']['default_read']['delete_all_mail']  = false
+default['opennms']['javamail_config']['default_read']['mail_folder']      = "INBOX"
+default['opennms']['javamail_config']['default_read']['debug']            = true
+default['opennms']['javamail_config']['default_read']['properties']       = {'mail.pop3.apop.enable' => false, 'mail.pop3.rsetbeforequit' => false}
+default['opennms']['javamail_config']['default_read']['host']             = "127.0.0.1"
+default['opennms']['javamail_config']['default_read']['port']             = 110
+default['opennms']['javamail_config']['default_read']['ssl_enable']       = false
+default['opennms']['javamail_config']['default_read']['start_tls']        = false
+default['opennms']['javamail_config']['default_read']['transport']        = "pop3"
+default['opennms']['javamail_config']['default_read']['user']             = "opennms"
+default['opennms']['javamail_config']['default_read']['password']         = "opennms"
+default['opennms']['javamail_config']['default_send']['attempt_interval']   = 3000
+default['opennms']['javamail_config']['default_send']['use_authentication'] = false
+default['opennms']['javamail_config']['default_send']['use_jmta']           = true
+default['opennms']['javamail_config']['default_send']['debug']              = true
+default['opennms']['javamail_config']['default_send']['host']               = "127.0.0.1"
+default['opennms']['javamail_config']['default_send']['port']               = 25
+default['opennms']['javamail_config']['default_send']['char_set']           = "us-ascii"
+default['opennms']['javamail_config']['default_send']['mailer']             = "smtpsend"
+default['opennms']['javamail_config']['default_send']['content_type']       = "text/plain"
+default['opennms']['javamail_config']['default_send']['encoding']           = "7-bit"
+default['opennms']['javamail_config']['default_send']['quit_wait']          = true
+default['opennms']['javamail_config']['default_send']['ssl_enable']         = false
+default['opennms']['javamail_config']['default_send']['start_tls']          = false
+default['opennms']['javamail_config']['default_send']['transport']          = "smtp"
+default['opennms']['javamail_config']['default_send']['to']                 = "root@localhost"
+default['opennms']['javamail_config']['default_send']['from']               = "root@[127.0.0.1]"
+default['opennms']['javamail_config']['default_send']['subject']            = "OpenNMS Test Message"
+default['opennms']['javamail_config']['default_send']['body']               = "This is an OpenNMS test message."
+default['opennms']['javamail_config']['default_send']['user']               = "opennms"
+default['opennms']['javamail_config']['default_send']['password']           = "opennms"
+# jcifs.properties
+default['opennms']['jcifs']['loglevel']      = 1
+default['opennms']['jcifs']['wins']          = nil
+default['opennms']['jcifs']['lmhosts']       = nil
+default['opennms']['jcifs']['resolve_order'] = nil
+default['opennms']['jcifs']['hostname']      = nil
+default['opennms']['jcifs']['retry_count']   = nil
+default['opennms']['jcifs']['username']      = nil
+default['opennms']['jcifs']['password']      = nil
+default['opennms']['jcifs']['client_laddr']  = nil
+# jdbc-datacollection-config.xml
+default['opennms']['jdbc_dc']['enable_default']     = true
+default['opennms']['jdbc_dc']['enable_mysql_stats'] = true
+default['opennms']['jdbc_dc']['enable_pgsql_stats'] = true
+# jmx-datacollection-config.xml
+default['opennms']['jmx_dc']['enable_jboss']        = true
+default['opennms']['jmx_dc']['enable_opennms']      = true
+# linkd-configuration.xml
+default['opennms']['linkd']['threads']                      = 5
+default['opennms']['linkd']['initial_sleep_time']           = 3600000
+default['opennms']['linkd']['snmp_poll_interval']           = 18000000
+default['opennms']['linkd']['discovery_link_interval']      = 1800000
+default['opennms']['linkd']['package']                      = "example1"
+default['opennms']['linkd']['filter']                       = "IPADDR != '0.0.0.0'"
+default['opennms']['linkd']['range_begin']                  = "1.1.1.1"
+default['opennms']['linkd']['range_end']                    = "254.254.254.254"
+default['opennms']['linkd']['iproutes']['enable_netscreen'] = true
+default['opennms']['linkd']['iproutes']['enable_cisco']     = true
+default['opennms']['linkd']['iproutes']['enable_darwin']    = true
+default['opennms']['linkd']['vlan']['enable_3com']          = true
+default['opennms']['linkd']['vlan']['enable_3com3870']      = true
+default['opennms']['linkd']['vlan']['enable_nortel']        = true
+default['opennms']['linkd']['vlan']['enable_intel']         = true
+default['opennms']['linkd']['vlan']['enable_hp']            = true
+default['opennms']['linkd']['vlan']['enable_cisco']         = true
+default['opennms']['linkd']['vlan']['enable_extreme']       = true
+# log4j.properties
+# each is a hash with possible keys being level, appender, max_file_size, max_backup_index, file, layout, conversion_pattern
+default['opennms']['log4j']['stds']                = {}
+default['opennms']['log4j']['uncategorized']       = {}
+default['opennms']['log4j']['misc']                = {}
+default['opennms']['log4j']['hibernate']           = {}
+default['opennms']['log4j']['spring']              = {}
+default['opennms']['log4j']['provisiond']          = {}
+default['opennms']['log4j']['pinger']              = {}
+default['opennms']['log4j']['reportd']             = {}
+default['opennms']['log4j']['ticketer']            = {}
+default['opennms']['log4j']['eventd']              = {}
+default['opennms']['log4j']['alarmd']              = {}
+default['opennms']['log4j']['ackd']                = {}
+default['opennms']['log4j']['discovery']           = {}
+default['opennms']['log4j']['capsd']               = {}
+default['opennms']['log4j']['notifd']              = {}
+default['opennms']['log4j']['poller']              = {}
+default['opennms']['log4j']['snmpinterfacepoller'] = {}
+default['opennms']['log4j']['collectd']            = {}
+default['opennms']['log4j']['correlation']         = {}
+default['opennms']['log4j']['drools']              = {}
+default['opennms']['log4j']['passive']             = {}
+default['opennms']['log4j']['threshd']             = {}
+default['opennms']['log4j']['trapd']               = {}
+default['opennms']['log4j']['actiond']             = {}
+default['opennms']['log4j']['scriptd']             = {}
+default['opennms']['log4j']['rtc']                 = {}
+default['opennms']['log4j']['rtcdata']             = {}
+default['opennms']['log4j']['outage']              = {}
+default['opennms']['log4j']['translator']          = {}
+default['opennms']['log4j']['vacuum']              = {}
+default['opennms']['log4j']['manager']             = {}
+default['opennms']['log4j']['queued']              = {}
+default['opennms']['log4j']['jetty']               = {}
+default['opennms']['log4j']['web']                 = {}
+default['opennms']['log4j']['webauth']             = {}
+default['opennms']['log4j']['web_rtc']             = {}
+default['opennms']['log4j']['tomcat_internal']     = {}
+default['opennms']['log4j']['dhcpd']               = {}
+default['opennms']['log4j']['vulnscand']           = {}
+default['opennms']['log4j']['syslogd']             = {}
+default['opennms']['log4j']['xmlrpcd']             = {}
+default['opennms']['log4j']['report']              = {}
+default['opennms']['log4j']['vmware']              = {}
+default['opennms']['log4j']['rancid']              = {}
+default['opennms']['log4j']['jmx']                 = {}
+default['opennms']['log4j']['linkd']               = {}
+default['opennms']['log4j']['web_map']             = {}
+default['opennms']['log4j']['statsd']              = {}
+default['opennms']['log4j']['instrumentation']     = {}
+default['opennms']['log4j']['snmp4j_internal']     = {}
+default['opennms']['log4j']['tl1d']                = {}
+default['opennms']['log4j']['asterisk']            = {}
+default['opennms']['log4j']['insproxy']            = {}
+default['opennms']['log4j']['accesspointmonitor']  = {}
+# magic-users.properties
+default['opennms']['magic_users']['admin_users']     = "admin"
+default['opennms']['magic_users']['ro_users']        = ""
+default['opennms']['magic_users']['dashboard_users'] = ""
+default['opennms']['magic_users']['provision_users'] = ""
+default['opennms']['magic_users']['remoting_users']  = ""
+default['opennms']['magic_users']['rest_users']      = "iphone"
+# map.properties
+default['opennms']['map']['severity']['critical']['label'] = "Critical"
+default['opennms']['map']['severity']['critical']['color'] = "red"
+default['opennms']['map']['severity']['critical']['flash'] = true
+default['opennms']['map']['severity']['major']['label'] = "Major"
+default['opennms']['map']['severity']['major']['color'] = "orange"
+default['opennms']['map']['severity']['minor']['label'] = "Minor"
+default['opennms']['map']['severity']['minor']['color'] = "yellow"
+default['opennms']['map']['severity']['warning']['label'] = "Warning"
+default['opennms']['map']['severity']['warning']['color'] = "cyan"
+default['opennms']['map']['severity']['normal']['label'] = "Normal"
+default['opennms']['map']['severity']['normal']['color'] = "green"
+default['opennms']['map']['severity']['cleared']['label'] = "Cleared"
+default['opennms']['map']['severity']['cleared']['color'] = "white"
+default['opennms']['map']['severity']['indeterminate']['label'] = "Indeterminate"
+default['opennms']['map']['severity']['indeterminate']['color'] = "lightblue"
+default['opennms']['map']['severity']['default'] = "normal"
+default['opennms']['map']['link']['ethernet']['text']      = "Ethernet"
+default['opennms']['map']['link']['fastethernet']['text']  = "Fast Ethernet"
+default['opennms']['map']['link']['fastethernet2']['text'] = "Fast Ethernet"
+default['opennms']['map']['link']['gigaethernet']['text']  = "GigaBit Ethernet"
+default['opennms']['map']['link']['gigaethernet2']['text'] = "GigaBit Ethernet"
+default['opennms']['map']['link']['serial']['text']        = "Serial Line"
+default['opennms']['map']['link']['framerelay']['text']    = "Frame Relay"
+default['opennms']['map']['link']['ieee80211']['text']     = "WIFI"
+default['opennms']['map']['link']['unknown']['text']       = "Unknown"
+default['opennms']['map']['link']['dwo']['text']           = "DWO Connection"
+default['opennms']['map']['link']['summary']['text']       = "SummaryLink"
+default['opennms']['map']['link']['default']               = 9999
+default['opennms']['map']['multilink']['max']              = 3
+default['opennms']['map']['multilink']['status']           = "best"
+default['opennms']['map']['multilink']['ignore_color']     = "yellow"
+default['opennms']['map']['linkstatus']['up_color']        = "green"
+default['opennms']['map']['linkstatus']['good_color']      = "green"
+default['opennms']['map']['linkstatus']['down_color']      = "red"
+default['opennms']['map']['linkstatus']['down_flash']      = "true"
+default['opennms']['map']['linkstatus']['bad_color']       = "red"
+default['opennms']['map']['linkstatus']['bad_flash']       = "true"
+default['opennms']['map']['linkstatus']['admindown_color'] = "blue"
+default['opennms']['map']['linkstatus']['testing_color']   = "orange"
+default['opennms']['map']['linkstatus']['unknown_color']   = "grey"
+default['opennms']['map']['status']['nodedown']['color']      = "red"
+default['opennms']['map']['status']['nodedown']['text']       = "NodeDown"
+default['opennms']['map']['status']['interfacedown']['color'] = "orange"
+default['opennms']['map']['status']['interfacedown']['text']  = "InterfaceDown"
+default['opennms']['map']['status']['linkdown']['color']      = "orange"
+default['opennms']['map']['status']['linkdown']['text']       = "SNMPLinkDown"
+default['opennms']['map']['status']['servicedown']['color']   = "yellow"
+default['opennms']['map']['status']['servicedown']['text']    = "NodeLostService"
+default['opennms']['map']['status']['undefined']['color']     = "grey"
+default['opennms']['map']['status']['undefined']['text']      = "SeeEventDetails"
+default['opennms']['map']['status']['nodeup']['color']        = "green"
+default['opennms']['map']['status']['nodeup']['text']         = "NodeUp"
+default['opennms']['map']['status']['default']                = "nodeup"
+default['opennms']['map']['status']['unknown_uei']            = "undefined"
+default['opennms']['map']['avail']['normal']['min']           = "99"
+default['opennms']['map']['avail']['normal']['color']         = "green"
+default['opennms']['map']['avail']['warning']['min']          = "97"
+default['opennms']['map']['avail']['warning']['color']        = "yellow"
+default['opennms']['map']['avail']['critical']['min']         = "0"
+default['opennms']['map']['avail']['critical']['color']       = "red"
+default['opennms']['map']['avail']['critical']['flash']       = true
+default['opennms']['map']['avail']['undefined']['min']        = "-1"
+default['opennms']['map']['avail']['undefined']['color']      = "grey"
+default['opennms']['map']['avail']['enable']                  = true
+default['opennms']['map']['icon']['desktop']          = "png/desktop.png"
+default['opennms']['map']['icon']['infrastructure']   = "png/infrastructure.png"
+default['opennms']['map']['icon']['laptop']           = "png/laptop.png"
+default['opennms']['map']['icon']['opennms']          = "png/opennms.png"
+default['opennms']['map']['icon']['other']            = "png/other.png"
+default['opennms']['map']['icon']['printer']          = "png/printer.png"
+default['opennms']['map']['icon']['server']           = "png/server.png"
+default['opennms']['map']['icon']['telephony']        = "png/telephony.png"
+default['opennms']['map']['icon']['unspecified']      = "png/unspecified.png"
+default['opennms']['map']['icon']['map']              = "map.gif"
+default['opennms']['map']['icon']['fileserver']       = "png/fileserver.png"
+default['opennms']['map']['icon']['firewall']         = "png/firewall.png"
+default['opennms']['map']['icon']['mainframe']        = "png/mainframe.png"
+default['opennms']['map']['icon']['multilayerswitch'] = "png/multilayerswitch.png"
+default['opennms']['map']['icon']['pix']              = "png/pix.png"
+default['opennms']['map']['icon']['router']           = "png/router.png"
+default['opennms']['map']['icon']['switch']           = "png/switch.png"
+default['opennms']['map']['icon']['vax']              = "png/vax.png"
+default['opennms']['map']['icon']['default_map']      = "map"
+default['opennms']['map']['icon']['default_node']     = "unspecified"
+default['opennms']['map']['cmenu']['node']['link']              = "element/node.jsp?node=ELEMENT_ID"
+default['opennms']['map']['cmenu']['node']['params']            = "toolbar,width=1280,height=800, left=0, top=0, scrollbars=1, resizable=1"
+default['opennms']['map']['cmenu']['telnet']['enabled']         = false
+default['opennms']['map']['cmenu']['telnet']['link']            = "telnet://ELEMENT_HOSTNAME"
+default['opennms']['map']['cmenu']['ping']['link']              = "map/response/ping.jsp?node=ELEMENT_ID"
+default['opennms']['map']['cmenu']['ping']['params']            = "toolbar,width=300,height=300, left=0, top=0, scrollbars=1, resizable=1"
+default['opennms']['map']['cmenu']['traceroute']['link']        = "map/response/traceroute.jsp?node=ELEMENT_ID"
+default['opennms']['map']['cmenu']['traceroute']['params']      = "toolbar,width=300,height=300, left=0, top=0, scrollbars=1, resizable=1"
+default['opennms']['map']['cmenu']['alarms']['link']            = "alarm/list.htm?sortby=id&acktype=unack&limit=20&filter=node%3DELEMENT_ID"
+default['opennms']['map']['cmenu']['alarms']['params']          = "toolbar,width=1280,height=800, left=0, top=0, scrollbars=1, resizable=1"
+default['opennms']['map']['cmenu']['events']['link']            = "event/list?filter=node%3DELEMENT_ID"
+default['opennms']['map']['cmenu']['events']['params']          = "toolbar,width=1280,height=800, left=0, top=0, scrollbars=1, resizable=1"
+default['opennms']['map']['cmenu']['resource_graphs']['link']   = "graph/chooseresource.htm?parentResourceType=node&parentResource=ELEMENT_ID&reports=all"
+default['opennms']['map']['cmenu']['resource_graphs']['params'] = "toolbar,width=1280,height=800, left=0, top=0, scrollbars=1, resizable=1"
+default['opennms']['map']['severity']['map'] = "worst"
+default['opennms']['map']['enable']['reload']      = false
+default['opennms']['map']['enable']['contextmenu'] = true
+default['opennms']['map']['enable']['doubleclick'] = true
+# microblog-configuration.xml 
+# NOTE: To define a profile not named identica or twitter you'll need to define ...['service_url'] as well.
+default['opennms']['microblog']['default_profile']['name']            = "identica"
+default['opennms']['microblog']['default_profile']['authen_username'] = "yourusername"
+default['opennms']['microblog']['default_profile']['authen_password'] = "yourpassword"
+
