@@ -19,12 +19,13 @@ Requirements
 * Unless you like really old JVMs and a poorly tuned PostgreSQL or just really want to install java and postgresql yourself you will also want these cookbooks:
   * java
   * postgresql
+
 See Usage for more details.
 
 Usage
 =====
 
-Running the default recipe will install OpenNMS on CentOS 6.x from the official repo and the default configuration. It will also execute `'$ONMS_HOME/bin/runjava -s` if `$ONMS_HOME/etc/java.conf` is not present and `$ONMS_HOME/bin/install -dis` if `$ONMS_HOME/etc/configured` is not present.
+Running the default recipe will install OpenNMS 1.12.5 on CentOS 6.x from the official repo with the default configuration. It will also execute `'$ONMS_HOME/bin/runjava -s` if `$ONMS_HOME/etc/java.conf` is not present and `$ONMS_HOME/bin/install -dis` if `$ONMS_HOME/etc/configured` is not present.
 
 Also, most configuration files are templated and can be overridden with environment, role, or node attributes.  See the default attributes file for a list of configuration items that can be changed in this manner, or keep reading for a brief overview of each template available. Some general notes:
 
@@ -34,7 +35,7 @@ Also, most configuration files are templated and can be overridden with environm
 
 You probably also want to check out the community java (https://github.com/socrata-cookbooks/java) and postgresql (https://github.com/hw-cookbooks/postgresql) cookbooks. Here's my default overrides for each:
 
-Java:
+### Java
 
 ```
 {
@@ -61,7 +62,9 @@ Java:
 }
 ```
 
-Postgresql: Include the server, config_initdb, config_pgtune and contrib recipes in your run list. Then use these override attributes for a fairly well tuned config:
+### Postgresql
+
+Include the server, config_initdb, config_pgtune and contrib recipes in your run list. Then use these override attributes for a fairly well tuned config:
 
 ```
 {
@@ -124,10 +127,10 @@ Postgresql: Include the server, config_initdb, config_pgtune and contrib recipes
 }
 ```
 
-There are also a couple OpenNMS attributes you'll probably want to override at a minimim: 
+There are also a couple OpenNMS attributes you'll probably want to override at a minimum: 
 
-opennms.conf
-============
+### opennms.conf
+
 ```{
      "opennms": {
        "conf":{
