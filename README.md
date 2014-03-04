@@ -142,6 +142,26 @@ There are also a couple OpenNMS attributes you'll probably want to override at a
    }
 ```
 
+### Template Overview
+
+#### etc/capsd-configuration.xml
+
+Note: the existance of this template does not imply that you should still be using capsd! To enable capsd you need to change the handler for newSuspect events in opennms.conf by setting `node['opennms']['properties']['provisioning']['enable_discovery']` to `false`.
+
+Example: change the timeout and retries for the ICMP scanner, do:
+
+```{
+     "opennms": {
+       "capsd": {
+         "icmp": {
+           "timeout": "5000",
+           "retry": "3"
+         }
+       }
+     }
+   }
+```
+
 License
 =======
 Apache 2.0
