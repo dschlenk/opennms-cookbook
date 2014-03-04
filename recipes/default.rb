@@ -206,6 +206,50 @@ template "#{onms_home}/etc/opennms.properties" do
   )
 end
 
+# Disabled by default and deprecated in 1.12. You've been warned.
+template "/opt/opennms/etc/capsd-configuration.xml" do
+  source "capsd-configuration.xml.erb"
+  mode 0664
+  owner "root"
+  group "root"
+  notifies :restart, "service[opennms]"
+  variables(
+    :rescan_frequency      => node['opennms']['capsd']['rescan_frequency'],
+    :initial_sleep_time    => node['opennms']['capsd']['initial_sleep_time'],
+    :max_suspect_threads   => node['opennms']['capsd']['max_suspect_threads'],
+    :max_rescan_threads    => node['opennms']['capsd']['max_rescan_threads'],
+    :protocol_plugins      => node['opennms']['capsd']['protocol_plugins'],
+    :icmp                  => node['opennms']['capsd']['icmp'],
+    :strafeping                  => node['opennms']['capsd']['strafeping'],
+    :snmp                  => node['opennms']['capsd']['snmp'],
+    :http                  => node['opennms']['capsd']['http'],
+    :http_8080                  => node['opennms']['capsd']['http_8080'],
+    :http_8000                  => node['opennms']['capsd']['http_8000'],
+    :https                  => node['opennms']['capsd']['https'],
+    :hyperic_agent                  => node['opennms']['capsd']['hyperic_agent'],
+    :hyperichq                  => node['opennms']['capsd']['hyperichq'],
+    :ftp                  => node['opennms']['capsd']['ftp'],
+    :telnet                  => node['opennms']['capsd']['telnet'],
+    :dns                  => node['opennms']['capsd']['dns'],
+    :imap                  => node['opennms']['capsd']['imap'],
+    :msexchange                  => node['opennms']['capsd']['msexchange'],
+    :smtp                  => node['opennms']['capsd']['smtp'],
+    :pop3                  => node['opennms']['capsd']['pop3'],
+    :ssh                  => node['opennms']['capsd']['ssh'],
+    :mysql                  => node['opennms']['capsd']['mysql'],
+    :sqlserver                  => node['opennms']['capsd']['sqlserver'],
+    :oracle                  => node['opennms']['capsd']['oracle'],
+    :postgres                  => node['opennms']['capsd']['postgres'],
+    :router                  => node['opennms']['capsd']['router'],
+    :hp_insight_manager                  => node['opennms']['capsd']['hp_insight_manager'],
+    :dell_openmanage                  => node['opennms']['capsd']['dell_openmanage'],
+    :nrpe                  => node['opennms']['capsd']['nrpe'],
+    :nrpe_nossl                  => node['opennms']['capsd']['nrpe_nossl'],
+    :windows_task_scheduler                  => node['opennms']['capsd']['windows_task_scheduler'],
+    :opennms_jvm                  => node['opennms']['capsd']['opennms_jvm']
+  )
+end
+
 service "opennms" do
   supports :status => true, :restart => true
   action [ :enable, :start ]
