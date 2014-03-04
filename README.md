@@ -151,7 +151,8 @@ You can change `threads` and `pscan_interval` or disable either of the default t
 #### etc/availability-reports.xml
 
 If you want to change the logo or default interval, count, hour or minute you can do so for either the calandar or classic report like so:
-```{
+```
+   {
      "opennms": {
        "db_reports": {
          "avail": {
