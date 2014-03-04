@@ -216,7 +216,8 @@ Disable one of the three default charts by setting `severity_enabled`, `outages_
 #### etc/collectd-configuration.xml
 
 Use the `node['opennms']['collectd']['threads']` attribute to change the number of threads (duh). There are also attributes for each default package. As of 1.12.5 those are: vmware3, vmware4, vmware5, example1. To modify one of those, for example, to change the IPv4 include range in the example1 package, you would do:
-```{
+```
+   {
      "opennms": {
        "collectd": {
            "example1": {
