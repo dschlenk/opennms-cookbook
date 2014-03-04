@@ -206,6 +206,40 @@ template "#{onms_home}/etc/opennms.properties" do
   )
 end
 
+template "#{onms_home}/etc/access-point-monitor-configuration.xml" do
+  source "access-point-monitor-configuration.xml.erb"
+  mode 00664
+  owner "root"
+  group "root"
+  notifies :restart, "service[opennms]"
+  variables(
+    :threads        => node[:opennms][:apm][:threads],
+    :pscan_interval => node[:opennms][:apm][:pscan_interval],
+    :aruba_enable   => node[:opennms][:apm][:aruba_enable],
+    :moto_enable    => node[:opennms][:apm][:moto_enable]
+  )
+end
+
+template "#{onms_home}/etc/availability-reports.xml" do
+  source "availability-reports.xml.erb"
+  mode 0664
+  owner "root"
+  group "root"
+  variables(
+    :cal_logo              => node['opennms']['db_reports']['avail']['cal']['logo'],
+    :cal_interval          => node['opennms']['db_reports']['avail']['cal']['endDate']['interval'],
+    :cal_count             => node['opennms']['db_reports']['avail']['cal']['endDate']['count'],
+    :cal_hours             => node['opennms']['db_reports']['avail']['cal']['endDate']['hours'],
+    :cal_minutes           => node['opennms']['db_reports']['avail']['cal']['endDate']['minutes'],
+    :classic_logo          => node['opennms']['db_reports']['avail']['classic']['logo'],
+    :classic_interval      => node['opennms']['db_reports']['avail']['classic']['endDate']['interval'],
+    :classic_count         => node['opennms']['db_reports']['avail']['classic']['endDate']['count'],
+    :classic_hours         => node['opennms']['db_reports']['avail']['classic']['endDate']['hours'],
+    :classic_minutes       => node['opennms']['db_reports']['avail']['classic']['endDate']['minutes'],
+    :onms_home             => onms_home
+  )
+end
+
 # Disabled by default and deprecated in 1.12. You've been warned.
 template "/opt/opennms/etc/capsd-configuration.xml" do
   source "capsd-configuration.xml.erb"
@@ -220,33 +254,170 @@ template "/opt/opennms/etc/capsd-configuration.xml" do
     :max_rescan_threads    => node['opennms']['capsd']['max_rescan_threads'],
     :protocol_plugins      => node['opennms']['capsd']['protocol_plugins'],
     :icmp                  => node['opennms']['capsd']['icmp'],
-    :strafeping                  => node['opennms']['capsd']['strafeping'],
+    :strafeping            => node['opennms']['capsd']['strafeping'],
     :snmp                  => node['opennms']['capsd']['snmp'],
     :http                  => node['opennms']['capsd']['http'],
-    :http_8080                  => node['opennms']['capsd']['http_8080'],
-    :http_8000                  => node['opennms']['capsd']['http_8000'],
-    :https                  => node['opennms']['capsd']['https'],
-    :hyperic_agent                  => node['opennms']['capsd']['hyperic_agent'],
-    :hyperichq                  => node['opennms']['capsd']['hyperichq'],
-    :ftp                  => node['opennms']['capsd']['ftp'],
-    :telnet                  => node['opennms']['capsd']['telnet'],
-    :dns                  => node['opennms']['capsd']['dns'],
+    :http_8080             => node['opennms']['capsd']['http_8080'],
+    :http_8000             => node['opennms']['capsd']['http_8000'],
+    :https                 => node['opennms']['capsd']['https'],
+    :hyperic_agent         => node['opennms']['capsd']['hyperic_agent'],
+    :hyperichq             => node['opennms']['capsd']['hyperichq'],
+    :ftp                   => node['opennms']['capsd']['ftp'],
+    :telnet                => node['opennms']['capsd']['telnet'],
+    :dns                   => node['opennms']['capsd']['dns'],
     :imap                  => node['opennms']['capsd']['imap'],
-    :msexchange                  => node['opennms']['capsd']['msexchange'],
+    :msexchange            => node['opennms']['capsd']['msexchange'],
     :smtp                  => node['opennms']['capsd']['smtp'],
     :pop3                  => node['opennms']['capsd']['pop3'],
-    :ssh                  => node['opennms']['capsd']['ssh'],
-    :mysql                  => node['opennms']['capsd']['mysql'],
-    :sqlserver                  => node['opennms']['capsd']['sqlserver'],
-    :oracle                  => node['opennms']['capsd']['oracle'],
-    :postgres                  => node['opennms']['capsd']['postgres'],
-    :router                  => node['opennms']['capsd']['router'],
-    :hp_insight_manager                  => node['opennms']['capsd']['hp_insight_manager'],
-    :dell_openmanage                  => node['opennms']['capsd']['dell_openmanage'],
+    :ssh                   => node['opennms']['capsd']['ssh'],
+    :mysql                 => node['opennms']['capsd']['mysql'],
+    :sqlserver             => node['opennms']['capsd']['sqlserver'],
+    :oracle                => node['opennms']['capsd']['oracle'],
+    :postgres              => node['opennms']['capsd']['postgres'],
+    :router                => node['opennms']['capsd']['router'],
+    :hp_insight_manager    => node['opennms']['capsd']['hp_insight_manager'],
+    :dell_openmanage       => node['opennms']['capsd']['dell_openmanage'],
     :nrpe                  => node['opennms']['capsd']['nrpe'],
-    :nrpe_nossl                  => node['opennms']['capsd']['nrpe_nossl'],
-    :windows_task_scheduler                  => node['opennms']['capsd']['windows_task_scheduler'],
-    :opennms_jvm                  => node['opennms']['capsd']['opennms_jvm']
+    :nrpe_nossl            => node['opennms']['capsd']['nrpe_nossl'],
+    :windows_task_scheduler => node['opennms']['capsd']['windows_task_scheduler'],
+    :opennms_jvm           => node['opennms']['capsd']['opennms_jvm']
+  )
+end
+
+template "#{onms_home}/etc/categories.xml" do
+  source "categories.xml.erb"
+  mode 0664
+  owner "root"
+  group "root"
+  notifies :restart, "service[opennms]"
+  variables(
+    :common_rule => node['opennms']['categories']['common_rule'],
+    :overall     => node['opennms']['categories']['overall'],
+    :interfaces  => node['opennms']['categories']['interfaces'],
+    :email       => node['opennms']['categories']['email'],
+    :web         => node['opennms']['categories']['web'],
+    :jmx         => node['opennms']['categories']['jmx'],
+    :dns         => node['opennms']['categories']['dns'],
+    :db          => node['opennms']['categories']['db'],
+    :other       => node['opennms']['categories']['other'],
+    :inet        => node['opennms']['categories']['inet']
+  )
+end
+
+template "#{onms_home}/etc/chart-configuration.xml" do
+  source "chart-configuration.xml.erb"
+  mode 0664
+  owner "root"
+  group "root"
+  notifies :restart, "service[opennms]"
+  variables(
+    :severity_enable  => node['opennms']['chart']['severity_enable'],
+    :outages_enable   => node['opennms']['chart']['outages_enable'],
+    :inventory_enable => node['opennms']['chart']['inventory_enable']
+  )
+end
+
+template "#{onms_home}/etc/collectd-configuration.xml" do
+  source "collectd-configuration.xml.erb"
+  mode 0664
+  owner "root"
+  group "root"
+  variables(
+    :threads  => node['opennms']['collectd']['threads'],
+    :vmware3  => node['opennms']['collectd']['vmware3'],
+    :vmware4  => node['opennms']['collectd']['vmware4'],
+    :vmware5  => node['opennms']['collectd']['vmware5'],
+    :example1 => node['opennms']['collectd']['example1']
+  )
+end
+
+template "#{onms_home}/etc/datacollection-config.xml" do
+  source "datacollection-config.xml.erb"
+  mode 0644
+  owner "root"
+  group "root"
+  notifies :restart, "service[opennms]"
+  variables(
+    :rrd_base_dir => node['opennms']['properties']['dc']['rrd_base_dir'],
+    :rrd_dc_dir   => node['opennms']['properties']['dc']['rrd_base_dir'],
+    :default      => node['opennms']['datacollection']['default'],
+    :mib2         => node['opennms']['datacollection']['default']['mib2'],
+    :threecom     => node['opennms']['datacollection']['default']['threecom'],
+    :acme         => node['opennms']['datacollection']['default']['acme'],
+    :akcp         => node['opennms']['datacollection']['default']['akcp'],
+    :alvarion     => node['opennms']['datacollection']['default']['alvarion'],
+    :apc          => node['opennms']['datacollection']['default']['apc'],
+    :ascend       => node['opennms']['datacollection']['default']['ascend'],
+    :asterisk     => node['opennms']['datacollection']['default']['asterisk'],
+    :bluecat      => node['opennms']['datacollection']['default']['bluecat'],
+    :bluecoat     => node['opennms']['datacollection']['default']['bluecoat'],
+    :brocade      => node['opennms']['datacollection']['default']['brocade'],
+    :checkpoint   => node['opennms']['datacollection']['default']['checkpoint'],
+    :cisco        => node['opennms']['datacollection']['default']['cisco'],
+    :clavister    => node['opennms']['datacollection']['default']['clavister'],
+    :colubris     => node['opennms']['datacollection']['default']['colubris'],
+    :concord      => node['opennms']['datacollection']['default']['concord'],
+    :cyclades     => node['opennms']['datacollection']['default']['cyclades'],
+    :dell         => node['opennms']['datacollection']['default']['dell'],
+    :ericsson     => node['opennms']['datacollection']['default']['ericsson'],
+    :equallogic   => node['opennms']['datacollection']['default']['equallogic'],
+    :extreme      => node['opennms']['datacollection']['default']['extreme'],
+    :f5           => node['opennms']['datacollection']['default']['f5'],
+    :fortinet     => node['opennms']['datacollection']['default']['fortinet'],
+    :force10      => node['opennms']['datacollection']['default']['force10'],
+    :foundry      => node['opennms']['datacollection']['default']['foundry'],
+    :hp           => node['opennms']['datacollection']['default']['hp'],
+    :hwg          => node['opennms']['datacollection']['default']['hwg'],
+    :ibm          => node['opennms']['datacollection']['default']['ibm'],
+    :ipunity      => node['opennms']['datacollection']['default']['ipunity'],
+    :juniper      => node['opennms']['datacollection']['default']['juniper'],
+    :kyocera      => node['opennms']['datacollection']['default']['kyocera'],
+    :lexmark      => node['opennms']['datacollection']['default']['lexmark'],
+    :liebert      => node['opennms']['datacollection']['default']['liebert'],
+    :makelsan     => node['opennms']['datacollection']['default']['makelsan'],
+    :mge          => node['opennms']['datacollection']['default']['mge'],
+    :microsoft    => node['opennms']['datacollection']['default']['microsoft'],
+    :microtik     => node['opennms']['datacollection']['default']['mikrotik'],
+    :netapp       => node['opennms']['datacollection']['default']['netapp'],
+    :netbotz      => node['opennms']['datacollection']['default']['netbotz'],
+    :netenforcer  => node['opennms']['datacollection']['default']['netenforcer'],
+    :netscalar    => node['opennms']['datacollection']['default']['netscaler'],
+    :netsnmp      => node['opennms']['datacollection']['default']['netsnmp'],
+    :nortel       => node['opennms']['datacollection']['default']['nortel'],
+    :novell       => node['opennms']['datacollection']['default']['novell'],
+    :pfsense      => node['opennms']['datacollection']['default']['pfsense'],
+    :powerware    => node['opennms']['datacollection']['default']['powerware'],
+    :postgres     => node['opennms']['datacollection']['default']['postgres'],
+    :riverbed     => node['opennms']['datacollection']['default']['riverbed'],
+    :savin        => node['opennms']['datacollection']['default']['savin'],
+    :servertech   => node['opennms']['datacollection']['default']['servertech'],
+    :sofaware     => node['opennms']['datacollection']['default']['sofaware'],
+    :sun          => node['opennms']['datacollection']['default']['sun'],
+    :trango       => node['opennms']['datacollection']['default']['trango'],
+    :wmi          => node['opennms']['datacollection']['default']['wmi'],
+    :xmp          => node['opennms']['datacollection']['default']['xmp'],
+    :zeus         => node['opennms']['datacollection']['default']['zeus'],
+    :vmware3      => node['opennms']['datacollection']['default']['vmware3'],
+    :vmware4      => node['opennms']['datacollection']['default']['vmware4'],
+    :vmware5      => node['opennms']['datacollection']['default']['vmware5'],
+    :vmwarecim    => node['opennms']['datacollection']['default']['vmwarecim'],
+    :ejn          => node['opennms']['datacollection']['ejn']
+  )
+end
+
+template "#{onms_home}/etc/discovery-configuration.xml" do
+  source "discovery-configuration.xml.erb"
+  mode 0644
+  owner "root"
+  group "root"
+  notifies :restart, "service[opennms]"
+  variables(
+    :threads          => node['opennms']['discovery']['threads'],
+    :pps              => node['opennms']['discovery']['pps'],
+    :init_sleep_ms    => node['opennms']['discovery']['init_sleep_ms'],
+    :restart_sleep_ms => node['opennms']['discovery']['restart_sleep_ms'],
+    :retries          => node['opennms']['discovery']['retries'],
+    :timeout          => node['opennms']['discovery']['timeout']
   )
 end
 
