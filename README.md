@@ -174,7 +174,8 @@ Note: the existance of this template does not imply that you should still be usi
 
 Example: change the timeout and retries for the ICMP scanner, do:
 
-```{
+```
+   {
      "opennms": {
        "capsd": {
          "icmp": {
