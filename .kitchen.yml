@@ -1,0 +1,40 @@
+---
+driver:
+  name: vagrant
+  box: openstack-devops
+  provider: openstack
+
+provisioner:
+  name: chef_solo
+
+platforms:
+  - name: centos-6.4
+
+suites:
+  - name: default
+    run_list:
+      - recipe[java]
+      - recipe[postgresql::server]
+      - recipe[postgresql::config_initdb]
+      - recipe[postgresql::config_pgtune]
+      #- recipe[postgresql::contrib]
+      - recipe[opennms::default]
+    attributes: { 
+                 "java": { 
+                          "oracle": { 
+                                      "accept_oracle_download_terms": "true"
+                                    }, 
+                          "install_flavor": "oracle", 
+                          "jdk":    { 
+                                     "7": { 
+                                           "x86_64": { 
+                                                      "checksum": "f2eae4d81c69dfa79d02466d1cb34db2b628815731ffc36e9b98f96f46f94b1a", 
+                                                      "url": "http://download.oracle.com/otn-pub/java/jdk/7u45-b18/jdk-7u45-linux-x64.tar.gz"
+                                                     }
+                                          }
+                                    }, 
+                          "jdk_version": 7 
+                         }, 
+                  "opennms": {
+                              "conf": {"start_timeout": 20}},  postgresql: {password: {postgres: "md5c23797e9a303da48b792b4339c426700"}, config: {autovacuum: "on", checkpoint_timeout: "15min", shared_preload_libraries: "pg_stat_statements", track_activities: "on", track_counts: "on", vacuum_cost_delay: 50}, pg_hba: [{addr: "", db: "all", method: "trust", type: "local", user: "all"}, {addr: "127.0.0.1/32", db: "all", method: "trust", type: "host", user: "all"},{addr: "::1/128", db: "all", method: "trust", type: "host", user: "all"}], server: {packages: ["postgresql-server","postgresql-contrib"]}}}
+    # contrib: {extensions: ["pageinspect", "pg_buffercache","pg_freespacemap","pgrowlocks","pg_stat_statements","pgstattuple"]}
