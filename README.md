@@ -131,7 +131,8 @@ There are also a couple OpenNMS attributes you'll probably want to override at a
 
 ### opennms.conf
 
-```{
+```
+   {
      "opennms": {
        "conf":{
          "start_timeout": 20,
