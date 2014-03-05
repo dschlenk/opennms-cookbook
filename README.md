@@ -438,16 +438,18 @@ You can set `node['opennms']['modem']` to one of the predefined modems (mac2412,
 
 #### etc/notifd-configuration.xml
 
-Is ignorance about your broken network in fact bliss?  Shut off notifd by setting `node['notifd']['status']` to "off" and find out. Don't know what `match-all` even means? Find out by setting `node['opennms']['notifd']['match_all']` to false. (It controls whether only the first matching notification is used or not). You can also disable any of the default auto-acknowledge elements with `node'notifd']['auto_ack']['service_unresponsive|service_lost|interface_down|widespread_outage']`.
+Is ignorance about your broken network in fact bliss?  Shut off notifd by setting `node['notifd']['status']` to "off" and find out. Don't know what `match-all` even means? Find out by setting `node['opennms']['notifd']['match_all']` to false. (It controls whether only the first matching notification is used or not). You can also disable any of the default auto-acknowledge elements with `node['notifd']['auto_ack']['service_unresponsive|service_lost|interface_down|widespread_outage']`.
 
 #### etc/notificationCommands.xml
 
 Turn off one of the default notification commands by setting one of the attributes in `node['opennms']['notification_commands']` to false:
 * java_pager_email
+* java_email
 * xmpp_message
 * xmpp_group_message
 * irc_cat
 * call_work_phone
+* call_mobile_phone
 * call_home_phone
 * microblog_update
 * microblog_reply
@@ -464,7 +466,9 @@ These attributes:
 * text_message
 * subject
 * numeric_message
+
 can be overridden to alter any of these default notifications:
+
 * interface_down
 * node_down
 * node_lost_service
@@ -472,6 +476,7 @@ can be overridden to alter any of these default notifications:
 * interface_deleted
 * high_threshold
 * low_threshold
+
 in `node['opennms']['notifications']`. Stay tuned for a notification LWRP.
 
 #### etc/nsclient-datacollection-config.xml
@@ -543,7 +548,7 @@ Two attributes are available for your availability report running pleasure:
 But they aren't very helpful until you add some reports. A LWRP for that is planned.
 
 #### etc/response-graph.properties
-Change the image format from the default `png` to `gif` or `jpg` (if using jrobin or you like broken images) with `node['response_graph']['image_format']`. Font sizes can also be changed with `node['response_graph']['default_font_size']` and `node['response_graph']['title_font_size']` (defaults are 7 and 10 respectively). Setting these attributes to false remotes them from the file:
+Change the image format from the default `png` to `gif` or `jpg` (if using jrobin or you like broken images) with `node['response_graph']['image_format']`. Font sizes can also be changed with `node['response_graph']['default_font_size']` and `node['response_graph']['title_font_size']` (defaults are 7 and 10 respectively). Setting these attributes to false removes them from the file:
 
 * icmp
 * avail
@@ -646,9 +651,6 @@ Populate `node['opennms']['sms_phonebook']['entries']` with `{ "hostname": "+PHO
 Similar to other *-graph.properties files, you can change the image format used in adhoc graphs by setting the attribute `node['opennms']['snmp_adhoc_graph']['image_format']` to `gif` or `jpg` rather than the default `png`. Note that the intersection of formats supported by both jrobin and rrdtool is `png`, though.
 
 #### etc/snmp-graph.properties & snmp-graph.properties.d/*
-
-snmp-graph.properties & snmp-graph.properties.d/*
--------------------------------------------------
 
 Similar to other *-graph.properties files, you can change the image format used in predefined graphs by setting the attribute `node['opennms']['snmp_adhoc_graph']['image_format']` t
 o `gif` or `jpg` rather than the default `png`. Note that the intersection of formats supported by both jrobin and rrdtool is `png`, though.
