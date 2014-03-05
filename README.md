@@ -413,6 +413,263 @@ Do you love maps but are a contrarian when it comes to color schemes? Have we go
 
 Join twitter and tell the public about your broken network! Set `node['opennms']['microblog']['default_profile']['name']` to `twitter` or `identica` and then set `['opennms']['microblog']['default_profile']['authen_username']` and `['opennms']['microblog']['default_profile']['authen_password']` to use those services, or use a different service by setting `node['opennms']['microblog']['default_profile']['service_url']` as well (assuming OpenNMS supports it). This only sets up the profile. You'll still need to define a destination path and set events and alarms to use it the normal way as described at http://www.opennms.org/wiki/Microblog_Notifications until the notification and destination path LWRPs are written.
 
+#### etc/model-importer.properties
+
+I couldn't figure out if this file is still used and/or necessary, but anyway the same attributes are used here and in provisiond-configuration.xml, so go check that one out.
+
+#### etc/modemConfig.properties
+
+You can set `node['opennms']['modem']` to one of the predefined modems (mac2412, mac2414, macFA22, macFA24, macFA42, macFA44, acm0, acm1, acm2, acm3, acm4, acm5) or set `node['opennms']['custom_modem']` to something like :
+```
+{
+  "opennms":
+  {
+    "custom_modem":
+    {
+      "name": "foobar",
+      "port": "/dev/ttyFoobar",
+      "model": "foobar37",
+      "manufacturer": "Foo Bar"
+      "baudrate": 57600
+    }
+  }
+}
+```
+
+#### etc/notifd-configuration.xml
+
+Is ignorance about your broken network in fact bliss?  Shut off notifd by setting `node['notifd']['status']` to "off" and find out. Don't know what `match-all` even means? Find out by setting `node['opennms']['notifd']['match_all']` to false. (It controls whether only the first matching notification is used or not). You can also disable any of the default auto-acknowledge elements with `node'notifd']['auto_ack']['service_unresponsive|service_lost|interface_down|widespread_outage']`.
+
+#### etc/notificationCommands.xml
+
+Turn off one of the default notification commands by setting one of the attributes in `node['opennms']['notification_commands']` to false:
+* java_pager_email
+* xmpp_message
+* xmpp_group_message
+* irc_cat
+* call_work_phone
+* call_home_phone
+* microblog_update
+* microblog_reply
+* microblog_dm
+
+#### etc/notifications.xml
+
+These attributes:
+* enabled
+* status
+* rule
+* destination_path
+* description
+* text_message
+* subject
+* numeric_message
+can be overridden to alter any of these default notifications:
+* interface_down
+* node_down
+* node_lost_service
+* node_added
+* interface_deleted
+* high_threshold
+* low_threshold
+in `node['opennms']['notifications']`. Stay tuned for a notification LWRP.
+
+#### etc/nsclient-datacollection-config.xml
+
+TODO: finish this template
+Similar to other datacollection-config.xml files, you can change the RRD repository, step, RRA definitions and disable default collections.
+#### etc/poller-configuration.xml
+
+Disable packages, change IPv4 and IPv6 include ranges and RRD settings, remove or disable services or change their polling interval, retry, timeout or another service parameter. Like collectd and capsd, the possibilities here are pretty extensive so check out the default attributes and template for more info.
+#### etc/provisiond-configuration.xml
+
+Same as model-importer.properties.
+```
+default['opennms']['importer']['import_url']         = "file:/path/to/dump.xml"
+default['opennms']['importer']['schedule']           = "0 0 0 1 1 ? 2023"
+default['opennms']['importer']['threads']            = 8
+default['opennms']['importer']['scan_threads']       = 10
+default['opennms']['importer']['rescan_threads']     = 10
+default['opennms']['importer']['write_threads']      = 8
+default['opennms']['importer']['requisition_dir']    = "#{default['opennms']['conf']['home']}/etc/imports"
+default['opennms']['importer']['foreign_source_dir'] = "#{default['opennms']['conf']['home']}/etc/foreign-sources"
+```
+
+#### etc/remedy.properties
+
+Do you use the Remedy integration but aren't the Italian that checked their Remedy config into git? Change all of these attributes then:
+
+```
+default['opennms']['remedy']['username']
+default['opennms']['remedy']['password']
+default['opennms']['remedy']['authentication']
+default['opennms']['remedy']['locale']
+default['opennms']['remedy']['timezone']
+default['opennms']['remedy']['endpoint']
+default['opennms']['remedy']['portname']
+default['opennms']['remedy']['createendpoint']
+default['opennms']['remedy']['createportname']
+default['opennms']['remedy']['targetgroups']
+default['opennms']['remedy']['assignedgroups']
+default['opennms']['remedy']['assignedsupportcompanies']
+default['opennms']['remedy']['assignedsupportorganizations']
+default['opennms']['remedy']['assignedgroup']
+default['opennms']['remedy']['firstname']
+default['opennms']['remedy']['lastname']
+default['opennms']['remedy']['serviceCI']
+default['opennms']['remedy']['serviceCIReconID']
+default['opennms']['remedy']['assignedsupportcompany']
+default['opennms']['remedy']['assignedsupportorganization']
+default['opennms']['remedy']['categorizationtier1']
+default['opennms']['remedy']['categorizationtier2']
+default['opennms']['remedy']['categorizationtier3']
+default['opennms']['remedy']['service_type']
+default['opennms']['remedy']['reported_source']
+default['opennms']['remedy']['impact']
+default['opennms']['remedy']['urgency']
+default['opennms']['remedy']['reason_reopen']
+default['opennms']['remedy']['resolution']
+default['opennms']['remedy']['reason_resolved']
+default['opennms']['remedy']['reason_cancelled']
+```
+
+#### etc/reportd-configuration.xml
+
+Two attributes are available for your availability report running pleasure:
+
+* storage_location
+* persist_reports
+
+But they aren't very helpful until you add some reports. A LWRP for that is planned.
+
+#### etc/response-graph.properties
+Change the image format from the default `png` to `gif` or `jpg` (if using jrobin or you like broken images) with `node['response_graph']['image_format']`. Font sizes can also be changed with `node['response_graph']['default_font_size']` and `node['response_graph']['title_font_size']` (defaults are 7 and 10 respectively). Setting these attributes to false remotes them from the file:
+
+* icmp
+* avail
+* dhcp
+* dns
+* http
+* http_8080
+* http_8000
+* mail
+* pop3
+* radius
+* smtp
+* ssh
+* jboss
+* snmp
+* ldap
+* strafeping
+* memcached_bytes
+* memcached_bytesrw
+* memcached_uptime
+* memcached_rusage
+* memcached_items
+* memcached_conns
+* memcached_tconns (off by default)
+* memcached_cmds
+* memcached_gets
+* memcached_evictions
+* memcached_threads
+* memcached_struct
+* ciscoping_time
+
+If you changed the count of pings in the strafer polling package to a value higher than 20, you'll also need to define additional colors for the strafeping graph, like `default['opennms']['response_graph']['strafeping_colors'][21] = ["#f5f5f5"]`. If you want to add a STACK to the graph for another ping number (defaults to 1-4,10,19) add a second color to that attribute's value array, like `default['opennms']['response_graph']['strafeping_colors'][21] = ["#f5f5f5","#050505"]`. TODO: Fix the STACK ranges. 
+
+#### etc/rrd-configuration.properties
+
+Tobi enthusiasts will want to set some attributes in `node['opennms']['rrd']` to switch from jrobin to rrdtool:
+```
+{
+  "opennms":
+  {
+    "rrd":
+    {
+      "strategy_class": "org.opennms.netmgt.rrd.rrdtool.JniRrdStrategy",
+      "interface_jar":  "/usr/share/java/jrrd.jar",
+      "jrrd":           "/usr/lib/libjrrd.so"
+    }
+  }
+}
+```
+TODO: automatically install the appropriate JNI stuff for the target architecture/platform.
+
+You can also change a multitude of queue settings or change the jrobin backend factory, but unless you know what you're doing that's probably a mistake. Look at the template for details if you're curious.
+
+Finally, to turn on the Google protobuf export thing described at http://www.opennms.org/wiki/Performance_Data_TCP_Export, set these attributes accordingly:
+
+```
+default['opennms']['rrd']['usetcp']      = true
+default['opennms']['rrd']['tcp']['host'] = 10.0.0.1
+default['opennms']['rrd']['tcp']['port'] = 9100     # Hope that's a JetDirect compatible network interface!
+```
+
+#### etc/rtc-configuration.xml
+
+Like other factory configuration files, you can change some settings with attributes:
+
+```
+default['opennms']['rtc']['updaters']                      = 10
+default['opennms']['rtc']['senders']                       = 5
+default['opennms']['rtc']['rolling_window']                = "24h"
+default['opennms']['rtc']['max_events_before_resend']      = 100
+default['opennms']['rtc']['low_threshold_interval']        = "20s"
+default['opennms']['rtc']['high_threshold_interval']       = "45s"
+default['opennms']['rtc']['user_refresh_interval']         = "2m"
+default['opennms']['rtc']['errors_before_url_unsubscribe'] = 5
+```
+
+#### etc/site-status-views.xml
+
+Do you actually populate the building column in assets or site field in provisioning reqs? Change the default site status view name and/or it's definition with these attributes: `node['opennms']['site_status_views']['default_view']['name']` and `node['opennms']['site_status_views']['default_view']['rows']` where `rows` is an array of single element hashes (to maintain order) like:
+```
+[
+  {
+    "Routers": "Routers"
+  },
+  {
+    "Switches": "Switches"
+  },
+  {
+    "Servers": "Servers"
+  }
+]
+```
+
+#### etc/smsPhonebook.properties
+
+Populate `node['opennms']['sms_phonebook']['entries']` with `{ "hostname": "+PHONE_NUMBER" }` keypairs to define an IP address' phone number for the mobile sequence monitor (http://www.opennms.org/wiki/Mobile_Sequence_Monitor). A pending LWRP will provide the ability to add the required mobile-sequence elements to make this useful.
+
+#### etc/snmp-adhoc-graph.properties
+
+Similar to other *-graph.properties files, you can change the image format used in adhoc graphs by setting the attribute `node['opennms']['snmp_adhoc_graph']['image_format']` to `gif` or `jpg` rather than the default `png`. Note that the intersection of formats supported by both jrobin and rrdtool is `png`, though.
+
+#### etc/snmp-graph.properties & snmp-graph.properties.d/*
+
+snmp-graph.properties & snmp-graph.properties.d/*
+-------------------------------------------------
+
+Similar to other *-graph.properties files, you can change the image format used in predefined graphs by setting the attribute `node['opennms']['snmp_adhoc_graph']['image_format']` t
+o `gif` or `jpg` rather than the default `png`. Note that the intersection of formats supported by both jrobin and rrdtool is `png`, though.
+You can also set the default and title font sizes like you can in the response graphs. Since these graphs are now split up by manufacturer, you can disable graphs for a manufacturer like you can in snmp-datacollection-config.xml. This example disables Dell graphs:
+
+```
+{
+  "opennms":
+  {
+    "snmp_graph":
+    {
+      "dell_openmanage": false,
+      "dell_rac": false
+    }
+  }
+}
+```
+
+Note that this doesn't delete that file, it merely comments out the `reports=...` line(s) in the file.
+
+You can also change the default KSC graph by setting `node['snmp_graph']['default_ksc_graph']` to the name of a valid graph.
 
 License
 =======

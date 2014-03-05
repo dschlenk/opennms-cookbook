@@ -722,6 +722,1190 @@ template "#{onms_home}/etc/microblog-configuration.xml" do
   )
 end
 
+template "#{onms_home}/etc/model-importer.properties" do
+  source "model-importer.properties.erb"
+  mode 00664
+  owner "root"
+  group "root"
+  notifies :restart, "service[opennms]"
+  variables(
+    :import_url => node[:opennms][:importer][:import_url],
+    :schedule => node[:opennms][:importer][:schedule],
+    :threads => node[:opennms][:importer][:threads],
+    :scan_threads => node[:opennms][:importer][:scan_threads],
+    :write_threads => node[:opennms][:importer][:write_threads],
+    :requisition_dir => node[:opennms][:importer][:requisition_dir],
+    :foreign_source_dir => node[:opennms][:importer][:foreign_source_dir]
+  )
+end
+
+template "#{onms_home}/etc/modemConfig.properties" do
+  source "modemConfig.properties.erb"
+  mode 00664
+  owner "root"
+  group "root"
+  notifies :restart, "service[opennms]"
+  variables(
+    :modem => node[:opennms][:modem],
+    :custom_modem => node[:opennms][:custom_modem]
+  )
+end
+
+template "#{onms_home}/etc/notifd-configuration.xml" do
+  source "notifd-configuration.xml.erb"
+  mode 00664
+  owner "root"
+  group "root"
+  notifies :restart, "service[opennms]"
+  variables(
+    :status    => node[:opennms][:notifd][:status],
+    :match_all => node[:opennms][:notifd][:match_all],
+    :auto_ack  => node[:opennms][:notifd][:auto_ack],
+    :queue     => node[:opennms][:notifd][:queue]
+  )
+end
+
+template "#{onms_home}/etc/notificationCommands.xml" do
+  source "notificationCommands.xml.erb"
+  mode 00664
+  owner "root"
+  group "root"
+  notifies :restart, "service[opennms]"
+  variables(
+    :java_pager_email   => node['opennms']['notification_commands']['java_pager_email'],
+    :java_email         => node['opennms']['notification_commands']['java_email'],
+    :text_page          => node['opennms']['notification_commands']['text_page'],
+    :numeric_page       => node['opennms']['notification_commands']['numeric_page'],
+    :xmpp_message       => node['opennms']['notification_commands']['xmpp_message'],
+    :xmpp_group_message => node['opennms']['notification_commands']['xmpp_group_message'],
+    :irc_cat            => node['opennms']['notification_commands']['irc_cat'],
+    :call_work_phone    => node['opennms']['notification_commands']['call_work_phone'],
+    :call_mobile_phone  => node['opennms']['notification_commands']['call_mobile_phone'],
+    :call_home_phone    => node['opennms']['notification_commands']['call_home_phone'],
+    :microblog_update   => node['opennms']['notification_commands']['microblog_update'],
+    :microblog_reply    => node['opennms']['notification_commands']['microblog_reply'],
+    :microblog_dm       => node['opennms']['notification_commands']['microblog_dm']
+  )
+end
+
+template "#{onms_home}/etc/notifications.xml" do
+  source "notifications.xml.erb"
+  mode 00664
+  owner "root"
+  group "root"
+  notifies :restart, "service[opennms]"
+  variables(
+    :interface_down         => node[:opennms][:notifications][:interface_down],
+    :node_down              => node[:opennms][:notifications][:node_down],
+    :node_lost_service      => node[:opennms][:notifications][:node_lost_service],
+    :node_added             => node[:opennms][:notifications][:node_added],
+    :interface_deleted      => node[:opennms][:notifications][:interface_deleted],
+    :high_threshold         => node[:opennms][:notifications][:high_threshold],
+    :low_threshold          => node[:opennms][:notifications][:low_threshold],
+    :low_threshold_rearmed  => node[:opennms][:notifications][:low_threshold_rearmed],
+    :high_threshold_rearmed => node[:opennms][:notifications][:high_threshold_rearmed]
+  )
+end
+
+template "#{onms_home}/etc/poller-configuration.xml" do
+  source "poller-configuration.xml.erb"
+  mode 0664
+  owner "root"
+  group "root"
+  notifies :restart, "service[opennms]"
+  variables(
+    :threads                        => node[:opennms][:poller][:threads],
+    :service_unresponsive_enabled   => node[:opennms][:poller][:service_unresponsive_enabled],
+    :node_outage                    => node[:opennms][:poller][:node_outage],
+    :example1                       => node[:opennms][:poller][:example1],
+    :icmp                           => node[:opennms][:poller][:example1][:icmp],
+    :dns                            => node[:opennms][:poller][:example1][:dns],
+    :smtp                           => node[:opennms][:poller][:example1][:smtp],
+    :ftp                            => node[:opennms][:poller][:example1][:ftp],
+    :snmp                           => node[:opennms][:poller][:example1][:snmp],
+    :http                           => node[:opennms][:poller][:example1][:http],
+    :http_8080                      => node[:opennms][:poller][:example1][:http_8080],
+    :http_8000                      => node[:opennms][:poller][:example1][:http_8000],
+    :https                          => node[:opennms][:poller][:example1][:https],
+    :hyperic_agent                  => node[:opennms][:poller][:example1][:hyperic_agent],
+    :hyperichq                      => node[:opennms][:poller][:example1][:hyperichq],
+    :mysql                          => node[:opennms][:poller][:example1][:mysql],
+    :sqlserver                      => node[:opennms][:poller][:example1][:sqlserver],
+    :oracle                         => node[:opennms][:poller][:example1][:oracle],
+    :postgres                       => node[:opennms][:poller][:example1][:postgres],
+    :ssh                            => node[:opennms][:poller][:example1][:ssh],
+    :imap                           => node[:opennms][:poller][:example1][:imap],
+    :pop3                           => node[:opennms][:poller][:example1][:pop3],
+    :nrpe                           => node[:opennms][:poller][:example1][:nrpe],
+    :nrpe_nossl                     => node[:opennms][:poller][:example1][:nrpe_nossl],
+    :win_task_sched                 => node[:opennms][:poller][:example1][:win_task_sched],
+    :opennms_jvm                    => node[:opennms][:poller][:example1][:opennms_jvm],
+    :vmware_host                    => node[:opennms][:poller][:example1][:vmware_host],
+    :vmware_entity                  => node[:opennms][:poller][:example1][:vmware_entity],
+    :strafer                        => node[:opennms][:poller][:strafer],
+    :strafeping                     => node[:opennms][:poller][:strafer][:strafeping]
+  )
+end
+
+template "#{onms_home}/etc/provisiond-configuration.xml" do
+  source "provisiond-configuration.xml.erb"
+  mode 0664
+  owner "root"
+  group "root"
+  notifies :restart, "service[opennms]"
+  variables(
+    :foreign_source_dir => node[:opennms][:importer][:foreign_source_dir],
+    :requisition_dir    => node[:opennms][:importer][:requisition_dir],
+    :import_threads     => node[:opennms][:importer][:threads],
+    :scan_threads       => node[:opennms][:importer][:scan_threads],
+    :rescan_threads     => node[:opennms][:importer][:rescan_threads],
+    :write_threads      => node[:opennms][:importer][:write_threads]
+  )
+end
+
+template "#{onms_home}/etc/remedy.properties" do
+  source "remedy.properties.erb"
+  mode 0664
+  owner "root"
+  group "root"
+  notifies :restart, "service[opennms]"
+  variables(
+    :username                     => node[:opennms][:remedy][:username],
+    :password                     => node[:opennms][:remedy][:password],
+    :authentication               => node[:opennms][:remedy][:authentication],
+    :locale                       => node[:opennms][:remedy][:locale],
+    :timezone                     => node[:opennms][:remedy][:timezone],
+    :endpoint                     => node[:opennms][:remedy][:endpoint],
+    :portname                     => node[:opennms][:remedy][:portname],
+    :createendpoint               => node[:opennms][:remedy][:createendpoint],
+    :createportname               => node[:opennms][:remedy][:createportname],
+    :targetgroups                 => node[:opennms][:remedy][:targetgroups],
+    :assignedgroups               => node[:opennms][:remedy][:assignedgroups],
+    :assignedsupportcompanies     => node[:opennms][:remedy][:assignedsupportcompanies],
+    :assignedsupportorganizations => node[:opennms][:remedy][:assignedsupportorganizations],
+    :assignedgroup                => node[:opennms][:remedy][:assignedgroup],
+    :firstname                    => node[:opennms][:remedy][:firstname],
+    :lastname                     => node[:opennms][:remedy][:lastname],
+    :serviceCI                    => node[:opennms][:remedy][:serviceCI],
+    :serviceCIReconID             => node[:opennms][:remedy][:serviceCIReconID],
+    :assignedsupportcompany       => node[:opennms][:remedy][:assignedsupportcompany],
+    :assignedsupportorganization  => node[:opennms][:remedy][:assignedsupportorganization],
+    :categorizationtier1          => node[:opennms][:remedy][:categorizationtier1],
+    :categorizationtier2          => node[:opennms][:remedy][:categorizationtier2],
+    :categorizationtier3          => node[:opennms][:remedy][:categorizationtier3],
+    :service_type                 => node[:opennms][:remedy][:service_type],
+    :reported_source              => node[:opennms][:remedy][:reported_source],
+    :impact                       => node[:opennms][:remedy][:impact],
+    :urgency                      => node[:opennms][:remedy][:urgency],
+    :reason_reopen                => node[:opennms][:remedy][:reason_reopen],
+    :resolution                   => node[:opennms][:remedy][:resolution],
+    :reason_resolved              => node[:opennms][:remedy][:reason_resolved],
+    :reason_cancelled             => node[:opennms][:remedy][:reason_cancelled]
+  )
+end
+
+template "#{onms_home}/etc/reportd-configuration.xml" do
+  source "reportd-configuration.xml.erb"
+  mode 0664
+  owner "root"
+  group "root"
+  notifies :restart, "service[opennms]"
+  variables(
+    :storage_location => node[:opennms][:reportd][:storage_location],
+    :persist_reports  => node[:opennms][:reportd][:persist_reports]
+  )
+end
+
+template "#{onms_home}/etc/response-graph.properties" do
+  source "response-graph.properties.erb"
+  mode 0664
+  owner "root"
+  group "root"
+  notifies :restart, "service[opennms]"
+  variables(
+    :image_format        => node[:opennms][:response_graph][:image_format],
+    :default_font_size   => node[:opennms][:response_graph][:default_font_size],
+    :title_font_size     => node[:opennms][:response_graph][:title_font_size],
+    :title_font_size     => node[:opennms][:response_graph][:title_font_size],
+    :icmp                => node[:opennms][:response_graph][:icmp],
+    :avail               => node[:opennms][:response_graph][:avail],
+    :dhcp                => node[:opennms][:response_graph][:dhcp],
+    :dns                 => node[:opennms][:response_graph][:dns],
+    :http                => node[:opennms][:response_graph][:http],
+    :http_8080           => node[:opennms][:response_graph][:http_8080],
+    :http_8000           => node[:opennms][:response_graph][:http_8000],
+    :mail                => node[:opennms][:response_graph][:mail],
+    :pop3                => node[:opennms][:response_graph][:pop3],
+    :radius              => node[:opennms][:response_graph][:radius],
+    :smtp                => node[:opennms][:response_graph][:smtp],
+    :ssh                 => node[:opennms][:response_graph][:ssh],
+    :jboss               => node[:opennms][:response_graph][:jboss],
+    :snmp                => node[:opennms][:response_graph][:snmp],
+    :ldap                => node[:opennms][:response_graph][:ldap],
+    :strafeping          => node[:opennms][:response_graph][:strafeping],
+    :strafeping_count    => node[:opennms][:poller][:strafer][:strafeping][:ping_count],
+    :strafeping_colors   => node[:opennms][:response_graph][:strafeping_colors],
+    :memcached_bytes     => node[:opennms][:response_graph][:memcached_bytes],
+    :memcached_bytesrw   => node[:opennms][:response_graph][:memcached_bytesrw],
+    :memcached_uptime    => node[:opennms][:response_graph][:memcached_uptime],
+    :memcached_rusage    => node[:opennms][:response_graph][:memcached_rusage],
+    :memcached_items     => node[:opennms][:response_graph][:memcached_items],
+    :memcached_conns     => node[:opennms][:response_graph][:memcached_conns],
+    :memcached_tconns    => node[:opennms][:response_graph][:memcached_tconns],
+    :memcached_cmds      => node[:opennms][:response_graph][:memcached_cmds],
+    :memcached_gets      => node[:opennms][:response_graph][:memcached_gets],
+    :memcached_evictions => node[:opennms][:response_graph][:memcached_evictions],
+    :memcached_threads   => node[:opennms][:response_graph][:memcached_threads],
+    :memcached_struct    => node[:opennms][:response_graph][:memcached_struct],
+    :ciscoping_time      => node[:opennms][:response_graph][:ciscoping_time]
+  )
+end
+
+template "#{onms_home}/etc/rrd-configuration.properties" do
+  source "rrd-configuration.properties.erb"
+  mode 0664
+  owner "root"
+  group "root"
+  notifies :restart, "service[opennms]"
+  variables(
+    :strategy_class  => node[:opennms][:rrd][:strategy_class],
+    :interface_jar   => node[:opennms][:rrd][:interface_jar],
+    :jrrd            => node[:opennms][:rrd][:jrrd],
+    :file_extension  => node[:opennms][:rrd][:file_extension],
+    :queue           => node[:opennms][:rrd][:queue],
+    :jrobin          => node[:opennms][:rrd][:jrobin],
+    :usetcp          => node[:opennms][:rrd][:usetcp],
+    :tcp             => node[:opennms][:rrd][:tcp]
+  )
+end
+
+template "#{onms_home}/etc/rtc-configuration.xml" do
+  source "rtc-configuration.xml.erb"
+  mode 0664
+  owner "root"
+  group "root"
+  notifies :restart, "service[opennms]"
+  variables(
+    :updaters                      => node[:opennms][:rtc][:updaters],
+    :senders                       => node[:opennms][:rtc][:senders],
+    :rolling_window                => node[:opennms][:rtc][:rolling_window],
+    :max_events_before_resend      => node[:opennms][:rtc][:max_events_before_resend],
+    :low_threshold_interval        => node[:opennms][:rtc][:low_threshold_interval],
+    :high_threshold_interval       => node[:opennms][:rtc][:high_threshold_interval],
+    :user_refresh_interval         => node[:opennms][:rtc][:user_refresh_interval],
+    :errors_before_url_unsubscribe => node[:opennms][:rtc][:errors_before_url_unsubscribe]
+  )
+end
+
+template "#{onms_home}/etc/site-status-views.xml" do
+  source "site-status-views.xml.erb"
+  mode 0664
+  owner "root"
+  group "root"
+  notifies :restart, "service[opennms]"
+  variables(
+    :default_view => node[:opennms][:site_status_views][:default_view]
+  )
+end
+
+template "#{onms_home}/etc/smsPhonebook.properties" do
+  source "smsPhonebook.properties.erb"
+  mode 0664
+  owner "root"
+  group "root"
+  notifies :restart, "service[opennms]"
+  variables(
+    :entries => node[:opennms][:sms_phonebook][:entries]
+  )
+end
+
+template "#{onms_home}/etc/snmp-adhoc-graph.properties" do
+  source "snmp-adhoc-graph.properties.erb"
+  mode 0664
+  owner "root"
+  group "root"
+  notifies :restart, "service[opennms]"
+  variables(
+    :image_format => node[:opennms][:snmp_adhoc_graph][:image_format]
+  )
+end
+
+template "#{onms_home}/etc/snmp-graph.properties" do
+  source "snmp-graph.properties.erb"
+  mode 0664
+  owner "root"
+  group "root"
+  notifies :restart, "service[opennms]"
+  variables(
+    :image_format        => node[:opennms][:snmp_graph][:image_format],
+    :default_font_size   => node[:opennms][:snmp_graph][:default_font_size],
+    :title_font_size     => node[:opennms][:snmp_graph][:title_font_size],
+    :default_ksc_graph   => node[:opennms][:snmp_graph][:default_ksc_graph],
+    :include_dir         => node[:opennms][:snmp_graph][:include_dir],
+    :include_rescan      => node[:opennms][:snmp_graph][:include_rescan],
+    :onms_queued_updates => node[:opennms][:snmp_graph][:onms_queued_updates],
+    :onms_queued_pending => node[:opennms][:snmp_graph][:onms_queued_pending]
+  )
+end
+
+template "#{onms_home}/etc/snmp-graph.properties.d/3gpp.properties" do
+  source "snmp-graph.properties.d/3gpp.properties.erb"
+  mode 0664
+  owner "root"
+  group "root"
+  notifies :restart, "service[opennms]"
+  variables(
+    :enabled => node[:opennms][:snmp_graph][:threegpp]
+  )
+end
+
+template "#{onms_home}/etc/snmp-graph.properties.d/acmepacket-graph.properties" do
+  source "snmp-graph.properties.d/acmepacket-graph.properties.erb"
+  mode 0664
+  owner "root"
+  group "root"
+  notifies :restart, "service[opennms]"
+  variables(
+    :enabled => node[:opennms][:snmp_graph][:acmepacket]
+  )
+end
+
+template "#{onms_home}/etc/snmp-graph.properties.d/adonis-graph.properties" do
+  source "snmp-graph.properties.d/adonis-graph.properties.erb"
+  mode 0664
+  owner "root"
+  group "root"
+  notifies :restart, "service[opennms]"
+  variables(
+    :enabled => node[:opennms][:snmp_graph][:adonis]
+  )
+end
+
+template "#{onms_home}/etc/snmp-graph.properties.d/adsl-graph.properties" do
+  source "snmp-graph.properties.d/adsl-graph.properties.erb"
+  mode 0664
+  owner "root"
+  group "root"
+  notifies :restart, "service[opennms]"
+  variables(
+    :enabled => node[:opennms][:snmp_graph][:adsl]
+  )
+end
+
+template "#{onms_home}/etc/snmp-graph.properties.d/airport-graph.properties" do
+  source "snmp-graph.properties.d/airport-graph.properties.erb"
+  mode 0664
+  owner "root"
+  group "root"
+  notifies :restart, "service[opennms]"
+  variables(
+    :enabled => node[:opennms][:snmp_graph][:airport]
+  )
+end
+
+template "#{onms_home}/etc/snmp-graph.properties.d/aix-graph.properties" do
+  source "snmp-graph.properties.d/aix-graph.properties.erb"
+  mode 0664
+  owner "root"
+  group "root"
+  notifies :restart, "service[opennms]"
+  variables(
+    :enabled => node[:opennms][:snmp_graph][:aix]
+  )
+end
+
+template "#{onms_home}/etc/snmp-graph.properties.d/akcp-graph.properties" do
+  source "snmp-graph.properties.d/akcp-graph.properties.erb"
+  mode 0664
+  owner "root"
+  group "root"
+  notifies :restart, "service[opennms]"
+  variables(
+    :enabled => node[:opennms][:snmp_graph][:akcp]
+  )
+end
+
+template "#{onms_home}/etc/snmp-graph.properties.d/alvarion-graph.properties" do
+  source "snmp-graph.properties.d/alvarion-graph.properties.erb"
+  mode 0664
+  owner "root"
+  group "root"
+  notifies :restart, "service[opennms]"
+  variables(
+    :enabled => node[:opennms][:snmp_graph][:alvarion]
+  )
+end
+
+template "#{onms_home}/etc/snmp-graph.properties.d/apc-graph.properties" do
+  source "snmp-graph.properties.d/apc-graph.properties.erb"
+  mode 0664
+  owner "root"
+  group "root"
+  notifies :restart, "service[opennms]"
+  variables(
+    :enabled => node[:opennms][:snmp_graph][:apc]
+  )
+end
+
+template "#{onms_home}/etc/snmp-graph.properties.d/ascend-graph.properties" do
+  source "snmp-graph.properties.d/ascend-graph.properties.erb"
+  mode 0664
+  owner "root"
+  group "root"
+  notifies :restart, "service[opennms]"
+  variables(
+    :enabled => node[:opennms][:snmp_graph][:ascend]
+  )
+end
+
+template "#{onms_home}/etc/snmp-graph.properties.d/asterisk-graph.properties" do
+  source "snmp-graph.properties.d/asterisk-graph.properties.erb"
+  mode 0664
+  owner "root"
+  group "root"
+  notifies :restart, "service[opennms]"
+  variables(
+    :enabled => node[:opennms][:snmp_graph][:asterisk]
+  )
+end
+
+template "#{onms_home}/etc/snmp-graph.properties.d/bgp-ietf-graph.properties" do
+  source "snmp-graph.properties.d/bgp-ietf-graph.properties.erb"
+  mode 0664
+  owner "root"
+  group "root"
+  notifies :restart, "service[opennms]"
+  variables(
+    :enabled => node[:opennms][:snmp_graph][:bgp_ietf]
+  )
+end
+
+template "#{onms_home}/etc/snmp-graph.properties.d/bluecoat-sgproxy-graph.properties" do
+  source "snmp-graph.properties.d/bluecoat-sgproxy-graph.properties.erb"
+  mode 0664
+  owner "root"
+  group "root"
+  notifies :restart, "service[opennms]"
+  variables(
+    :enabled => node[:opennms][:snmp_graph][:bluecoat_sgproxy]
+  )
+end
+
+template "#{onms_home}/etc/snmp-graph.properties.d/brocade-graph.properties" do
+  source "snmp-graph.properties.d/brocade-graph.properties.erb"
+  mode 0664
+  owner "root"
+  group "root"
+  notifies :restart, "service[opennms]"
+  variables(
+    :enabled => node[:opennms][:snmp_graph][:brocade]
+  )
+end
+
+template "#{onms_home}/etc/snmp-graph.properties.d/ca-empire-graph.properties" do
+  source "snmp-graph.properties.d/ca-empire-graph.properties.erb"
+  mode 0664
+  owner "root"
+  group "root"
+  notifies :restart, "service[opennms]"
+  variables(
+    :enabled => node[:opennms][:snmp_graph][:ca_empire]
+  )
+end
+
+template "#{onms_home}/etc/snmp-graph.properties.d/checkpoint-graph.properties" do
+  source "snmp-graph.properties.d/checkpoint-graph.properties.erb"
+  mode 0664
+  owner "root"
+  group "root"
+  notifies :restart, "service[opennms]"
+  variables(
+    :enabled => node[:opennms][:snmp_graph][:checkpoint]
+  )
+end
+
+template "#{onms_home}/etc/snmp-graph.properties.d/cisco-graph.properties" do
+  source "snmp-graph.properties.d/cisco-graph.properties.erb"
+  mode 0664
+  owner "root"
+  group "root"
+  notifies :restart, "service[opennms]"
+  variables(
+    :enabled => node[:opennms][:snmp_graph][:cisco]
+  )
+end
+
+template "#{onms_home}/etc/snmp-graph.properties.d/clavister-graph.properties" do
+  source "snmp-graph.properties.d/clavister-graph.properties.erb"
+  mode 0664
+  owner "root"
+  group "root"
+  notifies :restart, "service[opennms]"
+  variables(
+    :enabled => node[:opennms][:snmp_graph][:clavister]
+  )
+end
+
+template "#{onms_home}/etc/snmp-graph.properties.d/colubris-graph.properties" do
+  source "snmp-graph.properties.d/colubris-graph.properties.erb"
+  mode 0664
+  owner "root"
+  group "root"
+  notifies :restart, "service[opennms]"
+  variables(
+    :enabled => node[:opennms][:snmp_graph][:colubris]
+  )
+end
+
+template "#{onms_home}/etc/snmp-graph.properties.d/cyclades-graph.properties" do
+  source "snmp-graph.properties.d/cyclades-graph.properties.erb"
+  mode 0664
+  owner "root"
+  group "root"
+  notifies :restart, "service[opennms]"
+  variables(
+    :enabled => node[:opennms][:snmp_graph][:cyclades]
+  )
+end
+
+template "#{onms_home}/etc/snmp-graph.properties.d/dell-openmanage-graph.properties" do
+  source "snmp-graph.properties.d/dell-openmanage-graph.properties.erb"
+  mode 0664
+  owner "root"
+  group "root"
+  notifies :restart, "service[opennms]"
+  variables(
+    :enabled => node[:opennms][:snmp_graph][:dell_openmanage]
+  )
+end
+
+template "#{onms_home}/etc/snmp-graph.properties.d/dell-rac-graph.properties" do
+  source "snmp-graph.properties.d/dell-rac-graph.properties.erb"
+  mode 0664
+  owner "root"
+  group "root"
+  notifies :restart, "service[opennms]"
+  variables(
+    :enabled => node[:opennms][:snmp_graph][:dell_rac]
+  )
+end
+
+template "#{onms_home}/etc/snmp-graph.properties.d/dns-graph.properties" do
+  source "snmp-graph.properties.d/dns-graph.properties.erb"
+  mode 0664
+  owner "root"
+  group "root"
+  notifies :restart, "service[opennms]"
+  variables(
+    :enabled => node[:opennms][:snmp_graph][:dns]
+  )
+end
+
+template "#{onms_home}/etc/snmp-graph.properties.d/ejn-graph.properties" do
+  source "snmp-graph.properties.d/ejn-graph.properties.erb"
+  mode 0664
+  owner "root"
+  group "root"
+  notifies :restart, "service[opennms]"
+  variables(
+    :enabled => node[:opennms][:snmp_graph][:ejn]
+  )
+end
+
+template "#{onms_home}/etc/snmp-graph.properties.d/equallogic-graph.properties" do
+  source "snmp-graph.properties.d/equallogic-graph.properties.erb"
+  mode 0664
+  owner "root"
+  group "root"
+  notifies :restart, "service[opennms]"
+  variables(
+    :enabled => node[:opennms][:snmp_graph][:equallogic]
+  )
+end
+
+template "#{onms_home}/etc/snmp-graph.properties.d/ericsson-graph.properties" do
+  source "snmp-graph.properties.d/ericsson-graph.properties.erb"
+  mode 0664
+  owner "root"
+  group "root"
+  notifies :restart, "service[opennms]"
+  variables(
+    :enabled => node[:opennms][:snmp_graph][:ericsson]
+  )
+end
+
+template "#{onms_home}/etc/snmp-graph.properties.d/extreme-networks-graph.properties" do
+  source "snmp-graph.properties.d/extreme-networks-graph.properties.erb"
+  mode 0664
+  owner "root"
+  group "root"
+  notifies :restart, "service[opennms]"
+  variables(
+    :enabled => node[:opennms][:snmp_graph][:extreme_networks]
+  )
+end
+
+template "#{onms_home}/etc/snmp-graph.properties.d/f5-graph.properties" do
+  source "snmp-graph.properties.d/f5-graph.properties.erb"
+  mode 0664
+  owner "root"
+  group "root"
+  notifies :restart, "service[opennms]"
+  variables(
+    :enabled => node[:opennms][:snmp_graph][:f5]
+  )
+end
+
+template "#{onms_home}/etc/snmp-graph.properties.d/force10-graph.properties" do
+  source "snmp-graph.properties.d/force10-graph.properties.erb"
+  mode 0664
+  owner "root"
+  group "root"
+  notifies :restart, "service[opennms]"
+  variables(
+    :enabled => node[:opennms][:snmp_graph][:force10]
+  )
+end
+
+template "#{onms_home}/etc/snmp-graph.properties.d/fortinet-graph.properties" do
+  source "snmp-graph.properties.d/fortinet-graph.properties.erb"
+  mode 0664
+  owner "root"
+  group "root"
+  notifies :restart, "service[opennms]"
+  variables(
+    :enabled => node[:opennms][:snmp_graph][:fortinet]
+  )
+end
+
+template "#{onms_home}/etc/snmp-graph.properties.d/foundry-graph.properties" do
+  source "snmp-graph.properties.d/foundry-graph.properties.erb"
+  mode 0664
+  owner "root"
+  group "root"
+  notifies :restart, "service[opennms]"
+  variables(
+    :enabled => node[:opennms][:snmp_graph][:foundry]
+  )
+end
+
+template "#{onms_home}/etc/snmp-graph.properties.d/framerelay-graph.properties" do
+  source "snmp-graph.properties.d/framerelay-graph.properties.erb"
+  mode 0664
+  owner "root"
+  group "root"
+  notifies :restart, "service[opennms]"
+  variables(
+    :enabled => node[:opennms][:snmp_graph][:framerelay]
+  )
+end
+
+template "#{onms_home}/etc/snmp-graph.properties.d/host-resources-graph.properties" do
+  source "snmp-graph.properties.d/host-resources-graph.properties.erb"
+  mode 0664
+  owner "root"
+  group "root"
+  notifies :restart, "service[opennms]"
+  variables(
+    :enabled => node[:opennms][:snmp_graph][:host_resources]
+  )
+end
+
+template "#{onms_home}/etc/snmp-graph.properties.d/hp-graph.properties" do
+  source "snmp-graph.properties.d/hp-graph.properties.erb"
+  mode 0664
+  owner "root"
+  group "root"
+  notifies :restart, "service[opennms]"
+  variables(
+    :enabled => node[:opennms][:snmp_graph][:hp]
+  )
+end
+
+template "#{onms_home}/etc/snmp-graph.properties.d/hpux-graph.properties" do
+  source "snmp-graph.properties.d/hpux-graph.properties.erb"
+  mode 0664
+  owner "root"
+  group "root"
+  notifies :restart, "service[opennms]"
+  variables(
+    :enabled => node[:opennms][:snmp_graph][:hpux]
+  )
+end
+
+template "#{onms_home}/etc/snmp-graph.properties.d/hwg-graph.properties" do
+  source "snmp-graph.properties.d/hwg-graph.properties.erb"
+  mode 0664
+  owner "root"
+  group "root"
+  notifies :restart, "service[opennms]"
+  variables(
+    :enabled => node[:opennms][:snmp_graph][:hwg]
+  )
+end
+
+template "#{onms_home}/etc/snmp-graph.properties.d/ipunity-graph.properties" do
+  source "snmp-graph.properties.d/ipunity-graph.properties.erb"
+  mode 0664
+  owner "root"
+  group "root"
+  notifies :restart, "service[opennms]"
+  variables(
+    :enabled => node[:opennms][:snmp_graph][:ipunity]
+  )
+end
+
+template "#{onms_home}/etc/snmp-graph.properties.d/jboss-graph.properties" do
+  source "snmp-graph.properties.d/jboss-graph.properties.erb"
+  mode 0664
+  owner "root"
+  group "root"
+  notifies :restart, "service[opennms]"
+  variables(
+    :enabled => node[:opennms][:snmp_graph][:jboss]
+  )
+end
+
+template "#{onms_home}/etc/snmp-graph.properties.d/juniper-graph.properties" do
+  source "snmp-graph.properties.d/juniper-graph.properties.erb"
+  mode 0664
+  owner "root"
+  group "root"
+  notifies :restart, "service[opennms]"
+  variables(
+    :enabled => node[:opennms][:snmp_graph][:juniper]
+  )
+end
+
+template "#{onms_home}/etc/snmp-graph.properties.d/jvm-graph.properties" do
+  source "snmp-graph.properties.d/jvm-graph.properties.erb"
+  mode 0664
+  owner "root"
+  group "root"
+  notifies :restart, "service[opennms]"
+  variables(
+    :enabled => node[:opennms][:snmp_graph][:jvm]
+  )
+end
+
+template "#{onms_home}/etc/snmp-graph.properties.d/liebert-graph.properties" do
+  source "snmp-graph.properties.d/liebert-graph.properties.erb"
+  mode 0664
+  owner "root"
+  group "root"
+  notifies :restart, "service[opennms]"
+  variables(
+    :enabled => node[:opennms][:snmp_graph][:liebert]
+  )
+end
+
+template "#{onms_home}/etc/snmp-graph.properties.d/lmsensors-graph.properties" do
+  source "snmp-graph.properties.d/lmsensors-graph.properties.erb"
+  mode 0664
+  owner "root"
+  group "root"
+  notifies :restart, "service[opennms]"
+  variables(
+    :enabled => node[:opennms][:snmp_graph][:lmsensors]
+  )
+end
+
+template "#{onms_home}/etc/snmp-graph.properties.d/mailmarshal-graph.properties" do
+  source "snmp-graph.properties.d/mailmarshal-graph.properties.erb"
+  mode 0664
+  owner "root"
+  group "root"
+  notifies :restart, "service[opennms]"
+  variables(
+    :enabled => node[:opennms][:snmp_graph][:mailmarshal]
+  )
+end
+
+template "#{onms_home}/etc/snmp-graph.properties.d/mcast-graph.properties" do
+  source "snmp-graph.properties.d/mcast-graph.properties.erb"
+  mode 0664
+  owner "root"
+  group "root"
+  notifies :restart, "service[opennms]"
+  variables(
+    :enabled => node[:opennms][:snmp_graph][:mcast]
+  )
+end
+
+template "#{onms_home}/etc/snmp-graph.properties.d/mge-graph.properties" do
+  source "snmp-graph.properties.d/mge-graph.properties.erb"
+  mode 0664
+  owner "root"
+  group "root"
+  notifies :restart, "service[opennms]"
+  variables(
+    :enabled => node[:opennms][:snmp_graph][:mge]
+  )
+end
+
+template "#{onms_home}/etc/snmp-graph.properties.d/mib2-graph.properties" do
+  source "snmp-graph.properties.d/mib2-graph.properties.erb"
+  mode 0664
+  owner "root"
+  group "root"
+  notifies :restart, "service[opennms]"
+  variables(
+    :enabled => node[:opennms][:snmp_graph][:mib2]
+  )
+end
+
+template "#{onms_home}/etc/snmp-graph.properties.d/microsoft-exchange-graph.properties" do
+  source "snmp-graph.properties.d/microsoft-exchange-graph.properties.erb"
+  mode 0664
+  owner "root"
+  group "root"
+  notifies :restart, "service[opennms]"
+  variables(
+    :enabled => node[:opennms][:snmp_graph][:microsoft_exchange]
+  )
+end
+
+template "#{onms_home}/etc/snmp-graph.properties.d/microsoft-graph.properties" do
+  source "snmp-graph.properties.d/microsoft-graph.properties.erb"
+  mode 0664
+  owner "root"
+  group "root"
+  notifies :restart, "service[opennms]"
+  variables(
+    :enabled => node[:opennms][:snmp_graph][:microsoft]
+  )
+end
+
+template "#{onms_home}/etc/snmp-graph.properties.d/microsoft-http-graph.properties" do
+  source "snmp-graph.properties.d/microsoft-http-graph.properties.erb"
+  mode 0664
+  owner "root"
+  group "root"
+  notifies :restart, "service[opennms]"
+  variables(
+    :enabled => node[:opennms][:snmp_graph][:microsoft_http]
+  )
+end
+
+template "#{onms_home}/etc/snmp-graph.properties.d/microsoft-iis-graph.properties" do
+  source "snmp-graph.properties.d/microsoft-iis-graph.properties.erb"
+  mode 0664
+  owner "root"
+  group "root"
+  notifies :restart, "service[opennms]"
+  variables(
+    :enabled => node[:opennms][:snmp_graph][:microsoft_iis]
+  )
+end
+
+template "#{onms_home}/etc/snmp-graph.properties.d/microsoft-lcs-graph.properties" do
+  source "snmp-graph.properties.d/microsoft-lcs-graph.properties.erb"
+  mode 0664
+  owner "root"
+  group "root"
+  notifies :restart, "service[opennms]"
+  variables(
+    :enabled => node[:opennms][:snmp_graph][:microsoft_lcs]
+  )
+end
+
+template "#{onms_home}/etc/snmp-graph.properties.d/microsoft-sql-graph.properties" do
+  source "snmp-graph.properties.d/microsoft-sql-graph.properties.erb"
+  mode 0664
+  owner "root"
+  group "root"
+  notifies :restart, "service[opennms]"
+  variables(
+    :enabled => node[:opennms][:snmp_graph][:microsoft_sql]
+  )
+end
+
+template "#{onms_home}/etc/snmp-graph.properties.d/microsoft-windows-graph.properties" do
+  source "snmp-graph.properties.d/microsoft-windows-graph.properties.erb"
+  mode 0664
+  owner "root"
+  group "root"
+  notifies :restart, "service[opennms]"
+  variables(
+    :enabled => node[:opennms][:snmp_graph][:microsoft_windows]
+  )
+end
+
+template "#{onms_home}/etc/snmp-graph.properties.d/microsoft-wmi-graph.properties" do
+  source "snmp-graph.properties.d/microsoft-wmi-graph.properties.erb"
+  mode 0664
+  owner "root"
+  group "root"
+  notifies :restart, "service[opennms]"
+  variables(
+    :enabled => node[:opennms][:snmp_graph][:microsoft_wmi]
+  )
+end
+
+template "#{onms_home}/etc/snmp-graph.properties.d/mikrotik-graph.properties" do
+  source "snmp-graph.properties.d/mikrotik-graph.properties.erb"
+  mode 0664
+  owner "root"
+  group "root"
+  notifies :restart, "service[opennms]"
+  variables(
+    :enabled => node[:opennms][:snmp_graph][:mikrotik]
+  )
+end
+
+template "#{onms_home}/etc/snmp-graph.properties.d/mysql-graph.properties" do
+  source "snmp-graph.properties.d/mysql-graph.properties.erb"
+  mode 0664
+  owner "root"
+  group "root"
+  notifies :restart, "service[opennms]"
+  variables(
+    :enabled => node[:opennms][:snmp_graph][:mysql]
+  )
+end
+
+template "#{onms_home}/etc/snmp-graph.properties.d/netapp-graph.properties" do
+  source "snmp-graph.properties.d/netapp-graph.properties.erb"
+  mode 0664
+  owner "root"
+  group "root"
+  notifies :restart, "service[opennms]"
+  variables(
+    :enabled => node[:opennms][:snmp_graph][:netapp]
+  )
+end
+
+template "#{onms_home}/etc/snmp-graph.properties.d/netbotz-graph.properties" do
+  source "snmp-graph.properties.d/netbotz-graph.properties.erb"
+  mode 0664
+  owner "root"
+  group "root"
+  notifies :restart, "service[opennms]"
+  variables(
+    :enabled => node[:opennms][:snmp_graph][:netbotz]
+  )
+end
+
+template "#{onms_home}/etc/snmp-graph.properties.d/netenforcer-graph.properties" do
+  source "snmp-graph.properties.d/netenforcer-graph.properties.erb"
+  mode 0664
+  owner "root"
+  group "root"
+  notifies :restart, "service[opennms]"
+  variables(
+    :enabled => node[:opennms][:snmp_graph][:netenforcer]
+  )
+end
+
+template "#{onms_home}/etc/snmp-graph.properties.d/netscaler-graph.properties" do
+  source "snmp-graph.properties.d/netscaler-graph.properties.erb"
+  mode 0664
+  owner "root"
+  group "root"
+  notifies :restart, "service[opennms]"
+  variables(
+    :enabled => node[:opennms][:snmp_graph][:netscaler]
+  )
+end
+
+template "#{onms_home}/etc/snmp-graph.properties.d/netsnmp-graph.properties" do
+  source "snmp-graph.properties.d/netsnmp-graph.properties.erb"
+  mode 0664
+  owner "root"
+  group "root"
+  notifies :restart, "service[opennms]"
+  variables(
+    :enabled => node[:opennms][:snmp_graph][:netsnmp]
+  )
+end
+
+template "#{onms_home}/etc/snmp-graph.properties.d/nortel-graph.properties" do
+  source "snmp-graph.properties.d/nortel-graph.properties.erb"
+  mode 0664
+  owner "root"
+  group "root"
+  notifies :restart, "service[opennms]"
+  variables(
+    :enabled => node[:opennms][:snmp_graph][:nortel]
+  )
+end
+
+template "#{onms_home}/etc/snmp-graph.properties.d/novell-graph.properties" do
+  source "snmp-graph.properties.d/novell-graph.properties.erb"
+  mode 0664
+  owner "root"
+  group "root"
+  notifies :restart, "service[opennms]"
+  variables(
+    :enabled => node[:opennms][:snmp_graph][:novell]
+  )
+end
+
+template "#{onms_home}/etc/snmp-graph.properties.d/pfsense-graph.properties" do
+  source "snmp-graph.properties.d/pfsense-graph.properties.erb"
+  mode 0664
+  owner "root"
+  group "root"
+  notifies :restart, "service[opennms]"
+  variables(
+    :enabled => node[:opennms][:snmp_graph][:pfsense]
+  )
+end
+
+template "#{onms_home}/etc/snmp-graph.properties.d/postgresql-graph.properties" do
+  source "snmp-graph.properties.d/postgresql-graph.properties.erb"
+  mode 0664
+  owner "root"
+  group "root"
+  notifies :restart, "service[opennms]"
+  variables(
+    :enabled => node[:opennms][:snmp_graph][:postgresql]
+  )
+end
+
+template "#{onms_home}/etc/snmp-graph.properties.d/riverbed-steelhead-graph.properties" do
+  source "snmp-graph.properties.d/riverbed-steelhead-graph.properties.erb"
+  mode 0664
+  owner "root"
+  group "root"
+  notifies :restart, "service[opennms]"
+  variables(
+    :enabled => node[:opennms][:snmp_graph][:riverbed_steelhead]
+  )
+end
+
+template "#{onms_home}/etc/snmp-graph.properties.d/servertech-graph.properties" do
+  source "snmp-graph.properties.d/servertech-graph.properties.erb"
+  mode 0664
+  owner "root"
+  group "root"
+  notifies :restart, "service[opennms]"
+  variables(
+    :enabled => node[:opennms][:snmp_graph][:servertech]
+  )
+end
+
+template "#{onms_home}/etc/snmp-graph.properties.d/snmp-informant-graph.properties" do
+  source "snmp-graph.properties.d/snmp-informant-graph.properties.erb"
+  mode 0664
+  owner "root"
+  group "root"
+  notifies :restart, "service[opennms]"
+  variables(
+    :enabled => node[:opennms][:snmp_graph][:snmp_informant]
+  )
+end
+
+template "#{onms_home}/etc/snmp-graph.properties.d/sofaware-embeddedngx-graph.properties" do
+  source "snmp-graph.properties.d/sofaware-embeddedngx-graph.properties.erb"
+  mode 0664
+  owner "root"
+  group "root"
+  notifies :restart, "service[opennms]"
+  variables(
+    :enabled => node[:opennms][:snmp_graph][:sofaware_embeddedngx]
+  )
+end
+
+template "#{onms_home}/etc/snmp-graph.properties.d/sun-graph.properties" do
+  source "snmp-graph.properties.d/sun-graph.properties.erb"
+  mode 0664
+  owner "root"
+  group "root"
+  notifies :restart, "service[opennms]"
+  variables(
+    :enabled => node[:opennms][:snmp_graph][:sun]
+  )
+end
+
+template "#{onms_home}/etc/snmp-graph.properties.d/trango-graph.properties" do
+  source "snmp-graph.properties.d/trango-graph.properties.erb"
+  mode 0664
+  owner "root"
+  group "root"
+  notifies :restart, "service[opennms]"
+  variables(
+    :enabled => node[:opennms][:snmp_graph][:trango]
+  )
+end
+
+template "#{onms_home}/etc/snmp-graph.properties.d/vmware-cim-graph-simple.properties" do
+  source "snmp-graph.properties.d/vmware-cim-graph-simple.properties.erb"
+  mode 0664
+  owner "root"
+  group "root"
+  notifies :restart, "service[opennms]"
+  variables(
+    :enabled => node[:opennms][:snmp_graph][:vmware_cim]
+  )
+end
+
+template "#{onms_home}/etc/snmp-graph.properties.d/vmware3-graph-simple.properties" do
+  source "snmp-graph.properties.d/vmware3-graph-simple.properties.erb"
+  mode 0664
+  owner "root"
+  group "root"
+  notifies :restart, "service[opennms]"
+  variables(
+    :enabled => node[:opennms][:snmp_graph][:vmware3]
+  )
+end
+
+template "#{onms_home}/etc/snmp-graph.properties.d/vmware4-graph-simple.properties" do
+  source "snmp-graph.properties.d/vmware4-graph-simple.properties.erb"
+  mode 0664
+  owner "root"
+  group "root"
+  notifies :restart, "service[opennms]"
+  variables(
+    :enabled => node[:opennms][:snmp_graph][:vmware4]
+  )
+end
+
+template "#{onms_home}/etc/snmp-graph.properties.d/vmware5-graph-simple.properties" do
+  source "snmp-graph.properties.d/vmware5-graph-simple.properties.erb"
+  mode 0664
+  owner "root"
+  group "root"
+  notifies :restart, "service[opennms]"
+  variables(
+    :enabled => node[:opennms][:snmp_graph][:vmware5]
+  )
+end
+
+template "#{onms_home}/etc/snmp-graph.properties.d/xmp-graph.properties" do
+  source "snmp-graph.properties.d/xmp-graph.properties.erb"
+  mode 0664
+  owner "root"
+  group "root"
+  notifies :restart, "service[opennms]"
+  variables(
+    :enabled => node[:opennms][:snmp_graph][:xmp]
+  )
+end
+
+template "#{onms_home}/etc/snmp-graph.properties.d/xups-graph.properties" do
+  source "snmp-graph.properties.d/xups-graph.properties.erb"
+  mode 0664
+  owner "root"
+  group "root"
+  notifies :restart, "service[opennms]"
+  variables(
+    :enabled => node[:opennms][:snmp_graph][:xups]
+  )
+end
+
+template "#{onms_home}/etc/snmp-graph.properties.d/zeus-graph.properties" do
+  source "snmp-graph.properties.d/zeus-graph.properties.erb"
+  mode 0664
+  owner "root"
+  group "root"
+  notifies :restart, "service[opennms]"
+  variables(
+    :enabled => node[:opennms][:snmp_graph][:zeus]
+  )
+end
+
 service "opennms" do
   supports :status => true, :restart => true
   action [ :enable, :start ]

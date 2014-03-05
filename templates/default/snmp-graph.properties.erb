@@ -1,0 +1,122 @@
+
+
+#########################################################################
+## G E N E R A L   R E P O R T I N G   S E T T I N G S
+#########################################################################
+
+<% if @image_format == "gif" -%>
+command.prefix=/usr/bin/rrdtool graph - --imgformat GIF --font DEFAULT:<%=@default_font_size%> --font TITLE:<%=@title_font_size%> --start {startTime} --end {endTime}
+<% elsif @image_format == "jpg" || @image_format == "jpeg" -%>
+command.prefix=/usr/bin/rrdtool graph - --imgformat JPG --font DEFAULT:<%=@default_font_size%> --font TITLE:<%=@title_font_size%> --start {startTime} --end {endTime}
+<% else -%>
+command.prefix=/usr/bin/rrdtool graph - --imgformat PNG --font DEFAULT:<%=@default_font_size%> --font TITLE:<%=@title_font_size%> --start {startTime} --end {endTime}
+<% end -%>
+
+#the command used to get the RRD info
+info.command=/usr/bin/rrdtool info
+
+#The default graph for KSC node and domain reports
+default.report=<%=@default_ksc_graph%>
+
+#the output type of the image, should correspond to the type we
+#specified in the command.prefix variable
+output.mime=image/<%=@image_format%>
+
+# include.directory is a directory which will be checked for files with 
+# names matching *.properties.  If it is a relative path (e.g. contains no path
+# delimiters), it is relative to the directory this file is in.
+# Each of those properties files will then be read and the graphs defined in
+# them added to the list of prefabricated graphs that are available.
+# Each of these included files can contain either a single graph, or multiple graphs.
+# If it includes multiple graphs, use the same format as this file, e.g.
+# a "reports" property listing the graph ids, and each graph is defined with 
+# a set of 'report.<graphname>.<key>' properties
+# If it includes just a single graph, you may use a short format.  In this format,
+# an additional property "report.id" defines the internal "name" of the graph, and 
+# all the other properties no longer require the graph name in the key. 
+# For example, such a single-graph file would look like this:
+#
+#report.id=mib2.bits
+#report.name=Bits In/Out
+#report.columns=ifInOctets,ifOutOctets
+#report.type=interfaceSnmp
+#report.command=--title="Bits In/Out" \
+# --vertical-label="Bits per second" \
+# <rest of graph definition>
+#
+# Graphs in the include directory that have the same id as one in this root file
+# will replace/override the one in this file.  
+include.directory=<%=@include_dir%>
+
+#The minimum interval, in milliseconds, between rescans of the directory
+#specified by include.directory, looking for new .properties files
+# Defaults to 300000 (5 minutes) so as not to be hitting disk too often.
+<% if !@include_rescan.nil? -%>
+include.directory.rescan=<%=@include_rescan%>
+<% else -%>
+#include.directory.rescan=300000
+<% end -%>
+
+#########################################################################
+## P R E F A B   R E P O R T S
+#########################################################################
+
+# In order to get a report (defined below) to be automatically generated
+# its name must be included in the "reports" variable.
+
+# NOTE: Because of the large format of the netsnmp.memStats report it
+#       has been placed before netsnmp.cpuStats so that it looks better.
+#
+# NOTE: Because of the large format of the netsnmp.cpuStats report, it
+#       has been placed last so that it looks better. Everything else
+#       should be in alphabetical order.
+
+# NOTE: Only OpenNMS internal graph definitions. Please create for 
+#       customized graphs in snmp-graph.properties.d dedicated property
+#       files
+<% if @onms_queued_updates && @onms_queued_pending -%>
+reports=onms.queued.updates, onms.queued.pending
+<% elsif !@onms_queued_updates && @onms_queued_pending -%>
+reports=onms.queued.pending
+<% elsif @onms_queued_updates && !@onms_queued_pending -%>
+reports=onms.queued.updates
+<% else -%>
+reports=
+<% end -%>
+
+# values available to prefab reports:
+# {rrd1}, {rrd2}, {rrd3}, ...  must match the datasources exactly
+# {startTime}, {endTime}
+# any external values specified per report
+
+###
+## !!! Third party support or customized graphs in separate file in
+##     snmp-graph.properties.d folder
+###
+
+###
+## OpenNMS Queued
+###
+report.onms.queued.updates.name=OpenNMS Queued Updates
+report.onms.queued.updates.columns=ONMSQueUpdates
+report.onms.queued.updates.type=interfaceSnmp
+report.onms.queued.updates.command=--title="OpenNMS Queued Updates" \
+ --vertical-label="Updates per second" \
+ DEF:updates={rrd1}:ONMSQueUpdates:AVERAGE \
+ LINE1:updates#0000ff:"Completed Updates" \
+ GPRINT:updates:AVERAGE:" Avg  \\: %8.2lf %s" \
+ GPRINT:updates:MIN:"Min  \\: %8.2lf %s" \
+ GPRINT:updates:MAX:"Max  \\: %8.2lf %s\\n"
+
+report.onms.queued.pending.name=OpenNMS Queued Updates
+report.onms.queued.pending.columns=ONMSQueOpsPend
+report.onms.queued.pending.type=interfaceSnmp
+report.onms.queued.pending.command=--title="OpenNMS Queued Operations Pending" \
+ --vertical-label="Operations" \
+ DEF:pending={rrd1}:ONMSQueOpsPend:AVERAGE \
+ LINE1:pending#0000ff:"Total Pending" \
+ GPRINT:pending:AVERAGE:" Avg  \\: %8.2lf %s" \
+ GPRINT:pending:MIN:"Min  \\: %8.2lf %s" \
+ GPRINT:pending:MAX:"Max  \\: %8.2lf %s\\n"
+
+## EOF
