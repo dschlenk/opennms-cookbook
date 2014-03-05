@@ -142,6 +142,10 @@ There are also a couple OpenNMS attributes you'll probably want to override at a
    }
 ```
 
+### Other Recipes
+
+* `opennms::nsclient` installs the optional nsclient data collection plugin and uses the template for etc/nsclient-datacollection-config.xml. 
+
 ### Template Overview
 
 #### Access Point Monitor (etc/access-point-monitor-configuration.xml)
@@ -479,8 +483,8 @@ in `node['opennms']['notifications']`. Stay tuned for a notification LWRP.
 
 #### etc/nsclient-datacollection-config.xml
 
-TODO: finish this template
-Similar to other datacollection-config.xml files, you can change the RRD repository, step, RRA definitions and disable default collections.
+
+Similar to other datacollection-config.xml files, you can change the RRD repository, step, RRA definitions and disable default collections and wpms.
 #### etc/poller-configuration.xml
 
 Disable packages, change IPv4 and IPv6 include ranges and RRD settings, remove or disable services or change their polling interval, retry, timeout or another service parameter. Like collectd and capsd, the possibilities here are pretty extensive so check out the default attributes and template for more info.

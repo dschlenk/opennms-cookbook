@@ -606,6 +606,7 @@ template "#{onms_home}/etc/log4j.properties" do
   group "root"
   notifies :restart, "service[opennms]"
   variables(
+    :onms_home           => onms_home,
     :stds                => node[:opennms][:log4j][:stds],
     :uncategorized       => node[:opennms][:log4j][:uncategorized],
     :misc                => node[:opennms][:log4j][:misc],

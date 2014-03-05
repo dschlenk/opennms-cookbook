@@ -1013,7 +1013,28 @@ default['opennms']['notifications']['high_threshold_rearmed']['text_message']   
 default['opennms']['notifications']['high_threshold_rearmed']['subject']          = "Notice #%noticeid%: High Threshold Rearmed for %parm[ds]% on node %nodelabel%."
 default['opennms']['notifications']['high_threshold_rearmed']['numeric_message']  = nil
 # nsclient-datacollection-config.xml
-default['opennms']['nsclient_datacollection']['enable_default'] = true
+default['opennms']['nsclient_datacollection']['rrd_repository']                   = "#{default['opennms']['conf']['home']}/share/rrd/snmp/"
+default['opennms']['nsclient_datacollection']['enable_default']                   = true
+default['opennms']['nsclient_datacollection']['default']['rrd']['step']           = 300
+default['opennms']['nsclient_datacollection']['default']['rrd']['rras']           = ["RRA:AVERAGE:0.5:1:2016", "RRA:AVERAGE:0.5:12:1488", "RRA:AVERAGE:0.5:288:366", "RRA:MAX:0.5:288:366", "RRA:MIN:0.5:288:366"]
+default['opennms']['nsclient_datacollection']['default']['processor']['enabled']  = true
+default['opennms']['nsclient_datacollection']['default']['processor']['interval'] = 3600000
+default['opennms']['nsclient_datacollection']['default']['system']['enabled'] = true
+default['opennms']['nsclient_datacollection']['default']['system']['interval'] = 86400000
+default['opennms']['nsclient_datacollection']['default']['iis']['enabled'] = true
+default['opennms']['nsclient_datacollection']['default']['iis']['interval'] = 86400000
+default['opennms']['nsclient_datacollection']['default']['exchange']['enabled'] = true
+default['opennms']['nsclient_datacollection']['default']['exchange']['interval'] = 86400000
+default['opennms']['nsclient_datacollection']['default']['dns']['enabled'] = true
+default['opennms']['nsclient_datacollection']['default']['dns']['interval'] = 86400000
+default['opennms']['nsclient_datacollection']['default']['sqlserver']['enabled'] = true
+default['opennms']['nsclient_datacollection']['default']['sqlserver']['interval'] = 86400000
+default['opennms']['nsclient_datacollection']['default']['biztalk']['enabled'] = true
+default['opennms']['nsclient_datacollection']['default']['biztalk']['interval'] = 86400000
+default['opennms']['nsclient_datacollection']['default']['live']['enabled'] = true
+default['opennms']['nsclient_datacollection']['default']['live']['interval'] = 86400000
+default['opennms']['nsclient_datacollection']['default']['mailmarshal']['enabled'] = true
+default['opennms']['nsclient_datacollection']['default']['mailmarshal']['interval'] = 86400000
 # poller-configuration.xml
 default['opennms']['poller']['threads']                         = 30
 default['opennms']['poller']['service_unresponsive_enabled']    = false

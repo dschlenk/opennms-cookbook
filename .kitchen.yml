@@ -19,6 +19,7 @@ suites:
       - recipe[postgresql::config_pgtune]
       #- recipe[postgresql::contrib]
       - recipe[opennms::default]
+      - recipe[opennms::nsclient]
     attributes: { 
                  "java": { 
                           "oracle": { 
