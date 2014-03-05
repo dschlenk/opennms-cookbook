@@ -20,6 +20,7 @@ suites:
       #- recipe[postgresql::contrib]
       - recipe[opennms::default]
       - recipe[opennms::nsclient]
+      - recipe[opennms::xml]
     attributes: { 
                  "java": { 
                           "oracle": { 

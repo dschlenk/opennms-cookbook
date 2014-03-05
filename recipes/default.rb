@@ -2148,21 +2148,6 @@ template "#{onms_home}/etc/wmi-datacollection-config.xml" do
   )
 end
 
-# TOOD: split out to it's own recipe that also installs opennms-plugin-protocol-xml
-#template "#{onms_home}/etc/xml-datacollection-config.xml" do
-#  source "xml-datacollection-config.xml.erb"
-#  mode 0664
-#  owner "root"
-#  group "root"
-#  notifies :restart, "service[opennms]"
-#  variables(
-#    :rrd_repository => node[:opennms][:xml][:rrd_repository],
-#    :threegpp_full_5min        => node[:opennms][:xml][:threegpp_full_5min],
-#    :threegpp_full_15min        => node[:opennms][:xml][:threegpp_full_15min],
-#    :threegpp_sample        => node[:opennms][:xml][:threegpp_sample]
-#  )
-#end
-
 template "#{onms_home}/etc/xmlrpcd-configuration.xml" do
   source "xmlrpcd-configuration.xml.erb"
   mode 0664
