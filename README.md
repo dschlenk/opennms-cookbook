@@ -147,6 +147,12 @@ There are also a couple OpenNMS attributes you'll probably want to override at a
 * `opennms::nsclient` installs the optional nsclient data collection plugin and uses the template for etc/nsclient-datacollection-config.xml. 
 * `opennms::xml` installs the optional xml data collection plugin and uses the template for etc/xml-datacollection-config.xml. 
 
+### Custom Resources
+
+The list of implemented LWRPs is as follows: 
+
+* `opennms_collection_package`: adds a package element to etc/collectd-configuration.xml. See `opennms::test_collection_package` for example usage.
+
 ### Template Overview
 
 #### Access Point Monitor (etc/access-point-monitor-configuration.xml)
