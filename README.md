@@ -706,6 +706,7 @@ You can remove either of the default packages or an individual report by setting
   * top_10_this_month
   * top_10_last_month
   * top_10_this_year
+
 #### etc/support.properties
 
 Whatever this file is for, you can set support.queueId, support.timeout and support.retry with `node['opennms']['support']['queueid']`, `node['opennms']['support']['timeout']` and `node['opennms']['support']['retry']`.
@@ -715,7 +716,7 @@ Whatever this file is for, you can set support.queueId, support.timeout and supp
 Similar to site-status-views.xml.  Change this to change the default view shown in the Dashboard of the Web UI with the attribute `node['opennms']['surveillance_views']['default_view']`. Defaults to `default`. A LWRP is forthcoming that will let you add your own (and set it to default). So this is pretty useless ATM.
 #### etc/syslog-northbounder-configuration.xml
 
-orward alarms to a syslog server.  Attributes available in `node['opennms']['syslog_north']`:
+Forward alarms to a syslog server.  Attributes available in `node['opennms']['syslog_north']`:
 
 ```
 use_defaults       = true
@@ -933,18 +934,16 @@ To change the list of events sent via XML-RPC, override the `node['opennms']['xm
 
 Configure notifications to be sent via XMPP (aka Jabber, GTalk) with these attributes in `node['opennms']['xmpp']`:
 
-```
-server
-service_name
-port
-tls
-sasl
-self_signed_certs
-truststore_password
-debug
-user
-pass
-```
+* server
+* service_name
+* port
+* tls
+* sasl
+* self_signed_certs
+* truststore_password
+* debug
+* user
+* pass
 
 
 License
