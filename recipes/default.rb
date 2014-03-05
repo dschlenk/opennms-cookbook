@@ -1906,6 +1906,287 @@ template "#{onms_home}/etc/snmp-graph.properties.d/zeus-graph.properties" do
   )
 end
 
+template "#{onms_home}/etc/snmp-interface-poller-configuration.xml" do
+  source "snmp-interface-poller-configuration.xml.erb"
+  mode 0664
+  owner "root"
+  group "root"
+  notifies :restart, "service[opennms]"
+  variables(
+    :threads     => node[:opennms][:snmp_iface_poller][:threads],
+    :service     => node[:opennms][:snmp_iface_poller][:service],
+    :node_outage => node[:opennms][:snmp_iface_poller][:node_outage],
+    :example1    => node[:opennms][:snmp_iface_poller][:example1]
+  )
+end
+
+template "#{onms_home}/etc/statsd-configuration.xml" do
+  source "statsd-configuration.xml.erb"
+  mode 0664
+  owner "root"
+  group "root"
+  notifies :restart, "service[opennms]"
+  variables(
+    :example1              => node[:opennms][:statsd][:example1],
+    :response_time_reports => node[:opennms][:statsd][:response_time_reports]
+  )
+end
+
+template "#{onms_home}/etc/support.properties" do
+  source "support.properties.erb"
+  mode 0664
+  owner "root"
+  group "root"
+  notifies :restart, "service[opennms]"
+  variables(
+    :queueid => node[:opennms][:support][:queueid],
+    :timeout => node[:opennms][:support][:timeout],
+    :retry   => node[:opennms][:support][:retry]
+  )
+end
+
+template "#{onms_home}/etc/surveillance-views.xml" do
+  source "surveillance-views.xml.erb"
+  mode 0664
+  owner "root"
+  group "root"
+  notifies :restart, "service[opennms]"
+  variables(
+    :default_view => node[:opennms][:surveillance_views][:default_view],
+    :default      => node[:opennms][:surveillance_views][:default]
+  )
+end
+
+template "#{onms_home}/etc/syslog-northbounder-configuration.xml" do
+  source "syslog-northbounder-configuration.xml.erb"
+  mode 0664
+  owner "root"
+  group "root"
+  notifies :restart, "service[opennms]"
+  variables(
+    :use_defaults   => node[:opennms][:syslog_north][:use_defaults],
+    :enabled        => node[:opennms][:syslog_north][:enabled],
+    :nagles_delay   => node[:opennms][:syslog_north][:nagles_delay],
+    :batch_size     => node[:opennms][:syslog_north][:batch_size],
+    :queue_size     => node[:opennms][:syslog_north][:queue_size],
+    :message_format => node[:opennms][:syslog_north][:message_format],
+    :destination    => node[:opennms][:syslog_north][:destination],
+    :uei            => node[:opennms][:syslog_north][:uei]
+  )
+end
+
+template "#{onms_home}/etc/syslogd-configuration.xml" do
+  source "syslogd-configuration.xml.erb"
+  mode 0664
+  owner "root"
+  group "root"
+  notifies :restart, "service[opennms]"
+  variables(
+    :port                   => node[:opennms][:syslogd][:port],
+    :new_suspect            => node[:opennms][:syslogd][:new_suspect],
+    :parser                 => node[:opennms][:syslogd][:parser],
+    :forwarding_regexp      => node[:opennms][:syslogd][:forwarding_regexp],
+    :matching_group_host    => node[:opennms][:syslogd][:matching_group_host],
+    :matching_group_message => node[:opennms][:syslogd][:matching_group_message],
+    :discard_uei            => node[:opennms][:syslogd][:discard_uei],
+    :apache_httpd           => node[:opennms][:syslogd][:apache_httpd],
+    :linux_kernel           => node[:opennms][:syslogd][:linux_kernel],
+    :openssh                => node[:opennms][:syslogd][:openssh],
+    :sudo                   => node[:opennms][:syslogd][:sudo]
+  )
+end
+
+template "#{onms_home}/etc/threshd-configuration.xml" do
+  source "threshd-configuration.xml.erb"
+  mode 0664
+  owner "root"
+  group "root"
+  notifies :restart, "service[opennms]"
+  variables(
+    :threads                 => node[:opennms][:threshd][:threads],
+    :mib2                    => node[:opennms][:threshd][:mib2],
+    :hrstorage               => node[:opennms][:threshd][:hrstorage],
+    :cisco                   => node[:opennms][:threshd][:cisco],
+    :netsnmp                 => node[:opennms][:threshd][:netsnmp],
+    :netsnmp_memory_linux    => node[:opennms][:threshd][:netsnmp_memory_linux],
+    :netsnmp_memory_nonlinux => node[:opennms][:threshd][:netsnmp_memory_nonlinux]
+  )
+end
+
+template "#{onms_home}/etc/thresholds.xml" do
+  source "thresholds.xml.erb"
+  mode 0664
+  owner "root"
+  group "root"
+  notifies :restart, "service[opennms]"
+  variables(
+    :mib2                    => node[:opennms][:thresholds][:mib2],
+    :hrstorage               => node[:opennms][:thresholds][:hrstorage],
+    :cisco                   => node[:opennms][:thresholds][:cisco],
+    :netsnmp                 => node[:opennms][:thresholds][:netsnmp],
+    :netsnmp_memory_linux    => node[:opennms][:thresholds][:netsnmp_memory_linux],
+    :netsnmp_memory_nonlinux => node[:opennms][:thresholds][:netsnmp_memory_nonlinux],
+    :coffee                  => node[:opennms][:thresholds][:coffee]
+  )
+end
+
+template "#{onms_home}/etc/translator-configuration.xml" do
+  source "translator-configuration.xml.erb"
+  mode 0664
+  owner "root"
+  group "root"
+  notifies :restart, "service[opennms]"
+  variables(
+    :snmp_link_down        => node[:opennms][:translator][:snmp_link_down],
+    :snmp_link_up          => node[:opennms][:translator][:snmp_link_up],
+    :hyperic               => node[:opennms][:translator][:hyperic],
+    :cisco_config_man      => node[:opennms][:translator][:cisco_config_man],
+    :juniper_cfg_change    => node[:opennms][:translator][:juniper_cfg_change]
+  )
+end
+
+template "#{onms_home}/etc/trapd-configuration.xml" do
+  source "trapd-configuration.xml.erb"
+  mode 0664
+  owner "root"
+  group "root"
+  notifies :restart, "service[opennms]"
+  variables(
+    :port        => node[:opennms][:trapd][:port],
+    :new_suspect => node[:opennms][:trapd][:new_suspect]
+  )
+end
+
+template "#{onms_home}/etc/users.xml" do
+  source "users.xml.erb"
+  mode 0664
+  owner "root"
+  group "root"
+  notifies :restart, "service[opennms]"
+  variables(
+    :name          => node[:opennms][:users][:admin][:name],
+    :user_comments => node[:opennms][:users][:admin][:user_comments],
+    :password      => node[:opennms][:users][:admin][:password]
+  )
+end
+
+template "#{onms_home}/etc/vacuumd-configuration.xml" do
+  source "vacuumd-configuration.xml.erb"
+  mode 0664
+  owner "root"
+  group "root"
+  notifies :restart, "service[opennms]"
+  variables(
+    :period        => node[:opennms][:vacuumd][:period],
+    :statement     => node[:opennms][:vacuumd][:statement],
+    :automations   => node[:opennms][:vacuumd][:automations],
+    :triggers      => node[:opennms][:vacuumd][:triggers],
+    :actions       => node[:opennms][:vacuumd][:actions],
+    :auto_events   => node[:opennms][:vacuumd][:auto_events],
+    :action_events => node[:opennms][:vacuumd][:action_events]
+  )
+end
+
+template "#{onms_home}/etc/viewsdisplay.xml" do
+  source "viewsdisplay.xml.erb"
+  mode 0664
+  owner "root"
+  group "root"
+  notifies :restart, "service[opennms]"
+  variables(
+    :web_console_view        => node[:opennms][:web_console_view]
+  )
+end
+
+template "#{onms_home}/etc/vmware-cim-datacollection-config.xml" do
+  source "vmware-cim-datacollection-config.xml.erb"
+  mode 0664
+  owner "root"
+  group "root"
+  notifies :restart, "service[opennms]"
+  variables(
+    :rrd_repository         => node[:opennms][:vmware_cim][:rrd_repository],
+    :default_esx_hostsystem => node[:opennms][:vmware_cim][:default_esx_hostsystem]
+  )
+end
+
+template "#{onms_home}/etc/vmware-datacollection-config.xml" do
+  source "vmware-datacollection-config.xml.erb"
+  mode 0664
+  owner "root"
+  group "root"
+  notifies :restart, "service[opennms]"
+  variables(
+    :rrd_repository         => node[:opennms][:vmware][:rrd_repository],
+    :default_hostsystem3    => node[:opennms][:vmware][:default_hostsystem3],
+    :default_vm3            => node[:opennms][:vmware][:default_vm3],
+    :default_hostsystem4    => node[:opennms][:vmware][:default_hostsystem4],
+    :default_vm4            => node[:opennms][:vmware][:default_vm4],
+    :default_hostsystem5    => node[:opennms][:vmware][:default_hostsystem5],
+    :default_vm5            => node[:opennms][:vmware][:default_vm5]
+  )
+end
+
+template "#{onms_home}/etc/wmi-datacollection-config.xml" do
+  source "wmi-datacollection-config.xml.erb"
+  mode 0664
+  owner "root"
+  group "root"
+  notifies :restart, "service[opennms]"
+  variables(
+    :rrd_repository => node[:opennms][:wmi][:rrd_repository],
+    :default        => node[:opennms][:wmi][:default]
+  )
+end
+
+# TOOD: split out to it's own recipe that also installs opennms-plugin-protocol-xml
+#template "#{onms_home}/etc/xml-datacollection-config.xml" do
+#  source "xml-datacollection-config.xml.erb"
+#  mode 0664
+#  owner "root"
+#  group "root"
+#  notifies :restart, "service[opennms]"
+#  variables(
+#    :rrd_repository => node[:opennms][:xml][:rrd_repository],
+#    :threegpp_full_5min        => node[:opennms][:xml][:threegpp_full_5min],
+#    :threegpp_full_15min        => node[:opennms][:xml][:threegpp_full_15min],
+#    :threegpp_sample        => node[:opennms][:xml][:threegpp_sample]
+#  )
+#end
+
+template "#{onms_home}/etc/xmlrpcd-configuration.xml" do
+  source "xmlrpcd-configuration.xml.erb"
+  mode 0664
+  owner "root"
+  group "root"
+  notifies :restart, "service[opennms]"
+  variables(
+    :max_event_queue_size => node[:opennms][:xmlrpcd][:max_event_queue_size],
+    :external_servers     => node[:opennms][:xmlrpcd][:external_servers],
+    :base_events          => node[:opennms][:xmlrpcd][:base_events]
+  )
+end
+
+template "#{onms_home}/etc/xmpp-configuration.properties" do
+  source "xmpp-configuration.properties.erb"
+  mode 0664
+  owner "root"
+  group "root"
+  notifies :restart, "service[opennms]"
+  variables(
+    :server              => node[:opennms][:xmpp][:server],
+    :service_name        => node[:opennms][:xmpp][:service_name],
+    :port                => node[:opennms][:xmpp][:port],
+    :tls                 => node[:opennms][:xmpp][:tls],
+    :sasl                => node[:opennms][:xmpp][:sasl],
+    :self_signed_certs   => node[:opennms][:xmpp][:self_signed_certs],
+    :truststore_password => node[:opennms][:xmpp][:truststore_password],
+    :debug               => node[:opennms][:xmpp][:debug],
+    :user                => node[:opennms][:xmpp][:user],
+    :pass                => node[:opennms][:xmpp][:pass]
+  )
+end
+
 service "opennms" do
   supports :status => true, :restart => true
   action [ :enable, :start ]

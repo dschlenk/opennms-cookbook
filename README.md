@@ -673,6 +673,280 @@ Note that this doesn't delete that file, it merely comments out the `reports=...
 
 You can also change the default KSC graph by setting `node['snmp_graph']['default_ksc_graph']` to the name of a valid graph.
 
+#### etc/snmp-interface-poller-configuration.xml
+
+Some attributes are available to configure the 1.9+ SNMP Interface Poller (http://www.opennms.org/wiki/SNMP_Interface_Poller). Defaults (effectively disabled):
+
+```
+default['opennms']['snmp_iface_poller']['threads']                               = 30
+default['opennms']['snmp_iface_poller']['service']                               = "SNMP"
+# array of service names that if down cause the SNMP poller to stop polling
+default['opennms']['snmp_iface_poller']['node_outage']                           = ["ICMP","SNMP"]
+default['opennms']['snmp_iface_poller']['example1']['filter']                    = "IPADDR != '0.0.0.0'"
+default['opennms']['snmp_iface_poller']['example1']['ipv4_range']['begin']       = "1.1.1.1"
+default['opennms']['snmp_iface_poller']['example1']['ipv4_range']['end']         = "1.1.1.1"
+default['opennms']['snmp_iface_poller']['example1']['ipv6_range']['begin']       = "::1"
+default['opennms']['snmp_iface_poller']['example1']['ipv6_range']['end']         = "::1"
+default['opennms']['snmp_iface_poller']['example1']['interface']['name']         = "Ethernet"
+default['opennms']['snmp_iface_poller']['example1']['interface']['criteria']     = "snmpiftype = 6"
+default['opennms']['snmp_iface_poller']['example1']['interface']['interval']     = 300000
+default['opennms']['snmp_iface_poller']['example1']['interface']['user_defined'] = false
+default['opennms']['snmp_iface_poller']['example1']['interface']['status']       = "on"
+```
+
+
+#### etc/statsd-configuration.xml
+
+You can remove either of the default packages or an individual report by setting attributes in `node['opennms']['statsd']['PACKAGE_NAME']['REPORT_NAME']` to false. Packages and their reports are:
+
+* example1
+  * top_n
+* response_time_reports
+  * top_10_weekly
+  * top_10_this_month
+  * top_10_last_month
+  * top_10_this_year
+#### etc/support.properties
+
+Whatever this file is for, you can set support.queueId, support.timeout and support.retry with `node['opennms']['support']['queueid']`, `node['opennms']['support']['timeout']` and `node['opennms']['support']['retry']`.
+
+#### etc/surveillance-views.xml
+
+Similar to site-status-views.xml.  Change this to change the default view shown in the Dashboard of the Web UI with the attribute `node['opennms']['surveillance_views']['default_view']`. Defaults to `default`. A LWRP is forthcoming that will let you add your own (and set it to default). So this is pretty useless ATM.
+#### etc/syslog-northbounder-configuration.xml
+
+orward alarms to a syslog server.  Attributes available in `node['opennms']['syslog_north']`:
+
+```
+use_defaults       = true
+# set above to false if you want the following four attributes to take effect
+enabled            = false
+nagles_delay       = 1000
+batch_size         = 100
+queue_size         = 300000
+message_format     = "ALARM ID:${alarmId} NODE:${nodeLabel}; ${logMsg}"
+```
+
+Change these attributes in `node['opennms']['syslog_north']['destination']` to define the syslog server to send alarm data to:
+
+```
+name            = "localTest"
+host            = "127.0.0.1"
+port            = "514"
+ip_protocol     = "UDP"
+facility        = "LOCAL0"
+max_length      = 1024
+send_local_name = true
+send_local_time = true
+truncate        = false
+```
+
+And set these attributes in `node['opennms']['syslog_north']['uei']` to true to limit alarms forwarded to these specific UEIs:
+
+```
+default['opennms']['syslog_north']['uei']['node_down']
+default['opennms']['syslog_north']['uei']['node_up']
+```
+
+
+#### etc/syslogd-configuration.xml
+
+General settings and their defaults:
+
+```
+default['opennms']['syslogd']['port']                   = 10514
+default['opennms']['syslogd']['new_suspect']            = false
+default['opennms']['syslogd']['parser']                 = "org.opennms.netmgt.syslogd.CustomSyslogParser"
+default['opennms']['syslogd']['forwarding_regexp']      = "^.*\s(19|20)\d\d([-/.])(0[1-9]|1[012])\2(0[1-9]|[12][0-9]|3[01])(\s+)(\S+)(\s)(\S.+)"
+default['opennms']['syslogd']['matching_group_host']    = 6
+default['opennms']['syslogd']['matching_group_message'] = 8
+default['opennms']['syslogd']['discard_uei']            = "DISCARD-MATCHING-MESSAGES"
+```
+
+To disable the predefined definitions, set these to false:
+
+```
+default['opennms']['syslogd']['apache_httpd']
+default['opennms']['syslogd']['linux_kernel']
+default['opennms']['syslogd']['openssh']
+default['opennms']['syslogd']['sudo']
+```
+
+#### etc/threshd-configuration.xml
+
+Like everything else that has packages, filters, ranges and services, you can override attributes to tune the defaults. See the template and default attributes for details. You can also configure the number of threads with `node['opennms']['threshd']['threads']` (default is 5).
+
+#### etc/thresholds.xml
+
+Change the RRD repository location or disable threshold groups with the `enabled` and `rrd_repository` attributes in `node['opennms']['thresholds']['GROUP']` where group can be:
+
+* mib2
+* cisco
+* hrstorage
+* netsnmp
+* netsnmp_memory_linux
+* netsnmp_memory_nonlinux
+* coffee
+
+#### etc/translator-configuration.xml
+
+Remove one of the default event translations (http://www.opennms.org/wiki/Event_Translator) by setting an attribute in `node['opennms']['translator']` to false. They are:
+
+* snmp_link_down
+* snmp_link_up
+* hyperic
+* cisco_config_man
+* juniper_cfg_change
+
+#### etc/trapd-configuration.xml
+
+Two attributes available: `port` and `new_suspect` in `node['opennms']['trapd']` that allow you to configure the port to listen for traps on (default 162) and whether or not to create newSuspect events when a trap is received from an unmanaged host (default false).
+
+#### etc/users.xml
+
+Change your admin password by setting `node['opennms']['users']['admin']['password']` to whatever hashed value of your password OpenNMS uses. Uppercase MD5? In the future we'll generate one during install. You can also change the name and user_comments attributes, I guess.
+
+#### etc/vacuumd-configuration.xml
+
+Disable things that make OpenNMS run better by setting one of these attributes to false:
+
+* `node['opennms']['vacuumd']['statement']`:
+  * topo_delete_nodes
+  * delete_at_interfaces
+  * delete_dl_interfaces
+  * delete_ipr_interfaces
+  * delete_vlans
+  * delete_stp_interfaces
+  * delete_stp_nodes
+  * delete_snmp_interfaces
+  * delete_nodes
+  * delete_ip_interfaces
+  * delete_if_services
+  * delete_events
+* `node['opennms']['vacuumd']['automations']`:
+  * cosmic_clear
+  * clean_up
+  * full_clean_up
+  * gc
+  * full_gc
+  * unclear
+  * escalation
+  * purge_statistics_reports
+  * create_tickets
+  * create_critical_ticket
+  * update_tickets
+  * close_cleared_alarm_tickets
+  * clear_alarms_for_closed_tickets
+  * clean_up_rp_status_changes
+  * maintenance_check (default false)
+  * add_missing_access_points_to_table (default false)
+  * update_access_points_table (default false)
+  * clean_up_access_points_table (default false)
+* `node['opennms']['vacuumd']['triggers']`:
+  * select_closed_ticket_state_for_problem_alarms
+  * select_null_ticket_state_alarms
+  * select_critial_open_alarms
+  * select_not_null_ticket_state_alarms
+  * select_cleared_alarm_with_open_ticket_state
+  * select_suspect_alarms
+  * select_cleared_alarms
+  * select_resolvers
+  * select_expiration_maintenance (default false)
+  * select_access_points_missing_from_table (default false)
+* `node['opennms']['vacuumd']['actions']`:
+  * acknowledge_alarm
+  * update_automation_time
+  * escalate_alarm
+  * reset_severity
+  * garbage_collect_7_4
+  * garbage_collect_8_1 (default false)
+  * full_garbage_collect_7_4
+  * full_garbage_collect_8_1 (default false)
+  * delete_past_cleared_alarms
+  * delete_all_past_cleared_alarms
+  * clear_problems
+  * clear_closed_ticket_alarms
+  * delete_purgeable_statistics_reports
+  * do_nothing_action
+  * clean_up_rp_status_changes
+  * maintenance_expiration_warning (default false)
+  * add_access_point_to_table (default false)
+  * update_access_points_table (default false)
+  * clean_up_access_points_table (default false)
+* `node['opennms']['vacuumd']['auto_events']`:
+  * escalation_event
+* `node['opennms']['vacuumd']['action_events']`:
+  * create_ticket
+  * update_ticket
+  * close_ticket
+  * event_escalated
+  * maintenance_expiration_warning (default false)
+
+You can also change the frequency in which vacuumd runs by setting `node['opennms']['vacuumd']['period']`. Default is 86400000 (1 day).
+
+#### etc/viewsdisplay.xml
+
+Another web UI XML file, this one controls which categories are displayed in the availability box on the main landing page. Once a LWRP exists you'll be able to add sections, but until then you can disable any of the existing categories by setting one of these attributes in `node['opennms']['web_console_view']` to false:
+
+* network_interfaces
+* web_servers
+* email_servers
+* dns_dhcp_servers
+* db_servers
+* jmx_servers
+* other_servers
+
+#### etc/vmware-cim-datacollection-config.xml
+
+Similar to other *datacollection-config.xml files, you can change the RRD repository, step, RRA definitions and disable default vmware-cim-groups.
+
+#### etc/vmware-datacollection-config.xml
+
+Similar to other *datacollection-config.xml files, you can change the RRD repository, step, RRA definitions and disable default vmware-groups.
+
+#### etc/wmi-datacollection-config.xml
+
+Similar to other *datacollection-config.xml files, you can change the RRD repository, step, RRA definitions and disable default wpms.
+
+#### etc/xml-datacollection-config.xml
+
+Note that XML datacollection is a separate plugin package (not yet implemented as a recipe).
+Similar to other *datacollection-config.xml files, you can change the RRD repository, step, RRA definitions and disable default xml-collections.
+
+#### etc/xmlrpcd-configuration.xml
+
+Factory settings can be changed with these attributes in `node['opennms']['xmlrpcd']`:
+
+```
+['max_event_queue_size']            = 5000
+['external_servers']['retries']     = 3
+['external_servers']['elapse_time'] = 15000
+['external_servers']['url']         = "http://localhost:8000"
+['external_servers']['timeout']     = 0
+```
+
+Eventually a LWRP will exist to add more than 1 `external_servers`.
+
+To change the list of events sent via XML-RPC, override the `node['opennms']['xmlrpcd']['base_events']` attribute with an array of UEI strings.
+
+#### etc/xmpp-configuration.xml
+
+Configure notifications to be sent via XMPP (aka Jabber, GTalk) with these attributes in `node['opennms']['xmpp']`:
+
+```
+server
+service_name
+port
+tls
+sasl
+self_signed_certs
+truststore_password
+debug
+user
+pass
+```
+
+
 License
 =======
 Apache 2.0
