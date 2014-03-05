@@ -1144,7 +1144,7 @@ default['opennms']['poller']['example1']['hyperichq']['page_sequence']['login'][
 default['opennms']['poller']['example1']['hyperichq']['page_sequence']['auth']['path'] = "/j_security_check.do"
 default['opennms']['poller']['example1']['hyperichq']['page_sequence']['auth']['port'] = 7080
 default['opennms']['poller']['example1']['hyperichq']['page_sequence']['auth']['method'] = "POST"
-default['opennms']['poller']['example1']['hyperichq']['page_sequence']['auth']['failure_match'] = "(?s)(The username or password provided does not match our records)|(You are not signed in)"
+default['opennms']['poller']['example1']['hyperichq']['page_sequence']['auth']['failure_match'] = '(?s)(The username or password provided does not match our records)|(You are not signed in)'
 default['opennms']['poller']['example1']['hyperichq']['page_sequence']['auth']['failure_message'] = "HQ Login in Failed"
 default['opennms']['poller']['example1']['hyperichq']['page_sequence']['auth']['success_match'] = "HQ Dashboard"
 default['opennms']['poller']['example1']['hyperichq']['page_sequence']['auth']['parameters']['j_username'] = "hqadmin"
@@ -1277,18 +1277,18 @@ default['opennms']['remedy']['password']                     = "TNNwsC4ll"
 default['opennms']['remedy']['authentication']               = "ARSystem"
 default['opennms']['remedy']['locale']                       = "it_IT"
 default['opennms']['remedy']['timezone']                     = "CET"
-default['opennms']['remedy']['endpoint']                     = "http://172.20.0.76:8180/arsys/services/ARService?server=itts3h&webService=HPD_IncidentInterface_WS"
-default['opennms']['remedy']['portname']                     = "HPD_IncidentInterface_WSPortTypeSoap"
-default['opennms']['remedy']['createendpoint']               = "http://172.20.0.76:8180/arsys/services/ARService?server=itts3h&webService=HPD_IncidentInterface_Create_WS"
-default['opennms']['remedy']['createportname']               = "HPD_IncidentInterface_Create_WSPortTypeSoap"
-default['opennms']['remedy']['targetgroups']                 = "TNnet:Tetranet"
+default['opennms']['remedy']['endpoint']                     = 'http://172.20.0.76:8180/arsys/services/ARService?server=itts3h&webService=HPD_IncidentInterface_WS'
+default['opennms']['remedy']['portname']                     = 'HPD_IncidentInterface_WSPortTypeSoap'
+default['opennms']['remedy']['createendpoint']               = 'http://172.20.0.76:8180/arsys/services/ARService?server=itts3h&webService=HPD_IncidentInterface_Create_WS'
+default['opennms']['remedy']['createportname']               = 'HPD_IncidentInterface_Create_WSPortTypeSoap'
+default['opennms']['remedy']['targetgroups']                 = 'TNnet:Tetranet'
 default['opennms']['remedy']['assignedgroups']               = {"TNnet" => "TNnet", "Tetranet" => "TNnet - Tetranet" }
 default['opennms']['remedy']['assignedsupportcompanies']     = {"TNnet" => "Trentino Network srl", "Tetranet" => "Trentino Network srl" }
 default['opennms']['remedy']['assignedsupportorganizations'] = {"TNnet" => "Centro Gestione Rete", "Tetranet" => "Centro Gestione Rete" }
 default['opennms']['remedy']['assignedgroup']                = "TNnet"
 default['opennms']['remedy']['firstname']                    = "Opennms"
 default['opennms']['remedy']['lastname']                     = "Tnn"
-default['opennms']['remedy']['serviceCI']                    = "Trentino Network Connettivit\\uFFFD [C.TNNCN]"
+default['opennms']['remedy']['serviceCI']                    = 'Trentino Network Connettivit\uFFFD [C.TNNCN]'
 default['opennms']['remedy']['serviceCIReconID']             = "RE00505688005e3s-nTg4KEI5gFSov"
 default['opennms']['remedy']['assignedsupportcompany']       = "Trentino Network srl"
 default['opennms']['remedy']['assignedsupportorganization']  = "Centro Gestione Rete"
@@ -1526,7 +1526,7 @@ default['opennms']['syslog_north']['enabled']            = false
 default['opennms']['syslog_north']['nagles_delay']       = 1000
 default['opennms']['syslog_north']['batch_size']         = 100
 default['opennms']['syslog_north']['queue_size']         = 300000
-default['opennms']['syslog_north']['message_format']     = "ALARM ID:${alarmId} NODE:${nodeLabel}; ${logMsg}"
+default['opennms']['syslog_north']['message_format']     = 'ALARM ID:${alarmId} NODE:${nodeLabel}; ${logMsg}'
 default['opennms']['syslog_north']['destination']['name']            = "localTest"
 default['opennms']['syslog_north']['destination']['host']            = "127.0.0.1"
 default['opennms']['syslog_north']['destination']['port']            = "514"
@@ -1542,7 +1542,7 @@ default['opennms']['syslog_north']['uei']['node_up']   = false
 default['opennms']['syslogd']['port']                   = 10514
 default['opennms']['syslogd']['new_suspect']            = false
 default['opennms']['syslogd']['parser']                 = "org.opennms.netmgt.syslogd.CustomSyslogParser"
-default['opennms']['syslogd']['forwarding_regexp']      = "^.*\s(19|20)\d\d([-/.])(0[1-9]|1[012])\2(0[1-9]|[12][0-9]|3[01])(\s+)(\S+)(\s)(\S.+)"
+default['opennms']['syslogd']['forwarding_regexp']      = '^.*\s(19|20)\d\d([-/.])(0[1-9]|1[012])\2(0[1-9]|[12][0-9]|3[01])(\s+)(\S+)(\s)(\S.+)'
 default['opennms']['syslogd']['matching_group_host']    = 6
 default['opennms']['syslogd']['matching_group_message'] = 8
 default['opennms']['syslogd']['discard_uei']            = "DISCARD-MATCHING-MESSAGES"

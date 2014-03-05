@@ -21,6 +21,7 @@ suites:
       - recipe[opennms::default]
       - recipe[opennms::nsclient]
       - recipe[opennms::xml]
+      - recipe[opennms::test_collection_package]
     attributes: { 
                  "java": { 
                           "oracle": { 
