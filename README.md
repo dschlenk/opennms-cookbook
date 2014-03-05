@@ -145,6 +145,7 @@ There are also a couple OpenNMS attributes you'll probably want to override at a
 ### Other Recipes
 
 * `opennms::nsclient` installs the optional nsclient data collection plugin and uses the template for etc/nsclient-datacollection-config.xml. 
+* `opennms::xml` installs the optional xml data collection plugin and uses the template for etc/xml-datacollection-config.xml. 
 
 ### Template Overview
 
@@ -913,7 +914,7 @@ Similar to other *datacollection-config.xml files, you can change the RRD reposi
 
 #### etc/xml-datacollection-config.xml
 
-Note that XML datacollection is a separate plugin package (not yet implemented as a recipe).
+Note that XML datacollection is a separate plugin package in it's own recipe. 
 Similar to other *datacollection-config.xml files, you can change the RRD repository, step, RRA definitions and disable default xml-collections.
 
 #### etc/xmlrpcd-configuration.xml
