@@ -425,13 +425,15 @@ report.strafeping.command=--title="StrafePing Response Time" \
  CDEF:meH0=me0,0,*,0.0007145313,2,*,+ \
  AREA:meL0 \
  STACK:meH0#26ff00:0 \
+ <% last_i = 0 -%>
  <% for i in 1..@strafeping_count do -%>
  <% if @strafeping_colors[i].length == 2 -%>
- CDEF:me<%=i%>=loss,<%=(i-1)%>,GT,loss,<%=i%>,LE,*,1,UNKN,IF,median,* \
+ CDEF:me<%=i%>=loss,<%=last_i%>,GT,loss,<%=i%>,LE,*,1,UNKN,IF,median,* \
  CDEF:meL<%=i%>=me<%=i%>,0.0007145313,- \
  CDEF:meH<%=i%>=me<%=i%>,0,*,0.0007145313,2,*,+ \
  AREA:meL<%=i%> \
  STACK:meH<%=i%><%=@strafeping_colors[i][1]%>:<%=i%>/<%=@strafeping_count%> \
+ <% last_i = i -%>
  <% end -%>
  <% end -%>
  COMMENT:"\\l" \
