@@ -379,7 +379,7 @@ org.opennms.netmgt.jetty.https-host = <%=@https_host%>
 <% end -%>
 ## change the value of this property.  Note that the jetty.properties
 ## distributed with OpenNMS should never be used in production.
-#org.opennms.netmgt.jetty.https-keystore = /opt/opennms/etc/jetty.keystore
+#org.opennms.netmgt.jetty.https-keystore = <%=@onms_home%>/etc/jetty.keystore
 <% unless @keystore.nil? -%>
 org.opennms.netmgt.jetty.https-keystore = <%=@keystore%>
 <% end -%>

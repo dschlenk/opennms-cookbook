@@ -1,19 +1,20 @@
 <?xml version="1.0"?>
-<jmx-datacollection-config rrdRepository="/opt/opennms/share/rrd/snmp/">
+<jmx-datacollection-config rrdRepository="opennms/share/rrd/snmp/">
 <% if @enable_jboss -%>
   <jmx-collection name="jboss">
-    <rrd step="300">
-      <rra>RRA:AVERAGE:0.5:1:2016</rra>
-      <rra>RRA:AVERAGE:0.5:12:1488</rra>
-      <rra>RRA:AVERAGE:0.5:288:366</rra>
-      <rra>RRA:MAX:0.5:288:366</rra>
-      <rra>RRA:MIN:0.5:288:366</rra>
+    <rrd step="<%=@jboss[:rrd][:step]%>">
+      <% @jboss[:rrd][:rras].each do |rra| -%>
+      <rra><%=rra%></rra>
+      <% end -%>
     </rrd>
     <mbeans>
+      <% if @jboss[:system_info][:enabled] -%>
       <mbean name="SystemInfo" objectname="jboss.system:type=ServerInfo">
         <attrib name="FreeMemory" alias="FreeMemory" type="gauge"/>
         <attrib name="TotalMemory" alias="TotalMemory" type="gauge"/>
       </mbean>
+      <% end -%>
+      <% if @jboss[:default_ds_mcp][:enabled] -%>
       <mbean name="DefaultDSManagedConnectionPool" objectname="jboss.jca:service=ManagedConnectionPool,name=DefaultDS">
         <attrib name="AvailableConnectionCount" alias="DefDS_AvailConns" type="gauge"/>
         <attrib name="ConnectionCount" alias="DefDS_Conns" type="gauge"/>
@@ -21,36 +22,66 @@
         <attrib name="ConnectionCreatedCount" alias="DefDS_CreatedConns" type="counter"/>
         <attrib name="ConnectionDestroyedCount" alias="DefDS_DestroyConns" type="counter"/>
       </mbean>
+      <% end -%>
       <!-- JmsXA Connector Pool
+      <% if @jboss[:jms_xa_cp][:enabled] -%>
+      -->
+      <% end -%>
           <mbean name="JmsXAManagedConnectionPool" objectname="jboss.jca:service=ManagedConnectionPool,name=JmsXA">  
               <attrib name="AvailableConnectionCount"   alias="JmsXA_AvailConns"    type="gauge"/> 
               <attrib name="ConnectionCount"            alias="JmsXA_Conns"         type="gauge"/>  
               <attrib name="InUseConnectionCount"       alias="JmsXA_InUseConns"    type="gauge"/>  
               <attrib name="ConnectionCreatedCount"     alias="JmsXA_CreatedConns"  type="gauge"/>  
               <attrib name="ConnectionDestroyedCount"   alias="JmsXA_DestroyConns"  type="gauge"/>  
+      <% if !@jboss[:jms_xa_cp][:enabled] -%>
           </mbean-->
+      <% else -%>
+          </mbean>
+      <% end -%>
       <!-- Destination Manager
+      <% if @jboss[:jms_dm][:enabled] -%>
+      -->
+      <% end -%>
           <mbean name="MQ_DestinationManager" objectname="jboss.mq:service=DestinationManager">  
               <attrib name="ClientCount"   alias="MQ_ClientCount"    type="gauge"/> 
+      <% if !@jboss[:jms_dm][:enabled] -%>
           </mbean-->
+      <% else -%>
+          </mbean>
+      <% end -%>
       <!-- an example of a Queue 
-          <mbean name="MQ_DestinationQueueA" objectname="jboss.mq.destination:service=Queue,name=A">  
-              <attrib name="QueueDepth"       alias="A_QueueDepth"       type="gauge"/> 
-              <attrib name="ReceiversCount"   alias="A_QueueRecv"        type="gauge"/> 
-              <attrib name="MaxDepth"         alias="A_QueueMaxDepth"    type="gauge"/> 
+      <% if @jboss[:jms_queue][:enabled] -%>
+      -->
+      <% end -%>
+          <mbean name="MQ_DestinationQueue<%=@jboss[:jms_queue][:name]%>" objectname="jboss.mq.destination:service=Queue,name=<%=@jboss[:jms_queue][:name]%>">  
+              <attrib name="QueueDepth"       alias="<%=@jboss[:jms_queue][:name]%>_QueueDepth"       type="gauge"/> 
+              <attrib name="ReceiversCount"   alias="<%=@jboss[:jms_queue][:name]%>_QueueRecv"        type="gauge"/> 
+              <attrib name="MaxDepth"         alias="<%=@jboss[:jms_queue][:name]%>_QueueMaxDepth"    type="gauge"/> 
+      <% if !@jboss[:jms_queue][:enabled] -%>
           </mbean-->
+      <% else -%>
+          </mbean>
+      <% end -%>
       <!-- an example of a Topic
-          <mbean name="SecuredTopic" objectname="jboss.mq.destination:service=Topic,name=securedTopic">  
-              <attrib name="DurableMessageCount"         alias="ST_DurMsg"      type="gauge"/> 
-              <attrib name="NonDurableMessageCount"      alias="ST_NonDurMsg"   type="gauge"/> 
-              <attrib name="NonDurableSubscriptionCount" alias="ST_NonDurSub"   type="gauge"/> 
-              <attrib name="DurableSubscriptionCount"    alias="ST_DurSub"      type="gauge"/> 
-              <attrib name="AllMessageCount"             alias="ST_AllMsg"      type="gauge"/> 
-              <attrib name="MaxDepth"                    alias="ST_MaxDepth"    type="gauge"/> 
-              <attrib name="AllSubscriptionsCount"       alias="ST_AllSub"      type="gauge"/> 
+      <% if @jboss[:jms_topic][:enabled] -%>
+      -->
+      <% end -%>
+          <mbean name="<%=@jboss[:jms_topic][:name]%>" objectname="<%=@jboss[:jms_topic][:object_name]%>">
+              <attrib name="DurableMessageCount"         alias="<%=@jboss[:jms_topic][:short_name]%>_DurMsg"      type="gauge"/> 
+              <attrib name="NonDurableMessageCount"      alias="<%=@jboss[:jms_topic][:short_name]%>_NonDurMsg"   type="gauge"/> 
+              <attrib name="NonDurableSubscriptionCount" alias="<%=@jboss[:jms_topic][:short_name]%>_NonDurSub"   type="gauge"/> 
+              <attrib name="DurableSubscriptionCount"    alias="<%=@jboss[:jms_topic][:short_name]%>_DurSub"      type="gauge"/> 
+              <attrib name="AllMessageCount"             alias="<%=@jboss[:jms_topic][:short_name]%>_AllMsg"      type="gauge"/> 
+              <attrib name="MaxDepth"                    alias="<%=@jboss[:jms_topic][:short_name]%>_MaxDepth"    type="gauge"/> 
+              <attrib name="AllSubscriptionsCount"       alias="<%=@jboss[:jms_topic][:short_name]%>_AllSub"      type="gauge"/> 
+      <% if !@jboss[:jms_topic][:enabled] -%>
           </mbean-->
+      <% else -%>
+          </mbean>
+      <% end -%>
+      <% if @jboss[:global_request_processor][:enabled] -%>
       <!-- Global Request Processor -->
-      <mbean name="GlobalRequestProcessor" objectname="jboss.web:type=GlobalRequestProcessor,name=http-0.0.0.0-8080">
+      <mbean name="GlobalRequestProcessor" objectname="<%=@jboss[:global_request_processor][:object_name]%>">
         <attrib name="requestCount" alias="GRP_requests" type="counter"/>
         <attrib name="maxTime" alias="GRP_maxTime" type="gauge"/>
         <attrib name="bytesSent" alias="GRP_bytesSent" type="counter"/>
@@ -58,27 +89,29 @@
         <attrib name="processingTime" alias="GRP_procTime" type="counter"/>
         <attrib name="errorCount" alias="GRP_errors" type="counter"/>
       </mbean>
+      <% end -%>
+      <% if @jboss[:thread_pool][:enabled] -%>
       <!-- Thread Pool -->
-      <mbean name="ThreadPool" objectname="jboss.web:type=ThreadPool,name=http-0.0.0.0-8080">
+      <mbean name="ThreadPool" objectname="<%=@jboss[:thread_pool][:object_name]%>">
         <attrib name="currentThreadsBusy" alias="BusyThreads" type="gauge"/>
         <attrib name="currentThreadCount" alias="Threads" type="gauge"/>
         <attrib name="minSpareThreads" alias="MinSpareThreads" type="gauge"/>
         <attrib name="maxSpareThreads" alias="MaxSpareThreads" type="gauge"/>
         <attrib name="maxThreads" alias="MaxThreads" type="gauge"/>
       </mbean>
+      <% end -%>
     </mbeans>
   </jmx-collection>
 <% end -%>
 <% if @enable_opennms -%>
   <jmx-collection name="jsr160">
-    <rrd step="300">
-      <rra>RRA:AVERAGE:0.5:1:2016</rra>
-      <rra>RRA:AVERAGE:0.5:12:1488</rra>
-      <rra>RRA:AVERAGE:0.5:288:366</rra>
-      <rra>RRA:MAX:0.5:288:366</rra>
-      <rra>RRA:MIN:0.5:288:366</rra>
+    <rrd step="<%=@jsr160[:rrd][:step]%>">
+      <% @jsr160[:rrd][:rras].each do |rra| -%>
+      <rra><%=rra%></rra>
+      <% end -%>
     </rrd>
     <mbeans>
+      <% if @jsr160[:queued][:enabled] -%>
       <mbean name="OpenNMS Queued" objectname="OpenNMS:Name=Queued">
         <attrib name="CreatesCompleted" alias="ONMSQueCreates" type="counter"/>
         <attrib name="DequeuedItems" alias="ONMSQueItemDeque" type="counter"/>
@@ -92,23 +125,31 @@
         <attrib name="TotalOperationsPending" alias="ONMSQueOpsPend" type="gauge"/>
         <attrib name="UpdatesCompleted" alias="ONMSQueUpdates" type="counter"/>
       </mbean>
+      <% end -%>
+      <% if @jsr160[:jvm_memory][:enabled] -%>
       <mbean name="JVM Memory" objectname="java.lang:type=OperatingSystem">
         <attrib name="FreePhysicalMemorySize" alias="FreeMemory" type="gauge"/>
         <attrib name="TotalPhysicalMemorySize" alias="TotalMemory" type="gauge"/>
         <attrib name="FreeSwapSpaceSize" alias="FreeSwapSpace" type="gauge"/>
         <attrib name="TotalSwapSpaceSize" alias="TotalSwapSpace" type="gauge"/>
       </mbean>
+      <% end -%>
+      <% if @jsr160[:jvm_threading][:enabled] -%>
       <mbean name="JVM Threading" objectname="java.lang:type=Threading">
         <attrib name="ThreadCount" alias="ThreadCount" type="gauge"/>
         <attrib name="PeakThreadCount" alias="PeakThreadCount" type="gauge"/>
         <attrib name="DaemonThreadCount" alias="DaemonThreadCount" type="gauge"/>
         <attrib name="CurrentThreadCpuTime" alias="CurThreadCpuTime" type="gauge"/>
       </mbean>
+      <% end -%>
+      <% if @jsr160[:jvm_class_loading][:enabled] -%>
       <mbean name="JVM ClassLoading" objectname="java.lang:type=ClassLoading">
         <attrib name="TotalLoadedClassCount" alias="TotLoadedClasses" type="gauge"/>
         <attrib name="LoadedClassCount" alias="LoadedClasses" type="gauge"/>
         <attrib name="UnloadedClassCount" alias="UnloadedClass" type="gauge"/>
       </mbean>
+      <% end -%>
+      <% if @jsr160[:jvm_memory_pool_eden_space][:enabled] -%>
       <mbean name="JVM MemoryPool:Eden Space" objectname="java.lang:type=MemoryPool,name=Eden Space">
         <attrib name="CollectionUsageThreshold" alias="EdenCollUseThrsh" type="gauge"/>
         <attrib name="CollectionUsageThresholdCount" alias="EdenCollUseThrshCnt" type="gauge"/>
@@ -125,6 +166,8 @@
           <comp-member name="committed" type="gauge" alias="EdenPeakUsgCmmttd"/>
         </comp-attrib>
       </mbean>
+      <% end -%>
+      <% if @jsr160[:jvm_memory_pool_survivor_space][:enabled] -%>
       <mbean name="JVM MemoryPool:Survivor Space" objectname="java.lang:type=MemoryPool,name=Survivor Space">
         <attrib name="CollectionUsageThreshold" alias="SurvCollUseThresh" type="gauge"/>
         <attrib name="CollectionUsageThresholdCount" alias="SurvCollUseThrshCnt" type="gauge"/>
@@ -141,6 +184,8 @@
           <comp-member name="committed" type="gauge" alias="SurvPeakUsgCmmttd"/>
         </comp-attrib>
       </mbean>
+      <% end -%>
+      <% if @jsr160[:jvm_memory_perm_gen][:enabled] -%>
       <mbean name="JVM MemoryPool:Perm Gen" objectname="java.lang:type=MemoryPool,name=Perm Gen">
         <attrib name="CollectionUsageThreshold" alias="PermCollUseThresh" type="gauge"/>
         <attrib name="CollectionUsageThresholdCount" alias="PermCollUseThrshCnt" type="gauge"/>
@@ -151,6 +196,8 @@
           <comp-member name="committed" type="gauge" alias="PermUsgCmmttd"/>
         </comp-attrib>
       </mbean>
+      <% end -%>
+      <% if @jsr160[:jvm_memory_pool_old_gen][:enabled] -%>
       <mbean name="JVM MemoryPool:Old Gen" objectname="java.lang:type=MemoryPool,name=Old Gen">
         <attrib name="CollectionUsageThreshold" alias="OGenCollUseThresh" type="gauge"/>
         <attrib name="CollectionUsageThresholdCount" alias="OGenCollUseThrshCnt" type="gauge"/>
@@ -161,7 +208,9 @@
           <comp-member name="committed" type="gauge" alias="OGenUsgCmmttd"/>
         </comp-attrib>
       </mbean>
+      <% end -%>
 
+      <% if @jsr160[:jvm_gc_copy][:enabled] -%>
       <mbean name="JVM GarbageCollector:Copy" objectname="java.lang:type=GarbageCollector,name=Copy">
         <attrib name="CollectionCount" alias="CopyCollCnt" type="counter"/>
         <attrib name="CollectionTime" alias="CopyCollTime" type="counter"/>
@@ -171,6 +220,8 @@
           <comp-member name="endTime" type="gauge" alias="CopyEndTime"/>
         </comp-attrib>
       </mbean>
+      <% end -%>
+      <% if @jsr160[:jvm_gc_mark_sweep_compact][:enabled] -%>
       <mbean name="JVM GarbageCollector:MarkSweepCompact" objectname="java.lang:type=GarbageCollector,name=MarkSweepCompact">
         <attrib name="CollectionCount" alias="MSCCollCnt" type="counter"/>
         <attrib name="CollectionTime" alias="MSCCollTime" type="counter"/>
@@ -180,6 +231,8 @@
           <comp-member name="endTime" type="gauge" alias="MSCEndTime"/>
         </comp-attrib>
       </mbean>
+      <% end -%>
+      <% if @jsr160[:jvm_gc_par_new][:enabled] -%>
       <mbean name="JVM GarbageCollector:ParNew" objectname="java.lang:type=GarbageCollector,name=ParNew">
         <attrib name="CollectionCount" alias="ParNewCollCnt" type="counter"/>
         <attrib name="CollectionTime" alias="ParNewCollTime" type="counter"/>
@@ -189,6 +242,8 @@
           <comp-member name="endTime" type="gauge" alias="ParNewEndTime"/>
         </comp-attrib>
       </mbean>
+      <% end -%>
+      <% if @jsr160[:jvm_gc_concurrent_mark_sweep][:enabled] -%>
       <mbean name="JVM GarbageCollector:ConcurrentMarkSweep" objectname="java.lang:type=GarbageCollector,name=ConcurrentMarkSweep">
         <attrib name="CollectionCount" alias="CMSCollCnt" type="counter"/>
         <attrib name="CollectionTime" alias="CMSCollTime" type="counter"/>
@@ -198,6 +253,8 @@
           <comp-member name="endTime" type="gauge" alias="CMSEndTime"/>
         </comp-attrib>
       </mbean>
+      <% end -%>
+      <% if @jsr160[:jvm_gc_ps_mark_sweep][:enabled] -%>
       <mbean name="JVM GarbageCollector:PS MarkSweep" objectname="java.lang:type=GarbageCollector,name=PS MarkSweep">
         <attrib name="CollectionCount" alias="PSMSCollCnt" type="counter"/>
         <attrib name="CollectionTime" alias="PSMSCollTime" type="counter"/>
@@ -207,6 +264,8 @@
           <comp-member name="endTime" type="gauge" alias="PSMSEndTime"/>
         </comp-attrib>
       </mbean>
+      <% end -%>
+      <% if @jsr160[:jvm_gc_ps_scavenge][:enabled] -%>
       <mbean name="JVM GarbageCollector:PS Scavenge" objectname="java.lang:type=GarbageCollector,name=PS Scavenge">
         <attrib name="CollectionCount" alias="PSSCollCnt" type="counter"/>
         <attrib name="CollectionTime" alias="PSSCollTime" type="counter"/>
@@ -216,6 +275,7 @@
           <comp-member name="endTime" type="gauge" alias="PSSEndTime"/>
         </comp-attrib>
       </mbean>
+      <% end -%>
 
     </mbeans>
   </jmx-collection>

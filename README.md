@@ -345,13 +345,11 @@ This is useful for something I'm sure, but I don't know what. See the template o
 
 #### etc/jdbc-datacollection-config.xml 
 
-TODO: Finish this template!!!
-Similar to other datacollection-config.xml files, you can change the RRD repository, step, RRA definitions and disable default collections.
+Similar to other datacollection-config.xml files, you can change the RRD repository, step, RRA definitions and disable default collections and their queries.
 
 #### etc/jmx-datacollection-config.xml 
 
-TODO: Finish this template!!!
-Similar to other datacollection-config.xml files, you can change the RRD repository, step, RRA definitions and disable default collections.
+Similar to other datacollection-config.xml files, you can change the RRD repository, step, RRA definitions and disable default collections and their mbeans. In the JBoss collection you can specify a JMS queue and/or topic to collect stats on. See the template and default attributes for details. 
 
 #### etc/linkd-configuration.xml
 

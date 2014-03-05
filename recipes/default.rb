@@ -168,6 +168,7 @@ template "#{onms_home}/etc/opennms.properties" do
     :max_form_keys                  => node['opennms']['properties']['jetty']['max_form_keys'],
     :https_port                     => node['opennms']['properties']['jetty']['https_port'],
     :https_host                     => node['opennms']['properties']['jetty']['https_host'],
+    :onms_home                      => node['opennms']['conf']['home'],
     :keystore                       => node['opennms']['properties']['jetty']['keystore'],
     :ks_password                    => node['opennms']['properties']['jetty']['ks_password'],
     :key_password                   => node['opennms']['properties']['jetty']['key_password'],
@@ -241,7 +242,7 @@ template "#{onms_home}/etc/availability-reports.xml" do
 end
 
 # Disabled by default and deprecated in 1.12. You've been warned.
-template "/opt/opennms/etc/capsd-configuration.xml" do
+template "#{onms_home}/etc/capsd-configuration.xml" do
   source "capsd-configuration.xml.erb"
   mode 0664
   owner "root"
@@ -545,9 +546,13 @@ template "#{onms_home}/etc/jdbc-datacollection-config.xml" do
   group "root"
   notifies :restart, "service[opennms]"
   variables(
+    :rrd_repository     => node[:opennms][:jdbc_dc][:rrd_repository],
     :enable_default     => node[:opennms][:jdbc_dc][:enable_default],
+    :default            => node[:opennms][:jdbc_dc][:default],
     :enable_mysql_stats => node[:opennms][:jdbc_dc][:enable_mysql_stats],
-    :enable_pgsql_stats => node[:opennms][:jdbc_dc][:enable_pgsql_stats]
+    :mysql              => node[:opennms][:jdbc_dc][:mysql],
+    :enable_pgsql_stats => node[:opennms][:jdbc_dc][:enable_pgsql_stats],
+    :pgsql              => node[:opennms][:jdbc_dc][:pgsql]
   )
 end
 
@@ -558,8 +563,11 @@ template "#{onms_home}/etc/jmx-datacollection-config.xml" do
   group "root"
   notifies :restart, "service[opennms]"
   variables(
-    :enable_jboss   => node[:opennms][:jdbc_dc][:enable_default],
-    :enable_opennms => node[:opennms][:jdbc_dc][:enable_mysql_stats]
+    :rrd_repository => node[:opennms][:jmx_dc][:rrd_repository],
+    :enable_jboss   => node[:opennms][:jmx_dc][:enable_jboss],
+    :jboss          => node[:opennms][:jmx_dc][:jboss],
+    :enable_opennms => node[:opennms][:jmx_dc][:enable_opennms],
+    :jsr160         => node[:opennms][:jmx_dc][:jsr160],
   )
 end
 
