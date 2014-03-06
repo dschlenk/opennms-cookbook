@@ -19,7 +19,7 @@ def load_current_resource
   @current_resource = Chef::Resource::OpennmsCollectionPackage.new(@new_resource.name)
   @current_resource.name(@new_resource.name)
 
-  if collection_exists?(@current_resource.name)
+  if package_exists?(@current_resource.name)
      @current_resource.exists = true
   end
 end
@@ -27,7 +27,7 @@ end
 
 private
 
-def collection_exists?(name)
+def package_exists?(name)
   Chef::Log.debug "Checking to see if this collection package exists: '#{ name }'"
   file = ::File.new("/opt/opennms/etc/collectd-configuration.xml", "r")
   doc = REXML::Document.new file
