@@ -19,7 +19,7 @@ actions :create
 default_action :create
 
 attribute :group, :name_attribute => true, :kind_of => String, :required => true
-attribute :collection_name, :kind_of => String, :required => true, :default => 'default'
+attribute :collection_name, :kind_of => String, :default => 'default', :required => true
 attribute :file, :kind_of => String, :required => true
 attribute :system_def, :kind_of => String
 attribute :exclude_filters, :kind_of => Array, :default => []

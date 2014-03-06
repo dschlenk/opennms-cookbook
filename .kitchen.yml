@@ -22,11 +22,13 @@ suites:
       - recipe[opennms::nsclient]
       - recipe[opennms::xml]
       - recipe[opennms::test_snmp_collection]
-      - recipe[opennms::test_collection_package]
-      - recipe[opennms::test_snmp_collection_service]
-      - recipe[opennms::test_snmp_collection_group]
       - recipe[opennms::test_xml_collection]
       - recipe[opennms::test_wmi_collection]
+      - recipe[opennms::test_collection_package]
+      - recipe[opennms::test_snmp_collection_service]
+      - recipe[opennms::test_xml_collection_service]
+      - recipe[opennms::test_wmi_collection_service]
+      - recipe[opennms::test_snmp_collection_group]
     attributes: { 
                  "java": { 
                           "oracle": { 
