@@ -29,14 +29,14 @@ private
 
 def package_exists?(name)
   Chef::Log.debug "Checking to see if this collection package exists: '#{ name }'"
-  file = ::File.new("/opt/opennms/etc/collectd-configuration.xml", "r")
+  file = ::File.new("#{node['opennms']['conf']['home']}/etc/collectd-configuration.xml", "r")
   doc = REXML::Document.new file
   !doc.elements["/collectd-configuration/package[@name='#{name}']"].nil?
 end
 
 def create_collection_package
   Chef::Log.debug "Adding collection package: '#{ new_resource.name }'"
-  file = ::File.new("/opt/opennms/etc/collectd-configuration.xml")
+  file = ::File.new("#{node['opennms']['conf']['home']}/etc/collectd-configuration.xml")
   contents = file.read
   doc = REXML::Document.new(contents, { :respect_whitespace => :all })
   file.close
@@ -92,6 +92,6 @@ def create_collection_package
   formatter = REXML::Formatters::Pretty.new(2)
   formatter.compact = true
   formatter.write(doc, out)
-  ::File.open("/opt/opennms/etc/collectd-configuration.xml", "w"){ |file| file.puts(out) }
+  ::File.open("#{node['opennms']['conf']['home']}/etc/collectd-configuration.xml", "w"){ |file| file.puts(out) }
 end
 

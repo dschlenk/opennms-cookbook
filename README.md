@@ -152,6 +152,7 @@ There are also a couple OpenNMS attributes you'll probably want to override at a
 The list of implemented LWRPs is as follows: 
 
 * `opennms_snmp_collection`: adds an snmp-collection element to etc/datacollection-config.xml. See `opennms::test_snmp_collection` for example usage.
+* `opennms_snmp_collection_group`: adds an include-collection element to an snmp-collection in etc/datacollection-config.xml and drops off the specified cookbook file into etc/datacollection. See `opennms::test_snmp_collection_group` for example usage.
 * `opennms_collection_package`: adds a package element to etc/collectd-configuration.xml. See `opennms::test_collection_package` for example usage.
 * `opennms_snmp_collection_service`: adds a service element to a package in etc/collectd-configuration.xml. See `opennms::test_snmp_collection_service` for example usage.
 
