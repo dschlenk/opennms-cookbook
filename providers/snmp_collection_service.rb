@@ -43,6 +43,7 @@ def create_snmp_collection_service
   file = ::File.new("#{node['opennms']['conf']['home']}/etc/collectd-configuration.xml")
   contents = file.read
   doc = REXML::Document.new(contents, { :respect_whitespace => :all })
+  doc.context[:attribute_quote] = :quote 
   file.close
 
   package_el = doc.elements["/collectd-configuration/package[@name='#{new_resource.package_name}']"]

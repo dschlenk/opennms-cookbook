@@ -39,6 +39,7 @@ def create_collection_package
   file = ::File.new("#{node['opennms']['conf']['home']}/etc/collectd-configuration.xml")
   contents = file.read
   doc = REXML::Document.new(contents, { :respect_whitespace => :all })
+  doc.context[:attribute_quote] = :quote 
   file.close
   
   last_pkg_el = doc.root.elements["/collectd-configuration/package[last()]"]

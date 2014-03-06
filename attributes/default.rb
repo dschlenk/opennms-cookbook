@@ -1828,4 +1828,3 @@ default['opennms']['xmpp']['truststore_password'] = nil
 default['opennms']['xmpp']['debug']               = nil
 default['opennms']['xmpp']['user']                = nil
 default['opennms']['xmpp']['pass']                = nil
-

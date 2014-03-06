@@ -40,6 +40,7 @@ def create_snmp_collection_group
   file = ::File.new("#{node['opennms']['conf']['home']}/etc/datacollection-config.xml")
   contents = file.read
   doc = REXML::Document.new(contents, { :respect_whitespace => :all })
+  doc.context[:attribute_quote] = :quote 
   file.close
 
   collection_el = doc.elements["/datacollection-config/snmp-collection[@name='#{new_resource.collection_name}']"]
