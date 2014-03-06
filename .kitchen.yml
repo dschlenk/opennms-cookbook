@@ -21,6 +21,7 @@ suites:
       - recipe[opennms::default]
       - recipe[opennms::nsclient]
       - recipe[opennms::xml]
+      - recipe[opennms::test_snmp_collection]
       - recipe[opennms::test_collection_package]
       - recipe[opennms::test_snmp_collection_service]
     attributes: { 

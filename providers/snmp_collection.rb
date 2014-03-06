@@ -2,23 +2,16 @@ def whyrun_supported?
     true
 end
 
+use_inline_resources
+
 action :create do
   if @current_resource.exists
     Chef::Log.info "#{ @new_resource } already exists - nothing to do."
   else
     converge_by("Create #{ @new_resource }") do
       create_snmp_collection
+      new_resource.updated_by_last_action(true)
     end
-  end
-end
-
-action :delete do
-  if @current_resource.exists
-    converge_by("Delete #{ @new_resource }") do
-      delete_snmp_collection
-    end
-  else
-    Chef::Log.info "#{ @current_resource } doesn't exist - can't delete."
   end
 end
 
@@ -27,7 +20,7 @@ def load_current_resource
   @current_resource.name(@new_resource.name)
 
   # Good enough for create/delete but that's about it
-  if service_exists?(@current_resource.name)
+  if collection_exists?(@current_resource.name)
      @current_resource.exists = true
   end
 end
@@ -35,7 +28,7 @@ end
 
 private
 
-def service_exists?(name)
+def collection_exists?(name)
   Chef::Log.debug "Checking to see if this snmp collection exists: '#{ name }'"
   file = ::File.new("/opt/opennms/etc/datacollection-config.xml", "r")
   doc = REXML::Document.new file
