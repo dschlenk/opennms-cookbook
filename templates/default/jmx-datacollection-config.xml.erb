@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<jmx-datacollection-config rrdRepository="opennms/share/rrd/snmp/">
+<jmx-datacollection-config rrdRepository="<%=@rrd_repository%>">
 <% if @enable_jboss -%>
   <jmx-collection name="jboss">
     <rrd step="<%=@jboss[:rrd][:step]%>">
