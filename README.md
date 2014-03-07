@@ -149,8 +149,11 @@ There are also a couple OpenNMS attributes you'll probably want to override at a
 
 ### LWRPs
 
+As a general rule these LWRPs support a single action: create. For XML entities, when determining if the resource already exists on the node, a simple XPath to the name of the resource is performed without checking equality of other attributes. In other words, updating is not supported. 
+
 The list of implemented LWRPs is as follows: 
 
+* `opennms_resource_type`: adds a resourceType definition to a file in etc/datacollection and an include-collection element to the default snmp-collection. This LWRP supports a very limited form of updating - if the resource type already exists but isn't included in the default snmp-collection, an include-collection element will be added. The definition of the resource type won't be updated, however.  See opennms:test_resource_type for example usage. 
 * `opennms_snmp_collection`: adds an snmp-collection element to etc/datacollection-config.xml. See `opennms::test_snmp_collection` for example usage.
 * `opennms_xml_collection`: adds an xml-collection element to etc/xml-datacollection-config.xml. See `opennms::test_xml_collection` for example usage.
 * `opennms_wmi_collection`: adds a wmi-collection element to etc/wmi-datacollection-config.xml. See `opennms::test_wmi_collection` for example usage.

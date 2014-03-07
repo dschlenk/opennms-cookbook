@@ -340,7 +340,7 @@ template "#{onms_home}/etc/datacollection-config.xml" do
   notifies :restart, "service[opennms]"
   variables(
     :rrd_base_dir => node['opennms']['properties']['dc']['rrd_base_dir'],
-    :rrd_dc_dir   => node['opennms']['properties']['dc']['rrd_base_dir'],
+    :rrd_dc_dir   => node['opennms']['properties']['dc']['rrd_dc_dir'],
     :default      => node['opennms']['datacollection']['default'],
     :mib2         => node['opennms']['datacollection']['default']['mib2'],
     :threecom     => node['opennms']['datacollection']['default']['threecom'],

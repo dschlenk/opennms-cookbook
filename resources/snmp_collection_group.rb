@@ -20,7 +20,7 @@ default_action :create
 
 attribute :group, :name_attribute => true, :kind_of => String, :required => true
 attribute :collection_name, :kind_of => String, :default => 'default', :required => true
-attribute :file, :kind_of => String, :required => true
+attribute :file, :kind_of => String, :required => false # There's a use case where the file is created automatically with the jdbc_query resource in which case this won't get used. 
 attribute :system_def, :kind_of => String
 attribute :exclude_filters, :kind_of => Array, :default => []
 

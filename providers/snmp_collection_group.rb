@@ -52,12 +52,14 @@ def create_snmp_collection_group
     exclude_filter_el = include_collection_el.add_element 'exclude-filter'
     exclude_filter_el.add_text(REXML::CData.new(exclude_filter))
   }
-  cookbook_file new_resource.file do
-    path "#{node['opennms']['conf']['home']}/etc/datacollection/#{new_resource.file}"
-    owner "root"
-    group "root"
-    mode 00644
-  end  
+  if !new_resource.file.nil?
+    cookbook_file new_resource.file do
+      path "#{node['opennms']['conf']['home']}/etc/datacollection/#{new_resource.file}"
+      owner "root"
+      group "root"
+      mode 00644
+    end  
+  end
 
   # Write out changed content to file
   out = ""
