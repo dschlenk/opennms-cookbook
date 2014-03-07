@@ -27,6 +27,21 @@ def load_current_resource
   @current_resource.exists, @current_resource.included = resource_type_exists_included(@current_resource.name)
 end
 
+def resource_type_exists_included(name)
+  Chef::Log.debug "Checking to see if this resource type exists: '#{ name }'"
+  exists = false
+  included = false
+  group_name = find_resource_type(name)
+  # check datacollection-config.xml to make sure the group is included in a snmp-collection
+  if !group_name.nil?
+    exists = true
+    file = ::File.new("#{node['opennms']['conf']['home']}/etc/datacollection-config.xml", "r")
+    doc = REXML::Document.new file
+    file.close
+    included = !doc.elements["/datacollection-config/snmp-collection/include-collection[@dataCollectionGroup='#{group_name}']"].nil?
+  end
+  [exists, included]
+end
 
 private
 
@@ -64,21 +79,6 @@ def find_group(name)
   file_name
 end
 
-def resource_type_exists_included(name)
-  Chef::Log.debug "Checking to see if this resource type exists: '#{ name }'"
-  exists = false
-  included = false
-  group_name = find_resource_type(name)
-  # check datacollection-config.xml to make sure the group is included in a snmp-collection
-  if !group_name.nil?
-    exists = true
-    file = ::File.new("#{node['opennms']['conf']['home']}/etc/datacollection-config.xml", "r")
-    doc = REXML::Document.new file
-    file.close
-    included = !doc.elements["/datacollection-config/snmp-collection/include-collection[@dataCollectionGroup='#{group_name}']"].nil?
-  end
-  [exists, included]
-end
 
 # resource type doesn't exist and isn't included. Group could exist, though. 
 def create_resource_type

@@ -50,6 +50,7 @@ def create_wmi_collection
     rra_el = rrd_el.add_element 'rra'
     rra_el.add_text(rra)
   }
+  queries_el = collection_el.add_element 'wpms'
 
   out = ""
   formatter = REXML::Formatters::Pretty.new(2)
