@@ -153,6 +153,8 @@ As a general rule these LWRPs support a single action: create. For XML entities,
 
 The list of implemented LWRPs is as follows: 
 
+#### Data Collection
+
 * `opennms_resource_type`: adds a resourceType definition to a file in etc/datacollection and an include-collection element to the default snmp-collection. This LWRP supports a very limited form of updating - if the resource type already exists but isn't included in the default snmp-collection, an include-collection element will be added. The definition of the resource type won't be updated, however.  See opennms:test_resource_type for example usage. 
 * `opennms_snmp_collection`: adds an snmp-collection element to etc/datacollection-config.xml. See `opennms::test_snmp_collection` for example usage.
 * `opennms_xml_collection`: adds an xml-collection element to etc/xml-datacollection-config.xml. See `opennms::test_xml_collection` for example usage.
@@ -167,6 +169,10 @@ The list of implemented LWRPs is as follows:
 * `opennms_jdbc_query`: adds a query element to a jdbc-collection in etc/jdbc-datacollection-config.xml. See `opennms::test_jdbc_query` for example usage, which also uses the opennms_resource_type LWRP.
 * `opennms_xml_source`: adds a xml-source element to a xml-collection in etc/xml-datacollection-config.xml. See `opennms::test_xml_source` for example usage.
 * `opennms_xml_group`: adds a xml-source element to a xml-source in etc/xml-datacollection-config.xml. See `opennms::test_xml_group` for example usage.
+
+#### Events
+
+* `opennms_eventconf`: adds a event-file element to events in etc/eventconf.xml. See `opennms::test_eventconf` for example usage.
 
 ### Template Overview
 
