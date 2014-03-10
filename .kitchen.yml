@@ -36,6 +36,7 @@ suites:
       - recipe[opennms::test_wmi_wpm]
       - recipe[opennms::test_xml_source]
       - recipe[opennms::test_xml_group]
+      - recipe[opennms::test_eventconf]
     attributes: { 
                  "java": { 
                           "oracle": { 
