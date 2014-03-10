@@ -34,6 +34,8 @@ suites:
       - recipe[opennms::test_snmp_collection_group]
       - recipe[opennms::test_jdbc_query]
       - recipe[opennms::test_wmi_wpm]
+      - recipe[opennms::test_xml_source]
+      - recipe[opennms::test_xml_group]
     attributes: { 
                  "java": { 
                           "oracle": { 

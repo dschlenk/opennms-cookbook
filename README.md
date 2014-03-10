@@ -165,6 +165,8 @@ The list of implemented LWRPs is as follows:
 * `opennms_jdbc_collection_service`: adds a service element to a package in etc/collectd-configuration.xml. See `opennms::test_jdbc_collection_service` for example usage.
 * `opennms_snmp_collection_group`: adds an include-collection element to an snmp-collection in etc/datacollection-config.xml and drops off the specified cookbook file into etc/datacollection. See `opennms::test_snmp_collection_group` for example usage.
 * `opennms_jdbc_query`: adds a query element to a jdbc-collection in etc/jdbc-datacollection-config.xml. See `opennms::test_jdbc_query` for example usage, which also uses the opennms_resource_type LWRP.
+* `opennms_xml_source`: adds a xml-source element to a xml-collection in etc/xml-datacollection-config.xml. See `opennms::test_xml_source` for example usage.
+* `opennms_xml_group`: adds a xml-source element to a xml-source in etc/xml-datacollection-config.xml. See `opennms::test_xml_group` for example usage.
 
 ### Template Overview
 

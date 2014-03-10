@@ -2183,5 +2183,5 @@ end
 
 service "opennms" do
   supports :status => true, :restart => true
-  action [ :enable, :start ]
+  action [ :enable]#, :start ]
 end
