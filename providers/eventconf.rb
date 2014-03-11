@@ -31,7 +31,7 @@ def eventconf_exists?(name)
   Chef::Log.debug "Checking to see if this eventconf file exists: '#{ name }'"
   file = ::File.new("#{node['opennms']['conf']['home']}/etc/eventconf.xml", "r")
   doc = REXML::Document.new file
-  !doc.elements["/events/eventconf[text() = 'events/#{name}' and not(text()[2])]"].nil?
+  !doc.elements["/events/event-file[text() = 'events/#{name}' and not(text()[2])]"].nil?
 end
 
 def create_eventconf

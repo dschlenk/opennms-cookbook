@@ -153,6 +153,12 @@ As a general rule these LWRPs support a single action: create. For XML entities,
 
 The list of implemented LWRPs is as follows: 
 
+#### Discovery
+
+* `opennms_disco_specific`: add a specific IP to be discovered. See `opennms::test_disco_specific` for examples.
+* `opennms_disco_range`: add a include or exclude range  discovery. See `opennms::test_disco_range` for examples.
+* `opennms_disco_url`: add a include-url to discovery and if it's a file deploy it where specified. See `opennms::test_disco_url` for examples.
+
 #### Polling
 
 * `opennms_poller_package`: add a package to etc/poller-configuration.xml. Note that an instance of this resource without use of an accompanying `opennms_poller_service` resource will result in a failure to start opennms. 

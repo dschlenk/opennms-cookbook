@@ -16,7 +16,7 @@ action :create do
 end
 
 def load_current_resource
-  @current_resource = Chef::Resource::OpennmsSnmpCollectionService.new(@new_resource.name)
+  @current_resource = Chef::Resource::OpennmsPollerService.new(@new_resource.name)
   @current_resource.name(@new_resource.name)
   @current_resource.package_name(@new_resource.package_name)
 
