@@ -153,6 +153,11 @@ As a general rule these LWRPs support a single action: create. For XML entities,
 
 The list of implemented LWRPs is as follows: 
 
+#### Polling
+
+* `opennms_poller_package`: add a package to etc/poller-configuration.xml. Note that an instance of this resource without use of an accompanying `opennms_poller_service` resource will result in a failure to start opennms. 
+* `opennms_poller_service`: add a service to poller package named `poller_n$me`.  See `opennms::test_poller` for example usage of this and the `opennms_poller_package` resource. 
+
 #### Data Collection
 
 * `opennms_resource_type`: adds a resourceType definition to a file in etc/datacollection and an include-collection element to the default snmp-collection. This LWRP supports a very limited form of updating - if the resource type already exists but isn't included in the default snmp-collection, an include-collection element will be added. The definition of the resource type won't be updated, however.  See opennms:test_resource_type for example usage. 

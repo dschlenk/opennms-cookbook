@@ -37,6 +37,7 @@ suites:
       - recipe[opennms::test_xml_source]
       - recipe[opennms::test_xml_group]
       - recipe[opennms::test_eventconf]
+      - recipe[opennms::test_poller]
     attributes: { 
                  "java": { 
                           "oracle": { 
