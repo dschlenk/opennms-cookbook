@@ -41,6 +41,8 @@ suites:
       - recipe[opennms::test_disco_specific]
       - recipe[opennms::test_disco_range]
       - recipe[opennms::test_disco_url]
+      - recipe[opennms::test_foreign_source]
+      - recipe[opennms::test_service_detector]
     attributes: { 
                  "java": { 
                           "oracle": { 
