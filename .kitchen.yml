@@ -45,6 +45,7 @@ suites:
       - recipe[opennms::test_service_detector]
       - recipe[opennms::test_policy]
       - recipe[opennms::test_import]
+      - recipe[opennms::test_import_node]
     attributes: { 
                  "java": { 
                           "oracle": { 

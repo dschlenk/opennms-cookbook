@@ -5,7 +5,7 @@ default_action :create
 
 attribute :node_label, :kind_of => String, :name_attribute => true
 attribute :foreign_source_name, :kind_of => String, :required => true
-attribute :foreign_id, :kind_of => String
+attribute :foreign_id, :kind_of => String, :required => true
 attribute :parent_foreign_source, :kind_of => String
 attribute :parent_foreign_id, :kind_of => String
 attribute :parent_node_label, :kind_of => String
@@ -17,3 +17,8 @@ attribute :assets, :kind_of => Hash
 attribute :sync_import, :kind_of => [TrueClass, FalseClass], :default => false
 
 attr_accessor :exists, :import_exists
+
+def foreign_id(fid=nil)
+  t = Time.new()
+  fid || "#{t.to_i}#{t.usec}"
+end

@@ -141,25 +141,17 @@ module Provision
     if !building.nil?
       node_el.attributes['building'] = building
     end
-    RestClient.post "#{baseurl(node)}/requisitions/#{foreign_source_name}/nodes", nd.to_s, {:content_type => :xml}
-    if !categories.nil? && !categories.length > 0
-      cd = REXML::Document.new
-      cd << REXML::XMLDecl.new
-      cats_el = cd.add_element 'categories'
+    if !categories.nil? && categories.length > 0
       categories.each do |category|
-        cat_el = cats_el.add_element 'category', {'name' => category}
+        node_el.add_element 'category', {'name' => category}
       end
-      RestClient.post "#{baseurl(node)}/requisitions/#{foreign_source_name}/nodes/#{foreign_id}/categories", cd.to_s, {:content_type => :xml}
     end
     if !assets.nil? 
-      ad = REXML::Document.new
-      ad << REXML::XMLDecl.new
-      ael = ad.add_element 'assets'
       assets.each do |name, value|
-        ael.add_element 'asset', {'name' => name, 'value' => value}
+        node_el.add_element 'asset', {'name' => name, 'value' => value}
       end
-      RestClient.post "#{baseurl(node)}/requisitions/#{foreign_source_name}/nodes/#{foreign_id}/assets", ad.to_s, {:content_type => :xml}
     end
+    RestClient.post "#{baseurl(node)}/requisitions/#{foreign_source_name}/nodes", nd.to_s, {:content_type => :xml}
   end
   def import_node_interface_exists?(foreign_source_name, foreign_id, ip_addr, node)
     if import_node_exists?(foreign_source_name, foreign_id, node)
@@ -202,7 +194,11 @@ module Provision
   def sync_import(foreign_source_name, rescan, node)
     url = "#{baseurl(node)}/requisitions/#{foreign_source_name}/import"
     url = url + "?rescanExisting=false" if !rescan.nil? && rescan == false
-    RestClient.put url
+    RestClient.put url, nil
+  end
+  def foreign_id_gen
+    t = Time.new()
+    "#{t.to_i}#{t.usec}"
   end
   def baseurl(node)
     "http://admin:admin@localhost:#{node['opennms']['properties']['jetty']['port']}/opennms/rest"
