@@ -4,6 +4,11 @@ Description
 A Chef cookbook to manage the installation and configuration of OpenNMS.
 Current version of templates are based on OpenNMS release 1.12.5.
 
+Status
+======
+
+In active development. Feel free to try out a tagged version (or master if you dare) but don't expect everything to work perfectly yet. Tags happen when a decent chunk of new functionality is written, their test recipes converge (named test_*) and OpenNMS starts without errors. 
+
 Requirements
 ============
 
@@ -184,6 +189,18 @@ The list of implemented LWRPs is as follows:
 #### Events
 
 * `opennms_eventconf`: adds a event-file element to events in etc/eventconf.xml. See `opennms::test_eventconf` for example usage.
+
+#### Provisioning Requisitions
+
+These LWRPs use a cookbook library named Provision that I wrote to perform the work using the OpenNMS REST interface. As such, OpenNMS has to be running for the resources to converge. See any of the test recipes for my silly little ruby_block hack to make sure it is. Also you'll notice that I used 'import' a lot rather than the correct term 'requisition'. I can type 'import' a lot faster than 'requisition', so deal with it. And like everything else there are test recipes for each LWRP that have good examples in them.  
+
+* `opennms_foreign_source`: create a new foreign source optionally defining a scan interval (defaults to '1d'). 
+* `opennms_service_detector`: add a service detector to a foreign source. TODO: if capsd is enabled in favor of provisiond add protocol-plugins to capsd-configuration.xml instead.
+* `opennms_policy`: add a policy to a foreign source. 
+* `opennms_import`: Defines a requisition for a foreign source. This and all import* LWRPs include an option to synchronize the requisition - sync_import. 
+* `opennms_import_node`: Add a node to a requisition including categories (array of strings) and assets (key/value hash pairs). 
+* `opennms_import_node_interface`: Add an interface to a node in a requisition. 
+* `opennms_import_node_interface_service`: Add a service to an interface on a node in a requisition. 
 
 ### Template Overview
 

@@ -158,7 +158,7 @@ module Provision
   def import_node_interface_exists?(foreign_source_name, foreign_id, ip_addr, node)
     if import_node_exists?(foreign_source_name, foreign_id, node)
      begin
-      response = RestClient.get "#{baseurl(node)}/requisitions/#{foreign_source_name}/nodes/#{foreign_id}/#{ip_addr}"
+      response = RestClient.get "#{baseurl(node)}/requisitions/#{foreign_source_name}/nodes/#{foreign_id}/interfaces/#{ip_addr}"
       return true if response.code == 200
      rescue
       return false
@@ -178,7 +178,7 @@ module Provision
   def import_node_interface_service_exists?(service_name, foreign_source_name, foreign_id, ip_addr, node)
     if import_node_interface_exists?(foreign_source_name, foreign_id, ip_addr, node)
      begin
-      response = RestClient.get "#{baseurl(node)}/requisitions/#{foreign_source_name}/nodes/#{foreign_id}/#{ip_addr}/services/#{service_name}"
+      response = RestClient.get "#{baseurl(node)}/requisitions/#{foreign_source_name}/nodes/#{foreign_id}/interfaces/#{ip_addr}/services/#{service_name}"
       return true if response.code == 200
      rescue
       return false
@@ -189,7 +189,7 @@ module Provision
   def add_import_node_interface_service(service_name, foreign_source_name, foreign_id, ip_addr, node)
     sd = REXML::Document.new
     sd << REXML::XMLDecl.new
-    s_el = sd.add_element 'monitored-service', {'name' => service_name}
+    s_el = sd.add_element 'monitored-service', {'service-name' => service_name}
     RestClient.post "#{baseurl(node)}/requisitions/#{foreign_source_name}/nodes/#{foreign_id}/interfaces/#{ip_addr}/services", sd.to_s, {:content_type => :xml}
   end
   def sync_import(foreign_source_name, rescan, node)
