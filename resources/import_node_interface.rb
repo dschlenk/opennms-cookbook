@@ -6,7 +6,6 @@ default_action :create
 attribute :ip_addr, :kind_of => String, :name_attribute => true
 attribute :foreign_source_name, :kind_of => String, :required => true
 attribute :foreign_id, :kind_of => String, :required => true
-attribute :descr, :kind_of => String
 attribute :status, :kind_of => Fixnum
 attribute :managed, :kind_of => [TrueClass, FalseClass]
 attribute :snmp_primary, :kind_of => String, :equal_to => ["P","S","N"]

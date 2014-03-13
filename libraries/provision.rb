@@ -38,7 +38,7 @@ module Provision
     if foreign_source_exists?(foreign_source_name, node)
      begin
       response = RestClient.get "#{baseurl(node)}/foreignSources/#{foreign_source_name}/detectors/#{name}"
-      return true if response.code = "200"
+      return true if response.code == 200
      rescue
       return false
      end
@@ -69,7 +69,7 @@ module Provision
     if foreign_source_exists?(foreign_source_name, node)
       begin
         response = RestClient.get "#{baseurl(node)}/foreignSources/#{foreign_source_name}/policies/#{policy_name}"
-        return true if response.code = "200"
+        return true if response.code == 200
       rescue
         return false
       end
@@ -115,8 +115,10 @@ module Provision
     if import_exists?(foreign_source_name, node)
      begin
       response = RestClient.get "#{baseurl(node)}/requisitions/#{foreign_source_name}/nodes/#{foreign_id}"
-      return true if response.code = "200"
+      Chef::Log.info "INE: import_node_exists response is #{response.to_s}"
+      return true if response.code == 200
      rescue
+      Chef::Log.info "INE: import_node_exists doesn't exist: #{foreign_source_name} - #{foreign_id}"
       return false
      end
     end
@@ -157,28 +159,27 @@ module Provision
     if import_node_exists?(foreign_source_name, foreign_id, node)
      begin
       response = RestClient.get "#{baseurl(node)}/requisitions/#{foreign_source_name}/nodes/#{foreign_id}/#{ip_addr}"
-      return true if response.code = "200"
+      return true if response.code == 200
      rescue
       return false
      end
     end
     false
   end
-  def add_import_node_interface(ip_addr, foreign_source_name, foreign_id, descr, status, managed, snmp_primary, node)
+  def add_import_node_interface(ip_addr, foreign_source_name, foreign_id, status, managed, snmp_primary, node)
     id = REXML::Document.new
     id << REXML::XMLDecl.new
     i_el = id.add_element 'interface', {'ip-addr' => ip_addr}
-    i_el.attributes['descr'] = descr if !descr.nil?
-    i_el.attributes['status'] = descr if !status.nil?
-    i_el.attributes['managed'] = descr if !managed.nil?
-    i_el.attributes['snmp-primary'] = descr if !snmp_primary.nil?
+    i_el.attributes['status'] = status if !status.nil?
+    i_el.attributes['managed'] = managed if !managed.nil?
+    i_el.attributes['snmp-primary'] = snmp_primary if !snmp_primary.nil?
     RestClient.post "#{baseurl(node)}/requisitions/#{foreign_source_name}/nodes/#{foreign_id}/interfaces", id.to_s, {:content_type => :xml}
   end
   def import_node_interface_service_exists?(service_name, foreign_source_name, foreign_id, ip_addr, node)
     if import_node_interface_exists?(foreign_source_name, foreign_id, ip_addr, node)
      begin
       response = RestClient.get "#{baseurl(node)}/requisitions/#{foreign_source_name}/nodes/#{foreign_id}/#{ip_addr}/services/#{service_name}"
-      return true if response.code = "200"
+      return true if response.code == 200
      rescue
       return false
      end
@@ -193,7 +194,10 @@ module Provision
   end
   def sync_import(foreign_source_name, rescan, node)
     url = "#{baseurl(node)}/requisitions/#{foreign_source_name}/import"
-    url = url + "?rescanExisting=false" if !rescan.nil? && rescan == false
+    if !rescan.nil? && rescan == false
+      url = url + "?rescanExisting=false" 
+    end
+
     RestClient.put url, nil
   end
   def foreign_id_gen

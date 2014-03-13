@@ -17,8 +17,3 @@ attribute :assets, :kind_of => Hash
 attribute :sync_import, :kind_of => [TrueClass, FalseClass], :default => false
 
 attr_accessor :exists, :import_exists
-
-def foreign_id(fid=nil)
-  t = Time.new()
-  fid || "#{t.to_i}#{t.usec}"
-end

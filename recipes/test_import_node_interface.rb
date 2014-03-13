@@ -10,34 +10,29 @@ ruby_block "noop" do
   end
   notifies :start, "service[opennms]", :immediately
 end
-# minimal
-opennms_import_node "nodeA" do
-  foreign_source_name "dry-source"
-  foreign_id "nodeA_ID"
-end
-
+# need a node to add an interface to
 # make us a new foreign_id using the Provision library
-nodeB_foreign_id = foreign_id_gen
-# common options
-opennms_import_node "nodeB" do
+ifaceNode_foreign_id = foreign_id_gen
+opennms_import_node "ifaceNode" do
   foreign_source_name "dry-source"
-  foreign_id nodeB_foreign_id
+  foreign_id ifaceNode_foreign_id
   building "HQ"
   categories ["Servers", "Test"]
   assets 'vendorphone' => '411', 'serialnumber' => 'SN12838931'
+  sync_import true
 end
 
-nodeC_foreign_id = foreign_id_gen
 # all options
-opennms_import_node "nodeC" do
+opennms_import_node_interface "10.0.0.1" do
   foreign_source_name "dry-source"
-  foreign_id nodeC_foreign_id
-  parent_foreign_source 'dry-source'
-  parent_foreign_id nodeB_foreign_id
-  parent_node_label "nodeB"
-  city "Tulsa"
-  building "Barn"
-  categories ["Servers", "Test"]
-  assets 'vendorphone' => '511', 'serialnumber' => 'SN12838932'
+  foreign_id ifaceNode_foreign_id
+  managed true
+  snmp_primary 'P'
   sync_import true
+end
+
+# minimal
+opennms_import_node_interface "72.72.72.73" do
+  foreign_source_name "dry-source"
+  foreign_id ifaceNode_foreign_id
 end
