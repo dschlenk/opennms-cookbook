@@ -65,6 +65,28 @@ module Provision
    end
    RestClient.post "#{baseurl(node)}/foreignSources/#{foreign_source_name}/detectors", sd.to_s, {:content_type => :xml}
   end
+  def policy_exists?(policy_name, foreign_source_name, node)
+    if foreign_source_exists?(foreign_source_name, node)
+      begin
+        response = RestClient.get "#{baseurl(node)}/foreignSources/#{foreign_source_name}/policies/#{policy_name}"
+        return true if response.code = "200"
+      rescue
+        return false
+      end
+    end
+    false
+  end
+  def add_policy(policy_name, class_name, params, foreign_source_name, node)
+   pd = REXML::Document.new
+   pd << REXML::XMLDecl.new
+   pel = pd.add_element 'policy', {'name' => policy_name, 'class' => class_name}
+   if !params.nil?
+     params.each do |key, value|
+       pel.add_element 'parameter', {'key' => key, 'value' => value }
+     end
+   end
+   RestClient.post "#{baseurl(node)}/foreignSources/#{foreign_source_name}/policies", pd.to_s, {:content_type => :xml}
+  end
   def import_exists?(foreign_source_name, node)
     if foreign_source_exists?(foreign_source_name, node)
      begin
