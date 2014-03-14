@@ -15,5 +15,6 @@ attribute :ranges, :kind_of => Hash
 attribute :specifics, :kind_of => Array
 # Array of IPLIKE address strings ([0-9]{1,3}((,|-)[0-9]{1,3})*|\*)\.([0-9]{1,3}((,|-)[0-9]{1,3})*|\*)\.([0-9]{1,3}((,|-)[0-9]{1,3})*|\*)\.([0-9]{1,3}((,|-)[0-9]{1,3})*|\*)
 attribute :ip_matches, :kind_of => Array
+attribute :position, :kind_of => String, :equal_to => ['top', 'bottom'], :default => 'bottom'
 
 attr_accessor :exists, :different

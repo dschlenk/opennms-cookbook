@@ -331,7 +331,7 @@ def create_snmp_config_definition
   if !new_resource.ip_matches.nil?
     new_resource.ip_matches.each do |ip_match|
       ipm_el = definition_el.add_element 'ip-match'
-      ipm_el.add_text(ipm_el)
+      ipm_el.add_text(ip_match)
     end
   end
   out = ""
@@ -390,7 +390,7 @@ def update_snmp_config_definition
   if !new_resource.ip_matches.nil?
     new_resource.ip_matches.each do |ip_match|
       ipm_el = def_el.add_element 'ip-match'
-      ipm_el.add_text(ipm_el)
+      ipm_el.add_text(ip_match)
     end
   end
 

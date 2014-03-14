@@ -48,8 +48,10 @@ suites:
       #- recipe[opennms::test_import_node]
       #- recipe[opennms::test_import_node_interface]
       #- recipe[opennms::test_import_node_interface_service]
-      - recipe[opennms::test_snmp_config_definition]
-      - recipe[opennms::test_update_snmp_config_definition]
+      #- recipe[opennms::test_snmp_config_definition]
+      #- recipe[opennms::test_update_snmp_config_definition]
+      - recipe[opennms::test_wmi_config_definition]
+      - recipe[opennms::test_update_wmi_config_definition]
     attributes: { 
                  "java": { 
                           "oracle": { 

@@ -164,13 +164,16 @@ The list of implemented LWRPs is as follows:
 * `opennms_disco_range`: add a include or exclude range  discovery. See `opennms::test_disco_range` for examples.
 * `opennms_disco_url`: add a include-url to discovery and if it's a file deploy it where specified. See `opennms::test_disco_url` for examples.
 
-#### Node Authentication Configuration
+#### Node Service Credential Configuration
 
-* `opennms_snmp_config_definition`: add a definition element to snmp-config.xml including child range, specific and ip-match elements. This is one of the few that implement updating and deleting. Specifically:
-  * Since definitions don't have a name or any other way to to uniquely identify them, definition element equality is determined by all definition element attributes being equal, including nil values (so all resource attributes except `ranges`, `specifics` and `ip_matches`). 
-  * If the definition attributes match but `ranges`, `specifics` and `ip_matches` do not contain the same values, the values contained in the new resource will be used. Note that all `range`, `specific` and `ip-match` elements that exist currently in the definition will be removed before the new elements are added. 
-  * To successfully delete a definition all the definition element attributes must match otherwise no action is taken. 
-* `opennms_wmi_config_definition`: 
+These LWRPs allow you to define the credentials necessary to connect to services on monitored nodes. These are one of the few that currently implements updating and deleting. Action `:create` will update if changes are detected but `:create_if_missing` will do nothing. To determine if a resource needs to be updated or deleted, existance is determined by all definition element attributes being equal (so all resource attributes except `ranges`, `specifics`, `ip_matches` and `position`). 
+
+If an update occurs, the values contained in the new resource will be used. Note that all `range`, `specific` and `ip-match` elements that exist currently in the definition will be removed before the new elements are added. 
+
+Currently implemented are: 
+
+* `opennms_snmp_config_definition`: add a definition element to snmp-config.xml. 
+* `opennms_wmi_config_definition`: add a definition element to wmi-config.xml.
 
 #### Polling
 
