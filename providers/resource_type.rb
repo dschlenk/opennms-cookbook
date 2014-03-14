@@ -83,7 +83,7 @@ end
 # resource type doesn't exist and isn't included. Group could exist, though. 
 def create_resource_type
   Chef::Log.debug "Adding resource type: '#{ new_resource.name }'"
-  outfile_name = "/opt/opennms/etc/datacollection/#{new_resource.group_name}.xml"
+  outfile_name = "#{node['opennms']['conf']['home']}/etc/datacollection/#{new_resource.group_name}.xml"
   doc = nil
   group_el = nil
   file_name = find_group(new_resource.group_name)

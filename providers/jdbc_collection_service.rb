@@ -32,14 +32,14 @@ private
 
 def service_exists?(package_name, service_name, name)
   Chef::Log.debug "Checking to see if this jdbc collection service exists: '#{ service_name }'"
-  file = ::File.new("/opt/opennms/etc/collectd-configuration.xml", "r")
+  file = ::File.new("#{node['opennms']['conf']['home']}/etc/collectd-configuration.xml", "r")
   doc = REXML::Document.new file
   !doc.elements["/collectd-configuration/package[@name='#{package_name}']/service[@name='#{service_name}']/parameter[@key='collection' and @value='#{name}']"].nil?
 end
 
 def create_jdbc_collection_service
   Chef::Log.debug "Adding collection service: '#{ new_resource.name }'"
-  file = ::File.new("/opt/opennms/etc/collectd-configuration.xml")
+  file = ::File.new("#{node['opennms']['conf']['home']}/etc/collectd-configuration.xml")
   contents = file.read
   doc = REXML::Document.new(contents, { :respect_whitespace => :all })
   doc.context[:attribute_quote] = :quote
@@ -60,7 +60,7 @@ def create_jdbc_collection_service
   driver_el = service_el.add_element 'parameter', { 'key' => 'driver', 'value' => new_resource.driver }
   if new_resource.driver_file
     cookbook_file new_resource.driver_file do
-      path "/opt/opennms/lib/#{new_resource.driver_file}"
+      path "#{node['opennms']['conf']['home']}/lib/#{new_resource.driver_file}"
       mode 00644
       owner "root"
       group "root"
@@ -83,5 +83,5 @@ def create_jdbc_collection_service
   formatter = REXML::Formatters::Pretty.new(2)
   formatter.compact = true
   formatter.write(doc, out)
-  ::File.open("/opt/opennms/etc/collectd-configuration.xml", "w"){ |file| file.puts(out) }
+  ::File.open("#{node['opennms']['conf']['home']}/etc/collectd-configuration.xml", "w"){ |file| file.puts(out) }
 end

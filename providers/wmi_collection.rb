@@ -30,14 +30,14 @@ private
 
 def service_exists?(name)
   Chef::Log.debug "Checking to see if this wmi collection exists: '#{ name }'"
-  file = ::File.new("/opt/opennms/etc/wmi-datacollection-config.xml", "r")
+  file = ::File.new("#{node['opennms']['conf']['home']}/etc/wmi-datacollection-config.xml", "r")
   doc = REXML::Document.new file
   !doc.elements["/wmi-datacollection-config/wmi-collection[@name='#{name}']"].nil?
 end
 
 def create_wmi_collection
   Chef::Log.debug "Creating wmi collection : '#{ new_resource.name }'"
-  file = ::File.new("/opt/opennms/etc/wmi-datacollection-config.xml", "r")
+  file = ::File.new("#{node['opennms']['conf']['home']}/etc/wmi-datacollection-config.xml", "r")
   contents = file.read
   doc = REXML::Document.new(contents, { :respect_whitespace => :all })
   doc.context[:attribute_quote] = :quote  
@@ -56,5 +56,5 @@ def create_wmi_collection
   formatter = REXML::Formatters::Pretty.new(2)
   formatter.compact = true
   formatter.write(doc, out)
-  ::File.open("/opt/opennms/etc/wmi-datacollection-config.xml", "w"){ |file| file.puts(out) }
+  ::File.open("#{node['opennms']['conf']['home']}/etc/wmi-datacollection-config.xml", "w"){ |file| file.puts(out) }
 end
