@@ -38,8 +38,8 @@ action :delete do
   if !@current_resource.exists
     Chef::Log.info "#{ @new_resource } doesn't exist - nothing to do."
   else
-    converge_by("Create #{ @new_resource }") do
-      create_snmp_config_definition
+    converge_by("Delete #{ @new_resource }") do
+      delete_snmp_config_definition
       new_resource.updated_by_last_action(true)
     end
   end
@@ -125,28 +125,51 @@ def matching_def(doc, port, retry_count, timeout, read_community,
 
   definition = nil
   doc.elements.each("/snmp-config/definition") do |def_el|
-    if def_el.attributes['port'] == port\
-    && def_el.attributes['retry'] = retry_count\
-    && def_el.attributes['timeout'] = timeout\
-    && def_el.attributes['read-community'] == read_community\
-    && def_el.attributes['write-community'] == write_community\
-    && def_el.attributes['proxy-host'] == proxy_host\
-    && def_el.attributes['version'] == version\
-    && def_el.attributes['max-vars-per-pdu'] == max_vars_per_pdu\
-    && def_el.attributes['max-repetitions'] = max_repetitions\
-    && def_el.attributes['max-request-size'] == max_request_size\
-    && def_el.attributes['security-name'] == security_name\
-    && def_el.attributes['security-level'] == security_level\
-    && def_el.attributes['auth-passphrase'] == auth_passphrase\
-    && def_el.attributes['auth-protocol'] == auth_protocol\
-    && def_el.attributes['engine-id'] == engine_id\
-    && def_el.attributes['context-engine-id'] == context_engine_id\
-    && def_el.attributes['context-name'] == context_name\
-    && def_el.attributes['privacy-passphrase'] == privacy_passphrase\
-    && def_el.attributes['privacy-protocol'] == privacy_protocol\
-    && def_el.attributes['enterprise-id'] == enterprise_id
+    if "#{def_el.attributes['port']}" == "#{port}"\
+    && "#{def_el.attributes['retry']}" == "#{retry_count}"\
+    && "#{def_el.attributes['timeout']}" == "#{timeout}"\
+    && "#{def_el.attributes['read-community']}" == "#{read_community}"\
+    && "#{def_el.attributes['write-community']}" == "#{write_community}"\
+    && "#{def_el.attributes['proxy-host']}"== "#{proxy_host}"\
+    && "#{def_el.attributes['version']}" == "#{version}"\
+    && "#{def_el.attributes['max-vars-per-pdu']}" == "#{max_vars_per_pdu}"\
+    && "#{def_el.attributes['max-repetitions']}" == "#{max_repetitions}"\
+    && "#{def_el.attributes['max-request-size']}" == "#{max_request_size}"\
+    && "#{def_el.attributes['security-name']}" == "#{security_name}"\
+    && "#{def_el.attributes['security-level']}" == "#{security_level}"\
+    && "#{def_el.attributes['auth-passphrase']}" == "#{auth_passphrase}"\
+    && "#{def_el.attributes['auth-protocol']}" == "#{auth_protocol}"\
+    && "#{def_el.attributes['engine-id']}" == "#{engine_id}"\
+    && "#{def_el.attributes['context-engine-id']}" == "#{context_engine_id}"\
+    && "#{def_el.attributes['context-name']}" == "#{context_name}"\
+    && "#{def_el.attributes['privacy-passphrase']}" == "#{privacy_passphrase}"\
+    && "#{def_el.attributes['privacy-protocol']}" == "#{privacy_protocol}"\
+    && "#{def_el.attributes['enterprise-id']}" == "#{enterprise_id}"
+      Chef::Log.info "Found!"
       definition =  def_el
       break
+    else
+      Chef::Log.info "Not found."
+      Chef::Log.info "#{def_el.attributes['port']} == #{port}"
+      Chef::Log.info "#{def_el.attributes['retry']} == #{retry_count}"
+      Chef::Log.info "#{def_el.attributes['timeout']} == #{timeout}"
+      Chef::Log.info "#{def_el.attributes['read-community']} == #{read_community}"
+      Chef::Log.info "#{def_el.attributes['write-community']} == #{write_community}"
+      Chef::Log.info "#{def_el.attributes['proxy-host']} == #{proxy_host}"
+      Chef::Log.info "#{def_el.attributes['version']} == #{version}"
+      Chef::Log.info "#{def_el.attributes['max-vars-per-pdu']} == #{max_vars_per_pdu}"
+      Chef::Log.info "#{def_el.attributes['max-repetitions']} == #{max_repetitions}"
+      Chef::Log.info "#{def_el.attributes['max-request-size']} == #{max_request_size}"
+      Chef::Log.info "#{def_el.attributes['security-name']} == #{security_name}"
+      Chef::Log.info "#{def_el.attributes['security-level']} == #{security_level}"
+      Chef::Log.info "#{def_el.attributes['auth-passphrase']} == #{auth_passphrase}"
+      Chef::Log.info "#{def_el.attributes['auth-protocol']} == #{auth_protocol}"
+      Chef::Log.info "#{def_el.attributes['engine-id']} == #{engine_id}"
+      Chef::Log.info "#{def_el.attributes['context-engine-id']} == #{context_engine_id}"
+      Chef::Log.info "#{def_el.attributes['context-name']} == #{context_name}"
+      Chef::Log.info "#{def_el.attributes['privacy-passphrase']} == #{privacy_passphrase}"
+      Chef::Log.info "#{def_el.attributes['privacy-protocol']} == #{privacy_protocol}"
+      Chef::Log.info "#{def_el.attributes['enterprise-id']} == #{enterprise_id}"
     end
   end
   definition
@@ -155,24 +178,28 @@ end
 def ranges_equal?(def_el, ranges)
   equal = true # optimistic
   found = false
-  ranges.each do |r_begin, r_end|
-    def_el.elements.each("range") do |range|
-      if range.attributes['begin'] == r_begin && range.attributes['end'] == r_end
-        found = true
-        break
+  if !ranges.nil?
+    ranges.each do |r_begin, r_end|
+      def_el.elements.each("range") do |range|
+        if range.attributes['begin'] == r_begin && range.attributes['end'] == r_end
+          found = true
+          break
+        end
       end
+      break if found
     end
-    break if found
   end
   equal = false if !found
 
   if equal
     found = false
     def_el.elements.each("range") do |range|
-      ranges.each do |r_begin, r_end|
-        if r_begin == range.attributes['begin'] && r_end == range.attributes['end']
-          found = true
-          break
+      if !ranges.nil?
+        ranges.each do |r_begin, r_end|
+          if r_begin == range.attributes['begin'] && r_end == range.attributes['end']
+            found = true
+            break
+          end
         end
       end
       break if found
@@ -185,24 +212,28 @@ end
 def specifics_equal?(def_el, specifics)
   equal = true
   found = false
-  specifics.each do |s|
-    def_el.elements.each("specific") do |specific|
-      if specific.get_text == s
-        found = true
-        break
+  if !specifics.nil?
+    specifics.each do |s|
+      def_el.elements.each("specific") do |specific|
+        if specific.get_text == s
+          found = true
+          break
+        end
       end
+      break if found
     end
-    break if found
   end
   equal = false if !found
 
   if equal
     found = false
     def_el.elements.each("specific") do |specific|
-      specifics.each do |s|
-        if s == specific.get_text
-          found = true
-          break
+      if !specifics.nil?
+        specifics.each do |s|
+          if s == specific.get_text
+            found = true
+            break
+          end
         end
       end
       break if found
@@ -215,27 +246,31 @@ end
 def ip_matches_equal?(def_el, ip_matches)
   equal = true
   found = false
-  specifics.each do |s|
-    def_el.elements.each("specific") do |specific|
-      if specific.get_text == s
-        found = true
-        break
-      end
-    end
-    break if found
-  end
-  equal = false if !found
-
-  if equal
-    found = false
-    specifics.each do |s|
-      def_el.elements.each("specific") do |specific|
-        if specific.get_text == s
+  if !ip_matches.nil?
+    ip_matches.each do |ipm|
+      def_el.elements.each("ip-match") do |ip_match|
+        if ip_match.get_text == ipm
           found = true
           break
         end
       end
       break if found
+    end
+  end
+  equal = false if !found
+
+  if equal
+    found = false
+    def_el.elements.each("ip-match") do |ip_match|
+      if !ip_matches.nil?
+        ip_matches.each do |ipm|
+          if ip_match.get_text == ipm
+            found = true
+            break
+          end
+        end
+        break if found
+      end
     end
     equal = false if !found
   end
@@ -277,7 +312,7 @@ def create_snmp_config_definition
   definition_el.attributes['auth-passphrase'] = new_resource.auth_passphrase if !new_resource.auth_passphrase.nil?
   definition_el.attributes['auth-protocol'] = new_resource.auth_protocol if !new_resource.auth_protocol.nil?
   definition_el.attributes['engine-id'] = new_resource.engine_id if !new_resource.engine_id.nil?
-  definition_el.attributes['context-engine_id'] = new_resource.context_engine_id if !new_resource.context_engine_id.nil?
+  definition_el.attributes['context-engine-id'] = new_resource.context_engine_id if !new_resource.context_engine_id.nil?
   definition_el.attributes['context-name'] = new_resource.context_name if !new_resource.context_name.nil?
   definition_el.attributes['privacy-passphrase'] = new_resource.privacy_passphrase if !new_resource.privacy_passphrase.nil?
   definition_el.attributes['privacy-protocol'] = new_resource.privacy_protocol if !new_resource.privacy_protocol.nil?
@@ -336,9 +371,9 @@ def update_snmp_config_definition
                         new_resource.enterprise_id)
 
   # remove all ranges, specifics and ip_matches that exist already
-  def_el.delete_all('range')
-  def_el.delete_all('specific')
-  def_el.delete_all('ip-match')
+  def_el.elements.delete_all('range')
+  def_el.elements.delete_all('specific')
+  def_el.elements.delete_all('ip-match')
   
   # put the new ones in
   if !new_resource.ranges.nil?
@@ -367,12 +402,13 @@ def update_snmp_config_definition
 end
 
 def delete_snmp_config_definition
-  Chef::Log.debug "Deleting snmp config definition : '#{ new_resource.name }'"
+  Chef::Log.info "Deleting snmp config definition : '#{ new_resource.name }'"
   file = ::File.new("#{node['opennms']['conf']['home']}/etc/snmp-config.xml", "r")
   contents = file.read
   file.close
   doc = REXML::Document.new(contents, { :respect_whitespace => :all })
   doc.context[:attribute_quote] = :quote 
+  Chef::Log.info "Deleting a definition element. Doc is currently #{doc}"
 
   def_el = matching_def(doc, new_resource.port,
                         new_resource.retry_count,
@@ -394,7 +430,12 @@ def delete_snmp_config_definition
                         new_resource.privacy_passphrase,
                         new_resource.privacy_protocol,
                         new_resource.enterprise_id)
-  doc.root.delete(def_el)
+  if def_el.nil?
+    Chef::Log.warn "Couldn't find the definition to delete!"
+  else
+    doc.root.delete(def_el)
+    Chef::Log.info "Deleted definition element. Doc is now #{doc}"
+  end
 
   out = ""
   formatter = REXML::Formatters::Pretty.new(2)

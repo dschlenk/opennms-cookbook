@@ -164,6 +164,14 @@ The list of implemented LWRPs is as follows:
 * `opennms_disco_range`: add a include or exclude range  discovery. See `opennms::test_disco_range` for examples.
 * `opennms_disco_url`: add a include-url to discovery and if it's a file deploy it where specified. See `opennms::test_disco_url` for examples.
 
+#### Node Authentication Configuration
+
+* `opennms_snmp_config_definition`: add a definition element to snmp-config.xml including child range, specific and ip-match elements. This is one of the few that implement updating and deleting. Specifically:
+  * Since definitions don't have a name or any other way to to uniquely identify them, definition element equality is determined by all definition element attributes being equal, including nil values (so all resource attributes except `ranges`, `specifics` and `ip_matches`). 
+  * If the definition attributes match but `ranges`, `specifics` and `ip_matches` do not contain the same values, the values contained in the new resource will be used. Note that all `range`, `specific` and `ip-match` elements that exist currently in the definition will be removed before the new elements are added. 
+  * To successfully delete a definition all the definition element attributes must match otherwise no action is taken. 
+* `opennms_wmi_config_definition`: 
+
 #### Polling
 
 * `opennms_poller_package`: add a package to etc/poller-configuration.xml. Note that an instance of this resource without use of an accompanying `opennms_poller_service` resource will result in a failure to start opennms. 

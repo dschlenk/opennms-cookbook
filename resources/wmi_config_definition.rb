@@ -1,6 +1,6 @@
 require 'rexml/document'
 
-actions :create
+actions :create, :delete, :create_if_missing
 default_action :create
 
 attribute :name, :kind_of => String, :name_attribute => true
@@ -16,4 +16,4 @@ attribute :specifics, :kind_of => Array
 # Array of IPLIKE address strings ([0-9]{1,3}((,|-)[0-9]{1,3})*|\*)\.([0-9]{1,3}((,|-)[0-9]{1,3})*|\*)\.([0-9]{1,3}((,|-)[0-9]{1,3})*|\*)\.([0-9]{1,3}((,|-)[0-9]{1,3})*|\*)
 attribute :ip_matches, :kind_of => Array
 
-attr_accessor :exists
+attr_accessor :exists, :different
