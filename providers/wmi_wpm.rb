@@ -1,3 +1,4 @@
+include ResourceType
 def whyrun_supported?
     true
 end
@@ -29,64 +30,16 @@ def load_current_resource
   if wpm_exists?(@current_resource.collection_name, @current_resource.name)
      @current_resource.exists = true
   end
-#  rt = Chef::Resource::OpennmsResourceType.new(@new_resource.resource_type)
-  
-  exists, included = resource_type_exists_included(@current_resource.resource_type) #rt.resource_type_exists_included(@current_resource.resource_type)
-  @current_resource.resource_type_exists = exists && included
+  if resource_type_exists?(@current_resource.resource_type)
+     @current_resource.resource_type_exists = true
+  end
 end
 
 
 private
 
-# I'm sure there's a better way than copy/pasting these private methods from resource_type to figure out if it exists aleady.
-# returns the name of the group and the path of the file that contains resource_type 'name'.
-def find_resource_type(name)
-  group_name = nil
-  Dir.foreach("#{node['opennms']['conf']['home']}/etc/datacollection") do |group|
-    next if group !~ /.*\.xml$/
-    file = ::File.new("#{node['opennms']['conf']['home']}/etc/datacollection/#{group}", "r")
-    doc = REXML::Document.new file
-    file.close
-    exists = !doc.elements["/datacollection-group/resourceType[@name='#{name}']"].nil?
-    if exists
-      group_name = doc.elements["/datacollection-group"].attributes['name']
-      break
-    end
-  end
-  group_name
-end
-
-# returns the path of the file that contains group 'name'
-def find_group(name)
-  file_name = nil
-  Dir.foreach("#{node['opennms']['conf']['home']}/etc/datacollection") do |group|
-    next if group !~ /.*\.xml$/
-    file = ::File.new("#{node['opennms']['conf']['home']}/etc/datacollection/#{group}", "r")
-    doc = REXML::Document.new file
-    file.close
-    exists = !doc.elements["/datacollection-group[@name='#{name}']"].nil?
-    if exists
-      file_name = "#{node['opennms']['conf']['home']}/etc/datacollection/#{group}"
-      break
-    end
-  end
-  file_name
-end
-
-def resource_type_exists_included(name)
-  Chef::Log.debug "Checking to see if this resource type exists: '#{ name }'"
-  exists = false
-  included = false
-  group_name = find_resource_type(name)
-  # check datacollection-config.xml to make sure the group is included in a snmp-collection
-  if !group_name.nil?
-    exists = true
-    file = ::File.new("#{node['opennms']['conf']['home']}/etc/datacollection-config.xml", "r")
-    doc = REXML::Document.new file
-    file.close
-    included = !doc.elements["/datacollection-config/snmp-collection/include-collection[@dataCollectionGroup='#{group_name}']"].nil?
-  end
-  [exists, included]
+def resource_type_exists?(resource_type)
+  rt_exists?(node['opennms']['conf']['home'], resource_type) && rt_included?(node['opennms']['conf']['home'], resource_type)
 end
 
 def collection_exists?(collection_name)

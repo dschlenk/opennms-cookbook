@@ -1,3 +1,4 @@
+include ResourceType
 def whyrun_supported?
   true
 end
@@ -24,60 +25,13 @@ end
 def load_current_resource
   @current_resource = Chef::Resource::OpennmsResourceType.new(@new_resource.name)
   @current_resource.name(@new_resource.name)
-  @current_resource.exists, @current_resource.included = resource_type_exists_included(@current_resource.name)
+
+  @current_resource.exists = rt_exists?(node['opennms']['conf']['home'], @current_resource.name)
+  @current_resource.included = rt_included?(node['opennms']['conf']['home'], @current_resource.name)
 end
 
-def resource_type_exists_included(name)
-  Chef::Log.debug "Checking to see if this resource type exists: '#{ name }'"
-  exists = false
-  included = false
-  group_name = find_resource_type(name)
-  # check datacollection-config.xml to make sure the group is included in a snmp-collection
-  if !group_name.nil?
-    exists = true
-    file = ::File.new("#{node['opennms']['conf']['home']}/etc/datacollection-config.xml", "r")
-    doc = REXML::Document.new file
-    file.close
-    included = !doc.elements["/datacollection-config/snmp-collection/include-collection[@dataCollectionGroup='#{group_name}']"].nil?
-  end
-  [exists, included]
-end
 
 private
-
-# returns the name of the group and the path of the file that contains resource_type 'name'.
-def find_resource_type(name)
-  group_name = nil
-  Dir.foreach("#{node['opennms']['conf']['home']}/etc/datacollection") do |group|
-    next if group !~ /.*\.xml$/
-    file = ::File.new("#{node['opennms']['conf']['home']}/etc/datacollection/#{group}", "r")
-    doc = REXML::Document.new file
-    file.close
-    exists = !doc.elements["/datacollection-group/resourceType[@name='#{name}']"].nil?
-    if exists
-      group_name = doc.elements["/datacollection-group"].attributes['name']
-      break
-    end 
-  end
-  group_name
-end
-
-# returns the path of the file that contains group 'name'
-def find_group(name)
-  file_name = nil
-  Dir.foreach("#{node['opennms']['conf']['home']}/etc/datacollection") do |group|
-    next if group !~ /.*\.xml$/
-    file = ::File.new("#{node['opennms']['conf']['home']}/etc/datacollection/#{group}", "r")
-    doc = REXML::Document.new file
-    file.close
-    exists = !doc.elements["/datacollection-group[@name='#{name}']"].nil?
-    if exists
-      file_name = "#{node['opennms']['conf']['home']}/etc/datacollection/#{group}"
-      break
-    end 
-  end
-  file_name
-end
 
 
 # resource type doesn't exist and isn't included. Group could exist, though. 
@@ -95,20 +49,7 @@ def create_resource_type
     doc.context[:attribute_quote] = :quote
     file.close
     group_el = doc.elements["/datacollection-group[@name='#{new_resource.group_name}']"]
-  #Dir.foreach("#{node['opennms']['conf']['home']}/etc/datacollection") do |group|
-  #  next if group !~ /.*\.xml$/
-  #  file = ::File.new("#{node['opennms']['conf']['home']}/etc/datacollection/#{group}", "r")
-  #  doc = REXML::Document.new file
-  #  doc.context[:attribute_quote] = :quote
-  #  file.close
-  #  exists = !doc.elements["/datacollection-group[@name='#{new_resource.group_name}']"].nil?
-  #  if exists
-  ##    outfile_name = "#{node['opennms']['conf']['home']}/etc/datacollection/#{group}"
-  #    group_el = doc.elements["/datacollection-group[@name='#{new_resource.group_name}']"]
-  #    break
-  #  end
-  #end
-  else #if group_el.nil? && (!::File.exists?("#{node['opennms']['conf']['home']}/etc/datacollection/#{new_resource.group_name}.xml") || ::File.zero?("#{node['opennms']['conf']['home']}/etc/datacollection/#{new_resource.group_name}.xml"))
+  else
     doc = REXML::Document.new
     doc.context[:attribute_quote] = :quote
     doc << REXML::XMLDecl.new
@@ -140,7 +81,7 @@ end
 
 def include_resource_type
   # find the group name the resource_type exists in
-  group_name = find_resource_type(new_resource.name)
+  group_name = find_resource_type(node['opennms']['conf']['home'], new_resource.name)
   # add the group to the default snmp-collection
   opennms_snmp_collection_group group_name do
     collection_name 'default'

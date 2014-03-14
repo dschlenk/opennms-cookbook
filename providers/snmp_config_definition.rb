@@ -145,31 +145,8 @@ def matching_def(doc, port, retry_count, timeout, read_community,
     && "#{def_el.attributes['privacy-passphrase']}" == "#{privacy_passphrase}"\
     && "#{def_el.attributes['privacy-protocol']}" == "#{privacy_protocol}"\
     && "#{def_el.attributes['enterprise-id']}" == "#{enterprise_id}"
-      Chef::Log.info "Found!"
       definition =  def_el
       break
-    else
-      Chef::Log.info "Not found."
-      Chef::Log.info "#{def_el.attributes['port']} == #{port}"
-      Chef::Log.info "#{def_el.attributes['retry']} == #{retry_count}"
-      Chef::Log.info "#{def_el.attributes['timeout']} == #{timeout}"
-      Chef::Log.info "#{def_el.attributes['read-community']} == #{read_community}"
-      Chef::Log.info "#{def_el.attributes['write-community']} == #{write_community}"
-      Chef::Log.info "#{def_el.attributes['proxy-host']} == #{proxy_host}"
-      Chef::Log.info "#{def_el.attributes['version']} == #{version}"
-      Chef::Log.info "#{def_el.attributes['max-vars-per-pdu']} == #{max_vars_per_pdu}"
-      Chef::Log.info "#{def_el.attributes['max-repetitions']} == #{max_repetitions}"
-      Chef::Log.info "#{def_el.attributes['max-request-size']} == #{max_request_size}"
-      Chef::Log.info "#{def_el.attributes['security-name']} == #{security_name}"
-      Chef::Log.info "#{def_el.attributes['security-level']} == #{security_level}"
-      Chef::Log.info "#{def_el.attributes['auth-passphrase']} == #{auth_passphrase}"
-      Chef::Log.info "#{def_el.attributes['auth-protocol']} == #{auth_protocol}"
-      Chef::Log.info "#{def_el.attributes['engine-id']} == #{engine_id}"
-      Chef::Log.info "#{def_el.attributes['context-engine-id']} == #{context_engine_id}"
-      Chef::Log.info "#{def_el.attributes['context-name']} == #{context_name}"
-      Chef::Log.info "#{def_el.attributes['privacy-passphrase']} == #{privacy_passphrase}"
-      Chef::Log.info "#{def_el.attributes['privacy-protocol']} == #{privacy_protocol}"
-      Chef::Log.info "#{def_el.attributes['enterprise-id']} == #{enterprise_id}"
     end
   end
   definition
@@ -408,7 +385,6 @@ def delete_snmp_config_definition
   file.close
   doc = REXML::Document.new(contents, { :respect_whitespace => :all })
   doc.context[:attribute_quote] = :quote 
-  Chef::Log.info "Deleting a definition element. Doc is currently #{doc}"
 
   def_el = matching_def(doc, new_resource.port,
                         new_resource.retry_count,
@@ -430,12 +406,7 @@ def delete_snmp_config_definition
                         new_resource.privacy_passphrase,
                         new_resource.privacy_protocol,
                         new_resource.enterprise_id)
-  if def_el.nil?
-    Chef::Log.warn "Couldn't find the definition to delete!"
-  else
     doc.root.delete(def_el)
-    Chef::Log.info "Deleted definition element. Doc is now #{doc}"
-  end
 
   out = ""
   formatter = REXML::Formatters::Pretty.new(2)

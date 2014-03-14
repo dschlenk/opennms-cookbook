@@ -20,7 +20,6 @@ module ResourceType
        [exists, included]
     end
 
-    private
     # returns the name of the group and the path of the file that contains resource_type 'name'.
     def find_resource_type(onms_home, name)
        group_name = nil
@@ -38,6 +37,7 @@ module ResourceType
        group_name
     end
     
+    private
     # returns the path of the file that contains group 'name'
     def find_group(onms_home, name)
        file_name = nil
@@ -66,5 +66,10 @@ module ResourceType
      rtc = ResourceTypeClass.new
      exists, included = rtc.resource_type_exists_included(onms_home, name)
      included
+  end
+
+  def find_resource_type(onms_home, name)
+     rtc = ResourceTypeClass.new
+     rtc.find_resource_type(onms_home, name)
   end
 end
