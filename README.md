@@ -201,6 +201,16 @@ Currently implemented are:
 
 * `opennms_eventconf`: adds a event-file element to events in etc/eventconf.xml. See `opennms::test_eventconf` for example usage.
 
+#### Notifications
+
+As with other LWPRs, see the test recipes for example usage.
+
+* `opennms_notification_command`: Create a new command in notificationCommands.xml. 
+* `opennms_destination_path`: creates a destination path element in destinationPaths.xml. Requires at a minimum a single target which can be defined with the following LWRP. 
+* `opennms_target`: Add a target or escalate target to a destination path (defined either in the default config or with the above LWRP). 
+* `opennms_notification`: Create notification elements in notifications.xml. 
+* `opennms_notifd_autoack`: Create a auto acknowledge up/down pair in notifd-configuration.xml
+
 #### Provisioning Requisitions
 
 These LWRPs use a cookbook library named Provision that I wrote to perform the work using the OpenNMS REST interface. As such, OpenNMS has to be running for the resources to converge. See any of the test recipes for my silly little ruby_block hack to make sure it is. Also you'll notice that I used 'import' a lot rather than the correct term 'requisition'. I can type 'import' a lot faster than 'requisition', so deal with it. And like everything else there are test recipes for each LWRP that have good examples in them.  
