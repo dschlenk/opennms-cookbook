@@ -51,10 +51,10 @@
         <% end -%>
         
         <queue>
-                <queue-id><%=@queue[:id]%></queue-id>
-                <interval><%=@queue[:interval]%></interval>
+                <queue-id>default</queue-id>
+                <interval>20s</interval>
                 <handler-class>
-                        <name><%=@queue[:handler_class]%></name>
+                        <name>org.opennms.netmgt.notifd.DefaultQueueHandler</name>
                 </handler-class>
         </queue>
 </notifd-configuration>

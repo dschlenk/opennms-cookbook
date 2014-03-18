@@ -926,9 +926,6 @@ default['opennms']['notifd']['auto_ack']['service_lost']         = true
 default['opennms']['notifd']['auto_ack']['interface_down']       = true
 default['opennms']['notifd']['auto_ack']['node_down']            = true
 default['opennms']['notifd']['auto_ack']['widespread_outage']    = true
-default['opennms']['notifd']['queue']['id']            = "default"
-default['opennms']['notifd']['queue']['interval']      = "20s"
-default['opennms']['notifd']['queue']['handler_class'] = "org.opennms.netmgt.notifd.DefaultQueueHandler"
 # notificationCommands.xml
 # Control which default commands are enabled. New commands can be created with the notif_command LWRP.
 default['opennms']['notification_commands']['java_pager_email']   = true

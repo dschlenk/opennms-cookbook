@@ -769,8 +769,7 @@ template "#{onms_home}/etc/notifd-configuration.xml" do
   variables(
     :status    => node[:opennms][:notifd][:status],
     :match_all => node[:opennms][:notifd][:match_all],
-    :auto_ack  => node[:opennms][:notifd][:auto_ack],
-    :queue     => node[:opennms][:notifd][:queue]
+    :auto_ack  => node[:opennms][:notifd][:auto_ack]
   )
 end
 
