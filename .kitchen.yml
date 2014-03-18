@@ -52,8 +52,10 @@ suites:
       #- recipe[opennms::test_update_snmp_config_definition]
       #- recipe[opennms::test_wmi_config_definition]
       #- recipe[opennms::test_update_wmi_config_definition]
-      - recipe[opennms::test_destination_path]
-      - recipe[opennms::test_notification_command]
+      #- recipe[opennms::test_destination_path]
+      #- recipe[opennms::test_notification_command]
+      #- recipe[opennms::test_notifd_autoack]
+      - recipe[opennms::test_notification]
     attributes: { 
                  "java": { 
                           "oracle": { 
