@@ -156,7 +156,13 @@ There are also a couple OpenNMS attributes you'll probably want to override at a
 
 As a general rule these LWRPs support a single action: create. For XML entities, when determining if the resource already exists on the node, a simple XPath to the name of the resource is performed without checking equality of other attributes. In other words, updating is not supported. 
 
+Also, there are test recipes in the cookbook for most every LWRP named `opennms::test_<LWRP_NAME>`.
+
 The list of implemented LWRPs is as follows: 
+
+### Users, Groups and Roles
+
+* `opennms_user`: add a user. Uses the REST API. Annoyingly, NMS-6469 makes a restart necessary for these users to be available. 
 
 #### Discovery
 
