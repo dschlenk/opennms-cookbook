@@ -3,6 +3,7 @@ $:.unshift *Dir[File.expand_path('../../files/default/vendor/gems/**/lib', __FIL
 require 'rexml/document'
 require 'rest_client'
 require 'json'
+require 'fileutils'
 
 module Rbac
 
@@ -45,6 +46,7 @@ module Rbac
       end
     end
     RestClient.post "#{baseurl(node)}/users", cu.to_s, {:content_type => :xml}
+    FileUtils.touch "#{node['opennms']['conf']['home']}/etc/users.xml"
   end
 
   def baseurl(node)

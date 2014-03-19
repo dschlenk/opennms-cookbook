@@ -162,7 +162,7 @@ The list of implemented LWRPs is as follows:
 
 ### Users, Groups and Roles
 
-* `opennms_user`: add a user. Uses the REST API. Annoyingly, NMS-6469 makes a restart necessary for these users to be available. 
+* `opennms_user`: add a user. Uses the REST API. 
 
 #### Discovery
 
