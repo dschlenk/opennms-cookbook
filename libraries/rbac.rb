@@ -49,6 +49,52 @@ module Rbac
     FileUtils.touch "#{node['opennms']['conf']['home']}/etc/users.xml"
   end
 
+  # could use REST for this, but we're doing file based for creates as the REST API is very limited so let's be consistent
+  def group_exists?(group, node)
+    Chef::Log.debug "Checking to see if this group exists: '#{ group }'"
+    file = ::File.new("#{node['opennms']['conf']['home']}/etc/groups.xml", "r")
+    doc = REXML::Document.new file
+    file.close
+    !doc.elements["/groupinfo/groups/group/name[text() = '#{group}']"].nil?
+  end
+
+  def add_group(new_resource, node)
+    file = ::File.new("#{node['opennms']['conf']['home']}/etc/groups.xml", "r")
+    doc = REXML::Document.new file
+    file.close
+    
+    groups_el = doc.elements["/groupinfo/groups"]
+    group_el = groups_el.add_element 'group'
+    name_el = group_el.add_element 'name'
+    name_el.add_text new_resource.name
+    if !new_resource.default_svg_map.nil?
+      map_el = group_el.add_element 'default-map'
+      map_el.add_text new_resource.default_svg_map
+    end
+    if !new_resource.comments.nil?
+      comments_el = group_el.add_element 'comments'
+      comments_el.add_text new_resource.comments
+    end
+    if !new_resource.users.nil?
+      new_resource.users.each do |user|
+        user_el = group_el.add_element 'user'
+        user_el.add_text user
+      end
+    end
+    if !new_resource.duty_schedules.nil?
+      new_resource.duty_schedules.each do |ds|
+        ds_el = group_el.add_element 'duty-schedule'
+        ds_el.add_text ds
+      end
+    end
+
+    out = ""
+    formatter = REXML::Formatters::Pretty.new(2)
+    formatter.compact = true
+    formatter.write(doc, out)
+    ::File.open("#{node['opennms']['conf']['home']}/etc/groups.xml", "w"){ |file| file.puts(out) }
+  end
+
   def baseurl(node)
     "http://admin:admin@localhost:#{node['opennms']['properties']['jetty']['port']}/opennms/rest"
   end

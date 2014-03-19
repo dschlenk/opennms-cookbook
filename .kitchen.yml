@@ -18,7 +18,8 @@ suites:
       - recipe[postgresql::config_initdb]
       - recipe[postgresql::config_pgtune]
       #- recipe[postgresql::contrib]
-      - recipe[opennms::default]
+      #- recipe[opennms::default]
+      - recipe[opennms::notemplates]
       #- recipe[opennms::nsclient]
       #- recipe[opennms::xml]
       #- recipe[opennms::test_resource_type]
@@ -57,6 +58,7 @@ suites:
       #- recipe[opennms::test_notifd_autoack]
       #- recipe[opennms::test_notification]
       - recipe[opennms::test_user]
+      - recipe[opennms::test_group]
     attributes: { 
                  "java": { 
                           "oracle": { 

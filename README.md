@@ -148,7 +148,6 @@ There are also a couple OpenNMS attributes you'll probably want to override at a
 ```
 
 ### Other Recipes
-
 * `opennms::nsclient` installs the optional nsclient data collection plugin and uses the template for etc/nsclient-datacollection-config.xml. 
 * `opennms::xml` installs the optional xml data collection plugin and uses the template for etc/xml-datacollection-config.xml. 
 
@@ -163,12 +162,13 @@ The list of implemented LWRPs is as follows:
 ### Users, Groups and Roles
 
 * `opennms_user`: add a user. Uses the REST API. 
+* `opennms_group`: add a group and populate it with users. You can even set the default SVG map and duty schedules.
 
 #### Discovery
 
-* `opennms_disco_specific`: add a specific IP to be discovered. See `opennms::test_disco_specific` for examples.
-* `opennms_disco_range`: add a include or exclude range  discovery. See `opennms::test_disco_range` for examples.
-* `opennms_disco_url`: add a include-url to discovery and if it's a file deploy it where specified. See `opennms::test_disco_url` for examples.
+* `opennms_disco_specific`: add a specific IP to be discovered. 
+* `opennms_disco_range`: add a include or exclude range  discovery. 
+* `opennms_disco_url`: add a include-url to discovery and if it's a file deploy it where specified. 
 
 #### Node Service Credential Configuration
 
@@ -184,28 +184,28 @@ Currently implemented are:
 #### Polling
 
 * `opennms_poller_package`: add a package to etc/poller-configuration.xml. Note that an instance of this resource without use of an accompanying `opennms_poller_service` resource will result in a failure to start opennms. 
-* `opennms_poller_service`: add a service to poller package named `poller_n$me`.  See `opennms::test_poller` for example usage of this and the `opennms_poller_package` resource. 
+* `opennms_poller_service`: add a service to poller package named `poller_name`.  See `opennms::test_poller` for example usage of this and the `opennms_poller_package` resource. 
 
 #### Data Collection
 
-* `opennms_resource_type`: adds a resourceType definition to a file in etc/datacollection and an include-collection element to the default snmp-collection. This LWRP supports a very limited form of updating - if the resource type already exists but isn't included in the default snmp-collection, an include-collection element will be added. The definition of the resource type won't be updated, however.  See opennms:test_resource_type for example usage. 
-* `opennms_snmp_collection`: adds an snmp-collection element to etc/datacollection-config.xml. See `opennms::test_snmp_collection` for example usage.
-* `opennms_xml_collection`: adds an xml-collection element to etc/xml-datacollection-config.xml. See `opennms::test_xml_collection` for example usage.
-* `opennms_wmi_collection`: adds a wmi-collection element to etc/wmi-datacollection-config.xml. See `opennms::test_wmi_collection` for example usage.
-* `opennms_jdbc_collection`: adds a jdbc-collection element to etc/jdbc-datacollection-config.xml. See `opennms::test_jdbc_collection` for example usage.
-* `opennms_collection_package`: adds a package element to etc/collectd-configuration.xml. See `opennms::test_collection_package` for example usage.
-* `opennms_snmp_collection_service`: adds a service element to a package in etc/collectd-configuration.xml. See `opennms::test_snmp_collection_service` for example usage.
-* `opennms_xml_collection_service`: adds a service element to a package in etc/collectd-configuration.xml. See `opennms::test_snmp_collection_service` for example usage.
-* `opennms_wmi_collection_service`: adds a service element to a package in etc/collectd-configuration.xml. See `opennms::test_snmp_collection_service` for example usage.
-* `opennms_jdbc_collection_service`: adds a service element to a package in etc/collectd-configuration.xml. See `opennms::test_jdbc_collection_service` for example usage.
-* `opennms_snmp_collection_group`: adds an include-collection element to an snmp-collection in etc/datacollection-config.xml and drops off the specified cookbook file into etc/datacollection. See `opennms::test_snmp_collection_group` for example usage.
-* `opennms_jdbc_query`: adds a query element to a jdbc-collection in etc/jdbc-datacollection-config.xml. See `opennms::test_jdbc_query` for example usage, which also uses the opennms_resource_type LWRP.
-* `opennms_xml_source`: adds a xml-source element to a xml-collection in etc/xml-datacollection-config.xml. See `opennms::test_xml_source` for example usage.
-* `opennms_xml_group`: adds a xml-source element to a xml-source in etc/xml-datacollection-config.xml. See `opennms::test_xml_group` for example usage.
+* `opennms_resource_type`: adds a resourceType definition to a file in etc/datacollection and an include-collection element to the default snmp-collection. This LWRP supports a very limited form of updating - if the resource type already exists but isn't included in the default snmp-collection, an include-collection element will be added. The definition of the resource type won't be updated, however.  
+* `opennms_snmp_collection`: adds an snmp-collection element to etc/datacollection-config.xml. 
+* `opennms_xml_collection`: adds an xml-collection element to etc/xml-datacollection-config.xml. 
+* `opennms_wmi_collection`: adds a wmi-collection element to etc/wmi-datacollection-config.xml. 
+* `opennms_jdbc_collection`: adds a jdbc-collection element to etc/jdbc-datacollection-config.xml. 
+* `opennms_collection_package`: adds a package element to etc/collectd-configuration.xml. 
+* `opennms_snmp_collection_service`: adds a service element to a package in etc/collectd-configuration.xml. 
+* `opennms_xml_collection_service`: adds a service element to a package in etc/collectd-configuration.xml. 
+* `opennms_wmi_collection_service`: adds a service element to a package in etc/collectd-configuration.xml.
+* `opennms_jdbc_collection_service`: adds a service element to a package in etc/collectd-configuration.xml.
+* `opennms_snmp_collection_group`: adds an include-collection element to an snmp-collection in etc/datacollection-config.xml and drops off the specified cookbook file into etc/datacollection. 
+* `opennms_jdbc_query`: adds a query element to a jdbc-collection in etc/jdbc-datacollection-config.xml. 
+* `opennms_xml_source`: adds a xml-source element to a xml-collection in etc/xml-datacollection-config.xml. 
+* `opennms_xml_group`: adds a xml-source element to a xml-source in etc/xml-datacollection-config.xml. 
 
 #### Events
 
-* `opennms_eventconf`: adds a event-file element to events in etc/eventconf.xml. See `opennms::test_eventconf` for example usage.
+* `opennms_eventconf`: adds a event-file element to events in etc/eventconf.xml. 
 
 #### Notifications
 
@@ -219,7 +219,7 @@ As with other LWPRs, see the test recipes for example usage.
 
 #### Provisioning Requisitions
 
-These LWRPs use a cookbook library named Provision that I wrote to perform the work using the OpenNMS REST interface. As such, OpenNMS has to be running for the resources to converge. See any of the test recipes for my silly little ruby_block hack to make sure it is. Also you'll notice that I used 'import' a lot rather than the correct term 'requisition'. I can type 'import' a lot faster than 'requisition', so deal with it. And like everything else there are test recipes for each LWRP that have good examples in them.  
+These LWRPs use a cookbook library named Provision that I wrote to perform the work using the OpenNMS REST interface. As such, OpenNMS has to be running for the resources to converge. See any of the test recipes for my silly little ruby_block hack to make sure it is. Also you'll notice that I used 'import' a lot rather than the correct term 'requisition'. I can type 'import' a lot faster than 'requisition'. ;)
 
 * `opennms_foreign_source`: create a new foreign source optionally defining a scan interval (defaults to '1d'). 
 * `opennms_service_detector`: add a service detector to a foreign source. TODO: if capsd is enabled in favor of provisiond add protocol-plugins to capsd-configuration.xml instead.
