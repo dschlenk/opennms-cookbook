@@ -148,6 +148,8 @@ There are also a couple OpenNMS attributes you'll probably want to override at a
 ```
 
 ### Other Recipes
+
+* `opennms::notemplates` Everything default does except the only templates are for etc/opennms.conf and etc/opennms.properties.
 * `opennms::nsclient` installs the optional nsclient data collection plugin and uses the template for etc/nsclient-datacollection-config.xml. 
 * `opennms::xml` installs the optional xml data collection plugin and uses the template for etc/xml-datacollection-config.xml. 
 
