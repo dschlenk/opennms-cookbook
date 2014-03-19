@@ -17,7 +17,7 @@ action :create do
 end
 
 def load_current_resource
-  @current_resource = Chef::Resource::OpennmsNotification.new(@new_resource.name)
+  @current_resource = Chef::Resource::OpennmsUser.new(@new_resource.name)
   @current_resource.name(@new_resource.name)
 
   if user_exists?(@current_resource.name, node)

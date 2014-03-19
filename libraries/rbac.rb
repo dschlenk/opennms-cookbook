@@ -58,6 +58,18 @@ module Rbac
     !doc.elements["/groupinfo/groups/group/name[text() = '#{group}']"].nil?
   end
 
+  def user_in_group?(group, user, node)
+    ingroup = false
+    file = ::File.new("#{node['opennms']['conf']['home']}/etc/groups.xml", "r")
+    doc = REXML::Document.new file
+    file.close
+    group_el = doc.elements["/groupinfo/groups/group/name[text() = '#{group}']"].parent
+    if !group_el.nil?
+      ingroup = true if !group_el.elements["user[text() = '#{user}']"].nil?
+    end
+    ingroup
+  end
+
   def add_group(new_resource, node)
     file = ::File.new("#{node['opennms']['conf']['home']}/etc/groups.xml", "r")
     doc = REXML::Document.new file
@@ -86,6 +98,76 @@ module Rbac
         ds_el = group_el.add_element 'duty-schedule'
         ds_el.add_text ds
       end
+    end
+
+    out = ""
+    formatter = REXML::Formatters::Pretty.new(2)
+    formatter.compact = true
+    formatter.write(doc, out)
+    ::File.open("#{node['opennms']['conf']['home']}/etc/groups.xml", "w"){ |file| file.puts(out) }
+  end
+
+  def role_exists?(role, node)
+    Chef::Log.debug "Checking to see if this role exists: '#{ role }'"
+    file = ::File.new("#{node['opennms']['conf']['home']}/etc/groups.xml", "r")
+    doc = REXML::Document.new file
+    file.close
+    !doc.elements["/groupinfo/roles/role[@name = '#{role}']"].nil?
+  end
+
+  def group_for_role(role, node)
+    group = nil
+    Chef::Log.debug "Checking to see if this role exists: '#{ role }'"
+    file = ::File.new("#{node['opennms']['conf']['home']}/etc/groups.xml", "r")
+    doc = REXML::Document.new file
+    file.close
+    role_el = doc.elements["/groupinfo/roles/role[@name = '#{role}']"]
+    if !role_el.nil?
+      group = role_el.attributes['membership-group']
+    end
+    Chef::Log.info "Found group #{group} for role #{role}."
+    group
+  end
+
+  def add_role(new_resource, node)
+    file = ::File.new("#{node['opennms']['conf']['home']}/etc/groups.xml", "r")
+    doc = REXML::Document.new file
+    file.close
+    
+    roles_el = doc.elements["/groupinfo/roles"]
+    if roles_el.nil?
+      roles_el = doc.root.add_element 'roles'
+    end
+    role_el = roles_el.add_element 'role', {'name' => new_resource.name, 'membership-group' => new_resource.membership_group, 'supervisor' => new_resource.supervisor}
+    if !new_resource.description.nil?
+      role_el.attributes['description'] = new_resource.description
+    end
+
+    out = ""
+    formatter = REXML::Formatters::Pretty.new(2)
+    formatter.compact = true
+    formatter.write(doc, out)
+    ::File.open("#{node['opennms']['conf']['home']}/etc/groups.xml", "w"){ |file| file.puts(out) }
+  end
+
+  # assumes validity of arguments
+  def schedule_exists?(role, user, type, node)
+    file = ::File.new("#{node['opennms']['conf']['home']}/etc/groups.xml", "r")
+    doc = REXML::Document.new file
+    file.close
+    !doc.elements["/groupinfo/roles/role[@name = '#{role}']/schedule[@type = '#{type}' and @name = '#{user}']"].nil?
+  end
+
+  def add_schedule_to_role(new_resource, node)
+    file = ::File.new("#{node['opennms']['conf']['home']}/etc/groups.xml", "r")
+    doc = REXML::Document.new file
+    file.close
+    
+    role_el = doc.elements["/groupinfo/roles/role[@name = '#{new_resource.role_name}']"]
+    sched_el = role_el.add_element 'schedule', {'name' => new_resource.username, 'type' => new_resource.type}
+    new_resource.times.each do |time|
+      time_el = sched_el.add_element 'time', {'begins' => time['begins'], 'ends' => time['ends']}
+      time_el.attributes['day'] = time['day'] if !time['day'].nil?
     end
 
     out = ""

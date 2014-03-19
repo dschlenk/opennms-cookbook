@@ -9,7 +9,7 @@ module Map
   # annoyingly, you can only get specific maps by ID, so we get all and search for it by name. 
   def map_exists?(map, node)
     begin
-      response = RestClient.get "#{baseurl(node)}", {:accept => :json}
+      response = RestClient.get "#{baseurl(node)}/maps", {:accept => :json}
       count = JSON.parse(response)['@count']
       if count > 0
         maps = JSON.parse(response)['map']

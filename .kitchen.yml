@@ -57,8 +57,9 @@ suites:
       #- recipe[opennms::test_notification_command]
       #- recipe[opennms::test_notifd_autoack]
       #- recipe[opennms::test_notification]
-      - recipe[opennms::test_user]
-      - recipe[opennms::test_group]
+      #- recipe[opennms::test_user]
+      #- recipe[opennms::test_group]
+      - recipe[opennms::test_role]
     attributes: { 
                  "java": { 
                           "oracle": { 

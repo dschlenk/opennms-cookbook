@@ -163,6 +163,8 @@ The list of implemented LWRPs is as follows:
 
 * `opennms_user`: add a user. Uses the REST API. 
 * `opennms_group`: add a group and populate it with users. You can even set the default SVG map and duty schedules.
+* `opennms_role`: add a role.
+* `opennms_role_schedule`: Add schedules to a role. See an example for this and the role LWRP in recipe `opennms::test_role`.
 
 #### Discovery
 
