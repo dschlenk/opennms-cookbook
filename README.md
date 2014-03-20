@@ -207,6 +207,13 @@ Currently implemented are:
 * `opennms_xml_source`: adds a xml-source element to a xml-collection in etc/xml-datacollection-config.xml. 
 * `opennms_xml_group`: adds a xml-source element to a xml-source in etc/xml-datacollection-config.xml. 
 
+#### Statistics Reports
+
+See `opennms::test_statsd` for example usage of these LWRPs. 
+
+* `opennms_statsd_package`: create a new package optionally with a filter in statsd-configuration.xml.
+* `opennms_statsd_report`: add a report to a package in statsd-configuration.xml. 
+
 #### Events
 
 * `opennms_eventconf`: adds a event-file element to events in etc/eventconf.xml. 
