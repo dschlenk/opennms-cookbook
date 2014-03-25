@@ -2,7 +2,7 @@ module ResourceType
   class ResourceTypeClass 
     def resource_type_exists_included(onms_home, name)
        # take care of the built-in resource types
-       if name == 'node' || name == 'nodeSnmp' || name == 'interfaceSnmp' || name == 'damain' || name == 'nodeSource' || name == 'responseTime' || name == 'distributedStatus'
+       if name == 'node' || name == 'nodeSnmp' || name == 'interfaceSnmp' || name == 'domain' || name == 'nodeSource' || name == 'responseTime' || name == 'distributedStatus'
          return [true, true]
        end
        Chef::Log.debug "Checking to see if this resource type exists: '#{ name }'"
