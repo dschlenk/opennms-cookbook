@@ -115,10 +115,10 @@ module Provision
     if import_exists?(foreign_source_name, node)
      begin
       response = RestClient.get "#{baseurl(node)}/requisitions/#{foreign_source_name}/nodes/#{foreign_id}"
-      Chef::Log.info "INE: import_node_exists response is #{response.to_s}"
+      Chef::Log.debug "INE: import_node_exists response is #{response.to_s}"
       return true if response.code == 200
      rescue
-      Chef::Log.info "INE: import_node_exists doesn't exist: #{foreign_source_name} - #{foreign_id}"
+      Chef::Log.debug "INE: import_node_exists doesn't exist: #{foreign_source_name} - #{foreign_id}"
       return false
      end
     end

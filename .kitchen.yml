@@ -62,7 +62,8 @@ suites:
       #- recipe[opennms::test_role]
       #- recipe[opennms::test_statsd]
       #- recipe[opennms::test_collection_graph_file]
-      - recipe[opennms::test_collection_graph]
+      #- recipe[opennms::test_collection_graph]
+      - recipe[opennms::test_response_graph]
     attributes: { 
                  "java": { 
                           "oracle": { 

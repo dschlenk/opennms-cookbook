@@ -23,7 +23,7 @@ def load_current_resource
   @current_resource.name(@new_resource.name)
   @current_resource.type(@new_resource.type)
 
-  if graph_exists?(@current_resource.name, node)
+  if graph_exists?(@current_resource.name, 'collection', node)
     @current_resource.exists = true
   end
 

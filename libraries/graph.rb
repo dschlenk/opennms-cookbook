@@ -6,21 +6,28 @@ module Graph
   def graph_file_exists?(filename, node)
     ::File.exists?("#{node['opennms']['conf']['home']}/etc/snmp-graph.properties.d/#{filename}")
   end
-  def graph_exists?(name, node)
-    # check main graph file first
-    props = JavaProperties::Properties.new("#{node['opennms']['conf']['home']}/etc/snmp-graph.properties")
+  def graph_exists?(name, type, node)
     found = false
-    values = props[:reports].split(',') unless props[:reports].nil?
+    if type == 'collection'
+      found = checkFileForGraph("#{node['opennms']['conf']['home']}/etc/snmp-graph.properties", name)
+      if !found
+        Dir.foreach("#{node['opennms']['conf']['home']}/etc/snmp-graph.properties.d") do |gfile|
+          next if gfile !~ /.*\.properties$/
+          found = checkFileForGraph("#{node['opennms']['conf']['home']}/etc/snmp-graph.properties.d/#{gfile}", name)
+          break if found
+        end
+      end 
+    elsif type == 'response'
+      found = checkFileForGraph("#{node['opennms']['conf']['home']}/etc/response-graph.properties", name)
+    end
+    found
+  end
+  
+  def checkFileForGraph(file, name)
+    props = JavaProperties::Properties.new(file)
+    found = false
+    values = props[:reports].split(/,\s*/) unless props[:reports].nil?
     found = values.include?(name) unless values.nil?
-    if !found
-      Dir.foreach("#{node['opennms']['conf']['home']}/etc/snmp-graph.properties.d") do |gfile|
-        next if gfile !~ /.*\.properties$/
-        props = JavaProperties::Properties.new("#{node['opennms']['conf']['home']}/etc/snmp-graph.properties.d/#{gfile}")
-        values = props[:reports].split(',') unless props[:reports].nil?
-        found = values.include?(name) unless values.nil?
-        break if found
-      end
-    end 
     found
   end
   # do this with line-by-line parsing since JavaProperties doesn't support non-destructive editing
@@ -30,39 +37,7 @@ module Graph
     if !new_resource.file.nil?
       fn = "#{node['opennms']['conf']['home']}/etc/snmp-graph.properties.d/#{new_resource.file}"
     end
-    Chef::Log.info "fn is #{fn}"
-    lines = []
-    reports_start = false
-    reports_end = false
-    ::File.readlines(fn).each do |line| 
-      Chef::Log.info "current line: #{line}"
-      if !reports_start 
-        if line =~ /^reports=.*$/
-          Chef::Log.info "found line"
-          reports_start = true
-          # if first line of reports isn't extended, add here
-          if line !~ /.*\\$/
-            Chef::Log.info "Single report in reports"
-            lines.push "#{line.chomp}, \\\n"
-            lines.push new_resource.name
-            reports_end = true
-          else
-            Chef::Log.info "Multple reports in reports"
-            lines.push line
-          end 
-        else
-          lines.push line
-          Chef::Log.info "no reports line yet"
-        end
-      elsif !reports_end && line !~ /.*\\$/
-        Chef::Log.info "found end of reports"
-        lines.push (line + ", \\")
-        lines.push new_resource.name
-      else
-        Chef::Log.info "reports mess is over, just appending a line."
-        lines.push line
-      end
-    end
+    lines = add_report(fn, new_resource.name)
     # add a blank line for teh pretties
     lines.push "\n"
     # add the report definition
@@ -73,5 +48,64 @@ module Graph
 
     # write out the modified properties to the file
     ::File.open(fn, "w"){ |file| file.puts(lines) }
+  end
+
+  # response graphs are more predictably generated so more attributes can be implied
+  def add_response_graph(new_resource, node)
+    fn = "#{node['opennms']['conf']['home']}/etc/response-graph.properties"
+    lines = add_report(fn, new_resource.name)
+    long_name = (new_resource.long_name.nil? ? new_resource.name.upcase : new_resource.long_name)
+    columns = (new_resource.columns.nil? ? new_resource.name : new_resource.columns.join(', ') )
+    command = new_resource.command
+    if command.nil?
+      command = "--title=\"#{long_name} Response Time\" \\\n"
+      command = command + " --vertical-label=\"Seconds\" \\\n"
+      command = command + " DEF:rtMills={rrd1}:#{new_resource.name}:AVERAGE \\\n"
+      command = command + " DEF:minRtMicro={rrd1}:#{new_resource.name}:MIN \\\n"
+      command = command + " DEF:maxRtMicro={rrd1}:#{new_resource.name}:MAX \\\n"
+      command = command + " CDEF:rt=rtMills,1000,/ \\\n"
+      command = command + " CDEF:minRt=minRtMills,1000,/ \\\n"
+      command = command + " CDEF:maxRt=maxRtMills,1000,/ \\\n"
+      command = command + " LINE1:rt#0000ff:\"Response Time\" \\\n"
+      command = command + " GPRINT:rt:AVERAGE:\" Avg  \\\\: %8.2lf %s\" \\\n"
+      command = command + " GPRINT:rt:MIN:\"Min  \\\\: %8.2lf %s\" \\\n"
+      command = command + " GPRINT:rt:MAX:\"Max  \\\\: %8.2lf %s\\\\n\""
+    end
+    lines.push "\n"
+    lines.push "report.#{new_resource.name}.name=#{long_name}"
+    lines.push "report.#{new_resource.name}.columns=#{columns}"
+    lines.push "report.#{new_resource.name}.type=#{new_resource.type.join(', ')}"
+    lines.push "report.#{new_resource.name}.command=#{command}"
+    ::File.open(fn, "w"){ |file| file.puts(lines) }
+  end
+
+  # add report 'name' to the reports comma separated list in file 'fn'
+  def add_report(fn, name)
+    lines = []
+    reports_start = false
+    reports_end = false
+    ::File.readlines(fn).each do |line|
+      if !reports_start
+        if line =~ /^reports=.*$/
+          reports_start = true
+          if line !~ /.*\\$/
+            lines.push "#{line.chomp}, \\\n"
+            lines.push name
+            reports_end = true
+          else
+            lines.push line
+          end 
+        else
+          lines.push line
+        end
+      elsif !reports_end && line !~ /.*\\$/
+        lines.push ("#{line.chomp}, \\\n")
+        lines.push name
+        reports_end = true
+      else
+        lines.push line
+      end
+    end
+    lines
   end
 end
