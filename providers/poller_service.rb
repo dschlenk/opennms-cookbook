@@ -6,8 +6,13 @@ use_inline_resources
 
 action :create do
   if @current_resource.exists
-    Chef::Log.info "#{ @new_resource } already exists - nothing to do."
+    Chef::Log.info "#{ @new_resource } already exists - need to update."
+    converge_by("Create #{ @new_resource }") do
+      update_poller_service
+      new_resource.updated_by_last_action(true)
+    end
   else
+    Chef::Log.info "#{ @new_resource } doesn't exist - need to create."
     converge_by("Create #{ @new_resource }") do
       create_poller_service
       new_resource.updated_by_last_action(true)
@@ -33,6 +38,40 @@ def service_exists?(package_name, name)
   file = ::File.new("#{node['opennms']['conf']['home']}/etc/poller-configuration.xml", "r")
   doc = REXML::Document.new file
   !doc.elements["/poller-configuration/package[@name='#{package_name}']/service[@name='#{name}']"].nil?
+end
+
+def update_poller_service
+  Chef::Log.debug "Updating poller service: '#{ new_resource.name }' in package '#{new_resource.package_name}'"
+  file = ::File.new("#{node['opennms']['conf']['home']}/etc/poller-configuration.xml")
+  contents = file.read
+  doc = REXML::Document.new(contents, { :respect_whitespace => :all })
+  doc.context[:attribute_quote] = :quote
+  file.close
+
+  service_el = doc.elements["/poller-configuration/package[@name='#{new_resource.package_name}']/service[@name='#{new_resource.name}']"]
+  service_el.attributes['interval'] = new_resource.interval
+  service_el.attributes['user-defined'] = new_resource.user_defined
+  service_el.attributes['status'] = new_resource.status
+  # clear out all parameters
+  service_el.elements.delete_all 'parameter'
+  # add them back with new values
+  if !new_resource.timeout.nil?
+    service_el.add_element 'parameter', { 'key' => 'timeout', 'value' => new_resource.timeout }
+  end
+  if !new_resource.port.nil? 
+    service_el.add_element 'parameter', { 'key' => 'port', 'value' => new_resource.port }
+  end
+  if !new_resource.params.nil?
+    new_resource.params.each do |key, value|
+      service_el.add_element 'parameter', { 'key' => key, 'value' => value }
+    end
+  end
+  # don't need to bother checking if a monitor element exists - had to before or else broken!
+  out = ""
+  formatter = REXML::Formatters::Pretty.new(2)
+  formatter.compact = true
+  formatter.write(doc, out)
+  ::File.open("#{node['opennms']['conf']['home']}/etc/poller-configuration.xml", "w"){ |file| file.puts(out) }
 end
 
 def create_poller_service
