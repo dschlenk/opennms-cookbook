@@ -12,4 +12,4 @@ attribute :type, :kind_of => String, :default => 'nodeSnmp', :required => true
 attribute :command, :kind_of => String, :required => true
 attribute :file, :kind_of => String # refers to the name of the file to add the graph def to
 
-attr_accessor :exists, :type_exists
+attr_accessor :exists, :type_exists, :file_exists

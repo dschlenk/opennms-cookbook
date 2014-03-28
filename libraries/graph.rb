@@ -3,6 +3,10 @@ $:.unshift *Dir[File.expand_path('../../files/default/vendor/gems/**/lib', __FIL
 require 'java_properties'
 
 module Graph
+  def new_graph_file(file, node)
+    f = ::File.new("#{node['opennms']['conf']['home']}/etc/snmp-graph.properties.d/#{file}", "w")
+    ::File.open(f, "w"){ |file| file.puts(["reports=\n", "\n"]) }
+  end
   def graph_file_exists?(filename, node)
     ::File.exists?("#{node['opennms']['conf']['home']}/etc/snmp-graph.properties.d/#{filename}")
   end
@@ -86,11 +90,17 @@ module Graph
     reports_end = false
     ::File.readlines(fn).each do |line|
       if !reports_start
-        if line =~ /^reports=.*$/
+        if line =~ /^reports=(.*)$/
           reports_start = true
+          values = $1
           if line !~ /.*\\$/
-            lines.push "#{line.chomp}, \\\n"
-            lines.push name
+            # check to make sure at least one report is listed here
+            if values !~ /^\s*$/
+              lines.push "#{line.chomp}, \\\n"
+              lines.push name
+            else
+              lines.push "#{line.chomp}#{name}\n"
+            end
             reports_end = true
           else
             lines.push line

@@ -64,7 +64,7 @@ def create_expression
   expression_el.attributes['ds-label'] = new_resource.ds_label unless new_resource.ds_label.nil?
   expression_el.attributes['triggeredUEI'] = new_resource.triggered_uei unless new_resource.triggered_uei.nil?
   expression_el.attributes['rearmedUEI'] = new_resource.rearmed_uei unless new_resource.rearmed_uei.nil?
-  threshold_el.attributes['filterOperator'] = new_resource.filter_operator unless new_resource.filter_operator.nil? || new_resource.filter_operator == 'or'
+  expression_el.attributes['filterOperator'] = new_resource.filter_operator unless new_resource.filter_operator.nil? || new_resource.filter_operator == 'or'
   if !new_resource.resource_filters.nil?
     new_resource.resource_filters.each do |filter|
       filter_el = expression_el.add_element 'resource-filter', {'field' => filter['field']}

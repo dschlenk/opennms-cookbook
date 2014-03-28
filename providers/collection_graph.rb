@@ -8,6 +8,11 @@ end
 use_inline_resources
 
 action :create do
+  
+  unless @current_resource.file_exists
+    Chef::Log.info "#{ @new_resource } file doesn't exist - creating it."
+    new_graph_file(@current_resource.file, node)
+  end
   if @current_resource.exists
     Chef::Log.info "#{ @new_resource } already exists - nothing to do."
   else
@@ -22,7 +27,13 @@ def load_current_resource
   @current_resource = Chef::Resource::OpennmsCollectionGraph.new(@new_resource.name)
   @current_resource.name(@new_resource.name)
   @current_resource.type(@new_resource.type)
+  @current_resource.file(@new_resource.file)
 
+  if !@current_resource.file.nil? && graph_file_exists?(@current_resource.file, node)
+    @current_resource.file_exists = true 
+  elsif @current_resource.file.nil? # because means add it to main graph file like a bad person
+    @current_resource.file_exists = true
+  end
   if graph_exists?(@current_resource.name, 'collection', node)
     @current_resource.exists = true
   end

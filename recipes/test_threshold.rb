@@ -31,7 +31,26 @@ opennms_threshold "icmp" do
   trigger 2
 end
 
-# common options
+# define events for tiggered/rearmed
+opennms_event "uei.opennms.org/thresholdTest/testThresholdExceeded" do
+  file "events/chef.events.xml"
+  event_label "Chef defined event: testThresholdExceeded"
+  descr "<p>A threshold defined by a chef recipe that tests thresholds has been exceeded.</p>"
+  logmsg "Chef test threshold exceeded."
+  logmsg_dest "logndisplay"
+  logmsg_notify true
+  severity "Minor"
+end
+opennms_event "uei.opennms.org/thresholdTest/testThresholdRearmed" do
+  file "events/chef.events.xml"
+  event_label "Chef defined event: testThresholdRearmed"
+  descr "<p>A threshold defined by a chef recipe that tests thresholds has been rearmed.</p>"
+  logmsg "Chef test threshold rearmed."
+  logmsg_dest "logndisplay"
+  logmsg_notify true
+  severity "Normal"
+end
+# most  options
 opennms_expression "icmp / 1000" do
   group 'cheftest'
   type 'high'
@@ -40,4 +59,8 @@ opennms_expression "icmp / 1000" do
   value 20.0
   rearm 18.0
   trigger 3
+  triggered_uei 'uei.opennms.org/thresholdTest/testThresholdExceeded'
+  rearmed_uei 'uei.opennms.org/thresholdTest/testThresholdRearmed'
+  filter_operator 'and'
+  resource_filters [{'field' => 'ifHighSpeed', 'filter' => '^[1-9]+[0-9]*$'}]
 end

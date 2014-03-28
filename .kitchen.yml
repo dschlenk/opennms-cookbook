@@ -38,6 +38,7 @@ suites:
       #- recipe[opennms::test_xml_source]
       #- recipe[opennms::test_xml_group]
       #- recipe[opennms::test_eventconf]
+      #- recipe[opennms::test_event]
       #- recipe[opennms::test_poller]
       #- recipe[opennms::test_disco_specific]
       #- recipe[opennms::test_disco_range]
@@ -62,7 +63,7 @@ suites:
       #- recipe[opennms::test_role]
       #- recipe[opennms::test_statsd]
       #- recipe[opennms::test_collection_graph_file]
-      #- recipe[opennms::test_collection_graph]
+      - recipe[opennms::test_collection_graph]
       #- recipe[opennms::test_response_graph]
       - recipe[opennms::test_threshold]
     attributes: { 

@@ -1,3 +1,4 @@
+include Events
 def whyrun_supported?
   true
 end
@@ -42,27 +43,5 @@ def create_eventconf
     group "root"
     mode 00644
   end
-
-  Chef::Log.debug "Adding eventconf: '#{ new_resource.name }' to main eventconf.xml"
-  file = ::File.new("#{node['opennms']['conf']['home']}/etc/eventconf.xml")
-  contents = file.read
-  doc = REXML::Document.new(contents, { :respect_whitespace => :all })
-  doc.context[:attribute_quote] = :quote
-  file.close
-  
-  events_el = doc.root.elements["/events"]
-  eventconf_el = REXML::Element.new('event-file')
-  eventconf_el.add_text(REXML::CData.new("events/#{new_resource.name}"))
-  last_pkg_el = doc.root.elements["/events/event-file[text() = 'events/ncs-component.events.xml']"]
-  if new_resource.position == 'top'
-    last_pkg_el = doc.root.elements["/events/event-file[text() = 'events/Translator.default.events.xml']"]
-    events_el.insert_after(last_pkg_el, eventconf_el)
-  else
-    events_el.insert_before(last_pkg_el, eventconf_el)
-  end
-  out = ""
-  formatter = REXML::Formatters::Pretty.new(2)
-  formatter.compact = true
-  formatter.write(doc, out)
-  ::File.open("#{node['opennms']['conf']['home']}/etc/eventconf.xml", "w"){ |file| file.puts(out) }
+  add_file_to_eventconf(new_resource.name, new_resource.position, node)
 end
