@@ -37,7 +37,6 @@ module ResourceType
        group_name
     end
     
-    private
     # returns the path of the file that contains group 'name'
     def find_group(onms_home, name)
        file_name = nil
@@ -71,5 +70,10 @@ module ResourceType
   def find_resource_type(onms_home, name)
      rtc = ResourceTypeClass.new
      rtc.find_resource_type(onms_home, name)
+  end
+  
+  def find_group(onms_home, name)
+     rtc = ResourceTypeClass.new
+     rtc.find_group(onms_home, name)
   end
 end

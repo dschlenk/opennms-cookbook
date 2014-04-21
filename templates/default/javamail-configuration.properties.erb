@@ -60,13 +60,13 @@ org.opennms.core.utils.useJMTA=false
 <% if ! @authenticate.nil? -%>
 org.opennms.core.utils.authenticate=<%=@authenticate%>
 <% end -%>
-#org.opennms.core.utils.authenticateUser="opennms"
+#org.opennms.core.utils.authenticateUser=opennms
 <% if ! @authenticate_user.nil? -%>
-org.opennms.core.utils.authenticateUser="<%=@authenticate_user%>"
+org.opennms.core.utils.authenticateUser=<%=@authenticate_user%>
 <% end -%>
-#org.opennms.core.utils.authenticatePassword="opennms"
+#org.opennms.core.utils.authenticatePassword=opennms
 <% if ! @authenticate_password.nil? -%>
-org.opennms.core.utils.authenticatePassword="<%=@authenticate_password%>"
+org.opennms.core.utils.authenticatePassword=<%=@authenticate_password%>
 <% end -%>
 #org.opennms.core.utils.starttls.enable=false
 <% if ! @starttls.nil? -%>

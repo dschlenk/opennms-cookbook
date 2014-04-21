@@ -40,7 +40,7 @@ def create_resource_type
   outfile_name = "#{node['opennms']['conf']['home']}/etc/datacollection/#{new_resource.group_name}.xml"
   doc = nil
   group_el = nil
-  file_name = find_group(new_resource.group_name)
+  file_name = find_group(node['opennms']['conf']['home'], new_resource.group_name)
   # deal with the group existing but not the resource type
   if !file_name.nil?
     outfile_name = file_name

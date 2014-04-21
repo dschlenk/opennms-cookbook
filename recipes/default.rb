@@ -50,7 +50,7 @@ hostsfile_entry node['ipaddress'] do
 end
 
 package "opennms" do
-  version "1.12.5-1"
+  version "1.12.6-1"
   action :install
 end
 
@@ -355,6 +355,7 @@ template "#{onms_home}/etc/datacollection-config.xml" do
     :brocade      => node['opennms']['datacollection']['default']['brocade'],
     :checkpoint   => node['opennms']['datacollection']['default']['checkpoint'],
     :cisco        => node['opennms']['datacollection']['default']['cisco'],
+    :ciscoNexus   => node['opennms']['datacollection']['default']['ciscoNexus'],
     :clavister    => node['opennms']['datacollection']['default']['clavister'],
     :colubris     => node['opennms']['datacollection']['default']['colubris'],
     :concord      => node['opennms']['datacollection']['default']['concord'],
@@ -1240,6 +1241,17 @@ template "#{onms_home}/etc/snmp-graph.properties.d/cisco-graph.properties" do
   notifies :restart, "service[opennms]"
   variables(
     :enabled => node[:opennms][:snmp_graph][:cisco]
+  )
+end
+
+template "#{onms_home}/etc/snmp-graph.properties.d/ciscoNexus-graph.properties" do
+  source "snmp-graph.properties.d/ciscoNexus-graph.properties.erb"
+  mode 0664
+  owner "root"
+  group "root"
+  notifies :restart, "service[opennms]"
+  variables(
+    :enabled => node[:opennms][:snmp_graph][:ciscoNexus]
   )
 end
 

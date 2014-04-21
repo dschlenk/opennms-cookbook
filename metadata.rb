@@ -2,8 +2,10 @@ name             'opennms'
 maintainer       'David Schlenk'
 maintainer_email 'david.schlenk@spanlink.com'
 license          'Apache 2.0'
-description      'Installs and Configures opennms'
+description      'Installs and Configures opennms and provides many useful LWRPs.'
 long_description IO.read(File.join(File.dirname(__FILE__), 'README.md'))
-version          '0.1.8'
+supports         'centos', ">= 6.0"
+supports         'rhel', ">= 6.0"
+version          '0.1.9'
 depends          'yum'
 depends          'hostsfile'

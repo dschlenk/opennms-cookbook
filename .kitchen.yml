@@ -1,14 +1,26 @@
 ---
 driver:
-  name: vagrant
-  box: openstack-devops
-  provider: openstack
-
+  name: openstack
+  openstack_username: david.schlenk
+  openstack_api_key: 'wh0l3 m*lk'
+  openstack_auth_url: 'http://172.17.20.2:5000/v2.0/tokens'
+  require_chef_omnibus: latest
+  image_ref: /CentOS/
+  flavor_ref: m1.small
+  private_key_path: ~/.ssh/david-schlenk.pem
+  key_name: david-schlenk
+  username: ec2-user
+  security_groups:
+    - OpenNMS
+    - default
+  openstack_tenant: 'DevOps'
+  network_ref: devops_net
+  floating_ip: 172.17.21.35
 provisioner:
   name: chef_solo
 
 platforms:
-  - name: centos-6.4
+  - name: centos-6.5
 
 suites:
   - name: default
@@ -18,53 +30,53 @@ suites:
       - recipe[postgresql::config_initdb]
       - recipe[postgresql::config_pgtune]
       #- recipe[postgresql::contrib]
-      #- recipe[opennms::default]
-      - recipe[opennms::notemplates]
-      #- recipe[opennms::nsclient]
-      #- recipe[opennms::xml]
-      #- recipe[opennms::test_resource_type]
-      #- recipe[opennms::test_snmp_collection]
-      #- recipe[opennms::test_xml_collection]
-      #- recipe[opennms::test_wmi_collection]
-      #- recipe[opennms::test_jdbc_collection]
-      #- recipe[opennms::test_collection_package]
-      #- recipe[opennms::test_snmp_collection_service]
-      #- recipe[opennms::test_xml_collection_service]
-      #- recipe[opennms::test_wmi_collection_service]
-      #- recipe[opennms::test_jdbc_collection_service]
-      #- recipe[opennms::test_snmp_collection_group]
-      #- recipe[opennms::test_jdbc_query]
-      #- recipe[opennms::test_wmi_wpm]
-      #- recipe[opennms::test_xml_source]
-      #- recipe[opennms::test_xml_group]
-      #- recipe[opennms::test_eventconf]
-      #- recipe[opennms::test_event]
-      #- recipe[opennms::test_poller]
-      #- recipe[opennms::test_disco_specific]
-      #- recipe[opennms::test_disco_range]
-      #- recipe[opennms::test_disco_url]
-      #- recipe[opennms::test_foreign_source]
-      #- recipe[opennms::test_service_detector]
-      #- recipe[opennms::test_policy]
-      #- recipe[opennms::test_import]
-      #- recipe[opennms::test_import_node]
-      #- recipe[opennms::test_import_node_interface]
-      #- recipe[opennms::test_import_node_interface_service]
-      #- recipe[opennms::test_snmp_config_definition]
-      #- recipe[opennms::test_update_snmp_config_definition]
-      #- recipe[opennms::test_wmi_config_definition]
-      #- recipe[opennms::test_update_wmi_config_definition]
-      #- recipe[opennms::test_destination_path]
-      #- recipe[opennms::test_notification_command]
-      #- recipe[opennms::test_notifd_autoack]
-      #- recipe[opennms::test_notification]
-      #- recipe[opennms::test_user]
-      #- recipe[opennms::test_group]
-      #- recipe[opennms::test_role]
-      #- recipe[opennms::test_statsd]
-      #- recipe[opennms::test_collection_graph_file]
+      - recipe[opennms::default]
+      #- recipe[opennms::notemplates]
+      - recipe[opennms::nsclient]
+      - recipe[opennms::xml]
+      - recipe[opennms::test_resource_type]
+      - recipe[opennms::test_snmp_collection]
+      - recipe[opennms::test_xml_collection]
+      - recipe[opennms::test_wmi_collection]
+      - recipe[opennms::test_jdbc_collection]
+      - recipe[opennms::test_collection_package]
+      - recipe[opennms::test_snmp_collection_service]
+      - recipe[opennms::test_xml_collection_service]
+      - recipe[opennms::test_wmi_collection_service]
+      - recipe[opennms::test_jdbc_collection_service]
+      - recipe[opennms::test_snmp_collection_group]
+      - recipe[opennms::test_jdbc_query]
+      - recipe[opennms::test_wmi_wpm]
+      - recipe[opennms::test_xml_source]
+      - recipe[opennms::test_xml_group]
+      - recipe[opennms::test_eventconf]
+      - recipe[opennms::test_event]
+      - recipe[opennms::test_poller]
+      - recipe[opennms::test_disco_specific]
+      - recipe[opennms::test_disco_range]
+      - recipe[opennms::test_disco_url]
+      - recipe[opennms::test_foreign_source]
+      - recipe[opennms::test_service_detector]
+      - recipe[opennms::test_policy]
+      - recipe[opennms::test_import]
+      - recipe[opennms::test_import_node]
+      - recipe[opennms::test_import_node_interface]
+      - recipe[opennms::test_import_node_interface_service]
+      - recipe[opennms::test_snmp_config_definition]
+      - recipe[opennms::test_update_snmp_config_definition]
+      - recipe[opennms::test_wmi_config_definition]
+      - recipe[opennms::test_update_wmi_config_definition]
+      - recipe[opennms::test_destination_path]
+      - recipe[opennms::test_notification_command]
+      - recipe[opennms::test_notifd_autoack]
+      - recipe[opennms::test_notification]
+      - recipe[opennms::test_user]
+      - recipe[opennms::test_group]
+      - recipe[opennms::test_role]
+      - recipe[opennms::test_statsd]
+      - recipe[opennms::test_collection_graph_file]
       - recipe[opennms::test_collection_graph]
-      #- recipe[opennms::test_response_graph]
+      - recipe[opennms::test_response_graph]
       - recipe[opennms::test_threshold]
     attributes: { 
                  "java": { 
