@@ -14,6 +14,22 @@ module SystemDef
      exists
   end
 
+  def group_exists?(onms_home, group)
+     Chef::Log.debug "Checking to see if group #{group} exists."
+     exists = false
+     Dir.foreach("#{onms_home}/etc/datacollection") do |gf|
+        next if gf !~ /.*\.xml$/
+        file = ::File.new("#{onms_home}/etc/datacollection/#{gf}", "r")
+        doc = REXML::Document.new file
+        file.close
+        if !doc.elements["/datacollection-group/group[@name='#{group}']"].nil?
+          exists = true
+          break
+        end
+     end
+     exists
+  end
+
   def find_system_def(onms_home, name)
      system_def_file = nil
      Dir.foreach("#{onms_home}/etc/datacollection") do |group|

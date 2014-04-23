@@ -7,6 +7,7 @@ end
 use_inline_resources
 
 action :add do
+  Chef::Application.fatal!("Missing one of these data-collection groups: #{@current_resource.groups}.") if !@current_resource.groups_exist
   if @current_resource.exists
     Chef::Log.info "#{ @new_resource } already in systemDef - nothing to do."
   else
@@ -18,6 +19,7 @@ action :add do
 end
 
 action :remove do
+  Chef::Application.fatal!("Missing one of these data-collection groups: #{@current_resource.groups}.") if !@current_resource.groups_exist
   if !@current_resource.exists
     Chef::Log.info "#{ @new_resource } not present - nothing to do."
   else
@@ -33,6 +35,15 @@ def load_current_resource
   @current_resource.name(@new_resource.name)
   @current_resource.groups(@new_resource.groups)
 
+  ge = true
+  @current_resource.groups.each do |group|
+    if !group_exists?(node['opennms']['conf']['home'], group)
+      Chef::Log.error "Missing data-collection group #{group}"
+      ge = false
+      break
+    end
+  end
+  @current_resource.groups_exist = true if ge
   system_def_file = find_system_def(node['opennms']['conf']['home'], @current_resource.name)
   if !system_def_file.nil?
      @current_resource.system_def_exists = true
