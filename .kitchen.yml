@@ -2,7 +2,7 @@
 driver:
   name: openstack
   openstack_username: david.schlenk
-  openstack_api_key: 'wh0l3 m*lk'
+  openstack_api_key: 'redacted'
   openstack_auth_url: 'http://172.17.20.2:5000/v2.0/tokens'
   require_chef_omnibus: latest
   image_ref: /CentOS/

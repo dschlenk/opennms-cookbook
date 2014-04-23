@@ -6,6 +6,6 @@ description      'Installs and Configures opennms and provides many useful LWRPs
 long_description IO.read(File.join(File.dirname(__FILE__), 'README.md'))
 supports         'centos', ">= 6.0"
 supports         'rhel', ">= 6.0"
-version          '0.1.9'
+version          '0.1.10'
 depends          'yum'
 depends          'hostsfile'

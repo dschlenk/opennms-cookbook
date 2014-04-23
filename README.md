@@ -218,6 +218,7 @@ Currently implemented are:
 #### Data Collection
 
 * `opennms_resource_type`: adds a resourceType definition to a file in etc/datacollection and an include-collection element to the default snmp-collection. This LWRP supports a very limited form of updating - if the resource type already exists but isn't included in the default snmp-collection, an include-collection element will be added. The definition of the resource type won't be updated, however.  
+* `opennms_system_def`: add or remove pre-existing groups (`/datacollection-group/group[@name]`) to or from pre-existing systemDefs (`/datacollection-group/systemDef/collect/includeGroup[text()]`) in $ONMS_HOME/etc/datacollection/*.xml.
 * `opennms_snmp_collection`: adds an snmp-collection element to etc/datacollection-config.xml. 
 * `opennms_xml_collection`: adds an xml-collection element to etc/xml-datacollection-config.xml. 
 * `opennms_wmi_collection`: adds a wmi-collection element to etc/wmi-datacollection-config.xml. 
