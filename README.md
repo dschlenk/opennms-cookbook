@@ -2,22 +2,21 @@ Description
 ===========
 
 A Chef cookbook to manage the installation and configuration of OpenNMS.
-Current version of templates are based on OpenNMS release 1.12.6.
+Current version of templates are based on OpenNMS release 1.12.8.
 
 Status
 ======
 
-In active development. Feel free to try out a tagged version (or master if you dare) but don't expect everything to work perfectly yet. Tags happen when a decent chunk of new functionality is written, their test recipes converge (named test_*) and OpenNMS starts without errors. 
+Ready for limited use. Feel free to try out a tagged version (or master if you dare) but don't expect everything to work perfectly yet. Tags happen when a decent chunk of new functionality is written, their test recipes converge (named test_*) and OpenNMS starts without errors.  Notably missing are unit and more formal integration tests.
 
 Requirements
 ============
 
 * Chef 11.x
-* CentOS 6.x. Debian/Ubuntu support planned.
+* CentOS 6.x. Debian/Ubuntu support shouldn't be too hard to do - if anyone wants to head that up let me know. 
 * Some experience using OpenNMS without the benefit of configuration management.
 * The need to manage many instances of OpenNMS.
 * The desire to share configurations with other users without `$OPENNMS_HOME/etc` tarballs or git patches.
-* Patience as unimplemented templates and LWRPs are completed.
 * Either use Berkshelf to satisfy dependencies or manually acquire the following cookbooks: 
   * yum
   * hostsfile
@@ -30,41 +29,24 @@ See Usage for more details.
 Usage
 =====
 
-Running the default recipe will install OpenNMS 1.12.6 on CentOS 6.x from the official repo with the default configuration. It will also execute `'$ONMS_HOME/bin/runjava -s` if `$ONMS_HOME/etc/java.conf` is not present and `$ONMS_HOME/bin/install -dis` if `$ONMS_HOME/etc/configured` is not present.
+Running the default recipe will install OpenNMS 1.12.8 on CentOS 6.x from the official repo with the default configuration. It will also execute `'$ONMS_HOME/bin/runjava -s` if `$ONMS_HOME/etc/java.conf` is not present and `$ONMS_HOME/bin/install -dis` if `$ONMS_HOME/etc/configured` is not present.
 
 Also, most configuration files are templated and can be overridden with environment, role, or node attributes.  See the default attributes file for a list of configuration items that can be changed in this manner, or keep reading for a brief overview of each template available. Some general notes:
 
 * Default attribute values set to `nil` mean that the file's default value is commented out in the original file and will remain so unless set to a non-nil value.
-* For XML configuration files, you can disable or modify elements that exist in the default configuration, but in general if you want to add something new or drastically change something you will want to disable the default config and use the appropriate LWRP (coming soon!) in your own cookbook/recipe.
-* Some items that exist in the default configuration but are commented out can be turned on with attributes.
+* For XML configuration files, you can disable or modify elements that exist in the default configuration, but in general if you want to add something new or drastically change something you will want to disable the default config and use the appropriate LWRP in your own cookbook/recipe.
+* Some items that exist in the default configuration but are commented out can be turned on with attributes. Future work needed here for common use cases like switching to RRDTool and enabling the access point monitor as well as some things present in the examples. 
 
 You probably also want to check out the community java (https://github.com/socrata-cookbooks/java) and postgresql (https://github.com/hw-cookbooks/postgresql) cookbooks. Here's my default overrides for each:
 
 ### Java
 
 ```
-{
-  "java":
-  {
-    "oracle":
-    {
-      "accept_oracle_download_terms": true
-    },
-    "install_flavor":"oracle",
-    "jdk":
-    {
-      "7":
-      {
-        "x86_64":
-        {
-          "checksum":"77367c3ef36e0930bf3089fb41824f4b8cf55dcc8f43cce0868f7687a474f55c",
-          "url":"http://download.oracle.com/otn-pub/java/jdk/7u51-b13/jdk-7u51-linux-x64.tar.gz"
-        }
-      }
-    },
-    "jdk_version":7
-  }
-}
+node[:java][:oracle][:accept_oracle_download_terms] = true
+node[:java][:install_flavor] = 'oracle'
+node[:java][:jdk][:7][:x86_64][:checksum] = '77367c3ef36e0930bf3089fb41824f4b8cf55dcc8f43cce0868f7687a474f55c'
+node[:java][:jdk][:7][:x86_64][:url] = 'http://download.oracle.com/otn-pub/java/jdk/7u51-b13/jdk-7u51-linux-x64.tar.gz'
+node[:java][:jdk_version] = 7
 ```
 
 ### Postgresql
@@ -72,64 +54,37 @@ You probably also want to check out the community java (https://github.com/socra
 Include the server, config_initdb, config_pgtune and contrib recipes in your run list. Then use these override attributes for a fairly well tuned config:
 
 ```
-{
-  "postgresql":
-  {
-    "pg_hba":
-    [
-      {
-        "addr":"",
-        "user":"all",
-        "type":"local",
-        "method":"trust",
-        "db":"all"
-      },
-      {
-        "addr":"127.0.0.1/32",
-        "user":"all",
-        "type":"host",
-        "method":"trust",
-        "db":"all"
-      },
-      {
-        "addr":"::1/128",
-        "user":"all",
-        "type":"host",
-        "method":"trust",
-        "db":"all"
-      }
-    ],
-    "config":
-    {
-      "checkpoint_timeout":"15min",
-      "autovacuum":"on",
-      "track_activities":"on",
-      "track_counts":"on",
-      "shared_preload_libraries":"pg_stat_statements",
-      "vacuum_cost_delay":50
-    },
-    "server":
-    {
-      "packages":
-      [
-        "postgresql-server",
-        "postgresql-contrib"
-      ]
-    },
-    "contrib":
-    {
-      "extensions":
-      [
-        "pageinspect",
-        "pg_buffercache",
-        "pg_freespacemap",
-        "pgrowlocks",
-        "pg_stat_statements",
-        "pgstattuple"
-      ]
-    }
-  }
-}
+node[:postgresql][:pg_hba] = { :addr => '' :user => 'all', :type => 'local', :method => 'trust', :db => 'all' }
+node[:postgresql][:pg_hba] = { :addr => '127.0.0.1/32', :user => 'all', :type => 'host', :method => 'trust', :db => 'all'}
+node[:postgresql][:pg_hba] = { :addr => '::1/128', :user => 'all', :type => 'host', :method => 'trust', :db => 'all' }
+node[:postgresql][:config][:checkpoint_timeout] = '15min'
+node[:postgresql][:config][:autovacuum] = 'on'
+node[:postgresql][:config][:track_activities] = 'on'
+node[:postgresql][:config][:track_counts]  = 'on'
+node[:postgresql][:config][:shared_preload_libraries] = 'pg_stat_statements'
+node[:postgresql][:config][:vacuum_cost_delay] = 50
+node[:postgresql][:server][:packages] = ["postgresql-server", "postgresql-contrib"]
+node[:postgresql][:contrib][:extensions] = ["pageinspect", "pg_buffercache", "pg_freespacemap", "pgrowlocks", "pg_stat_statements", "pgstattuple"]
+```
+
+For a more recent version of PostgreSQL using the PGDG repo you might want something like this: 
+
+```
+node[:postgresql][:pg_hba] = [{:addr => '' :user => 'all', :type => 'local', :method => 'trust', :db => 'all' },{ :addr => '127.0.0.1/32', :user => 'all', :type => 'host', :method => 'trust', :db => 'all'},{ :addr => '::1/128', :user => 'all', :type => 'host', :method => 'trust', :db => 'all'}]
+node[:postgresql][:enable_pgdg_yum] = true
+node[:postgresql][:version]         = '9.3'
+node[:postgresql][:dir]             = '/var/lib/pgsql/9.3/data'
+node[:postgresql][:config][:autovacuum]               = 'on'
+node[:postgresql][:config][:checkpoint_timeout]       = '15min'
+node[:postgresql][:config][:shared_preload_libraries] = 'pg_stat_statements'
+node[:postgresql][:config][:track_activities]         = 'on'
+node[:postgresql][:config][:track_counts]             = 'on'
+node[:postgresql][:config][:vacuum_cost_delay]        = 50
+node[:postgresql][:client][:packages] = ["postgresql93","postgresql93-contrib","postgresql93-devel"]
+node[:postgresql][:server][:packages]     = ["postgresql93-server"]
+node[:postgresql][:server][:service_name] = "postgresql-9.3"
+node[:postgresql][:contrib][:packages]   = ["postgresql93-contrib"]
+node[:postgresql][:contrib][:extensions] = ["pageinspect", "pg_buffercache","pg_freespacemap","pgrowlocks","pg_stat_statements","pgstattuple"]
 ```
 
 There are also a couple OpenNMS attributes you'll probably want to override at a minimum: 
@@ -137,14 +92,8 @@ There are also a couple OpenNMS attributes you'll probably want to override at a
 ### opennms.conf
 
 ```
-   {
-     "opennms": {
-       "conf":{
-         "start_timeout": 20,
-         "heap_size": 1024
-       }
-     }
-   }
+node[:opennms][:conf][:start_timeout] = 20
+node[:opennms][:conf][:heap_size] = 1024
 ```
 
 ### Other Recipes
@@ -155,9 +104,9 @@ There are also a couple OpenNMS attributes you'll probably want to override at a
 
 ### LWRPs
 
-As a general rule these LWRPs support a single action: create. For XML entities, when determining if the resource already exists on the node, a simple XPath to the name of the resource is performed without checking equality of other attributes. In other words, updating is not supported. 
+As a general rule these LWRPs support a single action: create. For XML entities, when determining if the resource already exists on the node, a simple XPath to the name of the resource is performed without checking equality of other attributes. In other words, updating is generally not supported. This may change in future releases. 
 
-Also, there are test recipes in the cookbook for most every LWRP named `opennms::test_<LWRP_NAME>`.
+Also, there are example recipes in the cookbook for most every LWRP named `opennms::example_<LWRP_NAME>`.
 
 The list of implemented LWRPs is as follows: 
 
@@ -166,7 +115,7 @@ The list of implemented LWRPs is as follows:
 * `opennms_user`: add a user. Uses the REST API. 
 * `opennms_group`: add a group and populate it with users. You can even set the default SVG map and duty schedules.
 * `opennms_role`: add a role.
-* `opennms_role_schedule`: Add schedules to a role. See an example for this and the role LWRP in recipe `opennms::test_role`.
+* `opennms_role_schedule`: Add schedules to a role. See an example for this and the role LWRP in recipe `opennms::example_role`.
 
 #### Discovery
 
@@ -176,7 +125,7 @@ The list of implemented LWRPs is as follows:
 
 #### Provisioning Requisitions
 
-These LWRPs use a cookbook library named Provision that I wrote to perform the work using the OpenNMS REST interface. As such, OpenNMS has to be running for the resources to converge. See any of the test recipes for my silly little ruby_block hack to make sure it is. Also you'll notice that I used 'import' a lot rather than the correct term 'requisition'. I can type 'import' a lot faster than 'requisition'. ;)
+These LWRPs use a cookbook library named Provision that I wrote to perform the work using the OpenNMS REST interface. As such, OpenNMS has to be running for the resources to converge. See any of the example recipes for my silly little ruby_block hack to make sure it is. Also you'll notice that I used 'import' a lot rather than the correct term 'requisition'. I can type 'import' a lot faster than 'requisition'. ;)
 
 * `opennms_foreign_source`: create a new foreign source optionally defining a scan interval (defaults to '1d'). 
 * `opennms_service_detector`: add a service detector to a foreign source. TODO: if capsd is enabled in favor of provisiond add protocol-plugins to capsd-configuration.xml instead.
@@ -189,7 +138,7 @@ These LWRPs use a cookbook library named Provision that I wrote to perform the w
 #### Events
 
 * `opennms_eventconf`: adds a event-file element to events in etc/eventconf.xml. 
-* `opennms_event`: adds an event element to events in target eventconf file `file`. Not all elements from the eventconf schema are implemented, but the ones that seem to actually exist in the wild are. See resource for details and recipes `test_event` and `test_threshold` for example usage.
+* `opennms_event`: adds an event element to events in target eventconf file `file`. Not all elements from the eventconf schema are implemented, but the ones that seem to actually exist in the wild are. See resource for details and recipes `example_event` and `example_threshold` for example usage.
 
 #### Notifications
 
@@ -213,7 +162,7 @@ Currently implemented are:
 #### Polling
 
 * `opennms_poller_package`: add a package to etc/poller-configuration.xml. Note that an instance of this resource without use of an accompanying `opennms_poller_service` resource will result in a failure to start opennms. 
-* `opennms_poller_service`: add a service to poller package named `poller_name`.  See `opennms::test_poller` for example usage of this and the `opennms_poller_package` resource. 
+* `opennms_poller_service`: add a service to poller package named `poller_name`.  See `opennms::example_poller` for example usage of this and the `opennms_poller_package` resource. 
 
 #### Data Collection
 
@@ -235,7 +184,7 @@ Currently implemented are:
 
 #### Statistics Reports
 
-See `opennms::test_statsd` for example usage of these LWRPs. 
+See `opennms::example_statsd` for example usage of these LWRPs. 
 
 * `opennms_statsd_package`: create a new package optionally with a filter in statsd-configuration.xml.
 * `opennms_statsd_report`: add a report to a package in statsd-configuration.xml. 
@@ -248,7 +197,7 @@ See `opennms::test_statsd` for example usage of these LWRPs.
 
 #### Thresholds
 
-All of these LWRPs are tested in a single recipe, `test_threshold`. 
+See examples for all of these LWRPs are in a single recipe, `example_threshold`. 
 
 * `opennms_threshd_package`: Create a new package in threshd-configuration.xml. 
 * `opennms_threshold_group`: Create a new threshold group in thresholds.xml. 

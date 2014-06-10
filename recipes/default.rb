@@ -50,7 +50,7 @@ hostsfile_entry node['ipaddress'] do
 end
 
 package "opennms" do
-  version "1.12.6-1"
+  version "1.12.8-1"
   action :install
 end
 
@@ -102,6 +102,19 @@ template "#{onms_home}/etc/opennms.conf" do
     :runas                  => node[:opennms][:conf][:runas],
     :max_file_descr         => node[:opennms][:conf][:max_file_descr],
     :max_size_stack_segment => node[:opennms][:conf][:command]
+  )
+end
+
+template "#{onms_home}/etc/jetty.xml" do
+  source "jetty.xml.erb"
+  mode 00664
+  owner "root"
+  group "root"
+  notifies :restart, "service[opennms]"
+  variables(
+    :ajp   => node['opennms']['properties']['jetty']['ajp'],
+    :https_port => node['opennms']['properties']['jetty']['https_port'],
+    :https_host => node['opennms']['properties']['jetty']['https_host'],
   )
 end
 

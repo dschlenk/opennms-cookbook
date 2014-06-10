@@ -1,84 +1,12 @@
 ---
 driver:
-  name: openstack
-  openstack_username: david.schlenk
-  openstack_api_key: 'redacted'
-  openstack_auth_url: 'http://172.17.20.2:5000/v2.0/tokens'
-  require_chef_omnibus: latest
-  image_ref: /CentOS/
-  flavor_ref: m1.small
-  private_key_path: ~/.ssh/david-schlenk.pem
-  key_name: david-schlenk
-  username: ec2-user
-  security_groups:
-    - OpenNMS
-    - default
-  openstack_tenant: 'DevOps'
-  network_ref: devops_net
-  floating_ip: 172.17.21.35
+  name: vagrant
+
 provisioner:
   name: chef_solo
 
 platforms:
   - name: centos-6.5
-
-suites:
-  - name: default
-    run_list:
-      - recipe[java]
-      - recipe[postgresql::server]
-      - recipe[postgresql::config_initdb]
-      - recipe[postgresql::config_pgtune]
-      #- recipe[postgresql::contrib]
-      #- recipe[opennms::default]
-      - recipe[opennms::notemplates]
-      #- recipe[opennms::nsclient]
-      #- recipe[opennms::xml]
-      #- recipe[opennms::test_resource_type]
-      #- recipe[opennms::test_snmp_collection]
-      #- recipe[opennms::test_xml_collection]
-      #- recipe[opennms::test_wmi_collection]
-      #- recipe[opennms::test_jdbc_collection]
-      #- recipe[opennms::test_collection_package]
-      #- recipe[opennms::test_snmp_collection_service]
-      #- recipe[opennms::test_xml_collection_service]
-      #- recipe[opennms::test_wmi_collection_service]
-      #- recipe[opennms::test_jdbc_collection_service]
-      #- recipe[opennms::test_snmp_collection_group]
-      #- recipe[opennms::test_jdbc_query]
-      #- recipe[opennms::test_wmi_wpm]
-      #- recipe[opennms::test_xml_source]
-      #- recipe[opennms::test_xml_group]
-      #- recipe[opennms::test_eventconf]
-      #- recipe[opennms::test_event]
-      #- recipe[opennms::test_poller]
-      #- recipe[opennms::test_disco_specific]
-      #- recipe[opennms::test_disco_range]
-      #- recipe[opennms::test_disco_url]
-      #- recipe[opennms::test_foreign_source]
-      #- recipe[opennms::test_service_detector]
-      #- recipe[opennms::test_policy]
-      #- recipe[opennms::test_import]
-      #- recipe[opennms::test_import_node]
-      #- recipe[opennms::test_import_node_interface]
-      #- recipe[opennms::test_import_node_interface_service]
-      #- recipe[opennms::test_snmp_config_definition]
-      #- recipe[opennms::test_update_snmp_config_definition]
-      #- recipe[opennms::test_wmi_config_definition]
-      #- recipe[opennms::test_update_wmi_config_definition]
-      #- recipe[opennms::test_destination_path]
-      #- recipe[opennms::test_notification_command]
-      #- recipe[opennms::test_notifd_autoack]
-      #- recipe[opennms::test_notification]
-      #- recipe[opennms::test_user]
-      #- recipe[opennms::test_group]
-      #- recipe[opennms::test_role]
-      #- recipe[opennms::test_statsd]
-      #- recipe[opennms::test_collection_graph_file]
-      #- recipe[opennms::test_collection_graph]
-      #- recipe[opennms::test_response_graph]
-      #- recipe[opennms::test_threshold]
-      - recipe[opennms::test_system_def]
     attributes: { 
                  "java": { 
                           "oracle": { 
@@ -96,5 +24,639 @@ suites:
                           "jdk_version": 7 
                          }, 
                   "opennms": {
-                              "conf": {"start_timeout": 20}},  postgresql: {password: {postgres: "md5c23797e9a303da48b792b4339c426700"}, config: {autovacuum: "on", checkpoint_timeout: "15min", shared_preload_libraries: "pg_stat_statements", track_activities: "on", track_counts: "on", vacuum_cost_delay: 50}, pg_hba: [{addr: "", db: "all", method: "trust", type: "local", user: "all"}, {addr: "127.0.0.1/32", db: "all", method: "trust", type: "host", user: "all"},{addr: "::1/128", db: "all", method: "trust", type: "host", user: "all"}], server: {packages: ["postgresql-server","postgresql-contrib"]}}}
-    # contrib: {extensions: ["pageinspect", "pg_buffercache","pg_freespacemap","pgrowlocks","pg_stat_statements","pgstattuple"]}
+                              "conf": {"start_timeout": 20}},  
+                  postgresql: {
+                                password: { 
+                                           postgres: "md5c23797e9a303da48b792b4339c426700" 
+                                          }, 
+                                enable_pgdg_yum: false,
+                                
+                                config: {
+                                         autovacuum: "on", 
+                                         checkpoint_timeout: "15min", 
+                                         track_activities: "on", 
+                                         track_counts: "on", 
+                                         vacuum_cost_delay: 50
+                                        }, 
+                                pg_hba: [
+                                         {
+                                          addr: "", 
+                                          db: "all", 
+                                          method: "trust", 
+                                          type: "local", 
+                                          user: "all"
+                                         }, 
+                                         {
+                                          addr: "127.0.0.1/32", 
+                                          db: "all", 
+                                          method: "trust", 
+                                          type: "host", 
+                                          user: "all"
+                                         },
+                                         {
+                                          addr: "::1/128", 
+                                          db: "all", 
+                                          method: "trust", 
+                                          type: "host", 
+                                          user: "all"
+                                         }
+                                        ], 
+                                client: {
+                                         packages: [
+                                                    "postgresql",
+                                                    "postgresql-contrib",
+                                                    "postgresql-devel"
+                                                   ]
+                                        },
+                                server: { 
+                                         packages: [
+                                                    "postgresql-server"
+                                                   ],
+                                         service_name: "postgresql"
+                                        }
+                              }
+                }
+
+suites:
+  - name: default
+    run_list:
+      - recipe[java]
+      - recipe[postgresql::client]
+      - recipe[postgresql::server]
+      - recipe[postgresql::contrib]
+      - recipe[postgresql::config_initdb]
+      - recipe[postgresql::config_pgtune]
+      - recipe[opennms::default]
+  - name: all
+    run_list:
+      - recipe[java]
+      - recipe[postgresql::client]
+      - recipe[postgresql::server]
+      - recipe[postgresql::contrib]
+      - recipe[postgresql::config_initdb]
+      - recipe[postgresql::config_pgtune]
+      - recipe[opennms::example_webopts]
+      - recipe[opennms::default]
+      - recipe[opennms::nsclient]
+      - recipe[opennms::xml]
+      - recipe[opennms::example_resource_type]
+      - recipe[opennms::example_snmp_collection]
+      - recipe[opennms::example_xml_collection]
+      - recipe[opennms::example_wmi_collection]
+      - recipe[opennms::example_jdbc_collection]
+      - recipe[opennms::example_collection_package]
+      - recipe[opennms::example_snmp_collection_service]
+      - recipe[opennms::example_xml_collection_service]
+      - recipe[opennms::example_wmi_collection_service]
+      - recipe[opennms::example_jdbc_collection_service]
+      - recipe[opennms::example_snmp_collection_group]
+      - recipe[opennms::example_jdbc_query]
+      - recipe[opennms::example_wmi_wpm]
+      - recipe[opennms::example_xml_source]
+      - recipe[opennms::example_xml_group]
+      - recipe[opennms::example_eventconf]
+      - recipe[opennms::example_event]
+      - recipe[opennms::example_poller]
+      - recipe[opennms::example_disco_specific]
+      - recipe[opennms::example_disco_range]
+      - recipe[opennms::example_disco_url]
+      - recipe[opennms::example_foreign_source]
+      - recipe[opennms::example_service_detector]
+      - recipe[opennms::example_policy]
+      - recipe[opennms::example_import]
+      - recipe[opennms::example_import_node]
+      - recipe[opennms::example_import_node_interface]
+      - recipe[opennms::example_import_node_interface_service]
+      - recipe[opennms::example_snmp_config_definition]
+      - recipe[opennms::example_update_snmp_config_definition]
+      - recipe[opennms::example_wmi_config_definition]
+      - recipe[opennms::example_update_wmi_config_definition]
+      - recipe[opennms::example_destination_path]
+      - recipe[opennms::example_notification_command]
+      - recipe[opennms::example_notifd_autoack]
+      - recipe[opennms::example_notification]
+      - recipe[opennms::example_user]
+      - recipe[opennms::example_group]
+      - recipe[opennms::example_role]
+      - recipe[opennms::example_statsd]
+      - recipe[opennms::example_collection_graph_file]
+      - recipe[opennms::example_collection_graph]
+      - recipe[opennms::example_response_graph]
+      - recipe[opennms::example_threshold]
+      - recipe[opennms::example_system_def]
+  - name: notemplates
+    run_list:
+      - recipe[java]
+      - recipe[postgresql::client]
+      - recipe[postgresql::server]
+      - recipe[postgresql::contrib]
+      - recipe[postgresql::config_initdb]
+      - recipe[postgresql::config_pgtune]
+      - recipe[opennms::notemplates]
+  - name: nsclient
+    run_list:
+      - recipe[java]
+      - recipe[postgresql::client]
+      - recipe[postgresql::server]
+      - recipe[postgresql::contrib]
+      - recipe[postgresql::config_initdb]
+      - recipe[postgresql::config_pgtune]
+      - recipe[opennms::notemplates]
+      - recipe[opennms::nsclient]
+  - name: xml
+    run_list:
+      - recipe[java]
+      - recipe[postgresql::client]
+      - recipe[postgresql::server]
+      - recipe[postgresql::contrib]
+      - recipe[postgresql::config_initdb]
+      - recipe[postgresql::config_pgtune]
+      - recipe[opennms::notemplates]
+      - recipe[opennms::xml]
+  - name: resource_type
+    run_list:
+      - recipe[java]
+      - recipe[postgresql::client]
+      - recipe[postgresql::server]
+      - recipe[postgresql::contrib]
+      - recipe[postgresql::config_initdb]
+      - recipe[postgresql::config_pgtune]
+      - recipe[opennms::notemplates]
+      - recipe[opennms::example_resource_type]
+  - name: snmp_collection
+    run_list:
+      - recipe[java]
+      - recipe[postgresql::client]
+      - recipe[postgresql::server]
+      - recipe[postgresql::contrib]
+      - recipe[postgresql::config_initdb]
+      - recipe[postgresql::config_pgtune]
+      - recipe[opennms::notemplates]
+      - recipe[opennms::example_snmp_collection]
+  - name: xml_collection
+    run_list:
+      - recipe[java]
+      - recipe[postgresql::client]
+      - recipe[postgresql::server]
+      - recipe[postgresql::contrib]
+      - recipe[postgresql::config_initdb]
+      - recipe[postgresql::config_pgtune]
+      - recipe[opennms::notemplates]
+      - recipe[opennms::xml]
+      - recipe[opennms::example_xml_collection]
+  - name: wmi_collection
+    run_list:
+      - recipe[java]
+      - recipe[postgresql::client]
+      - recipe[postgresql::server]
+      - recipe[postgresql::contrib]
+      - recipe[postgresql::config_initdb]
+      - recipe[postgresql::config_pgtune]
+      - recipe[opennms::notemplates]
+      - recipe[opennms::example_wmi_collection]
+  - name: jdbc_collection
+    run_list:
+      - recipe[java]
+      - recipe[postgresql::client]
+      - recipe[postgresql::server]
+      - recipe[postgresql::contrib]
+      - recipe[postgresql::config_initdb]
+      - recipe[postgresql::config_pgtune]
+      - recipe[opennms::notemplates]
+      - recipe[opennms::example_jdbc_collection]
+  - name: collection_package
+    run_list:
+      - recipe[java]
+      - recipe[postgresql::client]
+      - recipe[postgresql::server]
+      - recipe[postgresql::contrib]
+      - recipe[postgresql::config_initdb]
+      - recipe[postgresql::config_pgtune]
+      - recipe[opennms::notemplates]
+      - recipe[opennms::example_collection_package]
+  - name: snmp_collection_service
+    run_list:
+      - recipe[java]
+      - recipe[postgresql::client]
+      - recipe[postgresql::server]
+      - recipe[postgresql::contrib]
+      - recipe[postgresql::config_initdb]
+      - recipe[postgresql::config_pgtune]
+      - recipe[opennms::notemplates]
+      - recipe[opennms::example_snmp_collection]
+      - recipe[opennms::example_collection_package]
+      - recipe[opennms::example_snmp_collection_service]
+  - name: xml_collection_service
+    run_list:
+      - recipe[java]
+      - recipe[postgresql::client]
+      - recipe[postgresql::server]
+      - recipe[postgresql::contrib]
+      - recipe[postgresql::config_initdb]
+      - recipe[postgresql::config_pgtune]
+      - recipe[opennms::notemplates]
+      - recipe[opennms::example_xml_collection]
+      - recipe[opennms::example_collection_package]
+      - recipe[opennms::example_xml_collection_service]
+  - name: wmi_collection_service
+    run_list:
+      - recipe[java]
+      - recipe[postgresql::client]
+      - recipe[postgresql::server]
+      - recipe[postgresql::contrib]
+      - recipe[postgresql::config_initdb]
+      - recipe[postgresql::config_pgtune]
+      - recipe[opennms::notemplates]
+      - recipe[opennms::example_wmi_collection]
+      - recipe[opennms::example_collection_package]
+      - recipe[opennms::example_wmi_collection_service]
+  - name: jdbc_collection_service
+    run_list:
+      - recipe[java]
+      - recipe[postgresql::client]
+      - recipe[postgresql::server]
+      - recipe[postgresql::contrib]
+      - recipe[postgresql::config_initdb]
+      - recipe[postgresql::config_pgtune]
+      - recipe[opennms::notemplates]
+      - recipe[opennms::example_jdbc_collection]
+      - recipe[opennms::example_collection_package]
+      - recipe[opennms::example_jdbc_collection_service]
+  - name: snmp_collection_group
+    run_list:
+      - recipe[java]
+      - recipe[postgresql::client]
+      - recipe[postgresql::server]
+      - recipe[postgresql::contrib]
+      - recipe[postgresql::config_initdb]
+      - recipe[postgresql::config_pgtune]
+      - recipe[opennms::notemplates]
+      - recipe[opennms::example_snmp_collection]
+      - recipe[opennms::example_collection_package]
+      - recipe[opennms::example_snmp_collection_service]
+      - recipe[opennms::example_snmp_collection_group]
+  - name: jdbc_query
+    run_list:
+      - recipe[java]
+      - recipe[postgresql::client]
+      - recipe[postgresql::server]
+      - recipe[postgresql::contrib]
+      - recipe[postgresql::config_initdb]
+      - recipe[postgresql::config_pgtune]
+      - recipe[opennms::notemplates]
+      - recipe[opennms::example_jdbc_collection]
+      - recipe[opennms::example_collection_package]
+      - recipe[opennms::example_jdbc_collection_service]
+      - recipe[opennms::example_jdbc_query]
+  - name: wmi_wpm
+    run_list:
+      - recipe[java]
+      - recipe[postgresql::client]
+      - recipe[postgresql::server]
+      - recipe[postgresql::contrib]
+      - recipe[postgresql::config_initdb]
+      - recipe[postgresql::config_pgtune]
+      - recipe[opennms::notemplates]
+      - recipe[opennms::example_wmi_collection]
+      - recipe[opennms::example_collection_package]
+      - recipe[opennms::example_wmi_collection_service]
+      - recipe[opennms::example_wmi_wpm]
+  - name: xml_source
+    run_list:
+      - recipe[java]
+      - recipe[postgresql::client]
+      - recipe[postgresql::server]
+      - recipe[postgresql::contrib]
+      - recipe[postgresql::config_initdb]
+      - recipe[postgresql::config_pgtune]
+      - recipe[opennms::notemplates]
+      - recipe[opennms::example_xml_collection]
+      - recipe[opennms::example_collection_package]
+      - recipe[opennms::example_xml_collection_service]
+      - recipe[opennms::example_xml_source]
+  - name: xml_group
+    run_list:
+      - recipe[java]
+      - recipe[postgresql::client]
+      - recipe[postgresql::server]
+      - recipe[postgresql::contrib]
+      - recipe[postgresql::config_initdb]
+      - recipe[postgresql::config_pgtune]
+      - recipe[opennms::notemplates]
+      - recipe[opennms::example_xml_collection]
+      - recipe[opennms::example_collection_package]
+      - recipe[opennms::example_xml_collection_service]
+      - recipe[opennms::example_xml_source]
+      - recipe[opennms::example_xml_group]
+  - name: eventconf
+    run_list:
+      - recipe[java]
+      - recipe[postgresql::client]
+      - recipe[postgresql::server]
+      - recipe[postgresql::contrib]
+      - recipe[postgresql::config_initdb]
+      - recipe[postgresql::config_pgtune]
+      - recipe[opennms::notemplates]
+      - recipe[opennms::example_eventconf]
+  - name: event
+    run_list:
+      - recipe[java]
+      - recipe[postgresql::client]
+      - recipe[postgresql::server]
+      - recipe[postgresql::contrib]
+      - recipe[postgresql::config_initdb]
+      - recipe[postgresql::config_pgtune]
+      - recipe[opennms::notemplates]
+      - recipe[opennms::example_event]
+  - name: poller
+    run_list:
+      - recipe[java]
+      - recipe[postgresql::client]
+      - recipe[postgresql::server]
+      - recipe[postgresql::contrib]
+      - recipe[postgresql::config_initdb]
+      - recipe[postgresql::config_pgtune]
+      - recipe[opennms::notemplates]
+      - recipe[opennms::example_poller]
+  - name: disco_specific
+    run_list:
+      - recipe[java]
+      - recipe[postgresql::client]
+      - recipe[postgresql::server]
+      - recipe[postgresql::contrib]
+      - recipe[postgresql::config_initdb]
+      - recipe[postgresql::config_pgtune]
+      - recipe[opennms::notemplates]
+      - recipe[opennms::example_disco_specific]
+  - name: disco_range
+    run_list:
+      - recipe[java]
+      - recipe[postgresql::client]
+      - recipe[postgresql::server]
+      - recipe[postgresql::contrib]
+      - recipe[postgresql::config_initdb]
+      - recipe[postgresql::config_pgtune]
+      - recipe[opennms::notemplates]
+      - recipe[opennms::example_disco_range]
+  - name: disco_url
+    run_list:
+      - recipe[java]
+      - recipe[postgresql::client]
+      - recipe[postgresql::server]
+      - recipe[postgresql::contrib]
+      - recipe[postgresql::config_initdb]
+      - recipe[postgresql::config_pgtune]
+      - recipe[opennms::notemplates]
+      - recipe[opennms::example_disco_url]
+  - name: foreign_source
+    run_list:
+      - recipe[java]
+      - recipe[postgresql::client]
+      - recipe[postgresql::server]
+      - recipe[postgresql::contrib]
+      - recipe[postgresql::config_initdb]
+      - recipe[postgresql::config_pgtune]
+      - recipe[opennms::notemplates]
+      - recipe[opennms::example_foreign_source]
+  - name: service_detector
+    run_list:
+      - recipe[java]
+      - recipe[postgresql::client]
+      - recipe[postgresql::server]
+      - recipe[postgresql::contrib]
+      - recipe[postgresql::config_initdb]
+      - recipe[postgresql::config_pgtune]
+      - recipe[opennms::notemplates]
+      - recipe[opennms::example_service_detector]
+  - name: policy
+    run_list:
+      - recipe[java]
+      - recipe[postgresql::client]
+      - recipe[postgresql::server]
+      - recipe[postgresql::contrib]
+      - recipe[postgresql::config_initdb]
+      - recipe[postgresql::config_pgtune]
+      - recipe[opennms::notemplates]
+      - recipe[opennms::example_policy]
+  - name: import
+    run_list:
+      - recipe[java]
+      - recipe[postgresql::client]
+      - recipe[postgresql::server]
+      - recipe[postgresql::contrib]
+      - recipe[postgresql::config_initdb]
+      - recipe[postgresql::config_pgtune]
+      - recipe[opennms::notemplates]
+      - recipe[opennms::example_foreign_source]
+      - recipe[opennms::example_import]
+  - name: import_node
+    run_list:
+      - recipe[java]
+      - recipe[postgresql::client]
+      - recipe[postgresql::server]
+      - recipe[postgresql::contrib]
+      - recipe[postgresql::config_initdb]
+      - recipe[postgresql::config_pgtune]
+      - recipe[opennms::notemplates]
+      - recipe[opennms::example_foreign_source]
+      - recipe[opennms::example_import]
+      - recipe[opennms::example_import_node]
+  - name: import_node_interface
+    run_list:
+      - recipe[java]
+      - recipe[postgresql::client]
+      - recipe[postgresql::server]
+      - recipe[postgresql::contrib]
+      - recipe[postgresql::config_initdb]
+      - recipe[postgresql::config_pgtune]
+      - recipe[opennms::notemplates]
+      - recipe[opennms::example_foreign_source]
+      - recipe[opennms::example_import]
+      - recipe[opennms::example_import_node]
+      - recipe[opennms::example_import_node_interface]
+  - name: import_node_interface_service
+    run_list:
+      - recipe[java]
+      - recipe[postgresql::client]
+      - recipe[postgresql::server]
+      - recipe[postgresql::contrib]
+      - recipe[postgresql::config_initdb]
+      - recipe[postgresql::config_pgtune]
+      - recipe[opennms::notemplates]
+      - recipe[opennms::example_foreign_source]
+      - recipe[opennms::example_import]
+      - recipe[opennms::example_import_node]
+      - recipe[opennms::example_import_node_interface]
+      - recipe[opennms::example_import_node_interface_service]
+  - name: snmp_config_definition
+    run_list:
+      - recipe[java]
+      - recipe[postgresql::client]
+      - recipe[postgresql::server]
+      - recipe[postgresql::contrib]
+      - recipe[postgresql::config_initdb]
+      - recipe[postgresql::config_pgtune]
+      - recipe[opennms::notemplates]
+      - recipe[opennms::example_snmp_config_definition]
+  - name: update_snmp_config_definition
+    run_list:
+      - recipe[java]
+      - recipe[postgresql::client]
+      - recipe[postgresql::server]
+      - recipe[postgresql::contrib]
+      - recipe[postgresql::config_initdb]
+      - recipe[postgresql::config_pgtune]
+      - recipe[opennms::notemplates]
+      - recipe[opennms::example_snmp_config_definition]
+      - recipe[opennms::example_update_snmp_config_definition]
+  - name: wmi_config_definition
+    run_list:
+      - recipe[java]
+      - recipe[postgresql::client]
+      - recipe[postgresql::server]
+      - recipe[postgresql::contrib]
+      - recipe[postgresql::config_initdb]
+      - recipe[postgresql::config_pgtune]
+      - recipe[opennms::notemplates]
+      - recipe[opennms::example_wmi_config_definition]
+  - name: update_wmi_config_definition
+    run_list:
+      - recipe[java]
+      - recipe[postgresql::client]
+      - recipe[postgresql::server]
+      - recipe[postgresql::contrib]
+      - recipe[postgresql::config_initdb]
+      - recipe[postgresql::config_pgtune]
+      - recipe[opennms::notemplates]
+      - recipe[opennms::example_wmi_config_definition]
+      - recipe[opennms::example_update_wmi_config_definition]
+  - name: destination_path
+    run_list:
+      - recipe[java]
+      - recipe[postgresql::client]
+      - recipe[postgresql::server]
+      - recipe[postgresql::contrib]
+      - recipe[postgresql::config_initdb]
+      - recipe[postgresql::config_pgtune]
+      - recipe[opennms::notemplates]
+      - recipe[opennms::example_destination_path]
+  - name: notification_command
+    run_list:
+      - recipe[java]
+      - recipe[postgresql::client]
+      - recipe[postgresql::server]
+      - recipe[postgresql::contrib]
+      - recipe[postgresql::config_initdb]
+      - recipe[postgresql::config_pgtune]
+      - recipe[opennms::notemplates]
+      - recipe[opennms::example_notification_command]
+  - name: notifd_autoack
+    run_list:
+      - recipe[java]
+      - recipe[postgresql::client]
+      - recipe[postgresql::server]
+      - recipe[postgresql::contrib]
+      - recipe[postgresql::config_initdb]
+      - recipe[postgresql::config_pgtune]
+      - recipe[opennms::notemplates]
+      - recipe[opennms::example_notifd_autoack]
+  - name: notification
+    run_list:
+      - recipe[java]
+      - recipe[postgresql::client]
+      - recipe[postgresql::server]
+      - recipe[postgresql::contrib]
+      - recipe[postgresql::config_initdb]
+      - recipe[postgresql::config_pgtune]
+      - recipe[opennms::notemplates]
+      - recipe[opennms::example_notification]
+  - name: user
+    run_list:
+      - recipe[java]
+      - recipe[postgresql::client]
+      - recipe[postgresql::server]
+      - recipe[postgresql::contrib]
+      - recipe[postgresql::config_initdb]
+      - recipe[postgresql::config_pgtune]
+      - recipe[opennms::notemplates]
+      - recipe[opennms::example_user]
+  - name: group
+    run_list:
+      - recipe[java]
+      - recipe[postgresql::client]
+      - recipe[postgresql::server]
+      - recipe[postgresql::contrib]
+      - recipe[postgresql::config_initdb]
+      - recipe[postgresql::config_pgtune]
+      - recipe[opennms::notemplates]
+      - recipe[opennms::example_group]
+  - name: role
+    run_list:
+      - recipe[java]
+      - recipe[postgresql::client]
+      - recipe[postgresql::server]
+      - recipe[postgresql::contrib]
+      - recipe[postgresql::config_initdb]
+      - recipe[postgresql::config_pgtune]
+      - recipe[opennms::notemplates]
+      - recipe[opennms::example_role]
+  - name: statsd
+    run_list:
+      - recipe[java]
+      - recipe[postgresql::client]
+      - recipe[postgresql::server]
+      - recipe[postgresql::contrib]
+      - recipe[postgresql::config_initdb]
+      - recipe[postgresql::config_pgtune]
+      - recipe[opennms::notemplates]
+      - recipe[opennms::example_statsd]
+  - name: collection_graph_file
+    run_list:
+      - recipe[java]
+      - recipe[postgresql::client]
+      - recipe[postgresql::server]
+      - recipe[postgresql::contrib]
+      - recipe[postgresql::config_initdb]
+      - recipe[postgresql::config_pgtune]
+      - recipe[opennms::notemplates]
+      - recipe[opennms::example_collection_graph_file]
+  - name: collection_graph
+    run_list:
+      - recipe[java]
+      - recipe[postgresql::client]
+      - recipe[postgresql::server]
+      - recipe[postgresql::contrib]
+      - recipe[postgresql::config_initdb]
+      - recipe[postgresql::config_pgtune]
+      - recipe[opennms::notemplates]
+      - recipe[opennms::example_collection_graph]
+  - name: response_graph
+    run_list:
+      - recipe[java]
+      - recipe[postgresql::client]
+      - recipe[postgresql::server]
+      - recipe[postgresql::contrib]
+      - recipe[postgresql::config_initdb]
+      - recipe[postgresql::config_pgtune]
+      - recipe[opennms::notemplates]
+      - recipe[opennms::example_response_graph]
+  - name: threshold
+    run_list:
+      - recipe[java]
+      - recipe[postgresql::client]
+      - recipe[postgresql::server]
+      - recipe[postgresql::contrib]
+      - recipe[postgresql::config_initdb]
+      - recipe[postgresql::config_pgtune]
+      - recipe[opennms::notemplates]
+      - recipe[opennms::example_threshold]
+  - name: system_def
+    run_list:
+      - recipe[java]
+      - recipe[postgresql::client]
+      - recipe[postgresql::server]
+      - recipe[postgresql::contrib]
+      - recipe[postgresql::config_initdb]
+      - recipe[postgresql::config_pgtune]
+      - recipe[opennms::notemplates]
+      - recipe[opennms::example_system_def]

@@ -702,6 +702,8 @@ default['opennms']['jmx_dc']['jsr160']['collectd']['enabled']                   
 default['opennms']['jmx_dc']['jsr160']['capsd']['enabled']                          = true
 default['opennms']['jmx_dc']['jsr160']['jetty']['enabled']                          = true
 default['opennms']['jmx_dc']['jsr160']['statsd']['enabled']                         = true
+default['opennms']['jmx_dc']['jsr160']['trapd']['enabled']                          = true
+default['opennms']['jmx_dc']['jsr160']['notifd']['enabled']                         = true
 default['opennms']['jmx_dc']['jsr160']['jvm_memory']['enabled']                     = true
 default['opennms']['jmx_dc']['jsr160']['jvm_threading']['enabled']                  = true
 default['opennms']['jmx_dc']['jsr160']['jvm_class_loading']['enabled']              = true
