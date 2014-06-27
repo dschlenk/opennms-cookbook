@@ -7,7 +7,7 @@ Current version of templates are based on OpenNMS release 1.12.8.
 Status
 ======
 
-Ready for limited use. Feel free to try out a tagged version (or master if you dare) but don't expect everything to work perfectly yet. Tags happen when a decent chunk of new functionality is written, their test recipes converge (named test_*) and OpenNMS starts without errors.  Notably missing are unit and more formal integration tests.
+Ready for limited use. Feel free to try out a tagged version (or master if you dare) but don't expect everything to work perfectly yet. Tags happen when a decent chunk of new functionality is written, their example recipes converge (named example_*) and OpenNMS starts without errors.  Notably missing are unit and more formal integration tests.
 
 Requirements
 ============
@@ -44,14 +44,14 @@ You probably also want to check out the community java (https://github.com/socra
 ```
 node[:java][:oracle][:accept_oracle_download_terms] = true
 node[:java][:install_flavor] = 'oracle'
-node[:java][:jdk][:7][:x86_64][:checksum] = '77367c3ef36e0930bf3089fb41824f4b8cf55dcc8f43cce0868f7687a474f55c'
-node[:java][:jdk][:7][:x86_64][:url] = 'http://download.oracle.com/otn-pub/java/jdk/7u51-b13/jdk-7u51-linux-x64.tar.gz'
+node[:java][:jdk][:7][:x86_64][:checksum] = 'f2eae4d81c69dfa79d02466d1cb34db2b628815731ffc36e9b98f96f46f94b1a'
+node[:java][:jdk][:7][:x86_64][:url] = 'http://download.oracle.com/otn-pub/java/jdk/7u45-b18/jdk-7u45-linux-x64.tar.gz'
 node[:java][:jdk_version] = 7
 ```
 
 ### Postgresql
 
-Include the server, config_initdb, config_pgtune and contrib recipes in your run list. Then use these override attributes for a fairly well tuned config:
+Include the client, server, contrib, config_initdb, config_pgtune recipes (in that order) in your run list. Then use these override attributes for a fairly well tuned config:
 
 ```
 node[:postgresql][:pg_hba] = { :addr => '' :user => 'all', :type => 'local', :method => 'trust', :db => 'all' }
@@ -63,28 +63,8 @@ node[:postgresql][:config][:track_activities] = 'on'
 node[:postgresql][:config][:track_counts]  = 'on'
 node[:postgresql][:config][:shared_preload_libraries] = 'pg_stat_statements'
 node[:postgresql][:config][:vacuum_cost_delay] = 50
-node[:postgresql][:server][:packages] = ["postgresql-server", "postgresql-contrib"]
-node[:postgresql][:contrib][:extensions] = ["pageinspect", "pg_buffercache", "pg_freespacemap", "pgrowlocks", "pg_stat_statements", "pgstattuple"]
-```
-
-For a more recent version of PostgreSQL using the PGDG repo you might want something like this: 
-
-```
-node[:postgresql][:pg_hba] = [{:addr => '' :user => 'all', :type => 'local', :method => 'trust', :db => 'all' },{ :addr => '127.0.0.1/32', :user => 'all', :type => 'host', :method => 'trust', :db => 'all'},{ :addr => '::1/128', :user => 'all', :type => 'host', :method => 'trust', :db => 'all'}]
-node[:postgresql][:enable_pgdg_yum] = true
-node[:postgresql][:version]         = '9.3'
-node[:postgresql][:dir]             = '/var/lib/pgsql/9.3/data'
-node[:postgresql][:config][:autovacuum]               = 'on'
-node[:postgresql][:config][:checkpoint_timeout]       = '15min'
-node[:postgresql][:config][:shared_preload_libraries] = 'pg_stat_statements'
-node[:postgresql][:config][:track_activities]         = 'on'
-node[:postgresql][:config][:track_counts]             = 'on'
-node[:postgresql][:config][:vacuum_cost_delay]        = 50
-node[:postgresql][:client][:packages] = ["postgresql93","postgresql93-contrib","postgresql93-devel"]
-node[:postgresql][:server][:packages]     = ["postgresql93-server"]
-node[:postgresql][:server][:service_name] = "postgresql-9.3"
-node[:postgresql][:contrib][:packages]   = ["postgresql93-contrib"]
-node[:postgresql][:contrib][:extensions] = ["pageinspect", "pg_buffercache","pg_freespacemap","pgrowlocks","pg_stat_statements","pgstattuple"]
+node[:postgresql][:client][:packages] = ["postgresql", "postgresql-contrib", "postgresql-devel"]
+node[:postgresql][:server][:packages] = ["postgresql-server"]
 ```
 
 There are also a couple OpenNMS attributes you'll probably want to override at a minimum: 
@@ -98,13 +78,13 @@ node[:opennms][:conf][:heap_size] = 1024
 
 ### Other Recipes
 
-* `opennms::notemplates` Everything default does except the only templates are for etc/opennms.conf and etc/opennms.properties.
+* `opennms::notemplates` Everything default does except minimal templates are used - etc/opennms.conf, etc/opennms.properties and etc/jetty.xml.
 * `opennms::nsclient` installs the optional nsclient data collection plugin and uses the template for etc/nsclient-datacollection-config.xml. 
 * `opennms::xml` installs the optional xml data collection plugin and uses the template for etc/xml-datacollection-config.xml. 
 
 ### LWRPs
 
-As a general rule these LWRPs support a single action: create. For XML entities, when determining if the resource already exists on the node, a simple XPath to the name of the resource is performed without checking equality of other attributes. In other words, updating is generally not supported. This may change in future releases. 
+As a general rule these LWRPs support a single action: `create` and most of them behave more like `create_if_missing` does in other cookbooks. In other words, updating is generally not supported. This may change in future releases. 
 
 Also, there are example recipes in the cookbook for most every LWRP named `opennms::example_<LWRP_NAME>`.
 
@@ -125,7 +105,7 @@ The list of implemented LWRPs is as follows:
 
 #### Provisioning Requisitions
 
-These LWRPs use a cookbook library named Provision that I wrote to perform the work using the OpenNMS REST interface. As such, OpenNMS has to be running for the resources to converge. See any of the example recipes for my silly little ruby_block hack to make sure it is. Also you'll notice that I used 'import' a lot rather than the correct term 'requisition'. I can type 'import' a lot faster than 'requisition'. ;)
+These LWRPs use a cookbook library named Provision that I wrote to perform the work using the OpenNMS REST interface. As such, OpenNMS has to be running for the resources to converge. See any of the example recipes for my silly little ruby_block hack to make sure it is. Also you'll notice that I used the term 'import' rather than the correct term 'requisition'. I can type 'import' a lot faster than 'requisition'. ;)
 
 * `opennms_foreign_source`: create a new foreign source optionally defining a scan interval (defaults to '1d'). 
 * `opennms_service_detector`: add a service detector to a foreign source. TODO: if capsd is enabled in favor of provisiond add protocol-plugins to capsd-configuration.xml instead.
@@ -137,7 +117,7 @@ These LWRPs use a cookbook library named Provision that I wrote to perform the w
 
 #### Events
 
-* `opennms_eventconf`: adds a event-file element to events in etc/eventconf.xml. 
+* `opennms_eventconf`: adds an event-file element to events in etc/eventconf.xml. 
 * `opennms_event`: adds an event element to events in target eventconf file `file`. Not all elements from the eventconf schema are implemented, but the ones that seem to actually exist in the wild are. See resource for details and recipes `example_event` and `example_threshold` for example usage.
 
 #### Notifications
@@ -1019,4 +999,5 @@ Development
 
 Please feel free to fork and send me pull requests!  The focus of my work will initially be on templates for configuration files that modify the default configuration and LWRPs to add new elements to configuration files. 
 
-I use test kitchen with the openstack vagrant plugin, so if you use the default VirtualBox driver you'll need to change that.  Otherwise I think it's a pretty normal Chef workflow but I'm new at writing cookbooks so criticism is welcome. 
+There's a test kitchen suite for every main and example recipe. The default test kitchen config uses the vagrant driver, but I actually use the openstack driver (overriding the default with .kitchen.local.yml), so if the default config doesn't work that's why.  
+

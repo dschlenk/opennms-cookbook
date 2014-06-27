@@ -1,10 +1,10 @@
 # Copy the example keystore file in place
-file "#{node['opennms']['conf']['home']}/etc/jetty.keystore" do
+cookbook_file 'jetty.keystore' do
+  path "#{node['opennms']['conf']['home']}/etc/jetty.keystore"
   owner 'root'
   group 'root'
   mode 00644
-  content ::File.open("#{node['opennms']['conf']['home']}/etc/examples/jetty.keystore").read
-  action :create
+  action :create_if_missing
 end 
 
 node.default['opennms']['properties']['jetty']['https_port'] = 443

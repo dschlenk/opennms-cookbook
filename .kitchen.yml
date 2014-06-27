@@ -95,10 +95,10 @@ suites:
       - recipe[postgresql::contrib]
       - recipe[postgresql::config_initdb]
       - recipe[postgresql::config_pgtune]
-      - recipe[opennms::example_webopts]
       - recipe[opennms::default]
       - recipe[opennms::nsclient]
       - recipe[opennms::xml]
+      - recipe[opennms::example_webopts]
       - recipe[opennms::example_resource_type]
       - recipe[opennms::example_snmp_collection]
       - recipe[opennms::example_xml_collection]
@@ -255,6 +255,7 @@ suites:
       - recipe[postgresql::config_initdb]
       - recipe[postgresql::config_pgtune]
       - recipe[opennms::notemplates]
+      - recipe[opennms::xml]
       - recipe[opennms::example_xml_collection]
       - recipe[opennms::example_collection_package]
       - recipe[opennms::example_xml_collection_service]
@@ -330,6 +331,7 @@ suites:
       - recipe[postgresql::config_initdb]
       - recipe[postgresql::config_pgtune]
       - recipe[opennms::notemplates]
+      - recipe[opennms::xml]
       - recipe[opennms::example_xml_collection]
       - recipe[opennms::example_collection_package]
       - recipe[opennms::example_xml_collection_service]
@@ -343,6 +345,7 @@ suites:
       - recipe[postgresql::config_initdb]
       - recipe[postgresql::config_pgtune]
       - recipe[opennms::notemplates]
+      - recipe[opennms::xml]
       - recipe[opennms::example_xml_collection]
       - recipe[opennms::example_collection_package]
       - recipe[opennms::example_xml_collection_service]
@@ -589,6 +592,7 @@ suites:
       - recipe[postgresql::config_initdb]
       - recipe[postgresql::config_pgtune]
       - recipe[opennms::notemplates]
+      - recipe[opennms::example_user]
       - recipe[opennms::example_group]
   - name: role
     run_list:
@@ -599,6 +603,7 @@ suites:
       - recipe[postgresql::config_initdb]
       - recipe[postgresql::config_pgtune]
       - recipe[opennms::notemplates]
+      - recipe[opennms::example_user]
       - recipe[opennms::example_role]
   - name: statsd
     run_list:

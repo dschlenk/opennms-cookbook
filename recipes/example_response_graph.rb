@@ -16,6 +16,8 @@ opennms_poller_service "ONMS" do
   port 8980
   params 'url' => '/opennms/login.jsp', 'rrd-repository' => '/opt/opennms/share/rrd/response', 'rrd-base-name' => 'onms', 'ds-name' => 'onms'
 end
+opennms_foreign_source "dry-source"
+opennms_import "dry-source"
 # make us a new foreign_id using the Provision library
 rgfsid = foreign_id_gen
 # make a node to add an interface to
