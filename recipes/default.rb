@@ -50,7 +50,7 @@ hostsfile_entry node['ipaddress'] do
 end
 
 package "opennms" do
-  version "1.12.8-1"
+  version "1.12.9-1"
   action :install
 end
 
@@ -1895,8 +1895,118 @@ template "#{onms_home}/etc/snmp-graph.properties.d/vmware4-graph-simple.properti
   )
 end
 
-template "#{onms_home}/etc/snmp-graph.properties.d/vmware5-graph-simple.properties" do
-  source "snmp-graph.properties.d/vmware5-graph-simple.properties.erb"
+template "#{onms_home}/etc/snmp-graph.properties.d/vmware5-cpu-graph.properties" do
+  source "snmp-graph.properties.d/vmware5-cpu-graph.properties.erb"
+  mode 0664
+  owner "root"
+  group "root"
+  notifies :restart, "service[opennms]"
+  variables(
+    :enabled => node[:opennms][:snmp_graph][:vmware5]
+  )
+end
+
+template "#{onms_home}/etc/snmp-graph.properties.d/vmware5-datastore-graph.properties" do
+  source "snmp-graph.properties.d/vmware5-datastore-graph.properties.erb"
+  mode 0664
+  owner "root"
+  group "root"
+  notifies :restart, "service[opennms]"
+  variables(
+    :enabled => node[:opennms][:snmp_graph][:vmware5]
+  )
+end
+
+template "#{onms_home}/etc/snmp-graph.properties.d/vmware5-disk-graph.properties" do
+  source "snmp-graph.properties.d/vmware5-disk-graph.properties.erb"
+  mode 0664
+  owner "root"
+  group "root"
+  notifies :restart, "service[opennms]"
+  variables(
+    :enabled => node[:opennms][:snmp_graph][:vmware5]
+  )
+end
+
+template "#{onms_home}/etc/snmp-graph.properties.d/vmware5-host-based-replication-graph.properties" do
+  source "snmp-graph.properties.d/vmware5-host-based-replication-graph.properties.erb"
+  mode 0664
+  owner "root"
+  group "root"
+  notifies :restart, "service[opennms]"
+  variables(
+    :enabled => node[:opennms][:snmp_graph][:vmware5]
+  )
+end
+
+template "#{onms_home}/etc/snmp-graph.properties.d/vmware5-memory-graph.properties" do
+  source "snmp-graph.properties.d/vmware5-memory-graph.properties.erb"
+  mode 0664
+  owner "root"
+  group "root"
+  notifies :restart, "service[opennms]"
+  variables(
+    :enabled => node[:opennms][:snmp_graph][:vmware5]
+  )
+end
+
+template "#{onms_home}/etc/snmp-graph.properties.d/vmware5-network-graph.properties" do
+  source "snmp-graph.properties.d/vmware5-network-graph.properties.erb"
+  mode 0664
+  owner "root"
+  group "root"
+  notifies :restart, "service[opennms]"
+  variables(
+    :enabled => node[:opennms][:snmp_graph][:vmware5]
+  )
+end
+
+template "#{onms_home}/etc/snmp-graph.properties.d/vmware5-power-graph.properties" do
+  source "snmp-graph.properties.d/vmware5-power-graph.properties.erb"
+  mode 0664
+  owner "root"
+  group "root"
+  notifies :restart, "service[opennms]"
+  variables(
+    :enabled => node[:opennms][:snmp_graph][:vmware5]
+  )
+end
+
+template "#{onms_home}/etc/snmp-graph.properties.d/vmware5-storage-adapter-graph.properties" do
+  source "snmp-graph.properties.d/vmware5-storage-adapter-graph.properties.erb"
+  mode 0664
+  owner "root"
+  group "root"
+  notifies :restart, "service[opennms]"
+  variables(
+    :enabled => node[:opennms][:snmp_graph][:vmware5]
+  )
+end
+
+template "#{onms_home}/etc/snmp-graph.properties.d/vmware5-storage-path-graph.properties" do
+  source "snmp-graph.properties.d/vmware5-storage-path-graph.properties.erb"
+  mode 0664
+  owner "root"
+  group "root"
+  notifies :restart, "service[opennms]"
+  variables(
+    :enabled => node[:opennms][:snmp_graph][:vmware5]
+  )
+end
+
+template "#{onms_home}/etc/snmp-graph.properties.d/vmware5-system-graph.properties" do
+  source "snmp-graph.properties.d/vmware5-system-graph.properties.erb"
+  mode 0664
+  owner "root"
+  group "root"
+  notifies :restart, "service[opennms]"
+  variables(
+    :enabled => node[:opennms][:snmp_graph][:vmware5]
+  )
+end
+
+template "#{onms_home}/etc/snmp-graph.properties.d/vmware5-virtual-disk-graph.properties" do
+  source "snmp-graph.properties.d/vmware5-virtual-disk-graph.properties.erb"
   mode 0664
   owner "root"
   group "root"

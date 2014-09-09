@@ -50,7 +50,7 @@ hostsfile_entry node['ipaddress'] do
 end
 
 package "opennms" do
-  version "1.12.8-1"
+  version "1.12.9-1"
   action :install
 end
 
