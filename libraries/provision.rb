@@ -1,6 +1,3 @@
-$:.unshift *Dir[File.expand_path('../../files/default/vendor/gems/**/lib', __FILE__)]
-
-require 'rest_client'
 require 'json'
 require 'rexml/document'
 
@@ -11,6 +8,7 @@ require 'rexml/document'
 # TODO: use dynamically generated password (which is a TODO in itself). 
 module Provision
   def foreign_source_exists?(name, node)
+    require 'rest_client'
     begin
       response = RestClient.get "#{baseurl(node)}/foreignSources", {:accept => :json}
       fsources = JSON.parse(response.to_str)
@@ -27,6 +25,7 @@ module Provision
     false
   end
   def add_foreign_source(name, scan_interval, node)
+    require 'rest_client'
     fs = REXML::Document.new
     fs << REXML::XMLDecl.new
     fsel = fs.add_element 'foreign-source', {'name' => name}
@@ -35,6 +34,7 @@ module Provision
     RestClient.post "#{baseurl(node)}/foreignSources", fs.to_s, {:content_type => :xml}
   end
   def service_detector_exists?(name, foreign_source_name, node)
+    require 'rest_client'
     if foreign_source_exists?(foreign_source_name, node)
      begin
       response = RestClient.get "#{baseurl(node)}/foreignSources/#{foreign_source_name}/detectors/#{name}"
@@ -46,6 +46,7 @@ module Provision
     false
   end
   def add_service_detector(name, class_name, port, retry_count, timeout, params, foreign_source_name, node)
+   require 'rest_client'
    sd = REXML::Document.new
    sd << REXML::XMLDecl.new
    sdel = sd.add_element 'detector', {'name' => name, 'class' => class_name}
@@ -66,6 +67,7 @@ module Provision
    RestClient.post "#{baseurl(node)}/foreignSources/#{foreign_source_name}/detectors", sd.to_s, {:content_type => :xml}
   end
   def policy_exists?(policy_name, foreign_source_name, node)
+    require 'rest_client'
     if foreign_source_exists?(foreign_source_name, node)
       begin
         response = RestClient.get "#{baseurl(node)}/foreignSources/#{foreign_source_name}/policies/#{policy_name}"
@@ -77,6 +79,7 @@ module Provision
     false
   end
   def add_policy(policy_name, class_name, params, foreign_source_name, node)
+   require 'rest_client'
    pd = REXML::Document.new
    pd << REXML::XMLDecl.new
    pel = pd.add_element 'policy', {'name' => policy_name, 'class' => class_name}
@@ -88,6 +91,7 @@ module Provision
    RestClient.post "#{baseurl(node)}/foreignSources/#{foreign_source_name}/policies", pd.to_s, {:content_type => :xml}
   end
   def import_exists?(foreign_source_name, node)
+   require 'rest_client'
     if foreign_source_exists?(foreign_source_name, node)
      begin
       response = RestClient.get "#{baseurl(node)}/requisitions", {:accept => :json}
@@ -106,12 +110,14 @@ module Provision
     false
   end
   def add_import(foreign_source_name, node)
+   require 'rest_client'
     id = REXML::Document.new
     id << REXML::XMLDecl.new
     mi_el = id.add_element 'model-import', {'foreign-source' => foreign_source_name}
     RestClient.post "#{baseurl(node)}/requisitions", id.to_s, {:content_type => :xml}
   end
   def import_node_exists?(foreign_source_name, foreign_id, node)
+   require 'rest_client'
     if import_exists?(foreign_source_name, node)
      begin
       response = RestClient.get "#{baseurl(node)}/requisitions/#{foreign_source_name}/nodes/#{foreign_id}"
@@ -125,6 +131,7 @@ module Provision
     false
   end
   def add_import_node(node_label, foreign_id, parent_foreign_source, parent_foreign_id, parent_node_label, city, building, categories, assets, foreign_source_name, node)
+   require 'rest_client'
     nd = REXML::Document.new
     nd << REXML::XMLDecl.new
     node_el = nd.add_element 'node', {'node-label' => node_label, 'foreign-id' => foreign_id }
@@ -156,6 +163,7 @@ module Provision
     RestClient.post "#{baseurl(node)}/requisitions/#{foreign_source_name}/nodes", nd.to_s, {:content_type => :xml}
   end
   def import_node_interface_exists?(foreign_source_name, foreign_id, ip_addr, node)
+   require 'rest_client'
     if import_node_exists?(foreign_source_name, foreign_id, node)
      begin
       response = RestClient.get "#{baseurl(node)}/requisitions/#{foreign_source_name}/nodes/#{foreign_id}/interfaces/#{ip_addr}"
@@ -167,6 +175,7 @@ module Provision
     false
   end
   def add_import_node_interface(ip_addr, foreign_source_name, foreign_id, status, managed, snmp_primary, node)
+   require 'rest_client'
     id = REXML::Document.new
     id << REXML::XMLDecl.new
     i_el = id.add_element 'interface', {'ip-addr' => ip_addr}
@@ -176,6 +185,7 @@ module Provision
     RestClient.post "#{baseurl(node)}/requisitions/#{foreign_source_name}/nodes/#{foreign_id}/interfaces", id.to_s, {:content_type => :xml}
   end
   def import_node_interface_service_exists?(service_name, foreign_source_name, foreign_id, ip_addr, node)
+   require 'rest_client'
     if import_node_interface_exists?(foreign_source_name, foreign_id, ip_addr, node)
      begin
       response = RestClient.get "#{baseurl(node)}/requisitions/#{foreign_source_name}/nodes/#{foreign_id}/interfaces/#{ip_addr}/services/#{service_name}"
@@ -187,12 +197,14 @@ module Provision
     false
   end
   def add_import_node_interface_service(service_name, foreign_source_name, foreign_id, ip_addr, node)
+   require 'rest_client'
     sd = REXML::Document.new
     sd << REXML::XMLDecl.new
     s_el = sd.add_element 'monitored-service', {'service-name' => service_name}
     RestClient.post "#{baseurl(node)}/requisitions/#{foreign_source_name}/nodes/#{foreign_id}/interfaces/#{ip_addr}/services", sd.to_s, {:content_type => :xml}
   end
   def sync_import(foreign_source_name, rescan, node)
+   require 'rest_client'
     url = "#{baseurl(node)}/requisitions/#{foreign_source_name}/import"
     if !rescan.nil? && rescan == false
       url = url + "?rescanExisting=false" 

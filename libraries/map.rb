@@ -1,13 +1,11 @@
-$:.unshift *Dir[File.expand_path('../../files/default/vendor/gems/**/lib', __FILE__)]
-
 require 'rexml/document'
-require 'rest_client'
 require 'json'
 
 module Map
 
   # annoyingly, you can only get specific maps by ID, so we get all and search for it by name. 
   def map_exists?(map, node)
+    require 'rest_client'
     begin
       response = RestClient.get "#{baseurl(node)}/maps", {:accept => :json}
       count = JSON.parse(response)['@count']

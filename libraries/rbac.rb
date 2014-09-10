@@ -1,13 +1,13 @@
 $:.unshift *Dir[File.expand_path('../../files/default/vendor/gems/**/lib', __FILE__)]
 
 require 'rexml/document'
-require 'rest_client'
 require 'json'
 require 'fileutils'
 
 module Rbac
 
   def user_exists?(user, node)
+    require 'rest_client'
     begin
       response = RestClient.get "#{baseurl(node)}/users/#{user}", {:accept => :json}
       return true if response.code == 200
@@ -18,6 +18,7 @@ module Rbac
   end
  
   def add_user(new_resource, node)
+    require 'rest_client'
     cu = REXML::Document.new
     cu << REXML::XMLDecl.new
     user_el = cu.add_element 'user'
