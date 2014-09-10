@@ -31,54 +31,54 @@ platforms:
                          }, 
                   "opennms": {
                               "conf": {"start_timeout": 20}},  
-                  postgresql: {
-                                password: { 
-                                           postgres: "md5c23797e9a303da48b792b4339c426700" 
+                  "postgresql": {
+                                "password": { 
+                                           "postgres": "md5c23797e9a303da48b792b4339c426700" 
                                           }, 
-                                enable_pgdg_yum: false,
+                                "enable_pgdg_yum": false,
                                 
-                                config: {
-                                         autovacuum: "on", 
-                                         checkpoint_timeout: "15min", 
-                                         track_activities: "on", 
-                                         track_counts: "on", 
-                                         vacuum_cost_delay: 50
+                                "config": {
+                                         "autovacuum": "on", 
+                                         "checkpoint_timeout": "15min", 
+                                         "track_activities": "on", 
+                                         "track_counts": "on", 
+                                         "vacuum_cost_delay": 50
                                         }, 
-                                pg_hba: [
+                                "pg_hba": [
                                          {
-                                          addr: "", 
-                                          db: "all", 
-                                          method: "trust", 
-                                          type: "local", 
-                                          user: "all"
+                                          "addr": "", 
+                                          "db": "all", 
+                                          "method": "trust", 
+                                          "type": "local", 
+                                          "user": "all"
                                          }, 
                                          {
-                                          addr: "127.0.0.1/32", 
-                                          db: "all", 
-                                          method: "trust", 
-                                          type: "host", 
-                                          user: "all"
+                                          "addr": "127.0.0.1/32", 
+                                          "db": "all", 
+                                          "method": "trust", 
+                                          "type": "host", 
+                                          "user": "all"
                                          },
                                          {
-                                          addr: "::1/128", 
-                                          db: "all", 
-                                          method: "trust", 
-                                          type: "host", 
-                                          user: "all"
+                                          "addr": "::1/128", 
+                                          "db": "all", 
+                                          "method": "trust", 
+                                          "type": "host", 
+                                          "user": "all"
                                          }
                                         ], 
-                                client: {
-                                         packages: [
+                                "client": {
+                                         "packages": [
                                                     "postgresql",
                                                     "postgresql-contrib",
                                                     "postgresql-devel"
                                                    ]
                                         },
-                                server: { 
-                                         packages: [
+                                "server": { 
+                                         "packages": [
                                                     "postgresql-server"
                                                    ],
-                                         service_name: "postgresql"
+                                         "service_name": "postgresql"
                                         }
                               }
                 }
