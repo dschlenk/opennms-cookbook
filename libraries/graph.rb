@@ -1,6 +1,3 @@
-$:.unshift *Dir[File.expand_path('../../files/default/vendor/gems/**/lib', __FILE__)]
-
-require 'java_properties'
 
 module Graph
   def new_graph_file(file, node)
@@ -28,6 +25,7 @@ module Graph
   end
   
   def checkFileForGraph(file, name)
+    require 'java_properties'
     props = JavaProperties::Properties.new(file)
     found = false
     values = props[:reports].split(/,\s*/) unless props[:reports].nil?

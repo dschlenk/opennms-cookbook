@@ -17,6 +17,9 @@
 # limitations under the License.
 #
 
+chef_gem 'java_properties'
+chef_gem 'rest-client'
+
 yum_repository 'opennms-stable-common' do
     description 'RPMs Common to All OpenNMS Architectures RPMs (stable)'
     baseurl node['yum']['opennms-stable-common']['baseurl']
