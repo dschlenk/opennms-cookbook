@@ -2,7 +2,7 @@ onms_home = node[:opennms][:conf][:home]
 onms_home ||= '/opt/opennms'
 
 package "opennms-plugin-protocol-xml" do
-  version "1.12.9-1"
+  version "1.12.9-2"
   action "install"
 end
 
