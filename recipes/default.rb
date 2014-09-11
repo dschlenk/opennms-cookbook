@@ -54,6 +54,7 @@ end
 
 package "opennms" do
   version "1.12.9-2"
+  timeout 1200
   action :install
 end
 
