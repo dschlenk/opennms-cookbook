@@ -1,7 +1,8 @@
 source "https://api.berkshelf.com"
 
 metadata
-cookbook 'java'
-cookbook 'yum'
-cookbook 'hostsfile'
-cookbook 'postgresql'
+group :integration do
+  cookbook 'yum-centos'
+  cookbook 'yum-epel'
+  cookbook 'postgresql'
+end

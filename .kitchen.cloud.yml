@@ -13,7 +13,15 @@ platforms:
       image_ref: /CentOS/
       username: ec2-user
       floating_ip_pool: 'prov_flat_net'
-    attributes: { 
+    attributes: {
+                 "yum": {
+                         "base": { "baseurl": "http://http-proxy.pe.spanlink.com/base", "mirrorlist": null },
+                         "extras": { "baseurl": "http://http-proxy.pe.spanlink.com/extras", "mirrorlist": null },
+                         "updates": { "baseurl": "http://http-proxy.pe.spanlink.com/updates", "mirrorlist": null },
+                         "epel": { "baseurl": "http://http-proxy.pe.spanlink.com/epel", "mirrorlist": null },
+                         "opennms-stable-common": { "baseurl": "http://http-proxy.pe.spanlink.com/opennms-stable-common" },
+                         "opennms-stable-rhel6": { "baseurl": "http://http-proxy.pe.spanlink.com/opennms-stable-rhel6" }
+                        }, 
                  "java": { 
                           "oracle": { 
                                       "accept_oracle_download_terms": "true"
@@ -87,6 +95,8 @@ suites:
   - name: default
     run_list:
       - recipe[java]
+      - recipe[yum-centos::default]
+      - recipe[yum-epel::default]
       - recipe[postgresql::client]
       - recipe[postgresql::server]
       - recipe[postgresql::contrib]
@@ -96,6 +106,8 @@ suites:
   - name: all
     run_list:
       - recipe[java]
+      - recipe[yum-centos::default]
+      - recipe[yum-epel::default]
       - recipe[postgresql::client]
       - recipe[postgresql::server]
       - recipe[postgresql::contrib]
@@ -153,6 +165,8 @@ suites:
   - name: notemplates
     run_list:
       - recipe[java]
+      - recipe[yum-centos::default]
+      - recipe[yum-epel::default]
       - recipe[postgresql::client]
       - recipe[postgresql::server]
       - recipe[postgresql::contrib]
@@ -162,6 +176,8 @@ suites:
   - name: nsclient
     run_list:
       - recipe[java]
+      - recipe[yum-centos::default]
+      - recipe[yum-epel::default]
       - recipe[postgresql::client]
       - recipe[postgresql::server]
       - recipe[postgresql::contrib]
@@ -172,6 +188,8 @@ suites:
   - name: xml
     run_list:
       - recipe[java]
+      - recipe[yum-centos::default]
+      - recipe[yum-epel::default]
       - recipe[postgresql::client]
       - recipe[postgresql::server]
       - recipe[postgresql::contrib]
@@ -182,6 +200,8 @@ suites:
   - name: resource_type
     run_list:
       - recipe[java]
+      - recipe[yum-centos::default]
+      - recipe[yum-epel::default]
       - recipe[postgresql::client]
       - recipe[postgresql::server]
       - recipe[postgresql::contrib]
@@ -192,6 +212,8 @@ suites:
   - name: snmp_collection
     run_list:
       - recipe[java]
+      - recipe[yum-centos::default]
+      - recipe[yum-epel::default]
       - recipe[postgresql::client]
       - recipe[postgresql::server]
       - recipe[postgresql::contrib]
@@ -202,6 +224,8 @@ suites:
   - name: xml_collection
     run_list:
       - recipe[java]
+      - recipe[yum-centos::default]
+      - recipe[yum-epel::default]
       - recipe[postgresql::client]
       - recipe[postgresql::server]
       - recipe[postgresql::contrib]
@@ -213,6 +237,8 @@ suites:
   - name: wmi_collection
     run_list:
       - recipe[java]
+      - recipe[yum-centos::default]
+      - recipe[yum-epel::default]
       - recipe[postgresql::client]
       - recipe[postgresql::server]
       - recipe[postgresql::contrib]
@@ -223,6 +249,8 @@ suites:
   - name: jdbc_collection
     run_list:
       - recipe[java]
+      - recipe[yum-centos::default]
+      - recipe[yum-epel::default]
       - recipe[postgresql::client]
       - recipe[postgresql::server]
       - recipe[postgresql::contrib]
@@ -233,6 +261,8 @@ suites:
   - name: collection_package
     run_list:
       - recipe[java]
+      - recipe[yum-centos::default]
+      - recipe[yum-epel::default]
       - recipe[postgresql::client]
       - recipe[postgresql::server]
       - recipe[postgresql::contrib]
@@ -243,6 +273,8 @@ suites:
   - name: snmp_collection_service
     run_list:
       - recipe[java]
+      - recipe[yum-centos::default]
+      - recipe[yum-epel::default]
       - recipe[postgresql::client]
       - recipe[postgresql::server]
       - recipe[postgresql::contrib]
@@ -255,6 +287,8 @@ suites:
   - name: xml_collection_service
     run_list:
       - recipe[java]
+      - recipe[yum-centos::default]
+      - recipe[yum-epel::default]
       - recipe[postgresql::client]
       - recipe[postgresql::server]
       - recipe[postgresql::contrib]
@@ -268,6 +302,8 @@ suites:
   - name: wmi_collection_service
     run_list:
       - recipe[java]
+      - recipe[yum-centos::default]
+      - recipe[yum-epel::default]
       - recipe[postgresql::client]
       - recipe[postgresql::server]
       - recipe[postgresql::contrib]
@@ -280,6 +316,8 @@ suites:
   - name: jdbc_collection_service
     run_list:
       - recipe[java]
+      - recipe[yum-centos::default]
+      - recipe[yum-epel::default]
       - recipe[postgresql::client]
       - recipe[postgresql::server]
       - recipe[postgresql::contrib]
@@ -292,6 +330,8 @@ suites:
   - name: snmp_collection_group
     run_list:
       - recipe[java]
+      - recipe[yum-centos::default]
+      - recipe[yum-epel::default]
       - recipe[postgresql::client]
       - recipe[postgresql::server]
       - recipe[postgresql::contrib]
@@ -305,6 +345,8 @@ suites:
   - name: jdbc_query
     run_list:
       - recipe[java]
+      - recipe[yum-centos::default]
+      - recipe[yum-epel::default]
       - recipe[postgresql::client]
       - recipe[postgresql::server]
       - recipe[postgresql::contrib]
@@ -318,6 +360,8 @@ suites:
   - name: wmi_wpm
     run_list:
       - recipe[java]
+      - recipe[yum-centos::default]
+      - recipe[yum-epel::default]
       - recipe[postgresql::client]
       - recipe[postgresql::server]
       - recipe[postgresql::contrib]
@@ -331,6 +375,8 @@ suites:
   - name: xml_source
     run_list:
       - recipe[java]
+      - recipe[yum-centos::default]
+      - recipe[yum-epel::default]
       - recipe[postgresql::client]
       - recipe[postgresql::server]
       - recipe[postgresql::contrib]
@@ -345,6 +391,8 @@ suites:
   - name: xml_group
     run_list:
       - recipe[java]
+      - recipe[yum-centos::default]
+      - recipe[yum-epel::default]
       - recipe[postgresql::client]
       - recipe[postgresql::server]
       - recipe[postgresql::contrib]
@@ -360,6 +408,8 @@ suites:
   - name: eventconf
     run_list:
       - recipe[java]
+      - recipe[yum-centos::default]
+      - recipe[yum-epel::default]
       - recipe[postgresql::client]
       - recipe[postgresql::server]
       - recipe[postgresql::contrib]
@@ -370,6 +420,8 @@ suites:
   - name: event
     run_list:
       - recipe[java]
+      - recipe[yum-centos::default]
+      - recipe[yum-epel::default]
       - recipe[postgresql::client]
       - recipe[postgresql::server]
       - recipe[postgresql::contrib]
@@ -380,6 +432,8 @@ suites:
   - name: poller
     run_list:
       - recipe[java]
+      - recipe[yum-centos::default]
+      - recipe[yum-epel::default]
       - recipe[postgresql::client]
       - recipe[postgresql::server]
       - recipe[postgresql::contrib]
@@ -390,6 +444,8 @@ suites:
   - name: disco_specific
     run_list:
       - recipe[java]
+      - recipe[yum-centos::default]
+      - recipe[yum-epel::default]
       - recipe[postgresql::client]
       - recipe[postgresql::server]
       - recipe[postgresql::contrib]
@@ -400,6 +456,8 @@ suites:
   - name: disco_range
     run_list:
       - recipe[java]
+      - recipe[yum-centos::default]
+      - recipe[yum-epel::default]
       - recipe[postgresql::client]
       - recipe[postgresql::server]
       - recipe[postgresql::contrib]
@@ -410,6 +468,8 @@ suites:
   - name: disco_url
     run_list:
       - recipe[java]
+      - recipe[yum-centos::default]
+      - recipe[yum-epel::default]
       - recipe[postgresql::client]
       - recipe[postgresql::server]
       - recipe[postgresql::contrib]
@@ -420,6 +480,8 @@ suites:
   - name: foreign_source
     run_list:
       - recipe[java]
+      - recipe[yum-centos::default]
+      - recipe[yum-epel::default]
       - recipe[postgresql::client]
       - recipe[postgresql::server]
       - recipe[postgresql::contrib]
@@ -430,6 +492,8 @@ suites:
   - name: service_detector
     run_list:
       - recipe[java]
+      - recipe[yum-centos::default]
+      - recipe[yum-epel::default]
       - recipe[postgresql::client]
       - recipe[postgresql::server]
       - recipe[postgresql::contrib]
@@ -440,6 +504,8 @@ suites:
   - name: policy
     run_list:
       - recipe[java]
+      - recipe[yum-centos::default]
+      - recipe[yum-epel::default]
       - recipe[postgresql::client]
       - recipe[postgresql::server]
       - recipe[postgresql::contrib]
@@ -450,6 +516,8 @@ suites:
   - name: import
     run_list:
       - recipe[java]
+      - recipe[yum-centos::default]
+      - recipe[yum-epel::default]
       - recipe[postgresql::client]
       - recipe[postgresql::server]
       - recipe[postgresql::contrib]
@@ -461,6 +529,8 @@ suites:
   - name: import_node
     run_list:
       - recipe[java]
+      - recipe[yum-centos::default]
+      - recipe[yum-epel::default]
       - recipe[postgresql::client]
       - recipe[postgresql::server]
       - recipe[postgresql::contrib]
@@ -473,6 +543,8 @@ suites:
   - name: import_node_interface
     run_list:
       - recipe[java]
+      - recipe[yum-centos::default]
+      - recipe[yum-epel::default]
       - recipe[postgresql::client]
       - recipe[postgresql::server]
       - recipe[postgresql::contrib]
@@ -486,6 +558,8 @@ suites:
   - name: import_node_interface_service
     run_list:
       - recipe[java]
+      - recipe[yum-centos::default]
+      - recipe[yum-epel::default]
       - recipe[postgresql::client]
       - recipe[postgresql::server]
       - recipe[postgresql::contrib]
@@ -500,6 +574,8 @@ suites:
   - name: snmp_config_definition
     run_list:
       - recipe[java]
+      - recipe[yum-centos::default]
+      - recipe[yum-epel::default]
       - recipe[postgresql::client]
       - recipe[postgresql::server]
       - recipe[postgresql::contrib]
@@ -510,6 +586,8 @@ suites:
   - name: update_snmp_config_definition
     run_list:
       - recipe[java]
+      - recipe[yum-centos::default]
+      - recipe[yum-epel::default]
       - recipe[postgresql::client]
       - recipe[postgresql::server]
       - recipe[postgresql::contrib]
@@ -521,6 +599,8 @@ suites:
   - name: wmi_config_definition
     run_list:
       - recipe[java]
+      - recipe[yum-centos::default]
+      - recipe[yum-epel::default]
       - recipe[postgresql::client]
       - recipe[postgresql::server]
       - recipe[postgresql::contrib]
@@ -531,6 +611,8 @@ suites:
   - name: update_wmi_config_definition
     run_list:
       - recipe[java]
+      - recipe[yum-centos::default]
+      - recipe[yum-epel::default]
       - recipe[postgresql::client]
       - recipe[postgresql::server]
       - recipe[postgresql::contrib]
@@ -542,6 +624,8 @@ suites:
   - name: destination_path
     run_list:
       - recipe[java]
+      - recipe[yum-centos::default]
+      - recipe[yum-epel::default]
       - recipe[postgresql::client]
       - recipe[postgresql::server]
       - recipe[postgresql::contrib]
@@ -552,6 +636,8 @@ suites:
   - name: notification_command
     run_list:
       - recipe[java]
+      - recipe[yum-centos::default]
+      - recipe[yum-epel::default]
       - recipe[postgresql::client]
       - recipe[postgresql::server]
       - recipe[postgresql::contrib]
@@ -562,6 +648,8 @@ suites:
   - name: notifd_autoack
     run_list:
       - recipe[java]
+      - recipe[yum-centos::default]
+      - recipe[yum-epel::default]
       - recipe[postgresql::client]
       - recipe[postgresql::server]
       - recipe[postgresql::contrib]
@@ -572,6 +660,8 @@ suites:
   - name: notification
     run_list:
       - recipe[java]
+      - recipe[yum-centos::default]
+      - recipe[yum-epel::default]
       - recipe[postgresql::client]
       - recipe[postgresql::server]
       - recipe[postgresql::contrib]
@@ -582,6 +672,8 @@ suites:
   - name: user
     run_list:
       - recipe[java]
+      - recipe[yum-centos::default]
+      - recipe[yum-epel::default]
       - recipe[postgresql::client]
       - recipe[postgresql::server]
       - recipe[postgresql::contrib]
@@ -592,6 +684,8 @@ suites:
   - name: group
     run_list:
       - recipe[java]
+      - recipe[yum-centos::default]
+      - recipe[yum-epel::default]
       - recipe[postgresql::client]
       - recipe[postgresql::server]
       - recipe[postgresql::contrib]
@@ -603,6 +697,8 @@ suites:
   - name: role
     run_list:
       - recipe[java]
+      - recipe[yum-centos::default]
+      - recipe[yum-epel::default]
       - recipe[postgresql::client]
       - recipe[postgresql::server]
       - recipe[postgresql::contrib]
@@ -614,6 +710,8 @@ suites:
   - name: statsd
     run_list:
       - recipe[java]
+      - recipe[yum-centos::default]
+      - recipe[yum-epel::default]
       - recipe[postgresql::client]
       - recipe[postgresql::server]
       - recipe[postgresql::contrib]
@@ -624,6 +722,8 @@ suites:
   - name: collection_graph_file
     run_list:
       - recipe[java]
+      - recipe[yum-centos::default]
+      - recipe[yum-epel::default]
       - recipe[postgresql::client]
       - recipe[postgresql::server]
       - recipe[postgresql::contrib]
@@ -634,6 +734,8 @@ suites:
   - name: collection_graph
     run_list:
       - recipe[java]
+      - recipe[yum-centos::default]
+      - recipe[yum-epel::default]
       - recipe[postgresql::client]
       - recipe[postgresql::server]
       - recipe[postgresql::contrib]
@@ -644,6 +746,8 @@ suites:
   - name: response_graph
     run_list:
       - recipe[java]
+      - recipe[yum-centos::default]
+      - recipe[yum-epel::default]
       - recipe[postgresql::client]
       - recipe[postgresql::server]
       - recipe[postgresql::contrib]
@@ -654,6 +758,8 @@ suites:
   - name: threshold
     run_list:
       - recipe[java]
+      - recipe[yum-centos::default]
+      - recipe[yum-epel::default]
       - recipe[postgresql::client]
       - recipe[postgresql::server]
       - recipe[postgresql::contrib]
@@ -664,6 +770,8 @@ suites:
   - name: system_def
     run_list:
       - recipe[java]
+      - recipe[yum-centos::default]
+      - recipe[yum-epel::default]
       - recipe[postgresql::client]
       - recipe[postgresql::server]
       - recipe[postgresql::contrib]

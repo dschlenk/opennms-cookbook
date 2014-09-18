@@ -11,7 +11,8 @@
   },
   "dependencies": {
     "yum": ">= 0.0.0",
-    "hostsfile": ">= 0.0.0"
+    "hostsfile": ">= 0.0.0",
+    "java": ">= 0.0.0"
   },
   "recommendations": {
   },

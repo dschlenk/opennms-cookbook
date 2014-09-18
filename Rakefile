@@ -1,5 +1,5 @@
 # Encoding: utf-8
-require 'kitchen'
+require 'kitchen/cli'
 
 namespace :integration do
   desc 'Run Test Kitchen with Vagrant'
@@ -18,15 +18,20 @@ namespace :integration do
     end
 
     if run_kitchen
-      Kitchen.logger = Kitchen.default_file_logger
-      @loader = Kitchen::Loader::YAML.new(
-        project_config: './.kitchen.cloud.yml',
-        local_config: './.kitchen.local.yml'
-      )
-      config = Kitchen::Config.new(loader: @loader)
-      config.instances.each do |instance|
-        instance.test(:passing)
-      end
+      #Kitchen.logger = Kitchen.default_file_logger
+      #@loader = Kitchen::Loader::YAML.new(
+      #  project_config: './.kitchen.cloud.yml',
+      #  local_config: './.kitchen.local.yml'
+      #)
+      #config = Kitchen::Config.new(loader: @loader)
+      #config.instances.each do |instance|
+      #  instance.test(:passing)
+      #end
+      destroy = ENV['KITCHEN_DESTROY'] || 'passing'
+      concurrency = ENV['KITCHEN_CONCURRENCY'] || '1'
+      ENV['KITCHEN_YAML'] = './.kitchen.cloud.yml'
+      ENV['KITCHEN_LOCAL_YAML'] = './.kitchen.local.yml'
+      Kitchen::CLI.new([], {concurrency: concurrency.to_i, destroy: destroy}).test()
     end
   end
 end
