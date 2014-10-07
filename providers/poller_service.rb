@@ -85,7 +85,6 @@ def create_poller_service
 
   package_el = doc.elements["/poller-configuration/package[@name='#{new_resource.package_name}']"]
   first_downtime_el = doc.elements["/poller-configuration/package[@name='#{new_resource.package_name}']/downtime[1]"]
-  Chef::Log.info "First downtime is: #{first_downtime_el}"
   service_el = REXML::Element.new('service')
   service_el.attributes['name'] = new_resource.name
   service_el.attributes['interval'] = new_resource.interval
