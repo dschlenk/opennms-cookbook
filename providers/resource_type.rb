@@ -45,7 +45,7 @@ def create_resource_type
   if !file_name.nil?
     outfile_name = file_name
     #file = ::File.new("#{node['opennms']['conf']['home']}/etc/datacollection/#{new_resource.group_name}.xml", "r")
-    file = ::File.new(filename, "r")
+    file = ::File.new(file_name, "r")
     doc = REXML::Document.new file
     doc.context[:attribute_quote] = :quote
     file.close
