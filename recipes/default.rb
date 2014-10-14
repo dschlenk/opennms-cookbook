@@ -53,7 +53,7 @@ hostsfile_entry node['ipaddress'] do
 end
 
 package "opennms" do
-  version "1.12.9-2"
+  version node['opennms']['version']
   timeout 1200
   action :install
 end

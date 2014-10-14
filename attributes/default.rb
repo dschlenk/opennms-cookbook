@@ -5,6 +5,7 @@ default['yum']['opennms-stable-common']['failovermethod'] = "roundrobin"
 default['yum']['opennms-stable-rhel6']['baseurl']         = "http://yum.opennms.org/stable/rhel6"
 default['yum']['opennms-stable-rhel6']['failovermethod']  = "roundrobin"
 
+default['opennms']['version'] = '1.12.9-2'
 # opennms.conf
 default['opennms']['conf']['home']           = "/opt/opennms"
 default['opennms']['conf']['pidfile']        = "#{default['opennms']['conf']['home']}/logs/daemon/opennms.pid"
