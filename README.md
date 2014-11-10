@@ -2,12 +2,12 @@ Description
 ===========
 
 A Chef cookbook to manage the installation and configuration of OpenNMS.
-Current version of templates are based on OpenNMS release 1.12.9.
+Current version of templates are based on OpenNMS release 14.0.
 
 Status
 ======
 
-Ready for limited use. Feel free to try out a tagged version (or master if you dare) but don't expect everything to work perfectly yet. Tags happen when a decent chunk of new functionality is written, their example recipes converge (named example_*) and OpenNMS starts without errors.  Notably missing are unit and more formal integration tests.
+Things generally work. Use the latest tag. Tags happen when a decent chunk of new functionality is written, their example recipes converge (named example_*) and OpenNMS starts without errors.  Notably missing are unit and more formal integration tests.
 
 Requirements
 ============
@@ -29,7 +29,7 @@ See Usage for more details.
 Usage
 =====
 
-Running the default recipe will install OpenNMS 1.12.9 on CentOS 6.x from the official repo with the default configuration. It will also execute `'$ONMS_HOME/bin/runjava -s` if `$ONMS_HOME/etc/java.conf` is not present and `$ONMS_HOME/bin/install -dis` if `$ONMS_HOME/etc/configured` is not present.
+Running the default recipe will install OpenNMS 14.0 (or a custom version using the attribute `node[:opennms][:version]`) on CentOS 6.x from the official repo with the default configuration. It will also execute `'$ONMS_HOME/bin/runjava -s` if `$ONMS_HOME/etc/java.conf` is not present and `$ONMS_HOME/bin/install -dis` if `$ONMS_HOME/etc/configured` is not present.
 
 Also, most configuration files are templated and can be overridden with environment, role, or node attributes.  See the default attributes file for a list of configuration items that can be changed in this manner, or keep reading for a brief overview of each template available. Some general notes:
 

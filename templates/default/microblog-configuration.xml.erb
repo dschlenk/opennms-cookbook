@@ -39,15 +39,19 @@
 	<microblog-profile
 		name="twitter"
 		service-url="https://twitter.com/"
-		authen-username="yourusername"
-		authen-password="yourpassword"
+                oauth-consumer-key=""
+                oauth-consumer-secret=""
+                oauth-access-token=""
+                oauth-access-token-secret=""
 	/>
         <% else -%>
 	<microblog-profile
 		name="twitter"
 		service-url="https://twitter.com/"
-                authen-username="<%=@default_profile[:authen_username]%>"
-                authen-password="<%=@default_profile[:authen_password]%>"
+                oauth-consumer-key=""
+                oauth-consumer-secret=""
+                oauth-access-token=""
+                oauth-access-token-secret=""
 	/>
         <% end -%>
 </microblog-configuration>

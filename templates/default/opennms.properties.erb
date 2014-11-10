@@ -158,7 +158,7 @@ org.opennms.snmp.dataCollectionConfig.reloadCheckInterval=<%=@reload_check_inter
 
 #
 # Collectd Instrumentation class
-# org.opennms.collectd.instrumentationClass=org.opennms.netmgt.collectd.DefaultCollectInstrumentation
+# org.opennms.collectd.instrumentationClass=org.opennms.netmgt.collectd.DefaultCollectdInstrumentation
 <% unless @instrumentation_class.nil? -%>
 org.opennms.collectd.instrumentationClass=<%=@instrumentation_class%>
 <% end %>
@@ -172,24 +172,6 @@ org.opennms.collectd.instrumentationClass=<%=@instrumentation_class%>
 <% unless @enable_check_file_mod.nil? -%>
 org.opennms.utils.propertiesCache.enableCheckFileModified=<%=@enable_check_file_mod%>
 <% end -%>
-
-###### REMOTE METHOD INVOCATION ######
-# Though this is not strictly an OpenNMS property this is a setting that you
-# may need to set if you are using the distributed monitor either via webstart
-# or the command-line remote poller.  In these cases, all of the remote
-# monitors need a hostname or IP address they can resolve to locate the
-# central OpenNMS server.  This code uses Java's RMI protocol to communicate
-# and needs to know the name the client will use to connect.  This will be
-# especially true if the client must connect to the server thru a firewall.
-#
-# The default behavior is for it to pick one of the IP addresses of the server
-# host.
-#
-#java.rmi.server.hostname=<some server ip address>
-<% unless @rmi_server_hostname.nil? -%>
-java.rmi.server.hostname=<%@rmi_server_hostname%>
-<% end -%>
-
 
 ###### TROUBLE TICKETING ######
 # The ticketer responsible for creating tickets from the Alarm details and passing these 
@@ -335,6 +317,14 @@ org.opennms.netmgt.jetty.ajp-port = <%=@ajp%>
 #org.opennms.netmgt.jetty.host = 127.0.0.1
 <% unless @jetty_host.nil? -%>
 org.opennms.netmgt.jetty.host = <%=@jetty_host%>
+<% end -%>
+# 
+# This enables NCSA style request logging in ${opennm.home}/logs
+#
+# Uncomment this and change to true to enable this
+#org.opennms.netmgt.jetty.enableRequestLogging=false
+<% unless @req_logging.nil? -%>
+org.opennms.netmgt.jetty.enableRequestLogging=<%=@req_loging%>
 <% end -%>
 
 # This sets the maximum size for a form submission in jetty.  
@@ -651,9 +641,9 @@ opennms.nodesWithProblems.count=<%=@problem_node_count%>
 <% end -%>
 
 # This value allows you to enable/disable the nodes with problems box on the front
-# page in the OpenNMS web UI. Default: false
+# page in the OpenNMS web UI. Default: true
 #
-#opennms.nodesWithProblems.show=false
+#opennms.nodesWithProblems.show=true
 <% unless @show_problem_nodes.nil? -%>
 opennms.nodesWithProblems.show=<%=@show_problem_nodes%>
 <% end -%>
@@ -673,7 +663,9 @@ opennms.nodeStatusBar.show=<%=@show_node_status_bar%>
 org.opennms.security.disableLoginSuccessEvent=<%=@disable_login_success_event%>
 <% end -%>
 
-###### REMOTE POLLER BACKEND SETTINGS ######
+###### REMOTE POLLER ######
+
+#### SERVER SETTINGS ####
 
 # This setting is the minimum amount of time between reloads of a remote poller configuration
 # in milliseconds because of global changes.  This value should never be set 
@@ -683,6 +675,31 @@ org.opennms.security.disableLoginSuccessEvent=<%=@disable_login_success_event%>
 <% unless @min_config_reload_int.nil? -%>
 opennms.pollerBackend.minimumConfigurationReloadInterval=<%=@min_config_reload_int%> 
 <% end -%>
+#
+# This is the amount of time in milliseconds after which a remote poller is considered
+# disconnected if it has not communicated with this OpenNMS system.
+#opennms.pollerBackend.disconnectedTimeout=600000
+<% unless @pb_disconnect_timeout.nil? -%>
+opennms.pollerBackend.disconnectedTimeout=<%=@pb_disconnect_timeout%>
+<% end -%>
+#
+# Specify the RMI ports when using the legacy RMI IPC interface
+#opennms.poller.server.serverPort=1199
+<% unless @pb_server_port.nil? -%>
+opennms.poller.server.serverPort=<%=@pb_server_port%>
+<% end -%>
+#opennms.poller.server.registryPort=1099
+<% unless @pb_registry_port.nil? -%>
+opennms.poller.server.registryPort=<%=@pb_registry_port%>
+<% end -%>
+
+#### REMOTE SETTINGS ####
+
+# All settings on the remote pollers are controlled via command-line options. Look at these 
+# wiki pages for more details.
+#
+# http://www.opennms.org/wiki/Remote_Polling
+# http://www.opennms.org/wiki/Remote_Poller_Design_Overview
 
 
 ###### JASPER REPORTS VERSION  ######

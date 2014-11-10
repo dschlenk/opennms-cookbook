@@ -79,9 +79,12 @@ reports=onms.queued.updates, \
 onms.queued.pending, \
 onms.pollerd.activeThreads, \
 onms.pollerd.completedRatio, \
+onms.pollerd.polls, \
 onms.collectd.activeThreads, \
 onms.collectd.threadpool, \
 onms.collectd.completedRatio, \
+onms.collectd.collectableServiceCount, \
+onms.vacuumd.automs, \
 OpenNMS.Capsd.ActiveSuspecThreads.AttributeReport, \
 OpenNMS.Capsd.ActiveRescanThreads.AttributeReport, \
 OpenNMS.Capsd.SuspectCompletTasks.AttributeReport, \
@@ -155,6 +158,17 @@ report.onms.queued.pending.command=--title="OpenNMS Queued Operations Pending" \
 ###
 ## OpenNMS Pollerd
 ###
+report.onms.pollerd.polls.name=OpenNMS Services Polled
+report.onms.pollerd.polls.columns=ONMSPollCount
+report.onms.pollerd.polls.type=interfaceSnmp
+report.onms.pollerd.polls.command=--title="OpenNMS Services Polled" \
+ --vertical-label="Polls per second" \
+ DEF:polls={rrd1}:ONMSPollCount:AVERAGE \
+ LINE1:polls#0000ff:"Services polled" \
+ GPRINT:polls:AVERAGE:" Avg  \\: %8.2lf %s" \
+ GPRINT:polls:MIN:"Min  \\: %8.2lf %s" \
+ GPRINT:polls:MAX:"Max  \\: %8.2lf %s\\n"
+
 report.onms.pollerd.activeThreads.name=OpenNMS Poller Threads Active
 report.onms.pollerd.activeThreads.columns=ONMSPollerThreadAct
 report.onms.pollerd.activeThreads.type=interfaceSnmp
@@ -232,6 +246,33 @@ report.onms.collectd.completedRatio.command=--title="OpenNMS Collectd Task Compl
  GPRINT:percent:AVERAGE:" Avg  \\: %8.2lf %s" \
  GPRINT:percent:MIN:"Min  \\: %8.2lf %s" \
  GPRINT:percent:MAX:"Max  \\: %8.2lf %s\\n"
+
+report.onms.collectd.collectableServiceCount.name=OpenNMS Collectd Collectable Services
+report.onms.collectd.collectableServiceCount.columns=ONMSCollectSvcCount
+report.onms.collectd.collectableServiceCount.type=interfaceSnmp
+report.onms.collectd.collectableServiceCount.command=--title="OpenNMS Collectd Collectable Services" \
+ --vertical-label="Services" \
+ DEF:total={rrd1}:ONMSCollectSvcCount:AVERAGE \
+ AREA:total#F5CD9A \
+ LINE2:total#F19A2A:"Collectable" \
+ GPRINT:total:AVERAGE:" Avg  \\: %8.2lf %s" \
+ GPRINT:total:MIN:"Min  \\: %8.2lf %s" \
+ GPRINT:total:MAX:"Max  \\: %8.2lf %s\\n"
+
+###
+## OpenNMS Vacuumd
+###
+report.onms.vacuumd.automs.name=OpenNMS Automations Ran
+report.onms.vacuumd.automs.columns=ONMSAutomCount
+report.onms.vacuumd.automs.type=interfaceSnmp
+report.onms.vacuumd.automs.command=--title="OpenNMS Automations Ran" \
+ --vertical-label="Automations per sec." \
+ DEF:polls={rrd1}:ONMSAutomCount:AVERAGE \
+ LINE1:polls#0000ff:"Automations ran" \
+ GPRINT:polls:AVERAGE:" Avg  \\: %8.2lf %s" \
+ GPRINT:polls:MIN:"Min  \\: %8.2lf %s" \
+ GPRINT:polls:MAX:"Max  \\: %8.2lf %s\\n"
+
 
 ###########################################
 ## OpenNMS.Capsd.ActiveSuspecThreads.AttributeReport

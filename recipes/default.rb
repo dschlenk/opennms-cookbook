@@ -150,6 +150,9 @@ template "#{onms_home}/etc/opennms.properties" do
     :rmi_server_hostname            => node['opennms']['properties']['remote']['rmi_server_hostname'],
     :exclude_service_monitors       => node['opennms']['properties']['remote']['exclude_service_monitors'],
     :min_config_reload_int          => node['opennms']['properties']['remote']['min_config_reload_int'],
+    :pb_disconnect_timeout          => node['opennms']['properties']['remote']['pb_disconnect_timeout'],
+    :pb_server_port                 => node['opennms']['properties']['remote']['pb_server_port'],
+    :pb_registry_port               => node['opennms']['properties']['remote']['pb_registry_port'],
     :servicelayer                   => node['opennms']['properties']['ticket']['servicelayer'],
     :plugin                         => node['opennms']['properties']['ticket']['plugin'],
     :enabled                        => node['opennms']['properties']['ticket']['enabled'],
@@ -180,6 +183,7 @@ template "#{onms_home}/etc/opennms.properties" do
     :jetty_port                     => node['opennms']['properties']['jetty']['port'],
     :ajp                            => node['opennms']['properties']['jetty']['ajp'],
     :jetty_host                     => node['opennms']['properties']['jetty']['host'],
+    :req_logging                    => node['opennms']['properties']['jetty']['req_logging'],
     :max_form_content_size          => node['opennms']['properties']['jetty']['max_form_content_size'],
     :request_header_size            => node['opennms']['properties']['jetty']['request_header_size'],
     :max_form_keys                  => node['opennms']['properties']['jetty']['max_form_keys'],
@@ -221,20 +225,6 @@ template "#{onms_home}/etc/opennms.properties" do
     :min_quality                    => node['opennms']['properties']['geo']['min_quality'],
     :email                          => node['opennms']['properties']['geo']['email'],
     :tile_url                       => node['opennms']['properties']['geo']['tile_url']
-  )
-end
-
-template "#{onms_home}/etc/access-point-monitor-configuration.xml" do
-  source "access-point-monitor-configuration.xml.erb"
-  mode 00664
-  owner "root"
-  group "root"
-  notifies :restart, "service[opennms]"
-  variables(
-    :threads        => node[:opennms][:apm][:threads],
-    :pscan_interval => node[:opennms][:apm][:pscan_interval],
-    :aruba_enable   => node[:opennms][:apm][:aruba_enable],
-    :moto_enable    => node[:opennms][:apm][:moto_enable]
   )
 end
 
@@ -390,6 +380,7 @@ template "#{onms_home}/etc/datacollection-config.xml" do
     :ibm          => node['opennms']['datacollection']['default']['ibm'],
     :ipunity      => node['opennms']['datacollection']['default']['ipunity'],
     :juniper      => node['opennms']['datacollection']['default']['juniper'],
+    :konica       => node['opennms']['datacollection']['default']['konica'],
     :kyocera      => node['opennms']['datacollection']['default']['kyocera'],
     :lexmark      => node['opennms']['datacollection']['default']['lexmark'],
     :liebert      => node['opennms']['datacollection']['default']['liebert'],
@@ -440,6 +431,24 @@ template "#{onms_home}/etc/discovery-configuration.xml" do
   )
 end
 
+template "#{onms_home}/etc/enlinkd-configuration.xml" do
+  source "enlinkd-configuration.xml.erb"
+  mode 0644
+  owner "root"
+  group "root"
+  notifies :restart, "service[opennms]"
+  variables(
+    :threads         => node['opennms']['enlinkd']['threads'],
+    :init_sleep_time => node['opennms']['enlinkd']['init_sleep_time'],
+    :rescan_interval => node['opennms']['enlinkd']['rescan_interval'],
+    :cdp             => node['opennms']['enlinkd']['cdp'],
+    :bridge          => node['opennms']['enlinkd']['bridge'],
+    :lldp            => node['opennms']['enlinkd']['lldp'],
+    :ospf            => node['opennms']['enlinkd']['ospf'],
+    :isis            => node['opennms']['enlinkd']['isis']
+  )
+end
+
 template "#{onms_home}/etc/eventd-configuration.xml" do
   source "eventd-configuration.xml.erb"
   mode 00664
@@ -455,18 +464,6 @@ template "#{onms_home}/etc/eventd-configuration.xml" do
     :get_next_eventid       => node['opennms']['eventd']['get_next_eventid'],
     :sock_so_timeout_req    => node['opennms']['eventd']['sock_so_timeout_req'],
     :socket_so_timeout_period => node['opennms']['eventd']['socket_so_timeout_period']
-  )
-end
-
-template "#{onms_home}/etc/events-archiver-configuration.xml" do
-  source "events-archiver-configuration.xml.erb"
-  mode 00664
-  owner "root"
-  group "root"
-  notifies :restart, "service[opennms]"
-  variables(
-    :age       => node['opennms']['events_archiver']['age'],
-    :separator => node['opennms']['events_archiver']['separator']
   )
 end
 
@@ -605,6 +602,7 @@ template "#{onms_home}/etc/linkd-configuration.xml" do
     :range_begin                  => node[:opennms][:linkd][:range_begin],
     :range_end                    => node[:opennms][:linkd][:range_end],
     :netscreen                    => node[:opennms][:linkd][:iproutes][:enable_netscreen],
+    :samsung                      => node[:opennms][:linkd][:iproutes][:enable_samsung],
     :iproute_cisco                => node[:opennms][:linkd][:iproutes][:enable_cisco],
     :darwin                       => node[:opennms][:linkd][:iproutes][:enable_darwin],
     :vlan_3com                    => node[:opennms][:linkd][:vlan][:enable_3com],
@@ -617,68 +615,14 @@ template "#{onms_home}/etc/linkd-configuration.xml" do
   )
 end
 
-template "#{onms_home}/etc/log4j.properties" do
-  source "log4j.properties.erb"
+template "#{onms_home}/etc/log4j2.xml" do
+  source "log4j2.xml.erb"
   mode 00664
   owner "root"
   group "root"
   notifies :restart, "service[opennms]"
   variables(
-    :onms_home           => onms_home,
-    :stds                => node[:opennms][:log4j][:stds],
-    :uncategorized       => node[:opennms][:log4j][:uncategorized],
-    :misc                => node[:opennms][:log4j][:misc],
-    :hibernate           => node[:opennms][:log4j][:hibernate],
-    :spring              => node[:opennms][:log4j][:spring],
-    :provisiond          => node[:opennms][:log4j][:provisiond],
-    :pinger              => node[:opennms][:log4j][:pinger],
-    :reportd             => node[:opennms][:log4j][:reportd],
-    :ticketer            => node[:opennms][:log4j][:ticketer],
-    :eventd              => node[:opennms][:log4j][:eventd],
-    :alarmd              => node[:opennms][:log4j][:alarmd],
-    :ackd                => node[:opennms][:log4j][:ackd],
-    :discovery           => node[:opennms][:log4j][:discovery],
-    :capsd               => node[:opennms][:log4j][:capsd],
-    :notifd              => node[:opennms][:log4j][:notifd],
-    :poller              => node[:opennms][:log4j][:poller],
-    :snmpinterfacepoller => node[:opennms][:log4j][:snmpinterfacepoller],
-    :collectd            => node[:opennms][:log4j][:collectd],
-    :correlation         => node[:opennms][:log4j][:correlation],
-    :drools              => node[:opennms][:log4j][:drools],
-    :passive             => node[:opennms][:log4j][:passive],
-    :threshd             => node[:opennms][:log4j][:threshd],
-    :trapd               => node[:opennms][:log4j][:trapd],
-    :actiond             => node[:opennms][:log4j][:actiond],
-    :scriptd             => node[:opennms][:log4j][:scriptd],
-    :rtc                 => node[:opennms][:log4j][:rtc],
-    :rtcdata             => node[:opennms][:log4j][:rtcdata],
-    :outage              => node[:opennms][:log4j][:outage],
-    :translator          => node[:opennms][:log4j][:translator],
-    :vacuum              => node[:opennms][:log4j][:vacuum],
-    :manager             => node[:opennms][:log4j][:manager],
-    :queued              => node[:opennms][:log4j][:queued],
-    :jetty               => node[:opennms][:log4j][:jetty],
-    :web                 => node[:opennms][:log4j][:web],
-    :webauth             => node[:opennms][:log4j][:webauth],
-    :web_rtc             => node[:opennms][:log4j][:web_rtc],
-    :tomcat_internal     => node[:opennms][:log4j][:tomcat_internal],
-    :dhcpd               => node[:opennms][:log4j][:dhcpd],
-    :vulnscand           => node[:opennms][:log4j][:vulnscand],
-    :syslogd             => node[:opennms][:log4j][:syslogd],
-    :xmlrpcd             => node[:opennms][:log4j][:xmlrpcd],
-    :report              => node[:opennms][:log4j][:report],
-    :vmware              => node[:opennms][:log4j][:vmware],
-    :rancid              => node[:opennms][:log4j][:rancid],
-    :jmx                 => node[:opennms][:log4j][:jmx],
-    :linkd               => node[:opennms][:log4j][:linkd],
-    :web_map             => node[:opennms][:log4j][:web_map],
-    :statsd              => node[:opennms][:log4j][:statsd],
-    :instrumentation     => node[:opennms][:log4j][:instrumentation],
-    :snmp4j_internal     => node[:opennms][:log4j][:snmp4j_internal],
-    :tl1d                => node[:opennms][:log4j][:tl1d],
-    :asterisk            => node[:opennms][:log4j][:asterisk],
-    :insproxy            => node[:opennms][:log4j][:insproxy],
-    :accesspointmonitor  => node[:opennms][:log4j][:accesspointmonitor]
+    :log => node[:opennms][:log4j2]
   )
 end
 
@@ -1031,17 +975,6 @@ template "#{onms_home}/etc/site-status-views.xml" do
   notifies :restart, "service[opennms]"
   variables(
     :default_view => node[:opennms][:site_status_views][:default_view]
-  )
-end
-
-template "#{onms_home}/etc/smsPhonebook.properties" do
-  source "smsPhonebook.properties.erb"
-  mode 0664
-  owner "root"
-  group "root"
-  notifies :restart, "service[opennms]"
-  variables(
-    :entries => node[:opennms][:sms_phonebook][:entries]
   )
 end
 

@@ -10,6 +10,7 @@
         <name>javaPagerEmail</name>
         <execute>org.opennms.netmgt.notifd.JavaMailNotificationStrategy</execute>
         <comment>class for sending pager email notifications</comment>
+        <contact-type>pagerEmail</contact-type>
         <argument streamed="false">
             <switch>-subject</switch>
         </argument>
@@ -26,6 +27,7 @@
         <name>javaEmail</name>
         <execute>org.opennms.netmgt.notifd.JavaMailNotificationStrategy</execute>
         <comment>class for sending email notifications</comment>
+        <contact-type>email</contact-type>
         <argument streamed="false">
             <switch>-subject</switch>
         </argument>
@@ -42,6 +44,7 @@
         <name>textPage</name>
         <execute>/usr/bin/qpage</execute>
         <comment>text paging program</comment>
+        <contact-type>textPage</contact-type>
         <argument streamed="false">
             <switch>-p</switch>
         </argument>
@@ -55,6 +58,7 @@
         <name>numericPage</name>
         <execute>/usr/bin/qpage</execute>
         <comment>numeric paging program</comment>
+        <contact-type>numericPage</contact-type>
         <argument streamed="false">
             <substitution>-p</substitution>
             <switch>-d</switch>
@@ -69,6 +73,7 @@
         <name>xmppMessage</name>
         <execute>org.opennms.netmgt.notifd.XMPPNotificationStrategy</execute>
         <comment>class for sending XMPP notifications</comment>
+        <contact-type>xmppAddress</contact-type>
         <argument streamed="false">
             <switch>-xmpp</switch>
         </argument>
@@ -82,6 +87,7 @@
         <name>xmppGroupMessage</name>
         <execute>org.opennms.netmgt.notifd.XMPPGroupNotificationStrategy</execute>
         <comment>class for sending XMPP Group Chat notifications</comment>
+        <contact-type>xmppAddress</contact-type>
         <argument streamed="false">
             <switch>-xmpp</switch>
         </argument>
@@ -95,6 +101,7 @@
         <name>ircCat</name>
         <execute>org.opennms.netmgt.notifd.IrcCatNotificationStrategy</execute>
         <comment>class for sending IRC notifications via an IRCcat bot</comment>
+        <contact-type>email</contact-type>
         <argument streamed="false">
             <switch>-email</switch>
         </argument>
@@ -108,6 +115,7 @@
         <name>callWorkPhone</name>
         <execute>org.opennms.netmgt.notifd.asterisk.AsteriskOriginateNotificationStrategy</execute>
         <comment>class for calling via Asterisk for notifications</comment>
+        <contact-type>workPhone</contact-type>
         <argument streamed="false">
             <switch>-d</switch>
         </argument>
@@ -139,6 +147,7 @@
         <name>callMobilePhone</name>
         <execute>org.opennms.netmgt.notifd.asterisk.AsteriskOriginateNotificationStrategy</execute>
         <comment>class for calling via Asterisk for notifications</comment>
+        <contact-type>mobilePhone</contact-type>
         <argument streamed="false">
             <switch>-d</switch>
         </argument>
@@ -170,6 +179,7 @@
         <name>callHomePhone</name>
         <execute>org.opennms.netmgt.notifd.asterisk.AsteriskOriginateNotificationStrategy</execute>
         <comment>class for calling via Asterisk for notifications</comment>
+        <contact-type>homePhone</contact-type>
         <argument streamed="false">
             <switch>-d</switch>
         </argument>
@@ -201,6 +211,7 @@
     	<name>microblogUpdate</name>
     	<execute>org.opennms.netmgt.notifd.MicroblogNotificationStrategy</execute>
     	<comment>class for updating a microblog service (Identica / StatusNet / Twitter) for notifications</comment>
+        <contact-type>microblog</contact-type>
         <argument streamed="false">
             <switch>-tm</switch>
         </argument>
@@ -211,6 +222,7 @@
     	<name>microblogReply</name>
     	<execute>org.opennms.netmgt.notifd.MicroblogReplyNotificationStrategy</execute>
     	<comment>class for replying to a microblog (Identica / StatusNet / Twitter) user for notifications</comment>
+        <contact-type>microblog</contact-type>
         <argument streamed="false">
             <switch>-ublog</switch>
         </argument>
@@ -224,6 +236,7 @@
     	<name>microblogDM</name>
     	<execute>org.opennms.netmgt.notifd.MicroblogDMNotificationStrategy</execute>
     	<comment>class for sending direct messages to a microblog (Identica / StatusNet / Twitter) user for notifications</comment>
+        <contact-type>microblog</contact-type>
         <argument streamed="false">
             <switch>-ublog</switch>
         </argument>

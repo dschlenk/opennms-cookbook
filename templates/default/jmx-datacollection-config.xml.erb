@@ -128,9 +128,15 @@
       <% end -%>
       <% if @jsr160[:pollerd][:enabled] -%>
       <mbean name="OpenNMS Pollerd" objectname="OpenNMS:Name=Pollerd">
+        <attrib name="NumPolls" alias="ONMSPollCount" type="counter"/>
         <attrib name="ActiveThreads"  alias="ONMSPollerThreadAct" type="gauge"/>
         <attrib name="TasksTotal"     alias="ONMSPollerTasksTot"  type="counter"/>
         <attrib name="TasksCompleted" alias="ONMSPollerTasksCpt"  type="counter"/>
+      </mbean>
+      <% end -%>
+      <% if @jsr160[:vacuumd][:enabled] -%>
+      <mbean name="OpenNMS Vacuumd" objectname="OpenNMS:Name=Vacuumd">
+        <attrib name="NumAutomations" alias="ONMSAutomCount" type="counter"/>
       </mbean>
       <% end -%>
       <% if @jsr160[:collectd][:enabled] -%>
@@ -141,6 +147,7 @@
         <attrib name="PeakPoolThreads"  alias="ONMSCollectPoolPeak" type="gauge"/>
         <attrib name="TasksTotal"     alias="ONMSCollectTasksTot"  type="counter"/>
         <attrib name="TasksCompleted" alias="ONMSCollectTasksCpt"  type="counter"/>
+        <attrib name="CollectableServiceCount" alias="ONMSCollectSvcCount" type="gauge"/>
       </mbean>
       <% end -%>
       <% if @jsr160[:capsd][:enabled] -%>
