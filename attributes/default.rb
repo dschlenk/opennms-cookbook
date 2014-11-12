@@ -5,11 +5,11 @@ default['yum']['opennms-stable-common']['failovermethod'] = "roundrobin"
 default['yum']['opennms-stable-rhel6']['baseurl']         = "http://yum.opennms.org/stable/rhel6"
 default['yum']['opennms-stable-rhel6']['failovermethod']  = "roundrobin"
 
-default['opennms']['version'] = '14.0-1'
+default['opennms']['version'] = '14.0.0-1'
 # opennms.conf
 default['opennms']['conf']['home']           = "/opt/opennms"
-default['opennms']['conf']['pidfile']        = "#{default['opennms']['conf']['home']}/logs/daemon/opennms.pid"
-default['opennms']['conf']['logdir']         = "#{default['opennms']['conf']['home']}/logs/daemon"
+default['opennms']['conf']['pidfile']        = "#{default['opennms']['conf']['home']}/logs/opennms.pid"
+default['opennms']['conf']['logdir']         = "#{default['opennms']['conf']['home']}/logs"
 default['opennms']['conf']['initdir']        = "#{default['opennms']['conf']['home']}/bin"
 default['opennms']['conf']['redirect']       = "$LOG_DIRECTORY/output.log"
 default['opennms']['conf']['start_timeout']  = 10
@@ -24,7 +24,8 @@ default['opennms']['conf']['runjava_opts']   = ""
 default['opennms']['conf']['invoke_url']     = "http://127.0.0.1:8181/invoke?objectname=OpenNMS:Name=Manager"
 default['opennms']['conf']['runas']          = "root"
 default['opennms']['conf']['max_file_descr'] = "20480"
-default['opennms']['conf']['command']        = "8192"
+default['opennms']['conf']['max_stack_sgmt'] = "8192"
+default['opennms']['conf']['command']        = ""
 
 # opennms.properties
 # ICMP
@@ -560,6 +561,7 @@ default['opennms']['discovery']['init_sleep_ms']    = 30000
 default['opennms']['discovery']['restart_sleep_ms'] = 86400000
 default['opennms']['discovery']['retries']          = 1
 default['opennms']['discovery']['timeout']          = 2000
+default['opennms']['discovery']['foreign_source']   = nil
 # enlinkd-configuration.xml
 default['opennms']['enlinkd']['threads'] = 5
 default['opennms']['enlinkd']['init_sleep_time'] = 60000
@@ -1423,7 +1425,7 @@ default['opennms']['snmp_graph']['include_dir']          = "snmp-graph.propertie
 default['opennms']['snmp_graph']['include_rescan']       = nil
 #default['opennms']['snmp_graph']['onms_queued_updates']  = true
 #default['opennms']['snmp_graph']['onms_queued_pending']  = true
-default['opennms']['snmp_graph']['threegpp']             = true
+default['opennms']['snmp_graph']['threegpp']             = false
 default['opennms']['snmp_graph']['acmepacket']           = true
 default['opennms']['snmp_graph']['adonis']               = true
 default['opennms']['snmp_graph']['adsl']                 = true
@@ -1805,17 +1807,17 @@ default['opennms']['wmi']['default']['server_errors']            = true
 default['opennms']['wmi']['default']['w3svc']                    = true
 # xml-datacollection-config.xml
 default['opennms']['xml']['rrd_repository']                     = "#{default['opennms']['conf']['home']}/share/rrd/snmp/"
-default['opennms']['xml']['threegpp_full_5min']['enabled']      = true
+default['opennms']['xml']['threegpp_full_5min']['enabled']      = false
 default['opennms']['xml']['threegpp_full_5min']['rrd']['step']  = 300
 default['opennms']['xml']['threegpp_full_5min']['rrd']['rras']  = ["RRA:AVERAGE:0.5:1:2016", "RRA:AVERAGE:0.5:12:1488","RRA:AVERAGE:0.5:288:366","RRA:MAX:0.5:288:366","RRA:MIN:0.5:288:366"]
 default['opennms']['xml']['threegpp_full_5min']['username']     = "opennms"
 default['opennms']['xml']['threegpp_full_5min']['password']     = "Op3nNMS@"
-default['opennms']['xml']['threegpp_full_15min']['enabled']     = true
+default['opennms']['xml']['threegpp_full_15min']['enabled']     = false
 default['opennms']['xml']['threegpp_full_15min']['rrd']['step'] = 300
 default['opennms']['xml']['threegpp_full_15min']['rrd']['rras'] = ["RRA:AVERAGE:0.5:1:2016", "RRA:AVERAGE:0.5:12:1488","RRA:AVERAGE:0.5:288:366","RRA:MAX:0.5:288:366","RRA:MIN:0.5:288:366"]
 default['opennms']['xml']['threegpp_full_15min']['username']    = "opennms"
 default['opennms']['xml']['threegpp_full_15min']['password']    = "Op3nNMS@"
-default['opennms']['xml']['threegpp_sample']['enabled']         = true
+default['opennms']['xml']['threegpp_sample']['enabled']         = false
 default['opennms']['xml']['threegpp_sample']['rrd']['step']     = 300
 default['opennms']['xml']['threegpp_sample']['rrd']['rras']     = ["RRA:AVERAGE:0.5:1:2016", "RRA:AVERAGE:0.5:12:1488","RRA:AVERAGE:0.5:288:366","RRA:MAX:0.5:288:366","RRA:MIN:0.5:288:366"]
 default['opennms']['xml']['threegpp_sample']['username']        = "opennms"

@@ -35,7 +35,8 @@ platforms:
                                                      }
                                           }
                                     }, 
-                          "jdk_version": 7 
+                          "jdk_version": 7,
+                          "ark_retries": 5
                          }, 
                   "opennms": {
                               "conf": {"start_timeout": 20}},  
@@ -92,7 +93,20 @@ platforms:
                 }
 
 suites:
-  - name: all
+  - name: default
+    run_list:
+      - recipe[java]
+      - recipe[yum-centos::default]
+      - recipe[yum-epel::default]
+      - recipe[postgresql::client]
+      - recipe[postgresql::server]
+      - recipe[postgresql::contrib]
+      - recipe[postgresql::config_initdb]
+      - recipe[postgresql::config_pgtune]
+      - recipe[opennms::default]
+      - recipe[opennms::nsclient]
+      - recipe[opennms::xml]
+  - name: lwrps
     run_list:
       - recipe[java]
       - recipe[yum-centos::default]

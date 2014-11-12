@@ -12,11 +12,9 @@ module Provision
     begin
       response = RestClient.get "#{baseurl(node)}/foreignSources", {:accept => :json}
       fsources = JSON.parse(response.to_str)
-      if fsources['@count'].to_i == 1
-        return true if fsources['foreign-source']['@name'] == name
-      elsif fsources['@count'].to_i > 1
-        fsources['foreign-source'].each do |fs|
-          return true if fs['@name'] == name
+      if !fsources.nil? 
+        fsources.each do |source|
+          return true if source['name'] == name
         end
       end
     rescue
@@ -96,11 +94,11 @@ module Provision
      begin
       response = RestClient.get "#{baseurl(node)}/requisitions", {:accept => :json}
       reqs = JSON.parse(response.to_str)
-      if reqs['@count'].to_i == 1
-        return true if reqs['model-import']['@foreign-source'] == foreign_source_name
-      elsif reqs['@count'].to_i > 1
+      if reqs['count'].to_i == 1
+        return true if reqs['model-import']['foreign-source'] == foreign_source_name
+      elsif reqs['count'].to_i > 1
         reqs['model-import'].each do |import|
-          return true if import['@foreign-source'] == foreign_source_name
+          return true if import['foreign-source'] == foreign_source_name
         end
       end
      rescue

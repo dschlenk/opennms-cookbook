@@ -51,6 +51,10 @@ def create_command
     comment_el = command_el.add_element 'comment'
     comment_el.add_text new_resource.comment
   end
+  unless new_resource.contact_type.nil?
+    ct_el = command_el.add_element 'contact-type'
+    ct_el.add_text new_resource.contact_type
+  end
   if !new_resource.arguments.nil?
     new_resource.arguments.each do |arg|
       arg_el = command_el.add_element 'argument', { 'streamed' => "#{arg['streamed']}" }

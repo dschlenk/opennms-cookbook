@@ -10,3 +10,9 @@ end
 opennms_notifd_autoack "example2/exampleFixed" do
   acknowledge "example2/exampleBroken"
 end
+
+# new autoack_alarm thing in 14
+opennms_notifd_autoack_alarm "RESOLVED: " do
+  notify true
+  uei ['uei.opennms.org/test/one', 'uei.opennms.org/test/two']
+end

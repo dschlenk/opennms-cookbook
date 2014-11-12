@@ -1,6 +1,7 @@
 # all options - only comment and arguments are optional although binary defaults to true if not defined. 
 opennms_notification_command "wallHost" do
   execute "/usr/bin/wall"
+  contact_type 'wall'
   comment "wall the hostname"
   binary true
   arguments [{'streamed' => false, 'switch' => '-tm'}]
@@ -25,3 +26,4 @@ opennms_target "Admin_Email_Admin_wallHost" do
   type "escalate"
   escalate_delay "30s"
 end
+

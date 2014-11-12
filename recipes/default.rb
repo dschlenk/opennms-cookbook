@@ -105,7 +105,8 @@ template "#{onms_home}/etc/opennms.conf" do
     :invoke_url             => node[:opennms][:conf][:invoke_url],
     :runas                  => node[:opennms][:conf][:runas],
     :max_file_descr         => node[:opennms][:conf][:max_file_descr],
-    :max_size_stack_segment => node[:opennms][:conf][:command]
+    :max_stack_sgmt         => node[:opennms][:conf][:max_stack_sgmt],
+    :command                => node[:opennms][:conf][:command],
   )
 end
 
@@ -427,7 +428,8 @@ template "#{onms_home}/etc/discovery-configuration.xml" do
     :init_sleep_ms    => node['opennms']['discovery']['init_sleep_ms'],
     :restart_sleep_ms => node['opennms']['discovery']['restart_sleep_ms'],
     :retries          => node['opennms']['discovery']['retries'],
-    :timeout          => node['opennms']['discovery']['timeout']
+    :timeout          => node['opennms']['discovery']['timeout'],
+    :foreign_source   => node['opennms']['discovery']['foreign_source']
   )
 end
 

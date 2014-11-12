@@ -7,3 +7,17 @@ end
 
 # minimal
 opennms_disco_url "http://example.com/include"
+
+ruby_block "noop" do
+  block do
+   noop = 1
+  end
+  notifies :start, "service[opennms]", :immediately
+end
+
+opennms_foreign_source 'disco-url-source'
+
+# with foreign source
+opennms_disco_url "http://other.net/things" do
+  foreign_source 'disco-url-source'
+end

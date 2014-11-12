@@ -1,3 +1,4 @@
+include Provision
 def whyrun_supported?
   true
 end
@@ -7,6 +8,8 @@ use_inline_resources
 action :create do
   if @current_resource.exists
     Chef::Log.info "#{ @new_resource } already exists - nothing to do."
+  elsif !@current_resource.foreign_source.nil? && !@current_resource.foreign_source_exists
+    Chef::Application.fatal!("Missing foreign source #{@current_resource.foreign_source}.")
   else
     converge_by("Create #{ @new_resource }") do
       create_range
@@ -21,20 +24,33 @@ def load_current_resource
   @current_resource.range_begin(@new_resource.range_begin)
   @current_resource.range_end(@new_resource.range_end)
   @current_resource.range_type(@new_resource.range_type)
+  @current_resource.foreign_source(@new_resource.foreign_source)
 
-  if range_exists?(@current_resource.name, @current_resource.range_begin, @current_resource.range_end, @current_resource.range_type)
-     @current_resource.exists = true
+  if @current_resource.foreign_source.nil?
+    if range_exists?(@current_resource.name, @current_resource.range_begin, @current_resource.range_end, @current_resource.range_type, nil)
+      @current_resource.exists = true
+    end
+  else
+    if range_exists?(@current_resource.name, @current_resource.range_begin, @current_resource.range_end, @current_resource.range_type, @current_resource.foreign_source)
+      @current_resource.exists = true
+    elsif foreign_source_exists?(@current_resource.foreign_source, node)
+      @current_resource.foreign_source_exists = true
+    end
   end
 end
 
 
 private
 
-def range_exists?(name, range_begin, range_end, range_type)
+def range_exists?(name, range_begin, range_end, range_type, foreign_source)
   Chef::Log.debug "Checking to see if this discovery #{range_type} range exists: '#{range_begin} to #{range_end}'"
   file = ::File.new("#{node['opennms']['conf']['home']}/etc/discovery-configuration.xml", "r")
   doc = REXML::Document.new file
-  !doc.elements["/discovery-configuration/#{range_type}-range/begin[text() ='#{range_begin}']"].nil? && !doc.elements["/discovery-configuration/#{range_type}-range/end[text() = '#{range_end}']"].nil?
+  if foreign_source.nil?
+    !doc.elements["/discovery-configuration/#{range_type}-range/begin[text() ='#{range_begin}']"].nil? && !doc.elements["/discovery-configuration/#{range_type}-range/end[text() = '#{range_end}']"].nil?
+  else
+    !doc.elements["/discovery-configuration/#{range_type}-range[@foreign-source = '#{foreign_source}']/begin[text() ='#{range_begin}']"].nil? && !doc.elements["/discovery-configuration/#{range_type}-range[@foreign-source = '#{foreign_source}']/end[text() = '#{range_end}']"].nil?
+  end
 end
 
 def create_range
@@ -45,6 +61,7 @@ def create_range
   doc.context[:attribute_quote] = :quote
   file.close
   new_el = REXML::Element.new("#{new_resource.range_type}-range")
+  new_el.attributes['foreign-source'] = new_resource.foreign_source unless new_resource.foreign_source.nil?
   begin_el = new_el.add_element 'begin'
   begin_el.add_text(new_resource.range_begin)
   end_el = new_el.add_element 'end'

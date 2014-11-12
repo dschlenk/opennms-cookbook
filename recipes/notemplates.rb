@@ -102,7 +102,8 @@ template "#{onms_home}/etc/opennms.conf" do
     :invoke_url             => node[:opennms][:conf][:invoke_url],
     :runas                  => node[:opennms][:conf][:runas],
     :max_file_descr         => node[:opennms][:conf][:max_file_descr],
-    :max_size_stack_segment => node[:opennms][:conf][:command]
+    :max_stack_sgmt         => node[:opennms][:conf][:max_stack_sgmt],
+    :command                => node[:opennms][:conf][:command]
   )
 end
 
