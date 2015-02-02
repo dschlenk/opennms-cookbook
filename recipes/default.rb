@@ -126,7 +126,6 @@ template "#{onms_home}/etc/jetty.xml" do
   group "root"
   notifies :restart, "service[opennms]"
   variables(
-    :addl_handlers => node['opennms']['addl_handlers'],
     :ajp   => node['opennms']['properties']['jetty']['ajp'],
     :https_port => node['opennms']['properties']['jetty']['https_port'],
     :https_host => node['opennms']['properties']['jetty']['https_host']
@@ -148,6 +147,8 @@ template "#{onms_home}/etc/opennms.properties" do
     :forward_runtime_exceptions     => node['opennms']['properties']['snmp']['forward_runtime_exceptions'],
     :log_factory                    => node['opennms']['properties']['snmp']['log_factory'],
     :allow_64bit_ipaddress          => node['opennms']['properties']['snmp']['allow_64bit_ipaddress'],
+    :no_getbulk                     => node['opennms']['properties']['snmp']['no_getbulk'],
+    :allow_snmpv2_in_v1             => node['opennms']['properties']['snmp']['allow_snmpv2_in_v1'],
     :store_by_group                 => node['opennms']['properties']['dc']['store_by_group'],
     :store_by_foreign_source        => node['opennms']['properties']['dc']['store_by_foreign_source'],
     :rrd_base_dir                   => node['opennms']['properties']['dc']['rrd_base_dir'],

@@ -53,6 +53,8 @@ default['opennms']['properties']['snmp']['smisyntaxes']                = "opennm
 default['opennms']['properties']['snmp']['forward_runtime_exceptions'] = false
 default['opennms']['properties']['snmp']['log_factory']                = "org.snmp4j.log.Log4jLogFactory"
 default['opennms']['properties']['snmp']['allow_64bit_ipaddress']      = true
+default['opennms']['properties']['snmp']['no_getbulk']                 = false
+default['opennms']['properties']['snmp']['allow_snmpv2_in_v1']         = false
 # Data collection
 default['opennms']['properties']['dc']['store_by_group']          = false
 default['opennms']['properties']['dc']['store_by_foreign_source'] = false

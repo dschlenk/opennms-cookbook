@@ -71,8 +71,12 @@ module Provision
     if foreign_source_exists?(foreign_source_name, node)
       foreign_sources(node).each do |source|
         if source['name'] == foreign_source_name
-          source['policies'].each do |policy|
-            return true if policy['name'] == name
+          policies = source['policies']
+          unless policies.nil?
+            policies.each do |policy|
+              Chef::Log.debug "policy: #{policy}; name: #{foreign_source_name}"
+              return true if policy['name'] == foreign_source_name
+            end
           end
         end
       end
@@ -114,10 +118,20 @@ module Provision
   end
   def import_node_exists?(foreign_source_name, foreign_id, node)
     if import_exists?(foreign_source_name, node)
-      imports(node)['model-import'].each do |import|
-        if import['foreign-source'] == foreign_source_name
-          import['foreign-source']['node'].each do |node|
-            return true if node['foreign-id'] == foreign_id
+      imports_mi = imports(node)['model-import']
+      Chef::Log.debug "imports on this server: #{imports_mi}"
+      unless imports_mi.nil?
+        imports_mi.each do |import|
+          Chef::Log.debug "#{import['foreign-source']} == #{foreign_source_name}"
+          if import['foreign-source'] == foreign_source_name
+            nodes = import['node']
+            Chef::Log.debug "nodes: #{nodes}"
+            unless nodes.nil?
+              import['node'].each do |node|
+                Chef::Log.debug "#{node['foreign-id']} == #{foreign_id}"
+                return true if node['foreign-id'] == foreign_id
+              end
+            end
           end
         end
       end
@@ -162,10 +176,13 @@ module Provision
     if import_node_exists?(foreign_source_name, foreign_id, node)
       imports(node)['model-import'].each do |import|
         if import['foreign-source'] == foreign_source_name
-          import['foreign-source']['node'].each do |node|
-            if node['foreign-id'] == foreign_id
-              node['foreign-id']['interface'].each do |iface|
-                return true if iface['ip-addr'] == ip_addr
+          nodes = import['node']
+          unless nodes.nil?
+            nodes.each do |node|
+              if node['foreign-id'] == foreign_id
+                node['interface'].each do |iface|
+                  return true if iface['ip-addr'] == ip_addr
+                end
               end
             end
           end
@@ -190,9 +207,9 @@ module Provision
     if import_node_exists?(foreign_source_name, foreign_id, node)
       imports(node)['model-import'].each do |import|
         if import['foreign-source'] == foreign_source_name
-          import['foreign-source']['node'].each do |node|
+          import['node'].each do |node|
             if node['foreign-id'] == foreign_id
-              node['foreign-id']['interface'].each do |iface|
+              node['interface'].each do |iface|
                 if iface['ip-addr'] == ip_addr
                   iface['monitored-service'].each do |svc|
                     return true if svc['service-name'] == service_name
