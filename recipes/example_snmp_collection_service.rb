@@ -16,5 +16,6 @@ end
 # minimal
 opennms_snmp_collection_service "SNMP-bar" do
   package_name "bar"
+  collection 'default'
   notifies :restart, "service[opennms]", :delayed
 end

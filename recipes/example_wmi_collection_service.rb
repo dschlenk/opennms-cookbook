@@ -15,5 +15,6 @@ end
 
 # minimal
 opennms_wmi_collection_service "WMIBar" do
+  collection 'default'
   notifies :restart, "service[opennms]", :delayed
 end

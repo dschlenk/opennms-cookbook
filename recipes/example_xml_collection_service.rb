@@ -15,5 +15,6 @@ end
 
 # minimal
 opennms_xml_collection_service "XML" do
+  collection 'default'
   notifies :restart, "service[opennms]", :delayed
 end

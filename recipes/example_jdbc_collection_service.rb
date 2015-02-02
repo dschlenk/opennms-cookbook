@@ -20,6 +20,7 @@ end
 
 # minimal
 opennms_jdbc_collection_service "JDBC" do
+  collection 'default'
   driver "org.postgresql.Driver"
   user "wibble"
   password "wobble"
