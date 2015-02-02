@@ -4,6 +4,7 @@
 ## G E N E R A L   R E P O R T I N G   S E T T I N G S
 #########################################################################
 
+<% if @command_prefix.nil? -%>
 <% if @image_format == "gif" -%>
 command.prefix=/usr/bin/rrdtool graph - --imgformat GIF --font DEFAULT:<%=@default_font_size%> --font TITLE:<%=@title_font_size%> --start {startTime} --end {endTime}
 <% elsif @image_format == "jpg" || @image_format == "jpeg" -%>
@@ -11,7 +12,9 @@ command.prefix=/usr/bin/rrdtool graph - --imgformat JPG --font DEFAULT:<%=@defau
 <% else -%>
 command.prefix=/usr/bin/rrdtool graph - --imgformat PNG --font DEFAULT:<%=@default_font_size%> --font TITLE:<%=@title_font_size%> --start {startTime} --end {endTime}
 <% end -%>
-
+<% else -%>
+command.prefix=<%=@command_prefix%>
+<% end -%>
 #the command used to get the RRD info
 info.command=/usr/bin/rrdtool info
 

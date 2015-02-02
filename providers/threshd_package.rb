@@ -56,8 +56,10 @@ def create_threshd_package
     new_resource.include_ranges.each do |range|
       package_el.add_element 'include-range', {'begin' => range['begin'], 'end' => range['end']}
     end
-    new_resource.exclude_ranges.each do |range|
-      package_el.add_element 'exclude-range', {'begin' => range['begin'], 'end' => range['end']}
+    unless new_resource.exclude_ranges.nil?
+      new_resource.exclude_ranges.each do |range|
+        package_el.add_element 'exclude-range', {'begin' => range['begin'], 'end' => range['end']}
+      end
     end
   end
   if !new_resource.include_urls.nil?

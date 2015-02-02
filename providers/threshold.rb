@@ -84,7 +84,6 @@ def create_threshold
       group_el.add_element threshold_el
     end
   end
-
   out = ""
   formatter = REXML::Formatters::Pretty.new(2)
   formatter.compact = true

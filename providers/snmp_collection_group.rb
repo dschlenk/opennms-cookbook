@@ -6,7 +6,18 @@ use_inline_resources
 
 action :create do
   if @current_resource.exists
-    Chef::Log.info "#{ @new_resource } already exists - nothing to do."
+    Chef::Log.info "#{ @new_resource } already exists - updating collection files as necessary."
+    updated = false
+    if !new_resource.file.nil?
+      f = cookbook_file new_resource.file do
+        path "#{node['opennms']['conf']['home']}/etc/datacollection/#{new_resource.file}"
+        owner "root"
+        group "root"
+        mode 00644
+      end
+      updated = f.updated_by_last_action?
+    end
+    new_resource.updated_by_last_action(updated)
   else
     converge_by("Create #{ @new_resource }") do
       create_snmp_collection_group

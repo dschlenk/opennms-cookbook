@@ -126,7 +126,7 @@ module Rbac
     if !role_el.nil?
       group = role_el.attributes['membership-group']
     end
-    Chef::Log.info "Found group #{group} for role #{role}."
+    Chef::Log.debug "Found group #{group} for role #{role}."
     group
   end
 

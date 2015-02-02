@@ -1,3 +1,5 @@
+# change default yum_timeout to 1200 because opennms packages are slow sometimes.
+default['yum_timeout'] = 1200
 # yum repo stuff
 default['yum']['opennms']['key_url']                      = "http://yum.opennms.org/OPENNMS-GPG-KEY"
 default['yum']['opennms-stable-common']['baseurl']        = "http://yum.opennms.org/stable/common"
@@ -5,7 +7,8 @@ default['yum']['opennms-stable-common']['failovermethod'] = "roundrobin"
 default['yum']['opennms-stable-rhel6']['baseurl']         = "http://yum.opennms.org/stable/rhel6"
 default['yum']['opennms-stable-rhel6']['failovermethod']  = "roundrobin"
 
-default['opennms']['version'] = '14.0.0-1'
+default['opennms']['version'] = '14.0.3-1'
+default['opennms']['addl_handlers'] = []
 # opennms.conf
 default['opennms']['conf']['home']           = "/opt/opennms"
 default['opennms']['conf']['pidfile']        = "#{default['opennms']['conf']['home']}/logs/opennms.pid"
@@ -27,6 +30,18 @@ default['opennms']['conf']['max_file_descr'] = "20480"
 default['opennms']['conf']['max_stack_sgmt'] = "8192"
 default['opennms']['conf']['command']        = ""
 
+# non-default daemons
+default['opennms']['services']['dhcpd']       = false
+default['opennms']['services']['capsd']       = false
+default['opennms']['services']['snmp_poller'] = false
+default['opennms']['services']['linkd']       = false
+default['opennms']['services']['correlator']  = false
+default['opennms']['services']['tl1d']        = false
+default['opennms']['services']['syslogd']     = false
+default['opennms']['services']['xmlrpcd']     = false
+default['opennms']['services']['xmlrpc_prov'] = false
+default['opennms']['services']['asterisk_gw'] = false
+default['opennms']['services']['apm']         = false
 # opennms.properties
 # ICMP
 default['opennms']['properties']['icmp']['pinger_class'] = "org.opennms.netmgt.icmp.jni6.Jni6Pinger"
@@ -1317,10 +1332,13 @@ default['opennms']['remedy']['reason_cancelled']             = "No longer a Caus
 # reportd-configuration.xml
 default['opennms']['reportd']['storage_location'] = "#{default['opennms']['conf']['home']}/share/reports/"
 default['opennms']['reportd']['persist_reports']  = "yes"
+# response adhoc graphs
+default['opennms']['response_adhoc_graph']['command_prefix'] = nil # lets you customize the entire command prefix
 # respons-graph.properties
 # There's a response_graph LWRP to add new response graphs. This just lets you change
 # some defaults and disable the out-of-the-box graphs
 default['opennms']['response_graph']['image_format']        = "png" # can be gif, jpg or png but only png works with both rrdtool and jrobin
+default['opennms']['response_graph']['command_prefix']      = nil # lets you customize the entire command prefix
 default['opennms']['response_graph']['default_font_size']   = 7
 default['opennms']['response_graph']['title_font_size']     = 10
 default['opennms']['response_graph']['icmp']                = true
@@ -1416,8 +1434,10 @@ default['opennms']['site_status_views']['default_view']['rows'] = nil
 default['opennms']['sms_phonebook']['entries'] = {'127.0.0.1' => '+19195551212'}
 # snmp-adhoc-graph.properties
 default['opennms']['snmp_adhoc_graph']['image_format'] = "png" # or gif, or jpg, but png is te only cross-tool compatible format
+default['opennms']['snmp_adhoc_graph']['command_prefix'] = nil # lets you customize entire command prefix
 # snmp-graph.properties / snmp-graph.properties.d/*
-default['opennms']['snmp_graph']['image_format']         = "png" # or gif, or jpg, but png is te only cross-tool compatible format
+default['opennms']['snmp_graph']['image_format']         = "png" # or gif, or jpg, but png is the only cross-tool compatible format
+default['opennms']['snmp_graph']['command_prefix']       = nil # lets you customize the entire command prefix
 default['opennms']['snmp_graph']['default_font_size']    = 7
 default['opennms']['snmp_graph']['title_font_size']      = 10
 default['opennms']['snmp_graph']['default_ksc_graph']    = "mib2.HCbits"

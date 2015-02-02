@@ -91,6 +91,16 @@
                                                     <Set name="ContextPath">/opennms-remoting</Set>
                                                 </New>
                                         </Item>
+                                      <% unless @addl_handlers.nil? -%>
+                                        <% @addl_handlers.each do |handler| -%>
+                                        <Item>
+                                                <New class="org.eclipse.jetty.webapp.WebAppContext">
+                                                    <Set name="War"><SystemProperty name="opennms.home" />/jetty-webapps/<%=handler%></Set>
+                                                    <Set name="ContextPath">/<%=handler%></Set>
+                                                </New>
+                                        </Item>
+                                        <% end -%>
+                                      <% end -%>
                                         <Item>
                                                 <New class="org.eclipse.jetty.webapp.WebAppContext">
                                                     <Set name="War"><SystemProperty name="opennms.home" />/jetty-webapps/ROOT</Set>

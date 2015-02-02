@@ -54,19 +54,16 @@ end
 
 package "opennms-webapp-jetty" do
   version node['opennms']['version']
-  timeout 1200
   action :install
 end
 
 package "opennms-core" do
   version node['opennms']['version']
-  timeout 1200
   action :install
 end
 
 package "opennms-docs" do
   version node['opennms']['version']
-  timeout 1200
   action :install
 end
 
@@ -118,7 +115,7 @@ template "#{onms_home}/etc/opennms.conf" do
     :runas                  => node[:opennms][:conf][:runas],
     :max_file_descr         => node[:opennms][:conf][:max_file_descr],
     :max_stack_sgmt         => node[:opennms][:conf][:max_stack_sgmt],
-    :command                => node[:opennms][:conf][:command],
+    :command                => node[:opennms][:conf][:command]
   )
 end
 
@@ -129,9 +126,10 @@ template "#{onms_home}/etc/jetty.xml" do
   group "root"
   notifies :restart, "service[opennms]"
   variables(
+    :addl_handlers => node['opennms']['addl_handlers'],
     :ajp   => node['opennms']['properties']['jetty']['ajp'],
     :https_port => node['opennms']['properties']['jetty']['https_port'],
-    :https_host => node['opennms']['properties']['jetty']['https_host'],
+    :https_host => node['opennms']['properties']['jetty']['https_host']
   )
 end
 
@@ -258,6 +256,25 @@ template "#{onms_home}/etc/availability-reports.xml" do
     :classic_hours         => node['opennms']['db_reports']['avail']['classic']['endDate']['hours'],
     :classic_minutes       => node['opennms']['db_reports']['avail']['classic']['endDate']['minutes'],
     :onms_home             => onms_home
+  )
+end
+
+template "#{onms_home}/etc/service-configuration.xml" do
+  source "service-configuration.xml.erb"
+  mode 00664
+  owner "root"
+  group "root"
+  notifies :restart, "service[opennms]"
+  variables(
+    :dhcpd       => node['opennms']['services']['dhcpd'],
+    :snmp_poller => node['opennms']['services']['snmp_poller'],
+    :correlator  => node['opennms']['services']['correlator'],
+    :tl1d        => node['opennms']['services']['tl1d'],
+    :syslogd     => node['opennms']['services']['syslogd'],
+    :xmlrpcd     => node['opennms']['services']['xmlrpcd'],
+    :xmlrpc_prov => node['opennms']['services']['xmlrpc_prov'],
+    :asterisk_gw => node['opennms']['services']['asterisk_gw'],
+    :apm         => node['opennms']['services']['apm']
   )
 end
 
@@ -900,6 +917,17 @@ template "#{onms_home}/etc/reportd-configuration.xml" do
   )
 end
 
+template "#{onms_home}/etc/response-adhoc-graph.properties" do
+  source "response-adhoc-graph.properties.erb"
+  mode 0664
+  owner "root"
+  group "root"
+  notifies :restart, "service[opennms]"
+  variables(
+    :command_prefix => node[:opennms][:response_adhoc_graph][:command_prefix]
+  )
+end
+
 template "#{onms_home}/etc/response-graph.properties" do
   source "response-graph.properties.erb"
   mode 0664
@@ -908,6 +936,7 @@ template "#{onms_home}/etc/response-graph.properties" do
   notifies :restart, "service[opennms]"
   variables(
     :image_format        => node[:opennms][:response_graph][:image_format],
+    :command_prefix      => node[:opennms][:response_graph][:command_prefix],
     :default_font_size   => node[:opennms][:response_graph][:default_font_size],
     :title_font_size     => node[:opennms][:response_graph][:title_font_size],
     :title_font_size     => node[:opennms][:response_graph][:title_font_size],
@@ -999,7 +1028,8 @@ template "#{onms_home}/etc/snmp-adhoc-graph.properties" do
   group "root"
   notifies :restart, "service[opennms]"
   variables(
-    :image_format => node[:opennms][:snmp_adhoc_graph][:image_format]
+    :image_format   => node[:opennms][:snmp_adhoc_graph][:image_format],
+    :command_prefix => node[:opennms][:snmp_adhoc_graph][:command_prefix]
   )
 end
 
@@ -1011,6 +1041,7 @@ template "#{onms_home}/etc/snmp-graph.properties" do
   notifies :restart, "service[opennms]"
   variables(
     :image_format        => node[:opennms][:snmp_graph][:image_format],
+    :command_prefix      => node[:opennms][:snmp_graph][:command_prefix],
     :default_font_size   => node[:opennms][:snmp_graph][:default_font_size],
     :title_font_size     => node[:opennms][:snmp_graph][:title_font_size],
     :default_ksc_graph   => node[:opennms][:snmp_graph][:default_ksc_graph],
@@ -2086,7 +2117,8 @@ template "#{onms_home}/etc/syslogd-configuration.xml" do
     :apache_httpd           => node[:opennms][:syslogd][:apache_httpd],
     :linux_kernel           => node[:opennms][:syslogd][:linux_kernel],
     :openssh                => node[:opennms][:syslogd][:openssh],
-    :sudo                   => node[:opennms][:syslogd][:sudo]
+    :sudo                   => node[:opennms][:syslogd][:sudo],
+    :files                  => node[:opennms][:syslogd][:files]
   )
 end
 

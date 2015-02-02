@@ -18,6 +18,9 @@ template "#{onms_home}/etc/xml-datacollection-config.xml" do
     :threegpp_full_15min => node[:opennms][:xml][:threegpp_full_15min],
     :threegpp_sample     => node[:opennms][:xml][:threegpp_sample]
   )
+  not_if do
+    File.exists?("#{onms_home}/etc/xml-datacollection-config.xml")
+  end
 end
 
 

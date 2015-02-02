@@ -6,10 +6,14 @@ use_inline_resources
 
 action :create do
   if @current_resource.exists
-    Chef::Log.info "#{ @new_resource } already exists - need to update."
-    converge_by("Create #{ @new_resource }") do
-      update_poller_service
-      new_resource.updated_by_last_action(true)
+    if @current_resource.changed
+      Chef::Log.info "#{ @new_resource } already exists - need to update."
+      converge_by("Create #{ @new_resource }") do
+        update_poller_service
+        new_resource.updated_by_last_action(true)
+      end
+    else
+      Chef::Log.info "#{ @new_resource } already exists - not changed."
     end
   else
     Chef::Log.info "#{ @new_resource } doesn't exist - need to create."
@@ -24,9 +28,24 @@ def load_current_resource
   @current_resource = Chef::Resource::OpennmsPollerService.new(@new_resource.name)
   @current_resource.name(@new_resource.name)
   @current_resource.package_name(@new_resource.package_name)
+  @current_resource.interval(@new_resource.interval)
+  @current_resource.user_defined(@new_resource.user_defined)
+  @current_resource.status(@new_resource.status)
+  @current_resource.timeout(@new_resource.timeout)
+  @current_resource.port(@new_resource.port)
+  @current_resource.params(@new_resource.params)
+  @current_resource.class_name(@new_resource.class_name)
 
   if service_exists?(@current_resource.package_name, @current_resource.name)
      @current_resource.exists = true
+  end
+  if service_changed?(@current_resource.name, @current_resource.package_name,
+                      @current_resource.interval,
+                      @current_resource.user_defined,
+                      @current_resource.status, @current_resource.timeout,
+                      @current_resource.port, @current_resource.params,
+                      @current_resource.class_name)
+    @current_resource.changed = true
   end
 end
 
@@ -38,6 +57,58 @@ def service_exists?(package_name, name)
   file = ::File.new("#{node['opennms']['conf']['home']}/etc/poller-configuration.xml", "r")
   doc = REXML::Document.new file
   !doc.elements["/poller-configuration/package[@name='#{package_name}']/service[@name='#{name}']"].nil?
+end
+
+def service_changed?(name, package_name, interval, user_defined, status,
+                     timeout, port, params, class_name)
+  Chef::Log.debug "Checking to see if this poller service has changed: '#{name}'"
+  file = ::File.new("#{node['opennms']['conf']['home']}/etc/poller-configuration.xml", "r")
+  doc = REXML::Document.new file
+  service_el = doc.elements["/poller-configuration/package[@name='#{package_name}']/service[@name='#{name}']"]
+  curr_interval = nil 
+  curr_interval = service_el.attributes['interval'] unless service_el.nil?
+  Chef::Log.debug "curr_interval: '#{curr_interval}'; interval: #{interval}"
+  return true if !interval.nil? && curr_interval != "#{interval}"
+  curr_user_defined = service_el.attributes['user-defined']
+  Chef::Log.debug "curr_user_defined: '#{curr_user_defined}'"
+  return true if !user_defined.nil? && curr_user_defined != "#{user_defined}"
+  curr_status = service_el.attributes['status']
+  Chef::Log.debug "curr_status: '#{curr_status}'"
+  return true if !status.nil? && curr_status != status
+  tel = service_el.elements["parameter[@key = 'timeout']"]
+  if tel.nil?
+    Chef::Log.debug "timeout: '#{timeout}'"
+    return true unless timeout.nil?
+  else
+    curr_timeout = tel.attributes['value']
+    Chef::Log.debug "curr_timeout: '#{curr_timeout}'"
+    return true if !timeout.nil? && curr_timeout != "#{timeout}"
+  end
+  pel = service_el.elements["parameter[@key = 'port']"]
+  if pel.nil?
+    return true unless port.nil?
+  else
+    curr_port = pel.attributes['value']
+    Chef::Log.debug "curr_port: '#{curr_port}'"
+    return true if !port.nil? && curr_port != "#{port}"
+  end
+  curr_params = {}
+  service_el.elements.each("parameter[@key != 'port' and @key != 'timeout']") do |p|
+    bval =  -1
+    bval = true if p.attributes['value'] == 'true'
+    bval = false if p.attributes['value'] == 'false'
+    fixnum_val = Integer(p.attributes['value']) rescue false
+    if bval != -1
+      curr_params[p.attributes['key']] = bval
+    elsif fixnum_val != false
+      curr_params[p.attributes['key']] = fixnum_val
+    else
+      curr_params[p.attributes['key']] = p.attributes['value']
+    end
+  end
+  Chef::Log.debug "curr_params: '#{curr_params}'; params: #{params}"
+  return true if !params.nil? && curr_params != params
+  return false
 end
 
 def update_poller_service

@@ -7,7 +7,20 @@ use_inline_resources
 action :create do
   Chef::Application.fatal!("Missing xml-collection #{@current_resource.collection_name}.") if !@current_resource.collection_exists
   if @current_resource.exists
-    Chef::Log.info "#{ @new_resource } already exists - nothing to do."
+    Chef::Log.info "#{ @new_resource } already exists - updating import-groups files as necessary."
+    updated = false
+    if !new_resource.import_groups.nil?
+      new_resource.import_groups.each do |file|
+        f = cookbook_file file do
+          path "#{node['opennms']['conf']['home']}/etc/xml-datacollection/#{file}"
+          owner "root"
+          group "root"
+          mode 00644
+        end
+        updated = f.updated_by_last_action? unless updated
+      end
+    end
+    new_resource.updated_by_last_action(updated)
   else
     converge_by("Create #{ @new_resource }") do
       create_xml_source
@@ -25,7 +38,7 @@ def load_current_resource
      @current_resource.collection_exists = true
   end
   if source_exists?(@current_resource.collection_name, @current_resource.name)
-     @current_resource.collection_exists = true
+     @current_resource.exists = true
   end
 end
 
@@ -83,8 +96,9 @@ def create_xml_source
   end
   if new_resource.import_groups
     new_resource.import_groups.each { |gf|
+      gf = gf.strip
       ig_el = source_el.add_element 'import-groups'
-      ig_el.add_text(REXML::CData.new("xml-datacollection/#{gf}"))
+      ig_el.add_text("xml-datacollection/#{gf}")
       cookbook_file gf do
         path "#{node['opennms']['conf']['home']}/etc/xml-datacollection/#{gf}"
         owner "root"
@@ -111,6 +125,7 @@ def create_xml_source
   out = ""
   formatter = REXML::Formatters::Pretty.new(2)
   formatter.compact = true
+  formatter.width = 100000
   formatter.write(doc, out)
   ::File.open("#{node['opennms']['conf']['home']}/etc/xml-datacollection-config.xml", "w"){ |file| file.puts(out) }
 end

@@ -61,7 +61,7 @@ def create_notification
   dp_el = notif_el.add_element 'destinationPath'
   dp_el.add_text new_resource.destination_path
   tm_el = notif_el.add_element 'text-message'
-  tm_el.add_text new_resource.text_message
+  tm_el.add_text REXML::CData.new(new_resource.text_message)
   if !new_resource.subject.nil?
     subject_el = notif_el.add_element 'subject'
     subject_el.add_text new_resource.subject

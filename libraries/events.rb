@@ -14,12 +14,24 @@ module Events
   end
   def uei_exists?(uei, node)
     exists = uei_in_file?("#{node['opennms']['conf']['home']}/etc/eventconf.xml", uei)
-    
+    # let's cheat!
+    eventfile = `grep -l #{uei} #{node['opennms']['conf']['home']}/etc/events/*.xml`
+    if eventfile != '' && eventfile.lines.to_a.length == 1
+      return uei_in_file?(eventfile.chomp, uei)
+    else
+      # if multiple files match, only return if true since could be a regex false positive.
+      eventfile.lines.each do |file|
+        return true if uei_in_file?(file.chomp, uei)
+      end
+    end
+    # okay, we'll do it right now, but this is slow.
+    Chef::Log.debug("Starting dir search for uei #{uei}")
     Dir.foreach("#{node['opennms']['conf']['home']}/etc/events") do |file|
       next if file !~ /.*\.xml$/
       exists = uei_in_file?("#{node['opennms']['conf']['home']}/etc/events/#{file}", uei)
       break if exists
     end
+    Chef::Log.debug("dir search for uei #{uei} complete")
     exists
   end
   def uei_in_file?(file, uei)
@@ -40,10 +52,10 @@ module Events
     eventfile
   end
   def add_file_to_eventconf(file, position, node)
-    Chef::Log.info "file is #{file}"
+    Chef::Log.debug "file is #{file}"
     if file =~ /^events\/(.*)$/ 
       file = $1
-      Chef::Log.info "file is now #{file}"
+      Chef::Log.debug "file is now #{file}"
     end
     f = ::File.new("#{node['opennms']['conf']['home']}/etc/eventconf.xml")
     contents = f.read

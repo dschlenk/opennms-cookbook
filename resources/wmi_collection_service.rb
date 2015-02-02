@@ -21,4 +21,4 @@ attribute :retry_count, :kind_of => Fixnum, :default => 1
 attribute :port, :kind_of => Fixnum
 attribute :thresholding_enabled, :kind_of => [FalseClass, TrueClass], :default => false
 
-attr_accessor :exists
+attr_accessor :exists, :changed

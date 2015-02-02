@@ -15,4 +15,4 @@ attribute :port, :kind_of => Fixnum
 attribute :params, :kind_of => Hash, :default => {}
 attribute :class_name, :kind_of => String, :required => true
 
-attr_accessor :exists, :package_exists
+attr_accessor :exists, :package_exists, :changed

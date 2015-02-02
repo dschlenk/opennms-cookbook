@@ -34,7 +34,11 @@
         anchor your regular expression matches with ^ and $, like in the examples below.  Failure to do so can
         cause extreme slowdowns, especially with large amounts of <ueiMatch> tags.
     -->
-
+    <% unless @files.nil? -%>
+    <% @files.each do |file| -%>
+    <import-file>syslog/<%=file%></import-file>
+    <% end -%>
+    <% end -%>
     <% if @apache_httpd -%>
     <import-file>syslog/ApacheHTTPD.syslog.xml</import-file>
     <% end -%>

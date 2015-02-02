@@ -63,7 +63,7 @@ def create_wmi_wpm
   doc = REXML::Document.new(contents, { :respect_whitespace => :all })
   doc.context[:attribute_quote] = :quote
   wpms_el = doc.elements["/wmi-datacollection-config/wmi-collection[@name='#{new_resource.collection_name}']/wpms"]
-  wpm_el = wpms_el.add_element 'wpm', {'name' => new_resource.name, 'wmiClass' => new_resource.wmi_class, 'keyvalue' => new_resource.keyvalue, 'recheckInterval' => new_resource.recheck_interval, 'ifType' => new_resource.if_type }
+  wpm_el = wpms_el.add_element 'wpm', {'name' => new_resource.name, 'wmiClass' => new_resource.wmi_class, 'keyvalue' => new_resource.keyvalue, 'recheckInterval' => new_resource.recheck_interval, 'ifType' => new_resource.if_type, 'resourceType' => new_resource.resource_type }
   if new_resource.wmi_namespace
     wpm_el.add_attribute('wmiNamespace' => new_resource.wmi_namespace)
   end

@@ -49,7 +49,19 @@ hostsfile_entry node['ipaddress'] do
   action [:create_if_missing, :append]
 end
 
-package "opennms" do
+package "opennms-webapp-jetty" do
+  version node['opennms']['version']
+  timeout 1200
+  action :install
+end
+
+package "opennms-core" do
+  version node['opennms']['version']
+  timeout 1200
+  action :install
+end
+
+package "opennms-docs" do
   version node['opennms']['version']
   timeout 1200
   action :install
@@ -114,6 +126,7 @@ template "#{onms_home}/etc/jetty.xml" do
   group "root"
   notifies :restart, "service[opennms]"
   variables(
+    :addl_handlers => node['opennms']['addl_handlers'],
     :ajp   => node['opennms']['properties']['jetty']['ajp'],
     :https_port => node['opennms']['properties']['jetty']['https_port'],
     :https_host => node['opennms']['properties']['jetty']['https_host'],
