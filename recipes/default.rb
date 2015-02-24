@@ -614,7 +614,7 @@ template "#{onms_home}/etc/jmx-datacollection-config.xml" do
     :enable_jboss   => node[:opennms][:jmx_dc][:enable_jboss],
     :jboss          => node[:opennms][:jmx_dc][:jboss],
     :enable_opennms => node[:opennms][:jmx_dc][:enable_opennms],
-    :jsr160         => node[:opennms][:jmx_dc][:jsr160],
+    :jsr160         => node[:opennms][:jmx_dc][:jsr160]
   )
 end
 

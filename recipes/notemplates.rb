@@ -129,7 +129,7 @@ template "#{onms_home}/etc/jetty.xml" do
     :addl_handlers => node['opennms']['addl_handlers'],
     :ajp   => node['opennms']['properties']['jetty']['ajp'],
     :https_port => node['opennms']['properties']['jetty']['https_port'],
-    :https_host => node['opennms']['properties']['jetty']['https_host'],
+    :https_host => node['opennms']['properties']['jetty']['https_host']
   )
 end
 
