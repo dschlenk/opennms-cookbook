@@ -145,6 +145,7 @@ suites:
       - recipe[opennms::example_response_graph]
       - recipe[opennms::example_threshold]
       - recipe[opennms::example_system_def]
+      - recipe[opennms::example_avail_category]
 #  - name: notemplates
 #    run_list:
 #      - recipe[java]

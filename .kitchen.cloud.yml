@@ -176,3 +176,28 @@ suites:
       - recipe[postgresql::config_initdb]
       - recipe[postgresql::config_pgtune]
       - recipe[opennms::notemplates]
+  - name: avail_views
+    run_list:
+      - recipe[java]
+      - recipe[yum-centos::default]
+      - recipe[yum-epel::default]
+      - recipe[postgresql::client]
+      - recipe[postgresql::server]
+      - recipe[postgresql::contrib]
+      - recipe[postgresql::config_initdb]
+      - recipe[postgresql::config_pgtune]
+      - recipe[opennms::notemplates]
+      - recipe[opennms::example_avail_category]
+      - recipe[opennms::example_avail_view_section]
+  - name: wallboard
+    run_list:
+      - recipe[java]
+      - recipe[yum-centos::default]
+      - recipe[yum-epel::default]
+      - recipe[postgresql::client]
+      - recipe[postgresql::server]
+      - recipe[postgresql::contrib]
+      - recipe[postgresql::config_initdb]
+      - recipe[postgresql::config_pgtune]
+      - recipe[opennms::notemplates]
+      - recipe[opennms::example_wallboard]
