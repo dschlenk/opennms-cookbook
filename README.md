@@ -2,7 +2,7 @@ Description
 ===========
 
 A Chef cookbook to manage the installation and configuration of OpenNMS.
-Current version of templates are based on OpenNMS release 14.0.
+Current version of templates are based on OpenNMS release 14.0.x
 
 Status
 ======
@@ -12,7 +12,7 @@ Things generally work. Use the latest tag. Tags happen when a decent chunk of ne
 Requirements
 ============
 
-* Chef 11.x
+* Chef 11.x+
 * CentOS 6.x. Debian/Ubuntu support shouldn't be too hard to do - if anyone wants to head that up let me know. 
 * Some experience using OpenNMS without the benefit of configuration management.
 * The need to manage many instances of OpenNMS.
@@ -31,11 +31,8 @@ Usage
 
 Running the default recipe will install OpenNMS 14.0 (or a custom version using the attribute `node[:opennms][:version]`) on CentOS 6.x from the official repo with the default configuration. It will also execute `'$ONMS_HOME/bin/runjava -s` if `$ONMS_HOME/etc/java.conf` is not present and `$ONMS_HOME/bin/install -dis` if `$ONMS_HOME/etc/configured` is not present.
 
-Also, most configuration files are templated and can be overridden with environment, role, or node attributes.  See the default attributes file for a list of configuration items that can be changed in this manner, or keep reading for a brief overview of each template available. Some general notes:
+There are two primary ways to use this cookbook: as an application cookbook or library cookbook. If you simply want to tweak a few settings to the default OpenNMS configuration, you can use the `default` recipe of this cookbook directly and modify node attributes to suit your needs. There are also a plethora of LWRPs that you can use to do more in depth customizations. If you go that route I recommend starting with the `notemplates` recipe and then using those LWRPs (and maybe a few of the templates in this cookbook) to define your run list. If your node's run list contains both the template and a resource that manages the same file you'll end up with a lot of churn during the chef client run, which is a waste of time and will probably cause unnecessary restarts of OpenNMS. 
 
-* Default attribute values set to `nil` mean that the file's default value is commented out in the original file and will remain so unless set to a non-nil value.
-* For XML configuration files, you can disable or modify elements that exist in the default configuration, but in general if you want to add something new or drastically change something you will want to disable the default config and use the appropriate LWRP in your own cookbook/recipe.
-* Some items that exist in the default configuration but are commented out can be turned on with attributes. Future work needed here for common use cases like switching to RRDTool and enabling the access point monitor as well as some things present in the examples. 
 
 You probably also want to check out the community java (https://github.com/socrata-cookbooks/java) and postgresql (https://github.com/hw-cookbooks/postgresql) cookbooks. Here's my default overrides for each:
 
@@ -76,9 +73,10 @@ node[:opennms][:conf][:start_timeout] = 20
 node[:opennms][:conf][:heap_size] = 1024
 ```
 
-### Other Recipes
+### Recipes
 
-* `opennms::notemplates` Everything default does except minimal templates are used - etc/opennms.conf, etc/opennms.properties and etc/jetty.xml.
+* `opennms::default` Installs and configures OpenNMS with the standard configuration modified with any node attribute values changed from their defaults.
+* `opennms::notemplates` Everything default does except minimal templates are used - etc/opennms.conf, etc/opennms.properties and etc/jetty.xml. Use this recipe if you intend to use any of the LWRPs in this cookbook.
 * `opennms::nsclient` installs the optional nsclient data collection plugin and uses the template for etc/nsclient-datacollection-config.xml. 
 * `opennms::xml` installs the optional xml data collection plugin and uses the template for etc/xml-datacollection-config.xml. 
 
@@ -86,7 +84,7 @@ node[:opennms][:conf][:heap_size] = 1024
 
 As a general rule these LWRPs support a single action: `create` and most of them behave more like `create_if_missing` does in other cookbooks. In other words, updating is generally not supported. This may change in future releases. 
 
-Also, there are example recipes in the cookbook for most every LWRP named `opennms::example_<LWRP_NAME>`.
+Also, there are example recipes in the cookbook for most every LWRP named `opennms::example_<LWRP_NAME>`. Eventually these will become tests. 
 
 The list of implemented LWRPs is as follows: 
 
@@ -130,7 +128,7 @@ These LWRPs use a cookbook library named Provision that I wrote to perform the w
 
 #### Node Service Credential Configuration
 
-These LWRPs allow you to define the credentials necessary to connect to services on monitored nodes. These are one of the few that currently implements updating and deleting. Action `:create` will update if changes are detected but `:create_if_missing` will do nothing. To determine if a resource needs to be updated or deleted, existance is determined by all definition element attributes being equal (so all resource attributes except `ranges`, `specifics`, `ip_matches` and `position`). 
+These LWRPs allow you to define the credentials necessary to connect to services on monitored nodes. These are some of the few that currently implement updating and deleting. Action `:create` will update if changes are detected but `:create_if_missing` will do nothing. To determine if a resource needs to be updated or deleted, existance is determined by all definition element attributes being equal (so all resource attributes except `ranges`, `specifics`, `ip_matches` and `position`). 
 
 If an update occurs, the values contained in the new resource will be used. Note that all `range`, `specific` and `ip-match` elements that exist currently in the definition will be removed before the new elements are added. 
 
@@ -184,7 +182,18 @@ See examples for all of these LWRPs are in a single recipe, `example_threshold`.
 * `opennms_threshold`: Create a new threshold in the specified group in thresholds.xml. 
 * `opennms_expression`: Create a new expression threshold in the specified group in thresholds.xml. 
 
+#### Web UI
+
+There are a couple LWRPs for managing the Web UI. All of these support updating.
+
+* `opennms_avail_category`: Define categories for use in the Availability box on the main page (and the Summary dashlet in Ops Board).
+* `opennms_avail_view`: Define the list of categories in each view sections displayed in the Availability box on the main page (and the Summary dashlet in Ops Board).
+* `opennms_wallboard`: Create a wallboard. 
+* `opennms_dashlet`: Add a dashlet to a wallboard.
+
 ### Template Overview
+
+Most configuration files are templated and can be overridden with environment, role, or node attributes.  See the default attributes file for a list of configuration items that can be changed in this manner, or keep reading for a brief overview of each template available. Default attribute values set to `nil` mean that the file's default value is commented out in the original file and will remain so unless set to a non-nil value.
 
 #### Access Point Monitor (etc/access-point-monitor-configuration.xml)
 
