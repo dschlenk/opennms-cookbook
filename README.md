@@ -190,6 +190,7 @@ There are a couple LWRPs for managing the Web UI. All of these support updating.
 * `opennms_avail_view`: Define the list of categories in each view sections displayed in the Availability box on the main page (and the Summary dashlet in Ops Board).
 * `opennms_wallboard`: Create a wallboard. 
 * `opennms_dashlet`: Add a dashlet to a wallboard.
+* `opennms_surveillance_view`: Manage surveillance views used in the legacy dashboard, Ops Board, and optionally on the front page. Note: does not verify that the categories you reference exist, because there's no ReST interface (yet). 
 
 ### Template Overview
 
