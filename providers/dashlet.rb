@@ -92,7 +92,9 @@ def dashlet_changed?(wallboard, title, boost_duration, boost_priority,
   curr_parameters = {}
   dashlet.elements["parameters"].elements.each 'entry' do |entry|
     key = entry.elements["key"].text.strip
-    value = entry.elements["value"].text.strip
+    # it's valid to have no text for the value
+    value = entry.elements["value"].text
+    value.strip! unless value.nil?
     curr_parameters[key] = value
   end
   Chef::Log.info "#{curr_parameters} != #{parameters}?"
