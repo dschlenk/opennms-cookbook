@@ -9,7 +9,7 @@ action :create do
   Chef::Application.fatal!("Missing requisition #{@current_resource.foreign_source_name}.") if !@current_resource.import_exists
   Chef::Application.fatal!("Missing node with foreign ID #{@current_resource.foreign_id}.") if !@current_resource.node_exists
   if @current_resource.exists
-    if @new_resource.sync_import
+    if @new_resource.sync_import && @new_resource.sync_existing
       converge_by("Exists, but syncing import #{ @new_resource }") do
         sync_import_node_interface
         new_resource.updated_by_last_action(true)
