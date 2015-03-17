@@ -9,7 +9,14 @@ action :create do
   Chef::Application.fatal!("Missing requisition #{@current_resource.foreign_source_name}.") if !@current_resource.import_exists
   Chef::Application.fatal!("Missing node with foreign ID #{@current_resource.foreign_id}.") if !@current_resource.node_exists
   if @current_resource.exists
-    Chef::Log.info "#{ @new_resource } already exists - nothing to do."
+    if @new_resource.sync_import
+      converge_by("Exists, but syncing import #{ @new_resource }") do
+        sync_import_node_interface
+        new_resource.updated_by_last_action(true)
+      end
+    else
+      Chef::Log.info "#{ @new_resource } already exists - nothing to do."
+    end
   else
     converge_by("Create #{ @new_resource }") do
       create_import_node_interface
@@ -43,6 +50,11 @@ def create_import_node_interface
     new_resource.foreign_id, new_resource.status, 
     new_resource.managed, new_resource.snmp_primary, node)
   Chef::Log.info "Added interface. Doing import..."
-  sync_import(new_resource.foreign_source_name,true, node) if !new_resource.sync_import.nil? && new_resource.sync_import
+  sync_import(new_resource.foreign_source_name, true, node) if !new_resource.sync_import.nil? && new_resource.sync_import
   Chef::Log.info "imported!"
+end
+
+def sync_import_node_interface
+  Chef::Log.info "syncing import!"
+  sync_import(new_resource.foreign_source_name, true, node)
 end
