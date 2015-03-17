@@ -53,7 +53,7 @@ end
 private
 
 def service_exists?(package_name, name)
-  Chef::Log.debug "Checking to see if this poller service exists: '#{ name }'"
+  Chef::Log.info "Checking to see if this poller service exists: '#{ name }'"
   file = ::File.new("#{node['opennms']['conf']['home']}/etc/poller-configuration.xml", "r")
   doc = REXML::Document.new file
   !doc.elements["/poller-configuration/package[@name='#{package_name}']/service[@name='#{name}']"].nil?
@@ -61,27 +61,27 @@ end
 
 def service_changed?(name, package_name, interval, user_defined, status,
                      timeout, port, params, class_name)
-  Chef::Log.debug "Checking to see if this poller service has changed: '#{name}'"
+  Chef::Log.info "Checking to see if this poller service has changed: '#{name}'"
   file = ::File.new("#{node['opennms']['conf']['home']}/etc/poller-configuration.xml", "r")
   doc = REXML::Document.new file
   service_el = doc.elements["/poller-configuration/package[@name='#{package_name}']/service[@name='#{name}']"]
   curr_interval = nil 
   curr_interval = service_el.attributes['interval'] unless service_el.nil?
-  Chef::Log.debug "curr_interval: '#{curr_interval}'; interval: #{interval}"
+  Chef::Log.info "curr_interval: '#{curr_interval}'; interval: #{interval}"
   return true if !interval.nil? && curr_interval != "#{interval}"
   curr_user_defined = service_el.attributes['user-defined']
-  Chef::Log.debug "curr_user_defined: '#{curr_user_defined}'"
+  Chef::Log.info "curr_user_defined: '#{curr_user_defined}'"
   return true if !user_defined.nil? && curr_user_defined != "#{user_defined}"
   curr_status = service_el.attributes['status']
-  Chef::Log.debug "curr_status: '#{curr_status}'"
+  Chef::Log.info "curr_status: '#{curr_status}'"
   return true if !status.nil? && curr_status != status
   tel = service_el.elements["parameter[@key = 'timeout']"]
   if tel.nil?
-    Chef::Log.debug "timeout: '#{timeout}'"
+    Chef::Log.info "timeout: '#{timeout}'"
     return true unless timeout.nil?
   else
     curr_timeout = tel.attributes['value']
-    Chef::Log.debug "curr_timeout: '#{curr_timeout}'"
+    Chef::Log.info "curr_timeout: '#{curr_timeout}'"
     return true if !timeout.nil? && curr_timeout != "#{timeout}"
   end
   pel = service_el.elements["parameter[@key = 'port']"]
@@ -89,7 +89,7 @@ def service_changed?(name, package_name, interval, user_defined, status,
     return true unless port.nil?
   else
     curr_port = pel.attributes['value']
-    Chef::Log.debug "curr_port: '#{curr_port}'"
+    Chef::Log.info "curr_port: '#{curr_port}'"
     return true if !port.nil? && curr_port != "#{port}"
   end
   curr_params = {}
@@ -106,7 +106,7 @@ def service_changed?(name, package_name, interval, user_defined, status,
       curr_params[p.attributes['key']] = p.attributes['value']
     end
   end
-  Chef::Log.debug "curr_params: '#{curr_params}'; params: #{params}"
+  Chef::Log.info "curr_params: '#{curr_params}'; params: #{params}"
   return true if !params.nil? && curr_params != params
   return false
 end
