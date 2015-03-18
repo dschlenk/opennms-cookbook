@@ -170,7 +170,7 @@ def specifics_equal?(def_el, specifics)
     curr_specifics.push specific.text
   end
   curr_specifics.sort!
-  Chef::Log.debug("specifics equal? #{curr_specific} == #{specifics.sort}"
+  Chef::Log.debug("specifics equal? #{curr_specific} == #{specifics.sort}")
   return curr_specifics == specifics.sort
 end
 
@@ -182,7 +182,7 @@ def ip_matches_equal?(def_el, ip_matches)
     curr_ipm.push ipm.text
   end
   curr_ipm.sort!
-  Chef::Log.debug("ip matches equal? #{curr_ipm} == #{ip_matches.sort}"
+  Chef::Log.debug("ip matches equal? #{curr_ipm} == #{ip_matches.sort}")
   return curr_ipm == ip_matches.sort
 end
 
