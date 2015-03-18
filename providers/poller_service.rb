@@ -93,12 +93,19 @@ def service_changed?(name, package_name, interval, user_defined, status,
     return true if "#{curr_port}" != "#{port}"
   end
   curr_params = {}
+  params_str = {}
+  # make a version of params that has strings for both keys and values
+  # just so we can compare without forcing certain param values to
+  # be specific types
+  params.each do |k,v|
+    params_str["#{k}"] = "#{v}" 
+  end
   service_el.elements.each("parameter[@key != 'port' and @key != 'timeout']") do |p|
     val = "#{p.attributes['value']}" # make a string outta whatever this was
     curr_params[p.attributes['key']] = val
   end
-  Chef::Log.debug "curr_params: '#{curr_params}'; params: #{params}"
-  return true if !params.nil? && curr_params != params
+  Chef::Log.debug "curr_params: '#{curr_params}'; params: #{params_str}"
+  return true if !params.nil? && curr_params != params_str
   return false
 end
 
