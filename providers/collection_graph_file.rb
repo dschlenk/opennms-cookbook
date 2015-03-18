@@ -8,10 +8,9 @@ use_inline_resources
 
 action :create do
   if @current_resource.exists
-    Chef::Log.info "#{ @new_resource } already exists - updating."
-    converge_by("Create #{ @new_resource }") do
-      update_collection_graph_file
-      new_resource.updated_by_last_action(true)
+    Chef::Log.info "#{ @new_resource } already exists - maybe updating."
+    converge_by("Update #{ @new_resource } if needed") do
+      new_resource.updated_by_last_action(update_collection_graph_file)
     end
   else
     Chef::Log.info "#{ @new_resource } doesn't exist - creating."
@@ -56,13 +55,14 @@ end
 private
 
 def update_collection_graph_file
-  cookbook_file new_resource.file do
+  f = cookbook_file new_resource.file do
     action :create
     path "#{node['opennms']['conf']['home']}/etc/snmp-graph.properties.d/#{new_resource.file}"
     owner "root"
     group "root"
     mode 00644
   end
+  f.updated_by_last_action?
 end
 
 def create_collection_graph_file

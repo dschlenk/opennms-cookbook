@@ -99,7 +99,7 @@ def load_current_resource
                         @current_resource.privacy_passphrase, 
                         @current_resource.privacy_protocol, 
                         @current_resource.enterprise_id)
-   if !def_el.nil?
+  if !def_el.nil?
      @current_resource.exists = true
      if ranges_equal?(def_el, @current_resource.ranges)\
      && specifics_equal?(def_el, @current_resource.specifics)\
@@ -147,6 +147,8 @@ def matching_def(doc, port, retry_count, timeout, read_community,
     && "#{def_el.attributes['enterprise-id']}" == "#{enterprise_id}"
       definition =  def_el
       break
+    else
+      Chef::Log.debug("#{def_el} doesn't match #{doc} #{port} #{retry_count} #{timeout} #{read_community} #{write_community} #{proxy_host} #{version} #{max_vars_per_pdu} #{max_repetitions} #{max_request_size} #{security_name} #{security_level} #{auth_passphrase} #{auth_protocol} #{engine_id} #{context_engine_id} #{context_name} #{privacy_passphrase} #{privacy_protocol} #{enterprise_id}")
     end
   end
   definition
