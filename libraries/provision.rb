@@ -75,7 +75,7 @@ module Provision
           unless policies.nil?
             policies.each do |policy|
               Chef::Log.debug "policy: #{policy}; name: #{foreign_source_name}"
-              return true if policy['name'] == foreign_source_name
+              return true if policy['name'] == policy_name
             end
           end
         end
