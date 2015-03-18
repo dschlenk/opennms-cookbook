@@ -170,7 +170,7 @@ def specifics_equal?(def_el, specifics)
     curr_specifics.push specific.text
   end
   curr_specifics.sort!
-  Chef::Log.debug("specifics equal? #{curr_specific} == #{specifics.sort}")
+  Chef::Log.debug("specifics equal? #{curr_specifics} == #{specifics.sort}")
   return curr_specifics == specifics.sort
 end
 
