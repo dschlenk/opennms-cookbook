@@ -146,118 +146,44 @@ def matching_def(doc, port, retry_count, timeout, read_community,
     && "#{def_el.attributes['privacy-protocol']}" == "#{privacy_protocol}"\
     && "#{def_el.attributes['enterprise-id']}" == "#{enterprise_id}"
       definition = def_el
-      Chef::Log.debug("#{def_el} does match #{doc} #{port} #{retry_count} #{timeout} #{read_community} #{write_community} #{proxy_host} #{version} #{max_vars_per_pdu} #{max_repetitions} #{max_request_size} #{security_name} #{security_level} #{auth_passphrase} #{auth_protocol} #{engine_id} #{context_engine_id} #{context_name} #{privacy_passphrase} #{privacy_protocol} #{enterprise_id}")
       break
-    else
-      Chef::Log.debug("#{def_el} doesn't match #{doc} #{port} #{retry_count} #{timeout} #{read_community} #{write_community} #{proxy_host} #{version} #{max_vars_per_pdu} #{max_repetitions} #{max_request_size} #{security_name} #{security_level} #{auth_passphrase} #{auth_protocol} #{engine_id} #{context_engine_id} #{context_name} #{privacy_passphrase} #{privacy_protocol} #{enterprise_id}")
     end
   end
   definition
 end
 
 def ranges_equal?(def_el, ranges)
+  Chef::Log.debug("Check for no ranges: #{def_el.elements["range"].nil?} && (#{ranges.nil?} || #{ranges.length == 0})")
   return true if def_el.elements["range"].nil? && (ranges.nil? || ranges.length == 0)
-  equal = true # optimistic
-  found = false
-  if !ranges.nil?
-    ranges.each do |r_begin, r_end|
-      def_el.elements.each("range") do |range|
-        if range.attributes['begin'] == r_begin && range.attributes['end'] == r_end
-          found = true
-          break
-        end
-      end
-      break if found
-    end
+  curr_ranges = {}
+  def_el.elements.each('range') do |r_el|
+    curr_ranges[r_el.attributes['begin']] = r_el.attributes['end']
   end
-  equal = false if !found
-
-  if equal
-    found = false
-    def_el.elements.each("range") do |range|
-      if !ranges.nil?
-        ranges.each do |r_begin, r_end|
-          if r_begin == range.attributes['begin'] && r_end == range.attributes['end']
-            found = true
-            break
-          end
-        end
-      end
-      break if found
-    end
-    equal = false if !found
-  end
-  equal
+  return curr_ranges == ranges
 end
 
 def specifics_equal?(def_el, specifics)
+  Chef::Log.debug("Check for no specifics: #{def_el.elements["specific"].nil?} && (#{specific.nil?} || #{specific.length == 0})")
   return true if def_el.elements["specific"].nil? && (specifics.nil? || specifics.length == 0)
-  equal = true
-  found = false
-  if !specifics.nil?
-    specifics.each do |s|
-      def_el.elements.each("specific") do |specific|
-        if specific.get_text == s
-          found = true
-          break
-        end
-      end
-      break if found
-    end
+  curr_specifics = []
+  def_el.elements.each("specific") do |specific|
+    curr_specifics.push specific.text
   end
-  equal = false if !found
-
-  if equal
-    found = false
-    def_el.elements.each("specific") do |specific|
-      if !specifics.nil?
-        specifics.each do |s|
-          if s == specific.get_text
-            found = true
-            break
-          end
-        end
-      end
-      break if found
-    end
-    equal = false if !found
-  end
-  equal
+  curr_specifics.sort!
+  Chef::Log.debug("specifics equal? #{curr_specific} == #{specifics.sort}"
+  return curr_specifics == specifics.sort
 end
 
 def ip_matches_equal?(def_el, ip_matches)
+  Chef::Log.debug("Check for no ip_matches: #{def_el.elements["ip-match"].nil?} && (#{ip_matches.nil?} || #{ip_matches.length == 0})")
   return true if def_el.elements["ip-match"].nil? && (ip_matches.nil? || ip_matches.length == 0)
-  equal = true
-  found = false
-  if !ip_matches.nil?
-    ip_matches.each do |ipm|
-      def_el.elements.each("ip-match") do |ip_match|
-        if ip_match.get_text == ipm
-          found = true
-          break
-        end
-      end
-      break if found
-    end
+  curr_ipm = []
+  def_el.elements.each("ip-match") do |ipm|
+    curr_ipm.push ipm.text
   end
-  equal = false if !found
-
-  if equal
-    found = false
-    def_el.elements.each("ip-match") do |ip_match|
-      if !ip_matches.nil?
-        ip_matches.each do |ipm|
-          if ip_match.get_text == ipm
-            found = true
-            break
-          end
-        end
-        break if found
-      end
-    end
-    equal = false if !found
-  end
-  equal
+  curr_ipm.sort!
+  Chef::Log.debug("ip matches equal? #{curr_ipm} == #{ip_matches.sort}"
+  return curr_ipm == ip_matches.sort
 end
 
 def create_snmp_config_definition

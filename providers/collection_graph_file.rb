@@ -9,9 +9,7 @@ use_inline_resources
 action :create do
   if @current_resource.exists
     Chef::Log.info "#{ @new_resource } already exists - maybe updating."
-    converge_by("Update #{ @new_resource } if needed") do
-      new_resource.updated_by_last_action(update_collection_graph_file)
-    end
+    new_resource.updated_by_last_action(update_collection_graph_file)
   else
     Chef::Log.info "#{ @new_resource } doesn't exist - creating."
     converge_by("Create #{ @new_resource }") do
