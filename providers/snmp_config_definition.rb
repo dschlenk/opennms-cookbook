@@ -145,7 +145,8 @@ def matching_def(doc, port, retry_count, timeout, read_community,
     && "#{def_el.attributes['privacy-passphrase']}" == "#{privacy_passphrase}"\
     && "#{def_el.attributes['privacy-protocol']}" == "#{privacy_protocol}"\
     && "#{def_el.attributes['enterprise-id']}" == "#{enterprise_id}"
-      definition =  def_el
+      definition = def_el
+      Chef::Log.debug("#{def_el} does match #{doc} #{port} #{retry_count} #{timeout} #{read_community} #{write_community} #{proxy_host} #{version} #{max_vars_per_pdu} #{max_repetitions} #{max_request_size} #{security_name} #{security_level} #{auth_passphrase} #{auth_protocol} #{engine_id} #{context_engine_id} #{context_name} #{privacy_passphrase} #{privacy_protocol} #{enterprise_id}")
       break
     else
       Chef::Log.debug("#{def_el} doesn't match #{doc} #{port} #{retry_count} #{timeout} #{read_community} #{write_community} #{proxy_host} #{version} #{max_vars_per_pdu} #{max_repetitions} #{max_request_size} #{security_name} #{security_level} #{auth_passphrase} #{auth_protocol} #{engine_id} #{context_engine_id} #{context_name} #{privacy_passphrase} #{privacy_protocol} #{enterprise_id}")
@@ -155,6 +156,7 @@ def matching_def(doc, port, retry_count, timeout, read_community,
 end
 
 def ranges_equal?(def_el, ranges)
+  return true if def_el.elements["range"].nil? && (ranges.nil? || ranges.length == 0)
   equal = true # optimistic
   found = false
   if !ranges.nil?
@@ -189,6 +191,7 @@ def ranges_equal?(def_el, ranges)
 end
 
 def specifics_equal?(def_el, specifics)
+  return true if def_el.elements["specific"].nil? && (specifics.nil? || specifics.length == 0)
   equal = true
   found = false
   if !specifics.nil?
@@ -223,6 +226,7 @@ def specifics_equal?(def_el, specifics)
 end
 
 def ip_matches_equal?(def_el, ip_matches)
+  return true if def_el.elements["ip-match"].nil? && (ip_matches.nil? || ip_matches.length == 0)
   equal = true
   found = false
   if !ip_matches.nil?
