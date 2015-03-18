@@ -153,7 +153,7 @@ def matching_def(doc, port, retry_count, timeout, read_community,
 end
 
 def ranges_equal?(def_el, ranges)
-  Chef::Log.debug("Check for no ranges: #{def_el.elements["range"].nil?} && (#{ranges.nil?} || #{ranges.length == 0})")
+  Chef::Log.debug("Check for no ranges: #{def_el.elements["range"].nil?} && #{ranges}")
   return true if def_el.elements["range"].nil? && (ranges.nil? || ranges.length == 0)
   curr_ranges = {}
   def_el.elements.each('range') do |r_el|
@@ -163,7 +163,7 @@ def ranges_equal?(def_el, ranges)
 end
 
 def specifics_equal?(def_el, specifics)
-  Chef::Log.debug("Check for no specifics: #{def_el.elements["specific"].nil?} && (#{specific.nil?} || #{specific.length == 0})")
+  Chef::Log.debug("Check for no specifics: #{def_el.elements["specific"].nil?} && #{specifics}")
   return true if def_el.elements["specific"].nil? && (specifics.nil? || specifics.length == 0)
   curr_specifics = []
   def_el.elements.each("specific") do |specific|
@@ -175,7 +175,7 @@ def specifics_equal?(def_el, specifics)
 end
 
 def ip_matches_equal?(def_el, ip_matches)
-  Chef::Log.debug("Check for no ip_matches: #{def_el.elements["ip-match"].nil?} && (#{ip_matches.nil?} || #{ip_matches.length == 0})")
+  Chef::Log.debug("Check for no ip_matches: #{def_el.elements["ip-match"].nil?} && #{ip_matches.nil?}")
   return true if def_el.elements["ip-match"].nil? && (ip_matches.nil? || ip_matches.length == 0)
   curr_ipm = []
   def_el.elements.each("ip-match") do |ipm|
