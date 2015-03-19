@@ -9,7 +9,15 @@ use_inline_resources
 action :create do
   if @current_resource.exists
     Chef::Log.info "#{ @new_resource } already exists - maybe updating."
-    new_resource.updated_by_last_action(update_collection_graph_file)
+    updated = update_collection_graph_file
+    if updated
+      converge_by("Update #{ @new_resource }") do
+        touch_main_file
+        new_resource.updated_by_last_action(true)
+      end
+    else
+      new_resource.updated_by_last_action(false)
+    end
   else
     Chef::Log.info "#{ @new_resource } doesn't exist - creating."
     converge_by("Create #{ @new_resource }") do
@@ -71,6 +79,7 @@ def create_collection_graph_file
     group "root"
     mode 00644
   end
+  touch_main_file
 end
 
 def delete_collection_graph_file
@@ -79,5 +88,12 @@ def delete_collection_graph_file
     owner "root"
     group "root"
     mode 00644
+  end
+  touch_main_file
+end
+
+def touch_main_file
+  file "#{node['opennms']['conf']['home']}/etc/snmp-graph.properties" do
+    action :touch
   end
 end

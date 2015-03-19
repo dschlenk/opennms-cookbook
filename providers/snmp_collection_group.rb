@@ -17,7 +17,14 @@ action :create do
       end
       updated = f.updated_by_last_action?
     end
-    new_resource.updated_by_last_action(updated)
+    if updated
+      converge_by("Update #{ @new_resource }") do
+        restart_collectd
+        new_resource.updated_by_last_action(true)
+      end
+    else
+      new_resource.updated_by_last_action(false)
+    end
   else
     converge_by("Create #{ @new_resource }") do
       create_snmp_collection_group
@@ -79,4 +86,10 @@ def create_snmp_collection_group
   formatter.compact = true
   formatter.write(doc, out)
   ::File.open("#{node['opennms']['conf']['home']}/etc/datacollection-config.xml", "w"){ |file| file.puts(out) }
+end
+
+def restart_collectd
+  file "#{node['opennms']['conf']['home']}/etc/datacollection-config.xml" do
+    action :touch
+  end
 end

@@ -248,6 +248,7 @@ def create_snmp_config_definition
   formatter.compact = true
   formatter.write(doc, out)
   ::File.open("#{node['opennms']['conf']['home']}/etc/snmp-config.xml", "w"){ |file| file.puts(out) }
+  activate_changes
 end
 
 def update_snmp_config_definition
@@ -308,6 +309,7 @@ def update_snmp_config_definition
   formatter.compact = true
   formatter.write(doc, out)
   ::File.open("#{node['opennms']['conf']['home']}/etc/snmp-config.xml", "w"){ |file| file.puts(out) }
+  activate_changes
 end
 
 def delete_snmp_config_definition
@@ -345,4 +347,15 @@ def delete_snmp_config_definition
   formatter.compact = true
   formatter.write(doc, out)
   ::File.open("#{node['opennms']['conf']['home']}/etc/snmp-config.xml", "w"){ |file| file.puts(out) }
+  activate_changes
 end
+
+def activate_changes
+  ruby_block "noop" do
+    block do
+      noop = 1
+    end
+    notifies :run, "bash[restart_snmp_config.xml]"
+  end
+end
+

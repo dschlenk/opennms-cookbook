@@ -78,6 +78,8 @@ package "perl-XML-Twig" do
   action :install
 end
 
+include_recipe 'opennms::send_events'
+
 execute "runjava" do
   cwd onms_home
   creates "#{onms_home}/etc/java.conf"
