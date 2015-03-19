@@ -12,7 +12,7 @@ GRAPH
   chef-sugar (2.4.1)
   hostsfile (2.4.5)
   java (1.28.0)
-  opennms (1.0.2)
+  opennms (1.0.4)
     hostsfile (>= 0.0.0)
     java (>= 0.0.0)
     yum (>= 0.0.0)

@@ -78,6 +78,9 @@ def create_resource_type
   opennms_snmp_collection_group new_resource.group_name do
     collection_name 'default'
   end
+  file "#{node['opennms']['conf']['home']}/etc/datacollection-config.xml" do
+    action :touch
+  end
 end
 
 def include_resource_type

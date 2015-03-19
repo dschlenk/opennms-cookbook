@@ -9,6 +9,7 @@ send_event = "#{onms_home}/bin/send-event.pl"
 # things that support reloadDaemonConfig
 reload_daemons = {
   'Ackd' => { 'subscribes' => "template[#{onms_home}/etc/ackd-configuration.xml]" },
+  'Eventd' => { 'subscribes' => "template[#{onms_home}/etc/eventconf.xml]" },
   'Provisiond.MapProvisioningAdapter' => { 'subscribes' => "template[#{onms_home}/etc/mapsadapter-configuration.xml]" },
   'Notifd' => { 'subscribes' => "template[#{onms_home}/etc/notificationCommands.xml]" },
   'Provisiond' => { 'subscribes' => "template[#{onms_home}/etc/provisiond-configuration.xml]" },
@@ -22,15 +23,14 @@ reload_daemons = {
 }
 reload_daemons.each do |daemon, settings|
   name = daemon
+  params = ["daemonName #{name}"]
   cmd = "#{send_event} -p 'daemonName #{daemon}' #{reload_uei}"
   if daemon == 'Thresholds'
     name = 'Threshd' 
-    cmd = "#{send_event} -p 'daemonName #{daemon}' -p 'configFile #{settings['configFile']}' #{reload_uei}"
+    params = ["daemonName #{name}", "configFile #{settings['configFile']}"]
   end
-  bash "restart_#{name}" do
-    code cmd
-    user 'root'
-    cwd onms_home
+  opennms_send_event "restart_#{name}" do
+    parameters params
     action :nothing
     subscribes :create, settings['subscribes'], :delayed
   end
@@ -43,13 +43,11 @@ specific_ueis = {
   'snmp-config.xml' => 'uei.opennms.org/internal/configureSNMP',
   'syslogd-configuration.xml' => 'uei.opennms.org/internal/syslogdConfigChange',
 }
-specific_ueis.each do |file, uei|
-  Chef::Log.debug("Making bash resource 'restart_#{file}'")
-  bash "restart_#{file}" do
-    code "#{onms_home}/bin/send-event.pl #{uei}"
-    user 'root'
-    cwd onms_home
+specific_ueis.each do |file, u|
+  Chef::Log.debug("Making send_event resource 'activate_#{file}'")
+  opennms_send_event "activate_#{file}" do
+    uei u
     action :nothing
-    subscribes :create, "template[#{onms_home}/etc/#{file}]", :delayed
+    subscribes :create, "template[#{onms_home}/etc/#{file}]"
   end
 end

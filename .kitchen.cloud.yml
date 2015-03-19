@@ -215,3 +215,15 @@ suites:
       - recipe[postgresql::config_pgtune]
       - recipe[opennms::notemplates]
       - recipe[opennms::example_surveillance_view]
+  - name: send_event
+    run_list:
+      - recipe[java]
+      - recipe[yum-centos::default]
+      - recipe[yum-epel::default]
+      - recipe[postgresql::client]
+      - recipe[postgresql::server]
+      - recipe[postgresql::contrib]
+      - recipe[postgresql::config_initdb]
+      - recipe[postgresql::config_pgtune]
+      - recipe[opennms::notemplates]
+      - recipe[opennms::example_send_event]
