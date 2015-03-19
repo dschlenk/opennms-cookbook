@@ -355,7 +355,7 @@ def activate_changes
     block do
       noop = 1
     end
-    notifies :run, "bash[restart_snmp_config.xml]"
+    notifies :run, "bash[restart_snmp-config.xml]"
   end
 end
 
