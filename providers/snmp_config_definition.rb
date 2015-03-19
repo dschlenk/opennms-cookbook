@@ -351,11 +351,11 @@ def delete_snmp_config_definition
 end
 
 def activate_changes
-  ruby_block "noop" do
-    block do
-      noop = 1
-    end
-    notifies :run, "bash[restart_snmp-config.xml]"
+  onms_home = node['opennms']['conf']['home']
+  bash "activate_snmp_config" do
+    code "#{onms_home}/bin/send-event.pl uei.opennms.org/internal/configureSNMP"
+    user 'root'
+    cwd onms_home
+    action :run
   end
 end
-

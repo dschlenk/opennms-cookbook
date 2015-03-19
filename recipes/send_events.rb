@@ -44,6 +44,7 @@ specific_ueis = {
   'syslogd-configuration.xml' => 'uei.opennms.org/internal/syslogdConfigChange',
 }
 specific_ueis.each do |file, uei|
+  Chef::Log.debug("Making bash resource 'restart_#{file}'")
   bash "restart_#{file}" do
     code "#{onms_home}/bin/send-event.pl #{uei}"
     user 'root'
