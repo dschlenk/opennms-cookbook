@@ -29,7 +29,7 @@ reload_daemons.each do |daemon, settings|
     name = 'Threshd' 
     params = ["daemonName #{name}", "configFile #{settings['configFile']}"]
   end
-  opennms_send_event "restart_#{name}" do
+  opennms_send_event "restart_#{daemon}" do
     parameters params
     action :nothing
     subscribes :create, settings['subscribes'], :delayed
