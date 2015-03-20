@@ -15,6 +15,7 @@ opennms_poller_service "ONMS" do
   class_name "org.opennms.netmgt.poller.monitors.HttpMonitor"
   port 8980
   params 'url' => '/opennms/login.jsp', 'rrd-repository' => '/opt/opennms/share/rrd/response', 'rrd-base-name' => 'onms', 'ds-name' => 'onms'
+  notifies :restart, 'service[opennms]'
 end
 opennms_foreign_source "dry-source"
 opennms_import "dry-source"

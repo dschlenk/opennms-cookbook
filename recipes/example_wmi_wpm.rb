@@ -2,6 +2,7 @@ opennms_resource_type "wmi_thing" do
   group_name "metasyntactic"
   label "wmi resource"
   resource_label "${resource}"
+  notifies :restart, 'service[opennms]'
 end
 
 opennms_wmi_wpm "wmi_test_resource" do

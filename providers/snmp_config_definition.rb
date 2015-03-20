@@ -248,7 +248,6 @@ def create_snmp_config_definition
   formatter.compact = true
   formatter.write(doc, out)
   ::File.open("#{node['opennms']['conf']['home']}/etc/snmp-config.xml", "w"){ |file| file.puts(out) }
-  activate_changes
 end
 
 def update_snmp_config_definition
@@ -281,26 +280,33 @@ def update_snmp_config_definition
                         new_resource.enterprise_id)
 
   # remove all ranges, specifics and ip_matches that exist already
-  def_el.elements.delete_all('range')
-  def_el.elements.delete_all('specific')
-  def_el.elements.delete_all('ip-match')
+  # nope, this is a bad idea
+  #def_el.elements.delete_all('range')
+  #def_el.elements.delete_all('specific')
+  #def_el.elements.delete_all('ip-match')
   
   # put the new ones in
   if !new_resource.ranges.nil?
     new_resource.ranges.each do |r_begin, r_end|
-      def_el.add_element 'range', {'begin' => r_begin, 'end' => r_end}
+      if !def_el.nil? && def_el.elements["range[@begin = '#{r_begin}' and @end = '#{r_end}']"].nil?
+        def_el.add_element 'range', {'begin' => r_begin, 'end' => r_end}
+      end
     end
   end
   if !new_resource.specifics.nil?
     new_resource.specifics.each do |specific|
-      sel = def_el.add_element 'specific'
-      sel.add_text(specific)
+      if def_el.elements["specific[text() = '#{specific}']"].nil?
+        sel = def_el.add_element 'specific'
+        sel.add_text(specific)
+      end
     end
   end
   if !new_resource.ip_matches.nil?
     new_resource.ip_matches.each do |ip_match|
-      ipm_el = def_el.add_element 'ip-match'
-      ipm_el.add_text(ip_match)
+      if def_el.elements["ip-match[text() = '#{ip_match}']"].nil?
+        ipm_el = def_el.add_element 'ip-match'
+        ipm_el.add_text(ip_match)
+      end
     end
   end
 
@@ -309,7 +315,6 @@ def update_snmp_config_definition
   formatter.compact = true
   formatter.write(doc, out)
   ::File.open("#{node['opennms']['conf']['home']}/etc/snmp-config.xml", "w"){ |file| file.puts(out) }
-  activate_changes
 end
 
 def delete_snmp_config_definition
@@ -347,15 +352,4 @@ def delete_snmp_config_definition
   formatter.compact = true
   formatter.write(doc, out)
   ::File.open("#{node['opennms']['conf']['home']}/etc/snmp-config.xml", "w"){ |file| file.puts(out) }
-  activate_changes
-end
-
-def activate_changes
-  onms_home = node['opennms']['conf']['home']
-  bash "activate_snmp_config" do
-    code "#{onms_home}/bin/send-event.pl uei.opennms.org/internal/configureSNMP"
-    user 'root'
-    cwd onms_home
-    action :run
-  end
 end

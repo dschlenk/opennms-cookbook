@@ -5,6 +5,7 @@ opennms_notification_command "wallHost" do
   comment "wall the hostname"
   binary true
   arguments [{'streamed' => false, 'switch' => '-tm'}]
+  notifies :run, 'opennms_send_event[restart_Notifd]'
 end
 
 # now let's use it in a destination path target

@@ -13,6 +13,7 @@ opennms_notification "exampleDown" do
 #  params 'key' => 'value' - used by the notificationCommands.xml command as a switch. Must exist in the command to be used here otherwise fail.
   vbname 'snmpifname'
   vbvalue 'eth0'  
+  notifies :run, 'opennms_send_event[restart_Notifd]'
 end
 
 # minimal options

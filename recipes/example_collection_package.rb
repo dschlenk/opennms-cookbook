@@ -7,6 +7,7 @@ opennms_collection_package "foo" do
   include_urls ['file:/opt/opennms/etc/foo']
   store_by_if_alias true
   if_alias_domain 'foo.com'
+  # collectd requires a restart for changes to take effect
   notifies :restart, "service[opennms]", :delayed
 end
 

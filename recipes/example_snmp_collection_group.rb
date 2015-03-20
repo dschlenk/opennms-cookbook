@@ -5,5 +5,4 @@ opennms_snmp_collection_group "wibble-wobble" do
   # while the schema let's you do both at the same time, it doesn't make sense
   # logically at least if I understand the use case properly.
   #exclude_filters ["Wobble"]
-  notifies :restart, "service[opennms]", :delayed
 end

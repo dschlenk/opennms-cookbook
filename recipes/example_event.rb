@@ -7,4 +7,6 @@ opennms_event "uei.opennms.org/cheftest/thresholdExceeded" do
   logmsg_notify true
   severity "Minor"
   alarm_data 'reduction_key' => '%uei%:%dpname%:%nodeid%:%interface%:%parm[ds]%:%parm[threshold]%:%parm[trigger]%:%parm[rearm]%:%parm[label]%', 'alarm_type' => 1, 'auto_clean' => false
+  # tell Eventd to reload config
+  notifies :run, 'opennms_send_event[restart_Eventd]'
 end

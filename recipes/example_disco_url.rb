@@ -3,6 +3,7 @@ opennms_disco_url "file:/opt/opennms/etc/include" do
   file_name "include"
   retry_count 13
   timeout 4000
+  notifies :run, 'opennms_send_event[activate_discovery-configuration.xml]'
 end
 
 # minimal

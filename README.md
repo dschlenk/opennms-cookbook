@@ -33,6 +33,7 @@ Running the default recipe will install OpenNMS 14.0 (or a custom version using 
 
 There are two primary ways to use this cookbook: as an application cookbook or library cookbook. If you simply want to tweak a few settings to the default OpenNMS configuration, you can use the `default` recipe of this cookbook directly and modify node attributes to suit your needs. There are also a plethora of LWRPs that you can use to do more in depth customizations. If you go that route I recommend starting with the `notemplates` recipe and then using those LWRPs (and maybe a few of the templates in this cookbook) to define your run list. If your node's run list contains both the template and a resource that manages the same file you'll end up with a lot of churn during the chef client run, which is a waste of time and will probably cause unnecessary restarts of OpenNMS. 
 
+Template resources for daemons that support configuration changes without a restart will automatically send the proper event to activate changes. Add `notifies` to your resource to similar funcationality when using the LWRPs from this cookbook. See the example recipe for each LWRP for details.
 
 You probably also want to check out the community java (https://github.com/socrata-cookbooks/java) and postgresql (https://github.com/hw-cookbooks/postgresql) cookbooks. Here's my default overrides for each:
 
@@ -117,6 +118,7 @@ These LWRPs use a cookbook library named Provision that I wrote to perform the w
 
 * `opennms_eventconf`: adds an event-file element to events in etc/eventconf.xml. 
 * `opennms_event`: adds an event element to events in target eventconf file `file`. Not all elements from the eventconf schema are implemented, but the ones that seem to actually exist in the wild are. See resource for details and recipes `example_event` and `example_threshold` for example usage.
+* `opennms_send_event`: creates an actual instance of an event using the `send-event.pl` script in `$ONMS_HOME/bin`. Used by the `send_events` recipe, which is included by `default` and `notemplates` recipes to cause config file reloads to take place when template resources make changes or an LWRP sends a notification.
 
 #### Notifications
 

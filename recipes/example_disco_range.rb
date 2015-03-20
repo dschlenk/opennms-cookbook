@@ -5,6 +5,8 @@ opennms_disco_range "anRange" do
   range_type 'include'  # can be 'include' or 'exclude'
   retry_count 37
   timeout 6000
+  # tell discovery daemon to use new config
+  notifies :run, 'opennms_send_event[activate_discovery-configuration.xml]'
 end
 
 # minimal

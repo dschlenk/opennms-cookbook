@@ -5,15 +5,15 @@ end
 use_inline_resources
 
 action :run do
-  converge_by("Create #{ @new_resource }") do
+  converge_by("Run #{ @new_resource }") do
     send_event
     new_resource.updated_by_last_action(true)
   end
 end
 
-action :nothing do
-  new_resource.updated_by_last_action(false)
-end
+#action :nothing do
+#  new_resource.updated_by_last_action(false)
+#end
 
 def load_current_resource
   @current_resource = Chef::Resource::OpennmsSendEvent.new(@new_resource.name)

@@ -48,4 +48,11 @@ private
 def create_collection_graph
   Chef::Log.debug "Creating collection graph #{new_resource.name} in #{new_resource.file}."
   add_collection_graph(new_resource, node)
+  touch_main_file
+end
+
+def touch_main_file
+  file "#{node['opennms']['conf']['home']}/etc/snmp-graph.properties" do
+    action :touch
+  end
 end

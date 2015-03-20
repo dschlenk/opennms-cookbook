@@ -1,4 +1,4 @@
-actions :run,:nothing
+actions :run
 default_action :run
 
 # not used for anything but identifying the resource

@@ -8,31 +8,38 @@ send_event = "#{onms_home}/bin/send-event.pl"
 
 # things that support reloadDaemonConfig
 reload_daemons = {
-  'Ackd' => { 'subscribes' => "template[#{onms_home}/etc/ackd-configuration.xml]" },
-  'Eventd' => { 'subscribes' => "template[#{onms_home}/etc/eventconf.xml]" },
-  'Provisiond.MapProvisioningAdapter' => { 'subscribes' => "template[#{onms_home}/etc/mapsadapter-configuration.xml]" },
-  'Notifd' => { 'subscribes' => "template[#{onms_home}/etc/notificationCommands.xml]" },
-  'Provisiond' => { 'subscribes' => "template[#{onms_home}/etc/provisiond-configuration.xml]" },
-  'Scriptd' => { 'subscribes' => "template[#{onms_home}/etc/scriptd-configuration.xml]" },
-  'Provisiond.SnmpAssetProvisioningAdapter' => { 'subscribes' => "template[#{onms_home}/etc/snmp-asset-adapter-configuration.xml]" },
-  'Statsd' => { 'subscribes' => "template[#{onms_home}/etc/statsd-configuration.xml]" },
-  'Translator' => { 'subscribes' => "template[#{onms_home}/etc/translator-configuration.xml]" },
-  'Threshd' => { 'subscribes' => "template[#{onms_home}/etc/threshd-configuration.xml]"},
-  'Thresholds' => { 'configFile' => 'thresholds.xml', 'subscribes' => "template[#{onms_home}/etc/thresholds.xml]"},
-  'Vacuumd' => { 'subscribes' => "template[#{onms_home}/etc/vacuumd-configuration.xml]" }
+  'Ackd' => { 'template' => "ackd-configuration.xml]" },
+  'Eventd' => { 'template' => "eventconf.xml]" },
+  'Provisiond.MapProvisioningAdapter' => { 'template' => "mapsadapter-configuration.xml" },
+  'Notifd' => { 'template' => "notificationCommands.xml" },
+  'Provisiond' => { 'template' => "provisiond-configuration.xml" },
+  'Scriptd' => { 'template' => "scriptd-configuration.xml]" },
+  'Provisiond.SnmpAssetProvisioningAdapter' => { 'template' => "snmp-asset-adapter-configuration.xml" },
+  'Statsd' => { 'template' => "statsd-configuration.xml" },
+  'Translator' => { 'template' => "translator-configuration.xml" },
+  'Threshd' => { 'template' => "threshd-configuration.xml"},
+  'Thresholds' => { 'template' => "thresholds.xml"},
+  'Vacuumd' => { 'template' => "vacuumd-configuration.xml" }
 }
 reload_daemons.each do |daemon, settings|
-  name = daemon
-  params = ["daemonName #{name}"]
+  params = ["daemonName #{daemon}"]
   cmd = "#{send_event} -p 'daemonName #{daemon}' #{reload_uei}"
   if daemon == 'Thresholds'
-    name = 'Threshd' 
-    params = ["daemonName #{name}", "configFile #{settings['configFile']}"]
+    params = ["daemonName Threshd", "configFile thresholds.xml"]
+  end
+  tm = nil
+  file = "#{onms_home}/etc/#{settings['template']}"
+  begin
+    tm = resources(template: file)
+  rescue
+    Chef::Log.info("No template for #{settings['template']} found in run list.")
   end
   opennms_send_event "restart_#{daemon}" do
     parameters params
     action :nothing
-    subscribes :create, settings['subscribes'], :delayed
+    unless tm.nil?
+      subscribes :create, settings['subscribes'], :delayed
+    end
   end
 end
 
@@ -45,9 +52,17 @@ specific_ueis = {
 }
 specific_ueis.each do |file, u|
   Chef::Log.debug("Making send_event resource 'activate_#{file}'")
+  tm = nil
+  begin
+    tm = resources(template: file)
+  rescue
+    Chef::Log.info("No template for file #{file} found in run list.")
+  end
   opennms_send_event "activate_#{file}" do
     uei u
     action :nothing
-    subscribes :create, "template[#{onms_home}/etc/#{file}]"
+    unless tm.nil?
+      subscribes :create, resource, :delayed
+    end
   end
 end

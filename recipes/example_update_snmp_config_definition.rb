@@ -13,6 +13,7 @@ opennms_snmp_config_definition "update_v1v2c_all" do
   specifics ['192.168.0.1', '192.168.2.3']
   position 'top'
   action :create
+  notifies :run, 'opennms_send_event[activate_snmp-config.xml]'
 end
 
 # this will delete the existing definition from the standard test
@@ -20,6 +21,7 @@ opennms_snmp_config_definition "update_v1v2c_typical" do
   read_community 'public'
   version 'v2c'
   action :delete
+  notifies :run, 'opennms_send_event[activate_snmp-config.xml]'
 end
 
 
@@ -46,4 +48,5 @@ opennms_snmp_config_definition "update_v3all" do
   enterprise_id "8072" # maybe set this to your org's private enterprise number? who knows!
   position 'bottom'
   action :create_if_missing
+  notifies :run, 'opennms_send_event[activate_snmp-config.xml]'
 end
