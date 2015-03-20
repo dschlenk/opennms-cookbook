@@ -7,7 +7,7 @@ opennms_wmi_config_definition "create_all" do
   password 'lolnope'
   ranges '10.0.0.1' => '10.0.0.254', '172.17.16.1' => '172.17.16.254'
   specifics ['192.168.0.1', '192.168.1.2', '192.168.2.3']
-  ip_matches ['172.17.21.*','172.17.20.1*']
+  ip_matches ['172.17.21.*','172.17.20.*']
   position 'top'
   notifies :restart, 'service[opennms]'
 end

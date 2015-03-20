@@ -170,8 +170,10 @@ def specifics_equal?(def_el, specifics)
     curr_specifics.push specific.text
   end
   curr_specifics.sort!
-  Chef::Log.debug("specifics equal? #{curr_specifics} == #{specifics.sort}")
-  return curr_specifics == specifics.sort
+  Chef::Log.debug("specifics equal? #{curr_specifics} == #{specifics}")
+  sorted_specifics = nil
+  sorted_specifics = specifics.sort unless specifics.nil?
+  return curr_specifics == sorted_specifics
 end
 
 def ip_matches_equal?(def_el, ip_matches)
@@ -182,8 +184,10 @@ def ip_matches_equal?(def_el, ip_matches)
     curr_ipm.push ipm.text
   end
   curr_ipm.sort!
-  Chef::Log.debug("ip matches equal? #{curr_ipm} == #{ip_matches.sort}")
-  return curr_ipm == ip_matches.sort
+  Chef::Log.debug("ip matches equal? #{curr_ipm} == #{ip_matches}")
+  sorted_ipm = nil
+  sorted_ipm = ip_matches.sort unless ip_matches.nil?
+  return curr_ipm == sorted_ipm
 end
 
 def create_snmp_config_definition
@@ -279,12 +283,6 @@ def update_snmp_config_definition
                         new_resource.privacy_protocol,
                         new_resource.enterprise_id)
 
-  # remove all ranges, specifics and ip_matches that exist already
-  # nope, this is a bad idea
-  #def_el.elements.delete_all('range')
-  #def_el.elements.delete_all('specific')
-  #def_el.elements.delete_all('ip-match')
-  
   # put the new ones in
   if !new_resource.ranges.nil?
     new_resource.ranges.each do |r_begin, r_end|

@@ -103,105 +103,40 @@ def matching_def(doc, retry_count, timeout, username, domain, password)
 end
 
 def ranges_equal?(def_el, ranges)
-  equal = true # optimistic
-  found = false
-  if !ranges.nil?
-    ranges.each do |r_begin, r_end|
-      def_el.elements.each("range") do |range|
-        if range.attributes['begin'] == r_begin && range.attributes['end'] == r_end
-          found = true
-          break
-        end
-      end
-      break if found
-    end
+  return true if def_el.elements["range"].nil? && (ranges.nil? || ranges.length == 0)
+  curr_ranges = {}
+  def_el.elements.each('range') do |r_el|
+    curr_ranges[r_el.attributes['begin']] = r_el.attributes['end']
   end
-  equal = false if !found
-
-  if equal
-    found = false
-    def_el.elements.each("range") do |range|
-      if !ranges.nil?
-        ranges.each do |r_begin, r_end|
-          if r_begin == range.attributes['begin'] && r_end == range.attributes['end']
-            found = true
-            break
-          end
-        end
-      end
-      break if found
-    end
-    equal = false if !found
-  end
-  equal
+  return curr_ranges == ranges
 end
 
 def specifics_equal?(def_el, specifics)
-  equal = true
-  found = false
-  if !specifics.nil?
-    specifics.each do |s|
-      def_el.elements.each("specific") do |specific|
-        if specific.get_text == s
-          found = true
-          break
-        end
-      end
-      break if found
-    end
+  Chef::Log.debug("Check for no specifics: #{def_el.elements["specific"].nil?} && #{specifics}")
+  return true if def_el.elements["specific"].nil? && (specifics.nil? || specifics.length == 0)
+  curr_specifics = []
+  def_el.elements.each("specific") do |specific|
+    curr_specifics.push specific.text
   end
-  equal = false if !found
-
-  if equal
-    found = false
-    def_el.elements.each("specific") do |specific|
-      if !specifics.nil?
-        specifics.each do |s|
-          if s == specific.get_text
-            found = true
-            break
-          end
-        end
-      end
-      break if found
-    end
-    equal = false if !found
-  end
-  equal
+  curr_specifics.sort!
+  Chef::Log.debug("specifics equal? #{curr_specifics} == #{specifics}")
+  sorted_specifics = nil
+  sorted_specifics = specifics.sort unless specifics.nil?
+  return curr_specifics == sorted_specifics
 end
 
 def ip_matches_equal?(def_el, ip_matches)
-  equal = true
-  found = false
-  if !ip_matches.nil?
-    ip_matches.each do |ipm|
-      def_el.elements.each("ip-match") do |ip_match|
-        if ip_match.get_text == ipm
-          found = true
-          break
-        end
-      end
-      break if found
-    end
+  Chef::Log.debug("Check for no ip_matches: #{def_el.elements["ip-match"].nil?} && #{ip_matches.nil?}")
+  return true if def_el.elements["ip-match"].nil? && (ip_matches.nil? || ip_matches.length == 0)
+  curr_ipm = []
+  def_el.elements.each("ip-match") do |ipm|
+    curr_ipm.push ipm.text
   end
-  equal = false if !found
-
-  if equal
-    found = false
-    def_el.elements.each("ip-match") do |ip_match|
-      if !ip_matches.nil?
-        ip_matches.each do |ipm|
-          if ip_match.get_text == ipm
-            found = true
-            break
-          end
-        end
-        break if found
-      end
-    end
-    equal = false if !found
-  end
-  equal
+  curr_ipm.sort!
+  Chef::Log.debug("ip matches equal? #{curr_ipm} == #{ip_matches}")
+  sorted_ipm = nil
+  sorted_ipm = ip_matches.sort unless ip_matches.nil?
+  return curr_ipm == sorted_ipm
 end
 
 def create_wmi_config_definition
@@ -267,27 +202,28 @@ def update_wmi_config_definition
                         new_resource.domain,
                         new_resource.password)
 
-  # remove all ranges, specifics and ip_matches that exist already
-  def_el.elements.delete_all('range')
-  def_el.elements.delete_all('specific')
-  def_el.elements.delete_all('ip-match')
-  
   # put the new ones in
   if !new_resource.ranges.nil?
     new_resource.ranges.each do |r_begin, r_end|
-      def_el.add_element 'range', {'begin' => r_begin, 'end' => r_end}
+      if !def_el.nil? && def_el.elements["range[@begin = '#{r_begin}' and @end = '#{r_end}']"].nil?
+        def_el.add_element 'range', {'begin' => r_begin, 'end' => r_end}
+      end
     end
   end
   if !new_resource.specifics.nil?
     new_resource.specifics.each do |specific|
-      sel = def_el.add_element 'specific'
-      sel.add_text(specific)
+      if def_el.elements["specific[text() = '#{specific}']"].nil?
+        sel = def_el.add_element 'specific'
+        sel.add_text(specific)
+      end
     end
   end
   if !new_resource.ip_matches.nil?
     new_resource.ip_matches.each do |ip_match|
-      ipm_el = def_el.add_element 'ip-match'
-      ipm_el.add_text(ip_match)
+      if def_el.elements["ip-match[text() = '#{ip_match}']"].nil?
+        ipm_el = def_el.add_element 'ip-match'
+        ipm_el.add_text(ip_match)
+      end
     end
   end
 

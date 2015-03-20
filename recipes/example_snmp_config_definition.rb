@@ -12,7 +12,7 @@ opennms_snmp_config_definition "v1v2c_all" do
   max_request_size 65535
   ranges '10.0.0.1' => '10.0.0.254', '172.17.16.1' => '172.17.16.254'
   specifics ['192.168.0.1', '192.168.1.2', '192.168.2.3']
-  ip_matches ['172.17.21.*','172.17.20.1*']
+  ip_matches ['172.17.21.*','172.17.20.*']
   position 'top'
   notifies :run, 'opennms_send_event[activate_snmp-config.xml]'
 end
@@ -48,7 +48,7 @@ opennms_snmp_config_definition "v3all" do
   enterprise_id "8072" # maybe set this to your org's private enterprise number? who knows!
   ranges '10.0.1.1' => '10.0.1.254', '172.17.17.1' => '172.17.17.254'
   specifics ['192.168.10.1', '192.168.11.2', '192.168.12.3']
-  ip_matches ['172.17.22.*','172.17.20.2*']
+  ip_matches ['172.17.22.*','172.17.20.*']
   position 'bottom'
   notifies :run, 'opennms_send_event[activate_snmp-config.xml]'
 end
