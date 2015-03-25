@@ -50,6 +50,7 @@ def create_xml_collection
   out = ""
   formatter = REXML::Formatters::Pretty.new(2)
   formatter.compact = true
+  formatter.width = 100000
   formatter.write(doc, out)
   ::File.open("#{node['opennms']['conf']['home']}/etc/xml-datacollection-config.xml", "w"){ |file| file.puts(out) }
 end
