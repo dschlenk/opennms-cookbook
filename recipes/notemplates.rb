@@ -83,7 +83,7 @@ include_recipe 'opennms::send_events'
 execute "runjava" do
   cwd onms_home
   creates "#{onms_home}/etc/java.conf"
-  command "#{onms_home}/bin/runjava -S /usr/java/latest/bin/java"
+  command "#{onms_home}/bin/runjava -s"
 end
 
 execute "install" do
