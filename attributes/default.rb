@@ -8,6 +8,8 @@ default['yum']['opennms-stable-rhel6']['baseurl']         = "http://yum.opennms.
 default['yum']['opennms-stable-rhel6']['failovermethod']  = "roundrobin"
 
 default['opennms']['version'] = '14.0.3-1'
+# whether or not to attempt to automatically upgrade opennms
+default['opennms']['upgrade'] = false
 default['opennms']['addl_handlers'] = []
 # opennms.conf
 default['opennms']['conf']['home']           = "/opt/opennms"

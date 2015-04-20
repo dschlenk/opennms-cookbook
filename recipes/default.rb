@@ -80,6 +80,10 @@ end
 
 include_recipe 'opennms::send_events'
 
+if node['opennms']['upgrade']
+  include_recipe 'opennms::upgrade'
+end
+
 execute "runjava" do
   cwd onms_home
   creates "#{onms_home}/etc/java.conf"
