@@ -9,7 +9,7 @@ end
 def clean_dir(dir, type)
   Dir.foreach(dir) do |file|
     if match = file.match(/^(.*)\.#{type}$/)
-      orig_file = match.captures
+      orig_file = match.captures[0]
       bash "backup orig files" do
         code "cp #{dir}/#{orig_file} #{dir}/#{orig_file}.bak"
       end
