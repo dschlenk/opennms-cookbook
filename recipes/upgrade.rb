@@ -2,7 +2,7 @@ upgraded = false
 etc_dir = "#{node['opennms']['conf']['home']}/etc"
 jetty_dir = "#{node['opennms']['conf']['home']}/jetty-webapps/opennms"
 # breaks during first run compile phase without this check
-if ::File.exists(etc_dir)  && ::File.exists(jetty_dir)
+if ::File.exist?(etc_dir)  && ::File.exist?(jetty_dir)
   Dir.foreach(etc_dir) do |file|
     upgraded = file =~ /^.*\.rpmnew$/
     break if upgraded
