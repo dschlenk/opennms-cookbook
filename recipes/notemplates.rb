@@ -51,7 +51,7 @@ end
 
 package ['opennms-core', 'opennms-webapp-jetty', 'opennms-docs'] do
   version node['opennms']['version']
-  action :upgrade
+  action :install
 end
 
 #package "opennms-core" do
