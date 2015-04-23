@@ -52,20 +52,20 @@ hostsfile_entry node['ipaddress'] do
   action [:create_if_missing, :append]
 end
 
-package "opennms-webapp-jetty" do
+package ['opennms-core', 'opennms-webapp-jetty', 'opennms-docs'] do
   version node['opennms']['version']
-  action :install
+  action :upgrade
 end
 
-package "opennms-core" do
-  version node['opennms']['version']
-  action :install
-end
+#package "opennms-core" do
+#  version node['opennms']['version']
+#  action :install
+#end
 
-package "opennms-docs" do
-  version node['opennms']['version']
-  action :install
-end
+#package "opennms-docs" do
+#  version node['opennms']['version']
+#  action :install
+#end
 
 package "iplike" do
   action :install
