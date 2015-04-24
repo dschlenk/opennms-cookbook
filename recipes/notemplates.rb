@@ -50,7 +50,8 @@ hostsfile_entry node['ipaddress'] do
 end
 
 package ['opennms-core', 'opennms-webapp-jetty', 'opennms-docs'] do
-  version node['opennms']['version']
+  version [node['opennms']['version'], 
+    node['opennms']['version'], node['opennms']['version']]
   action :install
 end
 
