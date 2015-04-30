@@ -17,6 +17,7 @@
 # limitations under the License.
 #
 
+include_recipe 'build-essential::default'
 chef_gem 'java_properties'
 chef_gem 'rest-client'
 
@@ -55,6 +56,7 @@ end
 package ['opennms-core', 'opennms-webapp-jetty', 'opennms-docs'] do
   version [node['opennms']['version'], 
     node['opennms']['version'], node['opennms']['version']]
+  allow_downgrade node['opennms']['allow_downgrade']
   action :install
 end
 
@@ -2060,7 +2062,7 @@ template "#{onms_home}/etc/statsd-configuration.xml" do
   group "root"
   notifies :restart, "service[opennms]"
   variables(
-    :example1              => node[:opennms][:statsd][:example1],
+    :throughput            => node[:opennms][:statsd][:throughput],
     :response_time_reports => node[:opennms][:statsd][:response_time_reports]
   )
 end
@@ -2125,6 +2127,8 @@ template "#{onms_home}/etc/syslogd-configuration.xml" do
     :apache_httpd           => node[:opennms][:syslogd][:apache_httpd],
     :linux_kernel           => node[:opennms][:syslogd][:linux_kernel],
     :openssh                => node[:opennms][:syslogd][:openssh],
+    :postfix                => node[:opennms][:syslogd][:postfix],
+    :procmail               => node[:opennms][:syslogd][:procmail],
     :sudo                   => node[:opennms][:syslogd][:sudo],
     :files                  => node[:opennms][:syslogd][:files]
   )

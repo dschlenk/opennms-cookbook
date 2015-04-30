@@ -48,6 +48,12 @@
     <% if @openssh -%>
     <import-file>syslog/OpenSSH.syslog.xml</import-file>
     <% end -%>
+    <% if @procmail -%>
+    <import-file>syslog/Procmail.syslog.xml</import-file>
+    <% end -%>
+    <% if @postfix -%>
+    <import-file>syslog/Postfix.syslog.xml</import-file>
+    <% end -%>
     <% if @sudo -%>
     <import-file>syslog/Sudo.syslog.xml</import-file>
     <% end -%>

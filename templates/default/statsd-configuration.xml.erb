@@ -4,24 +4,28 @@
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
   xsi:schemaLocation="http://www.opennms.org/xsd/config/statsd http://www.opennms.org/xsd/config/statistics-daemon-configuration.xsd ">
 
-  <package name="example1">
-    <% if @example1[:top_n] -%>
-    <packageReport name="TopN" description="Top 20 ifInOctets across all nodes"
+  <package name="ThroughputReports">
+    <packageReport name="TopN_InOctets" description="Top 20 ifInOctets across all nodes"
                    schedule="0 20 1 * * ?" retainInterval="2592000000"
+    <% if @throughput[:top_n_inOctets] -%>
                    status="on">
+    <% else -%>
+                   status="off">
+    <% end -%>
       <parameter key="count" value="20"/>
       <parameter key="consolidationFunction" value="AVERAGE"/>
       <parameter key="relativeTime" value="YESTERDAY"/>
       <parameter key="resourceTypeMatch" value="interfaceSnmp"/>
       <parameter key="attributeMatch" value="ifInOctets"/>
     </packageReport>
-    <% end -%>
   </package>
   
   <package name="ResponseTimeReports">
-    <% if @response_time_reports[:top_10_weekly] -%>
     <packageReport name="Top10_Response_Weekly" description="Weekly Top 10 responses across all nodes"
                    schedule="0 0 0 ? * MON" retainInterval="2592000000"
+    <% if @response_time_reports[:top_10_weekly] -%>
+                   status="on">
+    <% else -%>
                    status="off">
       <parameter key="count" value="10"/>
       <parameter key="consolidationFunction" value="AVERAGE"/>
@@ -31,9 +35,11 @@
     </packageReport>
     <% end -%>
     
-    <% if @response_time_reports[:top_10_this_month] -%>
     <packageReport name="Top10_Response_This_Month" description="This Month Top 10 responses across all nodes"
                    schedule="0 0 0 L * ?" retainInterval="2592000000"
+    <% if @response_time_reports[:top_10_this_month] -%>
+                   status="on">
+    <% else -%>
                    status="off">
       <parameter key="count" value="10"/>
       <parameter key="consolidationFunction" value="AVERAGE"/>
@@ -43,9 +49,11 @@
     </packageReport>
     <% end -%>
     
-    <% if @response_time_reports[:top_10_last_month] -%>
     <packageReport name="Top10_Response_Last_Month" description="Last Month Top 10 responses across all nodes"
                    schedule="0 0 0 1 * ?" retainInterval="2592000000"
+    <% if @response_time_reports[:top_10_last_month] -%>
+                   status="on">
+    <% else -%>
                    status="off">
       <parameter key="count" value="10"/>
       <parameter key="consolidationFunction" value="AVERAGE"/>
@@ -55,9 +63,11 @@
     </packageReport>
     <% end -%>
     
-    <% if @response_time_reports[:top_10_this_year] -%>
     <packageReport name="Top10_Response_This_Year" description="This Year Top 10 responses across all nodes"
                    schedule="0 0 0 1 * ?" retainInterval="2592000000"
+    <% if @response_time_reports[:top_10_this_year] -%>
+                   status="on">
+    <% else -%>
                    status="off">
       <parameter key="count" value="10"/>
       <parameter key="consolidationFunction" value="AVERAGE"/>
@@ -69,21 +79,11 @@
   </package>
   
   
-    <% if @example1[:top_n] -%>
-  <report name="TopN" class-name="org.opennms.netmgt.dao.support.TopNAttributeStatisticVisitor"/>
-    <% end -%>
-    <% if @response_time_reports[:top_10_weekly] -%>
+  <report name="TopN_InOctets" class-name="org.opennms.netmgt.dao.support.TopNAttributeStatisticVisitor"/>
   <report name="Top10_Response_Weekly" class-name="org.opennms.netmgt.dao.support.TopNAttributeStatisticVisitor"/>
-    <% end -%>
-    <% if @response_time_reports[:top_10_this_month] -%>
   <report name="Top10_Response_This_Month" class-name="org.opennms.netmgt.dao.support.TopNAttributeStatisticVisitor"/>
-    <% end -%>
-    <% if @response_time_reports[:top_10_last_month] -%>
   <report name="Top10_Response_Last_Month" class-name="org.opennms.netmgt.dao.support.TopNAttributeStatisticVisitor"/>
-    <% end -%>
-    <% if @response_time_reports[:top_10_this_year] -%>
   <report name="Top10_Response_This_Year" class-name="org.opennms.netmgt.dao.support.TopNAttributeStatisticVisitor"/>
-    <% end -%>
 
 </statistics-daemon-configuration>
 

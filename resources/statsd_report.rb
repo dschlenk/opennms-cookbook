@@ -7,7 +7,7 @@ default_action :create
 # to use the same name in multiple packages in the same chef run.
 attribute :name, :kind_of => String, :name_attribute => true
 attribute :report_name, :kind_of => String
-attribute :package_name, :kind_of => String, :default => 'example1', :required => true
+attribute :package_name, :kind_of => String, :required => true
 attribute :description, :kind_of => String, :required => true
 # default is daily at 01:20:00. No validation is done (currently). 
 attribute :schedule, :kind_of => String, :default => "0 20 1 * * ?", :required => true

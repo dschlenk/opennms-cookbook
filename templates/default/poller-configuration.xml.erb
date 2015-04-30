@@ -190,10 +190,12 @@
     <service name="VMwareCim-HostSystem" interval="<%=@vmware_host[:interval]%>" user-defined="<%=@vmware_host[:user_defined]%>" status="<%=@vmware_host[:status]%>">
       <parameter key="retry" value="<%=@vmware_host[:retry]%>"/>
       <parameter key="timeout" value="<%=@vmware_host[:timeout]%>"/>
+      <parameter key="ignoreStandBy" value="false"/>
     </service>
     <service name="VMware-ManagedEntity" interval="<%=@vmware_entity[:interval]%>" user-defined="<%=@vmware_entity[:user_defined]%>" status="<%=@vmware_entity[:status]%>">
       <parameter key="retry" value="<%=@vmware_entity[:retry]%>"/>
       <parameter key="timeout" value="<%=@vmware_entity[:timeout]%>"/>
+      <parameter key="ignoreStandBy" value="false"/>
     </service>
 
     <downtime interval="30000" begin="0" end="300000" /><!-- 30s, 0, 5m -->

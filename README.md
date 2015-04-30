@@ -14,9 +14,6 @@ Requirements
 
 * Chef 11.x+
 * CentOS 6.x. Debian/Ubuntu support shouldn't be too hard to do - if anyone wants to head that up let me know. 
-* Some experience using OpenNMS without the benefit of configuration management.
-* The need to manage many instances of OpenNMS.
-* The desire to share configurations with other users without `$OPENNMS_HOME/etc` tarballs or git patches.
 * Either use Berkshelf to satisfy dependencies or manually acquire the following cookbooks: 
   * yum
   * hostsfile
@@ -29,27 +26,61 @@ See Usage for more details.
 Usage
 =====
 
-Running the default recipe will install OpenNMS 14.0 (or a custom version using the attribute `node[:opennms][:version]`) on CentOS 6.x from the official repo with the default configuration. It will also execute `'$ONMS_HOME/bin/runjava -s` if `$ONMS_HOME/etc/java.conf` is not present and `$ONMS_HOME/bin/install -dis` if `$ONMS_HOME/etc/configured` is not present.
+Running the default recipe will install OpenNMS 15.0.2 (or a custom version using the attribute `node[:opennms][:version]`) on CentOS 6.x from the official repo with the default configuration. It will also execute `'$ONMS_HOME/bin/runjava -s` if `$ONMS_HOME/etc/java.conf` is not present and `$ONMS_HOME/bin/install -dis` if `$ONMS_HOME/etc/configured` is not present.
 
 There are two primary ways to use this cookbook: as an application cookbook or library cookbook. If you simply want to tweak a few settings to the default OpenNMS configuration, you can use the `default` recipe of this cookbook directly and modify node attributes to suit your needs. There are also a plethora of LWRPs that you can use to do more in depth customizations. If you go that route I recommend starting with the `notemplates` recipe and then using those LWRPs (and maybe a few of the templates in this cookbook) to define your run list. If your node's run list contains both the template and a resource that manages the same file you'll end up with a lot of churn during the chef client run, which is a waste of time and will probably cause unnecessary restarts of OpenNMS. 
 
-Template resources for daemons that support configuration changes without a restart will automatically send the proper event to activate changes. Add `notifies` to your resource to similar funcationality when using the LWRPs from this cookbook. See the example recipe for each LWRP for details.
+Template resources for daemons that support configuration changes without a restart will automatically send the proper event to activate changes. Add `notifies` to your resource for similar funcationality when using the LWRPs from this cookbook. See the example recipe for each LWRP for details.
 
-You probably also want to check out the community java (https://github.com/socrata-cookbooks/java) and postgresql (https://github.com/hw-cookbooks/postgresql) cookbooks. Here's my default overrides for each:
+You probably also want to check out the community java (https://github.com/socrata-cookbooks/java) and postgresql (https://github.com/hw-cookbooks/postgresql) cookbooks. Here's an example of each:
 
-### Java
+### Java 
+
+You probably want Java 8 because Java 7 is EOL. But, the community java
+cookbook doesn't support Java 8 as an RPM because reasons. I don't like
+installing things outside of package management if it can be avoided, so
+if you host the RPM yourself and use 
+[dschlenk's fork](https://github.com/dschlenk/java/) you can get around 
+that limitation. Here's an example of how:
+
+Download the appropriate RPM(s) from Oracle and make a yum repo available
+to your nodes. 
+
+Use the link above by either cloning the repo and uploading to your Chef
+server or using Berkshelf or another cookbook management tool that can 
+talk to git repos. 
+
+Set the following attributes:
 
 ```
-node[:java][:oracle][:accept_oracle_download_terms] = true
-node[:java][:install_flavor] = 'oracle'
-node[:java][:jdk][:7][:x86_64][:checksum] = 'f2eae4d81c69dfa79d02466d1cb34db2b628815731ffc36e9b98f96f46f94b1a'
-node[:java][:jdk][:7][:x86_64][:url] = 'http://download.oracle.com/otn-pub/java/jdk/7u45-b18/jdk-7u45-linux-x64.tar.gz'
-node[:java][:jdk_version] = 7
+node['java']['oracle']['accept_oracle_download_terms'] = true
+node['java']['install_flavor'] = 'oracle_rpm'
+node['java']['oracle_rpm']['type'] = 'jdk'
+node['java']['oracle_rpm']['package_name'] = 'jdk1.8.0_40'
+node['java']['alternatives_priority'] = 180040
+node['java']['jdk_version'] = 8
+node['java']['set_etc_environment'] = true
+node['java']['oracle']['jce']['enabled'] = true
 ```
+
+Add a `yum_repository` resource to your run list, like so:
+
+```
+yum_repository 'oracle-java' do
+  description 'mirror of oracle java RPM packages'
+  baseurl 'URL_TO_YOUR_YUM_REPO'
+  gpgcheck false
+  action :create
+end
+```
+
+Then add the 'java::default' recipe to your run list. 
 
 ### Postgresql
 
-Include the client, server, contrib, config_initdb, config_pgtune recipes (in that order) in your run list. Then use these override attributes for a fairly well tuned config:
+Include the client, server, contrib, config_initdb, config_pgtune recipes 
+(in that order) in your run list. Then use these attributes for a fairly well
+tuned config:
 
 ```
 node[:postgresql][:pg_hba] = { :addr => '' :user => 'all', :type => 'local', :method => 'trust', :db => 'all' }
@@ -65,6 +96,43 @@ node[:postgresql][:client][:packages] = ["postgresql", "postgresql-contrib", "po
 node[:postgresql][:server][:packages] = ["postgresql-server"]
 ```
 
+Or, if you want to use a version of Postgresql from this decade, use these 
+attributes:
+
+```
+node['postgresql']['enable_pgdg_yum'] = true
+node['postgresql']['version'] = '9.3'
+node['postgresql']['dir'] = '/var/lib/pgsql/9.3/data'
+node['postgresql']['config']['data_directory'] = '/var/lib/pgsql/9.3/data'
+node['postgresql']['config']['autovacuum'] = 'on'
+node['postgresql']['config']['checkpoint_timeout'] = '15min'
+node['postgresql']['config']['shared_preload_libraries'] =
+  'pg_stat_statements'
+node['postgresql']['config']['track_activities'] = 'on'
+node['postgresql']['config']['track_counts'] = 'on'
+node['postgresql']['config']['vacuum_cost_delay'] = 50
+node['postgresql']['pg_hba'] = [{ addr: '', db: 'all', method: 'trust',
+                                     type: 'local', user: 'all' },
+                                   { addr: '127.0.0.1/32', db: 'all',
+                                     method: 'trust', type: 'host',
+                                     user: 'all' },
+                                   { addr: '::1/128', db: 'all',
+                                     method: 'trust', type: 'host',
+                                     user: 'all' }]
+node['postgresql']['client']['packages'] = ['postgresql93',
+                                               'postgresql93-contrib',
+                                               'postgresql93-devel']
+node['postgresql']['server']['packages'] = ['postgresql93-server']
+node['postgresql']['contrib']['packages'] = ['postgresql93-contrib']
+node['postgresql']['server']['service_name'] = 'postgresql-9.3'
+node['postgresql']['contrib']['extensions'] = ['pageinspect',
+                                                  'pg_buffercache',
+                                                  'pg_freespacemap',
+                                                  'pgrowlocks',
+                                                  'pg_stat_statements',
+                                                  'pgstattuple']
+```
+
 There are also a couple OpenNMS attributes you'll probably want to override at a minimum: 
 
 ### opennms.conf
@@ -72,7 +140,14 @@ There are also a couple OpenNMS attributes you'll probably want to override at a
 ```
 node[:opennms][:conf][:start_timeout] = 20
 node[:opennms][:conf][:heap_size] = 1024
+node[:opennms][:conf][:addl_mgr_opts] = '-XX:+UseConcMarkSweepGC -XX:MaxMetaspaceSize=512m'
 ```
+
+The last part (`-XX:MaxMetaspaceSize=512m`) assumes Java 8 and will cause 
+OpenNMS to not start if you use Java 7 or earlier. It's the modern equivalent 
+of setting `-XX:MaxPermSize=512m`, which is even more important in Java 8 
+because things that used to be in PermGen are now in Heap and it grows unbounded
+unless you tell it not to. 
 
 ### Recipes
 
@@ -83,7 +158,7 @@ node[:opennms][:conf][:heap_size] = 1024
 
 ### LWRPs
 
-As a general rule these LWRPs support a single action: `create` and most of them behave more like `create_if_missing` does in other cookbooks. In other words, updating is generally not supported. This may change in future releases. 
+As a general rule these LWRPs support a single action: `create` and many of them behave more like `create_if_missing` does in other cookbooks. In other words, updating is generally not supported. This may change in future releases. 
 
 Also, there are example recipes in the cookbook for most every LWRP named `opennms::example_<LWRP_NAME>`. Eventually these will become tests. 
 
@@ -104,10 +179,10 @@ The list of implemented LWRPs is as follows:
 
 #### Provisioning Requisitions
 
-These LWRPs use a cookbook library named Provision that I wrote to perform the work using the OpenNMS REST interface. As such, OpenNMS has to be running for the resources to converge. See any of the example recipes for my silly little ruby_block hack to make sure it is. Also you'll notice that I used the term 'import' rather than the correct term 'requisition'. I can type 'import' a lot faster than 'requisition'. ;)
+These LWRPs use a cookbook library named Provision that I wrote to perform the work using the OpenNMS REST interface. As such, OpenNMS has to be running for the resources to converge. Also you'll notice that I used the term 'import' rather than the correct term 'requisition'. I can type 'import' a lot faster than 'requisition'. ;)
 
 * `opennms_foreign_source`: create a new foreign source optionally defining a scan interval (defaults to '1d'). 
-* `opennms_service_detector`: add a service detector to a foreign source. TODO: if capsd is enabled in favor of provisiond add protocol-plugins to capsd-configuration.xml instead.
+* `opennms_service_detector`: add a service detector to a foreign source.
 * `opennms_policy`: add a policy to a foreign source. 
 * `opennms_import`: Defines a requisition for a foreign source. This and all import* LWRPs include an option to synchronize the requisition - sync_import. 
 * `opennms_import_node`: Add a node to a requisition including categories (array of strings) and assets (key/value hash pairs). 
@@ -1004,12 +1079,11 @@ Apache 2.0
 
 Author
 ======
-David Schlenk (<david.schlenk@spanlink.com>)
+David Schlenk (<dschlenk@converge-one.com>)
 
 Development
 ===========
 
 Please feel free to fork and send me pull requests!  The focus of my work will initially be on templates for configuration files that modify the default configuration and LWRPs to add new elements to configuration files. 
 
-There's a test kitchen suite for every main and example recipe. The default test kitchen config uses the vagrant driver, but I actually use the openstack driver (overriding the default with .kitchen.local.yml), so if the default config doesn't work that's why.  
-
+There's a test kitchen suite for every main and example recipe. The default test kitchen config uses the vagrant driver, but I actually use the openstack driver (overriding the default with .kitchen.local.yml), so if the default config doesn't work that's why and I'm so, so sorry.  

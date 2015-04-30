@@ -37,7 +37,7 @@ user.<%=@rtc_username%>.password=<%=@rtc_password%>
 
 # A comma-separated list of role keys.  A role.{KEY}.name and 
 # role.{KEY}.users property must be set for each key in this property.
-roles=rtc, admin, rouser, dashboard, provision, remoting, rest, asset
+roles=rtc, admin, rouser, dashboard, provision, remoting, rest, asset, mobile
 
 # This role allows a user to make RTC data posts.
 role.rtc.name=OpenNMS RTC Daemon
@@ -70,3 +70,6 @@ role.remoting.users=<%=@remoting_users%>
 
 role.rest.name=OpenNMS REST User
 role.rest.users=<%=@rest_users%>
+
+role.mobile.name=OpenNMS Mobile User
+role.mobile.users=<%=@mobile_users%>

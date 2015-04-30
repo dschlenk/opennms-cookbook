@@ -6,8 +6,9 @@ default['yum']['opennms-stable-common']['baseurl']        = "http://yum.opennms.
 default['yum']['opennms-stable-common']['failovermethod'] = "roundrobin"
 default['yum']['opennms-stable-rhel6']['baseurl']         = "http://yum.opennms.org/stable/rhel6"
 default['yum']['opennms-stable-rhel6']['failovermethod']  = "roundrobin"
-
-default['opennms']['version'] = '14.0.3-1'
+default['build-essential']['compile_time'] = true
+default['opennms']['version'] = '15.0.2-1'
+default['opennms']['allow_downgrade'] = false
 # whether or not to attempt to automatically upgrade opennms
 default['opennms']['upgrade'] = false
 default['opennms']['addl_handlers'] = []
@@ -1544,11 +1545,11 @@ default['opennms']['snmp_iface_poller']['example1']['interface']['interval']    
 default['opennms']['snmp_iface_poller']['example1']['interface']['user_defined'] = false
 default['opennms']['snmp_iface_poller']['example1']['interface']['status']       = "on"
 # statsd-configuration.xml
-default['opennms']['statsd']['example1']['top_n']                          = true
-default['opennms']['statsd']['response_time_reports']['top_10_weekly']     = true
-default['opennms']['statsd']['response_time_reports']['top_10_this_month'] = true
-default['opennms']['statsd']['response_time_reports']['top_10_last_month'] = true
-default['opennms']['statsd']['response_time_reports']['top_10_this_year']  = true
+default['opennms']['statsd']['throughput']['top_n_inOctets']               = false
+default['opennms']['statsd']['response_time_reports']['top_10_weekly']     = false
+default['opennms']['statsd']['response_time_reports']['top_10_this_month'] = false
+default['opennms']['statsd']['response_time_reports']['top_10_last_month'] = false
+default['opennms']['statsd']['response_time_reports']['top_10_this_year']  = false
 # support.properties
 default['opennms']['support']['queueid'] = ""
 default['opennms']['support']['timeout'] = 6000
@@ -1585,6 +1586,8 @@ default['opennms']['syslogd']['discard_uei']            = "DISCARD-MATCHING-MESS
 default['opennms']['syslogd']['apache_httpd']           = true
 default['opennms']['syslogd']['linux_kernel']           = true
 default['opennms']['syslogd']['openssh']                = true
+default['opennms']['syslogd']['postfix']                = true
+default['opennms']['syslogd']['procmail']                = true
 default['opennms']['syslogd']['sudo']                   = true
 # threshd-configuration.xml
 default['opennms']['threshd']['threads']                      = 5

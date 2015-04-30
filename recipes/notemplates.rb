@@ -16,6 +16,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+include_recipe 'build-essential::default'
+chef_gem 'java_properties'
+chef_gem 'rest-client'
 
 yum_repository 'opennms-stable-common' do
     description 'RPMs Common to All OpenNMS Architectures RPMs (stable)'
@@ -52,6 +55,7 @@ end
 package ['opennms-core', 'opennms-webapp-jetty', 'opennms-docs'] do
   version [node['opennms']['version'], 
     node['opennms']['version'], node['opennms']['version']]
+  allow_downgrade node['opennms']['allow_downgrade']
   action :install
 end
 

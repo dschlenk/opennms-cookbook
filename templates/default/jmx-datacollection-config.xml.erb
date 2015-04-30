@@ -205,6 +205,9 @@
         <attrib name="UnknownNoticesInterrupted" alias="UnknowNoticeInterr" type="counter"/>
       </mbean>
       <% end -%>
+      <mbean name="OpenNMS.Manager" objectname="OpenNMS:Name=Manager">
+        <attrib name="onmsUptime" alias="Uptime" type="gauge"/>
+      </mbean>
       <% if @jsr160[:jvm_memory][:enabled] -%>
       <mbean name="JVM Memory" objectname="java.lang:type=OperatingSystem">
         <attrib name="FreePhysicalMemorySize" alias="FreeMemory" type="gauge"/>

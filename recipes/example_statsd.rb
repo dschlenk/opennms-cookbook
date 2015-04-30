@@ -22,6 +22,7 @@ end
 
 # minimum of the things. Although parameters isn't required by the schema it effectively is. 
 opennms_statsd_report "testDefaultsReport" do
+  package_name 'cheftest'
   description 'testing report lwrp defaults'
   parameters 'count' => '20', 'consolidationFunction' => 'AVERAGE', 'relativeTime' => 'YESTERDAY', 'resourceTypeMatch' => 'interfaceSnmp', 'attributeMatch' => 'ifOutOctets'
   notifies :run, 'opennms_send_event[restart_Statsd]'
