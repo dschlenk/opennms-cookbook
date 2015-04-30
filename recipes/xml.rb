@@ -3,6 +3,7 @@ onms_home ||= '/opt/opennms'
 
 package "opennms-plugin-protocol-xml" do
   version node['opennms']['version']
+  allow_downgrade node['opennms']['allow_downgrade']
   action "install"
 end
 
