@@ -10,8 +10,8 @@ if ::File.exist?(etc_dir)  && ::File.exist?(jetty_dir)
 
   def clean_dir(dir, type)
     Dir.foreach(dir) do |file|
-      if match = file.match(/^(.*)\.#{type}$/)
-        if type = 'rpmsave'
+      if match == file.match(/^(.*)\.#{type}$/)
+        if type == 'rpmsave'
           bash "remove rpmsaves" do
             code "rm #{dir}/#{file}"
           end
