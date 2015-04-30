@@ -149,6 +149,35 @@ of setting `-XX:MaxPermSize=512m`, which is even more important in Java 8
 because things that used to be in PermGen are now in Heap and it grows unbounded
 unless you tell it not to. 
 
+### Upgrades
+
+Starting with version 2.0.0 there is now experimental support for handling 
+upgrades automatically. Use at your own risk. It is disabled by default. 
+To enable, set `node['opennms']['upgrade']` to true. If this sounds like 
+something you want to do, review the `upgrade` recipe. It roughly translates to:
+
+* New RPM is installed. 
+* Are there any files named `*.rpmnew` in `$ONMS_HOME/etc` or `$ONMS_HOME/jetty-webapp`? If so, overwrite the existing files with them. 
+* Are there any files named `*.rpmsave` in `$ONMS_HOME/etc` or `$ONMS_HOME/jetty-webapp`? If so, remove them.
+
+`rpmsave` files happen when there's a config file that you have changed that 
+was replaced with the new version because not replacing it would prevent 
+OpenNMS from working properly. But since we're using Chef, we don't care about
+the old version as any changes we made to it previously will be redone with the
+appropriate LWRP(s) or templates later in the converge. Since OpenNMS won't 
+start with these files in place we just remove them. 
+
+Similarly, `rpmnew` files are created when a newer version of a file exists, but 
+it doesn't contain breaking changes. Just like `rpmsave` files, OpenNMS won't 
+start with these files present, and the rest of the converge will make the changes
+we want anyway, so we just overwrite the old file with the `rpmnew` version. 
+ 
+There is also an attribute named `node['opennms']['allow_downgrade']` which if 
+set to true will let you install an older version of OpenNMS than is currently 
+installed. Leave this alone unless you know what you're doing - sometimes yum 
+gets confused with versions when working with snapshot builds and this attribute
+helps work around that.
+
 ### Recipes
 
 * `opennms::default` Installs and configures OpenNMS with the standard configuration modified with any node attribute values changed from their defaults.

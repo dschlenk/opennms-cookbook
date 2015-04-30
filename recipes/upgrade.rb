@@ -11,12 +11,18 @@ if ::File.exist?(etc_dir)  && ::File.exist?(jetty_dir)
   def clean_dir(dir, type)
     Dir.foreach(dir) do |file|
       if match = file.match(/^(.*)\.#{type}$/)
-        orig_file = match.captures[0]
-        bash "backup orig files" do
-          code "cp #{dir}/#{orig_file} #{dir}/#{orig_file}.bak"
-        end
-        bash "move #{type} files into place" do
-          code "mv #{dir}/#{file} #{dir}/#{orig_file}"
+        if type = 'rpmsave'
+          bash "remove rpmsaves" do
+            code "rm #{dir}/#{file}"
+          end
+        elsif type = 'rpmnew'
+          orig_file = match.captures[0]
+          bash "backup orig files" do
+            code "cp #{dir}/#{orig_file} #{dir}/#{orig_file}.bak"
+          end
+          bash "move rpmnew file into place" do
+            code "mv #{dir}/#{file} #{dir}/#{orig_file}"
+          end
         end
       end
     end
