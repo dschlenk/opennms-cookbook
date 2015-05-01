@@ -3,9 +3,9 @@ def checkForUpgrade(dir)
   if ::File.exist?(dir)
     Dir.foreach(dir) do |file|
       found = file =~ /^.*\.rpmnew$/
-      break if upgraded
+      break if found
       found = file =~ /^.*\.rpmsave$/
-      break if upgraded
+      break if found
     end
   end
   found
