@@ -6,6 +6,8 @@ if ::File.exist?(etc_dir)  && ::File.exist?(jetty_dir)
   Dir.foreach(etc_dir) do |file|
     upgraded = file =~ /^.*\.rpmnew$/
     break if upgraded
+    upgraded = file =~ /^.*\.rpmsave$/
+    break if upgraded
   end
 
   def clean_dir(dir, type)

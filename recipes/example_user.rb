@@ -1,8 +1,5 @@
-ruby_block "noop" do
-  block do
-   noop = 1
-  end
-  notifies :start, "service[opennms]", :immediately
+log "Start OpenNMS to perform ReST operations." do
+    notifies :start, 'service[opennms]', :immediately
 end
 
 # all options except duty schedules. Note the password is pre-hashed and we 

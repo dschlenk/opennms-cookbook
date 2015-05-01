@@ -4,11 +4,8 @@ class Chef::Recipe
 end
 # note that opennms needs to be running for provisioning commands to work 
 # as they use the ReST interface. 
-ruby_block "noop" do
-  block do
-   noop = 1
-  end
-  notifies :start, "service[opennms]", :immediately
+log "Start OpenNMS to perform ReST operations." do
+    notifies :start, 'service[opennms]', :immediately
 end
 # need a node to add an interface to
 # make us a new foreign_id using the Provision library

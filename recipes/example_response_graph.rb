@@ -4,11 +4,8 @@ class Chef::Recipe
 end
 # opennms needs to be running for provisioning commands to work 
 # as they use the ReST interface. 
-ruby_block "noop" do
-  block do
-   noop = 1
-  end
-  notifies :start, "service[opennms]", :immediately
+log "Start OpenNMS to perform ReST operations." do
+    notifies :start, 'service[opennms]', :immediately
 end
 # create a poller service in the default package
 opennms_poller_service "ONMS" do

@@ -16,11 +16,8 @@ opennms_disco_range "anOtherRange" do
   range_type 'exclude'
 end
 
-ruby_block "noop" do
-  block do
-   noop = 1
-  end
-  notifies :start, "service[opennms]", :immediately
+log "Start OpenNMS to perform ReST operations." do
+  notifies :start, 'service[opennms]', :immediately
 end
 
 opennms_foreign_source 'disco-source'
