@@ -15,7 +15,7 @@ def clean_dir(dir, type)
   Dir.foreach(dir) do |file|
     if match = file.match(/^(.*)\.#{type}$/)
       if type == 'rpmsave'
-        bash "remove rpmsaves" do
+        bash "remove #{type}" do
           code "rm #{dir}/#{file}"
         end
       elsif type == 'rpmnew'
@@ -23,7 +23,7 @@ def clean_dir(dir, type)
         bash "backup orig files" do
           code "cp #{dir}/#{orig_file} #{dir}/#{orig_file}.bak"
         end
-        bash "move rpmnew file into place" do
+        bash "move #{type} file into place" do
           code "mv #{dir}/#{file} #{dir}/#{orig_file}"
         end
       end
@@ -33,13 +33,19 @@ end
 
 upgraded = false
 etc_dir = "#{node['opennms']['conf']['home']}/etc"
+etc_dc_dir = "#{etc_dir}/datacollection"
 jetty_dir = "#{node['opennms']['conf']['home']}/jetty-webapps/opennms"
 onms_home = node[:opennms][:conf][:home]
 onms_home ||= '/opt/opennms'
 # breaks during first run compile phase without this check
-if ::File.exist?(etc_dir) || ::File.exist?(jetty_dir)
+if ::File.exist?(etc_dir) || ::File.exist?(jetty_dir) || ::File.exist?(etc_dc_dir)
   if ::File.exist?(etc_dir)
     upgraded = checkForUpgrade(etc_dir)
+  end
+  unless upgraded
+    if ::File.exist?(etc_dc_dir)
+      upgraded = checkForUpgrade(etc_dc_dir)
+    end
   end
   unless upgraded
     if ::File.exist?(jetty_dir)
@@ -54,6 +60,10 @@ if ::File.exist?(etc_dir) || ::File.exist?(jetty_dir)
     if ::File.exist?(etc_dir)
       clean_dir(etc_dir, 'rpmnew')
       clean_dir(etc_dir, 'rpmsave')
+    end
+    if ::File.exist?(etc_dc_dir)
+      clean_dir(etc_dc_dir, 'rpmnew')
+      clean_dir(etc_dc_dir, 'rpmsave')
     end
     if ::File.exist?(jetty_dir)
       clean_dir(jetty_dir, 'rpmnew')
