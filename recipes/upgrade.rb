@@ -1,32 +1,49 @@
+def checkForUpgrade(dir)
+  found = false
+  if ::File.exist?(dir)
+    Dir.foreach(dir) do |file|
+      found = file =~ /^.*\.rpmnew$/
+      break if upgraded
+      found = file =~ /^.*\.rpmsave$/
+      break if upgraded
+    end
+  end
+  found
+end
+
+def clean_dir(dir, type)
+  Dir.foreach(dir) do |file|
+    if match = file.match(/^(.*)\.#{type}$/)
+      if type == 'rpmsave'
+        bash "remove rpmsaves" do
+          code "rm #{dir}/#{file}"
+        end
+      elsif type == 'rpmnew'
+        orig_file = match.captures[0]
+        bash "backup orig files" do
+          code "cp #{dir}/#{orig_file} #{dir}/#{orig_file}.bak"
+        end
+        bash "move rpmnew file into place" do
+          code "mv #{dir}/#{file} #{dir}/#{orig_file}"
+        end
+      end
+    end
+  end
+end
+
 upgraded = false
 etc_dir = "#{node['opennms']['conf']['home']}/etc"
 jetty_dir = "#{node['opennms']['conf']['home']}/jetty-webapps/opennms"
+onms_home = node[:opennms][:conf][:home]
+onms_home ||= '/opt/opennms'
 # breaks during first run compile phase without this check
-if ::File.exist?(etc_dir)  && ::File.exist?(jetty_dir)
-  Dir.foreach(etc_dir) do |file|
-    upgraded = file =~ /^.*\.rpmnew$/
-    break if upgraded
-    upgraded = file =~ /^.*\.rpmsave$/
-    break if upgraded
+if ::File.exist?(etc_dir) || ::File.exist?(jetty_dir)
+  if ::File.exist?(etc_dir)
+    upgraded = checkForUpgrade(etc_dir)
   end
-
-  def clean_dir(dir, type)
-    Dir.foreach(dir) do |file|
-      if match = file.match(/^(.*)\.#{type}$/)
-        if type == 'rpmsave'
-          bash "remove rpmsaves" do
-            code "rm #{dir}/#{file}"
-          end
-        elsif type = 'rpmnew'
-          orig_file = match.captures[0]
-          bash "backup orig files" do
-            code "cp #{dir}/#{orig_file} #{dir}/#{orig_file}.bak"
-          end
-          bash "move rpmnew file into place" do
-            code "mv #{dir}/#{file} #{dir}/#{orig_file}"
-          end
-        end
-      end
+  unless upgraded
+    if ::File.exist?(jetty_dir)
+      upgraded = checkForUpgrade(jetty_dir)
     end
   end
 
@@ -34,10 +51,14 @@ if ::File.exist?(etc_dir)  && ::File.exist?(jetty_dir)
     log "Stop OpenNMS to perform upgrade." do
       notifies :stop, 'service[opennms]', :immediately
     end
-    clean_dir(etc_dir, 'rpmnew')
-    clean_dir(etc_dir, 'rpmsave')
-    clean_dir(jetty_dir, 'rpmnew')
-    clean_dir(jetty_dir, 'rpmsave')
+    if ::File.exist?(etc_dir)
+      clean_dir(etc_dir, 'rpmnew')
+      clean_dir(etc_dir, 'rpmsave')
+    end
+    if ::File.exist?(jetty_dir)
+      clean_dir(jetty_dir, 'rpmnew')
+      clean_dir(jetty_dir, 'rpmsave')
+    end
 
     execute "runjava" do
       cwd onms_home

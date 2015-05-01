@@ -59,16 +59,6 @@ package ['opennms-core', 'opennms-webapp-jetty', 'opennms-docs'] do
   action :install
 end
 
-#package "opennms-core" do
-#  version node['opennms']['version']
-#  action :install
-#end
-
-#package "opennms-docs" do
-#  version node['opennms']['version']
-#  action :install
-#end
-
 package "iplike" do
   action :install
 end
@@ -79,8 +69,6 @@ end
 package "perl-XML-Twig" do
   action :install
 end
-
-include_recipe 'opennms::send_events'
 
 if node['opennms']['upgrade']
   include_recipe 'opennms::upgrade'
@@ -97,6 +85,8 @@ execute "install" do
   creates "#{onms_home}/etc/configured"
   command "#{onms_home}/bin/install -dis"
 end
+
+include_recipe 'opennms::send_events'
 
 template "#{onms_home}/etc/opennms.conf" do
   source "opennms.conf.erb"
