@@ -38,6 +38,21 @@ if ::File.exist?(etc_dir)  && ::File.exist?(jetty_dir)
     clean_dir(etc_dir, 'rpmsave')
     clean_dir(jetty_dir, 'rpmnew')
     clean_dir(jetty_dir, 'rpmsave')
-    log "All *.rpmnew and #.rpmsave files moved into place."
+
+    execute "runjava" do
+      cwd onms_home
+      creates "#{onms_home}/etc/java.conf"
+      command "#{onms_home}/bin/runjava -s"
+    end
+
+    execute "upgrade" do
+      cwd onms_home
+      creates "#{onms_home}/etc/configured"
+      command "#{onms_home}/bin/install -dis"
+    end
+
+    log "All *.rpmnew and #.rpmsave files moved into place." do
+      notifies :start, 'service[opennms]', :immediately
+    end
   end
 end
