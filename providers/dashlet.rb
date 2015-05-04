@@ -75,19 +75,19 @@ def dashlet_changed?(wallboard, title, boost_duration, boost_priority,
   file.close
   dashlet = doc.elements["/wallboards/wallboard[@title = '#{wallboard}']/dashlets/dashlet[title[text()[contains(.,'#{title}')]]]"]
   curr_bd = dashlet.elements["boostDuration"].text.strip
-  Chef::Log.info "#{curr_bd} != #{boost_duration}?"
+  Chef::Log.debug "#{curr_bd} != #{boost_duration}?"
   return true if "#{curr_bd}" != "#{boost_duration}"
   curr_bp = dashlet.elements["boostPriority"].text.strip
-  Chef::Log.info "#{curr_bp} != #{boost_priority}?"
+  Chef::Log.debug "#{curr_bp} != #{boost_priority}?"
   return true if "#{curr_bp}" != "#{boost_priority}"
   curr_duration = dashlet.elements["duration"].text.strip
-  Chef::Log.info "#{curr_duration} != #{duration}?"
+  Chef::Log.debug "#{curr_duration} != #{duration}?"
   return true if "#{curr_duration}" != "#{duration}"
   curr_priority = dashlet.elements["priority"].text.strip
-  Chef::Log.info "#{curr_priority} != #{priority}?"
+  Chef::Log.debug "#{curr_priority} != #{priority}?"
   return true if "#{curr_priority}" != "#{priority}"
   curr_dn = dashlet.elements['dashletName'].text.strip
-  Chef::Log.info "#{curr_dn} != #{dashlet_name}?"
+  Chef::Log.debug "#{curr_dn} != #{dashlet_name}?"
   return true if "#{curr_dn}" != "#{dashlet_name}"
   curr_parameters = {}
   dashlet.elements["parameters"].elements.each 'entry' do |entry|
@@ -98,7 +98,7 @@ def dashlet_changed?(wallboard, title, boost_duration, boost_priority,
     value = '' if value.nil?
     curr_parameters[key] = value
   end
-  Chef::Log.info "#{curr_parameters} != #{parameters}?"
+  Chef::Log.debug "#{curr_parameters} != #{parameters}?"
   return true if curr_parameters != parameters
   return false
 end

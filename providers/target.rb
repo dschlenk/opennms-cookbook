@@ -117,18 +117,18 @@ def create_target
   # add target element to appropriate place in path
   if new_resource.type == 'target'
     path_el.add_element target_el
-    Chef::Log.info "Added target element to path."
+    Chef::Log.debug "Added target element to path."
   elsif new_resource.type == 'escalate'
     # first see if an existing escalate element already exists
     escalate_el = path_el.elements["escalate[@delay='#{new_resource.escalate_delay}']"]
     # and create a new one if it doesn't
     if escalate_el.nil?
       escalate_el = path_el.add_element 'escalate', { 'delay' => new_resource.escalate_delay }
-      Chef::Log.info "Added target element to new escalate element that was added to path_el."
+      Chef::Log.debug "Added target element to new escalate element that was added to path_el."
     end
     # add target! we're done!
     escalate_el.add_element target_el
-    Chef::Log.info "Added target element to existing escalate element."
+    Chef::Log.debug "Added target element to existing escalate element."
   end
 
   out = ""

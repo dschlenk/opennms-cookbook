@@ -316,7 +316,7 @@ def update_snmp_config_definition
 end
 
 def delete_snmp_config_definition
-  Chef::Log.info "Deleting snmp config definition : '#{ new_resource.name }'"
+  Chef::Log.debug "Deleting snmp config definition : '#{ new_resource.name }'"
   file = ::File.new("#{node['opennms']['conf']['home']}/etc/snmp-config.xml", "r")
   contents = file.read
   file.close

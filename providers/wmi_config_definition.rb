@@ -235,7 +235,7 @@ def update_wmi_config_definition
 end
 
 def delete_wmi_config_definition
-  Chef::Log.info "Deleting wmi config definition : '#{ new_resource.name }'"
+  Chef::Log.debug "Deleting wmi config definition : '#{ new_resource.name }'"
   file = ::File.new("#{node['opennms']['conf']['home']}/etc/wmi-config.xml", "r")
   contents = file.read
   file.close
