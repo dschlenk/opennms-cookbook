@@ -2,7 +2,7 @@ Description
 ===========
 
 A Chef cookbook to manage the installation and configuration of OpenNMS.
-Current version of templates are based on OpenNMS release 14.0.x
+Current version of templates are based on OpenNMS release 15.0.2
 
 Status
 ======
