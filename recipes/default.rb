@@ -53,22 +53,25 @@ hostsfile_entry node['ipaddress'] do
   action [:create_if_missing, :append]
 end
 
-package ['opennms-core', 'opennms-webapp-jetty', 'opennms-docs'] do
-  version [node['opennms']['version'], 
-    node['opennms']['version'], node['opennms']['version']]
+onms_packages = ['opennms-core', 'opennms-webapp-jetty', 'opennms-docs']
+onms_versions =  [node['opennms']['version'], node['opennms']['version'],
+  node['opennms']['version']]
+
+if node['opennms']['plugin']['xml']
+  onms_packages.push 'opennms-plugin-protocol-xml'
+  onms_versions.push node['opennms']['version']
+end
+
+if node['opennms']['plugin']['nsclient']
+  onms_packages.push 'opennms-plugin-protocol-nsclient'
+  onms_versions.push node['opennms']['version']
+end
+
+package onms_packages do
+  version onms_versions
   allow_downgrade node['opennms']['allow_downgrade']
   action :install
 end
-
-#package "opennms-core" do
-#  version node['opennms']['version']
-#  action :install
-#end
-
-#package "opennms-docs" do
-#  version node['opennms']['version']
-#  action :install
-#end
 
 package "iplike" do
   action :install
@@ -455,6 +458,46 @@ template "#{onms_home}/etc/datacollection-config.xml" do
   )
 end
 
+if node['opennms']['plugin']['xml']
+  template "#{onms_home}/etc/xml-datacollection-config.xml" do
+    source "xml-datacollection-config.xml.erb"
+    mode 00664
+    owner "root"
+    group "root"
+    notifies :restart, "service[opennms]"
+    variables( 
+      :rrd_repository      => node[:opennms][:xml][:rrd_repository],
+      :threegpp_full_5min  => node[:opennms][:xml][:threegpp_full_5min],
+      :threegpp_full_15min => node[:opennms][:xml][:threegpp_full_15min],
+      :threegpp_sample     => node[:opennms][:xml][:threegpp_sample]
+    )
+  end
+end
+
+if node['opennms']['plugin']['nsclient']
+  template "#{onms_home}/etc/nsclient-datacollection-config.xml" do
+    source "nsclient-datacollection-config.xml.erb"
+    mode 00664
+    owner "root"
+    group "root"
+    notifies :restart, "service[opennms]"
+    variables(
+      :rrd_repository => node[:opennms][:nsclient_datacollection][:rrd_repository],
+      :enable_default => node[:opennms][:nsclient_datacollection][:enable_default],
+      :default        => node[:opennms][:nsclient_datacollection][:default],
+      :processor      => node[:opennms][:nsclient_datacollection][:default][:processor],
+      :system         => node[:opennms][:nsclient_datacollection][:default][:system],
+      :iis            => node[:opennms][:nsclient_datacollection][:default][:iis],
+      :exchange       => node[:opennms][:nsclient_datacollection][:default][:exchange],
+      :dns            => node[:opennms][:nsclient_datacollection][:default][:dns],
+      :sqlserver      => node[:opennms][:nsclient_datacollection][:default][:sqlserver],
+      :biztalk        => node[:opennms][:nsclient_datacollection][:default][:biztalk],
+      :live           => node[:opennms][:nsclient_datacollection][:default][:live],
+      :mailmarshal    => node[:opennms][:nsclient_datacollection][:default][:mailmarshal]
+    )
+  end
+end
+  
 template "#{onms_home}/etc/discovery-configuration.xml" do
   source "discovery-configuration.xml.erb"
   mode 0644

@@ -11,6 +11,9 @@ default['opennms']['version'] = '15.0.2-1'
 default['opennms']['allow_downgrade'] = false
 # whether or not to attempt to automatically upgrade opennms
 default['opennms']['upgrade'] = false
+# whether or not to include the plugin packages
+default['opennms']['plugin']['xml'] = false
+default['opennms']['plugin']['nsclient'] = false
 default['opennms']['addl_handlers'] = []
 # opennms.conf
 default['opennms']['conf']['home']           = "/opt/opennms"

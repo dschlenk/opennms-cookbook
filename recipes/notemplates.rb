@@ -52,9 +52,22 @@ hostsfile_entry node['ipaddress'] do
   action [:create_if_missing, :append]
 end
 
-package ['opennms-core', 'opennms-webapp-jetty', 'opennms-docs'] do
-  version [node['opennms']['version'], 
-    node['opennms']['version'], node['opennms']['version']]
+onms_packages = ['opennms-core', 'opennms-webapp-jetty', 'opennms-docs']
+onms_versions =  [node['opennms']['version'], node['opennms']['version'],
+  node['opennms']['version']]
+
+if node['opennms']['plugin']['xml']
+  onms_packages.push 'opennms-plugin-protocol-xml'
+  onms_versions.push node['opennms']['version']
+end
+
+if node['opennms']['plugin']['nsclient']
+  onms_packages.push 'opennms-plugin-protocol-nsclient'
+  onms_versions.push node['opennms']['version']
+end
+
+package onms_packages do
+  version onms_versions
   allow_downgrade node['opennms']['allow_downgrade']
   action :install
 end
