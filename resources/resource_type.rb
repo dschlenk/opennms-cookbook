@@ -18,10 +18,10 @@ attribute :type_name, :kind_of => String, :default => nil
 attribute :group_name, :kind_of => String, :default => nil
 attribute :label, :kind_of => String, :default => nil
 attribute :resource_label, :kind_of => String, :default => '${resource} (index:${index})'
-attribute :persistence_selector_strategy, :kind_of => String, :default => 'org.opennms.netmgt.collectd.PersistAllSelectorStrategy'
+attribute :persistence_selector_strategy, :kind_of => String, :default => 'org.opennms.netmgt.collection.support.PersistAllSelectorStrategy'
 # Must be an array of single key/value hashes with quoted string key names.
 attribute :persistence_selector_strategy_params, :kind_of => Array, :default => []
-attribute :storage_strategy, :kind_of => String, :default => 'org.opennms.netmgt.dao.support.IndexStorageStrategy'
+attribute :storage_strategy, :kind_of => String, :default => 'org.opennms.netmgt.collection.support.IndexStorageStrategy'
 # Must be an array of single key/value hashes with quoted string key names.
 attribute :storage_strategy_params, :kind_of => Array, :default => []
 
