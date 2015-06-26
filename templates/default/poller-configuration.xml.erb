@@ -1,7 +1,8 @@
 <?xml version="1.0"?>
 <?castor class-name="org.opennms.netmgt.poller.PollerConfiguration"?>
 <poller-configuration threads="<%=@threads%>" 
-                      serviceUnresponsiveEnabled="<%=@service_unresponsive_enabled%>"> 
+                      serviceUnresponsiveEnabled="<%=@service_unresponsive_enabled%>"
+                      nextOutageId="SELECT nextval('outageNxtId')"> 
   <node-outage status="<%=@node_outage[:status]%>">
     <critical-service name="<%=@node_outage[:critical_service]%>" />
   </node-outage>

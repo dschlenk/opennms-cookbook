@@ -21,17 +21,17 @@
 <% if !@strategy_class.nil? -%>
 org.opennms.rrd.strategyClass=<%=@strategy_class%>
 <% else -%>
-#org.opennms.rrd.strategyClass=org.opennms.netmgt.rrd.rrdtool.JniRrdStrategy
+#org.opennms.rrd.strategyClass=org.opennms.netmgt.rrd.rrdtool.MultithreadedJniRrdStrategy
 <% end -%>
 <% if !@interface_jar.nil? -%>
 org.opennms.rrd.interfaceJar=<%=@interface_jar%>
 <% else -%>
-#org.opennms.rrd.interfaceJar=/usr/share/java/jrrd.jar
+#org.opennms.rrd.interfaceJar=/usr/share/java/jrrd2.jar
 <% end -%>
 <% if !@jrrd.nil? -%>
 opennms.library.jrrd=<%=@jrrd%>
 <% else -%>
-#opennms.library.jrrd=/usr/lib/libjrrd.so
+#opennms.library.jrrd2=/usr/lib64/libjrrd2.so
 <% end -%>
 #
 # The default setting is org.opennms.netmgt.rrd.jrobin.JRobinRrdStrategy
@@ -71,8 +71,9 @@ org.opennms.rrd.usequeue=false
 # The following properties are for the queuing system
 #
 # This property defines how many threads to use to process the queue and
-# write to the disk.  The JNI backend is only single thread safe and therefore
-# synchronized so having more than two threads really only leads to contention.
+# write to the disk. You may get some performance benefit by increasing threads.
+# This of course depends on your I/O subsystem. It is unlikely that more than 10 threads
+# or so are needed here but there may be some # system where this is not true.
 #
 # The JRobin code however is multi-thread safe and may get some performance benefit
 # by increasing threads.  This of course depends on your I/O subsystem.  It is 
@@ -204,14 +205,14 @@ org.opennms.rrd.queuing.queueHighWaterMark=<%=@queue[:queue_hwmark]%>
 
 
 #
-# This property defines which log4j category to use when printing the queue
+# This property defines which log4j2 routing prefix to use when printing the queue
 # statistics
 #
 # The default setting is for the queueing daemon
 <% if !@queue[:log_cat].nil? -%>
 org.opennms.rrd.queuing.category=<%=@queue[:log_cat]%>
 <% else -%>
-#org.opennms.rrd.queuing.category=OpenNMS.Queued
+#org.opennms.rrd.queuing.category=queued
 <% end -%>
 
 #

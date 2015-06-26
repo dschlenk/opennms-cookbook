@@ -330,22 +330,6 @@ maintained
       <invoke method="status" pass="0" at="status"/>
       <invoke method="stop" pass="0" at="stop"/>
    </service>
-   <service enabled="<%=@xmlrpcd%>">
-      <name>OpenNMS:Name=Xmlrpcd</name>
-      <class-name>org.opennms.netmgt.xmlrpcd.jmx.Xmlrpcd</class-name>
-      <invoke method="init" pass="0" at="start"/>
-      <invoke method="start" pass="1" at="start"/>
-      <invoke method="status" pass="0" at="status"/>
-      <invoke method="stop" pass="0" at="stop"/>
-   </service>
-   <service enabled="<%=@xmlrpc_prov%>">
-      <name>OpenNMS:Name=XmlrpcProvisioner</name>
-      <class-name>org.opennms.netmgt.xmlrpcd.jmx.Provisioner</class-name>
-      <invoke method="init" pass="0" at="start"/>
-      <invoke method="start" pass="1" at="start"/>
-      <invoke method="status" pass="0" at="status"/>
-      <invoke method="stop" pass="0" at="stop"/>
-   </service>
    <service enabled="<%=@asterisk_gw%>">
       <name>OpenNMS:Name=AsteriskGateway</name>
       <class-name>org.opennms.netmgt.asterisk.agi.jmx.AsteriskGateway</class-name>

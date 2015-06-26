@@ -38,6 +38,14 @@
         </group>
         <% end -%>
         
+
+        <% if @juniper_srx[:enabled] -%>
+        <group name="juniper-srx"
+                        rrdRepository = "<%=@juniper_srx[:rrd_repository]%>">
+                        <expression description="Trigger a warning event when the number of tracked sessions of a Juniper SRX router exceeds 90% of its capacity." type="high" expression="juniSPUMonCurrFlow / juniSPUMonMaxFlow * 100.0" ds-type="node" ds-label="" value="90.0" rearm="75.0" trigger="2"/>
+        </group>
+        <% end -%>
+
         <% if @netsnmp[:enabled] -%>
         <group name="netsnmp"
         		rrdRepository = "<%=@netsnmp[:rrd_repository]%>">

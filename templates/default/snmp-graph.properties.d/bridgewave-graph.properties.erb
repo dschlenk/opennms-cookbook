@@ -1,0 +1,28 @@
+##############################################################################
+##
+##  Please add report definition in a new line to make it easier
+##  for script based sanity checks
+##
+##################################################
+
+<% if @enabled -%>
+reports=\
+brwaveRadioRSL
+<% else -%>
+#reports=\
+#brwaveRadioRSL
+<% end -%>
+
+##################################################
+#
+#      Reports for Bridgewave Wireless Radio
+#
+##################################################
+
+report.brwaveRadioRSL.name=Bridgewave Received Signal Level
+report.brwaveRadioRSL.columns=brwaveRadioRSL
+report.brwaveRadioRSL.type=nodeSnmp
+report.brwaveRadioRSL.command=--title="Bridge Received Signal Level" \
+--vertical-label="VDC" \
+DEF:brwaveRadioRSL={rrd1}:brwaveRadioRSL:AVERAGE \
+AREA:brwaveRadioRSL#0000AA:\

@@ -284,54 +284,8 @@ template "#{onms_home}/etc/service-configuration.xml" do
     :correlator  => node['opennms']['services']['correlator'],
     :tl1d        => node['opennms']['services']['tl1d'],
     :syslogd     => node['opennms']['services']['syslogd'],
-    :xmlrpcd     => node['opennms']['services']['xmlrpcd'],
-    :xmlrpc_prov => node['opennms']['services']['xmlrpc_prov'],
     :asterisk_gw => node['opennms']['services']['asterisk_gw'],
     :apm         => node['opennms']['services']['apm']
-  )
-end
-
-# Disabled by default and deprecated in 1.12. You've been warned.
-template "#{onms_home}/etc/capsd-configuration.xml" do
-  source "capsd-configuration.xml.erb"
-  mode 0664
-  owner "root"
-  group "root"
-  notifies :restart, "service[opennms]"
-  variables(
-    :rescan_frequency      => node['opennms']['capsd']['rescan_frequency'],
-    :initial_sleep_time    => node['opennms']['capsd']['initial_sleep_time'],
-    :max_suspect_threads   => node['opennms']['capsd']['max_suspect_threads'],
-    :max_rescan_threads    => node['opennms']['capsd']['max_rescan_threads'],
-    :protocol_plugins      => node['opennms']['capsd']['protocol_plugins'],
-    :icmp                  => node['opennms']['capsd']['icmp'],
-    :strafeping            => node['opennms']['capsd']['strafeping'],
-    :snmp                  => node['opennms']['capsd']['snmp'],
-    :http                  => node['opennms']['capsd']['http'],
-    :http_8080             => node['opennms']['capsd']['http_8080'],
-    :http_8000             => node['opennms']['capsd']['http_8000'],
-    :https                 => node['opennms']['capsd']['https'],
-    :hyperic_agent         => node['opennms']['capsd']['hyperic_agent'],
-    :hyperichq             => node['opennms']['capsd']['hyperichq'],
-    :ftp                   => node['opennms']['capsd']['ftp'],
-    :telnet                => node['opennms']['capsd']['telnet'],
-    :dns                   => node['opennms']['capsd']['dns'],
-    :imap                  => node['opennms']['capsd']['imap'],
-    :msexchange            => node['opennms']['capsd']['msexchange'],
-    :smtp                  => node['opennms']['capsd']['smtp'],
-    :pop3                  => node['opennms']['capsd']['pop3'],
-    :ssh                   => node['opennms']['capsd']['ssh'],
-    :mysql                 => node['opennms']['capsd']['mysql'],
-    :sqlserver             => node['opennms']['capsd']['sqlserver'],
-    :oracle                => node['opennms']['capsd']['oracle'],
-    :postgres              => node['opennms']['capsd']['postgres'],
-    :router                => node['opennms']['capsd']['router'],
-    :hp_insight_manager    => node['opennms']['capsd']['hp_insight_manager'],
-    :dell_openmanage       => node['opennms']['capsd']['dell_openmanage'],
-    :nrpe                  => node['opennms']['capsd']['nrpe'],
-    :nrpe_nossl            => node['opennms']['capsd']['nrpe_nossl'],
-    :windows_task_scheduler => node['opennms']['capsd']['windows_task_scheduler'],
-    :opennms_jvm           => node['opennms']['capsd']['opennms_jvm']
   )
 end
 
@@ -449,6 +403,7 @@ template "#{onms_home}/etc/datacollection-config.xml" do
     :trango       => node['opennms']['datacollection']['default']['trango'],
     :wmi          => node['opennms']['datacollection']['default']['wmi'],
     :xmp          => node['opennms']['datacollection']['default']['xmp'],
+    :zertico      => node['opennms']['datacollection']['default']['zertico'],
     :zeus         => node['opennms']['datacollection']['default']['zeus'],
     :vmware3      => node['opennms']['datacollection']['default']['vmware3'],
     :vmware4      => node['opennms']['datacollection']['default']['vmware4'],
@@ -1248,6 +1203,16 @@ template "#{onms_home}/etc/snmp-graph.properties.d/bluecoat-sgproxy-graph.proper
   )
 end
 
+template "${onms_home}/etc/snmp-graph.properties.d/bridgewave-graph.properties" do
+  source "snmp-graph.properties.d/bridgewave-graph.properties.erb"
+  mode 0664
+  owner "root"
+  group "root"
+  notifies :restart, "service[opennms]"
+  variables(
+    :enabled => node[:opennms][:snmp_graph][:bridgewave]
+  )
+end
 template "#{onms_home}/etc/snmp-graph.properties.d/brocade-graph.properties" do
   source "snmp-graph.properties.d/brocade-graph.properties.erb"
   mode 0664
@@ -2084,6 +2049,17 @@ template "#{onms_home}/etc/snmp-graph.properties.d/zeus-graph.properties" do
   )
 end
 
+template "#{onms_home}/etc/snmp-graph.properties.d/zertico-graph.properties" do
+  source "snmp-graph.properties.d/zertico-graph.properties.erb"
+  mode 0664
+  owner "root"
+  group "root"
+  notifies :restart, "service[opennms]"
+  variables(
+    :enabled => node[:opennms][:snmp_graph][:zertico]
+  )
+end
+
 template "#{onms_home}/etc/snmp-interface-poller-configuration.xml" do
   source "snmp-interface-poller-configuration.xml.erb"
   mode 0664
@@ -2188,6 +2164,7 @@ template "#{onms_home}/etc/threshd-configuration.xml" do
     :mib2                    => node[:opennms][:threshd][:mib2],
     :hrstorage               => node[:opennms][:threshd][:hrstorage],
     :cisco                   => node[:opennms][:threshd][:cisco],
+    :juniper_srx             => node[:opennms][:threshd][:juniper_srx],
     :netsnmp                 => node[:opennms][:threshd][:netsnmp],
     :netsnmp_memory_linux    => node[:opennms][:threshd][:netsnmp_memory_linux],
     :netsnmp_memory_nonlinux => node[:opennms][:threshd][:netsnmp_memory_nonlinux]
@@ -2204,6 +2181,7 @@ template "#{onms_home}/etc/thresholds.xml" do
     :mib2                    => node[:opennms][:thresholds][:mib2],
     :hrstorage               => node[:opennms][:thresholds][:hrstorage],
     :cisco                   => node[:opennms][:thresholds][:cisco],
+    :juniper_srx             => node[:opennms][:thresholds][:juniper_srx],
     :netsnmp                 => node[:opennms][:thresholds][:netsnmp],
     :netsnmp_memory_linux    => node[:opennms][:thresholds][:netsnmp_memory_linux],
     :netsnmp_memory_nonlinux => node[:opennms][:thresholds][:netsnmp_memory_nonlinux],
@@ -2317,19 +2295,6 @@ template "#{onms_home}/etc/wmi-datacollection-config.xml" do
   variables(
     :rrd_repository => node[:opennms][:wmi][:rrd_repository],
     :default        => node[:opennms][:wmi][:default]
-  )
-end
-
-template "#{onms_home}/etc/xmlrpcd-configuration.xml" do
-  source "xmlrpcd-configuration.xml.erb"
-  mode 0664
-  owner "root"
-  group "root"
-  notifies :restart, "service[opennms]"
-  variables(
-    :max_event_queue_size => node[:opennms][:xmlrpcd][:max_event_queue_size],
-    :external_servers     => node[:opennms][:xmlrpcd][:external_servers],
-    :base_events          => node[:opennms][:xmlrpcd][:base_events]
   )
 end
 
