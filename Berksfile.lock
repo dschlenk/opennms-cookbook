@@ -12,7 +12,7 @@ GRAPH
   chef-sugar (3.1.0)
   hostsfile (2.4.5)
   java (1.31.0)
-  opennms (2.0.0)
+  opennms (2.0.1)
     build-essential (>= 0.0.0)
     hostsfile (>= 0.0.0)
     java (>= 0.0.0)

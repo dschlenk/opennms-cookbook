@@ -22,24 +22,10 @@ platforms:
                          "opennms-stable-common": { "baseurl": "http://http-proxy.pe.spanlink.com/opennms-stable-common" },
                          "opennms-stable-rhel6": { "baseurl": "http://http-proxy.pe.spanlink.com/opennms-stable-rhel6" }
                         }, 
-                 "java": { 
-                          "oracle": { 
-                                      "accept_oracle_download_terms": "true"
-                                    }, 
-                          "install_flavor": "oracle", 
-                          "jdk":    { 
-                                     "7": { 
-                                           "x86_64": { 
-                                                      "checksum": "f2eae4d81c69dfa79d02466d1cb34db2b628815731ffc36e9b98f96f46f94b1a", 
-                                                      "url": "http://download.oracle.com/otn-pub/java/jdk/7u45-b18/jdk-7u45-linux-x64.tar.gz"
-                                                     }
-                                          }
-                                    }, 
-                          "jdk_version": 7,
-                          "ark_retries": 5
-                         }, 
                   "opennms": {
-                              "conf": {"start_timeout": 20}},  
+                              "conf": {"start_timeout": 20},
+                              "stable": false
+                              },
                   "postgresql": {
                                 "password": { 
                                            "postgres": "md5c23797e9a303da48b792b4339c426700" 
@@ -95,7 +81,6 @@ platforms:
 suites:
   - name: default
     run_list:
-      - recipe[java]
       - recipe[yum-centos::default]
       - recipe[yum-epel::default]
       - recipe[postgresql::client]

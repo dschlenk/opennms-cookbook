@@ -6,9 +6,14 @@ default['yum']['opennms-stable-common']['baseurl']        = "http://yum.opennms.
 default['yum']['opennms-stable-common']['failovermethod'] = "roundrobin"
 default['yum']['opennms-stable-rhel6']['baseurl']         = "http://yum.opennms.org/stable/rhel6"
 default['yum']['opennms-stable-rhel6']['failovermethod']  = "roundrobin"
+default['yum']['opennms-snapshot-common']['baseurl']        = "http://yum.opennms.org/snapshot/common"
+default['yum']['opennms-snapshot-common']['failovermethod'] = "roundrobin"
+default['yum']['opennms-snapshot-rhel6']['baseurl']         = "http://yum.opennms.org/snapshot/rhel6"
+default['yum']['opennms-snapshot-rhel6']['failovermethod']  = "roundrobin"
 default['build-essential']['compile_time'] = true
 default['opennms']['version'] = '15.0.2-1'
 default['opennms']['allow_downgrade'] = false
+default['opennms']['stable'] = true
 # whether or not to attempt to automatically upgrade opennms
 default['opennms']['upgrade'] = false
 # whether or not to include the plugin packages
