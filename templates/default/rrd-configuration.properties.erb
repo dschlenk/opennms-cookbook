@@ -26,12 +26,12 @@ org.opennms.rrd.strategyClass=<%=@strategy_class%>
 <% if !@interface_jar.nil? -%>
 org.opennms.rrd.interfaceJar=<%=@interface_jar%>
 <% else -%>
-#org.opennms.rrd.interfaceJar=/usr/share/java/jrrd2.jar
+#org.opennms.rrd.interfaceJar=/usr/share/java/jrrd.jar
 <% end -%>
 <% if !@jrrd.nil? -%>
 opennms.library.jrrd2=<%=@jrrd%>
 <% else -%>
-#opennms.library.jrrd2=/usr/lib64/libjrrd2.so
+#opennms.library.jrrd2=/usr/lib64/libjrrd.so
 <% end -%>
 #
 # The default setting is org.opennms.netmgt.rrd.jrobin.JRobinRrdStrategy
