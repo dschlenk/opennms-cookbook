@@ -53,6 +53,7 @@ template "#{onms_home}/etc/service-configuration.xml" do
     :correlator  => node['opennms']['services']['correlator'],
     :tl1d        => node['opennms']['services']['tl1d'],
     :syslogd     => node['opennms']['services']['syslogd'],
+    :xmlrpcd     => node['opennms']['services']['xmlrpcd'],
     :asterisk_gw => node['opennms']['services']['asterisk_gw'],
     :apm         => node['opennms']['services']['apm']
   )
@@ -176,7 +177,6 @@ template "#{onms_home}/etc/datacollection-config.xml" do
     :trango       => node['opennms']['datacollection']['default']['trango'],
     :wmi          => node['opennms']['datacollection']['default']['wmi'],
     :xmp          => node['opennms']['datacollection']['default']['xmp'],
-    :zertico      => node['opennms']['datacollection']['default']['zertico'],
     :zeus         => node['opennms']['datacollection']['default']['zeus'],
     :vmware3      => node['opennms']['datacollection']['default']['vmware3'],
     :vmware4      => node['opennms']['datacollection']['default']['vmware4'],
@@ -1931,18 +1931,6 @@ template "#{onms_home}/etc/snmp-graph.properties.d/zeus-graph.properties" do
   )
 end
 
-template "#{onms_home}/etc/snmp-graph.properties.d/zertico-graph.properties" do
-  cookbook node[:opennms][:snmp_graph][:zertico][:cookbook]
-  source "snmp-graph.properties.d/zertico-graph.properties.erb"
-  mode 0664
-  owner "root"
-  group "root"
-  notifies :restart, "service[opennms]"
-  variables(
-    :enabled => node[:opennms][:snmp_graph][:zertico][:enabled]
-  )
-end
-
 template "#{onms_home}/etc/snmp-interface-poller-configuration.xml" do
   cookbook node[:opennms][:snmp_iface_poller][:cookbook]
   source "snmp-interface-poller-configuration.xml.erb"
@@ -1995,25 +1983,6 @@ template "#{onms_home}/etc/surveillance-views.xml" do
   variables(
     :default_view => node[:opennms][:surveillance_views][:default_view],
     :default      => node[:opennms][:surveillance_views][:default]
-  )
-end
-
-template "#{onms_home}/etc/jms-northbounder-configuration.xml" do
-  cookbook node[:opennms][:jms_nbi][:cookbook]
-  source "jms-northbounder-configuration.xml.erb"
-  mode 00664
-  owner 'root'
-  group 'root'
-  notifies :restart, 'service[opennms]'
-  variables(
-    :enabled => node[:opennms][:jms_nbi][:enabled],
-    :nagles_delay => node[:opennms][:jms_nbi][:nagles_delay],
-    :batch_size => node[:opennms][:jms_nbi][:batch_size],
-    :queue_size => node[:opennms][:jms_nbi][:queue_size],
-    :message_format => node[:opennms][:jms_nbi][:message_format],
-    :jms_destination => node[:opennms][:jms_nbi][:jms_destination],
-    :send_as_object_message => node[:opennms][:jms_nbi][:send_as_object_message],
-    :first_occurence_only => node[:opennms][:jms_nbi][:first_occurence_only]
   )
 end
 
