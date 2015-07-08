@@ -1,6 +1,8 @@
 ---
 driver:
   name: vagrant
+  network:
+    - ["forwarded_port", {guest: 8980, host: 8980}]
 
 provisioner:
   name: chef_solo
@@ -16,15 +18,22 @@ platforms:
                                 password: { 
                                            postgres: "md5c23797e9a303da48b792b4339c426700" 
                                           }, 
-                                enable_pgdg_yum: false,
-                                
+                                enable_pgdg_yum: true,
+                                version: '9.3',
+                                dir: '/var/lib/pgsql/9.3/data',
                                 config: {
+                                         data_directory: '/var/lib/pgsql/9.3/data',
+                                         shared_preload_libraries: 'pg_stat_statements',
+
                                          autovacuum: "on", 
                                          checkpoint_timeout: "15min", 
                                          track_activities: "on", 
                                          track_counts: "on", 
                                          vacuum_cost_delay: 50
                                         }, 
+                                config_pgtune: {
+                                                max_connections: 160
+                                               },
                                 pg_hba: [
                                          {
                                           addr: "", 
@@ -50,17 +59,18 @@ platforms:
                                         ], 
                                 client: {
                                          packages: [
-                                                    "postgresql",
-                                                    "postgresql-contrib",
-                                                    "postgresql-devel"
+                                                    "postgresql93",
+                                                    "postgresql93-contrib",
+                                                    "postgresql93-devel"
                                                    ]
                                         },
                                 server: { 
                                          packages: [
-                                                    "postgresql-server"
+                                                    "postgresql93-server"
                                                    ],
-                                         service_name: "postgresql"
-                                        }
+                                         service_name: "postgresql-9.3"
+                                        },
+                                contrib: { extensions: [ 'pageinspect', 'pg_buffercache', 'pg_freespacemap', 'pgrowlocks', 'pg_stat_statements', 'pgstattuple' ] }
                               }
                 }
 

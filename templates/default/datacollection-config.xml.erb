@@ -1,8 +1,7 @@
 <?xml version="1.0"?>
 <datacollection-config rrdRepository="<%= @rrd_base_dir %><%= @rrd_dc_dir %>">
   <% if @default['enabled'] -%>
-  <snmp-collection name="default" 
-      snmpStorageFlag="<%= @default['snmpStorageFlag'] %>">
+    <snmp-collection name="default" snmpStorageFlag="<%= @default['snmpStorageFlag'] %>">
         <rrd step="<%= @default['rrd']['step'] %>">
           <% @default['rrd']['rras'].each do |rra| -%>
             <rra><%=rra%></rra>
@@ -206,12 +205,11 @@
   the data in the EJN SNMP MIB is only updated once every 15 min by default or alternatively
   once every 3 min with the hidden "set services epg pgw snmp update-every-three-minutes"
   config option -->
-    <snmp-collection name="ejn" 
-      snmpStorageFlag="<%= @ejn['snmpStorageFlag'] %>">
+    <snmp-collection name="ejn" snmpStorageFlag="<%= @ejn['snmpStorageFlag'] %>">
         <rrd step="<%= @ejn['rrd']['step'] %>">
-       <% @ejn['rrd']['rras'].each do |rra| -%>
-         <rra><%=rra%></rra>
-       <% end -%>
+	  <% @ejn['rrd']['rras'].each do |rra| -%>
+            <rra><%=rra%></rra>
+          <% end -%>
         </rrd>
 
         <include-collection dataCollectionGroup="ejn"/>

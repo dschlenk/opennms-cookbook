@@ -74,11 +74,6 @@ org.opennms.rrd.usequeue=false
 # write to the disk. You may get some performance benefit by increasing threads.
 # This of course depends on your I/O subsystem. It is unlikely that more than 10 threads
 # or so are needed here but there may be some # system where this is not true.
-#
-# The JRobin code however is multi-thread safe and may get some performance benefit
-# by increasing threads.  This of course depends on your I/O subsystem.  It is 
-# unlikely that more than 10 threads or so are needed here but there may be some
-# system where this is not true.
 # 
 # The default setting is 2
 <% if @queue[:writethreads] != 2 -%>
@@ -278,7 +273,6 @@ org.opennms.rrd.tcp.port=<%=@tcp[:port]%>
 <% else -%>
 #org.opennms.rrd.tcp.port=
 <% end -%>
-
 #
 # The queue size for outgoing TCP metrics
 #org.opennms.rrd.queuing.queueSize=50000

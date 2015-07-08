@@ -10,7 +10,6 @@ command.prefix=/usr/bin/rrdtool graph - --imgformat PNG --start {1} --end {2}
 command.prefix=<%=@command_prefix-%>
 <% end -%>
 
-
 #the output type of the image, should correspond to the type we 
 #specified in the command.prefix variable
 output.mime=image/png
@@ -39,3 +38,6 @@ output.mime=image/png
 adhoc.command.title=--title="{3}"
 adhoc.command.ds=DEF:{4}={0}:{5}:{6}
 adhoc.command.graphline={7}:{4}#{8}:"{9}"
+
+
+

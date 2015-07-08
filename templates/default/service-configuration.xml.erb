@@ -106,7 +106,7 @@ maintained
       <invoke method="status" pass="0" at="status"/>
       <invoke method="stop" pass="0" at="stop"/>
    </service>
-   <service enabled="<%=@capsd%>">
+   <service enabled="false">
       <name>OpenNMS:Name=Capsd</name>
       <class-name>org.opennms.netmgt.capsd.jmx.Capsd</class-name>
       <invoke method="init" pass="0" at="start"/>
@@ -162,7 +162,7 @@ maintained
       <invoke method="status" pass="0" at="status"/>
       <invoke method="stop" pass="0" at="stop"/>
    </service>
-   <service enabled="<%=!@linkd%>">
+   <service>
       <name>OpenNMS:Name=EnhancedLinkd</name>
       <class-name>org.opennms.netmgt.enlinkd.jmx.EnhancedLinkd</class-name>
       <invoke method="init" pass="0" at="start"/>
@@ -298,7 +298,7 @@ maintained
       <invoke method="status" pass="0" at="status"/>
       <invoke method="stop" pass="0" at="stop"/>
    </service>
-   <service enabled="<%=@linkd%>">
+   <service enabled="false">
       <name>OpenNMS:Name=Linkd</name>
       <class-name>org.opennms.netmgt.linkd.jmx.Linkd</class-name>
       <invoke method="init" pass="0" at="start"/>

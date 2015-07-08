@@ -1,10 +1,10 @@
 <discovery-configuration threads="<%= @threads %>" packets-per-second="<%= @pps %>"
-        initial-sleep-time="<%= @init_sleep_ms %>" restart-sleep-time="<%= @restart_sleep_ms %>"
-        retries="<%= @retries %>" timeout="<%= @timeout %>"
-        <% if @foreign_source -%>
-        foreign-source="<%= @foreign_source %>"
-        <% end -%>
-        >
+	initial-sleep-time="<%= @init_sleep_ms %>" restart-sleep-time="<%= @restart_sleep_ms %>"
+  <% if @foreign_source -%>
+	retries="<%= @retries %>" timeout="<%= @timeout %>" foreign-source="<%= @foreign_source %>">
+  <% else -%>
+	retries="<%= @retries %>" timeout="<%= @timeout %>">
+  <% end -%>
 
     <!-- see examples/discovery-configuration.xml for options
     <include-range>

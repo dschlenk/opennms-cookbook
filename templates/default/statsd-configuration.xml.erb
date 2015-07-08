@@ -4,6 +4,17 @@
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
   xsi:schemaLocation="http://www.opennms.org/xsd/config/statsd http://www.opennms.org/xsd/config/statistics-daemon-configuration.xsd ">
 
+  <!--
+       The following packages are simple sample configuration.
+       All of them are disabled by default (status="off").
+       Change the status to be "on" on to enable the scheduling.
+
+       To reload the configuration, use the following command:
+       /opt/opennms/bin/send-event.pl \
+         uei.opennms.org/internal/reloadDaemonConfig \
+         -p 'daemonName Statsd'
+  -->
+
   <package name="ThroughputReports">
     <packageReport name="TopN_InOctets" description="Top 20 ifInOctets across all nodes"
                    schedule="0 20 1 * * ?" retainInterval="2592000000"

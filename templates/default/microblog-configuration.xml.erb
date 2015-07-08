@@ -35,23 +35,29 @@
 		authen-password="<%=@default_profile[:authen_password]%>"
 	/>
         <% end -%>
+	<!--
+		Twitter no longer supports username/password for application posting.
+		Instead, you should use OAuth authentication.  To configure OpenNMS
+		for OAuth, run $OPENNMS_HOME/bin/microblog-auth and follow the prompts.
+		It will update this configuration file for you.
+	-->
         <% if @default_profile[:name] != "twitter" -%>
 	<microblog-profile
 		name="twitter"
 		service-url="https://twitter.com/"
-                oauth-consumer-key=""
-                oauth-consumer-secret=""
-                oauth-access-token=""
-                oauth-access-token-secret=""
+		oauth-consumer-key=""
+		oauth-consumer-secret=""
+		oauth-access-token=""
+		oauth-access-token-secret=""
 	/>
         <% else -%>
 	<microblog-profile
 		name="twitter"
 		service-url="https://twitter.com/"
-                oauth-consumer-key=""
-                oauth-consumer-secret=""
-                oauth-access-token=""
-                oauth-access-token-secret=""
+		oauth-consumer-key="<%=@default_profile[:oauth_ckey]%>"
+		oauth-consumer-secret="<%=@default_profile[:oauth_csecret]%>"
+		oauth-access-token="<%=@default_profile[:oauth_atoken]%>"
+		oauth-access-token-secret="<%=@default_profile[:oauth_atoken_secret]%>"
 	/>
         <% end -%>
 </microblog-configuration>

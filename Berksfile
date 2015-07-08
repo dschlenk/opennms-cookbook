@@ -4,5 +4,5 @@ metadata
 group :integration do
   cookbook 'yum-centos'
   cookbook 'yum-epel'
-  cookbook 'postgresql'
+  cookbook 'postgresql', '>= 3.4.20'
 end

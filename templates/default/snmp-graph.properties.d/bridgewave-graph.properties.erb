@@ -6,16 +6,15 @@
 ##################################################
 
 <% if @enabled -%>
-reports=\
-brwaveRadioRSL
+reports=brwaveRadioRSL,\
 <% else -%>
-#reports=\
-#brwaveRadioRSL
+#reports=brwaveRadioRSL,\
 <% end -%>
+
 
 ##################################################
 #
-#      Reports for Bridgewave Wireless Radio
+#	Reports for Bridgewave Wireless Radio
 #
 ##################################################
 
@@ -26,3 +25,4 @@ report.brwaveRadioRSL.command=--title="Bridge Received Signal Level" \
 --vertical-label="VDC" \
 DEF:brwaveRadioRSL={rrd1}:brwaveRadioRSL:AVERAGE \
 AREA:brwaveRadioRSL#0000AA:\
+

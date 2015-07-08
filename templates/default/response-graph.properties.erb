@@ -412,7 +412,7 @@ report.strafeping.command=--title="StrafePing Response Time" \
  DEF:loss={rrd1}:loss:AVERAGE \
  DEF:maxLoss={rrd1}:loss:MAX \
  <% for i in @strafeping_count.downto(1) do -%>
- AREA:cp<%=i%><%=@strafeping_colors[i]%> \
+ AREA:cp<%=i%><%=@strafeping_colors[i][0]%> \
  <% end -%>
  DEF:medianMicro={rrd1}:median:AVERAGE \
  CDEF:median=medianMicro,1000000,/ \
@@ -564,7 +564,6 @@ report.memcached.conns.command=--title="Memcached Connections"  \
  GPRINT:cconns:MAX:"Max \\: %8.2lf %s\\n"
 <% end -%>
 
-<% if @memcached_tconns -%>
 ## connections
 ## connections total
 report.memcached.tconns.name=Memcached Connections (Total)
@@ -579,7 +578,6 @@ report.memcached.tconns.command=--title="Memcached Connections"  \
  GPRINT:tconns:AVERAGE:" Avg \\: %8.2lf %s" \
  GPRINT:tconns:MIN:"Min \\: %8.2lf %s" \
  GPRINT:tconns:MAX:"Max \\: %8.2lf %s\\n"
-<% end -%>
 
 <% if @memcached_struct -%>
 ## connections

@@ -1,14 +1,14 @@
 <EventdConfiguration
-  TCPAddress="<%= @tcp_address %>"
-  TCPPort="<%= @tcp_port %>"
-  UDPAddress="<%= @udp_address %>"
-  UDPPort="<%= @udp_port %>"
-  receivers="<%= @receivers %>"
-  getNextEventID="<%= @get_next_eventid %>"
+        TCPAddress="<%= @tcp_address %>"
+        TCPPort="<%= @tcp_port %>"
+        UDPAddress="<%= @udp_address %>"
+        UDPPort="<%= @udp_port %>"
+	receivers="<%= @receivers %>"
+	getNextEventID="<%= @get_next_eventid %>"
 <% if @sock_so_timeout_req -%>
-  socketSoTimeoutRequired="yes"
+	socketSoTimeoutRequired="yes"
 <% else -%>
-  socketSoTimeoutRequired="no"
+	socketSoTimeoutRequired="no"
 <% end -%>
-  socketSoTimeoutPeriod="<%= @socket_so_timeout_period %>">
+	socketSoTimeoutPeriod="<%= @socket_so_timeout_period %>">
 </EventdConfiguration>

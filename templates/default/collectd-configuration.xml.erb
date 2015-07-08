@@ -2,7 +2,7 @@
 <?castor class-name="org.opennms.netmgt.collectd.CollectdConfiguration"?>
 <collectd-configuration
         threads="<%= @threads %>">
-  
+
     <% if @vmware3[:enabled] -%> 
     <package name="vmware3">
         <filter><![CDATA[<%=@vmware3[:filter]%>]]></filter>
@@ -52,7 +52,7 @@
         <% end -%>
     </package>
     <% end -%>
-    
+
     <% if @vmware5[:enabled] -%> 
     <package name="vmware5">
         <filter><![CDATA[<%=@vmware5[:filter]%>]]></filter>
@@ -80,7 +80,7 @@
 
     <% if @example1[:enabled] -%> 
     <package name="example1">
-        <filter><![CDATA[<%=@example1[:filter]%>]]></filter>
+        <filter><%=@example1[:filter]%></filter>
         <include-range begin="<%=@example1[:ipv4_range][:begin]%>" end="<%=@example1[:ipv4_range][:end]%>"/>
         <include-range begin="<%=@example1[:ipv6_range][:begin]%>" end="<%=@example1[:ipv6_range][:end]%>"/>
 
@@ -125,6 +125,7 @@
         <% end -%>
     </package>
     <% end -%>
+
 
     <% if ( @example1[:enabled] && @example1[:service][:snmp][:enabled]) -%>
     <collector service="SNMP" class-name="org.opennms.netmgt.collectd.SnmpCollector"/>

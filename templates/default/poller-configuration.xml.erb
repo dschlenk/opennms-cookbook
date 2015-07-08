@@ -1,11 +1,13 @@
 <?xml version="1.0"?>
 <?castor class-name="org.opennms.netmgt.poller.PollerConfiguration"?>
 <poller-configuration threads="<%=@threads%>" 
-                      serviceUnresponsiveEnabled="<%=@service_unresponsive_enabled%>"
-                      nextOutageId="SELECT nextval('outageNxtId')"> 
+                      pathOutageEnabled="false"
+                      serviceUnresponsiveEnabled="<%=@service_unresponsive_enabled%>"> 
+
   <node-outage status="<%=@node_outage[:status]%>">
     <critical-service name="<%=@node_outage[:critical_service]%>" />
   </node-outage>
+
   <% if @example1[:enabled]-%>
   <package name="example1">
     <filter><%=@example1[:filter]%></filter>
@@ -206,6 +208,7 @@
 
   </package>
   <% end -%>
+
   <!-- Moved StrafePing to its own package.  This allows for more flexible configuration of which interfaces
     will have StrafePing statistical analysis rather than being on for or off for all interfaces.  Change
     this package's filter / ranges for directing the StrafePinger to choice interfaces.  Note: Strafing all
@@ -222,7 +225,7 @@
     <% end -%>
     <rrd step="<%=@strafer[:rrd][:step]%>">
       <% @strafer[:rrd][:rras].each do |rra| -%>
-      <rra><%=@rra%></rra>
+      <rra><%=rra%></rra>
       <% end -%>
     </rrd>
     <service name="StrafePing" interval="<%=@strafeping[:interval]%>" user-defined="<%=@strafeping[:user_defined]%>" status="<%=@strafeping[:status]%>">

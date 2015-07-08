@@ -11,6 +11,7 @@ default['yum']['opennms-snapshot-common']['failovermethod'] = "roundrobin"
 default['yum']['opennms-snapshot-rhel6']['baseurl']         = "http://yum.opennms.org/snapshot/rhel6"
 default['yum']['opennms-snapshot-rhel6']['failovermethod']  = "roundrobin"
 default['build-essential']['compile_time'] = true
+default['opennms']['default_template_cookbook'] = 'opennms'
 default['opennms']['version'] = '15.0.2-1'
 default['opennms']['allow_downgrade'] = false
 default['opennms']['stable'] = true
@@ -21,6 +22,7 @@ default['opennms']['plugin']['xml'] = false
 default['opennms']['plugin']['nsclient'] = false
 default['opennms']['addl_handlers'] = []
 # opennms.conf
+default['opennms']['conf']['cookbook']       = node['opennms']['default_template_cookbook']
 default['opennms']['conf']['home']           = "/opt/opennms"
 default['opennms']['conf']['pidfile']        = "#{default['opennms']['conf']['home']}/logs/opennms.pid"
 default['opennms']['conf']['logdir']         = "#{default['opennms']['conf']['home']}/logs"
@@ -42,6 +44,7 @@ default['opennms']['conf']['max_stack_sgmt'] = "8192"
 default['opennms']['conf']['command']        = ""
 
 # non-default daemons
+default['opennms']['services']['cookbook']    = node['opennms']['default_template_cookbook']
 default['opennms']['services']['dhcpd']       = false
 default['opennms']['services']['snmp_poller'] = false
 default['opennms']['services']['linkd']       = false
@@ -51,8 +54,9 @@ default['opennms']['services']['syslogd']     = false
 default['opennms']['services']['asterisk_gw'] = false
 default['opennms']['services']['apm']         = false
 # opennms.properties
+default['opennms']['properties']['cookbook'] = node['opennms']['default_template_cookbook']
 # ICMP
-default['opennms']['properties']['icmp']['pinger_class'] = "org.opennms.netmgt.icmp.jni6.Jni6Pinger"
+default['opennms']['properties']['icmp']['pinger_class'] = nil #"org.opennms.netmgt.icmp.jni6.Jni6Pinger"
 default['opennms']['properties']['icmp']['require_v4']   = nil
 default['opennms']['properties']['icmp']['require_v6']   = nil
 # SNMP
@@ -99,7 +103,7 @@ default['opennms']['properties']['reporting']['template_dir']         = "#{defau
 default['opennms']['properties']['reporting']['report_dir']           = "#{default['opennms']['conf']['home']}/share/reports"
 default['opennms']['properties']['reporting']['report_logo']          = "#{default['opennms']['conf']['home']}/webapps/images/logo.gif"
 default['opennms']['properties']['reporting']['ksc_graphs_per_line']  = 1
-default['opennms']['properties']['reporting']['jasper_version']       = "3.7.6"
+default['opennms']['properties']['reporting']['jasper_version']       = "5.6.1"
 # Eventd IPC
 default['opennms']['properties']['eventd']['proxy_host']     = nil
 default['opennms']['properties']['eventd']['proxy_port']     = nil
@@ -159,18 +163,19 @@ default['opennms']['properties']['sms']['polling']       = true
 # Mapping / Geocoding
 default['opennms']['properties']['geo']['map_type']       = "OpenLayers"
 default['opennms']['properties']['geo']['api_key']        = ""
-default['opennms']['properties']['geo']['geocoder_class'] = "org.opennms.features.poller.remote.gwt.server.geocoding.NullGeocoder"
+default['opennms']['properties']['geo']['geocoder_class'] = nil #"org.opennms.features.poller.remote.gwt.server.geocoding.NullGeocoder"
 default['opennms']['properties']['geo']['rate']           = 10
 default['opennms']['properties']['geo']['referrer']       = "http://localhost/"
 default['opennms']['properties']['geo']['min_quality']    = "ZIP"
 default['opennms']['properties']['geo']['email']          = ""
-default['opennms']['properties']['geo']['tile_url']       = "http://otile1.mqcdn.com/tiles/1.0.0/osm/${z}/${x}/${y}.png"
+default['opennms']['properties']['geo']['tile_url']       = nil #"http://otile1.mqcdn.com/tiles/1.0.0/osm/${z}/${x}/${y}.png"
 # access point monitor
 default['opennms']['apm']['threads']           = 30
 default['opennms']['apm']['pscan_interval']    = 1800000
 default['opennms']['apm']['aruba_enabled']     = true
 default['opennms']['apm']['moto_enabled']      = true
 # database reports - availability
+default['opennms']['db_reports']['avail']['cookbook']                       = node['opennms']['default_template_cookbook']
 default['opennms']['db_reports']['avail']['cal']['logo']                    = "#{default['opennms']['conf']['home']}/etc/reports/logo.gif"
 default['opennms']['db_reports']['avail']['cal']['endDate']['interval']     = "day"
 default['opennms']['db_reports']['avail']['cal']['endDate']['count']        = 1
@@ -182,6 +187,7 @@ default['opennms']['db_reports']['avail']['classic']['endDate']['count']    = 1
 default['opennms']['db_reports']['avail']['classic']['endDate']['hours']    = 23
 default['opennms']['db_reports']['avail']['classic']['endDate']['minutes']  = 59
 # categories.xml
+default['opennms']['categories']['cookbook']           = node['opennms']['default_template_cookbook']
 default['opennms']['categories']['common_rule']        = "IPADDR != '0.0.0.0'"
 default['opennms']['categories']['overall']['enable']   = true
 default['opennms']['categories']['overall']['label']    = "Overall Service Availability"
@@ -195,8 +201,8 @@ default['opennms']['categories']['interfaces']['label']    = "Network Interfaces
 default['opennms']['categories']['interfaces']['comment']  = "This category reflects the ability to 'ping' managed devices and SNMP agents.  'Ping', using the ICMP protocol, tests a devices network connectivity/availability."
 default['opennms']['categories']['interfaces']['normal']   = 99.99
 default['opennms']['categories']['interfaces']['warning']  = 97
-default['opennms']['categories']['interfaces']['services'] = ["ICMP,SNMP"]
-default['opennms']['categories']['interfaces']['rule']     = "isICMP | isSNMP) & (IPADDR != '0.0.0.0')"
+default['opennms']['categories']['interfaces']['services'] = ["ICMP","SNMP"]
+default['opennms']['categories']['interfaces']['rule']     = "(isICMP | isSNMP) & (IPADDR != '0.0.0.0')"
 default['opennms']['categories']['email']['enable']   = true
 default['opennms']['categories']['email']['label']    = "Email Servers"
 default['opennms']['categories']['email']['comment']  = "This category includes all managed interfaces which are running an Email service, including SMTP, POP3, or IMAP.  This will include MS Exchange servers running these protocols."
@@ -247,10 +253,12 @@ default['opennms']['categories']['inet']['warning']  = 97
 default['opennms']['categories']['inet']['services'] = ["ICMP"]
 default['opennms']['categories']['inet']['rule']     = "ipaddr == '0.0.0.0'"
 # chart-configuration.xml
+default['opennms']['chart']['cookbook']         = node['opennms']['default_template_cookbook']
 default['opennms']['chart']['severity_enable']  = true
 default['opennms']['chart']['outages_enable']   = true
 default['opennms']['chart']['inventory_enable'] = true
 # collectd-configuration.xml
+default['opennms']['collectd']['cookbook']         = node['opennms']['default_template_cookbook']
 default['opennms']['collectd']['threads'] = 50
 default['opennms']['collectd']['vmware3']['enabled']                     = true
 default['opennms']['collectd']['vmware3']['filter']                      = "(IPADDR != '0.0.0.0') & (categoryName == 'VMware3')"
@@ -286,7 +294,7 @@ default['opennms']['collectd']['vmware4']['service']['cim_host']['interval']   =
 default['opennms']['collectd']['vmware4']['service']['cim_host']['status']     = "on"
 default['opennms']['collectd']['vmware4']['service']['cim_host']['collection'] = "default-ESX-HostSystem"
 default['opennms']['collectd']['vmware4']['service']['cim_host']['threshold']  = true
-default['opennms']['collectd']['vmware4']['enabled']                     = true
+default['opennms']['collectd']['vmware5']['enabled']                     = true
 default['opennms']['collectd']['vmware5']['filter']                      = "(IPADDR != '0.0.0.0') & (categoryName == 'VMware5')"
 default['opennms']['collectd']['vmware5']['service']['vm']['enabled']    = true
 default['opennms']['collectd']['vmware5']['service']['vm']['interval']   = 300000
@@ -303,7 +311,6 @@ default['opennms']['collectd']['vmware5']['service']['cim_host']['interval']   =
 default['opennms']['collectd']['vmware5']['service']['cim_host']['status']     = "on"
 default['opennms']['collectd']['vmware5']['service']['cim_host']['collection'] = "default-ESX-HostSystem"
 default['opennms']['collectd']['vmware5']['service']['cim_host']['threshold']  = true
-default['opennms']['collectd']['vmware5']['enabled'] = nil
 default['opennms']['collectd']['example1']['enabled']                      = true
 default['opennms']['collectd']['example1']['filter']                       = "IPADDR != '0.0.0.0'"
 default['opennms']['collectd']['example1']['ipv4_range']['begin']          = "1.1.1.1"
@@ -329,8 +336,8 @@ default['opennms']['collectd']['example1']['service']['opennms_jvm']['timeout'] 
 default['opennms']['collectd']['example1']['service']['opennms_jvm']['protocol']      = "rmi"
 default['opennms']['collectd']['example1']['service']['opennms_jvm']['url_path']      = "/jmxrmi"
 default['opennms']['collectd']['example1']['service']['opennms_jvm']['rrd_base_name'] = "java"
-default['opennms']['collectd']['example1']['service']['opennms_jvm']['ds_name']       = "opennms-java"
-default['opennms']['collectd']['example1']['service']['opennms_jvm']['friendly_name'] = "opennms-java"
+default['opennms']['collectd']['example1']['service']['opennms_jvm']['ds_name']       = "opennms-jvm"
+default['opennms']['collectd']['example1']['service']['opennms_jvm']['friendly_name'] = "opennms-jvm"
 default['opennms']['collectd']['example1']['service']['opennms_jvm']['collection']    = "jsr160"
 default['opennms']['collectd']['example1']['service']['opennms_jvm']['threshold']     = true
 default['opennms']['collectd']['example1']['service']['postgresql']['enabled']     = true
@@ -343,6 +350,7 @@ default['opennms']['collectd']['example1']['service']['postgresql']['user']     
 default['opennms']['collectd']['example1']['service']['postgresql']['password']   = "postgres"
 default['opennms']['collectd']['example1']['service']['postgresql']['url']        = "jdbc:postgresql://OPENNMS_JDBC_HOSTNAME:5432/opennms"
 # Data Collection
+default['opennms']['datacollection']['cookbook']                    = node['opennms']['default_template_cookbook']
 default['opennms']['datacollection']['default']['enabled']          = true
 default['opennms']['datacollection']['default']['snmpStorageFlag']  = "select"
 default['opennms']['datacollection']['default']['rrd']['step']      = 300
@@ -416,6 +424,7 @@ default['opennms']['datacollection']['ejn']['rrd']['step']      = 180
 default['opennms']['datacollection']['ejn']['rrd']['rras']      = ["RRA:AVERAGE:0.5:1:3360","RRA:AVERAGE:0.5:20:1488","RRA:AVERAGE:0.5:480:366","RRA:MAX:0.5:480:366","RRA:MIN:0.5:480:366"]
 default['opennms']['datacollection']['ejn']['rrd']['rras']      = ["RRA:AVERAGE:0.5:1:3360","RRA:AVERAGE:0.5:20:1488","RRA:AVERAGE:0.5:480:366","RRA:MAX:0.5:480:366","RRA:MIN:0.5:480:366"]
 # discovery-configuration.xml
+default['opennms']['discovery']['cookbook']         = node['opennms']['default_template_cookbook']
 default['opennms']['discovery']['threads']          = 1
 default['opennms']['discovery']['pps']              = 1
 default['opennms']['discovery']['init_sleep_ms']    = 30000
@@ -424,6 +433,7 @@ default['opennms']['discovery']['retries']          = 1
 default['opennms']['discovery']['timeout']          = 2000
 default['opennms']['discovery']['foreign_source']   = nil
 # enlinkd-configuration.xml
+default['opennms']['enlinkd']['cookbook']         = node['opennms']['default_template_cookbook']
 default['opennms']['enlinkd']['threads'] = 5
 default['opennms']['enlinkd']['init_sleep_time'] = 60000
 default['opennms']['enlinkd']['rescan_interval'] = 86400000
@@ -434,6 +444,7 @@ default['opennms']['enlinkd']['ospf'] = true
 default['opennms']['enlinkd']['isis'] = true
 
 # eventd-configuration.xml
+default['opennms']['eventd']['cookbook']               = node['opennms']['default_template_cookbook']
 default['opennms']['eventd']['tcp_address']            = "127.0.0.1"
 default['opennms']['eventd']['tcp_port']               = 5817
 default['opennms']['eventd']['udp_address']            = "127.0.0.1"
@@ -443,9 +454,11 @@ default['opennms']['eventd']['get_next_eventid']       = "SELECT nextval('events
 default['opennms']['eventd']['sock_so_timeout_req']    = true
 default['opennms']['eventd']['socket_so_timeout_period'] = 3000
 # events-archiver-configuration.xml
+default['opennms']['events_archiver']['cookbook']         = node['opennms']['default_template_cookbook']
 default['opennms']['events_archiver']['age']        = "7d"
 default['opennms']['events_archiver']['separator'] = "#"
 # javamail-configuration.properties
+default['opennms']['javamail_props']['cookbook']         = node['opennms']['default_template_cookbook']
 default['opennms']['javamail_props']['from_address']          = nil
 default['opennms']['javamail_props']['mail_host']             = nil
 default['opennms']['javamail_props']['mailer']                = nil
@@ -462,6 +475,7 @@ default['opennms']['javamail_props']['starttls']              = nil
 default['opennms']['javamail_props']['message_content_type']  = nil
 default['opennms']['javamail_props']['charset']               = nil
 # javamail-configuration.xml
+default['opennms']['javamail_config']['cookbook']         = node['opennms']['default_template_cookbook']
 default['opennms']['javamail_config']['default_read_config_name'] = "localhost"
 default['opennms']['javamail_config']['default_send_config_name'] = "localhost"
 default['opennms']['javamail_config']['default_read']['attempt_interval'] = 1000
@@ -497,6 +511,7 @@ default['opennms']['javamail_config']['default_send']['body']               = "T
 default['opennms']['javamail_config']['default_send']['user']               = "opennms"
 default['opennms']['javamail_config']['default_send']['password']           = "opennms"
 # jcifs.properties
+default['opennms']['jcifs']['cookbook']         = node['opennms']['default_template_cookbook']
 default['opennms']['jcifs']['loglevel']      = 1
 default['opennms']['jcifs']['wins']          = nil
 default['opennms']['jcifs']['lmhosts']       = nil
@@ -507,6 +522,7 @@ default['opennms']['jcifs']['username']      = nil
 default['opennms']['jcifs']['password']      = nil
 default['opennms']['jcifs']['client_laddr']  = nil
 # jdbc-datacollection-config.xml
+default['opennms']['jdbc_dc']['cookbook']         = node['opennms']['default_template_cookbook']
 default['opennms']['jdbc_dc']['rrd_repository']     = "#{default['opennms']['conf']['home']}/share/rrd/snmp/"
 default['opennms']['jdbc_dc']['enable_default']     = true
 default['opennms']['jdbc_dc']['default']['rrd']['step'] = 300
@@ -553,6 +569,7 @@ default['opennms']['jdbc_dc']['pgsql']['rrd']['rras']     = ["RRA:AVERAGE:0.5:1:
 default['opennms']['jdbc_dc']['pgsql']['tablespace_size'] = true
 default['opennms']['jdbc_dc']['pgsql']['stat_database']   = true
 # jmx-datacollection-config.xml
+default['opennms']['jmx_dc']['cookbook']         = node['opennms']['default_template_cookbook']
 default['opennms']['jmx_dc']['rrd_repository']       = "#{default['opennms']['conf']['home']}/share/rrd/snmp/"
 default['opennms']['jmx_dc']['enable_jboss']         = true
 default['opennms']['jmx_dc']['jboss']['rrd']['step'] = 300
@@ -597,6 +614,7 @@ default['opennms']['jmx_dc']['jsr160']['jvm_gc_concurrent_mark_sweep']['enabled'
 default['opennms']['jmx_dc']['jsr160']['jvm_gc_ps_mark_sweep']['enabled']           = true
 default['opennms']['jmx_dc']['jsr160']['jvm_gc_ps_scavenge']['enabled']             = true
 # linkd-configuration.xml
+default['opennms']['linkd']['cookbook']         = node['opennms']['default_template_cookbook']
 default['opennms']['linkd']['threads']                      = 5
 default['opennms']['linkd']['initial_sleep_time']           = 3600000
 default['opennms']['linkd']['snmp_poll_interval']           = 18000000
@@ -617,6 +635,7 @@ default['opennms']['linkd']['vlan']['enable_hp']            = true
 default['opennms']['linkd']['vlan']['enable_cisco']         = true
 default['opennms']['linkd']['vlan']['enable_extreme']       = true
 # log4j2.xml
+default['opennms']['log4j2']['cookbook']         = node['opennms']['default_template_cookbook']
 default['opennms']['log4j2']['size'] = '100MB'
 default['opennms']['log4j2']['access_point_monitor'] = "DEBUG"
 default['opennms']['log4j2']['ackd'] = "DEBUG"
@@ -660,6 +679,7 @@ default['opennms']['log4j2']['web'] = "DEBUG"
 default['opennms']['log4j2']['xmlrpcd'] = "DEBUG"
 
 # magic-users.properties
+default['opennms']['magic_users']['cookbook']         = node['opennms']['default_template_cookbook']
 default['opennms']['magic_users']['admin_users']     = "admin"
 default['opennms']['magic_users']['ro_users']        = ""
 default['opennms']['magic_users']['dashboard_users'] = ""
@@ -667,6 +687,7 @@ default['opennms']['magic_users']['provision_users'] = ""
 default['opennms']['magic_users']['remoting_users']  = ""
 default['opennms']['magic_users']['rest_users']      = "iphone"
 # map.properties
+default['opennms']['map']['cookbook']         = node['opennms']['default_template_cookbook']
 default['opennms']['map']['severity']['critical']['label'] = "Critical"
 default['opennms']['map']['severity']['critical']['color'] = "red"
 default['opennms']['map']['severity']['critical']['flash'] = true
@@ -770,12 +791,16 @@ default['opennms']['map']['enable']['reload']      = false
 default['opennms']['map']['enable']['contextmenu'] = true
 default['opennms']['map']['enable']['doubleclick'] = true
 # microblog-configuration.xml 
-# NOTE: To define a profile not named identica or twitter you'll need to define ...['service_url'] as well.
-# NOTE: Twitter requires OAuth now instead of username/password. See template or OpenNMS source config file for details.
-default['opennms']['microblog']['default_profile']['name']            = "identica"
-default['opennms']['microblog']['default_profile']['authen_username'] = "yourusername"
-default['opennms']['microblog']['default_profile']['authen_password'] = "yourpassword"
+default['opennms']['microblog']['cookbook']         = node['opennms']['default_template_cookbook']
+default['opennms']['microblog']['default_profile']['name']                = "twitter" # or 'identica'
+default['opennms']['microblog']['default_profile']['authen_username']     = "yourusername" # relevant for identica only
+default['opennms']['microblog']['default_profile']['authen_password']     = "yourpassword" # relevant for identica only
+default['opennms']['microblog']['default_profile']['oauth_ckey']          = nil # relevant for twitter only
+default['opennms']['microblog']['default_profile']['oauth_csecret']       = nil # relevant for twitter only
+default['opennms']['microblog']['default_profile']['oauth_atoken']        = nil # relevant for twitter only
+default['opennms']['microblog']['default_profile']['oauth_atoken_secret'] = nil # relevant for twitter only
 # model-importer.properties / provisiond-configuration.xml
+default['opennms']['importer']['cookbook']         = node['opennms']['default_template_cookbook']
 default['opennms']['importer']['import_url']         = "file:/path/to/dump.xml"
 default['opennms']['importer']['schedule']           = "0 0 0 1 1 ? 2023"
 default['opennms']['importer']['threads']            = 8
@@ -785,15 +810,17 @@ default['opennms']['importer']['write_threads']      = 8
 default['opennms']['importer']['requisition_dir']    = "#{default['opennms']['conf']['home']}/etc/imports"
 default['opennms']['importer']['foreign_source_dir'] = "#{default['opennms']['conf']['home']}/etc/foreign-sources"
 # modemConfig.properties
+default['opennms']['modem']['cookbook']         = node['opennms']['default_template_cookbook']
 # NOTE: Predefined options are: mac2412, mac2414, macFA22, macFA24, macFA42, macFA44, acm0, acm1, acm2, acm3, acm4, acm5.
 # To define your own, you'll need to populate custom_modem with the following keys defined: name, port, model, manufacturer, baudrate, and optionally pin. The defaults for all predefined modems are: 
 # port: /dev/tty(\.usbmodem)?#{name}
 # model: w760i
 # manufacturer: Sony Ericsson
 # baudrate: 57600
-default['opennms']['modem'] = "mac2412"
+default['opennms']['modem']['model'] = "mac2412"
 default['opennms']['custom_modem'] = nil
 # notifd-configuration.xml
+default['opennms']['notifd']['cookbook']         = node['opennms']['default_template_cookbook']
 default['opennms']['notifd']['status'] = "off"
 default['opennms']['notifd']['match_all'] = true
 default['opennms']['notifd']['auto_ack']['service_unresponsive'] = true
@@ -802,6 +829,7 @@ default['opennms']['notifd']['auto_ack']['interface_down']       = true
 default['opennms']['notifd']['auto_ack']['node_down']            = true
 default['opennms']['notifd']['auto_ack']['widespread_outage']    = true
 # notificationCommands.xml
+default['opennms']['notification_commands']['cookbook']         = node['opennms']['default_template_cookbook']
 # Control which default commands are enabled. New commands can be created with the notif_command LWRP.
 default['opennms']['notification_commands']['java_pager_email']   = true
 default['opennms']['notification_commands']['java_email']         = true
@@ -817,39 +845,40 @@ default['opennms']['notification_commands']['microblog_update']   = true
 default['opennms']['notification_commands']['microblog_reply']    = true
 default['opennms']['notification_commands']['microblog_dm']       = true
 # notifications.xml
+default['opennms']['notifications']['cookbook']         = node['opennms']['default_template_cookbook']
 default['opennms']['notifications']['interface_down']['enabled']          = true
 default['opennms']['notifications']['interface_down']['status']           = "on"
 default['opennms']['notifications']['interface_down']['rule']             = "IPADDR != '0.0.0.0'"
 default['opennms']['notifications']['interface_down']['destination_path'] = "Email-Admin"
-default['opennms']['notifications']['interface_down']['text_message']     = "All services are down on interface %interfaceresolve% (%interface%)\n on node %nodelabel%.  New Outage records have been created\n and service level availability calculations will be impacted\n until this outage is resolved.\n"
+default['opennms']['notifications']['interface_down']['text_message']     = "All services are down on interface %interfaceresolve% (%interface%) \non node %nodelabel%.  New Outage records have been created \nand service level availability calculations will be impacted \nuntil this outage is resolved.  "
 default['opennms']['notifications']['interface_down']['subject']          = "Notice #%noticeid%: %interfaceresolve% (%interface%) on node %nodelabel% down."
 default['opennms']['notifications']['interface_down']['numeric_message']  = "111-%noticeid%"
 default['opennms']['notifications']['node_down']['enabled']          = true
 default['opennms']['notifications']['node_down']['status']           = "on"
 default['opennms']['notifications']['node_down']['destination_path'] = "Email-Admin"
 default['opennms']['notifications']['node_down']['rule']             = "IPADDR != '0.0.0.0'"
-default['opennms']['notifications']['node_down']['text_message']     = "All services are down on node %nodelabel%.  New Outage records have\nbeen created and service level availability calculations will\nbe impacted until this outage is resolved."
+default['opennms']['notifications']['node_down']['text_message']     = "All services are down on node %nodelabel%.  New Outage records have \nbeen created and service level availability calculations will \nbe impacted until this outage is resolved.  "
 default['opennms']['notifications']['node_down']['subject']          = "Notice #%noticeid%: node %nodelabel% down."
 default['opennms']['notifications']['node_down']['numeric_message']  = "111-%noticeid%"
 default['opennms']['notifications']['node_lost_service']['enabled']          = true
 default['opennms']['notifications']['node_lost_service']['status']           = "on"
 default['opennms']['notifications']['node_lost_service']['destination_path'] = "Email-Admin"
 default['opennms']['notifications']['node_lost_service']['rule']             = "IPADDR != '0.0.0.0'"
-default['opennms']['notifications']['node_lost_service']['text_message']     = "The %service% service poll on interface %interfaceresolve% (%interface%)\non node %nodelabel% failed at %time%.\n"
+default['opennms']['notifications']['node_lost_service']['text_message']     = "The %service% service poll on interface %interfaceresolve% (%interface%) \non node %nodelabel% failed at %time%. "
 default['opennms']['notifications']['node_lost_service']['subject']          = "Notice #%noticeid%: %service% down on %interfaceresolve% (%interface%) on node %nodelabel%."
 default['opennms']['notifications']['node_lost_service']['numeric_message']  = "111-%noticeid%"
 default['opennms']['notifications']['node_added']['enabled']          = true
 default['opennms']['notifications']['node_added']['status']           = "on"
 default['opennms']['notifications']['node_added']['destination_path'] = "Email-Admin"
 default['opennms']['notifications']['node_added']['rule']             = "IPADDR != '0.0.0.0'"
-default['opennms']['notifications']['node_added']['text_message']     = "OpenNMS has discovered a new node named\n%parm[nodelabel]%. Please be advised.\n"
+default['opennms']['notifications']['node_added']['text_message']     = "OpenNMS has discovered a new node named\n%parm[nodelabel]%. Please be advised."
 default['opennms']['notifications']['node_added']['subject']          = "Notice #%noticeid%: %parm[nodelabel]% discovered."
 default['opennms']['notifications']['node_added']['numeric_message']  = "111-%noticeid%"
 default['opennms']['notifications']['interface_deleted']['enabled']          = true
 default['opennms']['notifications']['interface_deleted']['status']           = "on"
 default['opennms']['notifications']['interface_deleted']['destination_path'] = "Email-Admin"
 default['opennms']['notifications']['interface_deleted']['rule']             = "IPADDR != '0.0.0.0'"
-default['opennms']['notifications']['interface_deleted']['text_message']     = "Due to extended downtime or operator action, the interface %interfaceresolve% (%interface%)\non node %nodelabel% has been deleted from OpenNMS&apos;s polling database.\n"
+default['opennms']['notifications']['interface_deleted']['text_message']     = "Due to extended downtime or operator action, the interface %interfaceresolve% (%interface%) \non node %nodelabel% has been deleted from OpenNMS&apos;s polling database."
 default['opennms']['notifications']['interface_deleted']['subject']          = "Notice #%noticeid%: [OpenNMS] %interfaceresolve% (%interface%) on node %nodelabel% deleted."
 default['opennms']['notifications']['interface_deleted']['numeric_message']  = "111-%noticeid%"
 default['opennms']['notifications']['high_threshold']['enabled']          = true
@@ -885,6 +914,7 @@ default['opennms']['notifications']['high_threshold_rearmed']['text_message']   
 default['opennms']['notifications']['high_threshold_rearmed']['subject']          = "Notice #%noticeid%: High Threshold Rearmed for %parm[ds]% on node %nodelabel%."
 default['opennms']['notifications']['high_threshold_rearmed']['numeric_message']  = nil
 # nsclient-datacollection-config.xml
+default['opennms']['nsclient_datacollection']['cookbook']         = node['opennms']['default_template_cookbook']
 default['opennms']['nsclient_datacollection']['rrd_repository']                   = "#{default['opennms']['conf']['home']}/share/rrd/snmp/"
 default['opennms']['nsclient_datacollection']['enable_default']                   = true
 default['opennms']['nsclient_datacollection']['default']['rrd']['step']           = 300
@@ -908,6 +938,7 @@ default['opennms']['nsclient_datacollection']['default']['live']['interval'] = 8
 default['opennms']['nsclient_datacollection']['default']['mailmarshal']['enabled'] = true
 default['opennms']['nsclient_datacollection']['default']['mailmarshal']['interval'] = 86400000
 # poller-configuration.xml
+default['opennms']['poller']['cookbook']         = node['opennms']['default_template_cookbook']
 default['opennms']['poller']['threads']                         = 30
 default['opennms']['poller']['service_unresponsive_enabled']    = false
 default['opennms']['poller']['node_outage']['status']           = "on"
@@ -1010,6 +1041,7 @@ default['opennms']['poller']['example1']['hyperichq']['retry']          = 1
 default['opennms']['poller']['example1']['hyperichq']['timeout']        = 3000
 default['opennms']['poller']['example1']['hyperichq']['rrd_repository'] = "#{default['opennms']['conf']['home']}/share/rrd/response"
 default['opennms']['poller']['example1']['hyperichq']['rrd_base_name']  = "hyperic-hq"
+default['opennms']['poller']['example1']['hyperichq']['ds_name']        = "hyperic-hq"
 default['opennms']['poller']['example1']['hyperichq']['page_sequence']['login']['path'] = "/Login.do"
 default['opennms']['poller']['example1']['hyperichq']['page_sequence']['login']['port'] = 7080
 default['opennms']['poller']['example1']['hyperichq']['page_sequence']['login']['success_match'] = "(HQ Login)|(Sign in to Hyperic HQ)"
@@ -1124,7 +1156,7 @@ default['opennms']['poller']['example1']['vmware_entity']['user_defined']   = fa
 default['opennms']['poller']['example1']['vmware_entity']['status']         = "on"
 default['opennms']['poller']['example1']['vmware_entity']['retry']          = 2
 default['opennms']['poller']['example1']['vmware_entity']['timeout']        = 3000
-default['opennms']['poller']['strafer']['enable'] = true
+default['opennms']['poller']['strafer']['enabled'] = true
 default['opennms']['poller']['strafer']['filter'] = "IPADDR != '0.0.0.0'"
 default['opennms']['poller']['strafer']['ipv4_range']['begin'] = "10.1.1.1"
 default['opennms']['poller']['strafer']['ipv4_range']['end']   = "10.1.1.10"
@@ -1144,6 +1176,7 @@ default['opennms']['poller']['strafer']['strafeping']['wait_interval']      = 50
 default['opennms']['poller']['strafer']['strafeping']['rrd_repository']     = "#{default['opennms']['conf']['home']}/share/rrd/response"
 default['opennms']['poller']['strafer']['strafeping']['rrd_base_name']      = "strafeping"
 # remedy.properties
+default['opennms']['remedy']['cookbook']         = node['opennms']['default_template_cookbook']
 default['opennms']['remedy']['username']                     = "opennmstnn"
 default['opennms']['remedy']['password']                     = "TNNwsC4ll"
 default['opennms']['remedy']['authentication']               = "ARSystem"
@@ -1176,11 +1209,14 @@ default['opennms']['remedy']['resolution']                   = "Chiusura da Open
 default['opennms']['remedy']['reason_resolved']              = "Automated Resolution Reported"
 default['opennms']['remedy']['reason_cancelled']             = "No longer a Causal CI"
 # reportd-configuration.xml
+default['opennms']['reportd']['cookbook']         = node['opennms']['default_template_cookbook']
 default['opennms']['reportd']['storage_location'] = "#{default['opennms']['conf']['home']}/share/reports/"
 default['opennms']['reportd']['persist_reports']  = "yes"
 # response adhoc graphs
+default['opennms']['response_adhoc_graph']['cookbook']         = node['opennms']['default_template_cookbook']
 default['opennms']['response_adhoc_graph']['command_prefix'] = nil # lets you customize the entire command prefix
 # respons-graph.properties
+default['opennms']['response_graph']['cookbook']         = node['opennms']['default_template_cookbook']
 # There's a response_graph LWRP to add new response graphs. This just lets you change
 # some defaults and disable the out-of-the-box graphs
 default['opennms']['response_graph']['image_format']        = "png" # can be gif, jpg or png but only png works with both rrdtool and jrobin
@@ -1241,6 +1277,7 @@ default['opennms']['response_graph']['ciscoping_time']      = true
 # because I'm lazy, you can't disable ciscoping_success. Feel free to add logic to not print a comma and \ on the last graph in the list if you want.
 
 # rrd-configuration.properties
+default['opennms']['rrd']['cookbook']         = node['opennms']['default_template_cookbook']
 default['opennms']['rrd']['strategy_class']                          = nil
 default['opennms']['rrd']['interface_jar']                           = nil
 default['opennms']['rrd']['jrrd']                                    = nil
@@ -1262,6 +1299,7 @@ default['opennms']['rrd']['usetcp']                                  = false
 default['opennms']['rrd']['tcp']['host']                             = nil
 default['opennms']['rrd']['tcp']['port']                             = nil
 # rtc-configuration.xml
+default['opennms']['rtc']['cookbook']         = node['opennms']['default_template_cookbook']
 default['opennms']['rtc']['updaters']                      = 10
 default['opennms']['rtc']['senders']                       = 5
 default['opennms']['rtc']['rolling_window']                = "24h"
@@ -1271,17 +1309,21 @@ default['opennms']['rtc']['high_threshold_interval']       = "45s"
 default['opennms']['rtc']['user_refresh_interval']         = "2m"
 default['opennms']['rtc']['errors_before_url_unsubscribe'] = 5
 # site-status-views.xml
+default['opennms']['site_status_views']['cookbook']         = node['opennms']['default_template_cookbook']
 default['opennms']['site_status_views']['default_view']['name'] = "default"
 # Array of single element hashes of {label => name}, like [{"Routers" => "Routers"}, {"Switches" => "Switches"}, {"Servers" => "Servers"}] 
 # which duplicates the default setting. 
 # If it was just be a single hash but then you wouldn't get defined ordering of elements. 
 default['opennms']['site_status_views']['default_view']['rows'] = nil
 # smsPhonebook.properties
+default['opennms']['sms_phonebook']['cookbook']         = node['opennms']['default_template_cookbook']
 default['opennms']['sms_phonebook']['entries'] = {'127.0.0.1' => '+19195551212'}
 # snmp-adhoc-graph.properties
+default['opennms']['snmp_adhoc_graph']['cookbook']         = node['opennms']['default_template_cookbook']
 default['opennms']['snmp_adhoc_graph']['image_format'] = "png" # or gif, or jpg, but png is te only cross-tool compatible format
 default['opennms']['snmp_adhoc_graph']['command_prefix'] = nil # lets you customize entire command prefix
 # snmp-graph.properties / snmp-graph.properties.d/*
+default['opennms']['snmp_graph']['cookbook']         = node['opennms']['default_template_cookbook']
 default['opennms']['snmp_graph']['image_format']         = "png" # or gif, or jpg, but png is the only cross-tool compatible format
 default['opennms']['snmp_graph']['command_prefix']       = nil # lets you customize the entire command prefix
 default['opennms']['snmp_graph']['default_font_size']    = 7
@@ -1291,88 +1333,168 @@ default['opennms']['snmp_graph']['include_dir']          = "snmp-graph.propertie
 default['opennms']['snmp_graph']['include_rescan']       = nil
 #default['opennms']['snmp_graph']['onms_queued_updates']  = true
 #default['opennms']['snmp_graph']['onms_queued_pending']  = true
-default['opennms']['snmp_graph']['threegpp']             = false
-default['opennms']['snmp_graph']['acmepacket']           = true
-default['opennms']['snmp_graph']['adonis']               = true
-default['opennms']['snmp_graph']['adsl']                 = true
-default['opennms']['snmp_graph']['airport']              = true
-default['opennms']['snmp_graph']['aix']                  = true
-default['opennms']['snmp_graph']['akcp']                 = true
-default['opennms']['snmp_graph']['alvarion']             = true
-default['opennms']['snmp_graph']['apc']                  = true
-default['opennms']['snmp_graph']['ascend']               = true
-default['opennms']['snmp_graph']['asterisk']             = true
-default['opennms']['snmp_graph']['bgp_ietf']             = true
-default['opennms']['snmp_graph']['bluecoat_sgproxy']     = true
-default['opennms']['snmp_graph']['bridgewave']           = true
-default['opennms']['snmp_graph']['brocade']              = true
-default['opennms']['snmp_graph']['ca_empire']            = true
-default['opennms']['snmp_graph']['checkpoint']           = true
-default['opennms']['snmp_graph']['cisco']                = true
-default['opennms']['snmp_graph']['ciscoNexus']           = true
-default['opennms']['snmp_graph']['clavister']            = true
-default['opennms']['snmp_graph']['colubris']             = true
-default['opennms']['snmp_graph']['cyclades']             = true
-default['opennms']['snmp_graph']['dell_openmanage']      = true
-default['opennms']['snmp_graph']['dell_rac']             = true
-default['opennms']['snmp_graph']['dns']                  = true
-default['opennms']['snmp_graph']['ejn']                  = true
-default['opennms']['snmp_graph']['equallogic']           = true
-default['opennms']['snmp_graph']['ericsson']             = true
-default['opennms']['snmp_graph']['extreme_networks']     = true
-default['opennms']['snmp_graph']['f5']                   = true
-default['opennms']['snmp_graph']['force10']              = true
-default['opennms']['snmp_graph']['fortinet']             = true
-default['opennms']['snmp_graph']['foundry']              = true
-default['opennms']['snmp_graph']['framerelay']           = true
-default['opennms']['snmp_graph']['host_resources']       = true
-default['opennms']['snmp_graph']['hp']                   = true
-default['opennms']['snmp_graph']['hpux']                 = true
-default['opennms']['snmp_graph']['hwg']                  = true
-default['opennms']['snmp_graph']['ipunity']              = true
-default['opennms']['snmp_graph']['jboss']                = true
-default['opennms']['snmp_graph']['juniper']              = true
-default['opennms']['snmp_graph']['jvm']                  = true
-default['opennms']['snmp_graph']['liebert']              = true
-default['opennms']['snmp_graph']['lmsensors']            = true
-default['opennms']['snmp_graph']['mailmarshal']          = true
-default['opennms']['snmp_graph']['mcast']                = true
-default['opennms']['snmp_graph']['mge']                  = true
-default['opennms']['snmp_graph']['mib2']                 = true
-default['opennms']['snmp_graph']['microsoft_exchange']   = true
-default['opennms']['snmp_graph']['microsoft']            = true
-default['opennms']['snmp_graph']['microsoft_http']       = true
-default['opennms']['snmp_graph']['microsoft_iis']        = true
-default['opennms']['snmp_graph']['microsoft_lcs']        = true
-default['opennms']['snmp_graph']['microsoft_sql']        = true
-default['opennms']['snmp_graph']['microsoft_windows']    = true
-default['opennms']['snmp_graph']['microsoft_wmi']        = true
-default['opennms']['snmp_graph']['mikrotik']             = true
-default['opennms']['snmp_graph']['mysql']                = true
-default['opennms']['snmp_graph']['netapp']               = true
-default['opennms']['snmp_graph']['netbotz']              = true
-default['opennms']['snmp_graph']['netenforcer']          = true
-default['opennms']['snmp_graph']['netscaler']            = true
-default['opennms']['snmp_graph']['netsnmp']              = true
-default['opennms']['snmp_graph']['nortel']               = true
-default['opennms']['snmp_graph']['novell']               = true
-default['opennms']['snmp_graph']['pfsense']              = true
-default['opennms']['snmp_graph']['postgresql']           = true
-default['opennms']['snmp_graph']['riverbed_steelhead']   = true
-default['opennms']['snmp_graph']['servertech']           = true
-default['opennms']['snmp_graph']['snmp_informant']       = true
-default['opennms']['snmp_graph']['sofaware_embeddedngx'] = true
-default['opennms']['snmp_graph']['sun']                  = true
-default['opennms']['snmp_graph']['trango']               = true
-default['opennms']['snmp_graph']['vmware_cim']           = true
-default['opennms']['snmp_graph']['vmware3']              = true
-default['opennms']['snmp_graph']['vmware4']              = true
-default['opennms']['snmp_graph']['vmware5']              = true
-default['opennms']['snmp_graph']['xmp']                  = true
-default['opennms']['snmp_graph']['xups']                 = true
-default['opennms']['snmp_graph']['zertico']              = true
-default['opennms']['snmp_graph']['zeus']                 = true
+default['opennms']['snmp_graph']['acmepacket']['enabled']  = true
+default['opennms']['snmp_graph']['acmepacket']['cookbook'] = node['opennms']['default_template_cookbook']
+default['opennms']['snmp_graph']['adonis']['enabled']    = true
+default['opennms']['snmp_graph']['adonis']['cookbook']   = node['opennms']['default_template_cookbook']
+default['opennms']['snmp_graph']['adsl']['enabled']      = true
+default['opennms']['snmp_graph']['adsl']['cookbook']     = node['opennms']['default_template_cookbook']
+default['opennms']['snmp_graph']['airport']['enabled']   = true
+default['opennms']['snmp_graph']['airport']['cookbook']  = node['opennms']['default_template_cookbook']
+default['opennms']['snmp_graph']['aix']['enabled']       = true
+default['opennms']['snmp_graph']['aix']['cookbook']      = node['opennms']['default_template_cookbook']
+default['opennms']['snmp_graph']['akcp']['enabled']      = true
+default['opennms']['snmp_graph']['akcp']['cookbook']     = node['opennms']['default_template_cookbook']
+default['opennms']['snmp_graph']['alvarion']['enabled']  = true
+default['opennms']['snmp_graph']['alvarion']['cookbook'] = node['opennms']['default_template_cookbook']
+default['opennms']['snmp_graph']['apc']['enabled']       = true
+default['opennms']['snmp_graph']['apc']['cookbook']      = node['opennms']['default_template_cookbook']
+default['opennms']['snmp_graph']['ascend']['enabled']    = true
+default['opennms']['snmp_graph']['ascend']['cookbook']   = node['opennms']['default_template_cookbook']
+default['opennms']['snmp_graph']['asterisk']['enabled']  = true
+default['opennms']['snmp_graph']['asterisk']['cookbook'] = node['opennms']['default_template_cookbook']
+default['opennms']['snmp_graph']['bgp_ietf']['enabled']  = true
+default['opennms']['snmp_graph']['bgp_ietf']['cookbook'] = node['opennms']['default_template_cookbook']
+default['opennms']['snmp_graph']['bluecoat_sgproxy']['enabled']  = true
+default['opennms']['snmp_graph']['bluecoat_sgproxy']['cookbook'] = node['opennms']['default_template_cookbook']
+default['opennms']['snmp_graph']['bridgewave']['enabled']  = true
+default['opennms']['snmp_graph']['bridgewave']['cookbook'] = node['opennms']['default_template_cookbook']
+default['opennms']['snmp_graph']['brocade']['enabled']   = true
+default['opennms']['snmp_graph']['brocade']['cookbook']  = node['opennms']['default_template_cookbook']
+default['opennms']['snmp_graph']['ca_empire']['enabled']  = true
+default['opennms']['snmp_graph']['ca_empire']['cookbook'] = node['opennms']['default_template_cookbook']
+default['opennms']['snmp_graph']['checkpoint']['enabled']  = true
+default['opennms']['snmp_graph']['checkpoint']['cookbook'] = node['opennms']['default_template_cookbook']
+default['opennms']['snmp_graph']['cisco']['enabled']     = true
+default['opennms']['snmp_graph']['cisco']['cookbook']    = node['opennms']['default_template_cookbook']
+default['opennms']['snmp_graph']['ciscoNexus']['enabled']  = true
+default['opennms']['snmp_graph']['ciscoNexus']['cookbook'] = node['opennms']['default_template_cookbook']
+default['opennms']['snmp_graph']['clavister']['enabled']  = true
+default['opennms']['snmp_graph']['clavister']['cookbook'] = node['opennms']['default_template_cookbook']
+default['opennms']['snmp_graph']['colubris']['enabled']  = true
+default['opennms']['snmp_graph']['colubris']['cookbook'] = node['opennms']['default_template_cookbook']
+default['opennms']['snmp_graph']['cyclades']['enabled']  = true
+default['opennms']['snmp_graph']['cyclades']['cookbook'] = node['opennms']['default_template_cookbook']
+default['opennms']['snmp_graph']['dell_openmanage']['enabled']  = true
+default['opennms']['snmp_graph']['dell_openmanage']['cookbook'] = node['opennms']['default_template_cookbook']
+default['opennms']['snmp_graph']['dell_rac']['enabled']  = true
+default['opennms']['snmp_graph']['dell_rac']['cookbook'] = node['opennms']['default_template_cookbook']
+default['opennms']['snmp_graph']['dns']['enabled']       = true
+default['opennms']['snmp_graph']['dns']['cookbook']      = node['opennms']['default_template_cookbook']
+default['opennms']['snmp_graph']['ejn']['enabled']       = true
+default['opennms']['snmp_graph']['ejn']['cookbook']      = node['opennms']['default_template_cookbook']
+default['opennms']['snmp_graph']['equallogic']['enabled']  = true
+default['opennms']['snmp_graph']['equallogic']['cookbook'] = node['opennms']['default_template_cookbook']
+default['opennms']['snmp_graph']['ericsson']['enabled']  = true
+default['opennms']['snmp_graph']['ericsson']['cookbook'] = node['opennms']['default_template_cookbook']
+default['opennms']['snmp_graph']['extreme_networks']['enabled']  = true
+default['opennms']['snmp_graph']['extreme_networks']['cookbook'] = node['opennms']['default_template_cookbook']
+default['opennms']['snmp_graph']['f5']['enabled']        = true
+default['opennms']['snmp_graph']['f5']['cookbook']       = node['opennms']['default_template_cookbook']
+default['opennms']['snmp_graph']['force10']['enabled']   = true
+default['opennms']['snmp_graph']['force10']['cookbook']  = node['opennms']['default_template_cookbook']
+default['opennms']['snmp_graph']['fortinet']['enabled']  = true
+default['opennms']['snmp_graph']['fortinet']['cookbook'] = node['opennms']['default_template_cookbook']
+default['opennms']['snmp_graph']['foundry']['enabled']   = true
+default['opennms']['snmp_graph']['foundry']['cookbook']  = node['opennms']['default_template_cookbook']
+default['opennms']['snmp_graph']['framerelay']['enabled']  = true
+default['opennms']['snmp_graph']['framerelay']['cookbook'] = node['opennms']['default_template_cookbook']
+default['opennms']['snmp_graph']['host_resources']['enabled']  = true
+default['opennms']['snmp_graph']['host_resources']['cookbook'] = node['opennms']['default_template_cookbook']
+default['opennms']['snmp_graph']['hp']['enabled']        = true
+default['opennms']['snmp_graph']['hp']['cookbook']       = node['opennms']['default_template_cookbook']
+default['opennms']['snmp_graph']['hpux']['enabled']      = true
+default['opennms']['snmp_graph']['hpux']['cookbook']     = node['opennms']['default_template_cookbook']
+default['opennms']['snmp_graph']['hwg']['enabled']       = true
+default['opennms']['snmp_graph']['hwg']['cookbook']      = node['opennms']['default_template_cookbook']
+default['opennms']['snmp_graph']['ipunity']['enabled']   = true
+default['opennms']['snmp_graph']['ipunity']['cookbook']  = node['opennms']['default_template_cookbook']
+default['opennms']['snmp_graph']['jboss']['enabled']     = true
+default['opennms']['snmp_graph']['jboss']['cookbook']    = node['opennms']['default_template_cookbook']
+default['opennms']['snmp_graph']['juniper']['enabled']   = true
+default['opennms']['snmp_graph']['juniper']['cookbook']  = node['opennms']['default_template_cookbook']
+default['opennms']['snmp_graph']['jvm']['enabled']       = true
+default['opennms']['snmp_graph']['jvm']['cookbook']      = node['opennms']['default_template_cookbook']
+default['opennms']['snmp_graph']['liebert']['enabled']   = true
+default['opennms']['snmp_graph']['liebert']['cookbook']  = node['opennms']['default_template_cookbook']
+default['opennms']['snmp_graph']['lmsensors']['enabled']  = true
+default['opennms']['snmp_graph']['lmsensors']['cookbook'] = node['opennms']['default_template_cookbook']
+default['opennms']['snmp_graph']['mailmarshal']['enabled']  = true
+default['opennms']['snmp_graph']['mailmarshal']['cookbook'] = node['opennms']['default_template_cookbook']
+default['opennms']['snmp_graph']['mcast']['enabled']     = true
+default['opennms']['snmp_graph']['mcast']['cookbook']    = node['opennms']['default_template_cookbook']
+default['opennms']['snmp_graph']['mge']['enabled']       = true
+default['opennms']['snmp_graph']['mge']['cookbook']      = node['opennms']['default_template_cookbook']
+default['opennms']['snmp_graph']['mib2']['enabled']      = true
+default['opennms']['snmp_graph']['mib2']['cookbook']     = node['opennms']['default_template_cookbook']
+default['opennms']['snmp_graph']['microsoft_exchange']['enabled']  = true
+default['opennms']['snmp_graph']['microsoft_exchange']['cookbook'] = node['opennms']['default_template_cookbook']
+default['opennms']['snmp_graph']['microsoft']['enabled']  = true
+default['opennms']['snmp_graph']['microsoft']['cookbook'] = node['opennms']['default_template_cookbook']
+default['opennms']['snmp_graph']['microsoft_http']['enabled']  = true
+default['opennms']['snmp_graph']['microsoft_http']['cookbook'] = node['opennms']['default_template_cookbook']
+default['opennms']['snmp_graph']['microsoft_iis']['enabled']  = true
+default['opennms']['snmp_graph']['microsoft_iis']['cookbook'] = node['opennms']['default_template_cookbook']
+default['opennms']['snmp_graph']['microsoft_lcs']['enabled']  = true
+default['opennms']['snmp_graph']['microsoft_lcs']['cookbook'] = node['opennms']['default_template_cookbook']
+default['opennms']['snmp_graph']['microsoft_sql']['enabled']  = true
+default['opennms']['snmp_graph']['microsoft_sql']['cookbook'] = node['opennms']['default_template_cookbook']
+default['opennms']['snmp_graph']['microsoft_windows']['enabled']  = true
+default['opennms']['snmp_graph']['microsoft_windows']['cookbook'] = node['opennms']['default_template_cookbook']
+default['opennms']['snmp_graph']['microsoft_wmi']['enabled']  = true
+default['opennms']['snmp_graph']['microsoft_wmi']['cookbook'] = node['opennms']['default_template_cookbook']
+default['opennms']['snmp_graph']['mikrotik']['enabled']  = true
+default['opennms']['snmp_graph']['mikrotik']['cookbook'] = node['opennms']['default_template_cookbook']
+default['opennms']['snmp_graph']['mysql']['enabled']     = true
+default['opennms']['snmp_graph']['mysql']['cookbook']    = node['opennms']['default_template_cookbook']
+default['opennms']['snmp_graph']['netapp']['enabled']    = true
+default['opennms']['snmp_graph']['netapp']['cookbook']   = node['opennms']['default_template_cookbook']
+default['opennms']['snmp_graph']['netbotz']['enabled']   = true
+default['opennms']['snmp_graph']['netbotz']['cookbook']  = node['opennms']['default_template_cookbook']
+default['opennms']['snmp_graph']['netenforcer']['enabled']  = true
+default['opennms']['snmp_graph']['netenforcer']['cookbook'] = node['opennms']['default_template_cookbook']
+default['opennms']['snmp_graph']['netscaler']['enabled']  = true
+default['opennms']['snmp_graph']['netscaler']['cookbook'] = node['opennms']['default_template_cookbook']
+default['opennms']['snmp_graph']['netsnmp']['enabled']   = true
+default['opennms']['snmp_graph']['netsnmp']['cookbook']  = node['opennms']['default_template_cookbook']
+default['opennms']['snmp_graph']['nortel']['enabled']    = true
+default['opennms']['snmp_graph']['nortel']['cookbook']   = node['opennms']['default_template_cookbook']
+default['opennms']['snmp_graph']['novell']['enabled']    = true
+default['opennms']['snmp_graph']['novell']['cookbook']   = node['opennms']['default_template_cookbook']
+default['opennms']['snmp_graph']['pfsense']['enabled']   = true
+default['opennms']['snmp_graph']['pfsense']['cookbook']  = node['opennms']['default_template_cookbook']
+default['opennms']['snmp_graph']['postgresql']['enabled']  = true
+default['opennms']['snmp_graph']['postgresql']['cookbook'] = node['opennms']['default_template_cookbook']
+default['opennms']['snmp_graph']['riverbed_steelhead']['enabled']  = true
+default['opennms']['snmp_graph']['riverbed_steelhead']['cookbook'] = node['opennms']['default_template_cookbook']
+default['opennms']['snmp_graph']['servertech']['enabled']  = true
+default['opennms']['snmp_graph']['servertech']['cookbook'] = node['opennms']['default_template_cookbook']
+default['opennms']['snmp_graph']['snmp_informant']['enabled']  = true
+default['opennms']['snmp_graph']['snmp_informant']['cookbook'] = node['opennms']['default_template_cookbook']
+default['opennms']['snmp_graph']['sofaware_embeddedngx']['enabled']  = true
+default['opennms']['snmp_graph']['sofaware_embeddedngx']['cookbook'] = node['opennms']['default_template_cookbook']
+default['opennms']['snmp_graph']['sun']['enabled']       = true
+default['opennms']['snmp_graph']['sun']['cookbook']      = node['opennms']['default_template_cookbook']
+default['opennms']['snmp_graph']['trango']['enabled']    = true
+default['opennms']['snmp_graph']['trango']['cookbook']   = node['opennms']['default_template_cookbook']
+default['opennms']['snmp_graph']['vmware_cim']['enabled']  = true
+default['opennms']['snmp_graph']['vmware_cim']['cookbook'] = node['opennms']['default_template_cookbook']
+default['opennms']['snmp_graph']['vmware3']['enabled']   = true
+default['opennms']['snmp_graph']['vmware3']['cookbook']  = node['opennms']['default_template_cookbook']
+default['opennms']['snmp_graph']['vmware4']['enabled']   = true
+default['opennms']['snmp_graph']['vmware4']['cookbook']  = node['opennms']['default_template_cookbook']
+default['opennms']['snmp_graph']['vmware5']['enabled']   = true
+default['opennms']['snmp_graph']['vmware5']['cookbook']  = node['opennms']['default_template_cookbook']
+default['opennms']['snmp_graph']['xmp']['enabled']       = true
+default['opennms']['snmp_graph']['xmp']['cookbook']      = node['opennms']['default_template_cookbook']
+default['opennms']['snmp_graph']['xups']['enabled']      = true
+default['opennms']['snmp_graph']['xups']['cookbook']     = node['opennms']['default_template_cookbook']
+default['opennms']['snmp_graph']['zertico']['enabled']   = true
+default['opennms']['snmp_graph']['zertico']['cookbook']  = node['opennms']['default_template_cookbook']
+default['opennms']['snmp_graph']['zeus']['enabled']      = true
+default['opennms']['snmp_graph']['zeus']['cookbook']     = node['opennms']['default_template_cookbook']
 # snmp-interface-poller-configuration.xml
+default['opennms']['snmp_iface_poller']['cookbook']         = node['opennms']['default_template_cookbook']
 default['opennms']['snmp_iface_poller']['threads']                               = 30
 default['opennms']['snmp_iface_poller']['service']                               = "SNMP"
 # array of service names
@@ -1388,19 +1510,23 @@ default['opennms']['snmp_iface_poller']['example1']['interface']['interval']    
 default['opennms']['snmp_iface_poller']['example1']['interface']['user_defined'] = false
 default['opennms']['snmp_iface_poller']['example1']['interface']['status']       = "on"
 # statsd-configuration.xml
+default['opennms']['statsd']['cookbook']         = node['opennms']['default_template_cookbook']
 default['opennms']['statsd']['throughput']['top_n_inOctets']               = false
 default['opennms']['statsd']['response_time_reports']['top_10_weekly']     = false
 default['opennms']['statsd']['response_time_reports']['top_10_this_month'] = false
 default['opennms']['statsd']['response_time_reports']['top_10_last_month'] = false
 default['opennms']['statsd']['response_time_reports']['top_10_this_year']  = false
 # support.properties
+default['opennms']['support']['cookbook']         = node['opennms']['default_template_cookbook']
 default['opennms']['support']['queueid'] = ""
 default['opennms']['support']['timeout'] = 6000
 default['opennms']['support']['retry']   = 0
 # surveillance-views.xml
+default['opennms']['surveillance_views']['cookbook']         = node['opennms']['default_template_cookbook']
 default['opennms']['surveillance_views']['default_view'] = "default"
 default['opennms']['surveillance_views']['default']      = true
 # syslog-northbounder-configuration.xml
+default['opennms']['syslog_north']['cookbook']         = node['opennms']['default_template_cookbook']
 default['opennms']['syslog_north']['use_defaults']       = true
 default['opennms']['syslog_north']['enabled']            = false
 default['opennms']['syslog_north']['nagles_delay']       = 1000
@@ -1419,6 +1545,7 @@ default['opennms']['syslog_north']['destination']['truncate']        = false
 default['opennms']['syslog_north']['uei']['node_down'] = false
 default['opennms']['syslog_north']['uei']['node_up']   = false
 # syslogd-configuration.xml
+default['opennms']['syslogd']['cookbook']         = node['opennms']['default_template_cookbook']
 default['opennms']['syslogd']['port']                   = 10514
 default['opennms']['syslogd']['new_suspect']            = false
 default['opennms']['syslogd']['parser']                 = "org.opennms.netmgt.syslogd.CustomSyslogParser"
@@ -1433,6 +1560,7 @@ default['opennms']['syslogd']['postfix']                = true
 default['opennms']['syslogd']['procmail']                = true
 default['opennms']['syslogd']['sudo']                   = true
 # threshd-configuration.xml
+default['opennms']['threshd']['cookbook']         = node['opennms']['default_template_cookbook']
 default['opennms']['threshd']['threads']                      = 5
 default['opennms']['threshd']['mib2']['filter']               = "IPADDR != '0.0.0.0'"
 default['opennms']['threshd']['mib2']['ipv4_range']['begin']  = "1.1.1.1"
@@ -1491,6 +1619,7 @@ default['opennms']['threshd']['netsnmp_memory_nonlinux']['snmp']['interval']    
 default['opennms']['threshd']['netsnmp_memory_nonlinux']['snmp']['user_defined'] = false
 default['opennms']['threshd']['netsnmp_memory_nonlinux']['snmp']['status']       = "on"
 # thresholds.xml
+default['opennms']['thresholds']['cookbook']         = node['opennms']['default_template_cookbook']
 default['opennms']['thresholds']['mib2']['enabled']                           = true
 default['opennms']['thresholds']['mib2']['rrd_repository']                    = "#{default['opennms']['conf']['home']}/share/rrd/snmp/"
 default['opennms']['thresholds']['hrstorage']['enabled']                      = true
@@ -1508,19 +1637,23 @@ default['opennms']['thresholds']['netsnmp_memory_nonlinux']['rrd_repository'] = 
 default['opennms']['thresholds']['coffee']['enabled']                         = true
 default['opennms']['thresholds']['coffee']['rrd_repository']                  = "#{default['opennms']['conf']['home']}/share/rrd/snmp/"
 # translator-configuration.xml
+default['opennms']['translator']['cookbook']         = node['opennms']['default_template_cookbook']
 default['opennms']['translator']['snmp_link_down']     = true
 default['opennms']['translator']['snmp_link_up']       = true
 default['opennms']['translator']['hyperic']            = true
 default['opennms']['translator']['cisco_config_man']   = true
 default['opennms']['translator']['juniper_cfg_change'] = true
 # trapd-configuration.xml
+default['opennms']['trapd']['cookbook']         = node['opennms']['default_template_cookbook']
 default['opennms']['trapd']['port']        = 162
 default['opennms']['trapd']['new_suspect'] = false
 # users.xml
+default['opennms']['users']['cookbook']         = node['opennms']['default_template_cookbook']
 default['opennms']['users']['admin']['name']          = "Administrator"
 default['opennms']['users']['admin']['user_comments'] = "Default administrator, do not delete"
 default['opennms']['users']['admin']['password']      = "21232F297A57A5A743894A0E4A801FC3"
 # vacuumd-configuration.xml
+default['opennms']['vacuumd']['cookbook']         = node['opennms']['default_template_cookbook']
 default['opennms']['vacuumd']['period']                             = 86400000
 default['opennms']['vacuumd']['statement']['topo_delete_nodes']     = true
 default['opennms']['vacuumd']['statement']['delete_at_interfaces']  = true
@@ -1549,9 +1682,7 @@ default['opennms']['vacuumd']['automations']['close_cleared_alarm_tickets']     
 default['opennms']['vacuumd']['automations']['clear_alarms_for_closed_tickets']    = true
 default['opennms']['vacuumd']['automations']['clean_up_rp_status_changes']         = true
 default['opennms']['vacuumd']['automations']['maintenance_check']                  = false
-default['opennms']['vacuumd']['automations']['add_missing_access_points_to_table'] = false
-default['opennms']['vacuumd']['automations']['update_access_points_table']         = false
-default['opennms']['vacuumd']['automations']['clean_up_access_points_table']       = false
+default['opennms']['vacuumd']['automations']['access_points_table']                = false
 default['opennms']['vacuumd']['triggers']['select_closed_ticket_state_for_problem_alarms'] = true
 default['opennms']['vacuumd']['triggers']['select_null_ticket_state_alarms']               = true
 default['opennms']['vacuumd']['triggers']['select_critial_open_alarms']                    = true
@@ -1578,9 +1709,7 @@ default['opennms']['vacuumd']['actions']['delete_purgeable_statistics_reports'] 
 default['opennms']['vacuumd']['actions']['do_nothing_action']                    = true
 default['opennms']['vacuumd']['actions']['clean_up_rp_status_changes']           = true
 default['opennms']['vacuumd']['actions']['maintenance_expiration_warning']       = false
-default['opennms']['vacuumd']['actions']['add_access_point_to_table']            = false
-default['opennms']['vacuumd']['actions']['update_access_points_table']           = false
-default['opennms']['vacuumd']['actions']['clean_up_access_points_table']         = false
+default['opennms']['vacuumd']['actions']['access_points_table']                  = false
 default['opennms']['vacuumd']['auto_events']['escalation_event']                 = true
 default['opennms']['vacuumd']['action_events']['create_ticket']                  = true
 default['opennms']['vacuumd']['action_events']['update_ticket']                  = true
@@ -1588,6 +1717,7 @@ default['opennms']['vacuumd']['action_events']['close_ticket']                  
 default['opennms']['vacuumd']['action_events']['event_escalated']                = true
 default['opennms']['vacuumd']['action_events']['maintenance_expiration_warning'] = false
 # viewsdisplay.xml
+default['opennms']['web_console_view']['cookbook']         = node['opennms']['default_template_cookbook']
 default['opennms']['web_console_view']['enabled']            = true
 default['opennms']['web_console_view']['network_interfaces'] = true
 default['opennms']['web_console_view']['web_servers']        = true
@@ -1597,6 +1727,7 @@ default['opennms']['web_console_view']['db_servers']         = true
 default['opennms']['web_console_view']['jmx_servers']        = true
 default['opennms']['web_console_view']['other_servers']      = true
 # vmware-cim-datacollection-config.xml
+default['opennms']['vmware_cim']['cookbook']         = node['opennms']['default_template_cookbook']
 default['opennms']['vmware_cim']['rrd_repository']                                     = "#{default['opennms']['conf']['home']}/share/rrd/snmp/"
 default['opennms']['vmware_cim']['default_esx_hostsystem']['rrd']['step']              = 300
 default['opennms']['vmware_cim']['default_esx_hostsystem']['rrd']['rras']              = ["RRA:AVERAGE:0.5:1:2016","RRA:AVERAGE:0.5:12:1488","RRA:AVERAGE:0.5:288:366","RRA:MAX:0.5:288:366","RRA:MIN:0.5:288:366"]
@@ -1617,6 +1748,7 @@ default['opennms']['vmware_cim']['default_esx_hostsystem']['sensor_power_consump
 default['opennms']['vmware_cim']['default_esx_hostsystem']['sensor_power_production']  = true
 default['opennms']['vmware_cim']['default_esx_hostsystem']['sensor_pressure']    = true
 # vmware-datacollection-config.xml
+default['opennms']['vmware']['cookbook']         = node['opennms']['default_template_cookbook']
 default['opennms']['vmware']['rrd_repository']                       = "#{default['opennms']['conf']['home']}/share/rrd/snmp/"
 default['opennms']['vmware']['default_hostsystem3']['enabled']       = true
 default['opennms']['vmware']['default_hostsystem3']['rrd']['step']   = 300
@@ -1672,6 +1804,7 @@ default['opennms']['vmware']['default_vm5']['vmware5_vrt_disk']        = true
 default['opennms']['vmware']['default_vm5']['vmware5_disk']           = true
 default['opennms']['vmware']['default_vm5']['vmware5_da_st']           = true
 # wmi-datacollection-config.xml
+default['opennms']['wmi']['cookbook']         = node['opennms']['default_template_cookbook']
 default['opennms']['wmi']['rrd_repository']                      = "#{default['opennms']['conf']['home']}/share/rrd/snmp/"
 default['opennms']['wmi']['default']['rrd']['step']              = 300
 default['opennms']['wmi']['default']['rrd']['rras']              = ["RRA:AVERAGE:0.5:1:2016", "RRA:AVERAGE:0.5:12:1488","RRA:AVERAGE:0.5:288:366","RRA:MAX:0.5:288:366","RRA:MIN:0.5:288:366"]
@@ -1686,6 +1819,7 @@ default['opennms']['wmi']['default']['server_sessions']          = true
 default['opennms']['wmi']['default']['server_errors']            = true
 default['opennms']['wmi']['default']['w3svc']                    = true
 # xml-datacollection-config.xml
+default['opennms']['xml']['cookbook']         = node['opennms']['default_template_cookbook']
 default['opennms']['xml']['rrd_repository']                     = "#{default['opennms']['conf']['home']}/share/rrd/snmp/"
 default['opennms']['xml']['threegpp_full_5min']['enabled']      = false
 default['opennms']['xml']['threegpp_full_5min']['rrd']['step']  = 300
@@ -1703,6 +1837,7 @@ default['opennms']['xml']['threegpp_sample']['rrd']['rras']     = ["RRA:AVERAGE:
 default['opennms']['xml']['threegpp_sample']['username']        = "opennms"
 default['opennms']['xml']['threegpp_sample']['password']        = "Op3nNMS!@"
 # xmpp-configuration.properties
+default['opennms']['xmpp']['cookbook']         = node['opennms']['default_template_cookbook']
 default['opennms']['xmpp']['server']              = nil
 default['opennms']['xmpp']['service_name']        = nil
 default['opennms']['xmpp']['port']                = nil

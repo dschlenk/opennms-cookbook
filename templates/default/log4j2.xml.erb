@@ -22,7 +22,7 @@
 
   <properties>
     <property name="prefix">uncategorized</property>
-    <property name="logdir">${install.logs.dir}</property>
+    <property name="logdir">/opt/opennms/logs</property>
   </properties>
 
   <!--
@@ -37,8 +37,8 @@
     <Routing name="RoutingAppender">
       <Routes pattern="$${ctx:prefix}">
         <Route>
-          <RollingFile name="Rolling-\${ctx:prefix}" fileName="\${logdir}/\${ctx:prefix}.log"
-                       filePattern="\${logdir}/\${ctx:prefix}.%i.log.gz">
+          <RollingFile name="Rolling-${ctx:prefix}" fileName="${logdir}/${ctx:prefix}.log"
+                       filePattern="${logdir}/${ctx:prefix}.%i.log.gz">
             <PatternLayout>
               <pattern>%d %-5p [%t] %c{1.}: %m%n</pattern>
             </PatternLayout>
@@ -56,8 +56,8 @@
               pattern.
 	  -->
         <Route key="instrumentation">
-          <RollingFile name="Rolling-instrumentation" fileName="\${logdir}/instrumentation.log"
-                       filePattern="\${logdir}/instrumentation.%i.log">
+          <RollingFile name="Rolling-instrumentation" fileName="${logdir}/instrumentation.log"
+                       filePattern="${logdir}/instrumentation.%i.log">
             <PatternLayout>
               <!-- the logging class is not included here since its is verbose and always the same -->
               <pattern>%d %-5p [%t] %m%n</pattern>
@@ -202,7 +202,6 @@
         <KeyValuePair key="trapd"                value="<%=@log[:trapd]%>" />
         <KeyValuePair key="vacuumd"              value="<%=@log[:vacuumd]%>" />
         <KeyValuePair key="web"                  value="<%=@log[:web]%>" />
-        <KeyValuePair key="xmlrpcd"              value="<%=@log[:xmlrpcd]%>" />
       </DynamicThresholdFilter>
 
       <appender-ref ref="RoutingAppender"/>

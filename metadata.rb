@@ -6,7 +6,7 @@ description      'Installs and Configures opennms 15 and provides many useful LW
 long_description IO.read(File.join(File.dirname(__FILE__), 'README.md'))
 supports         'centos', ">= 6.0"
 supports         'rhel', ">= 6.0"
-version          '2.0.1'
+version          '3.0.0'
 depends          'yum'
 depends          'hostsfile'
 depends          'java'

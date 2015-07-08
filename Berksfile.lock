@@ -2,24 +2,24 @@ DEPENDENCIES
   opennms
     path: .
     metadata: true
-  postgresql
+  postgresql (>= 3.4.20)
   yum-centos
   yum-epel
 
 GRAPH
   apt (2.7.0)
   build-essential (2.2.3)
-  chef-sugar (3.1.0)
+  chef-sugar (3.1.1)
   hostsfile (2.4.5)
   java (1.31.0)
-  opennms (2.0.1)
+  opennms (3.0.0)
     build-essential (>= 0.0.0)
     hostsfile (>= 0.0.0)
     java (>= 0.0.0)
     yum (>= 0.0.0)
   openssl (4.0.0)
     chef-sugar (>= 0.0.0)
-  postgresql (3.4.18)
+  postgresql (3.4.20)
     apt (>= 1.9.0)
     build-essential (>= 0.0.0)
     openssl (~> 4.0.0)
