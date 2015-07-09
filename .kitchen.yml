@@ -3,6 +3,8 @@ driver:
   name: vagrant
   network:
     - ["forwarded_port", {guest: 8980, host: 8980}]
+  customize: 
+    memory: 1024
 
 provisioner:
   name: chef_solo
@@ -12,8 +14,12 @@ platforms:
     attributes: { 
                   "opennms": {
                               "conf": {"start_timeout": 20},
-                              "stable": false
-                              },  
+                              "stable": false,
+                              "plugin": {
+                                         "xml": true,
+                                         "nsclient": true
+                                        }
+                             },  
                   postgresql: {
                                 password: { 
                                            postgres: "md5c23797e9a303da48b792b4339c426700" 
