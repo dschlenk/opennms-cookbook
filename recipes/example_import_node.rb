@@ -21,7 +21,7 @@ opennms_import_node "nodeB" do
   foreign_id nodeB_foreign_id
   building "HQ"
   categories ["Servers", "Test"]
-  assets 'vendorphone' => '411', 'serialnumber' => 'SN12838931'
+  assets 'vendorPhone' => '411', 'serialNumber' => 'SN12838931'
 end
 
 nodeC_foreign_id = foreign_id_gen
@@ -35,6 +35,6 @@ opennms_import_node "nodeC" do
   city "Tulsa"
   building "Barn"
   categories ["Servers", "Test"]
-  assets 'vendorphone' => '511', 'serialnumber' => 'SN12838932'
+  assets 'vendorPhone' => '511', 'serialNumber' => 'SN12838932'
   sync_import true
 end

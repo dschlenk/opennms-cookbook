@@ -42,3 +42,15 @@ template "#{onms_home}/etc/opennms.properties" do
     :properties => node[:opennms][:properties]
   )
 end
+
+template "#{onms_home}/etc/log4j2.xml" do
+  cookbook node[:opennms][:log4j2][:cookbook]
+  source "log4j2.xml.erb"
+  mode 00664
+  owner "root"
+  group "root"
+  notifies :restart, "service[opennms]"
+  variables(
+    :log => node[:opennms][:log4j2]
+  )
+end

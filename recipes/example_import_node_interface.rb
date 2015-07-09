@@ -15,7 +15,7 @@ opennms_import_node "ifaceNode" do
   foreign_id ifaceNode_foreign_id
   building "HQ"
   categories ["Servers", "Test"]
-  assets 'vendorphone' => '411', 'serialnumber' => 'SN12838931'
+  assets 'vendorPhone' => '411', 'serialNumber' => 'SN12838931'
   sync_import true
 end
 

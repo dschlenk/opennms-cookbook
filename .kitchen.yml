@@ -18,7 +18,8 @@ platforms:
                               "plugin": {
                                          "xml": true,
                                          "nsclient": true
-                                        }
+                                        },
+                              "log4j2": { "provisiond": "DEBUG", "web": "DEBUG" }
                              },  
                   postgresql: {
                                 password: { 
@@ -91,7 +92,6 @@ suites:
       - recipe[opennms::default]
   - name: all
     run_list:
-      - recipe[java]
       - recipe[postgresql::client]
       - recipe[postgresql::server]
       - recipe[postgresql::contrib]
@@ -147,6 +147,17 @@ suites:
       - recipe[opennms::example_threshold]
       - recipe[opennms::example_system_def]
       - recipe[opennms::example_avail_category]
+  - name: prov_req_rest
+    run_list:
+      - recipe[postgresql::client]
+      - recipe[postgresql::server]
+      - recipe[postgresql::contrib]
+      - recipe[postgresql::config_initdb]
+      - recipe[postgresql::config_pgtune]
+      - recipe[opennms::notemplates]
+      - recipe[opennms::example_foreign_source]
+      - recipe[opennms::example_import]
+      - recipe[opennms::example_stress_test_provreq]
 #  - name: notemplates
 #    run_list:
 #      - recipe[java]
