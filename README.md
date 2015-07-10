@@ -721,25 +721,24 @@ See the template and default attributes source for more details on using these t
 * etc/microblog-configuration.xml
 * etc/model-importer.properties
 * etc/modemConfig.properties
-
-#### etc/nsclient-datacollection-config.xml
-#### etc/poller-configuration.xml
-#### etc/provisiond-configuration.xml
-#### etc/remedy.properties
-#### etc/reportd-configuration.xml
-#### etc/rtc-configuration.xml
-#### etc/smsPhonebook.properties
-#### etc/snmp-interface-poller-configuration.xml
-#### etc/support.properties
-#### etc/surveillance-views.xml
-#### etc/syslog-northbounder-configuration.xml
-#### etc/syslogd-configuration.xml
-#### etc/vacuumd-configuration.xml
-#### etc/vmware-cim-datacollection-config.xml
-#### etc/vmware-datacollection-config.xml
-#### etc/wmi-datacollection-config.xml
-#### etc/xml-datacollection-config.xml
-#### etc/xmlrpcd-configuration.xml
+* etc/nsclient-datacollection-config.xml
+* etc/poller-configuration.xml
+* etc/provisiond-configuration.xml
+* etc/remedy.properties
+* etc/reportd-configuration.xml
+* etc/rtc-configuration.xml
+* etc/smsPhonebook.properties
+* etc/snmp-interface-poller-configuration.xml
+* etc/support.properties
+* etc/surveillance-views.xml
+* etc/syslog-northbounder-configuration.xml
+* etc/syslogd-configuration.xml
+* etc/vacuumd-configuration.xml
+* etc/vmware-cim-datacollection-config.xml
+* etc/vmware-datacollection-config.xml
+* etc/wmi-datacollection-config.xml
+* etc/xml-datacollection-config.xml
+* etc/xmlrpcd-configuration.xml
 
 License
 =======
