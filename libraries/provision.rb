@@ -238,9 +238,16 @@ module Provision
     if !rescan.nil? && rescan == false
       url = url + "?rescanExisting=false" 
     end
-    Chef::Log.debug "Sleeping for a few seconds before we sync to work around a race condition in 16.0.2."
-    sleep(5)
-    RestClient.put url, nil
+    begin
+      tries ||= 3
+      RestClient.put url, nil
+    rescue => e
+      if (tries -= 1) > 0
+        retry
+      else
+        raise
+      end
+    end
   end
   def foreign_id_gen
     t = Time.new()

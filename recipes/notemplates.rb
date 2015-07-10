@@ -20,7 +20,8 @@ include_recipe 'build-essential::default'
 chef_gem 'java_properties'
 chef_gem 'rest-client'
 
-yum_repository 'opennms-stable-common' do
+if node['opennms']['stable']
+  yum_repository 'opennms-stable-common' do
     description 'RPMs Common to All OpenNMS Architectures RPMs (stable)'
     baseurl node['yum']['opennms-stable-common']['baseurl']
     mirrorlist node['yum']['opennms-stable-common']['url']
@@ -29,9 +30,8 @@ yum_repository 'opennms-stable-common' do
     includepkgs node['yum']['opennms-stable-common']['includepkgs']
     exclude node['yum']['opennms-stable-common']['exclude']
     action :create
-end
-
-yum_repository 'opennms-stable-rhel6' do
+  end
+  yum_repository 'opennms-stable-rhel6' do
     description 'RedHat Enterprise Linux 6.x and CentOS 6.x RPMs (stable)'
     baseurl node['yum']['opennms-stable-rhel6']['baseurl']
     mirrorlist node['yum']['opennms-stable-rhel6']['url']
@@ -39,6 +39,29 @@ yum_repository 'opennms-stable-rhel6' do
     includepkgs node['yum']['opennms-stable-rhel6']['includepkgs']
     exclude node['yum']['opennms-stable-rhel6']['exclude']
     action :create
+  end
+else
+  yum_repository 'opennms-snapshot-common' do
+      description 'RPMs Common to All OpenNMS Architectures RPMs (stable)'
+      baseurl node['yum']['opennms-snapshot-common']['baseurl']
+      mirrorlist node['yum']['opennms-snapshot-common']['url']
+      gpgkey node['yum']['opennms']['key_url']
+      failovermethod node['yum']['opennms-snapshot-common']['failovermethod']
+      includepkgs node['yum']['opennms-snapshot-common']['includepkgs']
+      exclude node['yum']['opennms-snapshot-common']['exclude']
+      gpgcheck false
+      action :create
+  end
+  yum_repository 'opennms-snapshot-rhel6' do
+    description 'RedHat Enterprise Linux 6.x and CentOS 6.x RPMs (stable)'
+    baseurl node['yum']['opennms-snapshot-rhel6']['baseurl']
+    mirrorlist node['yum']['opennms-snapshot-rhel6']['url']
+    gpgkey node['yum']['opennms']['key_url']
+    includepkgs node['yum']['opennms-snapshot-rhel6']['includepkgs']
+    exclude node['yum']['opennms-snapshot-rhel6']['exclude']
+      gpgcheck false
+    action :create
+  end
 end
 
 fqdn = node[:fqdn]

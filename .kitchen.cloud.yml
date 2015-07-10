@@ -16,7 +16,7 @@ platforms:
     attributes: { 
                   "opennms": {
                               "conf": {"start_timeout": 20},
-                              "stable": false,
+                              "stable": true,
                               "plugin": {
                                          "xml": true,
                                          "nsclient": true
