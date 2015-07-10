@@ -2,12 +2,13 @@ Description
 ===========
 
 A Chef cookbook to manage the installation and configuration of OpenNMS.
-Current version of templates are based on OpenNMS release 15.0.2
+Current version of templates are based on OpenNMS release 16.0.2
 
-Status
-======
+Versions
+========
 
-Things generally work. Use the latest tag. Tags happen when a decent chunk of new functionality is written, their example recipes converge (named example_*) and OpenNMS starts without errors.  Notably missing are unit and more formal integration tests.
+Starting with OpenNMS 16, the MSB of the version of the cookbook matches the MSB of the version of OpenNMS it is meant to support. 
+
 
 Requirements
 ============
@@ -17,53 +18,49 @@ Requirements
 * Either use Berkshelf to satisfy dependencies or manually acquire the following cookbooks: 
   * yum
   * hostsfile
-* Unless you like really old JVMs and a poorly tuned PostgreSQL or just really want to install java and postgresql yourself you will also want these cookbooks:
-  * java
-  * postgresql
-
-See Usage for more details.
+  * build-essential
+* In OpenNMS 17+ you will need a newer PostgreSQL than CentOS 6.x provides. Also, using Chef to install PostgreSQL makes tuning a lot easier. While there's no explicit dependency, you most likely will want some combination of recipes from the `postgresql` cookbook.  See Usage for details.
 
 Usage
 =====
 
-Running the default recipe will install OpenNMS 15.0.2 (or a custom version using the attribute `node[:opennms][:version]`) on CentOS 6.x from the official repo with the default configuration. It will also execute `'$ONMS_HOME/bin/runjava -s` if `$ONMS_HOME/etc/java.conf` is not present and `$ONMS_HOME/bin/install -dis` if `$ONMS_HOME/etc/configured` is not present.
+Running the default recipe will install OpenNMS 16.0.2 (or a custom version using the attribute `node[:opennms][:version]`) on CentOS 6.x from the official repo with the default configuration. It will also execute `'$ONMS_HOME/bin/runjava -s` if `$ONMS_HOME/etc/java.conf` is not present and `$ONMS_HOME/bin/install -dis` if `$ONMS_HOME/etc/configured` is not present.
 
 There are two primary ways to use this cookbook: as an application cookbook or library cookbook. If you simply want to tweak a few settings to the default OpenNMS configuration, you can use the `default` recipe of this cookbook directly and modify node attributes to suit your needs. There are also a plethora of LWRPs that you can use to do more in depth customizations. If you go that route I recommend starting with the `notemplates` recipe and then using those LWRPs (and maybe a few of the templates in this cookbook) to define your run list. If your node's run list contains both the template and a resource that manages the same file you'll end up with a lot of churn during the chef client run, which is a waste of time and will probably cause unnecessary restarts of OpenNMS. 
 
 Template resources for daemons that support configuration changes without a restart will automatically send the proper event to activate changes. Add `notifies` to your resource for similar funcationality when using the LWRPs from this cookbook. See the example recipe for each LWRP for details.
 
-You probably also want to check out the community java (https://github.com/socrata-cookbooks/java) and postgresql (https://github.com/hw-cookbooks/postgresql) cookbooks. Here's an example of each:
+### Java (Optional)
 
-### Java 
+You might also want to check out the community java (https://github.com/socrata-cookbooks/java) and almost definitely postgresql (https://github.com/hw-cookbooks/postgresql) cookbooks. Here's an example of each:
 
-You probably want Java 8 because Java 7 is EOL. But, the community java
-cookbook doesn't support Java 8 as an RPM because reasons. I don't like
-installing things outside of package management if it can be avoided, so
-if you host the RPM yourself and use 
-[dschlenk's fork](https://github.com/dschlenk/java/) you can get around 
-that limitation. Here's an example of how:
+At this time the OpenNMS yum repo includes a modern Oracle JDK. Since Oracle likes to change license terms on a whim (and their RPM doesn't necessarily set up things (like alternatives priorities) to your liking), you might want to get ahead of the curve and manage installing the JDK yourself. Here's an example using [dschlenk's fork](https://github.com/dschlenk/java/) of the community java cookbook. 
 
-Download the appropriate RPM(s) from Oracle and make a yum repo available
-to your nodes. 
+First, you need to download the appropriate RPM(s) from Oracle and make a yum repo available to your nodes. For example, on a CentOS server with Apache httpd installed you could do:
 
-Use the link above by either cloning the repo and uploading to your Chef
-server or using Berkshelf or another cookbook management tool that can 
-talk to git repos. 
+```
+# mkdir /var/www/html/oracle-java
+# mv jdk*.rpm /var/www/html/oracle-java/
+# createrepo /var/www/html/oracle-java
+# chown -R apache:apache /var/www/html/oracle-java
+```
 
-Set the following attributes:
+Next, acquire the java cookbook in the link above by either cloning the repo and uploading to your Chef server or using Berkshelf or another cookbook management tool that can talk to git repos. 
+
+Set the following attributes (in a role, environement, or in a wrapper cookbook - up to you):
 
 ```
 node['java']['oracle']['accept_oracle_download_terms'] = true
 node['java']['install_flavor'] = 'oracle_rpm'
 node['java']['oracle_rpm']['type'] = 'jdk'
-node['java']['oracle_rpm']['package_name'] = 'jdk1.8.0_40'
+node['java']['oracle_rpm']['package_name'] = 'jdk1.8.0_40' # match the current JDK version you've downloaded and set up a yum repo for
 node['java']['alternatives_priority'] = 180040
 node['java']['jdk_version'] = 8
 node['java']['set_etc_environment'] = true
 node['java']['oracle']['jce']['enabled'] = true
 ```
 
-Add a `yum_repository` resource to your run list, like so:
+Add a `yum_repository` resource to your node or role's run list, like so:
 
 ```
 yum_repository 'oracle-java' do
@@ -83,56 +80,27 @@ Include the client, server, contrib, config_initdb, config_pgtune recipes
 tuned config:
 
 ```
+node[:postgresql][:enable_pgdg_yum] = true,
+node[:postgresql][:version] = '9.3',
+node[:postgresql][:dir] = '/var/lib/pgsql/9.3/data',
 node[:postgresql][:pg_hba] = { :addr => '' :user => 'all', :type => 'local', :method => 'trust', :db => 'all' }
 node[:postgresql][:pg_hba] = { :addr => '127.0.0.1/32', :user => 'all', :type => 'host', :method => 'trust', :db => 'all'}
 node[:postgresql][:pg_hba] = { :addr => '::1/128', :user => 'all', :type => 'host', :method => 'trust', :db => 'all' }
 node[:postgresql][:config][:checkpoint_timeout] = '15min'
+node[:postgresql][:config][:data_directory] = '/var/lib/pgsql/9.3/data'
 node[:postgresql][:config][:autovacuum] = 'on'
 node[:postgresql][:config][:track_activities] = 'on'
 node[:postgresql][:config][:track_counts]  = 'on'
 node[:postgresql][:config][:shared_preload_libraries] = 'pg_stat_statements'
 node[:postgresql][:config][:vacuum_cost_delay] = 50
-node[:postgresql][:client][:packages] = ["postgresql", "postgresql-contrib", "postgresql-devel"]
-node[:postgresql][:server][:packages] = ["postgresql-server"]
+node[:postgresql][:config_pgtune][:max_connections] = 160
+node[:postgresql][:contrib][:extensions] = ['pageinspect', 'pg_buffercache', 'pg_freespacemap', 'pgrowlocks', 'pg_stat_statements', 'pgstattuple']
+node[:postgresql][:client][:packages] = ["postgresql93", "postgresql93-contrib", "postgresql93-devel"]
+node[:postgresql][:server][:packages] = ["postgresql93-server"]
+node[:postgresql][:server][:service_name] = "postgresql-93
 ```
 
-Or, if you want to use a version of Postgresql from this decade, use these 
-attributes:
-
-```
-node['postgresql']['enable_pgdg_yum'] = true
-node['postgresql']['version'] = '9.3'
-node['postgresql']['dir'] = '/var/lib/pgsql/9.3/data'
-node['postgresql']['config']['data_directory'] = '/var/lib/pgsql/9.3/data'
-node['postgresql']['config']['autovacuum'] = 'on'
-node['postgresql']['config']['checkpoint_timeout'] = '15min'
-node['postgresql']['config']['shared_preload_libraries'] =
-  'pg_stat_statements'
-node['postgresql']['config']['track_activities'] = 'on'
-node['postgresql']['config']['track_counts'] = 'on'
-node['postgresql']['config']['vacuum_cost_delay'] = 50
-node['postgresql']['pg_hba'] = [{ addr: '', db: 'all', method: 'trust',
-                                     type: 'local', user: 'all' },
-                                   { addr: '127.0.0.1/32', db: 'all',
-                                     method: 'trust', type: 'host',
-                                     user: 'all' },
-                                   { addr: '::1/128', db: 'all',
-                                     method: 'trust', type: 'host',
-                                     user: 'all' }]
-node['postgresql']['client']['packages'] = ['postgresql93',
-                                               'postgresql93-contrib',
-                                               'postgresql93-devel']
-node['postgresql']['server']['packages'] = ['postgresql93-server']
-node['postgresql']['contrib']['packages'] = ['postgresql93-contrib']
-node['postgresql']['server']['service_name'] = 'postgresql-9.3'
-node['postgresql']['contrib']['extensions'] = ['pageinspect',
-                                                  'pg_buffercache',
-                                                  'pg_freespacemap',
-                                                  'pgrowlocks',
-                                                  'pg_stat_statements',
-                                                  'pgstattuple']
-```
-
+### Recommended Tweaks
 There are also a couple OpenNMS attributes you'll probably want to override at a minimum: 
 
 ### opennms.conf
@@ -142,12 +110,6 @@ node[:opennms][:conf][:start_timeout] = 20
 node[:opennms][:conf][:heap_size] = 1024
 node[:opennms][:conf][:addl_mgr_opts] = '-XX:+UseConcMarkSweepGC -XX:MaxMetaspaceSize=512m'
 ```
-
-The last part (`-XX:MaxMetaspaceSize=512m`) assumes Java 8 and will cause 
-OpenNMS to not start if you use Java 7 or earlier. It's the modern equivalent 
-of setting `-XX:MaxPermSize=512m`, which is even more important in Java 8 
-because things that used to be in PermGen are now in Heap and it grows unbounded
-unless you tell it not to. 
 
 ### Upgrades
 
@@ -172,28 +134,25 @@ it doesn't contain breaking changes. Just like `rpmsave` files, OpenNMS won't
 start with these files present, and the rest of the converge will make the changes
 we want anyway, so we just overwrite the old file with the `rpmnew` version. 
  
-There is also an attribute named `node['opennms']['allow_downgrade']` which if 
-set to true will let you install an older version of OpenNMS than is currently 
-installed. Leave this alone unless you know what you're doing - sometimes yum 
-gets confused with versions when working with snapshot builds and this attribute
-helps work around that.
-
 ### Recipes
 
 * `opennms::default` Installs and configures OpenNMS with the standard configuration modified with any node attribute values changed from their defaults.
-* `opennms::notemplates` Everything default does except minimal templates are used - etc/opennms.conf, etc/opennms.properties and etc/jetty.xml. Use this recipe if you intend to use any of the LWRPs in this cookbook.
+* `opennms::notemplates` Everything default does except minimal templates are used - etc/opennms.conf, etc/opennms.properties and etc/log4j2.xml. Use this recipe if you intend to use any of the LWRPs in this cookbook.
+
+#### Depreceated
+The following recipes are deprecated. The preferred method to install these packages is by setting `node[:opennms][:plugin][:nsclient]` and/or `node[:opennms][:plugin][:xml]` to true. All these recipes do now is set those attributes at the default level. 
 * `opennms::nsclient` installs the optional nsclient data collection plugin and uses the template for etc/nsclient-datacollection-config.xml. 
 * `opennms::xml` installs the optional xml data collection plugin and uses the template for etc/xml-datacollection-config.xml. 
 
 ### LWRPs
 
-As a general rule these LWRPs support a single action: `create` and many of them behave more like `create_if_missing` does in other cookbooks. In other words, updating is generally not supported. This may change in future releases. 
+As a general rule these LWRPs support a single action: `create` and many of them behave more like `create_if_missing` does in other cookbooks. In other words, updating is generally not supported. Exceptions are noted, and this behavior may change in future releases. 
 
 Also, there are example recipes in the cookbook for most every LWRP named `opennms::example_<LWRP_NAME>`. Eventually these will become tests. 
 
 The list of implemented LWRPs is as follows: 
 
-### Users, Groups and Roles
+#### Users, Groups and Roles
 
 * `opennms_user`: add a user. Uses the REST API. 
 * `opennms_group`: add a group and populate it with users. You can even set the default SVG map and duty schedules.
@@ -302,10 +261,6 @@ There are a couple LWRPs for managing the Web UI. All of these support updating.
 
 Most configuration files are templated and can be overridden with environment, role, or node attributes.  See the default attributes file for a list of configuration items that can be changed in this manner, or keep reading for a brief overview of each template available. Default attribute values set to `nil` mean that the file's default value is commented out in the original file and will remain so unless set to a non-nil value.
 
-#### Access Point Monitor (etc/access-point-monitor-configuration.xml)
-
-You can change `threads` and `pscan_interval` or disable either of the default types by setting `aruba_enable` or `moto_enable` to false in `node['opennms']['apm']`.
-
 #### etc/availability-reports.xml
 
 If you want to change the logo or default interval, count, hour or minute you can do so for either the calandar or classic report like so:
@@ -326,24 +281,6 @@ If you want to change the logo or default interval, count, hour or minute you ca
    }
 ```
 
-#### etc/capsd-configuration.xml
-
-Note: the existance of this template does not imply that you should still be using capsd! To enable capsd you need to change the handler for newSuspect events in opennms.conf by setting `node['opennms']['properties']['provisioning']['enable_discovery']` to `false`.
-
-Example: change the timeout and retries for the ICMP scanner, do:
-
-```
-   {
-     "opennms": {
-       "capsd": {
-         "icmp": {
-           "timeout": "5000",
-           "retry": "3"
-         }
-       }
-     }
-   }
-```
 #### etc/categories.xml
 
 Default categories can be modified by doing things like
@@ -509,7 +446,7 @@ Similar to other datacollection-config.xml files, you can change the RRD reposit
 
 Similar to other datacollection-config.xml files, you can change the RRD repository, step, RRA definitions and disable default collections and their mbeans. In the JBoss collection you can specify a JMS queue and/or topic to collect stats on. See the template and default attributes for details. 
 
-#### etc/linkd-configuration.xml
+#### etc/linkd-configuration.xml & etc/enlinkd-configuration.xml
 
 Attributes available in `node['opennms']['linkd']` that allow you change global settings like:
 * threads
@@ -530,24 +467,12 @@ default['opennms']['linkd']['range_begin']                  = "1.1.1.1"
 default['opennms']['linkd']['range_end']                    = "254.254.254.254"
 ```
 
-#### etc/log4j.properties
+#### etc/log4j2.xml
 
 This one is a little different. If you want to turn up logging for collectd, for instance, you'd set these override attributes:
 ```
-{
-  "opennms":
-  {
-    "log4j":
-    {
-      "collectd":
-      {
-        "level": "DEBUG"
-      }
-    }
-  }
-}
+default['opennms']['log4j2']['collectd'] = 'DEBUG'
 ```
-But you could also change the appender class, the max file size, the max number of files (assuming the use of RollingFileAppender), the layout class and the layout conversion pattern (assuming the use of PatternLayout) using `appender`, `max_file_size`, `max_backup_index`, `layout`, and `conversion_pattern`.
 
 #### magic-users.properties
 
@@ -563,34 +488,7 @@ default['opennms']['magic_users']['rest_users']      = "iphone"
 
 #### etc/map.properties
 
-Do you love maps but are a contrarian when it comes to color schemes? Have we got the template for you! I guess also useful for translating labels?  Check out the default attributes for details on what you can change.
-
-#### etec/microblog-configuration.xml
-
-Join twitter and tell the public about your broken network! Set `node['opennms']['microblog']['default_profile']['name']` to `twitter` or `identica` and then set `['opennms']['microblog']['default_profile']['authen_username']` and `['opennms']['microblog']['default_profile']['authen_password']` to use those services, or use a different service by setting `node['opennms']['microblog']['default_profile']['service_url']` as well (assuming OpenNMS supports it). This only sets up the profile. You'll still need to define a destination path and set events and alarms to use it the normal way as described at http://www.opennms.org/wiki/Microblog_Notifications until the notification and destination path LWRPs are written.
-
-#### etc/model-importer.properties
-
-I couldn't figure out if this file is still used and/or necessary, but anyway the same attributes are used here and in provisiond-configuration.xml, so go check that one out.
-
-#### etc/modemConfig.properties
-
-You can set `node['opennms']['modem']` to one of the predefined modems (mac2412, mac2414, macFA22, macFA24, macFA42, macFA44, acm0, acm1, acm2, acm3, acm4, acm5) or set `node['opennms']['custom_modem']` to something like :
-```
-{
-  "opennms":
-  {
-    "custom_modem":
-    {
-      "name": "foobar",
-      "port": "/dev/ttyFoobar",
-      "model": "foobar37",
-      "manufacturer": "Foo Bar"
-      "baudrate": 57600
-    }
-  }
-}
-```
+Do you love the old SVG maps but are a contrarian when it comes to color schemes? Have we got the template for you! I guess also useful for translating labels?  Check out the default attributes for details on what you can change.
 
 #### etc/notifd-configuration.xml
 
@@ -634,74 +532,6 @@ can be overridden to alter any of these default notifications:
 * low_threshold
 
 in `node['opennms']['notifications']`. Stay tuned for a notification LWRP.
-
-#### etc/nsclient-datacollection-config.xml
-
-
-Similar to other datacollection-config.xml files, you can change the RRD repository, step, RRA definitions and disable default collections and wpms.
-#### etc/poller-configuration.xml
-
-Disable packages, change IPv4 and IPv6 include ranges and RRD settings, remove or disable services or change their polling interval, retry, timeout or another service parameter. Like collectd and capsd, the possibilities here are pretty extensive so check out the default attributes and template for more info.
-#### etc/provisiond-configuration.xml
-
-Same as model-importer.properties.
-```
-default['opennms']['importer']['import_url']         = "file:/path/to/dump.xml"
-default['opennms']['importer']['schedule']           = "0 0 0 1 1 ? 2023"
-default['opennms']['importer']['threads']            = 8
-default['opennms']['importer']['scan_threads']       = 10
-default['opennms']['importer']['rescan_threads']     = 10
-default['opennms']['importer']['write_threads']      = 8
-default['opennms']['importer']['requisition_dir']    = "#{default['opennms']['conf']['home']}/etc/imports"
-default['opennms']['importer']['foreign_source_dir'] = "#{default['opennms']['conf']['home']}/etc/foreign-sources"
-```
-
-#### etc/remedy.properties
-
-Do you use the Remedy integration but aren't the Italian that checked their Remedy config into git? Change all of these attributes then:
-
-```
-default['opennms']['remedy']['username']
-default['opennms']['remedy']['password']
-default['opennms']['remedy']['authentication']
-default['opennms']['remedy']['locale']
-default['opennms']['remedy']['timezone']
-default['opennms']['remedy']['endpoint']
-default['opennms']['remedy']['portname']
-default['opennms']['remedy']['createendpoint']
-default['opennms']['remedy']['createportname']
-default['opennms']['remedy']['targetgroups']
-default['opennms']['remedy']['assignedgroups']
-default['opennms']['remedy']['assignedsupportcompanies']
-default['opennms']['remedy']['assignedsupportorganizations']
-default['opennms']['remedy']['assignedgroup']
-default['opennms']['remedy']['firstname']
-default['opennms']['remedy']['lastname']
-default['opennms']['remedy']['serviceCI']
-default['opennms']['remedy']['serviceCIReconID']
-default['opennms']['remedy']['assignedsupportcompany']
-default['opennms']['remedy']['assignedsupportorganization']
-default['opennms']['remedy']['categorizationtier1']
-default['opennms']['remedy']['categorizationtier2']
-default['opennms']['remedy']['categorizationtier3']
-default['opennms']['remedy']['service_type']
-default['opennms']['remedy']['reported_source']
-default['opennms']['remedy']['impact']
-default['opennms']['remedy']['urgency']
-default['opennms']['remedy']['reason_reopen']
-default['opennms']['remedy']['resolution']
-default['opennms']['remedy']['reason_resolved']
-default['opennms']['remedy']['reason_cancelled']
-```
-
-#### etc/reportd-configuration.xml
-
-Two attributes are available for your availability report running pleasure:
-
-* storage_location
-* persist_reports
-
-But they aren't very helpful until you add some reports. A LWRP for that is planned.
 
 #### etc/response-graph.properties
 Change the image format from the default `png` to `gif` or `jpg` (if using jrobin or you like broken images) with `node['response_graph']['image_format']`. Font sizes can also be changed with `node['response_graph']['default_font_size']` and `node['response_graph']['title_font_size']` (defaults are 7 and 10 respectively). Setting these attributes to false removes them from the file:
@@ -766,21 +596,6 @@ default['opennms']['rrd']['tcp']['host'] = 10.0.0.1
 default['opennms']['rrd']['tcp']['port'] = 9100     # Hope that's a JetDirect compatible network interface!
 ```
 
-#### etc/rtc-configuration.xml
-
-Like other factory configuration files, you can change some settings with attributes:
-
-```
-default['opennms']['rtc']['updaters']                      = 10
-default['opennms']['rtc']['senders']                       = 5
-default['opennms']['rtc']['rolling_window']                = "24h"
-default['opennms']['rtc']['max_events_before_resend']      = 100
-default['opennms']['rtc']['low_threshold_interval']        = "20s"
-default['opennms']['rtc']['high_threshold_interval']       = "45s"
-default['opennms']['rtc']['user_refresh_interval']         = "2m"
-default['opennms']['rtc']['errors_before_url_unsubscribe'] = 5
-```
-
 #### etc/site-status-views.xml
 
 Do you actually populate the building column in assets or site field in provisioning reqs? Change the default site status view name and/or it's definition with these attributes: `node['opennms']['site_status_views']['default_view']['name']` and `node['opennms']['site_status_views']['default_view']['rows']` where `rows` is an array of single element hashes (to maintain order) like:
@@ -797,10 +612,6 @@ Do you actually populate the building column in assets or site field in provisio
   }
 ]
 ```
-
-#### etc/smsPhonebook.properties
-
-Populate `node['opennms']['sms_phonebook']['entries']` with `{ "hostname": "+PHONE_NUMBER" }` keypairs to define an IP address' phone number for the mobile sequence monitor (http://www.opennms.org/wiki/Mobile_Sequence_Monitor). A pending LWRP will provide the ability to add the required mobile-sequence elements to make this useful.
 
 #### etc/snmp-adhoc-graph.properties
 
@@ -829,28 +640,6 @@ Note that this doesn't delete that file, it merely comments out the `reports=...
 
 You can also change the default KSC graph by setting `node['snmp_graph']['default_ksc_graph']` to the name of a valid graph.
 
-#### etc/snmp-interface-poller-configuration.xml
-
-Some attributes are available to configure the 1.9+ SNMP Interface Poller (http://www.opennms.org/wiki/SNMP_Interface_Poller). Defaults (effectively disabled):
-
-```
-default['opennms']['snmp_iface_poller']['threads']                               = 30
-default['opennms']['snmp_iface_poller']['service']                               = "SNMP"
-# array of service names that if down cause the SNMP poller to stop polling
-default['opennms']['snmp_iface_poller']['node_outage']                           = ["ICMP","SNMP"]
-default['opennms']['snmp_iface_poller']['example1']['filter']                    = "IPADDR != '0.0.0.0'"
-default['opennms']['snmp_iface_poller']['example1']['ipv4_range']['begin']       = "1.1.1.1"
-default['opennms']['snmp_iface_poller']['example1']['ipv4_range']['end']         = "1.1.1.1"
-default['opennms']['snmp_iface_poller']['example1']['ipv6_range']['begin']       = "::1"
-default['opennms']['snmp_iface_poller']['example1']['ipv6_range']['end']         = "::1"
-default['opennms']['snmp_iface_poller']['example1']['interface']['name']         = "Ethernet"
-default['opennms']['snmp_iface_poller']['example1']['interface']['criteria']     = "snmpiftype = 6"
-default['opennms']['snmp_iface_poller']['example1']['interface']['interval']     = 300000
-default['opennms']['snmp_iface_poller']['example1']['interface']['user_defined'] = false
-default['opennms']['snmp_iface_poller']['example1']['interface']['status']       = "on"
-```
-
-
 #### etc/statsd-configuration.xml
 
 You can remove either of the default packages or an individual report by setting attributes in `node['opennms']['statsd']['PACKAGE_NAME']['REPORT_NAME']` to false. Packages and their reports are:
@@ -862,72 +651,6 @@ You can remove either of the default packages or an individual report by setting
   * top_10_this_month
   * top_10_last_month
   * top_10_this_year
-
-#### etc/support.properties
-
-Whatever this file is for, you can set support.queueId, support.timeout and support.retry with `node['opennms']['support']['queueid']`, `node['opennms']['support']['timeout']` and `node['opennms']['support']['retry']`.
-
-#### etc/surveillance-views.xml
-
-Similar to site-status-views.xml.  Change this to change the default view shown in the Dashboard of the Web UI with the attribute `node['opennms']['surveillance_views']['default_view']`. Defaults to `default`. A LWRP is forthcoming that will let you add your own (and set it to default). So this is pretty useless ATM.
-#### etc/syslog-northbounder-configuration.xml
-
-Forward alarms to a syslog server.  Attributes available in `node['opennms']['syslog_north']`:
-
-```
-use_defaults       = true
-# set above to false if you want the following four attributes to take effect
-enabled            = false
-nagles_delay       = 1000
-batch_size         = 100
-queue_size         = 300000
-message_format     = "ALARM ID:${alarmId} NODE:${nodeLabel}; ${logMsg}"
-```
-
-Change these attributes in `node['opennms']['syslog_north']['destination']` to define the syslog server to send alarm data to:
-
-```
-name            = "localTest"
-host            = "127.0.0.1"
-port            = "514"
-ip_protocol     = "UDP"
-facility        = "LOCAL0"
-max_length      = 1024
-send_local_name = true
-send_local_time = true
-truncate        = false
-```
-
-And set these attributes in `node['opennms']['syslog_north']['uei']` to true to limit alarms forwarded to these specific UEIs:
-
-```
-default['opennms']['syslog_north']['uei']['node_down']
-default['opennms']['syslog_north']['uei']['node_up']
-```
-
-
-#### etc/syslogd-configuration.xml
-
-General settings and their defaults:
-
-```
-default['opennms']['syslogd']['port']                   = 10514
-default['opennms']['syslogd']['new_suspect']            = false
-default['opennms']['syslogd']['parser']                 = "org.opennms.netmgt.syslogd.CustomSyslogParser"
-default['opennms']['syslogd']['forwarding_regexp']      = "^.*\s(19|20)\d\d([-/.])(0[1-9]|1[012])\2(0[1-9]|[12][0-9]|3[01])(\s+)(\S+)(\s)(\S.+)"
-default['opennms']['syslogd']['matching_group_host']    = 6
-default['opennms']['syslogd']['matching_group_message'] = 8
-default['opennms']['syslogd']['discard_uei']            = "DISCARD-MATCHING-MESSAGES"
-```
-
-To disable the predefined definitions, set these to false:
-
-```
-default['opennms']['syslogd']['apache_httpd']
-default['opennms']['syslogd']['linux_kernel']
-default['opennms']['syslogd']['openssh']
-default['opennms']['syslogd']['sudo']
-```
 
 #### etc/threshd-configuration.xml
 
@@ -963,84 +686,6 @@ Two attributes available: `port` and `new_suspect` in `node['opennms']['trapd']`
 
 Change your admin password by setting `node['opennms']['users']['admin']['password']` to whatever hashed value of your password OpenNMS uses. Uppercase MD5? In the future we'll generate one during install. You can also change the name and user_comments attributes, I guess.
 
-#### etc/vacuumd-configuration.xml
-
-Disable things that make OpenNMS run better by setting one of these attributes to false:
-
-* `node['opennms']['vacuumd']['statement']`:
-  * topo_delete_nodes
-  * delete_at_interfaces
-  * delete_dl_interfaces
-  * delete_ipr_interfaces
-  * delete_vlans
-  * delete_stp_interfaces
-  * delete_stp_nodes
-  * delete_snmp_interfaces
-  * delete_nodes
-  * delete_ip_interfaces
-  * delete_if_services
-  * delete_events
-* `node['opennms']['vacuumd']['automations']`:
-  * cosmic_clear
-  * clean_up
-  * full_clean_up
-  * gc
-  * full_gc
-  * unclear
-  * escalation
-  * purge_statistics_reports
-  * create_tickets
-  * create_critical_ticket
-  * update_tickets
-  * close_cleared_alarm_tickets
-  * clear_alarms_for_closed_tickets
-  * clean_up_rp_status_changes
-  * maintenance_check (default false)
-  * add_missing_access_points_to_table (default false)
-  * update_access_points_table (default false)
-  * clean_up_access_points_table (default false)
-* `node['opennms']['vacuumd']['triggers']`:
-  * select_closed_ticket_state_for_problem_alarms
-  * select_null_ticket_state_alarms
-  * select_critial_open_alarms
-  * select_not_null_ticket_state_alarms
-  * select_cleared_alarm_with_open_ticket_state
-  * select_suspect_alarms
-  * select_cleared_alarms
-  * select_resolvers
-  * select_expiration_maintenance (default false)
-  * select_access_points_missing_from_table (default false)
-* `node['opennms']['vacuumd']['actions']`:
-  * acknowledge_alarm
-  * update_automation_time
-  * escalate_alarm
-  * reset_severity
-  * garbage_collect_7_4
-  * garbage_collect_8_1 (default false)
-  * full_garbage_collect_7_4
-  * full_garbage_collect_8_1 (default false)
-  * delete_past_cleared_alarms
-  * delete_all_past_cleared_alarms
-  * clear_problems
-  * clear_closed_ticket_alarms
-  * delete_purgeable_statistics_reports
-  * do_nothing_action
-  * clean_up_rp_status_changes
-  * maintenance_expiration_warning (default false)
-  * add_access_point_to_table (default false)
-  * update_access_points_table (default false)
-  * clean_up_access_points_table (default false)
-* `node['opennms']['vacuumd']['auto_events']`:
-  * escalation_event
-* `node['opennms']['vacuumd']['action_events']`:
-  * create_ticket
-  * update_ticket
-  * close_ticket
-  * event_escalated
-  * maintenance_expiration_warning (default false)
-
-You can also change the frequency in which vacuumd runs by setting `node['opennms']['vacuumd']['period']`. Default is 86400000 (1 day).
-
 #### etc/viewsdisplay.xml
 
 Another web UI XML file, this one controls which categories are displayed in the availability box on the main landing page. Once a LWRP exists you'll be able to add sections, but until then you can disable any of the existing categories by setting one of these attributes in `node['opennms']['web_console_view']` to false:
@@ -1052,39 +697,6 @@ Another web UI XML file, this one controls which categories are displayed in the
 * db_servers
 * jmx_servers
 * other_servers
-
-#### etc/vmware-cim-datacollection-config.xml
-
-Similar to other *datacollection-config.xml files, you can change the RRD repository, step, RRA definitions and disable default vmware-cim-groups.
-
-#### etc/vmware-datacollection-config.xml
-
-Similar to other *datacollection-config.xml files, you can change the RRD repository, step, RRA definitions and disable default vmware-groups.
-
-#### etc/wmi-datacollection-config.xml
-
-Similar to other *datacollection-config.xml files, you can change the RRD repository, step, RRA definitions and disable default wpms.
-
-#### etc/xml-datacollection-config.xml
-
-Note that XML datacollection is a separate plugin package in it's own recipe. 
-Similar to other *datacollection-config.xml files, you can change the RRD repository, step, RRA definitions and disable default xml-collections.
-
-#### etc/xmlrpcd-configuration.xml
-
-Factory settings can be changed with these attributes in `node['opennms']['xmlrpcd']`:
-
-```
-['max_event_queue_size']            = 5000
-['external_servers']['retries']     = 3
-['external_servers']['elapse_time'] = 15000
-['external_servers']['url']         = "http://localhost:8000"
-['external_servers']['timeout']     = 0
-```
-
-Eventually a LWRP will exist to add more than 1 `external_servers`.
-
-To change the list of events sent via XML-RPC, override the `node['opennms']['xmlrpcd']['base_events']` attribute with an array of UEI strings.
 
 #### etc/xmpp-configuration.xml
 
@@ -1101,6 +713,31 @@ Configure notifications to be sent via XMPP (aka Jabber, GTalk) with these attri
 * user
 * pass
 
+#### Others
+See the template and default attributes source for more details on using these templates:
+
+* etc/microblog-configuration.xml
+* etc/model-importer.properties
+* etc/modemConfig.properties
+
+#### etc/nsclient-datacollection-config.xml
+#### etc/poller-configuration.xml
+#### etc/provisiond-configuration.xml
+#### etc/remedy.properties
+#### etc/reportd-configuration.xml
+#### etc/rtc-configuration.xml
+#### etc/smsPhonebook.properties
+#### etc/snmp-interface-poller-configuration.xml
+#### etc/support.properties
+#### etc/surveillance-views.xml
+#### etc/syslog-northbounder-configuration.xml
+#### etc/syslogd-configuration.xml
+#### etc/vacuumd-configuration.xml
+#### etc/vmware-cim-datacollection-config.xml
+#### etc/vmware-datacollection-config.xml
+#### etc/wmi-datacollection-config.xml
+#### etc/xml-datacollection-config.xml
+#### etc/xmlrpcd-configuration.xml
 
 License
 =======
@@ -1115,4 +752,4 @@ Development
 
 Please feel free to fork and send me pull requests!  The focus of my work will initially be on templates for configuration files that modify the default configuration and LWRPs to add new elements to configuration files. 
 
-There's a test kitchen suite for every main and example recipe. The default test kitchen config uses the vagrant driver, but I actually use the openstack driver (overriding the default with .kitchen.local.yml), so if the default config doesn't work that's why and I'm so, so sorry.  
+There's some kitchen suites available that exercise the main recipes and LWRPs. More testing will be a thing someday!
