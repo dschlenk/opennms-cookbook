@@ -139,7 +139,7 @@ we want anyway, so we just overwrite the old file with the `rpmnew` version.
 * `opennms::default` Installs and configures OpenNMS with the standard configuration modified with any node attribute values changed from their defaults.
 * `opennms::notemplates` Everything default does except minimal templates are used - etc/opennms.conf, etc/opennms.properties and etc/log4j2.xml. Use this recipe if you intend to use any of the LWRPs in this cookbook.
 
-#### Depreceated
+#### Deprecated
 The following recipes are deprecated. The preferred method to install these packages is by setting `node[:opennms][:plugin][:nsclient]` and/or `node[:opennms][:plugin][:xml]` to true. All these recipes do now is set those attributes at the default level. 
 * `opennms::nsclient` installs the optional nsclient data collection plugin and uses the template for etc/nsclient-datacollection-config.xml. 
 * `opennms::xml` installs the optional xml data collection plugin and uses the template for etc/xml-datacollection-config.xml. 
@@ -260,6 +260,8 @@ There are a couple LWRPs for managing the Web UI. All of these support updating.
 ### Template Overview
 
 Most configuration files are templated and can be overridden with environment, role, or node attributes.  See the default attributes file for a list of configuration items that can be changed in this manner, or keep reading for a brief overview of each template available. Default attribute values set to `nil` mean that the file's default value is commented out in the original file and will remain so unless set to a non-nil value.
+
+Each template can also be overridden in a wrapper cookbook by manipulating the appropriate node attribute. For example, if you've got a pretty heavily customized collectd-configuration.xml file and you don't want to move to the LWRP/library cookbook workflow, turn your custom version into a template (append `.erb` to the filename and optionally add some templating logic to it) and add it to `templates/default` in your wrapper cookbook. Then set `default[:opennms][:collectd][:cookbook]` to the name of your wrapper cookbook. You could also copy all of the templates from this cookbook to your wrapper, edit them all as desired and set `default[:opennms][:default_template_cookbook]` to your wrapper cookbook's name.  
 
 #### etc/availability-reports.xml
 
