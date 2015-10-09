@@ -130,6 +130,7 @@ template "#{onms_home}/etc/datacollection-config.xml" do
     :asterisk     => node['opennms']['datacollection']['default']['asterisk'],
     :bluecat      => node['opennms']['datacollection']['default']['bluecat'],
     :bluecoat     => node['opennms']['datacollection']['default']['bluecoat'],
+    :bridgewave   => node['opennms']['datacollection']['default']['bridgewave'],
     :brocade      => node['opennms']['datacollection']['default']['brocade'],
     :checkpoint   => node['opennms']['datacollection']['default']['checkpoint'],
     :cisco        => node['opennms']['datacollection']['default']['cisco'],

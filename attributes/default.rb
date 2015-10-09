@@ -366,6 +366,7 @@ default['opennms']['datacollection']['default']['ascend']           = true
 default['opennms']['datacollection']['default']['asterisk']         = true
 default['opennms']['datacollection']['default']['bluecat']          = true
 default['opennms']['datacollection']['default']['bluecoat']         = true
+default['opennms']['datacollection']['default']['bridgewave']       = true
 default['opennms']['datacollection']['default']['brocade']          = true
 default['opennms']['datacollection']['default']['checkpoint']       = true
 default['opennms']['datacollection']['default']['cisco']            = true
