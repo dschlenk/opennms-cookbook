@@ -53,7 +53,7 @@ def create_snmp_collection_service
   if new_resource.user_defined
     service_el.add_attribute('user-defined' => new_resource.user_defined)
   end
-  collection_param_el = service_el.add_element 'parameter', { 'key' => 'collection', 'value' => new_resource.service_name }
+  collection_param_el = service_el.add_element 'parameter', { 'key' => 'collection', 'value' => new_resource.collection }
   if !new_resource.port.nil?
     port_el = service_el.add_element 'parameter', { 'key' => 'port', 'value' => new_resource.port }
   end
