@@ -158,6 +158,15 @@ suites:
       - recipe[opennms::example_foreign_source]
       - recipe[opennms::example_import]
       - recipe[opennms::example_stress_test_provreq]
+  - name: event_mask
+    run_list:
+      - recipe[postgresql::client]
+      - recipe[postgresql::server]
+      - recipe[postgresql::contrib]
+      - recipe[postgresql::config_initdb]
+      - recipe[postgresql::config_pgtune]
+      - recipe[opennms::notemplates]
+      - recipe[opennms::example_event]
 #  - name: notemplates
 #    run_list:
 #      - recipe[java]
