@@ -2,7 +2,7 @@
 driver:
   name: vagrant
   network:
-    - ["forwarded_port", {guest: 8980, host: 8980}]
+    - ["forwarded_port", {guest: 8980, host: 8988}]
   customize: 
     memory: 1024
 
@@ -167,15 +167,15 @@ suites:
       - recipe[postgresql::config_pgtune]
       - recipe[opennms::notemplates]
       - recipe[opennms::example_event]
-#  - name: notemplates
-#    run_list:
-#      - recipe[java]
-#      - recipe[postgresql::client]
-#      - recipe[postgresql::server]
-#      - recipe[postgresql::contrib]
-#      - recipe[postgresql::config_initdb]
-#      - recipe[postgresql::config_pgtune]
-#      - recipe[opennms::notemplates]
+  - name: notemplates
+    run_list:
+      - recipe[java]
+      - recipe[postgresql::client]
+      - recipe[postgresql::server]
+      - recipe[postgresql::contrib]
+      - recipe[postgresql::config_initdb]
+      - recipe[postgresql::config_pgtune]
+      - recipe[opennms::notemplates]
 #  - name: nsclient
 #    run_list:
 #      - recipe[java]
