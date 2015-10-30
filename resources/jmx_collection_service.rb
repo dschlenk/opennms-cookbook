@@ -18,6 +18,7 @@ attribute :status, :kind_of => String, :equal_to => ['on','off'], :default => 'o
 attribute :timeout, :kind_of => Fixnum, :default => 3000
 attribute :retry_count, :kind_of => Fixnum, :default => 1
 attribute :thresholding_enabled, :kind_of => [FalseClass, TrueClass], :default => false
+attribute :port, :kind_of => Fixnum, :default => 1099
 attribute :protocol, :kind_of => String, :default => 'rmi'
 attribute :url_path, :kind_of => String, :default => '/jmxrmi'
 attribute :rrd_base_name, :kind_of => String, :default => 'java'
