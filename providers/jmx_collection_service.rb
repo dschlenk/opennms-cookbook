@@ -51,7 +51,7 @@ def create_jmx_collection_service
     service_el.add_attribute('user-defined' => new_resource.user_defined)
   end
   collection_param_el = service_el.add_element 'parameter', { 'key' => 'collection', 'value' => new_resource.collection }
-  port_el = service_el.add_element 'port', { 'key' => 'port', 'value' => new_resource.port }
+  port_el = service_el.add_element 'parameter', { 'key' => 'port', 'value' => new_resource.port }
   proto_el = service_el.add_element 'parameter', { 'key' => 'protocol', 'value' => new_resource.protocol }
   url_path_el = service_el.add_element 'parameter', { 'key' => 'urlPath', 'value' => new_resource.url_path }
   rrd_base_name_el = service_el.add_element 'parameter', { 'key' => 'rrd-base-name', 'value' => new_resource.rrd_base_name }
