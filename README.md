@@ -215,13 +215,16 @@ Currently implemented are:
 * `opennms_xml_collection`: adds an xml-collection element to etc/xml-datacollection-config.xml. 
 * `opennms_wmi_collection`: adds a wmi-collection element to etc/wmi-datacollection-config.xml. 
 * `opennms_jdbc_collection`: adds a jdbc-collection element to etc/jdbc-datacollection-config.xml. 
+* `opennms_jmx_collection`: adds a jmx-collection element to etc/jmx-datacollection-config.xml. 
 * `opennms_collection_package`: adds a package element to etc/collectd-configuration.xml. 
 * `opennms_snmp_collection_service`: adds a service element to a package in etc/collectd-configuration.xml. 
 * `opennms_xml_collection_service`: adds a service element to a package in etc/collectd-configuration.xml. 
 * `opennms_wmi_collection_service`: adds a service element to a package in etc/collectd-configuration.xml.
 * `opennms_jdbc_collection_service`: adds a service element to a package in etc/collectd-configuration.xml.
+* `opennms_jmx_collection_service`: adds a service element to a package in etc/collectd-configuration.xml.
 * `opennms_snmp_collection_group`: adds an include-collection element to an snmp-collection in etc/datacollection-config.xml and drops off the specified cookbook file into etc/datacollection. 
 * `opennms_jdbc_query`: adds a query element to a jdbc-collection in etc/jdbc-datacollection-config.xml. 
+* `opennms_jmx_mbean`: adds a mbean element to a jmx-collection in etc/jmx-datacollection-config.xml. 
 * `opennms_xml_source`: adds a xml-source element to a xml-collection in etc/xml-datacollection-config.xml. 
 * `opennms_xml_group`: adds a xml-source element to a xml-source in etc/xml-datacollection-config.xml. 
 

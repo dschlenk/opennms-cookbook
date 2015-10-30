@@ -176,6 +176,16 @@ suites:
       - recipe[postgresql::config_initdb]
       - recipe[postgresql::config_pgtune]
       - recipe[opennms::notemplates]
+  - name: jmx
+    run_list:
+      - recipe[java]
+      - recipe[postgresql::client]
+      - recipe[postgresql::server]
+      - recipe[postgresql::contrib]
+      - recipe[postgresql::config_initdb]
+      - recipe[postgresql::config_pgtune]
+      - recipe[opennms::notemplates]
+      - recipe[opennms::example_jmx]
 #  - name: nsclient
 #    run_list:
 #      - recipe[java]
