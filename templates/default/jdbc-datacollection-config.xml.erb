@@ -349,11 +349,11 @@ AND CURRENT_TIMESTAMP;</queryString>
 <% end -%>
 <% if @enable_pgsql_stats -%>
     <jdbc-collection name="PostgreSQL">
-	<rrd step="<%=@pgsql[:rrd][:step]%>">
+        <rrd step="<%=@pgsql[:rrd][:step]%>">
             <% @pgsql[:rrd][:rras].each do |rra| -%>
-	    <rra><%=rra%></rra>
+            <rra><%=rra%></rra>
             <% end -%>
-	</rrd>
+        </rrd>
         <queries>
             <% if @pgsql[:tablespace_size] -%>
             <query name="pg_tablespace_size" ifType="all" resourceType="pgTableSpace" instance-column="spcname">

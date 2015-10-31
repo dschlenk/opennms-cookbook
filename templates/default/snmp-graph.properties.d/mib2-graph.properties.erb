@@ -47,7 +47,7 @@ mib2printer.lifeCount, \
 mib2printer.powerOnCount, \
 mib2printer.markersupply, \
 mib2.storage.usage, \
-mib2.storage-non-unique.usage
+mib2.storage-non-unique.usage,
 <% else -%>
 #reports=mib2.HCbits, \
 #mib2.bits, \
@@ -90,8 +90,9 @@ mib2.storage-non-unique.usage
 #mib2printer.powerOnCount, \
 #mib2printer.markersupply, \
 #mib2.storage.usage, \
-#mib2.storage-non-unique.usage
+#mib2.storage-non-unique.usage,
 <% end -%>
+
 # Reports Generated From MIB-2 OIDs
 
 report.mib2.bits.name=Bits In/Out
@@ -612,7 +613,6 @@ report.mib2.udperrors.command=--title="UDP Errors" \
  GPRINT:errors:AVERAGE:" Avg  \\: %8.2lf %s" \
  GPRINT:errors:MIN:"Min  \\: %8.2lf %s" \
  GPRINT:errors:MAX:"Max  \\: %8.2lf %s\\n"
-
 
 report.mib2.traffic.name=Traffic
 report.mib2.traffic.columns=ifInOctets,ifOutOctets

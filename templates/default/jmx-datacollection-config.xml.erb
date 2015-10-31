@@ -66,7 +66,7 @@
       <% if @jboss[:jms_topic][:enabled] -%>
       -->
       <% end -%>
-          <mbean name="<%=@jboss[:jms_topic][:name]%>" objectname="<%=@jboss[:jms_topic][:object_name]%>">
+          <mbean name="<%=@jboss[:jms_topic][:name]%>" objectname="<%=@jboss[:jms_topic][:object_name]%>">  
               <attrib name="DurableMessageCount"         alias="<%=@jboss[:jms_topic][:short_name]%>_DurMsg"      type="gauge"/> 
               <attrib name="NonDurableMessageCount"      alias="<%=@jboss[:jms_topic][:short_name]%>_NonDurMsg"   type="gauge"/> 
               <attrib name="NonDurableSubscriptionCount" alias="<%=@jboss[:jms_topic][:short_name]%>_NonDurSub"   type="gauge"/> 
@@ -180,7 +180,7 @@
         <attrib name="ReportsCompleted" alias="StaReportsCompleted" type="counter"/>
         <attrib name="ReportsPersisted" alias="StaReportsPersisted" type="counter"/>
         <attrib name="ReportRunTime" alias="StaReportRunTime" type="counter"/>
-      </mbean> 
+      </mbean>
       <% end -%>
       <% if @jsr160[:trapd][:enabled] -%>
       <mbean name="OpenNMS.Trapd" objectname="OpenNMS:Name=Trapd">

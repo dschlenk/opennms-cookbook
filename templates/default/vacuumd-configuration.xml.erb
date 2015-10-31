@@ -188,31 +188,19 @@
     <% end -%>
     
 	<!-- Enable these automations to maintain the accesspoints table -->
-    <% if !@automations[:add_missing_access_points_to_table] -%>
+    <% if !@automations[:access_points_table] -%>
     <!--
     <% end -%>
     <automation name="addMissingAccessPointsToTable" interval="600000" active="true" 
                 trigger-name="selectAccessPointsMissingFromTable" 
                 action-name="addAccessPointToTable" />
-    <% if !@automations[:add_missing_access_points_to_table] -%>
-    -->
-    <% end -%>
 				
-    <% if !@automations[:update_access_points_table] -%>
-    <!--
-    <% end -%>
     <automation name="updateAccessPointsTable" interval="600000" active="true"
                 action-name="updateAccessPointsTable" />
-    <% if !@automations[:update_access_points_table] -%>
-    -->
-    <% end -%>
 				
-    <% if !@automations[:clean_up_access_points_table] -%>
-    <!--
-    <% end -%>
     <automation name="cleanUpAccessPointsTable" interval="600000" active="true" 
                 action-name="cleanUpAccessPointsTable" />
-    <% if !@automations[:clean_up_access_points_table] -%>
+    <% if !@automations[:access_points_table] -%>
     -->
     <% end -%>
   </automations>
@@ -601,7 +589,7 @@
     <% end -%>
     
     <!-- Access Point Monitor -->
-    <% if !@actions[:add_access_point_to_table] -%>
+    <% if !@actions[:access_points_table] -%>
     <!--
     <% end -%>
     <action name="addAccessPointToTable" >
@@ -610,13 +598,7 @@
            VALUES (${_serialnumber}, ${_nodeid}, ${_package})
       </statement>
     </action>
-    <% if !@actions[:add_access_point_to_table] -%>
-    -->
-    <% end -%>
 	
-    <% if !@actions[:update_access_points_table] -%>
-    <!--
-    <% end -%>
     <action name="updateAccessPointsTable">
         <statement>
             UPDATE accesspoints
@@ -629,13 +611,7 @@
              WHERE accesspoints.physaddr=assets.serialnumber
         </statement>
     </action>
-    <% if !@actions[:update_access_points_table] -%>
-    -->
-    <% end -%>
 	
-    <% if !@actions[:clean_up_access_points_table] -%>
-    <!--
-    <% end -%>
     <action name="cleanUpAccessPointsTable">
       <statement>
         DELETE FROM accesspoints
@@ -643,7 +619,7 @@
            ( SELECT 1 FROM assets WHERE assets.serialnumber = accesspoints.physaddr )
       </statement>
     </action>
-    <% if !@actions[:clean_up_access_points_table] -%>
+    <% if !@actions[:access_points_table] -%>
     -->
     <% end -%>
   </actions>

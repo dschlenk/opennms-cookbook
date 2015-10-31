@@ -1,6 +1,10 @@
 ---
 driver:
   name: vagrant
+  network:
+    - ["forwarded_port", {guest: 8980, host: 8988}]
+  customize: 
+    memory: 1024
 
 provisioner:
   name: chef_solo
@@ -8,37 +12,35 @@ provisioner:
 platforms:
   - name: centos-6.5
     attributes: { 
-                 "java": { 
-                          "oracle": { 
-                                      "accept_oracle_download_terms": "true"
-                                    }, 
-                          "install_flavor": "oracle", 
-                          "jdk":    { 
-                                     "7": { 
-                                           "x86_64": { 
-                                                      "checksum": "f2eae4d81c69dfa79d02466d1cb34db2b628815731ffc36e9b98f96f46f94b1a", 
-                                                      "url": "http://download.oracle.com/otn-pub/java/jdk/7u45-b18/jdk-7u45-linux-x64.tar.gz"
-                                                     }
-                                          }
-                                    }, 
-                          "jdk_version": 7,
-                          "ark_retries": 5
-                         }, 
                   "opennms": {
-                              "conf": {"start_timeout": 20}},  
+                              "conf": {"start_timeout": 20},
+                              "stable": false,
+                              "plugin": {
+                                         "xml": true,
+                                         "nsclient": true
+                                        },
+                              "log4j2": { "provisiond": "DEBUG", "web": "DEBUG" }
+                             },  
                   postgresql: {
                                 password: { 
                                            postgres: "md5c23797e9a303da48b792b4339c426700" 
                                           }, 
-                                enable_pgdg_yum: false,
-                                
+                                enable_pgdg_yum: true,
+                                version: '9.3',
+                                dir: '/var/lib/pgsql/9.3/data',
                                 config: {
+                                         data_directory: '/var/lib/pgsql/9.3/data',
+                                         shared_preload_libraries: 'pg_stat_statements',
+
                                          autovacuum: "on", 
                                          checkpoint_timeout: "15min", 
                                          track_activities: "on", 
                                          track_counts: "on", 
                                          vacuum_cost_delay: 50
                                         }, 
+                                config_pgtune: {
+                                                max_connections: 160
+                                               },
                                 pg_hba: [
                                          {
                                           addr: "", 
@@ -64,24 +66,24 @@ platforms:
                                         ], 
                                 client: {
                                          packages: [
-                                                    "postgresql",
-                                                    "postgresql-contrib",
-                                                    "postgresql-devel"
+                                                    "postgresql93",
+                                                    "postgresql93-contrib",
+                                                    "postgresql93-devel"
                                                    ]
                                         },
                                 server: { 
                                          packages: [
-                                                    "postgresql-server"
+                                                    "postgresql93-server"
                                                    ],
-                                         service_name: "postgresql"
-                                        }
+                                         service_name: "postgresql-9.3"
+                                        },
+                                contrib: { extensions: [ 'pageinspect', 'pg_buffercache', 'pg_freespacemap', 'pgrowlocks', 'pg_stat_statements', 'pgstattuple' ] }
                               }
                 }
 
 suites:
   - name: default
     run_list:
-      - recipe[java]
       - recipe[postgresql::client]
       - recipe[postgresql::server]
       - recipe[postgresql::contrib]
@@ -90,7 +92,6 @@ suites:
       - recipe[opennms::default]
   - name: all
     run_list:
-      - recipe[java]
       - recipe[postgresql::client]
       - recipe[postgresql::server]
       - recipe[postgresql::contrib]
@@ -146,15 +147,35 @@ suites:
       - recipe[opennms::example_threshold]
       - recipe[opennms::example_system_def]
       - recipe[opennms::example_avail_category]
-#  - name: notemplates
-#    run_list:
-#      - recipe[java]
-#      - recipe[postgresql::client]
-#      - recipe[postgresql::server]
-#      - recipe[postgresql::contrib]
-#      - recipe[postgresql::config_initdb]
-#      - recipe[postgresql::config_pgtune]
-#      - recipe[opennms::notemplates]
+  - name: prov_req_rest
+    run_list:
+      - recipe[postgresql::client]
+      - recipe[postgresql::server]
+      - recipe[postgresql::contrib]
+      - recipe[postgresql::config_initdb]
+      - recipe[postgresql::config_pgtune]
+      - recipe[opennms::notemplates]
+      - recipe[opennms::example_foreign_source]
+      - recipe[opennms::example_import]
+      - recipe[opennms::example_stress_test_provreq]
+  - name: event_mask
+    run_list:
+      - recipe[postgresql::client]
+      - recipe[postgresql::server]
+      - recipe[postgresql::contrib]
+      - recipe[postgresql::config_initdb]
+      - recipe[postgresql::config_pgtune]
+      - recipe[opennms::notemplates]
+      - recipe[opennms::example_event]
+  - name: notemplates
+    run_list:
+      - recipe[java]
+      - recipe[postgresql::client]
+      - recipe[postgresql::server]
+      - recipe[postgresql::contrib]
+      - recipe[postgresql::config_initdb]
+      - recipe[postgresql::config_pgtune]
+      - recipe[opennms::notemplates]
 #  - name: nsclient
 #    run_list:
 #      - recipe[java]

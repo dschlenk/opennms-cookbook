@@ -15,7 +15,7 @@ attribute :file, :kind_of => String, :default => 'eventconf.xml', :required => t
 #      {'mename' => 'generic', 'mevalue' => ['6']}, 
 #      {'mename' => 'specific', 'mevalue' => ['1']}
 #     ]
-attribute :mask, :kind_of => Hash
+attribute :mask, :kind_of => Array
 attribute :event_label, :kind_of => String, :required => true
 # Never seen this in the wild but it's in the schema.
 # ex: 'id' => 'string', 'idtext' => 'string', 'version' => 'v1|v2c|v3', 'specific' => Fixnum, 'generic' => Fixnum, 'community' => 'string'

@@ -46,5 +46,5 @@ def create_import_node_interface_service
   Chef::Log.debug "Adding service..."
   add_import_node_interface_service(new_resource.name, new_resource.foreign_source_name,
     new_resource.foreign_id, new_resource.ip_addr, node)
-  sync_import(new_resource.foreign_source_name,true, node) if !new_resource.sync_import.nil? && new_resource.sync_import
+  sync_import(new_resource.foreign_source_name, false, node) if !new_resource.sync_import.nil? && new_resource.sync_import
 end

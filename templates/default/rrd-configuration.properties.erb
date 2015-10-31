@@ -204,14 +204,14 @@ org.opennms.rrd.queuing.queueHighWaterMark=<%=@queue[:queue_hwmark]%>
 
 
 #
-# This property defines which log4j category to use when printing the queue
+# This property defines which log4j2 routing prefix to use when printing the queue
 # statistics
 #
 # The default setting is for the queueing daemon
 <% if !@queue[:log_cat].nil? -%>
 org.opennms.rrd.queuing.category=<%=@queue[:log_cat]%>
 <% else -%>
-#org.opennms.rrd.queuing.category=OpenNMS.Queued
+#org.opennms.rrd.queuing.category=queued
 <% end -%>
 
 #
@@ -277,7 +277,6 @@ org.opennms.rrd.tcp.port=<%=@tcp[:port]%>
 <% else -%>
 #org.opennms.rrd.tcp.port=
 <% end -%>
-
 #
 # The queue size for outgoing TCP metrics
 #org.opennms.rrd.queuing.queueSize=50000

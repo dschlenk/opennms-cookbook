@@ -7,27 +7,28 @@ end
 log "Start OpenNMS to perform ReST operations." do
     notifies :start, 'service[opennms]', :immediately
 end
-# need a node to add an interface to
-# make us a new foreign_id using the Provision library
 serviceNode_foreign_id = foreign_id_gen
-opennms_import_node "serviceNode" do
+opennms_import_node "stressNode" do
   foreign_source_name "dry-source"
   foreign_id serviceNode_foreign_id
   building "HQ"
   categories ["Servers", "Test"]
-  assets 'vendorPhone' => '411', 'serialNumber' => 'SN12838932'
-end
-
-# minimal
-opennms_import_node_interface "72.72.72.74" do
-  foreign_source_name "dry-source"
-  foreign_id serviceNode_foreign_id
-end
-
-# all options - only sync_import is optional
-opennms_import_node_interface_service "ICMP" do
-  foreign_source_name "dry-source"
-  foreign_id serviceNode_foreign_id
-  ip_addr "72.72.72.74"
+  assets 'vendorPhone' => '412', 'serialNumber' => 'SN12838933'
   sync_import true
+end
+
+opennms_import_node_interface "72.72.72.75" do
+  foreign_source_name "dry-source"
+  foreign_id serviceNode_foreign_id
+  sync_import true
+end
+
+services = ['ICMP', 'SSH', 'SNMP', 'HTTP', 'WMI', 'LDAP', 'IMAP', 'POP3', 'DNS', 'NTP', 'SIP', 'SCCP', 'HTTPS']
+services.each do |svc|
+  opennms_import_node_interface_service svc do
+    foreign_source_name "dry-source"
+    foreign_id serviceNode_foreign_id
+    ip_addr "72.72.72.75"
+    sync_import true
+  end
 end

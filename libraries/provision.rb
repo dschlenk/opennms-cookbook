@@ -238,8 +238,16 @@ module Provision
     if !rescan.nil? && rescan == false
       url = url + "?rescanExisting=false" 
     end
-
-    RestClient.put url, nil
+    begin
+      tries ||= 3
+      RestClient.put url, nil
+    rescue => e
+      if (tries -= 1) > 0
+        retry
+      else
+        raise
+      end
+    end
   end
   def foreign_id_gen
     t = Time.new()
