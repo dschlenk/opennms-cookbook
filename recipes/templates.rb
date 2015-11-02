@@ -2094,6 +2094,7 @@ template "#{onms_home}/etc/users.xml" do
   group "root"
   notifies :restart, "service[opennms]"
   variables(
+    :salted        => node[:opennms][:users][:admin][:salted],
     :name          => node[:opennms][:users][:admin][:name],
     :user_comments => node[:opennms][:users][:admin][:user_comments],
     :password      => node[:opennms][:users][:admin][:password]

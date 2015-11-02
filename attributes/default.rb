@@ -1638,6 +1638,7 @@ default['opennms']['trapd']['port']        = 162
 default['opennms']['trapd']['new_suspect'] = false
 # users.xml
 default['opennms']['users']['cookbook']         = node['opennms']['default_template_cookbook']
+default['opennms']['users']['admin']['salted']        = false
 default['opennms']['users']['admin']['name']          = "Administrator"
 default['opennms']['users']['admin']['user_comments'] = "Default administrator, do not delete"
 default['opennms']['users']['admin']['password']      = "21232F297A57A5A743894A0E4A801FC3"

@@ -10,7 +10,11 @@
             <user-id>admin</user-id>
             <full-name><%=@name%></full-name>
             <user-comments><%=@user_comments%></user-comments>
+          <% if @salted -%>
+            <password salted="true"><%=@password%></password>
+          <% else -%>
             <password><%=@password%></password>
+          <% end -%>
         </user>
     </users>
 </userinfo>

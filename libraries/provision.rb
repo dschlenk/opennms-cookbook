@@ -254,7 +254,7 @@ module Provision
     "#{t.to_i}#{t.usec}"
   end
   def baseurl(node)
-    "http://admin:admin@localhost:#{node['opennms']['properties']['jetty']['port']}/opennms/rest"
+    "http://admin:#{node['opennms']['poller']['example1']['opennms_jvm']['password']}@localhost:#{node['opennms']['properties']['jetty']['port']}/opennms/rest"
   end
   def default_foreign_source(node)
     require 'rest_client'
