@@ -11,7 +11,7 @@
             <full-name><%=@name%></full-name>
             <user-comments><%=@user_comments%></user-comments>
           <% if @salted -%>
-            <password salted="true"><%=@password%></password>
+            <password salt="true"><%=@password%></password>
           <% else -%>
             <password><%=@password%></password>
           <% end -%>
