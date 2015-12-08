@@ -8,6 +8,14 @@ use_inline_resources
 action :create do
   if @current_resource.exists
     Chef::Log.info "#{ @new_resource } already exists - nothing to do."
+    updated = update_eventconf
+    if updated
+      converge_by("Update #{ @new_resource }") do
+        new_resource.updated_by_last_action(true)
+      end
+    else
+      new_resource.updated_by_last_action(false)
+    end
   else
     converge_by("Create #{ @new_resource }") do
       create_eventconf
@@ -44,4 +52,13 @@ def create_eventconf
     mode 00644
   end
   add_file_to_eventconf(new_resource.name, new_resource.position, node)
+end
+
+def update_eventconf
+  f = cookbook_file new_resource.name do
+    path "#{node['opennms']['conf']['home']}/etc/events/#{new_resource.name}"
+    owner 'root'
+    group 'root'
+    mode 00644
+  end
 end

@@ -49,6 +49,25 @@ if node['opennms']['stable']
     exclude node['yum']['opennms-stable-rhel6']['exclude']
     action :create
   end
+  yum_repository 'opennms-obsolete-common' do
+    description 'RPMs Common to All OpenNMS Architectures RPMs (stable)'
+    baseurl node['yum']['opennms-obsolete-common']['baseurl']
+    mirrorlist node['yum']['opennms-obsolete-common']['url']
+    gpgkey 'file:///etc/yum.repos.d/OPENNMS-GPG-KEY'
+    failovermethod node['yum']['opennms-obsolete-common']['failovermethod']
+    includepkgs node['yum']['opennms-obsolete-common']['includepkgs']
+    exclude node['yum']['opennms-obsolete-common']['exclude']
+    action :create
+  end
+  yum_repository 'opennms-obsolete-rhel6' do
+    description 'RedHat Enterprise Linux 6.x and CentOS 6.x RPMs (stable)'
+    baseurl node['yum']['opennms-obsolete-rhel6']['baseurl']
+    mirrorlist node['yum']['opennms-obsolete-rhel6']['url']
+    gpgkey 'file:///etc/yum.repos.d/OPENNMS-GPG-KEY'
+    includepkgs node['yum']['opennms-obsolete-rhel6']['includepkgs']
+    exclude node['yum']['opennms-obsolete-rhel6']['exclude']
+    action :create
+  end
 else
   yum_repository 'opennms-snapshot-common' do
       description 'RPMs Common to All OpenNMS Architectures RPMs (stable)'
