@@ -114,12 +114,12 @@ def update_avail_category
   while normal_el.has_text?
     normal_el.text = nil
   end
-  normal_el.add_text new_resource.normal
+  normal_el.add_text new_resource.normal.to_s
   warning_el = cat_el.elements['warning']
   while warning_el.has_text?
     warning_el.text = nil
   end
-  warning_el.add_text new_resource.warning
+  warning_el.add_text new_resource.warning.to_s
   cat_el.elements.delete_all 'service'
   new_resource.services.each do |s|
     s_el = cat_el.add_element 'service'
