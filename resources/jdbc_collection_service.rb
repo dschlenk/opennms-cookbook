@@ -9,7 +9,9 @@ require 'rexml/document'
 actions :create
 default_action :create
 
-attribute :service_name, :name_attribute => true, :kind_of => String, :default => 'JDBC', :required => true
+# name doesn't actually get used for anything in the config.
+attribute :name, :name_attribute => true, :kind_of => String
+attribute :service_name, :kind_of => String, :default => 'JDBC', :required => true
 attribute :package_name, :kind_of => String, :default => 'example1', :required => true
 attribute :collection, :kind_of => String, :default => 'default', :required => true
 attribute :interval, :kind_of => Fixnum, :default => 300000, :required => true

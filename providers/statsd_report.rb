@@ -21,7 +21,7 @@ end
 def load_current_resource
   @current_resource = Chef::Resource::OpennmsStatsdReport.new(@new_resource.name)
   @current_resource.name(@new_resource.name)
-  @current_resource.report_name(@new_resource.report_name)
+  @current_resource.report_name(@new_resource.report_name) unless @new_resource.report_name.nil?
   @current_resource.package_name(@new_resource.package_name)
   
   if package_exists?(@current_resource.package_name, node)

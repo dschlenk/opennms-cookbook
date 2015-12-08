@@ -48,30 +48,29 @@ end
 def load_current_resource
   @current_resource = Chef::Resource::OpennmsSnmpConfigDefinition.new(@new_resource.name)
   @current_resource.name(@new_resource.name)
-  @current_resource.port(@new_resource.port)
-  @current_resource.retry_count(@new_resource.retry_count)
-  @current_resource.timeout(@new_resource.timeout)
-  @current_resource.read_community(@new_resource.read_community)
-  @current_resource.write_community(@new_resource.write_community)
-  @current_resource.proxy_host(@new_resource.proxy_host)
-  @current_resource.version(@new_resource.version)
-  @current_resource.max_vars_per_pdu(@new_resource.max_vars_per_pdu)
-  @current_resource.max_repetitions(@new_resource.max_repetitions)
-  @current_resource.max_request_size(@new_resource.max_request_size)
-  @current_resource.security_name(@new_resource.security_name)
-  @current_resource.security_level(@new_resource.security_level)
-  @current_resource.auth_passphrase(@new_resource.auth_passphrase)
-  @current_resource.auth_protocol(@new_resource.auth_protocol)
-  @current_resource.engine_id(@new_resource.engine_id)
-  @current_resource.context_engine_id(@new_resource.context_engine_id)
-  @current_resource.context_name(@new_resource.context_name)
-  @current_resource.privacy_passphrase(@new_resource.privacy_passphrase)
-  @current_resource.privacy_protocol(@new_resource.privacy_protocol)
-  @current_resource.enterprise_id(@new_resource.enterprise_id)
-
-  @current_resource.ranges(@new_resource.ranges)
-  @current_resource.specifics(@new_resource.specifics)
-  @current_resource.ip_matches(@new_resource.ip_matches)
+  @current_resource.port(@new_resource.port) unless @new_resource.port.nil?
+  @current_resource.retry_count(@new_resource.retry_count) unless @new_resource.retry_count.nil?
+  @current_resource.timeout(@new_resource.timeout) unless @new_resource.timeout.nil?
+  @current_resource.read_community(@new_resource.read_community) unless @new_resource.read_community.nil?
+  @current_resource.write_community(@new_resource.write_community) unless @new_resource.write_community.nil?
+  @current_resource.proxy_host(@new_resource.proxy_host) unless @new_resource.proxy_host.nil?
+  @current_resource.version(@new_resource.version) unless @new_resource.version.nil?
+  @current_resource.max_vars_per_pdu(@new_resource.max_vars_per_pdu) unless @new_resource.max_vars_per_pdu.nil?
+  @current_resource.max_repetitions(@new_resource.max_repetitions) unless @new_resource.max_repetitions.nil?
+  @current_resource.max_request_size(@new_resource.max_request_size) unless @new_resource.max_request_size.nil?
+  @current_resource.security_name(@new_resource.security_name) unless @new_resource.security_name.nil?
+  @current_resource.security_level(@new_resource.security_level) unless @new_resource.security_level.nil?
+  @current_resource.auth_passphrase(@new_resource.auth_passphrase) unless @new_resource.auth_passphrase.nil?
+  @current_resource.auth_protocol(@new_resource.auth_protocol) unless @new_resource.auth_protocol.nil?
+  @current_resource.engine_id(@new_resource.engine_id) unless @new_resource.engine_id.nil?
+  @current_resource.context_engine_id(@new_resource.context_engine_id) unless @new_resource.context_engine_id.nil?
+  @current_resource.context_name(@new_resource.context_name) unless @new_resource.context_name.nil?
+  @current_resource.privacy_passphrase(@new_resource.privacy_passphrase) unless @new_resource.privacy_passphrase.nil?
+  @current_resource.privacy_protocol(@new_resource.privacy_protocol) unless @new_resource.privacy_protocol.nil?
+  @current_resource.enterprise_id(@new_resource.enterprise_id) unless @new_resource.enterprise_id.nil?
+  @current_resource.ranges(@new_resource.ranges) unless @new_resource.ranges.nil?
+  @current_resource.specifics(@new_resource.specifics) unless @new_resource.specifics.nil?
+  @current_resource.ip_matches(@new_resource.ip_matches) unless @new_resource.ip_matches.nil?
 
   file = ::File.new("#{node['opennms']['conf']['home']}/etc/snmp-config.xml", "r")
   contents = file.read

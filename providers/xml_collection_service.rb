@@ -18,11 +18,12 @@ end
 def load_current_resource
   @current_resource = Chef::Resource::OpennmsXmlCollectionService.new(@new_resource.name)
   @current_resource.name(@new_resource.name)
+  @current_resource.service_name(@new_resource.service_name)
   @current_resource.package_name(@new_resource.package_name)
   @current_resource.collection(@new_resource.collection)
 
   # Good enough for create/delete but that's about it
-  if service_exists?(@current_resource.package_name, @current_resource.name, @current_resource.collection)
+  if service_exists?(@current_resource.package_name, @current_resource.service_name, @current_resource.collection)
      @current_resource.exists = true
   end
 end
@@ -30,15 +31,15 @@ end
 
 private
 
-def service_exists?(package_name, name, collection)
-  Chef::Log.debug "Checking to see if this xml collection service exists: '#{ name }'"
+def service_exists?(package_name, service_name, collection)
+  Chef::Log.debug "Checking to see if this xml collection service exists: '#{ service_name }'"
   file = ::File.new("#{node['opennms']['conf']['home']}/etc/collectd-configuration.xml", "r")
   doc = REXML::Document.new file
-  !doc.elements["/collectd-configuration/package[@name='#{package_name}']/service[@name='#{name}']/parameter[@key='collection' and @value='#{collection}']"].nil?
+  !doc.elements["/collectd-configuration/package[@name='#{package_name}']/service[@name='#{service_name}']/parameter[@key='collection' and @value='#{collection}']"].nil?
 end
 
 def create_xml_collection_service
-  Chef::Log.debug "Adding collection service: '#{ new_resource.name }'"
+  Chef::Log.debug "Adding collection service: '#{ new_resource.service_name }'"
   # Open file
   file = ::File.new("#{node['opennms']['conf']['home']}/etc/collectd-configuration.xml")
   contents = file.read

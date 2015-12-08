@@ -21,7 +21,7 @@ end
 def load_current_resource
   @current_resource = Chef::Resource::OpennmsDiscoSpecific.new(@new_resource.name)
   @current_resource.name(@new_resource.name)
-  @current_resource.foreign_source(@new_resource.foreign_source)
+  @current_resource.foreign_source(@new_resource.foreign_source) unless @new_resource.foreign_source.nil?
 
   if @current_resource.foreign_source.nil?
     if specific_exists?(@current_resource.name, nil)

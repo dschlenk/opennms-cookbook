@@ -24,8 +24,8 @@ def load_current_resource
   @current_resource.name(@new_resource.name)
   @current_resource.group(@new_resource.group)
   @current_resource.ds_type(@new_resource.ds_type)
-  @current_resource.triggered_uei(@new_resource.triggered_uei)
-  @current_resource.rearmed_uei(@new_resource.rearmed_uei)
+  @current_resource.triggered_uei(@new_resource.triggered_uei) unless @new_resource.triggered_uei.nil?
+  @current_resource.rearmed_uei(@new_resource.rearmed_uei) unless @new_resource.rearmed_uei.nil?
 
   if group_exists?(@current_resource.group, node)
     @current_resource.group_exists = true

@@ -19,7 +19,7 @@ def load_current_resource
   @current_resource = Chef::Resource::OpennmsSendEvent.new(@new_resource.name)
   @current_resource.name(@new_resource.name)
   @current_resource.uei(@new_resource.uei)
-  @current_resource.parameters(@new_resource.parameters)
+  @current_resource.parameters(@new_resource.parameters) unless @new_resource.parameters.nil?
 end
 
 def send_event

@@ -48,15 +48,15 @@ end
 def load_current_resource
   @current_resource = Chef::Resource::OpennmsWmiConfigDefinition.new(@new_resource.name)
   @current_resource.name(@new_resource.name)
-  @current_resource.retry_count(@new_resource.retry_count)
-  @current_resource.timeout(@new_resource.timeout)
-  @current_resource.username(@new_resource.username)
-  @current_resource.domain(@new_resource.domain)
-  @current_resource.password(@new_resource.password)
+  @current_resource.retry_count(@new_resource.retry_count) unless @new_resource.retry_count.nil?
+  @current_resource.timeout(@new_resource.timeout) unless @new_resource.timeout.nil?
+  @current_resource.username(@new_resource.username) unless @new_resource.username.nil?
+  @current_resource.domain(@new_resource.domain) unless @new_resource.domain.nil?
+  @current_resource.password(@new_resource.password) unless @new_resource.password.nil?
 
-  @current_resource.ranges(@new_resource.ranges)
-  @current_resource.specifics(@new_resource.specifics)
-  @current_resource.ip_matches(@new_resource.ip_matches)
+  @current_resource.ranges(@new_resource.ranges) unless @new_resource.ranges.nil?
+  @current_resource.specifics(@new_resource.specifics) unless @new_resource.specifics.nil?
+  @current_resource.ip_matches(@new_resource.ip_matches) unless @new_resource.ip_matches.nil?
 
   file = ::File.new("#{node['opennms']['conf']['home']}/etc/wmi-config.xml", "r")
   contents = file.read

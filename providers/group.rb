@@ -22,8 +22,8 @@ end
 def load_current_resource
   @current_resource = Chef::Resource::OpennmsGroup.new(@new_resource.name)
   @current_resource.name(@new_resource.name)
-  @current_resource.default_svg_map(@new_resource.default_svg_map)
-  @current_resource.users(@new_resource.users)
+  @current_resource.default_svg_map(@new_resource.default_svg_map) unless @new_resource.default_svg_map.nil?
+  @current_resource.users(@new_resource.users) unless @new_resource.users.nil?
 
   if users_exist?(@current_resource.users)
      @current_resource.users_exist = true

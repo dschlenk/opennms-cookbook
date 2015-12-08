@@ -5,8 +5,11 @@ log "Start OpenNMS to perform ReST operations." do
 end
 # all options
 opennms_import "saucy-source" do
+  foreign_source_name 'saucy-source'
   sync_import true
 end
 
 #minimal
-opennms_import "dry-source" 
+opennms_import "dry-source" do
+  foreign_source_name "dry-source" 
+end

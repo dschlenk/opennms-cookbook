@@ -1,6 +1,9 @@
+# Note that package_name and collection must be defined somewhere
+# else in your resource collection.
+#
 # most useful options
-# Note that package_name 'foo' must be defined somewhere else in your resource collection.
 opennms_jdbc_collection_service "JDBCFoo" do
+  service_name 'JDBCFoo'
   collection "foo"
   package_name "foo"
   interval 400000

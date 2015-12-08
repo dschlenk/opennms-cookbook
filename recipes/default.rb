@@ -18,8 +18,12 @@
 #
 
 include_recipe 'build-essential::default'
-chef_gem 'java_properties'
-chef_gem 'rest-client'
+chef_gem 'java_properties' do
+  compile_time true
+end
+chef_gem 'rest-client' do
+  compile_time true
+end
 
 fqdn = node[:fqdn]
 fqdn ||= node[:hostname]

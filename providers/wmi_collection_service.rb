@@ -25,6 +25,7 @@ end
 def load_current_resource
   @current_resource = Chef::Resource::OpennmsWmiCollectionService.new(@new_resource.name)
   @current_resource.name(@new_resource.name)
+  @current_resource.service_name(@new_resource.service_name)
   @current_resource.package_name(@new_resource.package_name)
   @current_resource.collection(@new_resource.collection)
   @current_resource.interval(@new_resource.interval)
@@ -32,14 +33,14 @@ def load_current_resource
   @current_resource.status(@new_resource.status)
   @current_resource.timeout(@new_resource.timeout)
   @current_resource.retry_count(@new_resource.retry_count)
-  @current_resource.port(@new_resource.port)
+  @current_resource.port(@new_resource.port) unless @new_resource.port.nil?
   @current_resource.thresholding_enabled(@new_resource.thresholding_enabled)
 
   if service_exists?(@current_resource.package_name,
                      @current_resource.collection,
                      @current_resource.name)
      @current_resource.exists = true
-     if service_changed?(@current_resource.name,
+     if service_changed?(@current_resource.service_name,
                          @current_resource.package_name,
                          @current_resource.collection,
                          @current_resource.interval,
@@ -57,21 +58,21 @@ end
 
 private
 
-def service_exists?(package_name, collection, name)
-  Chef::Log.debug "Checking to see if this wmi collection service exists: '#{ name }'"
+def service_exists?(package_name, collection, service_name)
+  Chef::Log.debug "Checking to see if this wmi collection service exists: '#{ service_name }'"
   file = ::File.new("#{node['opennms']['conf']['home']}/etc/collectd-configuration.xml", "r")
   doc = REXML::Document.new file
-  !doc.elements["/collectd-configuration/package[@name='#{package_name}']/service[@name='#{name}']/parameter[@key='collection' and @value='#{collection}']"].nil?
+  !doc.elements["/collectd-configuration/package[@name='#{package_name}']/service[@name='#{service_name}']/parameter[@key='collection' and @value='#{collection}']"].nil?
 end
 
 # assumes exists
-def service_changed?(name, package_name, collection, interval,
+def service_changed?(service_name, package_name, collection, interval,
                     user_defined, status, timeout, retry_count, port,
                     thresholding_enabled)
-  Chef::Log.debug "Checking to see if this wmi collection service has changed: '#{ name }'"
+  Chef::Log.debug "Checking to see if this wmi collection service has changed: '#{ service_name }'"
   file = ::File.new("#{node['opennms']['conf']['home']}/etc/collectd-configuration.xml", "r")
   doc = REXML::Document.new file
-  service_el = doc.elements["/collectd-configuration/package[@name='#{package_name}']/service[@name='#{name}' and parameter[@key='collection' and @value='#{collection}']]"]
+  service_el = doc.elements["/collectd-configuration/package[@name='#{package_name}']/service[@name='#{service_name}' and parameter[@key='collection' and @value='#{collection}']]"]
   old_interval = service_el.attributes['interval']
   Chef::Log.debug "checking interval: #{old_interval} != #{interval} ?"
   return true if "#{old_interval}" != "#{interval}"
@@ -110,13 +111,13 @@ def service_changed?(name, package_name, collection, interval,
 end
 
 def update_wmi_collection_service
-  Chef::Log.debug "Updating wmi collection service: '#{ new_resource.name }'"
+  Chef::Log.debug "Updating wmi collection service: '#{ new_resource.service_name }'"
   file = ::File.new("#{node['opennms']['conf']['home']}/etc/collectd-configuration.xml")
   contents = file.read
   doc = REXML::Document.new(contents, { :respect_whitespace => :all })
   file.close
 
-  service_el = doc.elements["/collectd-configuration/package[@name='#{new_resource.package_name}']/service[@name='#{new_resource.name}' and parameter[@key='collection' and @value='#{new_resource.collection}']]"]
+  service_el = doc.elements["/collectd-configuration/package[@name='#{new_resource.package_name}']/service[@name='#{new_resource.service_name}' and parameter[@key='collection' and @value='#{new_resource.collection}']]"]
   service_el.attributes['status'] = new_resource.status
   service_el.attributes['interval'] = new_resource.interval
   if new_resource.user_defined.nil? && !service_el.attributes['user-defined'].nil?
@@ -177,7 +178,7 @@ def update_wmi_collection_service
 end
 
 def create_wmi_collection_service
-  Chef::Log.debug "Adding wmi collection package: '#{ new_resource.name }'"
+  Chef::Log.debug "Adding wmi collection package: '#{ new_resource.service_name }'"
   file = ::File.new("#{node['opennms']['conf']['home']}/etc/collectd-configuration.xml")
   contents = file.read
   doc = REXML::Document.new(contents, { :respect_whitespace => :all })
@@ -188,7 +189,7 @@ def create_wmi_collection_service
   if !new_resource.user_defined.nil?
     service_el.add_attribute('user-defined' => new_resource.user_defined)
   end
-  collection_param_el = service_el.add_element 'parameter', { 'key' => 'collection', 'value' => new_resource.name }
+  collection_param_el = service_el.add_element 'parameter', { 'key' => 'collection', 'value' => new_resource.collection }
   if new_resource.port
     port_el = service_el.add_element 'parameter', { 'key' => 'port', 'value' => new_resource.port }
   end

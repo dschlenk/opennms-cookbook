@@ -1,6 +1,7 @@
 # most useful options
 # Note that package_name 'foo' must be defined somewhere else in your resource collection.
-opennms_xml_collection_service "XMLFoo" do
+opennms_xml_collection_service "XMLFoo Service" do
+  service_name 'XMLFoo'
   collection "foo"
   package_name "foo"
   interval 400000
@@ -14,7 +15,7 @@ opennms_xml_collection_service "XMLFoo" do
 end
 
 # minimal
-opennms_xml_collection_service "XML" do
+opennms_xml_collection_service "XML Service" do
   collection 'default'
   notifies :restart, "service[opennms]", :delayed
 end

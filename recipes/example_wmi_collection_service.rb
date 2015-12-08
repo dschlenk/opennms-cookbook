@@ -1,6 +1,7 @@
 # most useful options
 # Note that package_name 'foo' must be defined somewhere else in your resource collection.
-opennms_wmi_collection_service "WMIFoo" do
+opennms_wmi_collection_service "WMIFoo Service" do
+  service_name 'WMIFoo'
   collection "foo"
   package_name "foo"
   interval 400000
@@ -14,7 +15,7 @@ opennms_wmi_collection_service "WMIFoo" do
 end
 
 # minimal
-opennms_wmi_collection_service "WMIBar" do
+opennms_wmi_collection_service "WMI Service" do
   collection 'default'
   notifies :restart, "service[opennms]", :delayed
 end

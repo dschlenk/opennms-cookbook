@@ -26,7 +26,7 @@ def load_current_resource
   @current_resource.type(@new_resource.type)
   @current_resource.destination_path_name(@new_resource.destination_path_name)
   @current_resource.commands(@new_resource.commands)
-  @current_resource.escalate_delay(@new_resource.escalate_delay)
+  @current_resource.escalate_delay(@new_resource.escalate_delay) unless @new_resource.escalate_delay.nil?
 
   if destination_path_exists?(@current_resource.destination_path_name)
     @current_resource.destination_path_exists = true

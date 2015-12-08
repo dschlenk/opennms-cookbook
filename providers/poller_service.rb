@@ -32,7 +32,7 @@ def load_current_resource
   @current_resource.user_defined(@new_resource.user_defined)
   @current_resource.status(@new_resource.status)
   @current_resource.timeout(@new_resource.timeout)
-  @current_resource.port(@new_resource.port)
+  @current_resource.port(@new_resource.port) unless @new_resource.port.nil?
   @current_resource.params(@new_resource.params)
   @current_resource.class_name(@new_resource.class_name)
 

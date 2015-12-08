@@ -24,7 +24,7 @@ def load_current_resource
   @current_resource.range_begin(@new_resource.range_begin)
   @current_resource.range_end(@new_resource.range_end)
   @current_resource.range_type(@new_resource.range_type)
-  @current_resource.foreign_source(@new_resource.foreign_source)
+  @current_resource.foreign_source(@new_resource.foreign_source) unless @new_resource.foreign_source.nil?
 
   if @current_resource.foreign_source.nil?
     if range_exists?(@current_resource.name, @current_resource.range_begin, @current_resource.range_end, @current_resource.range_type, nil)
