@@ -36,10 +36,6 @@ hostsfile_entry node['ipaddress'] do
   action [:create_if_missing, :append]
 end
 
-log "xml is a thing indeed? #{node['opennms']['plugin']['xml']}" do
-  level :info
-end
-
 include_recipe 'opennms::packages'
 
 if node['opennms']['upgrade']
