@@ -48,7 +48,7 @@ specific_ueis = {
   'model-importer.properties' => 'uei.opennms.org/internal/importer/reloadImport',
   'poll-outages.xml' => 'uei.opennms.org/internal/schedOutagesChanged',
   'snmp-config.xml' => 'uei.opennms.org/internal/configureSNMP',
-  'syslogd-configuration.xml' => 'uei.opennms.org/internal/syslogdConfigChange',
+  'syslogd-configuration.xml' => 'uei.opennms.org/internal/syslogdConfigChange'
 }
 specific_ueis.each do |file, u|
   Chef::Log.debug("Making send_event resource 'activate_#{file}'")

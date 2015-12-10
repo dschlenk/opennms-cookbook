@@ -32,6 +32,11 @@ def send_event
     end
   end
   cmd = "#{cmd} #{new_resource.uei}"
+  unless new_resource.parameters.nil?
+    if new_resource.parameters[0] == 'daemonName Eventd'
+      cmd = "#{cmd}; #{send_event} uei.opennms.org/internal/eventsConfigChange"
+    end
+  end
   bash "send_event_#{new_resource.name}" do
     code cmd
     user 'root'
