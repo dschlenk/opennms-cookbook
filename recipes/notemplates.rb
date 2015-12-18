@@ -25,6 +25,10 @@ chef_gem 'rest-client' do
   compile_time true
 end
 
+chef_gem 'addressable' do
+  compile_time true
+end
+
 fqdn = node[:fqdn]
 fqdn ||= node[:hostname]
 
