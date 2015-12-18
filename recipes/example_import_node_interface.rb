@@ -26,6 +26,8 @@ opennms_import_node_interface "10.0.0.1" do
   managed true
   snmp_primary 'P'
   sync_import true
+  sync_wait_periods 30
+  sync_wait_secs 10
 end
 
 # minimal

@@ -37,4 +37,6 @@ opennms_import_node "nodeC" do
   categories ["Servers", "Test"]
   assets 'vendorPhone' => '511', 'serialNumber' => 'SN12838932'
   sync_import true
+  sync_wait_periods 30
+  sync_wait_secs 10
 end

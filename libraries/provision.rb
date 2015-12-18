@@ -232,6 +232,31 @@ module Provision
     node.run_state[:imports] = nil
     RestClient.post "#{baseurl(node)}/requisitions/#{foreign_source_name}/nodes/#{foreign_id}/interfaces/#{ip_addr}/services", sd.to_s, {:content_type => :xml}
   end
+
+  def wait_for_sync(foreign_source_name, node, wait_periods, wait_length)
+    now = Time.now.strftime "%Y-%m-%d %H:%M:%S"
+    period = 0
+    until sync_complete?(new_resource.foreign_source_name, now, node) || period == wait_periods
+      Chef::Log.debug "Waiting period ##{period}/#{wait_periods} for #{wait_length} seconds for requisition #{new_resource.foreign_source_name} import to finish."
+      sleep(wait_length);
+      period += 1
+    end
+    Chef::Log.warn "Waited #{(wait_periods * wait_length).to_s} seconds for #{new_resource.foreign_source_name} to import, giving up. If a service restart occurs before it finishes, this and any pending requisitions may need to be synchronized manually." if period == wait_periods
+  end
+
+  # after must be in SQL query format: '2015-12-17 21:00:00'
+  def sync_complete?(foreign_source_name, after, node)
+    complete = false
+    require 'rest-client'
+    require 'addressable/uri'
+    url = "#{baseurl(node)}/events?eventUei=uei.opennms.org/internal/importer/importSuccessful&eventParms=%25#{foreign_source_name}%25&comparator=like&query=eventcreatetime >= '#{after}'"
+    parsed_url = Addressable::URI.parse(url).normalize.to_str
+    Chef::Log.debug("sync_complete? URL: #{parsed_url}")
+    events = JSON.parse(RestClient.get(parsed_url, { :accept => :json}).to_str)
+    complete = true if !events.nil? && events.has_key?('totalCount') && events['totalCount'].to_i > 0
+    complete
+  end
+
   def sync_import(foreign_source_name, rescan, node)
     require 'rest_client'
     url = "#{baseurl(node)}/requisitions/#{foreign_source_name}/import"
@@ -240,9 +265,11 @@ module Provision
     end
     begin
       tries ||= 3
+      Chef::Log.debug("Attempting import sync for #{foreign_source_name} with URL #{url}")
       RestClient.put url, nil
     rescue => e
       if (tries -= 1) > 0
+        Chef::Log.debug("Retrying import sync for #{foreign_source_name} #{tries}")
         retry
       else
         raise

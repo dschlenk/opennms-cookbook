@@ -35,5 +35,9 @@ private
 
 def create_import_node
   add_import_node(new_resource.name, new_resource.foreign_id, new_resource.parent_foreign_source, new_resource.parent_foreign_id, new_resource.parent_node_label, new_resource.city, new_resource.building, new_resource.categories, new_resource.assets, new_resource.foreign_source_name, node)
-  sync_import(new_resource.foreign_source_name,true, node) if !new_resource.sync_import.nil? && new_resource.sync_import
+  if !new_resource.sync_import.nil? && new_resource.sync_import
+    sync_import(new_resource.foreign_source_name,true, node) 
+    wait_for_sync(new_resource.foreign_source_name, node, 
+                  new_resource.sync_wait_periods, new_resource.sync_wait_secs)
+  end
 end

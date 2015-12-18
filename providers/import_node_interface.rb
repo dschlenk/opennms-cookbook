@@ -49,12 +49,19 @@ def create_import_node_interface
   add_import_node_interface(new_resource.name, new_resource.foreign_source_name,
     new_resource.foreign_id, new_resource.status, 
     new_resource.managed, new_resource.snmp_primary, node)
-  Chef::Log.debug "Added interface. Doing import..."
-  sync_import(new_resource.foreign_source_name, true, node) if !new_resource.sync_import.nil? && new_resource.sync_import
+  Chef::Log.debug "Added interface. Doing import... syncing? #{new_resource.sync_import}"
+
+  if !new_resource.sync_import.nil? && new_resource.sync_import
+    sync_import(new_resource.foreign_source_name, true, node) 
+    wait_for_sync(new_resource.foreign_source_name, node, 
+                  new_resource.sync_wait_periods, new_resource.sync_wait_secs)
+  end
   Chef::Log.debug "imported!"
 end
 
 def sync_import_node_interface
   Chef::Log.debug "syncing import!"
   sync_import(new_resource.foreign_source_name, true, node)
+    wait_for_sync(new_resource.foreign_source_name, node, 
+                  new_resource.sync_wait_periods, new_resource.sync_wait_secs)
 end

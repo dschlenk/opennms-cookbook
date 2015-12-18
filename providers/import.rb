@@ -35,5 +35,9 @@ private
 
 def create_import
   add_import(new_resource.foreign_source_name, node)
-  sync_import(new_resource.foreign_source_name,true, node) if !new_resource.sync_import.nil? && new_resource.sync_import
+  if !new_resource.sync_import.nil? && new_resource.sync_import
+    sync_import(new_resource.foreign_source_name,true, node) 
+    wait_for_sync(new_resource.foreign_source_name, node, 
+                  new_resource.sync_wait_periods, new_resource.sync_wait_secs)
+  end
 end

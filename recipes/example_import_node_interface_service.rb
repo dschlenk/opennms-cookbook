@@ -24,10 +24,12 @@ opennms_import_node_interface "72.72.72.74" do
   foreign_id serviceNode_foreign_id
 end
 
-# all options - only sync_import is optional
+# all options
 opennms_import_node_interface_service "ICMP" do
   foreign_source_name "dry-source"
   foreign_id serviceNode_foreign_id
   ip_addr "72.72.72.74"
   sync_import true
+  sync_wait_periods 30
+  sync_wait_secs 10
 end
