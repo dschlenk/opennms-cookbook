@@ -17,6 +17,7 @@ default['yum']['opennms-snapshot-rhel6']['failovermethod']  = "roundrobin"
 default['build-essential']['compile_time'] = true
 default['opennms']['default_template_cookbook'] = 'opennms'
 default['opennms']['version'] = '16.0.4-1'
+default['opennms']['version_major'] = node['opennms']['version'].match(/(\d+)\..*/).captures[0]
 default['opennms']['allow_downgrade'] = false
 default['opennms']['stable'] = true
 # whether or not to attempt to automatically upgrade opennms

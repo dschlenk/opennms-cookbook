@@ -1,0 +1,282 @@
+################################################################################
+# This file is the configuration for the the RrdUtils class.  It is used to
+# specify the details of the Rrd backend
+################################################################################
+#
+# Properties are defined but commented out indicating the default values.
+#
+
+#
+# This property defines which RrdStrategy implementation to use for writing data to
+# RRD files.  There are two RrdStrategies that ship with opennms.  The first one is
+# org.opennms.netmgt.rrd.rrdtool.JniRrdStrategy.  It uses the original JNI RrdTool based code
+# to write to the rrdtool compatible .rrd files.  The second version uses JRobin, a
+# pure java implementation of RrdTool.  Its class name is 
+# org.opennms.netmgt.rrd.jrobin.JRobinRrdStrategy
+#
+# To switch to the JNI implementation uncomment the following lines.  Note
+# that paths may differ from one platform to the next, and a few platforms
+# use an extension other than ".so" on JNI shared objects; Mac OS X notably
+# uses ".jnilib":
+<% if !@strategy_class.nil? -%>
+org.opennms.rrd.strategyClass=<%=@strategy_class%>
+<% else -%>
+#org.opennms.rrd.strategyClass=org.opennms.netmgt.rrd.rrdtool.JniRrdStrategy
+<% end -%>
+<% if !@interface_jar.nil? -%>
+org.opennms.rrd.interfaceJar=<%=@interface_jar%>
+<% else -%>
+#org.opennms.rrd.interfaceJar=/usr/share/java/jrrd.jar
+<% end -%>
+<% if !@jrrd.nil? -%>
+opennms.library.jrrd=<%=@jrrd%>
+<% else -%>
+#opennms.library.jrrd=/usr/lib/libjrrd.so
+<% end -%>
+#
+# The default setting is org.opennms.netmgt.rrd.jrobin.JRobinRrdStrategy
+#org.opennms.rrd.strategyClass=org.opennms.netmgt.rrd.jrobin.JRobinRrdStrategy
+
+#
+# This property allows the definition of a custom file extension to use for data files.
+# OpenNMS uses the extension to find which files to use.  The jrobin convertor tool will
+# append .jrb to the filenames for the new files it creates.  This property will allow the 
+# use of these new files by setting the extension to .rrd.jrb
+#
+# The default fileExtension is approperiate for the Strategy in use... JRobin uses .jrb and 
+# JNI uses .rrd.  If you set a value here that value will be used regardless of the value preferred
+# by the individual strategies.
+<% if !@file_extension.nil? -%>
+org.opennms.rrd.fileExtension=<%=@file_extension%>
+<% else -%>
+#org.opennms.rrd.fileExtension=.jrb
+<% end -%>
+
+
+#
+# This property defines whether or not to use the write queuing system.  
+# The write queuing queues rrd create and update operations so as not to
+# lose collected data due to slow I/O performance.  As the I/O system gets
+# behind this leads to multiple data points being stored per file update.
+# This leads to greater amortized performance of the I/O system.  
+#
+# The default setting is true (use the queuing system)
+<% if !@queue[:use] -%>
+org.opennms.rrd.usequeue=false
+<% else -%>
+#org.opennms.rrd.usequeue=true
+<% end -%>
+
+#
+# The following properties are for the queuing system
+#
+# This property defines how many threads to use to process the queue and
+# write to the disk.  The JNI backend is only single thread safe and therefore
+# synchronized so having more than two threads really only leads to contention.
+#
+# The JRobin code however is multi-thread safe and may get some performance benefit
+# by increasing threads.  This of course depends on your I/O subsystem.  It is 
+# unlikely that more than 10 threads or so are needed here but there may be some
+# system where this is not true.
+# 
+# The default setting is 2
+<% if @queue[:writethreads] != 2 -%>
+org.opennms.rrd.queuing.writethreads=<%=@queue[:writethreads]%>
+<% else -%>
+#org.opennms.rrd.queuing.writethreads=2
+<% end -%>
+
+#
+# This property defines whether creates should be processed immediately or enqueued.
+# Setting it to true enqueues the creates and they are processed
+# as the threads get to them.  False, causes the enqueuing thread to block as the
+# files are created.  
+#
+# WARNING: There is currently a bug in the queueing of creates in that multiple creates
+# will get queued if many updates happen and there is a lag in the actual creation
+# due the delay of queuing.  This may cause the loss of some initial data.  It is not
+# recommended that this be changed until the bug is fixed!
+#
+# The default setting is false (don't enqueue the creates)
+<% if @queue[:queuecreates] == true -%>
+org.opennms.rrd.queuing.queuecreates=true
+<% else -%>
+#org.opennms.rrd.queuing.queuecreates=false
+<% end -%>
+
+#
+# The queuing system distinguishes between zero valued and non-zero valued updates.
+# Zero-value updates are termed 'insignificant' by the queuing system and pushed
+# down in priority compared with 'significant' updates which have non-zero values
+# if you set the "org.opennms.rrd.queuing.prioritizeSignificantUpdates" property to
+# "true". The default value is "false" because this optimization is only necessary
+# on systems that are heavily-loaded by data collection.
+# 
+# As updates are queued, files which have significant updates in their list of
+# pending updates are boosted in priority to ensure that their data is written as soon
+# as possible.  Files with only insignificant updates are delayed until 'free time'
+# exists on the write threads and they have time to be processed.
+#
+# Given this situation there is an inherent 'unfairness' which on busy systems will
+# cause the files with only insignificant updates to never get written.  
+# 
+<% if @queue[:prioritize_significant_updates] == true -%>
+org.opennms.rrd.queuing.prioritizeSignificantUpdates=true
+<% else -%>
+#org.opennms.rrd.queuing.prioritizeSignificantUpdates=false
+<% end -%>
+
+# This property represents the number of seconds over which (on average) all
+# insignificant files will be promoted to the significant list.  This ensures that
+# all files will eventually get written.
+#
+# An example value for this file would be 21600.  This would cause all the 
+# insignificant files to be pushed through the updates queue over a six hour period.
+# 
+# Setting the value to 0 means don't promote insignificant files at all.
+# 
+# The default setting is 0 (don't promote insignificant files).
+<% if @queue[:max_insig_update_seconds] != 0 -%>
+org.opennms.rrd.queuing.maxInsigUpdateSeconds=<%=@queue[:max_insig_update_seconds]%>
+<% else -%>
+#org.opennms.rrd.queuing.maxInsigUpdateSeconds=0
+<% end -%>
+
+#
+# This queuing system regularly prints statistics regarding queue size, pending 
+# operations, enqueue rates, dequeue rates, etc.  These updates are printed every
+# so often based on the number of updates that get processed by the system.
+# 
+# This property defines the modulus indicating how often to print the statistics.
+# If (updateCount % modulus) == 0 then printStats;
+#
+# The default setting is 10000L
+<% if @queue[:modulus] != 10000 -%>
+org.opennms.rrd.queuing.modulus=<%=@queue[:modulus]%>
+<% else -%>
+#org.opennms.rrd.queuing.modulus=10000
+<% end -%>
+
+# On some very large installations it is possible to overwhelm the I/O system of the
+# the NMS and continue queuing data until all of the JVM memory is used up.  The next
+# three properties indicated high water marks beyond which collected data will be thrown
+# away because it is not possible to continue queuing collected data.  The best mix of
+# values for these will need to be experimentally determined based on your data collection
+# requirements and I/O subsystem capabilities.
+#
+# When the totalOperationsPending value reaches or is higher than the value of the 
+# below high water mark, any newly enqueued insignificant operations will be 
+# discarded.  This will allow for the loss of only zero valued data and may be
+# sufficient to keep your system from becoming overwhelmed.
+#
+# The default value is 0L (don't discard insignificant operations)
+<% if @queue[:insig_hwmark] != 0 -%>
+org.opennms.rrd.queuing.inSigHighWaterMark=<%=@queue[:insig_hwmark]%>
+<% else -%>
+#org.opennms.rrd.queuing.inSigHighWaterMark=0
+<% end -%>
+
+#
+# When the totalOpsPending value reaches or is higher than the value of the below
+# high water mark, any newly enqueue signficant operations will be discarded.  This
+# will allow the system to 'catch up' by writing a higher percentage of high throughput
+# insignificant operations.
+#
+# The default value is 0L (don't discard significant operations
+<% if @queue[:sig_hwmark] != 0 -%>
+org.opennms.rrd.queuing.sigHighWaterMark=<%=@queue[:sig_hwmark]%>
+<% else -%>
+#org.opennms.rrd.queuing.sigHighWaterMark=0
+<% end -%>
+
+#
+# When the totalOpsPending value reaches or is higher than the value of the below
+# high water mark, any newly enqueued operations or any sort will be discarded, this
+# will prevent the queue from using up all the memory of the system and eventually
+# crashing the JVM. 
+#
+# The default value is 0L (don't discard operations)
+<% if @queue[:queue_hwmark] != 0 -%>
+org.opennms.rrd.queuing.queueHighWaterMark=<%=@queue[:queue_hwmark]%>
+<% else -%>
+#org.opennms.rrd.queuing.queueHighWaterMark=0
+<% end -%>
+
+
+#
+# This property defines which log4j2 routing prefix to use when printing the queue
+# statistics
+#
+# The default setting is for the queueing daemon
+<% if !@queue[:log_cat].nil? -%>
+org.opennms.rrd.queuing.category=<%=@queue[:log_cat]%>
+<% else -%>
+#org.opennms.rrd.queuing.category=queued
+<% end -%>
+
+#
+# The following constants are related to how long a write thread lingers before
+# it exits.  You probably don't need to change these.  Changing these values will 
+# void your warranty.  grins.
+# 
+<% if @queue[:write_thread][:sleep_time] != 50 -%>
+org.opennms.rrd.queuing.writethread.sleepTime=<%=@queue[:write_thread][:sleep_time]%>
+<% else -%>
+#org.opennms.rrd.queuing.writethread.sleepTime=50
+<% end -%>
+<% if @queue[:write_thread][:exit_delay] != 60000 -%>
+#org.opennms.rrd.queuing.writethread.exitDelay=<%=@queue[:write_thread][:exit_delay]%>
+<% else -%>
+#org.opennms.rrd.queuing.writethread.exitDelay=60000
+<% end -%>
+
+#
+# The following property sets the default JRobin backend Factory.  Acceptable values are
+# FILE, SAFE, NIO, MNIO, MEMORY.  Default is FILE.
+#
+# Recommended backends:
+# FILE - Standard RRD algorithm, cache when possible and no locking.
+# MNIO - NIO ByteBuffer RRD implementation.  Experimental.  This will become the default
+#        in future OpenNMS releases.  Note that this will use more memory than FILE.  The
+#        additional memory usage is nominal, but can be can be computed with:
+#            additinal memory = (jrb file size) * (number of queued write threads)
+#        When queuing is disabled, the number of write threads becomes the number of 
+#        Collectd threads since it is these threads that with then do the persisting.
+# 
+# Other backends (not recommended):
+# SAFE - Aggressive locking and low levels of caching.  Untested.
+# MEMORY - In-memory only.
+# NIO - MMAPped RRDs, using NIO.
+<% if !@jrobin[:backend_factory].nil? -%>
+org.jrobin.core.RrdBackendFactory=<%=@jrobin[:backend_factory]%>
+<% else -%>
+#org.jrobin.core.RrdBackendFactory=FILE
+<% end -%>
+
+
+#
+# If you would like to export performance data to an external system
+# over a TCP port, please set org.opennms.rrd.usetcp to 'true' and fill
+# in your values for the external listener. 
+<% if @usetcp == true -%>
+org.opennms.rrd.usetcp=true
+<% else -%>
+#org.opennms.rrd.usetcp=false
+<% end -%>
+#
+# The IPv4 address or hostname of the target system
+<% if !@tcp[:host].nil? -%>
+org.opennms.rrd.tcp.host=<%=@tcp[:host]%>
+<% else -%>
+#org.opennms.rrd.tcp.host=
+<% end -%>
+#
+# The TCP port where the target system is listening for performance data
+<% if !@tcp[:port].nil? -%>
+org.opennms.rrd.tcp.port=<%=@tcp[:port]%>
+<% else -%>
+#org.opennms.rrd.tcp.port=
+<% end -%>
+#
+# The queue size for outgoing TCP metrics
+#org.opennms.rrd.queuing.queueSize=50000

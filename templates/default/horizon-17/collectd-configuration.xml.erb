@@ -1,0 +1,152 @@
+<?xml version="1.0"?>
+<?castor class-name="org.opennms.netmgt.collectd.CollectdConfiguration"?>
+<collectd-configuration
+        threads="<%= @threads %>">
+
+    <% if @vmware3[:enabled] -%> 
+    <package name="vmware3">
+        <filter><![CDATA[<%=@vmware3[:filter]%>]]></filter>
+        <% if @vmware3[:service][:vm][:enabled] -%> 
+        <service name="VMware-VirtualMachine" interval="<%=@vmware3[:service][:vm][:interval]%>" user-defined="false" status="<%=@vmware3[:service][:vm][:status]%>">
+            <parameter key="collection" value="<%=@vmware3[:service][:vm][:collection]%>"/>
+            <parameter key="thresholding-enabled" value="<%=@vmware3[:service][:vm][:threshold]%>"/>
+        </service>
+        <% end -%>
+
+        <% if @vmware3[:service][:host][:enabled] -%> 
+        <service name="VMware-HostSystem" interval="<%=@vmware3[:service][:host][:interval]%>" user-defined="false" status="<%=@vmware3[:service][:host][:status]%>">
+            <parameter key="collection" value="<%=@vmware3[:service][:host][:collection]%>"/>
+            <parameter key="thresholding-enabled" value="<%=@vmware3[:service][:host][:threshold]%>"/>
+        </service>
+        <% end -%>
+        <% if @vmware3[:service][:cim_host][:enabled] -%> 
+        <service name="VMwareCim-HostSystem" interval="<%=@vmware3[:service][:cim_host][:interval]%>" user-defined="false" status="<%=@vmware3[:service][:cim_host][:status]%>">
+            <parameter key="collection" value="<%=@vmware3[:service][:cim_host][:collection]%>"/>
+            <parameter key="thresholding-enabled" value="<%=@vmware3[:service][:cim_host][:threshold]%>"/>
+        </service>
+        <% end -%>
+    </package>
+    <% end -%>
+
+    <% if @vmware4[:enabled] -%> 
+    <package name="vmware4">
+        <filter><![CDATA[<%=@vmware4[:filter]%>]]></filter>
+        <% if @vmware4[:service][:vm][:enabled] -%> 
+        <service name="VMware-VirtualMachine" interval="<%=@vmware4[:service][:vm][:interval]%>" user-defined="false" status="<%=@vmware4[:service][:vm][:status]%>">
+            <parameter key="collection" value="<%=@vmware4[:service][:vm][:collection]%>"/>
+            <parameter key="thresholding-enabled" value="<%=@vmware4[:service][:vm][:threshold]%>"/>
+        </service>
+        <% end -%>
+
+        <% if @vmware4[:service][:host][:enabled] -%> 
+        <service name="VMware-HostSystem" interval="<%=@vmware4[:service][:host][:interval]%>" user-defined="false" status="<%=@vmware4[:service][:host][:status]%>">
+            <parameter key="collection" value="<%=@vmware4[:service][:host][:collection]%>"/>
+            <parameter key="thresholding-enabled" value="<%=@vmware4[:service][:host][:threshold]%>"/>
+        </service>
+        <% end -%>
+        <% if @vmware4[:service][:cim_host][:enabled] -%> 
+        <service name="VMwareCim-HostSystem" interval="<%=@vmware4[:service][:cim_host][:interval]%>" user-defined="false" status="<%=@vmware4[:service][:cim_host][:status]%>">
+            <parameter key="collection" value="<%=@vmware4[:service][:cim_host][:collection]%>"/>
+            <parameter key="thresholding-enabled" value="<%=@vmware4[:service][:cim_host][:threshold]%>"/>
+        </service>
+        <% end -%>
+    </package>
+    <% end -%>
+
+    <% if @vmware5[:enabled] -%> 
+    <package name="vmware5">
+        <filter><![CDATA[<%=@vmware5[:filter]%>]]></filter>
+        <% if @vmware5[:service][:vm][:enabled] -%> 
+        <service name="VMware-VirtualMachine" interval="<%=@vmware5[:service][:vm][:interval]%>" user-defined="false" status="<%=@vmware5[:service][:vm][:status]%>">
+            <parameter key="collection" value="<%=@vmware5[:service][:vm][:collection]%>"/>
+            <parameter key="thresholding-enabled" value="<%=@vmware5[:service][:vm][:threshold]%>"/>
+        </service>
+        <% end -%>
+
+        <% if @vmware5[:service][:host][:enabled] -%> 
+        <service name="VMware-HostSystem" interval="<%=@vmware5[:service][:host][:interval]%>" user-defined="false" status="<%=@vmware5[:service][:host][:status]%>">
+            <parameter key="collection" value="<%=@vmware5[:service][:host][:collection]%>"/>
+            <parameter key="thresholding-enabled" value="<%=@vmware5[:service][:host][:threshold]%>"/>
+        </service>
+        <% end -%>
+        <% if @vmware5[:service][:cim_host][:enabled] -%> 
+        <service name="VMwareCim-HostSystem" interval="<%=@vmware5[:service][:cim_host][:interval]%>" user-defined="false" status="<%=@vmware5[:service][:cim_host][:status]%>">
+            <parameter key="collection" value="<%=@vmware5[:service][:cim_host][:collection]%>"/>
+            <parameter key="thresholding-enabled" value="<%=@vmware5[:service][:cim_host][:threshold]%>"/>
+        </service>
+        <% end -%>
+    </package>
+    <% end -%>
+
+    <% if @example1[:enabled] -%> 
+    <package name="example1">
+        <filter><%=@example1[:filter]%></filter>
+        <include-range begin="<%=@example1[:ipv4_range][:begin]%>" end="<%=@example1[:ipv4_range][:end]%>"/>
+        <include-range begin="<%=@example1[:ipv6_range][:begin]%>" end="<%=@example1[:ipv6_range][:end]%>"/>
+
+        <% if @example1[:service][:snmp][:enabled] -%> 
+        <service name="SNMP" interval="<%=@example1[:service][:snmp][:interval]%>" user-defined="false" status="<%=@example1[:service][:snmp][:status]%>">
+            <parameter key="collection" value="<%=@example1[:service][:snmp][:collection]%>"/>
+            <parameter key="thresholding-enabled" value="<%=@example1[:service][:snmp][:threshold]%>"/>
+        </service>
+        <% end -%>
+
+        <% if @example1[:service][:wmi][:enabled] -%> 
+        <service name="WMI" interval="<%=@example1[:service][:wmi][:interval]%>" user-defined="false" status="<%=@example1[:service][:wmi][:status]%>">
+            <parameter key="collection" value="<%=@example1[:service][:wmi][:collection]%>"/>
+            <parameter key="thresholding-enabled" value="<%=@example1[:service][:wmi][:threshold]%>"/>
+        </service>
+        <% end -%>
+
+        <% if @example1[:service][:opennms_jvm][:enabled] -%> 
+        <service name="OpenNMS-JVM" interval="<%=@example1[:service][:opennms_jvm][:interval]%>" user-defined="false" status="<%=@example1[:service][:opennms_jvm][:status]%>">
+            <parameter key="port" value="<%=@example1[:service][:opennms_jvm][:port]%>"/>
+            <parameter key="retry" value="<%=@example1[:service][:opennms_jvm][:retry]%>"/>
+            <parameter key="timeout" value="<%=@example1[:service][:opennms_jvm][:timeout]%>"/>
+            <parameter key="protocol" value="<%=@example1[:service][:opennms_jvm][:protocol]%>"/>
+            <parameter key="urlPath" value="<%=@example1[:service][:opennms_jvm][:url_path]%>"/>
+            <parameter key="rrd-base-name" value="<%=@example1[:service][:opennms_jvm][:rrd_base_name]%>"/>
+            <parameter key="ds-name" value="<%=@example1[:service][:opennms_jvm][:ds_name]%>"/>
+            <parameter key="friendly-name" value="<%=@example1[:service][:opennms_jvm][:friendly_name]%>"/>
+            <parameter key="collection" value="<%=@example1[:service][:opennms_jvm][:collection]%>"/>
+            <parameter key="thresholding-enabled" value="<%=@example1[:service][:opennms_jvm][:threshold]%>"/>
+        </service>
+        <% end -%>
+
+        <% if @example1[:service][:postgresql][:enabled] -%> 
+        <service name="PostgreSQL" interval="<%=@example1[:service][:postgresql][:interval]%>" user-defined="false" status="<%=@example1[:service][:postgresql][:status]%>">
+            <parameter key="collection" value="<%=@example1[:service][:postgresql][:collection]%>"/>
+            <parameter key="thresholding-enabled" value="<%=@example1[:service][:postgresql][:threshold]%>"/>
+            <parameter key="driver" value="<%=@example1[:service][:postgresql][:driver]%>"/>
+            <parameter key="user" value="<%=@example1[:service][:postgresql][:user]%>"/>
+            <parameter key="password" value="<%=@example1[:service][:postgresql][:password]%>"/>
+            <parameter key="url" value="<%=@example1[:service][:postgresql][:url]%>"/>
+        </service>
+        <% end -%>
+    </package>
+    <% end -%>
+
+
+    <% if ( @example1[:enabled] && @example1[:service][:snmp][:enabled]) -%>
+    <collector service="SNMP" class-name="org.opennms.netmgt.collectd.SnmpCollector"/>
+    <% end -%>
+    <% if @example1[:enabled] && @example1[:service][:wmi][:enabled]  -%>
+    <collector service="WMI" class-name="org.opennms.netmgt.collectd.WmiCollector"/>
+    <% end -%>
+    <% if @example1[:enabled] && @example1[:service][:opennms_jvm][:enabled]  -%>
+    <collector service="OpenNMS-JVM" class-name="org.opennms.netmgt.collectd.Jsr160Collector"/>
+    <% end -%>
+    <% if (@vmware3[:enabled] && @vmware3[:service][:vm][:enabled]) || (@vmware4[:enabled] && @vmware4[:service][:vm][:enabled]) || (@vmware5[:enabled] && @vmware5[:service][:vm][:enabled])  -%>
+    <collector service="VMware-VirtualMachine" class-name="org.opennms.netmgt.collectd.VmwareCollector"/>
+    <% end -%>
+    <% if (@vmware3[:enabled] && @vmware3[:service][:host][:enabled]) || (@vmware4[:enabled] && @vmware4[:service][:host][:enabled]) || (@vmware5[:enabled] && @vmware5[:service][:host][:enabled])  -%>
+    <collector service="VMware-HostSystem" class-name="org.opennms.netmgt.collectd.VmwareCollector"/>
+    <% end -%>
+    <% if (@vmware3[:enabled] && @vmware3[:service][:cim_host][:enabled]) || (@vmware4[:enabled] && @vmware4[:service][:cim_host][:enabled]) || (@vmware5[:enabled] && @vmware5[:service][:cim_host][:enabled])  -%>
+    <collector service="VMwareCim-HostSystem" class-name="org.opennms.netmgt.collectd.VmwareCimCollector"/>
+    <% end -%>
+    <% if @example1[:enabled] && @example1[:service][:postgresql][:enabled]  -%>
+    <collector service="PostgreSQL" class-name="org.opennms.netmgt.collectd.JdbcCollector"/>
+    <% end -%>
+</collectd-configuration>
+

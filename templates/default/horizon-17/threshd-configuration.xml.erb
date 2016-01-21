@@ -1,0 +1,67 @@
+<?xml version="1.0"?>
+<?castor class-name="org.opennms.netmgt.threshd.ThreshdConfiguration"?>
+<threshd-configuration 
+	threads="<%=@threads%>">
+
+	<package name="mib2">
+		<filter><%=@mib2[:filter]%></filter>	 
+		<include-range begin="<%=@mib2[:ipv4_range][:begin]%>" end="<%=@mib2[:ipv4_range][:end]%>"/>
+		<include-range begin="<%=@mib2[:ipv6_range][:begin]%>" end="<%=@mib2[:ipv6_range][:end]%>" />
+		
+		<service name="SNMP" interval="<%=@mib2[:snmp][:interval]%>" user-defined="<%=@mib2[:snmp][:user_defined]%>" status="<%=@mib2[:snmp][:status]%>">
+			<parameter key="thresholding-group" value="mib2"/>
+		</service>
+	</package>
+	
+	<package name="hrstorage">
+		<filter><%=@hrstorage[:filter]%></filter>	 
+		<include-range begin="<%=@hrstorage[:ipv4_range][:begin]%>" end="<%=@hrstorage[:ipv4_range][:end]%>"/>
+		<include-range begin="<%=@hrstorage[:ipv6_range][:begin]%>" end="<%=@hrstorage[:ipv6_range][:end]%>" />
+		
+		<service name="SNMP" interval="<%=@hrstorage[:snmp][:interval]%>" user-defined="<%=@hrstorage[:snmp][:user_defined]%>" status="<%=@hrstorage[:snmp][:status]%>">
+			<parameter key="thresholding-group" value="hrstorage"/>
+		</service>
+	</package>
+
+	<package name="cisco">
+		<filter><%=@cisco[:filter]%></filter>	 
+		<include-range begin="<%=@cisco[:ipv4_range][:begin]%>" end="<%=@cisco[:ipv4_range][:end]%>"/>
+		<include-range begin="<%=@cisco[:ipv6_range][:begin]%>" end="<%=@cisco[:ipv6_range][:end]%>" />
+		
+		<service name="SNMP" interval="<%=@cisco[:snmp][:interval]%>" user-defined="<%=@cisco[:snmp][:user_defined]%>" status="<%=@cisco[:snmp][:status]%>">
+			<parameter key="thresholding-group" value="cisco"/>
+		</service>
+	</package>
+
+	<package name="netsnmp">
+		<filter><%=@netsnmp[:filter]%></filter>	 
+		<include-range begin="<%=@netsnmp[:ipv4_range][:begin]%>" end="<%=@netsnmp[:ipv4_range][:end]%>"/>
+		<include-range begin="<%=@netsnmp[:ipv6_range][:begin]%>" end="<%=@netsnmp[:ipv6_range][:end]%>" />
+		
+		<service name="SNMP" interval="<%=@netsnmp[:snmp][:interval]%>" user-defined="<%=@netsnmp[:snmp][:user_defined]%>" status="<%=@netsnmp[:snmp][:status]%>">
+			<parameter key="thresholding-group" value="netsnmp"/>
+		</service>
+	</package>
+
+	<package name="netsnmp-memory-linux">
+		<filter><%=@netsnmp_memory_linux[:filter]%></filter> 
+		<include-range begin="<%=@netsnmp_memory_linux[:ipv4_range][:begin]%>" end="<%=@netsnmp_memory_linux[:ipv4_range][:end]%>"/>
+		<include-range begin="<%=@netsnmp_memory_linux[:ipv6_range][:begin]%>" end="<%=@netsnmp_memory_linux[:ipv6_range][:end]%>" />
+		
+		<service name="SNMP" interval="<%=@netsnmp_memory_linux[:snmp][:interval]%>" user-defined="<%=@netsnmp_memory_linux[:snmp][:user_defined]%>" status="<%=@netsnmp_memory_linux[:snmp][:status]%>">
+			<parameter key="thresholding-group" value="netsnmp-memory-linux"/>
+		</service>
+	</package>
+
+	<package name="netsnmp-memory-nonlinux">
+		<filter><%=@netsnmp_memory_nonlinux[:filter]%></filter> 
+		<include-range begin="<%=@netsnmp_memory_nonlinux[:ipv4_range][:begin]%>" end="<%=@netsnmp_memory_nonlinux[:ipv4_range][:end]%>"/>
+		<include-range begin="<%=@netsnmp_memory_nonlinux[:ipv6_range][:begin]%>" end="<%=@netsnmp_memory_nonlinux[:ipv6_range][:end]%>" />
+		
+		<service name="SNMP" interval="<%=@netsnmp_memory_nonlinux[:snmp][:interval]%>" user-defined="<%=@netsnmp_memory_nonlinux[:snmp][:user_defined]%>" status="<%=@netsnmp_memory_nonlinux[:snmp][:status]%>">
+			<parameter key="thresholding-group" value="netsnmp-memory-nonlinux"/>
+		</service>
+	</package>
+
+</threshd-configuration>
+

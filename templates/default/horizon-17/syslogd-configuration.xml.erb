@@ -1,0 +1,62 @@
+<?xml version="1.0"?>
+<syslogd-configuration>
+    <configuration
+            syslog-port="<%=@port%>"
+            new-suspect-on-message="<%=@new_suspect%>"
+            parser="<%=@parser%>"
+            forwarding-regexp="<%=@forwarding_regexp%>"
+            matching-group-host="<%=@matching_group_host%>"
+            matching-group-message="<%=@matching_group_message%>"
+            discard-uei="<%=@discard_uei%>"
+            />
+
+    <!--
+        NOTE: This uses the CustomSyslogParser and forwarding-regexp for backwards compatibility.  If your
+        syslog sources will always use a particular format, it's better to use one of the more specific parsers
+        in the "parser" attribute, above.
+
+        Available parsers:
+
+        * org.opennms.netmgt.syslogd.CustomSyslogParser: A backwards-compatible parser that has the same behavior
+          as OpenNMS 1.8 (and previous).  It has relaxed standards and can usually pull data out of most BSD-
+          or Syslog-NG-style traps.
+        * org.opennms.netmgt.syslogd.SyslogNGParser: A stricter variant of the CustomSyslogParser which parses
+          Syslog-NG's default format.  It ignores forwarding-regexp, matching-group-host, and matching-group-message
+          and instead relies on a well-known properly-formatted syslog message.
+        * org.opennms.netmgt.syslogd.Rfc5424SyslogParser: A parser that handles the new Syslog standard (as
+          defined in RFC5424).  It has strict parsing that should match the grammar specified in the RFC, although
+          it currently discards structured data.  Like the SyslogNGParser, it ignores forwarding-regexp,
+          matching-group-host, and matching-group-message in favor of stricter parsing of the known grammer.
+
+        *** PERFORMANCE NOTES ***
+
+        For the most deterministic performance of OpenNMS when matching syslog messages, you should *always*
+        anchor your regular expression matches with ^ and $, like in the examples below.  Failure to do so can
+        cause extreme slowdowns, especially with large amounts of <ueiMatch> tags.
+    -->
+
+    <% unless @files.nil? -%>
+    <% @files.each do |file| -%>
+    <import-file>syslog/<%=file%></import-file>
+    <% end -%>
+    <% end -%>
+    <% if @apache_httpd -%>
+    <import-file>syslog/ApacheHTTPD.syslog.xml</import-file>
+    <% end -%>
+    <% if @linux_kernel -%>
+    <import-file>syslog/LinuxKernel.syslog.xml</import-file>
+    <% end -%>
+    <% if @openssh -%>
+    <import-file>syslog/OpenSSH.syslog.xml</import-file>
+    <% end -%>
+    <% if @procmail -%>
+    <import-file>syslog/Procmail.syslog.xml</import-file>
+    <% end -%>
+    <% if @postfix -%>
+    <import-file>syslog/Postfix.syslog.xml</import-file>
+    <% end -%>
+    <% if @sudo -%>
+    <import-file>syslog/Sudo.syslog.xml</import-file>
+    <% end -%>
+
+</syslogd-configuration>

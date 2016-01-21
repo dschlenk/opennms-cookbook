@@ -1,0 +1,695 @@
+<VacuumdConfiguration period="<%=@period%>" >
+  <% if @statement[:topo_delete_nodes] -%>
+  <statement>
+    <!-- removes references in topo maps to nodes that have been marked as deleted - cascading deletes cannot work here -->
+    DELETE FROM element
+     WHERE element.elementtype = 'N'
+       AND element.elementid IN
+           (SELECT nodeid
+              FROM node
+             WHERE nodetype = 'D');
+  </statement>
+  <% end -%>
+
+  <% if @statement[:delete_at_interfaces] -%>
+  <statement>
+    <!-- this deletes all entries in atInterface that have been marked as deleted -->
+    DELETE FROM atInterface WHERE atInterface.status = 'D';
+  </statement>
+  <% end -%>
+
+  <% if @statement[:delete_dl_interfaces] -%>
+  <statement>
+    <!-- this deletes all entries in datalinkInterface that have been marked as deleted -->
+    DELETE FROM datalinkInterface WHERE datalinkInterface.status = 'D';
+  </statement>
+  <% end -%>
+
+  <% if @statement[:delete_ipr_interfaces] -%>
+  <statement>
+    <!-- this deletes all entries in ipRouteInterface that have been marked as deleted -->
+    DELETE FROM ipRouteInterface WHERE ipRouteInterface.status = 'D';
+  </statement>
+  <% end -%>
+
+  <% if @statement[:delete_vlans] -%>
+  <statement>
+    <!-- this deletes all entries in vlan that have been marked as deleted -->
+    DELETE FROM vLan WHERE vLan.status = 'D';
+  </statement>
+  <% end -%>
+
+  <% if @statement[:delete_stp_interfaces] -%>
+  <statement>
+    <!-- this deletes all entries in stpInterface that have been marked as deleted -->
+    DELETE FROM stpInterface WHERE stpInterface.status = 'D';
+  </statement>
+  <% end -%>
+
+  <% if @statement[:delete_stp_nodes] -%>
+  <statement>
+    <!-- this deletes all entries in stpInterface that have been marked as deleted -->
+    DELETE FROM stpNode WHERE stpNode.status = 'D';
+  </statement>
+  <% end -%>
+   
+  <% if @statement[:delete_snmp_interfaces] -%>
+  <statement>
+    <!-- this deletes all the snmpInterfaces that have been marked as deleted -->
+    DELETE FROM snmpInterface WHERE snmpInterface.snmpCollect = 'D';
+  </statement>
+  <% end -%>
+
+  <% if @statement[:delete_nodes] -%>
+  <statement>
+    <!-- this deletes all the nodes that have been marked as deleted - it relies on cascading deletes -->
+    DELETE FROM node WHERE node.nodeType = 'D';
+  </statement>
+  <% end -%>
+   
+  <% if @statement[:delete_ip_interfaces] -%>
+  <statement>
+    <!-- this deletes all the interfaces that have been marked as deleted - it relies on cascading deletes -->
+    DELETE FROM ipInterface WHERE ipInterface.isManaged = 'D';
+  </statement>
+  <% end -%>
+   
+  <% if @statement[:delete_if_services] -%>
+  <statement>
+    <!-- this deletes all the services that have been marked as deleted - it relies on cascading deletes -->
+    DELETE FROM ifServices WHERE ifServices.status = 'D';
+  </statement>
+  <% end -%>
+   
+  <% if @statement[:delete_events] -%>
+  <statement>
+    <!-- this deletes any events that are not associated with outages - Thanks to Chris Fedde for this -->
+    DELETE FROM events WHERE NOT EXISTS 
+      (SELECT svclosteventid FROM outages WHERE svclosteventid = events.eventid  
+    UNION 
+      SELECT svcregainedeventid FROM outages WHERE svcregainedeventid = events.eventid 
+    UNION 
+      SELECT eventid FROM notifications WHERE eventid = events.eventid) 
+    AND eventtime &lt; now() - interval '6 weeks';
+  </statement>
+  <% end -%>
+    
+  <automations>
+    <% if @automations[:cosmic_clear] -%>
+    <automation name="cosmicClear" interval="30000" active="true" 
+                trigger-name="selectResolvers" 
+                action-name="clearProblems" />
+    <% end -%>
+                
+    <% if @automations[:clean_up] -%>
+    <automation name="cleanUp" interval="60000" active="true"
+                action-name="deletePastClearedAlarms" />
+    <% end -%>
+                
+    <% if @automations[:full_clean_up] -%>
+    <automation name="fullCleanUp" interval="300000" active="true" 
+                action-name="deleteAllPastClearedAlarms" />
+    <% end -%>
+                
+    <% if @automations[:gc] -%>
+    <automation name="GC" interval="300000" active="true" 
+                action-name="garbageCollect" />
+    <% end -%>
+                
+    <% if @automations[:full_gc] -%>
+    <automation name="fullGC" interval="300000" active="true" 
+                action-name="fullGarbageCollect" />
+    <% end -%>
+                
+    <% if @automations[:unclear] -%>
+    <automation name="unclear" interval="30000"  active="true" 
+                trigger-name="selectClearedAlarms" 
+                action-name="resetSeverity" />
+    <% end -%>
+                
+    <% if @automations[:escalation] -%>
+    <automation name="escalation" interval="30000" active="false" 
+                trigger-name="selectSuspectAlarms" 
+                action-name="escalateAlarm" 
+                action-event="eventEscalated" />
+    <% end -%>
+                
+    <% if @automations[:purge_statistics_reports] -%>
+    <automation name="purgeStatisticsReports" active="true"
+                interval="3600000" 
+                action-name="deletePurgeableStatisticsReports" />
+    <% end -%>
+    
+    <% if @automations[:create_tickets] -%>
+    <!-- Enable these automation for automatic Trouble Ticketing -->
+    <automation name="createTickets" interval="30000" active="false" 
+                trigger-name="selectNullTicketStateAlarms" 
+                action-name="acknowledgeAlarm" 
+                action-event="createTicket" />
+    <% end -%>
+    <% if @automations[:create_critical_ticket] -%>
+    <automation name="createCriticalTicket" interval="30000" active="false" 
+                trigger-name="selectCritialOpenAlarms" 
+                action-name="acknowledgeAlarm" 
+                action-event="createTicket" />
+    <% end -%>
+    <% if @automations[:update_tickets] -%>
+    <automation name="updateTickets" interval="15000" active="false"
+                trigger-name="selectNotNullTicketStateAlarms" 
+                action-name="updateAutomationTime" 
+                action-event="updateTicket" />
+    <% end -%>
+    <% if @automations[:close_cleared_alarm_tickets] -%>
+    <automation name="closeClearedAlarmTickets" interval="60000" active="false" 
+                trigger-name="selectClearedAlarmWithOpenTicketState" 
+                action-name="updateAutomationTime" 
+                action-event="closeTicket" />
+    <% end -%>
+    <% if @automations[:clear_alarms_for_closed_tickets] -%>
+    <automation name="clearAlarmsForClosedTickets" interval="60000" active="false" 
+                trigger-name="selectClosedTicketStateForProblemAlarms" 
+                action-name="clearClosedTicketAlarms" />
+    <% end -%>
+    <% if @automations[:clean_up_rp_status_changes] -%>
+    <automation name="cleanUpRpStatusChanges" interval="600000" active="true" 
+                action-name="cleanUpRpStatusChanges" />
+    <% end -%>
+    
+    <!-- Enable these automation for monitoring maintenance contracts -->
+    <% if !@automations[:maintenance_check] -%>
+    <!--
+    <% end -%>
+    <automation name="maintenanceCheck" interval="84600000" active="true" 
+                trigger-name="selectExpirationMaintenance" 
+                action-name="maintenanceExpirationWarning"
+                action-event="maintenanceExpirationWarning" />
+    <% if !@automations[:maintenance_check] -%>
+    -->
+    <% end -%>
+    
+	<!-- Enable these automations to maintain the accesspoints table -->
+    <% if !@automations[:access_points_table] -%>
+    <!--
+    <% end -%>
+    <automation name="addMissingAccessPointsToTable" interval="600000" active="true" 
+                trigger-name="selectAccessPointsMissingFromTable" 
+                action-name="addAccessPointToTable" />
+				
+    <automation name="updateAccessPointsTable" interval="600000" active="true"
+                action-name="updateAccessPointsTable" />
+				
+    <automation name="cleanUpAccessPointsTable" interval="600000" active="true" 
+                action-name="cleanUpAccessPointsTable" />
+    <% if !@automations[:access_points_table] -%>
+    -->
+    <% end -%>
+  </automations>
+  
+  <triggers>
+    <% if @triggers[:select_closed_ticket_state_for_problem_alarms] -%>
+    <!-- Find Alarms that have a closed ticket state that haven't been cleared, yet -->
+    <trigger name="selectClosedTicketStateForProblemAlarms" operator="&gt;=" row-count="1" >
+      <statement>
+          SELECT a.alarmid AS _alarmid, 
+                 now() AS _ts
+            FROM alarms a
+           WHERE a.tticketstate = 3
+             AND a.severity &gt; 2
+             AND ( a.alarmType = 1 OR a.alarmType = 3 )
+      </statement>
+    </trigger>
+    <% end -%>
+  
+    <% if @triggers[:select_null_ticket_state_alarms] -%>
+    <!-- Find Alarms that are older than 15 minutes with no Ticket ID (Only works with PostgreSQL 8.1 or better) -->
+    <trigger name="selectNullTicketStateAlarms" operator="&gt;=" row-count="1" >
+      <statement>
+          SELECT a.alarmid AS _alarmid, 
+                 a.eventuei AS _eventuei, 
+                 'admin' AS _user, 
+                 a.tticketID AS _tticketID,
+                 now() AS _ts
+            FROM alarms a
+           WHERE a.severity &gt; 2 
+             AND ( a.alarmType = 1 OR a.alarmType = 3 )
+             AND a.alarmAckUser is NULL 
+             AND a.tticketState IS NULL
+             AND GREATEST(lastautomationtime, lasteventtime) &lt; now() - interval '15 minutes'
+      </statement>
+    </trigger>
+    <% end -%>
+
+    <% if @triggers[:select_critial_open_alarms] -%>
+    <!-- Find Alarms that are in critical state with no TicketID and open ticket.  This handles issues where 
+         alarms are continuously being reduced and has escalated high enough to require a ticket when 
+         the alarm hasn't been escalated. (Only works with PostgreSQL 8.1 or better) -->
+    <trigger name="selectCritialOpenAlarms" operator="&gt;=" row-count="1" >
+      <statement>
+          SELECT a.alarmid AS _alarmid, 
+                 a.eventuei AS _eventuei, 
+                 'admin' AS _user, 
+                 a.tticketID AS _tticketID,
+                 now() AS _ts
+            FROM alarms a
+           WHERE a.severity = 7 
+             AND ( a.alarmType = 1 OR a.alarmType = 3 )
+             AND a.alarmAckUser is NULL 
+             AND a.tticketState IS NULL
+             AND lasteventtime &lt; now() - interval '5 minutes'
+      </statement>
+    </trigger>
+    <% end -%>
+    
+    <% if @triggers[:select_not_null_ticket_state_alarms] -%>
+    <!-- Find Alarms that have a TicketState (Only works with PostgreSQL 8.1 or better) -->
+    <trigger name="selectNotNullTicketStateAlarms" operator="&gt;=" row-count="1" >
+      <statement>
+          SELECT a.alarmid AS _alarmid, 
+                 a.eventuei AS _eventuei, 
+                 'admin' AS _user, 
+                 a.tticketID AS _tticketID,
+                 now() AS _ts
+            FROM alarms a
+           WHERE a.severity &gt; 2 
+             AND ( a.alarmType = 1 OR a.alarmType = 3 )
+             AND a.tticketState IS NOT NULL
+             AND GREATEST(lastautomationtime, lasteventtime) &lt; now() - interval '15 minutes'
+      </statement>
+    </trigger>
+    <% end -%>
+
+    <% if @triggers[:select_cleared_alarm_with_open_ticket_state] -%>
+    <!-- Find Alarms that have cleared and have an open ticket state (Only works with PostgreSQL 8.1 or better) -->
+    <trigger name="selectClearedAlarmWithOpenTicketState" operator="&gt;=" row-count="1" >
+      <statement>
+          SELECT a.alarmid AS _alarmid, 
+                 a.eventuei AS _eventuei, 
+                 'admin' AS _user, 
+                 a.tticketID AS _tticketID,
+                 now() AS _ts
+            FROM alarms a
+           WHERE a.severity = 2 
+             AND a.alarmType = 1 
+             AND a.tticketState = 0
+             AND GREATEST(lastautomationtime, lasteventtime) &lt; now() - interval '15 minutes'
+      </statement>
+    </trigger>    
+    <% end -%>
+  
+    <% if @triggers[:select_suspect_alarms] -%>
+    <trigger name="selectSuspectAlarms" operator="&gt;=" row-count="1" >
+      <statement>
+          SELECT a.alarmid AS _alarmid, 
+                 a.eventuei AS _eventuei, 
+                 a.nodeid AS _nodeid, 
+                 a.ipaddr AS _ipaddr, 
+                 a.serviceid AS _serviceid,
+                 s.servicename AS _servicename,
+                 now() AS _ts
+            FROM alarms a
+ LEFT OUTER JOIN service s
+              ON s.serviceid = a.serviceid
+           WHERE ( a.alarmType = 1 OR a.alarmType = 3 )
+             AND severity &gt; 3
+             AND severity &lt; 7
+             AND alarmacktime IS NULL
+             AND COALESCE(lastautomationtime, lasteventtime) &lt; now() - interval '60 minutes'
+      </statement>
+    </trigger>
+    <% end -%>
+  
+    <% if @triggers[:select_cleared_alarms] -%>
+    <!-- This finds problems that have reoccurred since the previoius clear -->
+    <trigger name="selectClearedAlarms" operator="&gt;=" row-count="1" >
+      <statement>
+        SELECT a.alarmid AS _id, e.eventseverity AS _sev, now() AS _ts
+          FROM alarms a
+          JOIN events e 
+            ON e.eventid = a.lasteventid
+         WHERE severity = 2
+           AND alarmtype = 1
+           AND a.lasteventtime > a.lastautomationtime
+      </statement>
+    </trigger>
+    <% end -%>
+ 
+    <% if @triggers[:select_resolvers] -%>
+    <!-- Find all alarms that potentially clear problems --> 
+    <trigger name="selectResolvers" operator="&gt;=" row-count="1" >
+      <statement>
+        SELECT *, now() AS _ts 
+          FROM alarms 
+         WHERE alarmType=2
+      </statement>
+    </trigger>
+    <% end -%>
+    
+    <!-- Find assets that have maintenance-contract that will expire in less then 30 days -->
+    <% if !@triggers[:select_expiration_maintenance] -%>
+    <!-- 
+    <% end -%>
+    <trigger name="selectExpirationMaintenance" operator="&gt;=" row-count="1" >
+        <statement>
+        SELECT 
+          a.id, 
+          a.nodeid, 
+          a.maintcontract, 
+          CAST(a.maintcontractexpires as date),
+          '30' AS timeframe
+        FROM 
+          public.assets a
+        JOIN
+          node
+        ON
+          (a.nodeid = node.nodeid)
+        WHERE 
+          a.maintcontract IS NOT NULL  AND 
+          a.maintcontractexpires IS NOT NULL  AND 
+          a.maintcontractexpires != '' AND 
+          a.maintcontractexpires != 'n.v.' AND 
+          a.maintcontract != 'n.v.' AND 
+          a.maintcontract != '' AND 
+          CAST(a.maintcontractexpires as date) &lt; (current_date + integer '30') AND
+          CAST(a.maintcontractexpires as date) &gt; current_date AND
+          node.nodetype = 'A'
+        ORDER BY
+          CAST(a.maintcontractexpires as date) ASC;
+        </statement>
+    </trigger>
+    <% if !@triggers[:select_expiration_maintenance] -%>
+    -->
+    <% end -%>
+
+	<!-- Enable these automations to maintain the accesspoints table -->
+    <% if !@triggers[:select_access_points_missing_from_table] -%>
+    <!--
+    <% end -%>
+    <trigger name="selectAccessPointsMissingFromTable" operator="&gt;=" row-count="1" >
+      <statement>
+          SELECT assets.serialnumber AS _serialnumber,
+                 node.nodeid AS _nodeid,
+                 assets.pollercategory AS _package
+            FROM node
+           JOIN category_node ON node.nodeid = category_node.nodeid
+           JOIN categories ON category_node.categoryid = categories.categoryid
+           JOIN assets ON node.nodeid = assets.nodeid
+           WHERE categories.categoryname = 'AccessPoint' 
+             AND NOT EXISTS (SELECT 1 FROM accesspoints WHERE physaddr=assets.serialnumber)
+      </statement>
+    </trigger>
+    <% if !@triggers[:select_access_points_missing_from_table] -%>
+    -->
+    <% end -%>
+  </triggers>
+    
+  <actions>
+    <% if @actions[:acknowledge_alarm] -%>
+    <action name="acknowledgeAlarm" >
+      <statement>
+        UPDATE alarms
+           SET alarmackuser = ${_user}, alarmacktime = ${_ts}, lastautomationtime = ${_ts}
+         WHERE alarmid = ${_alarmid}
+      </statement>
+    </action>
+    <% end -%>
+  
+    <% if @actions[:update_automation_time] -%>
+    <action name="updateAutomationTime" >
+      <statement>
+        UPDATE alarms
+           SET lastautomationtime = ${_ts}
+         WHERE alarmid = ${_alarmid}
+      </statement>
+    </action>
+    <% end -%>
+  
+    <% if @actions[:escalate_alarm] -%>
+    <action name="escalateAlarm" >
+      <statement>
+        UPDATE alarms
+           SET alarmAckUser = null, alarmAckTime = null, severity = severity +1, firstautomationtime = COALESCE(firstautomationtime, ${_ts}), lastautomationtime = ${_ts}
+         WHERE alarmid = ${_alarmid}
+      </statement>
+    </action>
+    <% end -%>
+  
+    <% if @actions[:reset_severity] -%>
+    <action name="resetSeverity" >
+      <statement>
+        UPDATE alarms
+           SET severity = ${_sev}, firstautomationtime = COALESCE(firstautomationtime, ${_ts}), lastautomationtime = ${_ts}
+         WHERE alarmid = ${_id}
+      </statement>
+    </action>
+    <% end -%>
+
+    <% if @actions[:garbage_collect_7_4] -%>
+    <!-- action used for postgres 7.4 compatibility -->
+    <action name="garbageCollect" >
+      <statement>
+        DELETE FROM alarms
+         WHERE COALESCE(lastautomationtime, lasteventtime) &lt; now() - interval '3 days'
+           AND alarmacktime IS NULL
+      </statement>
+    </action>
+    <% end -%>
+  
+    <% if !@actions[:garbage_collect_8_1] -%>
+    <!-- a better action when using postgres 8.1 
+    <% end -%>
+    <action name="garbageCollect" >
+      <statement>
+        DELETE FROM alarms
+         WHERE GREATEST(lastautomationtime, lasteventtime) &lt; now() - interval '3 days'
+           AND alarmacktime IS NULL
+      </statement>
+    </action>
+    <% if !@actions[:garbage_collect_8_1] -%>
+    -->
+    <% end -%>
+  
+    <% if @actions[:full_garbage_collect_7_4] -%>
+    <!-- action used for postgres 7.4 compatibility -->
+    <action name="fullGarbageCollect" >
+      <statement>
+        DELETE FROM alarms
+         WHERE COALESCE(lastautomationtime, lasteventtime) &lt; now() - interval '8 days'
+      </statement>
+    </action>
+    <% end -%>
+  
+    <% if !@actions[:full_garbage_collect_8_1] -%>
+    <!-- a better action when using postgres 8.1 
+    <% end -%>
+    <action name="fullGarbageCollect" >
+      <statement>
+        DELETE FROM alarms
+         WHERE GREATEST(lastautomationtime, lasteventtime) &lt; now() - interval '8 days'
+      </statement>
+    </action>
+    <% if !@actions[:full_garbage_collect_8_1] -%>
+    -->
+    <% end -%>
+    
+    <% if @actions[:delete_past_cleared_alarms] -%>
+    <!--  ticket state of 3 is closed -->
+    <action name="deletePastClearedAlarms" >
+      <statement>
+        DELETE FROM alarms
+         WHERE severity &lt;= 3
+           AND COALESCE(lastautomationtime, lasteventtime) &lt; now() - interval '5 minutes'
+           AND (alarmacktime IS NULL AND (tticketState IS NULL OR tticketState = 3))
+      </statement>
+    </action>
+    <% end -%>
+
+    <% if @actions[:delete_all_past_cleared_alarms] -%>
+    <!-- May need to add a check for Open ticket state and wait for the state to be closed based on
+         update ticket action-event -->
+    <action name="deleteAllPastClearedAlarms" >
+      <statement>
+        DELETE from alarms
+         WHERE severity &lt;= 3
+           AND COALESCE(lastautomationtime, lasteventtime) &lt; now() - interval '24 hours'
+           AND (tticketState IS NULL OR tticketState = 3)
+      </statement>
+    </action>
+    <% end -%>
+  
+    <% if @actions[:clear_problems] -%>
+    <!--  New and optimized version of clearing problems -->
+    <action name="clearProblems" >
+      <statement>
+        UPDATE alarms 
+           SET severity=2, firstautomationtime = COALESCE(firstautomationtime, ${_ts}), lastautomationtime = ${_ts}
+         WHERE alarmType=1 
+           AND severity &gt; 2 
+           AND lastEventTime &lt;=  ${lastEventTime} 
+           AND reductionKey = ${clearKey} 
+      </statement> 
+    </action>
+    <% end -%>
+    
+    <% if @actions[:clear_closed_ticket_alarms] -%>
+    <!--  clear alarms that have a trouble ticket assigned as closed and alarm has not cleared-->
+    <action name="clearClosedTicketAlarms" >
+      <statement>
+        UPDATE alarms 
+           SET severity=2, firstautomationtime = COALESCE(firstautomationtime, ${_ts}), lastautomationtime = ${_ts}
+         WHERE alarmid = ${_alarmid}
+      </statement> 
+    </action>
+    <% end -%>
+    
+    <% if @actions[:delete_purgeable_statistics_reports] -%>
+    <action name="deletePurgeableStatisticsReports" >
+      <statement>
+        DELETE from statisticsReport
+         WHERE purgeDate &lt; now()
+      </statement>
+    </action>
+    <% end -%>
+
+    <% if @actions[:do_nothing_action] -%>
+    <!-- Does nothing while still meeting the requirements of all actions -->
+    <action name="doNothingAction" >
+      <statement>
+        UPDATE node
+           SET nodeid = -1
+         WHERE nodeid = -1
+      </statement>
+    </action>
+    <% end -%>
+
+    <% if @actions[:clean_up_rp_status_changes] -%>
+    <action name="cleanUpRpStatusChanges">
+      <statement>
+        <!-- Remove expired locations specific status changes -->
+        DELETE 
+          FROM location_specific_status_changes
+         WHERE (locationmonitorid, ifserviceid, id) 
+        NOT IN (SELECT locationmonitorid, ifserviceid, max(id) 
+                  FROM location_specific_status_changes 
+              GROUP BY locationmonitorid, ifserviceid)
+           AND statustime &lt; now() - interval '24 hours'
+      </statement>
+    </action>
+    <% end -%>
+    
+    <!-- Monitoring maintenance contracts -->
+    <% if !@actions[:maintenance_expiration_warning] -%>
+    <!--
+    <% end -%>
+    <action name="maintenanceExpirationWarning" >
+      <statement>
+      </statement>
+    </action>
+    <% if !@actions[:maintenance_expiration_warning] -%>
+    -->
+    <% end -%>
+    
+    <!-- Access Point Monitor -->
+    <% if !@actions[:access_points_table] -%>
+    <!--
+    <% end -%>
+    <action name="addAccessPointToTable" >
+      <statement>
+        INSERT INTO accesspoints (physaddr, nodeid, pollingpackage) 
+           VALUES (${_serialnumber}, ${_nodeid}, ${_package})
+      </statement>
+    </action>
+	
+    <action name="updateAccessPointsTable">
+        <statement>
+            UPDATE accesspoints
+                SET pollingpackage = assets.pollercategory,
+             nodeid = node.nodeid
+            FROM node
+            JOIN category_node ON node.nodeid = category_node.nodeid
+            JOIN categories ON category_node.categoryid = categories.categoryid
+            JOIN assets ON node.nodeid = assets.nodeid
+             WHERE accesspoints.physaddr=assets.serialnumber
+        </statement>
+    </action>
+	
+    <action name="cleanUpAccessPointsTable">
+      <statement>
+        DELETE FROM accesspoints
+           WHERE NOT EXISTS
+           ( SELECT 1 FROM assets WHERE assets.serialnumber = accesspoints.physaddr )
+      </statement>
+    </action>
+    <% if !@actions[:access_points_table] -%>
+    -->
+    <% end -%>
+  </actions>
+
+  <!--  Deprecating this element... see the new <action-events> element -->    
+  <auto-events>
+    <% if @auto_events[:escalation_event] -%>
+    <auto-event name="escalationEvent" >
+      <uei>uei.opennms.org/vacuumd/alarmEscalated</uei>
+    </auto-event>
+    <% end -%>
+  </auto-events>
+
+  <!-- Note: action events that have tokens require the for-each-result attribute to be set to true -->
+  <action-events>
+    <% if @action_events[:create_ticket] -%>
+    <action-event name="createTicket" for-each-result="true" >
+      <assignment type="field" name="uei" value="uei.opennms.org/troubleTicket/create" />
+      <assignment type="parameter" name="alarmUei" value="${_eventuei}" />
+      <assignment type="parameter" name="user" value="${_user}" />
+      <assignment type="parameter" name="alarmId" value="${_alarmid}" />
+    </action-event>
+    <% end -%>
+    
+    <% if @action_events[:update_ticket] -%>
+    <action-event name="updateTicket" for-each-result="true" >
+      <assignment type="field" name="uei" value="uei.opennms.org/troubleTicket/update" />
+      <assignment type="parameter" name="alarmUei" value="${_eventuei}" />
+      <assignment type="parameter" name="user" value="${_user}" />
+      <assignment type="parameter" name="alarmId" value="${_alarmid}" />
+      <assignment type="parameter" name="troubleTicket" value="${_tticketID}" />
+    </action-event>
+    <% end -%>
+
+    <% if @action_events[:close_ticket] -%>
+    <action-event name="closeTicket" for-each-result="true" >
+      <assignment type="field" name="uei" value="uei.opennms.org/troubleTicket/close" />
+      <assignment type="parameter" name="alarmUei" value="${_eventuei}" />
+      <assignment type="parameter" name="user" value="${_user}" />
+      <assignment type="parameter" name="alarmId" value="${_alarmid}" />
+      <assignment type="parameter" name="troubleTicket" value="${_tticketID}" />
+    </action-event>
+    <% end -%>
+    
+    <% if @action_events[:event_escalated] -%>
+    <action-event name="eventEscalated" for-each-result="true" >
+      <assignment type="field" name="uei" value="uei.opennms.org/vacuumd/alarmEscalated" />
+      <assignment type="field" name="nodeid" value="${_nodeid}" />
+      <assignment type="field" name="interface" value="${_ipaddr}" />
+      <assignment type="field" name="service" value="${_servicename}" />
+      <assignment type="parameter" name="alarmId" value="${_alarmid}" />
+      <assignment type="parameter" name="alarmEventUei" value="${_eventUei}" />
+    </action-event>
+    <% end -%>
+    
+    <!-- Monitoring maintenance conracts -->
+    <% if !@action_events[:maintenance_expiration_warning] -%>
+    <!--
+    <% end -%>
+    <action-event name="maintenanceExpirationWarning" for-each-result="true" >
+      <assignment type="field" name="uei" value="uei.opennms.org/asset/maintenance/expirationWarning" />
+      <assignment type="field" name="nodeid" value="${nodeid}" />
+      <assignment type="parameter" name="nodeId" value="${nodeid}" />
+      <assignment type="parameter" name="maintcontractexpires" value="${maintcontractexpires}" />
+      <assignment type="parameter" name="maintcontract" value="${maintcontract}" />
+      <assignment type="parameter" name="timeframe" value="${timeframe}" />
+    </action-event>
+    <% if !@action_events[:maintenance_expiration_warning] -%>
+    -->
+    <% end -%>
+  </action-events>
+  
+</VacuumdConfiguration>
