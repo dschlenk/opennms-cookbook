@@ -188,7 +188,7 @@ These LWRPs use a cookbook library named Provision that I wrote to perform the w
 * `opennms_notification_command`: Create a new command in notificationCommands.xml. 
 * `opennms_destination_path`: creates a destination path element in destinationPaths.xml. Requires at a minimum a single target which can be defined with the following LWRP. 
 * `opennms_target`: Add a target or escalate target to a destination path (defined either in the default config or with the above LWRP). 
-* `opennms_notification`: Create notification elements in notifications.xml. 
+* `opennms_notification`: Create notification elements in notifications.xml.  Supports updating.
 
 #### Node Service Credential Configuration
 

@@ -20,4 +20,4 @@ attribute :params, :kind_of => Hash
 attribute :vbname, :kind_of => String
 attribute :vbvalue, :kind_of => String
 
-attr_accessor :exists
+attr_accessor :exists, :changed

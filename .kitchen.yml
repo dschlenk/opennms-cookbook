@@ -77,6 +77,18 @@ suites:
       - recipe[postgresql::config_initdb]
       - recipe[postgresql::config_pgtune]
       - recipe[opennms::default]
+  - name: change_notif
+    run_list:
+      - recipe[postgresql::client]
+      - recipe[postgresql::server]
+      - recipe[postgresql::contrib]
+      - recipe[postgresql::config_initdb]
+      - recipe[postgresql::config_pgtune]
+      - recipe[opennms::notemplates]
+      - recipe[opennms::example_destination_path]
+      - recipe[opennms::example_notification_command]
+      - recipe[opennms::example_notifd_autoack]
+      - recipe[opennms::example_notification]
   - name: all
     run_list:
       - recipe[postgresql::client]
