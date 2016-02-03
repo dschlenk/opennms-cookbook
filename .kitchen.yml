@@ -10,7 +10,7 @@ provisioner:
   name: chef_solo
 
 platforms:
-  - name: centos-6.5
+  - name: centos-6.7
     attributes:
       opennms:
         conf: 
@@ -134,9 +134,9 @@ suites:
       - recipe[onms_lwrp_test::system_def]
       - recipe[onms_lwrp_test::avail_category]
       - recipe[onms_lwrp_test::avail_view_section]
+      - recipe[onms_lwrp_test::wallboard]
       - recipe[onms_lwrp_test::dashlet]
       - recipe[onms_lwrp_test::update_dashlet]
-      - recipe[onms_lwrp_test::wallboard]
       - recipe[onms_lwrp_test::surveillance_view]
       - recipe[onms_lwrp_test::send_event]
   - name: notemplates

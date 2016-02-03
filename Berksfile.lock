@@ -1,4 +1,6 @@
 DEPENDENCIES
+  onms_lwrp_test
+    path: test/fixtures/cookbooks/onms_lwrp_test
   opennms
     path: .
     metadata: true
@@ -13,6 +15,8 @@ GRAPH
   hostsfile (2.4.5)
   java (1.36.0)
     apt (>= 0.0.0)
+  onms_lwrp_test (0.1.0)
+    opennms (>= 0.0.0)
   opennms (16.2.5)
     build-essential (>= 0.0.0)
     hostsfile (>= 0.0.0)
