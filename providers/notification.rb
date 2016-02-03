@@ -87,45 +87,45 @@ def notification_changed?(name, status, writeable, uei, description, rule,
     # so return true if it doesn't exist (nil) or is 'yes'
     return true if "#{notif_el.attributes['writeable']}" != 'no'
   end
-  Chef::Log.debug "#{notif_el.elements['uei'].text.strip} != #{uei}?"
-  return true if "#{notif_el.elements['uei'].text.strip}" != "#{uei}"
+  Chef::Log.debug "#{notif_el.elements['uei'].texts.join("\n").strip} != #{uei}?"
+  return true if "#{notif_el.elements['uei'].texts.join("\n").strip}" != "#{uei}"
   d_el = notif_el.elements['description']
   if d_el.nil?
     Chef::Log.debug "no existing description, new is #{description}"
     return true unless description.nil?
   else
-    Chef::Log.debug "#{d_el.text.strip} != #{description}?"
-    return true if "#{d_el.text.strip}" != "#{description}"
+    Chef::Log.debug "#{d_el.texts.join("\n").strip} != #{description}?"
+    return true if "#{d_el.texts.join("\n").strip}" != "#{description}"
   end
-  Chef::Log.debug "#{notif_el.elements['rule'].text.strip} != #{rule}?"
-  return true if "#{notif_el.elements['rule'].text.strip}" != "#{rule}"
-  Chef::Log.debug "#{notif_el.elements['destinationPath'].text.strip} != #{destination_path}?"
-  return true if "#{notif_el.elements['destinationPath'].text.strip}" != "#{destination_path}"
-  Chef::Log.debug "#{notif_el.elements['text-message'].text.strip} != #{text_message}?"
-  return true if "#{notif_el.elements['text-message'].text.strip}" != "#{text_message}"
+  Chef::Log.debug "#{notif_el.elements['rule'].texts.join("\n").strip} != #{rule}?"
+  return true if "#{notif_el.elements['rule'].texts.join("\n").strip}" != "#{rule}"
+  Chef::Log.debug "#{notif_el.elements['destinationPath'].texts.join("\n").strip} != #{destination_path}?"
+  return true if "#{notif_el.elements['destinationPath'].texts.join("\n").strip}" != "#{destination_path}"
+  Chef::Log.debug "#{notif_el.elements['text-message'].texts.join("\n").strip} != #{text_message}?"
+  return true if "#{notif_el.elements['text-message'].texts.join("\n").strip}" != "#{text_message}"
   sub_el = notif_el.elements['subject']
   if sub_el.nil?
     Chef::Log.debug "no existing subject, new is #{subject}"
     return true unless subject.nil?
   else
-    Chef::Log.debug "#{sub_el.text.strip} != #{subject}?"
-    return true if "#{sub_el.text.strip}" != "#{subject}"
+    Chef::Log.debug "#{sub_el.texts.join("\n").strip} != #{subject}?"
+    return true if "#{sub_el.texts.join("\n").strip}" != "#{subject}"
   end
   nm_el = notif_el.elements['numeric-message']
   if nm_el.nil?
     Chef::Log.debug "no existing numeric message, new is #{numeric_message}"
     return true unless numeric_message.nil?
   else
-    Chef::Log.debug "#{nm_el.text.strip} != #{numeric_message}?"
-    return true if "#{nm_el.text.strip}" != "#{numeric_message}"
+    Chef::Log.debug "#{nm_el.texts.join("\n").strip} != #{numeric_message}?"
+    return true if "#{nm_el.texts.join("\n").strip}" != "#{numeric_message}"
   end
   es_el = notif_el.elements['event-severity']
   if es_el.nil?
     Chef::Log.debug "no existing event_severity, new is #{event_severity}"
     return true unless event_severity.nil?
   else
-    Chef::Log.debug "#{es_el.text.strip} != #{event_severity}?"
-    return true if "#{es_el.text.strip}" != "#{event_severity}"
+    Chef::Log.debug "#{es_el.texts.join("\n").strip} != #{event_severity}?"
+    return true if "#{es_el.texts.join("\n").strip}" != "#{event_severity}"
   end
   curr_params = {}
   params_str = {}
@@ -144,16 +144,16 @@ def notification_changed?(name, status, writeable, uei, description, rule,
     Chef::Log.debug "no existing vbname, new is #{vbname}"
     return true unless vbname.nil?
   else
-    Chef::Log.debug "#{vn_el.text.strip} != #{vbname}?"
-    return true if "#{vn_el.text.strip}" != "#{vbname}"
+    Chef::Log.debug "#{vn_el.texts.join("\n").strip} != #{vbname}?"
+    return true if "#{vn_el.texts.join("\n").strip}" != "#{vbname}"
   end
   vv_el = notif_el.elements['varbind/vbvalue']
   if vv_el.nil?
     Chef::Log.debug "no existing vbvalue, new is #{vbvalue}"
     return true unless vbvalue.nil?
   else
-    Chef::Log.debug "#{vv_el.text.strip} != #{vbvalue}?"
-    return true if "#{vv_el.text.strip}" != "#{vbvalue}"
+    Chef::Log.debug "#{vv_el.texts.join("\n").strip} != #{vbvalue}?"
+    return true if "#{vv_el.texts.join("\n").strip}" != "#{vbvalue}"
   end
   return false
 end
