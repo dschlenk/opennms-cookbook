@@ -87,45 +87,80 @@ def notification_changed?(name, status, writeable, uei, description, rule,
     # so return true if it doesn't exist (nil) or is 'yes'
     return true if "#{notif_el.attributes['writeable']}" != 'no'
   end
-  Chef::Log.debug "#{notif_el.elements['uei'].texts.join("\n").strip} != #{uei}?"
-  return true if "#{notif_el.elements['uei'].texts.join("\n").strip}" != "#{uei}"
+  ueitext = ''
+  # OMG I hate XML text
+  notif_el.elements['uei'].texts.each do |t|
+    ueitext += "#{t}".strip
+  end
+  Chef::Log.debug "#{ueitext} != #{REXML::Text.new(uei)}?"
+  return true if "#{ueitext}" != "#{REXML::Text.new(uei)}"
   d_el = notif_el.elements['description']
   if d_el.nil?
     Chef::Log.debug "no existing description, new is #{description}"
     return true unless description.nil?
   else
-    Chef::Log.debug "#{d_el.texts.join("\n").strip} != #{description}?"
-    return true if "#{d_el.texts.join("\n").strip}" != "#{description}"
+    detext = ''
+    d_el.texts.each do |t|
+      detext += "#{t}".strip#.gsub(/\t/, ' ').gsub(/\n/, ' ').squeeze(' ')
+    end
+    Chef::Log.debug "#{detext} != #{REXML::Text.new(description)}?"
+    return true if "#{detext}" != "#{REXML::Text.new(description)}"
   end
-  Chef::Log.debug "#{notif_el.elements['rule'].texts.join("\n").strip} != #{rule}?"
-  return true if "#{notif_el.elements['rule'].texts.join("\n").strip}" != "#{rule}"
-  Chef::Log.debug "#{notif_el.elements['destinationPath'].texts.join("\n").strip} != #{destination_path}?"
-  return true if "#{notif_el.elements['destinationPath'].texts.join("\n").strip}" != "#{destination_path}"
-  Chef::Log.debug "#{notif_el.elements['text-message'].texts.join("\n").strip} != #{text_message}?"
-  return true if "#{notif_el.elements['text-message'].texts.join("\n").strip}" != "#{text_message}"
+  rtext = ''
+  notif_el.elements['rule'].texts.each do |t|
+    rtext += "#{t}".strip#.gsub(/\t/, ' ').gsub(/\n/, ' ').squeeze(' ')
+  end
+  # we use CData for rules
+  Chef::Log.debug "#{rtext} != #{rule}?"
+  return true if "#{rtext}" != "#{rule}"
+  dptext = ''
+  notif_el.elements['destinationPath'].texts.each do |t|
+    dptext += "#{t}".strip#.gsub(/\t/, ' ').gsub(/\n/, ' ').squeeze(' ')
+  end
+  Chef::Log.debug "#{dptext} != #{REXML::Text.new(destination_path)}?"
+  return true if "#{dptext}" != "#{REXML::Text.new(destination_path)}"
+  tmtext = ''
+  notif_el.elements['text-message'].texts.each do |t|
+    tmtext += "#{t}".strip#.gsub(/\t/, ' ').gsub(/\n/, ' ').squeeze(' ')
+  end
+  # we use CData for text messages
+  Chef::Log.debug "#{tmtext} != #{text_message}?"
+  return true if "#{tmtext}" != "#{text_message}"
   sub_el = notif_el.elements['subject']
   if sub_el.nil?
     Chef::Log.debug "no existing subject, new is #{subject}"
     return true unless subject.nil?
   else
-    Chef::Log.debug "#{sub_el.texts.join("\n").strip} != #{subject}?"
-    return true if "#{sub_el.texts.join("\n").strip}" != "#{subject}"
+    stext = ''
+    sub_el.texts.each do |t|
+      stext += "#{t}".strip#.gsub(/\t/, ' ').gsub(/\n/, ' ').squeeze(' ')
+    end
+    Chef::Log.debug "#{stext} != #{REXML::Text.new(subject)}?"
+    return true if "#{stext}" != "#{REXML::Text.new(subject)}"
   end
   nm_el = notif_el.elements['numeric-message']
   if nm_el.nil?
     Chef::Log.debug "no existing numeric message, new is #{numeric_message}"
     return true unless numeric_message.nil?
   else
-    Chef::Log.debug "#{nm_el.texts.join("\n").strip} != #{numeric_message}?"
-    return true if "#{nm_el.texts.join("\n").strip}" != "#{numeric_message}"
+    nmtext = ''
+    nm_el.texts.each do |t|
+      nmtext += "#{t}".strip#.gsub(/\t/, ' ').gsub(/\n/, ' ').squeeze(' ')
+    end
+    Chef::Log.debug "#{nmtext} != #{REXML::Text.new(numeric_message)}?"
+    return true if "#{nmtext}" != "#{REXML::Text.new(numeric_message)}"
   end
   es_el = notif_el.elements['event-severity']
   if es_el.nil?
     Chef::Log.debug "no existing event_severity, new is #{event_severity}"
     return true unless event_severity.nil?
   else
-    Chef::Log.debug "#{es_el.texts.join("\n").strip} != #{event_severity}?"
-    return true if "#{es_el.texts.join("\n").strip}" != "#{event_severity}"
+    estext = ''
+    es_el.texts.each do |t|
+      estext += "#{t}".strip#.gsub(/\t/, ' ').gsub(/\n/, ' ').squeeze(' ')
+    end
+    Chef::Log.debug "#{estext} != #{REXML::Text.new(event_severity)}?"
+    return true if "#{estext}" != "#{REXML::Text.new(event_severity)}"
   end
   curr_params = {}
   params_str = {}
@@ -144,16 +179,24 @@ def notification_changed?(name, status, writeable, uei, description, rule,
     Chef::Log.debug "no existing vbname, new is #{vbname}"
     return true unless vbname.nil?
   else
-    Chef::Log.debug "#{vn_el.texts.join("\n").strip} != #{vbname}?"
-    return true if "#{vn_el.texts.join("\n").strip}" != "#{vbname}"
+    vntext = ''
+    vn_el.texts.each do |t|
+      vntext += "#{t}".strip#.gsub(/\t/, ' ').gsub(/\n/, ' ').squeeze(' ')
+    end
+    Chef::Log.debug "#{vntext} != #{REXML::Text.new(vbname)}?"
+    return true if "#{vntext}" != "#{REXML::Text.new(vbname)}"
   end
   vv_el = notif_el.elements['varbind/vbvalue']
   if vv_el.nil?
     Chef::Log.debug "no existing vbvalue, new is #{vbvalue}"
     return true unless vbvalue.nil?
   else
-    Chef::Log.debug "#{vv_el.texts.join("\n").strip} != #{vbvalue}?"
-    return true if "#{vv_el.texts.join("\n").strip}" != "#{vbvalue}"
+    vvtext = ''
+    vv_el.texts.each do |t|
+      vvtext += "#{t}".strip#.gsub(/\t/, ' ').gsub(/\n/, ' ').squeeze(' ')
+    end
+    Chef::Log.debug "#{vvtext} != #{REXML::Text.new(vbvalue)}?"
+    return true if "#{vvtext}" != "#{REXML::Text.new(vbvalue)}"
   end
   return false
 end
@@ -228,6 +271,7 @@ def create_notification
   out = ""
   formatter = REXML::Formatters::Pretty.new(2)
   formatter.compact = true
+  formatter.width = 100000
   formatter.write(doc, out)
   ::File.open("#{node['opennms']['conf']['home']}/etc/notifications.xml", "w"){ |file| file.puts(out) }
 end
