@@ -20,6 +20,18 @@ action :create do
   end
 end
 
+action :delete do
+  if @current_resource.exists
+    Chef::Log.info "#{ @new_resource } is being deleted."
+    converge_by("Delete #{ @new_resource }") do
+      delete_notification
+      new_resource.updated_by_last_action(true)
+    end
+  else
+    Chef::Log.info "#{ @new_resource } doesn't exist - nothing to do."
+  end
+end
+
 def load_current_resource
   @current_resource = Chef::Resource::OpennmsNotification.new(@new_resource.name)
   @current_resource.name(@new_resource.name)
@@ -268,6 +280,23 @@ def create_notification
     vbvalue_el.add_text new_resource.vbvalue
   end
 
+  out = ""
+  formatter = REXML::Formatters::Pretty.new(2)
+  formatter.compact = true
+  formatter.width = 100000
+  formatter.write(doc, out)
+  ::File.open("#{node['opennms']['conf']['home']}/etc/notifications.xml", "w"){ |file| file.puts(out) }
+end
+
+def delete_notification
+  Chef::Log.debug "Creating notification : '#{ new_resource.name }'"
+  file = ::File.new("#{node['opennms']['conf']['home']}/etc/notifications.xml", "r")
+  contents = file.read
+  doc = REXML::Document.new(contents, { :respect_whitespace => :all })
+  doc.context[:attribute_quote] = :quote
+  file.close
+  # we've already established that the current resource is what we described to delete
+  notif_el = doc.elements.delete("/notifications/notification[@name = '#{new_resource.name}']")
   out = ""
   formatter = REXML::Formatters::Pretty.new(2)
   formatter.compact = true
