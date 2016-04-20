@@ -98,14 +98,16 @@ def create_xml_group
   source_el = doc.elements["/xml-datacollection-config/xml-collection[@name='#{new_resource.collection_name}']/xml-source[@url='#{new_resource.source_url}']"]
   # handle xml-group element
   xg_el = source_el.add_element 'xml-group', { 'name' => new_resource.name, 'resource-type' => new_resource.resource_type, 'resource-xpath' => new_resource.resource_xpath }
-  if !new_resource.key_xpath.nil?
-    xg_el.add_attribute( 'key-xpath' => new_resource.key_xpath)
+  Chef::Log.info "key_xpath: #{new_resource.key_xpath}"
+  unless new_resource.key_xpath.nil?
+    Chef::Log.info "key_xpath defined!"
+    xg_el.attributes['key-xpath'] = new_resource.key_xpath
   end
-  if !new_resource.timestamp_xpath.nil?
-   xg_el.add_attribute( 'timestamp-xpath' => new_resource.timestamp_xpath)
+  unless new_resource.timestamp_xpath.nil?
+   xg_el.attributes['timestamp-xpath'] = new_resource.timestamp_xpath
   end
-  if !new_resource.timestamp_format.nil?
-    xg_el.add_attribute( 'timestamp-format' => new_resource.timestamp_format)
+  unless new_resource.timestamp_format.nil?
+    xg_el.attributes['timestamp-format'] = new_resource.timestamp_format
   end
   # handle xml-object elements
   if !new_resource.objects.nil?
