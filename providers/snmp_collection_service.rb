@@ -51,7 +51,7 @@ def create_snmp_collection_service
   package_el = doc.elements["/collectd-configuration/package[@name='#{new_resource.package_name}']"]
   service_el = package_el.add_element 'service', { 'name' => new_resource.service_name, 'status' => new_resource.status, 'interval' => new_resource.interval }
   if new_resource.user_defined
-    service_el.add_attribute('user-defined' => new_resource.user_defined)
+    service_el.add_attribute('user-defined', new_resource.user_defined)
   end
   collection_param_el = service_el.add_element 'parameter', { 'key' => 'collection', 'value' => new_resource.collection }
   if !new_resource.port.nil?

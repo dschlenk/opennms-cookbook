@@ -106,20 +106,6 @@ def create_xml_source
         mode 00644
       end
     }
-  #else
-  #  xml_groups.each {|name, details|
-  #    #TODO: need to validate that selected resource type is present in the collection definition in the main datacollection-config.xml file
-  #    xg_el = source_el.add_element 'xml-group', { 'name' => name, 'resource-type' => details['resource_type'], 'resource-xpath' => details['resource_xpath'] }
-  #    if details['key_xpath']
-  #      xg_el.add_attribute( 'key-xpath' => details['key_xpath'])
-  #    end
-  #    if details['timestamp_xpath']
-  #      xg_el.add_attribute( 'timestamp-xpath' => details['timestamp_xpath'])
-  #    end
-  #    if details['timestamp_format']
-  #      xg_el.add_attribute( 'timestamp-format' => details['timestamp_format'])
-  #    end
-  #  }
   end
 
   out = ""

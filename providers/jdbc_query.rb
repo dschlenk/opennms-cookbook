@@ -65,7 +65,7 @@ def create_jdbc_query
   if !queries_el.nil?
     query_el = queries_el.add_element 'query', {'name' => new_resource.name, 'ifType' => new_resource.if_type, 'recheckInterval' => new_resource.recheck_interval, 'resourceType' => new_resource.resource_type }
     if new_resource.instance_column
-      query_el.add_attribute( 'instance-column' =>  new_resource.instance_column )
+      query_el.add_attribute( 'instance-column', new_resource.instance_column )
     end
     if new_resource.query_string
       statement_el = query_el.add_element 'statement'
@@ -77,7 +77,7 @@ def create_jdbc_query
       new_resource.columns.each { |name,details|
         column_el = columns_el.add_element 'column', { 'name' => name , 'type' => details['type'], 'alias' => details['alias'] }
         if details['data_source_name']
-          column_el.add_attribute( 'data-source-name' => details['data_source_name'] )
+          column_el.add_attribute( 'data-source-name', details['data_source_name'] )
         end
       }
     end

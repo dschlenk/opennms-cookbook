@@ -58,7 +58,7 @@ def create_resource_type
   end
   type_el = group_el.add_element 'resourceType', { 'name' => new_resource.name, 'label' => new_resource.label }
   if new_resource.resource_label
-    type_el.add_attribute( 'resourceLabel' => new_resource.resource_label )
+    type_el.add_attribute( 'resourceLabel', new_resource.resource_label )
   end
   persist_el = type_el.add_element 'persistenceSelectorStrategy', { 'class' => new_resource.persistence_selector_strategy }
   new_resource.persistence_selector_strategy_params.each { |param|

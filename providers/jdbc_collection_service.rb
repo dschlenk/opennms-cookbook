@@ -49,7 +49,7 @@ def create_jdbc_collection_service
   package_el = doc.elements["/collectd-configuration/package[@name='#{new_resource.package_name}']"]
   service_el = package_el.add_element 'service', { 'name' => new_resource.service_name, 'status' => new_resource.status, 'interval' => new_resource.interval }
   if !new_resource.user_defined.nil?
-    service_el.add_attribute('user-defined' => new_resource.user_defined)
+    service_el.add_attribute('user-defined', new_resource.user_defined)
   end
   collection_param_el = service_el.add_element 'parameter', { 'key' => 'collection', 'value' => new_resource.collection }
   user_el = service_el.add_element 'parameter', { 'key' => 'user', 'value' => new_resource.user }
