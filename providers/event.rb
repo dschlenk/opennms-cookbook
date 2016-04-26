@@ -104,11 +104,15 @@ def create_event
   doc = REXML::Document.new file
   file.close
   doc.context[:attribute_quote] = :quote
-  unless event_el = doc.root.elements["/events/event/uei[text() = '#{uei}']"].nil?
-    doc.root.elements.delete("/events/event[uei/text() = '#{uei}']")
+  updating = false
+  event_el = doc.root.elements["/events/event[uei/text() = '#{uei}']"]
+  if event_el.nil?
+    event_el = doc.root.add_element 'event'
+  else
+    updating = true
   end
-  event_el = doc.root.add_element 'event'
-  if !new_resource.mask.nil?
+  unless new_resource.mask.nil?
+    event_el.elements.delete('mask') if updating
     mask_el = event_el.add_element 'mask'
     new_resource.mask.each do |mask|
       me_el = mask_el.add_element 'maskelement'
@@ -120,29 +124,60 @@ def create_event
       end
     end
   end
-  uei_el = event_el.add_element 'uei'
-  uei_el.add_text(new_resource.uei)
-  el_el = event_el.add_element 'event-label'
-  el_el.add_text(REXML::CData.new(new_resource.event_label))
+  unless updating
+    uei_el = event_el.add_element('uei')
+    uei_el.add_text(new_resource.uei)
+  end
+  unless new_resource.event_label.nil?
+    el_el = event_el.elements['event-label'] || event_el.add_element('event-label')
+    while el_el.has_text? do
+      el_el.text = nil
+    end
+    el_el.add_text(REXML::CData.new(new_resource.event_label))
+  end
   if !new_resource.snmp.nil?
     # TODO
   end
-  descr_el = event_el.add_element 'descr'
-  descr_el.add_text(REXML::CData.new(new_resource.descr))
-  logmsg_el = event_el.add_element 'logmsg'
-  logmsg_el.attributes['notify'] = 'true' if new_resource.logmsg_notify == true
-  logmsg_el.attributes['dest'] = new_resource.logmsg_dest
-  logmsg_el.add_text(REXML::CData.new(new_resource.logmsg))
-  sev_el = event_el.add_element 'severity'
-  sev_el.add_text(new_resource.severity)
+  unless new_resource.descr.nil?
+    descr_el = event_el.elements['descr'] || event_el.add_element('descr')
+    while descr_el.has_text? do
+      descr_el.text = nil
+    end
+    descr_el.add_text(REXML::CData.new(new_resource.descr)) unless new_resource.descr.nil?
+  end
+  if updating
+    logmsg_el = event_el.elements['logmsg']
+    logmsg_el.attributes['notify'] = 'true' if new_resource.logmsg_notify == true
+    logmsg_el.attributes['dest'] = new_resource.logmsg_dest unless new_resource.logmsg_dest.nil?
+    unless new_resource.logmsg.nil?
+      while logmsg_el.has_text? do
+        logmsg_el.text = nil
+      end
+      logmsg_el.add_text(REXML::CData.new(new_resource.logmsg)) unless new_resource.logmsg.nil?
+    end
+  else
+    logmsg_el = event_el.add_element 'logmsg'
+    logmsg_el.attributes['notify'] = 'true' if new_resource.logmsg_notify == true
+    logmsg_el.attributes['dest'] = new_resource.logmsg_dest
+    logmsg_el.add_text(REXML::CData.new(new_resource.logmsg))
+  end
+  unless new_resource.severity.nil?
+    sev_el = event_el.elements['severity'] || event_el.add_element('severity')
+    while sev_el.has_text? do
+      sev_el.text = nil
+    end
+    sev_el.add_text(new_resource.severity) unless new_resource.severity.nil?
+  end
   if !new_resource.correlation.nil?
      # TODO
   end
-  if !new_resource.operinstruct.nil?
+  unless new_resource.operinstruct.nil?
+    event_el.elements.delete('operinstruct') if updating
     oi_el = event_el.add_element 'operinstruct'
     oi_el.add_text(REXML::CData.new(new_resource.operinstruct))
   end
-  if !new_resource.autoaction.nil?
+  unless new_resource.autoaction.nil?
+    event_el.elements.delete_all('autoaction') if updating
     new_resource.autoaction.each do |autoaction|
       aa_el = event_el.add_element 'autoaction'
       if autoaction['state'] == 'off'
@@ -151,7 +186,8 @@ def create_event
       aa_el.add_text(REXML::CData.new(autoaction['action']))
     end
   end
-  if !new_resource.varbindsdecode.nil?
+  unless new_resource.varbindsdecode.nil?
+    event_el.elements.delete_all('varbindsdecode') if updating
     new_resource.varbindsdecode.each do |vbd|
       vbd_el = event_el.add_element 'varbindsdecode'
       parmid_el = vbd_el.add_element 'parmid'
@@ -170,12 +206,16 @@ def create_event
   if !new_resource.loggroup.nil?
     # TODO
   end
-  if !new_resource.tticket.nil?
-    tt_el = event_el.add_element 'tticket'
-    tt_el.attributes['state'] = 'off' if new_resource.tticket['state'] == 'off'
-    tt_el.add_text(REXML::CData.new(new_resource.tticket['info']))
+  unless new_resource.tticket.nil?
+    event_el.elements.delete('tticket') if updating
+    unless new_resource.tticket == false
+      tt_el = event_el.add_element 'tticket'
+      tt_el.attributes['state'] = 'off' if new_resource.tticket['state'] == 'off'
+      tt_el.add_text(REXML::CData.new(new_resource.tticket['info']))
+    end
   end
-  if !new_resource.forward.nil?
+  unless new_resource.forward.nil?
+    event_el.elements.delete_all('forward') if updating
     new_resource.forward.each do |forward|
       fw_el = event_el.add_element 'forward'
       fw_el.attributes['state'] = 'off' if forward['state'] == 'off'
@@ -183,27 +223,34 @@ def create_event
       fw_el.add_text(REXML::CData.new(forward['info']))
     end
   end
-  if !new_resource.script.nil?
+  unless new_resource.script.nil?
+    Chef::Log.debug "doing script work because #{new_resource.script}. updating? #{updating}"
+    deletes = event_el.elements.delete_all('script') if updating
+    Chef::Log.debug "removed #{deletes}"
     new_resource.script.each do |script|
       script_el = event_el.add_element 'script', {'language' => script['language']}
       script_el.add_text(script['name'])
     end
   end
-  if !new_resource.mouseovertext.nil?
+  unless new_resource.mouseovertext.nil?
+    event_el.elements.delete('mouseovertext') if updating
     mot_el = event_el.add_element 'mouseovertext'
     mot_el.add_text(REXML::CData.new(new_resource.mouseovertext))
   end
-  if !new_resource.alarm_data.nil?
-    ad = new_resource.alarm_data
-    ad_el = event_el.add_element 'alarm-data', {'reduction-key' => ad['reduction_key'], 'alarm-type' => ad['alarm_type']}
-    ad_el.attributes['clear-key'] = ad['clear_key'] if ad.has_key? 'clear_key'
-    ad_el.attributes['auto-clean'] = ad['auto_clean'] if ad.has_key? 'auto_clean'
-    ad_el.attributes['x733-alarm-type'] = ad['x733_alarm_type'] if ad.has_key? 'x733_alarm_type'
-    ad_el.attributes['x733-probable-cause'] = ad['x733_probable_cause'] if ad.has_key? 'x733_probable_cause'
-    if ad.has_key? 'update_fields'
-      ad['update_fields'].each do |field|
-        uf_el = ad_el.add_element 'update-field', {'field-name' => field['field_name']}
-        uf_el.attributes['update-on-reduction'] = 'false' if field.has_key? 'update_on_reduction' && field['update_on_reduction'] == false
+  unless new_resource.alarm_data.nil?
+    event_el.elements.delete('alarm-data') if updating
+    unless new_resource.alarm_data == false
+      ad = new_resource.alarm_data
+      ad_el = event_el.add_element 'alarm-data', {'reduction-key' => ad['reduction_key'], 'alarm-type' => ad['alarm_type']}
+      ad_el.attributes['clear-key'] = ad['clear_key'] if ad.has_key? 'clear_key'
+      ad_el.attributes['auto-clean'] = ad['auto_clean'] if ad.has_key? 'auto_clean'
+      ad_el.attributes['x733-alarm-type'] = ad['x733_alarm_type'] if ad.has_key? 'x733_alarm_type'
+      ad_el.attributes['x733-probable-cause'] = ad['x733_probable_cause'] if ad.has_key? 'x733_probable_cause'
+      if ad.has_key? 'update_fields'
+        ad['update_fields'].each do |field|
+          uf_el = ad_el.add_element 'update-field', {'field-name' => field['field_name']}
+          uf_el.attributes['update-on-reduction'] = 'false' if field.has_key? 'update_on_reduction' && field['update_on_reduction'] == false
+        end
       end
     end
   end
