@@ -180,7 +180,7 @@ These LWRPs use a cookbook library named Provision that I wrote to perform the w
 #### Events
 
 * `opennms_eventconf`: adds an event-file element to events in etc/eventconf.xml.  Supports updating.
-* `opennms_event`: adds an event element to events in target eventconf file `file`. Not all elements from the eventconf schema are implemented, but the ones that seem to actually exist in the wild are. See resource for details and recipes `example_event` and `example_threshold` for example usage.
+* `opennms_event`: adds an event element to events in target eventconf file `file`. Not all elements from the eventconf schema are implemented, but the ones that seem to actually exist in the wild are. See resource for details and recipes `example_event` and `example_threshold` for example usage. Supports updating existing events, so if you want to change an event in an eventconf file distributed with OpenNMS, this is the resource for you - no more merging files after an upgrade!
 * `opennms_send_event`: creates an actual instance of an event using the `send-event.pl` script in `$ONMS_HOME/bin`. Used by the `send_events` recipe, which is included by `default` and `notemplates` recipes to cause config file reloads to take place when template resources make changes or an LWRP sends a notification.
 
 #### Notifications
