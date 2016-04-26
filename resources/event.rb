@@ -2,11 +2,14 @@ require 'rexml/document'
 
 # Add an event to an eventconf file. Will create the event file if it does not exist. Fails if file exists but 
 # is not an eventconf file.  If new file, will add it to main eventconf.xml file.
+# Supports updating existing events.
 
-actions :create
+actions :create, :create_if_missing
 default_action :create
 
-attribute :uei, :kind_of => String, :name_attribute => true
+attribute :name, :kind_of => String, :name_attribute => true
+# use name if this isn't a thing
+attribute :uei, :kind_of => String
 # should include full relative path to file from $ONMS_HOME/etc
 attribute :file, :kind_of => String, :default => 'eventconf.xml', :required => true
 # Array of hashes that contain keys mename with a string value and mevalue with an array of string values. 
@@ -75,4 +78,4 @@ attribute :mouseovertext, :kind_of => String
 # ex: 'update_fields' => [{'field_name' => String, 'update_on_reduction' => true*|false}, ...], 'reduction_key' => String, 'alarm_type' => Fixnum, 'clear_key' => String, 'auto_clean' => true|false*, 'x733_alarm_type' => 'CommunicationsAlarm|ProcessingErrorAlarm|EnvironmentalAlarm|QualityOfServiceAlarm|EquipmentAlarm|IntegrityViolation|SecurityViolation|TimeDomainViolation|OperationalViolation|PhysicalViolation', 'x733_probable_cause' => Fixnum
 attribute :alarm_data, :kind_of => Hash
 
-attr_accessor :exists, :file_exists, :is_event_file
+attr_accessor :exists, :file_exists, :is_event_file, :changed

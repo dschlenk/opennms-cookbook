@@ -12,6 +12,23 @@ action :create do
   elsif !event_file_included?(@current_resource.file, node)
     add_file_to_eventconf(@current_resource.file, 'bottom', node)
   end
+  if @current_resource.exists && !@current_resource.changed
+    Chef::Log.info "#{ @new_resource } already exists - nothing to do."
+  else
+    converge_by("Create/Update #{ @new_resource }") do
+      create_event
+      new_resource.updated_by_last_action(true)
+    end
+  end
+end
+
+action :create_if_missing do
+  Chef::Application.fatal!("File specified '#{@current_resource.file}' exists but is not an eventconf file!") if current_resource.file_exists && !current_resource.is_event_file
+  if !@current_resource.file_exists
+    create_event_file # also adds to eventconf
+  elsif !event_file_included?(@current_resource.file, node)
+    add_file_to_eventconf(@current_resource.file, 'bottom', node)
+  end
   if @current_resource.exists
     Chef::Log.info "#{ @new_resource } already exists - nothing to do."
   else
@@ -25,16 +42,35 @@ end
 def load_current_resource
   @current_resource = Chef::Resource::OpennmsEvent.new(@new_resource.name)
   @current_resource.name(@new_resource.name)
+  @current_resource.uei(@new_resource.uei || @new_resource.name)
   @current_resource.file(@new_resource.file)
+  @current_resource.mask(@new_resource.mask)
+  @current_resource.event_label(@new_resource.event_label)
+  @current_resource.descr(@new_resource.descr)
+  @current_resource.logmsg(@new_resource.logmsg)
+  @current_resource.logmsg_dest(@new_resource.logmsg_dest)
+  @current_resource.logmsg_notify(@new_resource.logmsg_notify)
+  @current_resource.severity(@new_resource.severity)
+  @current_resource.operinstruct(@new_resource.operinstruct)
+  @current_resource.autoaction(@new_resource.autoaction)
+  @current_resource.varbindsdecode(@new_resource.varbindsdecode)
+  @current_resource.tticket(@new_resource.tticket)
+  @current_resource.forward(@new_resource.forward)
+  @current_resource.script(@new_resource.script)
+  @current_resource.mouseovertext(@new_resource.mouseovertext)
+  @current_resource.alarm_data(@new_resource.alarm_data)
 
-  if uei_exists?(@current_resource.name, node)
-     @current_resource.exists = true
-  end
   if ::File.exists?("#{node['opennms']['conf']['home']}/etc/#{@current_resource.file}")
-     @current_resource.file_exists = true
-  end
-  if is_event_file?(@current_resource.file, node)
-     @current_resource.is_event_file = true
+    @current_resource.file_exists = true
+    if is_event_file?(@current_resource.file, node)
+      @current_resource.is_event_file = true
+      if uei_in_file?("#{node['opennms']['conf']['home']}/etc/#{@current_resource.file}", @current_resource.uei)
+        @current_resource.exists = true
+        if event_changed?(@current_resource, node)
+          @current_resource.changed = true
+        end
+      end
+    end
   end
 end
 
@@ -56,17 +92,20 @@ def create_event_file
 end
 
 def create_event
+  new_resource.uei = new_resource.name if new_resource.uei.nil?
   # make sure event file is included in main eventconf
   if !event_file_included?(new_resource.file, node)
     add_file_to_eventconf(new_resource.file, 'bottom', node)
   end
-  Chef::Log.debug "Adding uei '#{new_resource.name}' to '#{new_resource.file}'."
+  Chef::Log.debug "Adding uei '#{new_resource.uei}' to '#{new_resource.file}'."
   
   file = ::File.new("#{node['opennms']['conf']['home']}/etc/#{new_resource.file}", "r")
   doc = REXML::Document.new file
   file.close
   doc.context[:attribute_quote] = :quote
-
+  unless event_el = doc.root.elements["/events/event/uei[text() = '#{new_resource.uei}']"].nil?
+    doc.root.elements.delete("/events/event[uei/text() = '#{new_resource.uei}']")
+  end
   event_el = doc.root.add_element 'event'
   if !new_resource.mask.nil?
     mask_el = event_el.add_element 'mask'
@@ -140,6 +179,7 @@ def create_event
       fw_el = event_el.add_element 'forward'
       fw_el.attributes['state'] = 'off' if forward['state'] == 'off'
       fw_el.attributes['mechanism'] = forward['mechanism'] if !forward['mechanism'].nil?
+      fw_el.add_text(REXML::CData.new(forward['info']))
     end
   end
   if !new_resource.script.nil?

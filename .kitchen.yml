@@ -158,7 +158,7 @@ suites:
       - recipe[opennms::example_import_node]
       - recipe[opennms::example_import_node_interface]
       - recipe[opennms::example_import_node_interface_service]
-  - name: event_mask
+  - name: event
     run_list:
       - recipe[postgresql::client]
       - recipe[postgresql::server]
