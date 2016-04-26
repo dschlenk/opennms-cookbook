@@ -92,19 +92,20 @@ def create_event_file
 end
 
 def create_event
-  new_resource.uei = new_resource.name if new_resource.uei.nil?
+  uei = new_resource.uei || new_resource.name
+  #new_resource.uei = new_resource.name if new_resource.uei.nil?
   # make sure event file is included in main eventconf
   if !event_file_included?(new_resource.file, node)
     add_file_to_eventconf(new_resource.file, 'bottom', node)
   end
-  Chef::Log.debug "Adding uei '#{new_resource.uei}' to '#{new_resource.file}'."
+  Chef::Log.debug "Adding uei '#{uei}' to '#{new_resource.file}'."
   
   file = ::File.new("#{node['opennms']['conf']['home']}/etc/#{new_resource.file}", "r")
   doc = REXML::Document.new file
   file.close
   doc.context[:attribute_quote] = :quote
-  unless event_el = doc.root.elements["/events/event/uei[text() = '#{new_resource.uei}']"].nil?
-    doc.root.elements.delete("/events/event[uei/text() = '#{new_resource.uei}']")
+  unless event_el = doc.root.elements["/events/event/uei[text() = '#{uei}']"].nil?
+    doc.root.elements.delete("/events/event[uei/text() = '#{uei}']")
   end
   event_el = doc.root.add_element 'event'
   if !new_resource.mask.nil?

@@ -13,7 +13,7 @@ GRAPH
   hostsfile (2.4.5)
   java (1.36.0)
     apt (>= 0.0.0)
-  opennms (16.2.11)
+  opennms (16.3.1)
     build-essential (>= 0.0.0)
     hostsfile (>= 0.0.0)
     java (>= 0.0.0)
