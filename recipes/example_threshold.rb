@@ -45,6 +45,7 @@ opennms_event "uei.opennms.org/thresholdTest/testThresholdExceeded" do
   severity "Minor"
   notifies :run, 'opennms_send_event[restart_Eventd]'
 end
+
 opennms_event "uei.opennms.org/thresholdTest/testThresholdRearmed" do
   file "events/chef.events.xml"
   event_label "Chef defined event: testThresholdRearmed"
@@ -55,7 +56,7 @@ opennms_event "uei.opennms.org/thresholdTest/testThresholdRearmed" do
   severity "Normal"
   notifies :run, 'opennms_send_event[restart_Eventd]'
 end
-# most  options
+# most options
 opennms_expression "icmp / 1000" do
   group 'cheftest'
   type 'high'
@@ -69,4 +70,145 @@ opennms_expression "icmp / 1000" do
   filter_operator 'and'
   resource_filters [{'field' => 'ifHighSpeed', 'filter' => '^[1-9]+[0-9]*$'}]
   notifies :run, 'opennms_send_event[restart_Thresholds]'
+end
+
+opennms_expression 'change description on ping latency thing' do
+  expression 'icmp / 1000'
+  group 'cheftest'
+  type 'high'
+  ds_type 'if'
+  description 'ping latency too damn high expression'
+  filter_operator 'and'
+  resource_filters [{'field' => 'ifHighSpeed', 'filter' => '^[1-9]+[0-9]*$'}]
+end
+
+opennms_expression 'change value on ping latency thing' do
+  expression 'icmp / 1000'
+  group 'cheftest'
+  type 'high'
+  ds_type 'if'
+  value 30.0
+  filter_operator 'and'
+  resource_filters [{'field' => 'ifHighSpeed', 'filter' => '^[1-9]+[0-9]*$'}]
+end
+
+opennms_expression 'change rearm on ping latency thing' do
+  expression 'icmp / 1000'
+  group 'cheftest'
+  type 'high'
+  ds_type 'if'
+  rearm 20.0
+  filter_operator 'and'
+  resource_filters [{'field' => 'ifHighSpeed', 'filter' => '^[1-9]+[0-9]*$'}]
+end
+
+opennms_expression 'change trigger on ping latency thing' do
+  expression 'icmp / 1000'
+  group 'cheftest'
+  type 'high'
+  ds_type 'if'
+  trigger 5
+  filter_operator 'and'
+  resource_filters [{'field' => 'ifHighSpeed', 'filter' => '^[1-9]+[0-9]*$'}]
+end
+
+opennms_expression 'change relaxed on ping latency thing' do
+  expression 'icmp / 1000'
+  group 'cheftest'
+  type 'high'
+  ds_type 'if'
+  relaxed true
+  filter_operator 'and'
+  resource_filters [{'field' => 'ifHighSpeed', 'filter' => '^[1-9]+[0-9]*$'}]
+end
+
+# create, then make some changes
+opennms_threshold 'espresso' do # name is ds-name, and is part of identity
+  group 'coffee' # part of identity
+  type 'low' # part of identity
+  ds_type 'if' # part of identity
+  description 'alarm when percentage of espresso in bloodstream too low'
+  value 50.0
+  rearm 60.0
+  trigger 3
+  ds_label 'bloodEspressoContent'
+  filter_operator 'and' # part of identity
+  resource_filters [{ 'field' => 'ifHighSpeed', 'filter' => '^[1-9]+[0-9]*$' }] # part of identity
+end
+
+# change description
+opennms_threshold 'change description on espression' do
+  ds_name 'espresso'
+  group 'coffee'
+  type 'low'
+  ds_type 'if'
+  description 'alarm when BEC too low'
+  filter_operator 'and'
+  resource_filters [{ 'field' => 'ifHighSpeed', 'filter' => '^[1-9]+[0-9]*$' }]
+end
+
+# change value
+opennms_threshold 'change espresso value' do
+  ds_name 'espresso'
+  group 'coffee'
+  type 'low'
+  ds_type 'if'
+  value 10.0
+  filter_operator 'and'
+  resource_filters [{ 'field' => 'ifHighSpeed', 'filter' => '^[1-9]+[0-9]*$' }]
+end
+
+# change rearm
+opennms_threshold 'change rearm on espresso' do
+  ds_name 'espresso'
+  group 'coffee'
+  type 'low'
+  ds_type 'if'
+  rearm 20.0
+  filter_operator 'and'
+  resource_filters [{ 'field' => 'ifHighSpeed', 'filter' => '^[1-9]+[0-9]*$' }]
+end
+
+# change trigger
+opennms_threshold 'change trigger on espresso' do
+  ds_name 'espresso'
+  group 'coffee'
+  type 'low'
+  ds_type 'if'
+  trigger 2
+  filter_operator 'and'
+  resource_filters [{ 'field' => 'ifHighSpeed', 'filter' => '^[1-9]+[0-9]*$' }]
+end
+
+# change ds-label
+opennms_threshold 'change ds-label on espresso' do
+  ds_name 'espresso'
+  group 'coffee'
+  type 'low'
+  ds_type 'if'
+  ds_label 'ifName'
+  filter_operator 'and'
+  resource_filters [{ 'field' => 'ifHighSpeed', 'filter' => '^[1-9]+[0-9]*$' }]
+end
+
+# change triggeredUEI
+opennms_threshold 'change triggeredUEI on espresso' do
+  ds_name 'espresso'
+  group 'coffee'
+  type 'low'
+  ds_type 'if'
+  triggered_uei 'uei.opennms.org/thresholdTest/testThresholdExceeded'
+  filter_operator 'and'
+  resource_filters [{ 'field' => 'ifHighSpeed', 'filter' => '^[1-9]+[0-9]*$' }]
+end
+
+# change rearmedUEI
+opennms_threshold 'change rearmedUEI on espresso' do
+  ds_name 'espresso'
+  group 'coffee'
+  type 'low'
+  ds_type 'if'
+  rearmed_uei 'uei.opennms.org/thresholdTest/testThresholdRearmed'
+  filter_operator 'and'
+  resource_filters [{ 'field' => 'ifHighSpeed', 'filter' => '^[1-9]+[0-9]*$' }]
 end

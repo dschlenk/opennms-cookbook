@@ -668,16 +668,16 @@ suites:
 #      - recipe[postgresql::config_pgtune]
 #      - recipe[opennms::notemplates]
 #      - recipe[opennms::example_response_graph]
-#  - name: threshold
-#    run_list:
-#      - recipe[java]
-#      - recipe[postgresql::client]
-#      - recipe[postgresql::server]
-#      - recipe[postgresql::contrib]
-#      - recipe[postgresql::config_initdb]
-#      - recipe[postgresql::config_pgtune]
-#      - recipe[opennms::notemplates]
-#      - recipe[opennms::example_threshold]
+  - name: threshold
+    run_list:
+      - recipe[java]
+      - recipe[postgresql::client]
+      - recipe[postgresql::server]
+      - recipe[postgresql::contrib]
+      - recipe[postgresql::config_initdb]
+      - recipe[postgresql::config_pgtune]
+      - recipe[opennms::notemplates]
+      - recipe[opennms::example_threshold]
 #  - name: system_def
 #    run_list:
 #      - recipe[java]
