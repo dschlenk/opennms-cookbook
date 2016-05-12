@@ -7,19 +7,25 @@ require 'rexml/document'
 # in the xml_source LWRPs respectively. The package is created with the 
 # collection_package LWRP.
 
-actions :create
+actions :create, :create_if_missing, :delete
 default_action :create
 
 attribute :name, :name_attribute => true, :kind_of => String
 attribute :service_name, :kind_of => String, :default => 'XML', :required => true
 attribute :package_name, :kind_of => String, :default => 'example1', :required => true
 attribute :collection, :kind_of => String, :default => 'default', :required => true
-attribute :interval, :kind_of => Fixnum, :default => 300000, :required => true
-attribute :user_defined, :kind_of => [FalseClass, TrueClass], :default => false
-attribute :status, :kind_of => String, :equal_to => ['on','off'], :default => 'on', :required => true
-attribute :timeout, :kind_of => Fixnum, :default => 3000
-attribute :retry_count, :kind_of => Fixnum, :default => 1
+# during non-update create, defaults to 300000
+attribute :interval, :kind_of => Fixnum
+# during non-update create, defaults to false
+attribute :user_defined, :kind_of => [FalseClass, TrueClass]
+# during non-update create, defaults to 'on'
+attribute :status, :kind_of => String, :equal_to => ['on','off']
+# during non-update create, defaults to 3000
+attribute :timeout, :kind_of => Fixnum
+# during non-update create, defaults to 1
+attribute :retry_count, :kind_of => Fixnum
 attribute :port, :kind_of => Fixnum
-attribute :thresholding_enabled, :kind_of => [FalseClass, TrueClass], :default => false
+# during non-update create, defaults to false
+attribute :thresholding_enabled, :kind_of => [FalseClass, TrueClass]
 
-attr_accessor :exists
+attr_accessor :exists, :changed

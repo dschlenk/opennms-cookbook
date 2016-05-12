@@ -269,19 +269,19 @@ suites:
 #      - recipe[opennms::example_snmp_collection]
 #      - recipe[opennms::example_collection_package]
 #      - recipe[opennms::example_snmp_collection_service]
-#  - name: xml_collection_service
-#    run_list:
-#      - recipe[java]
-#      - recipe[postgresql::client]
-#      - recipe[postgresql::server]
-#      - recipe[postgresql::contrib]
-#      - recipe[postgresql::config_initdb]
-#      - recipe[postgresql::config_pgtune]
-#      - recipe[opennms::notemplates]
-#      - recipe[opennms::xml]
-#      - recipe[opennms::example_xml_collection]
-#      - recipe[opennms::example_collection_package]
-#      - recipe[opennms::example_xml_collection_service]
+  - name: xml_collection_service
+    run_list:
+      - recipe[java]
+      - recipe[postgresql::client]
+      - recipe[postgresql::server]
+      - recipe[postgresql::contrib]
+      - recipe[postgresql::config_initdb]
+      - recipe[postgresql::config_pgtune]
+      - recipe[opennms::notemplates]
+      - recipe[opennms::xml]
+      - recipe[opennms::example_xml_collection]
+      - recipe[opennms::example_collection_package]
+      - recipe[opennms::example_xml_collection_service]
 #  - name: wmi_collection_service
 #    run_list:
 #      - recipe[java]
@@ -294,18 +294,18 @@ suites:
 #      - recipe[opennms::example_wmi_collection]
 #      - recipe[opennms::example_collection_package]
 #      - recipe[opennms::example_wmi_collection_service]
-#  - name: jdbc_collection_service
-#    run_list:
-#      - recipe[java]
-#      - recipe[postgresql::client]
-#      - recipe[postgresql::server]
-#      - recipe[postgresql::contrib]
-#      - recipe[postgresql::config_initdb]
-#      - recipe[postgresql::config_pgtune]
-#      - recipe[opennms::notemplates]
-#      - recipe[opennms::example_jdbc_collection]
-#      - recipe[opennms::example_collection_package]
-#      - recipe[opennms::example_jdbc_collection_service]
+  - name: jdbc_collection_service
+    run_list:
+      - recipe[java]
+      - recipe[postgresql::client]
+      - recipe[postgresql::server]
+      - recipe[postgresql::contrib]
+      - recipe[postgresql::config_initdb]
+      - recipe[postgresql::config_pgtune]
+      - recipe[opennms::notemplates]
+      - recipe[opennms::example_jdbc_collection]
+      - recipe[opennms::example_collection_package]
+      - recipe[opennms::example_jdbc_collection_service]
 #  - name: snmp_collection_group
 #    run_list:
 #      - recipe[java]
