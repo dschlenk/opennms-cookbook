@@ -208,21 +208,21 @@ Currently implemented are:
 
 #### Data Collection
 
-* `opennms_resource_type`: adds a resourceType definition to a file in etc/datacollection and an include-collection element to the default snmp-collection. This LWRP supports a very limited form of updating - if the resource type already exists but isn't included in the default snmp-collection, an include-collection element will be added. The definition of the resource type won't be updated, however.  
+* `opennms_resource_type`: adds a resourceType definition to a file in etc/datacollection and an include-collection element to the default snmp-collection. This LWRP supports a very limited form of updating - if the resource type already exists but isn't included in the default snmp-collection, an include-collection element will be added. The definition of the resource type won't be updated, however.
 * `opennms_system_def`: add or remove pre-existing groups (`/datacollection-group/group[@name]`) to or from pre-existing systemDefs (`/datacollection-group/systemDef/collect/includeGroup[text()]`) in $ONMS_HOME/etc/datacollection/*.xml.
-* `opennms_snmp_collection`: adds an snmp-collection element to etc/datacollection-config.xml. 
-* `opennms_xml_collection`: adds an xml-collection element to etc/xml-datacollection-config.xml. 
-* `opennms_wmi_collection`: adds a wmi-collection element to etc/wmi-datacollection-config.xml. 
-* `opennms_jdbc_collection`: adds a jdbc-collection element to etc/jdbc-datacollection-config.xml. 
-* `opennms_collection_package`: adds a package element to etc/collectd-configuration.xml. 
-* `opennms_snmp_collection_service`: adds a service element to a package in etc/collectd-configuration.xml. 
-* `opennms_xml_collection_service`: adds a service element to a package in etc/collectd-configuration.xml. 
+* `opennms_snmp_collection`: adds an snmp-collection element to etc/datacollection-config.xml.
+* `opennms_xml_collection`: adds an xml-collection element to etc/xml-datacollection-config.xml.
+* `opennms_wmi_collection`: adds a wmi-collection element to etc/wmi-datacollection-config.xml.
+* `opennms_jdbc_collection`: adds a jdbc-collection element to etc/jdbc-datacollection-config.xml.
+* `opennms_collection_package`: adds a package element to etc/collectd-configuration.xml.
+* `opennms_snmp_collection_service`: adds a service element to a package in etc/collectd-configuration.xml.
+* `opennms_xml_collection_service`: adds a service element to a package in etc/collectd-configuration.xml. Supports update & delete.
 * `opennms_wmi_collection_service`: adds a service element to a package in etc/collectd-configuration.xml.
-* `opennms_jdbc_collection_service`: adds a service element to a package in etc/collectd-configuration.xml.
-* `opennms_snmp_collection_group`: adds an include-collection element to an snmp-collection in etc/datacollection-config.xml and drops off the specified cookbook file into etc/datacollection. 
-* `opennms_jdbc_query`: adds a query element to a jdbc-collection in etc/jdbc-datacollection-config.xml. 
-* `opennms_xml_source`: adds a xml-source element to a xml-collection in etc/xml-datacollection-config.xml. 
-* `opennms_xml_group`: adds a xml-source element to a xml-source in etc/xml-datacollection-config.xml. 
+* `opennms_jdbc_collection_service`: adds a service element to a package in etc/collectd-configuration.xml. Supports update & delete.
+* `opennms_snmp_collection_group`: adds an include-collection element to an snmp-collection in etc/datacollection-config.xml and drops off the specified cookbook file into etc/datacollection.
+* `opennms_jdbc_query`: adds a query element to a jdbc-collection in etc/jdbc-datacollection-config.xml.
+* `opennms_xml_source`: adds a xml-source element to a xml-collection in etc/xml-datacollection-config.xml.
+* `opennms_xml_group`: adds a xml-source element to a xml-source in etc/xml-datacollection-config.xml.
 
 #### Statistics Reports
 
