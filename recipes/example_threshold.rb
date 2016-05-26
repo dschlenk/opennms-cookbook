@@ -34,7 +34,7 @@ opennms_threshold "icmp" do
   notifies :run, 'opennms_send_event[restart_Thresholds]'
 end
 
-# define events for tiggered/rearmed
+# define events for triggered/rearmed
 opennms_event "uei.opennms.org/thresholdTest/testThresholdExceeded" do
   file "events/chef.events.xml"
   event_label "Chef defined event: testThresholdExceeded"
