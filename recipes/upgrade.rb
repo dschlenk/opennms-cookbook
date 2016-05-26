@@ -34,53 +34,30 @@ ruby_block "Perform OpenNMS Upgrade If Necessary" do
     end
 
     upgraded = false
-    etc_dir = "#{node['opennms']['conf']['home']}/etc"
-    etc_dc_dir = "#{etc_dir}/datacollection"
-    jetty_dir = "#{node['opennms']['conf']['home']}/jetty-webapps/opennms"
-    onms_home = node[:opennms][:conf][:home]
+    onms_home = node['opennms']['conf']['home']
     onms_home ||= '/opt/opennms'
 
-    if ::File.exist?(etc_dir) || ::File.exist?(jetty_dir) || ::File.exist?(etc_dc_dir)
-      if ::File.exist?(etc_dir)
-        upgraded = checkForUpgrade(etc_dir)
-      end
-      unless upgraded
-        if ::File.exist?(etc_dc_dir)
-          upgraded = checkForUpgrade(etc_dc_dir)
+    node['opennms']['upgrade_dirs'].each do |d|
+      conf_dir = "#{onms_home}/#{d}"
+      if ::File.exist?(conf_dir)# || ::File.exist?(jetty_dir) || ::File.exist?(etc_dc_dir)
+        if checkForUpgrade(conf_dir)
+          Chef::Log.debug("During upgrade, found rpmnew or rpmsave files in #{conf_dir}. Cleaning them up!")
+          clean_dir(conf_dir, 'rpmnew')
+          clean_dir(conf_dir, 'rpmsave')
         end
-      end
-      unless upgraded
-        if ::File.exist?(jetty_dir)
-          upgraded = checkForUpgrade(jetty_dir)
-        end
-      end
-    
-      if upgraded
-        if ::File.exist?(etc_dir)
-          clean_dir(etc_dir, 'rpmnew')
-          clean_dir(etc_dir, 'rpmsave')
-        end
-        if ::File.exist?(etc_dc_dir)
-          clean_dir(etc_dc_dir, 'rpmnew')
-          clean_dir(etc_dc_dir, 'rpmsave')
-        end
-        if ::File.exist?(jetty_dir)
-          clean_dir(jetty_dir, 'rpmnew')
-          clean_dir(jetty_dir, 'rpmsave')
-        end
-    
-        unless ::File.exist?("#{onms_home}/etc/java.conf")
-          cmd = shell_out!("#{onms_home}/bin/runjava -s", {:returns => [0]})
-        end
-    
-        unless ::File.exist?("#{onms_home}/etc/configured")
-          cmd = shell_out!("#{onms_home}/bin/install -dis", {:returns => [0]})
-        end
-    
-        # stop current service until we have important things reconverged
-        cmd = shell_out("#{onms_home}/bin/opennms stop", {:returns => [0]})
-        Chef::Log.info "All *.rpmnew and #.rpmsave files moved into place." 
       end
     end
+
+    unless ::File.exist?("#{onms_home}/etc/java.conf")
+      cmd = shell_out!("#{onms_home}/bin/runjava -s", {:returns => [0]})
+    end
+
+    unless ::File.exist?("#{onms_home}/etc/configured")
+      cmd = shell_out!("#{onms_home}/bin/install -dis", {:returns => [0]})
+    end
+
+    # stop current service until we have important things reconverged
+    cmd = shell_out("#{onms_home}/bin/opennms stop", {:returns => [0]})
+    Chef::Log.info "All *.rpmnew and *.rpmsave files moved into place." 
   end
 end
