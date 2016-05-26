@@ -21,6 +21,18 @@ default['opennms']['allow_downgrade'] = false
 default['opennms']['stable'] = true
 # whether or not to attempt to automatically upgrade opennms
 default['opennms']['upgrade'] = false
+default['opennms']['upgrade_dirs'] = [
+  'etc',
+  'etc/datacollection',
+  'etc/events',
+  'etc/drools-engine.d/ncs',
+  'etc/snmp-graph.properties.d',
+  'jetty-webapps/opennms',
+  'jetty-webapps/opennms/WEB-INF/',
+  'jetty-webapps/opennms/WEB-INF/jsp/alarm',
+  'jetty-webapps/opennms/WEB-INF/jsp/ncs',
+  'jetty-webapps/opennms-remoting/WEB-INF'
+]
 # whether or not to include the plugin packages
 default['opennms']['plugin']['xml'] = false
 default['opennms']['plugin']['nsclient'] = false

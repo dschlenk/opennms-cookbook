@@ -15,7 +15,9 @@ opennms_poller_service "ONMS" do
   notifies :restart, 'service[opennms]'
 end
 opennms_foreign_source "dry-source"
-opennms_import "dry-source"
+opennms_import 'dry-source' do
+  foreign_source_name 'dry-source'
+end
 # make us a new foreign_id using the Provision library
 rgfsid = foreign_id_gen
 # make a node to add an interface to
