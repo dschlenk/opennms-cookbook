@@ -119,8 +119,8 @@ To enable, set `node['opennms']['upgrade']` to true. If this sounds like
 something you want to do, review the `upgrade` recipe. It roughly translates to:
 
 * New RPM is installed. 
-* Are there any files named `*.rpmnew` in `$ONMS_HOME/etc` or `$ONMS_HOME/jetty-webapp`? If so, overwrite the existing files with them. 
-* Are there any files named `*.rpmsave` in `$ONMS_HOME/etc` or `$ONMS_HOME/jetty-webapp`? If so, remove them.
+* Are there any files named `*.rpmnew` in `$ONMS_HOME`? If so, overwrite the existing files with them. 
+* Are there any files named `*.rpmsave` in `$ONMS_HOME`? If so, remove them.
 
 `rpmsave` files happen when there's a config file that you have changed that 
 was replaced with the new version because not replacing it would prevent 
