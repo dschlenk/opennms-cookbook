@@ -146,9 +146,30 @@ def create_xml_collection_service
     service_el.attributes['status'] = new_resource.status unless new_resource.status.nil?
     service_el.attributes['interval'] = new_resource.interval unless new_resource.interval.nil?
     service_el.attributes['user-defined'] = new_resource.user_defined unless new_resource.user_defined.nil?
-    service_el.elements["parameter[@key = 'timeout']"].attributes['value'] = new_resource.timeout unless new_resource.timeout.nil?
-    service_el.elements["parameter[@key = 'retry']"].attributes['value'] = new_resource.retry_count unless new_resource.retry_count.nil?
-    service_el.elements["parameter[@key = 'thresholding-enabled']"].attributes['value'] = new_resource.thresholding_enabled  unless new_resource.thresholding_enabled.nil?
+    unless new_resource.timeout.nil?
+      tpel = service_el.elements["parameter[@key = 'timeout']"]
+      if tpel.nil?
+        service_el.add_element 'parameter', { 'key' => 'timeout', 'value' => new_resource.timeout }
+      else
+        tpel.attributes['value'] = new_resource.timeout
+      end
+    end
+    unless new_resource.retry_count.nil?
+      rpel = service_el.elements["parameter[@key = 'retry']"]
+      if rpel.nil?
+        service_el.add_element 'parameter', { 'key' => 'retry', 'value' => new_resource.retry_count }
+      else
+        rpel.attributes['value'] = new_resource.retry_count
+      end
+    end
+    unless new_resource.thresholding_enabled.nil?
+      thpel = service_el.elements["parameter[@key = 'thresholding-enabled']"]
+      if thpel.nil?
+        service_el.add_element 'parameter', { 'key' => 'thresholding-enabled', 'value' => new_resource.thresholding_enabled }
+      else
+        thpel.attributes['value'] = new_resource.thresholding_enabled
+      end
+    end
     unless new_resource.port.nil?
       port_el = service_el.elements["parameter[@key = 'port']"]
       if port_el.nil?
