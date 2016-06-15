@@ -44,6 +44,146 @@ module Provision
     end
     false
   end
+  def service_detector_changed?(current_resource, node)
+    detector = nil
+    if current_resource.foreign_source_name == 'default'
+      default_foreign_source(node)['detectors'].each do |d|
+        if d['name'] == current_resource.service_name
+          detector = d
+          break
+        end
+      end
+    else
+      foreign_sources(node).each do |source|
+        if source['name'] == current_resource.foreign_source_name
+          source['detectors'].each do |d|
+            if d['name'] == current_resource.service_name
+              detector = d
+              break
+            end
+          end
+        end
+      end
+    end
+    Chef::Log.debug detector
+    curr_retries = nil
+    curr_timeout = nil
+    curr_port = nil
+    curr_params = {}
+    curr_class = detector['class']
+    detector['parameter'].each do |p|
+      case(p['key'])
+      when 'retries'
+        curr_retries = p['value']
+      when 'timeout'
+        curr_timeout = p['value']
+      when 'port'
+        curr_port = p['value']
+      else
+        curr_params[p['key']] = p['value']
+      end
+    end
+
+    return true if thing_changed?(current_resource.retry_count, curr_retries)
+    return true if thing_changed?(current_resource.timeout, curr_timeout)
+    return true if thing_changed?(current_resource.port, curr_port)
+    return true if thing_changed?(current_resource.class_name, curr_class)
+    return true if things_equal?(current_resource.params, curr_params)
+    false
+  end
+
+  def service_detector(service_name, foreign_source_name, node)
+    detector = nil
+    if foreign_source_name == 'default'
+      default_foreign_source(node)['detectors'].each do |d|
+        if d['name'] == current_resource.service_name
+          detector = d
+          break
+        end
+      end
+    else
+      foreign_sources(node).each do |source|
+        if source['name'] == current_resource.foreign_source_name
+          source['detectors'].each do |d|
+            if d['name'] == current_resource.service_name
+              detector = d
+              break
+            end
+          end
+        end
+      end
+    end
+    detector
+  end
+
+  def thing_changed?(resource, current)
+    unless resource.nil?
+      Chef::Log.debug "#{resource} == #{current}?"
+      return true unless "#{resource}" == "#{current}"
+    end
+    false
+  end
+  def things_equal?(resource, current)
+    unless resource.nil?
+      Chef::Log.debug "#{resource} == #{current}?"
+      return true unless resource == current
+    end
+    false
+  end
+
+  # {"name"=>"Router", 
+  #  "class"=>"org.opennms.netmgt.provision.detector.snmp.SnmpDetector", 
+  #  "parameter"=>[
+  #    {"key"=>"port", "value"=>"161"}, 
+  #    {"key"=>"retries", "value"=>"3"}, 
+  #    {"key"=>"timeout", "value"=>"5000"}, 
+  #    {"key"=>"vbname", "value"=>".1.3.6.1.2.1.4.1.0"}, 
+  #    {"key"=>"vbvalue", "value"=>"1"}]
+  # }
+  # new_resource only needs to define elements it wants to change.
+  def update_service_detector(new_resource, node)
+    require 'rest-client'
+    detector = service_detector(new_resource.service_name, new_resource.foreign_source_name, node)
+    unless new_resource.class_name.nil?
+      detector['class'] = new_resource.class_name
+    end
+    update_parameter(detector['parameter'], 'port', new_resource.port)
+    update_parameter(detector['parameter'], 'retries', new_resource.retry_count)
+    update_parameter(detector['parameter'], 'timeout', new_resource.timeout)
+    # don't change anything if no parameters specified in update resource
+    unless new_resource.params.nil? || new_resource.params.size == 0
+      # if you specify params, they replace all the current params. No merging of old and new occur.
+      detector['parameter'].delete_if do |p|
+        !['port', 'retries', 'timeout'].include? p['key']
+      end
+    end
+    new_resource.params.each do |k,v|
+      detector['parameter'].push({ 'key' => k, 'value' => v })
+    end
+    # seems easier to just delete the current then add the modified rather than grab the entire 
+    # foreign source and PUT that with the change.
+    RestClient.delete "#{baseurl(node)}/foreignSources/#{new_resource.foreign_source_name}/detectors/#{new_resource.service_name}"
+    RestClient.post "#{baseurl(node)}/foreignSources/#{new_resource.foreign_source_name}/detectors", JSON.dump(detector), { :content_type => :json }
+  end
+
+  def update_parameter(curr_parameters, name, new_value)
+    updated = false
+    unless new_value.nil?
+      curr_parameters.each do |p|
+        if p['key'] == name
+          p['value'] = new_value
+          updated = true
+          break
+        end
+      end
+      # handle adding a previously undefined common param
+      unless updated
+        curr_parameters.push({ 'key' => name, 'value' => new_value })
+      end
+    end
+    curr_parameters
+  end
+
   def add_service_detector(name, class_name, port, retry_count, timeout, params, foreign_source_name, node)
     require 'rest_client'
     sd = REXML::Document.new

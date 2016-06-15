@@ -170,7 +170,7 @@ The list of implemented LWRPs is as follows:
 These LWRPs use a cookbook library named Provision that I wrote to perform the work using the OpenNMS REST interface. As such, OpenNMS has to be running for the resources to converge. Also you'll notice that I used the term 'import' rather than the correct term 'requisition'. I can type 'import' a lot faster than 'requisition'. ;)
 
 * `opennms_foreign_source`: create a new foreign source optionally defining a scan interval (defaults to '1d'). 
-* `opennms_service_detector`: add a service detector to a foreign source.
+* `opennms_service_detector`: add a service detector to a foreign source. Supports updating and deleting.
 * `opennms_policy`: add a policy to a foreign source. 
 * `opennms_import`: Defines a requisition for a foreign source. This and all import* LWRPs include an option to synchronize the requisition - sync_import. 
 * `opennms_import_node`: Add a node to a requisition including categories (array of strings) and assets (key/value hash pairs). 
