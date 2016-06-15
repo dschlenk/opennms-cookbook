@@ -61,9 +61,10 @@ def load_current_resource
       end
       if rt_exists?(node['opennms']['conf']['home'], @current_resource.ds_type) && rt_included?(node['opennms']['conf']['home'], @current_resource.ds_type)
         @current_resource.ds_type_exists = true
-        if uei_exists?(@current_resource.triggered_uei, node) && uei_exists?(@current_resource.rearmed_uei, node)
-          @current_resource.ueis_exist = true
-        end
+        #aint nobody got time fo dat
+        #if uei_exists?(@current_resource.triggered_uei, node) && uei_exists?(@current_resource.rearmed_uei, node)
+        @current_resource.ueis_exist = true
+        #end
       end
     end
   end
