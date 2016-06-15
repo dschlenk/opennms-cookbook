@@ -143,7 +143,8 @@ module Provision
   # new_resource only needs to define elements it wants to change.
   def update_service_detector(new_resource, node)
     require 'rest-client'
-    detector = service_detector(new_resource.service_name, new_resource.foreign_source_name, node)
+    service_name = new_resource.service_name||new_resource.name
+    detector = service_detector(service_name, new_resource.foreign_source_name, node)
     unless new_resource.class_name.nil?
       detector['class'] = new_resource.class_name
     end
@@ -162,7 +163,7 @@ module Provision
     end
     # seems easier to just delete the current then add the modified rather than grab the entire 
     # foreign source and PUT that with the change.
-    RestClient.delete "#{baseurl(node)}/foreignSources/#{new_resource.foreign_source_name}/detectors/#{new_resource.service_name}"
+    RestClient.delete "#{baseurl(node)}/foreignSources/#{new_resource.foreign_source_name}/detectors/#{service_name}"
     RestClient.post "#{baseurl(node)}/foreignSources/#{new_resource.foreign_source_name}/detectors", JSON.dump(detector), { :content_type => :json }
   end
 

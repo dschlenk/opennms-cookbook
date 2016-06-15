@@ -7,7 +7,6 @@ use_inline_resources
 
 action :create_if_missing do
   Chef::Application.fatal!("Missing foreign source #{@current_resource.foreign_source_name}.") if !@current_resource.foreign_source_exists
-  new_resource.service_name = new_resource.name if new_resource.service_name.nil?
   if @current_resource.exists
     Chef::Log.info "#{ @new_resource } already exists - nothing to do."
   else
@@ -20,7 +19,6 @@ end
 
 action :create do
   Chef::Application.fatal!("Missing foreign source #{@current_resource.foreign_source_name}.") if !@current_resource.foreign_source_exists
-  new_resource.service_name = new_resource.name if new_resource.service_name.nil?
   if @current_resource.exists && !@current_resource.changed
     Chef::Log.info "#{ @new_resource } already exists and has not changed - nothing to do."
   elsif @current_resource.exists && @current_resource.changed
@@ -38,7 +36,6 @@ end
 
 action :delete do
   Chef::Application.fatal!("Missing foreign source #{@current_resource.foreign_source_name}.") if !@current_resource.foreign_source_exists
-  new_resource.service_name = new_resource.name if new_resource.service_name.nil?
   if @current_resource.exists
     Chef::Log.info "#{ @new_resource } exists - deleting."
   else
@@ -74,7 +71,8 @@ end
 private
 
 def create_service_detector
-  add_service_detector(new_resource.name,new_resource.class_name, 
+  service_name = new_resource.service_name||new_resource.name
+  add_service_detector(service_name,new_resource.class_name, 
     new_resource.port, new_resource.retry_count, new_resource.timeout, 
     new_resource.params, new_resource.foreign_source_name, node)
 end
