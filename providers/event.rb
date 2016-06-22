@@ -13,8 +13,9 @@ action :create do
     add_file_to_eventconf(@current_resource.file, 'bottom', node)
   end
   if @current_resource.exists && !@current_resource.changed
-    Chef::Log.info "#{ @new_resource } already exists - nothing to do."
+    Chef::Log.info "#{ @new_resource } already exists and not changed - nothing to do."
   else
+    Chef::Log.info "#{ @new_resource } changed - updating."
     converge_by("Create/Update #{ @new_resource }") do
       create_event
       new_resource.updated_by_last_action(true)
@@ -65,8 +66,10 @@ def load_current_resource
     if is_event_file?(@current_resource.file, node)
       @current_resource.is_event_file = true
       if uei_in_file?("#{node['opennms']['conf']['home']}/etc/#{@current_resource.file}", @current_resource.uei)
+        Chef::Log.debug("uei #{@current_resource.uei} is in file already")
         @current_resource.exists = true
         if event_changed?(@current_resource, node)
+          Chef::Log.debug("uei #{@current_resource.uei} has changed.")
           @current_resource.changed = true
         end
       end
@@ -126,7 +129,7 @@ def create_event
   end
   unless updating
     uei_el = event_el.add_element('uei')
-    uei_el.add_text(new_resource.uei)
+    uei_el.add_text(uei)
   end
   unless new_resource.event_label.nil?
     el_el = event_el.elements['event-label'] || event_el.add_element('event-label')
