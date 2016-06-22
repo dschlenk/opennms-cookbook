@@ -22,7 +22,7 @@ action :sync do
   if @current_resource.exists
     Chef::Log.info "#{ @new_resource } already exists - syncing."
     converge_by("Sync #{ @new_resource }") do
-      sync_import
+      sync_import_action
       new_resource.updated_by_last_action(true)
     end
   end
@@ -54,7 +54,7 @@ def create_import
   end
 end
 
-def sync_import
+def sync_import_action
   sync_import(new_resource.foreign_source_name, true, node)
   wait_for_sync(new_resource.foreign_source_name, node, 
                   new_resource.sync_wait_periods, new_resource.sync_wait_secs)
