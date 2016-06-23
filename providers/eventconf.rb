@@ -61,4 +61,5 @@ def update_eventconf
     group 'root'
     mode 00644
   end
+  f.updated_by_last_action?
 end
