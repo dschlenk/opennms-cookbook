@@ -88,7 +88,7 @@ module Provision
     return true if thing_changed?(current_resource.timeout, curr_timeout)
     return true if thing_changed?(current_resource.port, curr_port)
     return true if thing_changed?(current_resource.class_name, curr_class)
-    return true if things_equal?(current_resource.params, curr_params)
+    return true if things_changed?(current_resource.params, curr_params)
     false
   end
 
@@ -118,14 +118,14 @@ module Provision
 
   def thing_changed?(resource, current)
     unless resource.nil?
-      Chef::Log.debug "#{resource} == #{current}?"
+      Chef::Log.debug "thing_changed? #{resource} == #{current}?"
       return true unless "#{resource}" == "#{current}"
     end
     false
   end
-  def things_equal?(resource, current)
+  def things_changed?(resource, current)
     unless resource.nil?
-      Chef::Log.debug "#{resource} == #{current}?"
+      Chef::Log.debug "things_changed? #{resource} == #{current}?"
       return true unless resource == current
     end
     false
@@ -263,13 +263,10 @@ module Provision
       Chef::Log.debug "imports on this server: #{imports_mi}"
       unless imports_mi.nil?
         imports_mi.each do |import|
-          Chef::Log.debug "#{import['foreign-source']} == #{foreign_source_name}"
           if import['foreign-source'] == foreign_source_name
             nodes = import['node']
-            Chef::Log.debug "nodes: #{nodes}"
             unless nodes.nil?
               import['node'].each do |node|
-                Chef::Log.debug "#{node['foreign-id']} == #{foreign_id}"
                 return true if node['foreign-id'] == foreign_id
               end
             end
@@ -279,6 +276,79 @@ module Provision
     end
     false
   end
+
+  def import_node_changed?(current_resource, node)
+    require 'rest_client'
+    n = JSON.parse(RestClient.get("#{baseurl(node)}/requisitions/#{current_resource.foreign_source_name}/nodes/#{current_resource.foreign_id}", {:accept => :json}).to_s)
+    Chef::Log.debug("checking for changes in #{new_resource.foreign_id}.")
+    Chef::Log.debug("n is #{n.to_s}")
+    return true if thing_changed?(current_resource.node_label, n['node-label'])
+    return true if thing_changed?(current_resource.parent_foreign_source, n['parent-foreign-source'])
+    return true if thing_changed?(current_resource.parent_foreign_id, n['parent-foreign-id'])
+    return true if thing_changed?(current_resource.parent_node_label, n['parent-node-label'])
+    return true if thing_changed?(current_resource.city, n['city'])
+    return true if thing_changed?(current_resource.building, n['building'])
+    #TODO: support categories/assets return true if things_changed?(current_resource.categories, n[
+    curr_cats = []
+    n['category'].each do |cat|
+      Chef::Log.debug "current category membership includes #{cat['name']}"
+      curr_cats.push cat['name']
+    end
+    return true if things_changed?(current_resource.categories, curr_cats)
+    curr_assets = {}
+    n['asset'].each do |asset|
+      curr_assets[asset['name']] = asset['value']
+    end
+    return true if things_changed?(current_resource.assets, curr_assets)
+    false
+  end
+
+  def delete_imported_node(fsid, fsname, node)
+    require 'rest_client'
+    RestClient.delete "#{baseurl(node)}/requisitions/#{fsname}/nodes/#{fsid}"
+  end
+
+  def update_imported_node(new_resource, node)
+    require 'rest_client'
+    
+    n = REXML::Document.new(RestClient.get("#{baseurl(node)}/requisitions/#{new_resource.foreign_source_name}/nodes/#{new_resource.foreign_id}").to_s)
+    # you can't update a node label using the implied node label from the name of the resource
+    node_el = n.elements["node"]
+    if !new_resource.node_label.nil? && new_resource.node_label != node_el.attributes['node-label']
+      node_el.attributes['node-label'] = new_resource.node_label
+    end
+    unless new_resource.parent_foreign_source.nil?
+      node_el.attributes['parent-foreign-source'] = new_resource.parent_foreign_source
+    end
+    unless new_resource.parent_foreign_id.nil?
+      node_el.attributes['parent-foreign-id'] = new_resource.parent_foreign_id
+    end
+    unless new_resource.parent_node_label.nil?
+      node_el.attributes['parent-node-label'] = new_resource.parent_node_label
+    end
+    unless new_resource.city.nil?
+      node_el.attributes['city'] = new_resource.city
+    end
+    unless new_resource.building.nil?
+      node_el.attributes['building'] = new_resource.building
+    end
+    # TODO: categories
+    unless new_resource.categories.nil?
+      node_el.elements.delete_all 'category'
+      new_resource.categories.each do |c|
+        node_el.add_element('category', { 'name' => c })
+      end
+    end
+    # TODO: assets
+    unless new_resource.assets.nil?
+      node_el.elements.delete_all 'asset'
+      new_resource.assets.each do |k,v|
+        node_el.add_element 'asset', {'name' => k, 'value' => v}
+      end
+    end
+    RestClient.post "#{baseurl(node)}/requisitions/#{new_resource.foreign_source_name}/nodes", n.to_s, {:content_type => :xml}
+  end
+
   def add_import_node(node_label, foreign_id, parent_foreign_source, parent_foreign_id, parent_node_label, city, building, categories, assets, foreign_source_name, node)
     require 'rest_client'
     nd = REXML::Document.new
