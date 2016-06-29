@@ -98,3 +98,16 @@ opennms_import_node "nothing nodeC" do
   assets 'vendorPhone' => '311'
   sync_import true
 end
+
+opennms_import_node "nothing for different reasons nodeC" do
+  foreign_source_name "dry-source"
+  foreign_id nodeC_foreign_id
+  sync_import true
+  action :create_if_missing
+end
+
+opennms_import_node "delete nodeB" do
+  foreign_source_name "dry-source"
+  foreign_id nodeB_foreign_id
+  action :delete
+end
