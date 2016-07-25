@@ -8,7 +8,6 @@ driver:
 
 provisioner:
   name: chef_zero
-  log_level: debug
 
 platforms:
   - name: centos-6.7
@@ -197,6 +196,7 @@ suites:
       - recipe[postgresql::config_pgtune]
       - recipe[opennms::notemplates]
       - recipe[opennms::example_foreign_source]
+      - recipe[opennms::example_policy]
       - recipe[opennms::example_service_detector]
       - recipe[opennms::example_import]
       - recipe[opennms::example_import_node]

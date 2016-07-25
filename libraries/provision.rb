@@ -1,5 +1,6 @@
 require 'json'
 require 'rexml/document'
+require 'uri'
 
 # Note that any of the methods that do work do not do any error handling as 
 # they assume you've used the test methods first to establish that you can 
@@ -145,6 +146,7 @@ module Provision
     require 'rest-client'
     service_name = new_resource.service_name||new_resource.name
     detector = service_detector(service_name, new_resource.foreign_source_name, node)
+    service_name = URI.escape(service_name)
     unless new_resource.class_name.nil?
       detector['class'] = new_resource.class_name
     end
@@ -187,6 +189,7 @@ module Provision
 
   def add_service_detector(name, class_name, port, retry_count, timeout, params, foreign_source_name, node)
     require 'rest_client'
+    foreign_source_name = URI.escape(foreign_source_name)
     sd = REXML::Document.new
     sd << REXML::XMLDecl.new
     sdel = sd.add_element 'detector', {'name' => name, 'class' => class_name}
@@ -226,6 +229,7 @@ module Provision
   end
   def add_policy(policy_name, class_name, params, foreign_source_name, node)
     require 'rest_client'
+    foreign_source_name = URI.escape(foreign_source_name)
     pd = REXML::Document.new
     pd << REXML::XMLDecl.new
     pel = pd.add_element 'policy', {'name' => policy_name, 'class' => class_name}
@@ -279,7 +283,9 @@ module Provision
 
   def import_node_changed?(current_resource, node)
     require 'rest_client'
-    n = JSON.parse(RestClient.get("#{baseurl(node)}/requisitions/#{current_resource.foreign_source_name}/nodes/#{current_resource.foreign_id}", {:accept => :json}).to_s)
+    foreign_source_name = URI.escape(current_resource.foreign_source_name)
+    foreign_id = URI.escape(current_resource.foreign_id)
+    n = JSON.parse(RestClient.get("#{baseurl(node)}/requisitions/#{foreign_source_name}/nodes/#{foreign_id}", {:accept => :json}).to_s)
     Chef::Log.debug("checking for changes in #{new_resource.foreign_id}.")
     Chef::Log.debug("n is #{n.to_s}")
     return true if thing_changed?(current_resource.node_label, n['node-label'])
@@ -310,8 +316,10 @@ module Provision
 
   def update_imported_node(new_resource, node)
     require 'rest_client'
+    foreign_source_name = URI.escape(new_resource.foreign_source_name)
+    foreign_id = URI.escape(new_resource.foreign_id)
     
-    n = REXML::Document.new(RestClient.get("#{baseurl(node)}/requisitions/#{new_resource.foreign_source_name}/nodes/#{new_resource.foreign_id}").to_s)
+    n = REXML::Document.new(RestClient.get("#{baseurl(node)}/requisitions/#{foreign_source_name}/nodes/#{foreign_id}").to_s)
     # you can't update a node label using the implied node label from the name of the resource
     node_el = n.elements["node"]
     if !new_resource.node_label.nil? && new_resource.node_label != node_el.attributes['node-label']
@@ -346,7 +354,7 @@ module Provision
         node_el.add_element 'asset', {'name' => k, 'value' => v}
       end
     end
-    RestClient.post "#{baseurl(node)}/requisitions/#{new_resource.foreign_source_name}/nodes", n.to_s, {:content_type => :xml}
+    RestClient.post "#{baseurl(node)}/requisitions/#{foreign_source_name}/nodes", n.to_s, {:content_type => :xml}
   end
 
   def add_import_node(node_label, foreign_id, parent_foreign_source, parent_foreign_id, parent_node_label, city, building, categories, assets, foreign_source_name, node)
@@ -381,6 +389,7 @@ module Provision
     end
     # clear current list from cache
     node.run_state[:imports] = nil
+    foreign_source_name = URI.escape(foreign_source_name)
     RestClient.post "#{baseurl(node)}/requisitions/#{foreign_source_name}/nodes", nd.to_s, {:content_type => :xml}
   end
   def import_node_interface_exists?(foreign_source_name, foreign_id, ip_addr, node)
@@ -412,6 +421,8 @@ module Provision
     i_el.attributes['snmp-primary'] = snmp_primary if !snmp_primary.nil?
     # clear current list from cache
     node.run_state[:imports] = nil
+    foreign_source_name = URI.escape(foreign_source_name)
+    foreign_id = URI.escape(foreign_id)
     RestClient.post "#{baseurl(node)}/requisitions/#{foreign_source_name}/nodes/#{foreign_id}/interfaces", id.to_s, {:content_type => :xml}
   end
   def import_node_interface_service_exists?(service_name, foreign_source_name, foreign_id, ip_addr, node)
@@ -441,6 +452,9 @@ module Provision
     s_el = sd.add_element 'monitored-service', {'service-name' => service_name}
     # clear current list from cache
     node.run_state[:imports] = nil
+    foreign_source_name = URI.escape(foreign_source_name)
+    foreign_id = URI.escape(foreign_id)
+    ip_addr = URI.escape(ip_addr)
     RestClient.post "#{baseurl(node)}/requisitions/#{foreign_source_name}/nodes/#{foreign_id}/interfaces/#{ip_addr}/services", sd.to_s, {:content_type => :xml}
   end
 
@@ -470,6 +484,7 @@ module Provision
 
   def sync_import(foreign_source_name, rescan, node)
     require 'rest_client'
+    foreign_source_name = URI.escape(foreign_source_name)
     url = "#{baseurl(node)}/requisitions/#{foreign_source_name}/import"
     if !rescan.nil? && rescan == false
       url = url + "?rescanExisting=false" 
