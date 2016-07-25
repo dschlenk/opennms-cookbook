@@ -19,3 +19,83 @@ opennms_xml_collection_service "XML Service" do
   collection 'default'
   notifies :restart, "service[opennms]", :delayed
 end
+
+# test updates
+opennms_xml_collection_service "change XMLFoo interval" do
+  service_name "XMLFoo"
+  collection "foo"
+  package_name "foo"
+  interval 500000
+end
+
+opennms_xml_collection_service "change XMLFoo user_defined" do
+  service_name "XMLFoo"
+  collection "foo"
+  package_name "foo"
+  user_defined false
+end
+
+opennms_xml_collection_service "XMLFoo status" do
+  service_name "XMLFoo"
+  collection "foo"
+  package_name "foo"
+  status 'on'
+end
+
+opennms_xml_collection_service "XMLFoo timeout" do
+  service_name "XMLFoo"
+  collection "foo"
+  package_name "foo"
+  timeout 6000
+end
+
+opennms_xml_collection_service "XMLFoo retry_count" do
+  service_name "XMLFoo"
+  collection "foo"
+  package_name "foo"
+  retry_count 11
+end
+
+opennms_xml_collection_service "XMLFoo port" do
+  service_name "XMLFoo"
+  collection "foo"
+  package_name "foo"
+  port 12
+end
+
+opennms_xml_collection_service "XMLFoo thresholding_enabled" do
+  service_name "XMLFoo"
+  collection "foo"
+  package_name "foo"
+  thresholding_enabled false
+end
+
+opennms_xml_collection_service "XMLFoo nothing" do
+  service_name "XMLFoo"
+  collection "foo"
+  package_name "foo"
+end
+
+opennms_xml_collection_service "XMLFoo still nothing" do
+  service_name "XMLFoo"
+  collection "foo"
+  package_name "foo"
+  thresholding_enabled false
+  port 12
+  retry_count 11
+  timeout 6000
+  status 'on'
+  interval 500000
+end
+
+# test create_if_missing
+opennms_xml_collection_service "create_if_missing XML Service" do
+  status 'off'
+  action :create_if_missing
+end
+
+# test delete
+opennms_xml_collection_service "delete XML Service" do
+  collection 'default'
+  action :delete
+end

@@ -7,7 +7,7 @@ driver:
     memory: 1024
 
 provisioner:
-  name: chef_solo
+  name: chef_zero
 
 platforms:
   - name: centos-6.7
@@ -77,7 +77,61 @@ suites:
       - recipe[postgresql::config_initdb]
       - recipe[postgresql::config_pgtune]
       - recipe[opennms::default]
-  - name: lwrps
+  - name: service_detector
+    run_list:
+      - recipe[postgresql::client]
+      - recipe[postgresql::server]
+      - recipe[postgresql::contrib]
+      - recipe[postgresql::config_initdb]
+      - recipe[postgresql::config_pgtune]
+      - recipe[opennms::notemplates]
+      - recipe[onms_lwrp_test::example_service_detector]
+  - name: upgrade_step1
+    run_list:
+      - recipe[postgresql::client]
+      - recipe[postgresql::server]
+      - recipe[postgresql::contrib]
+      - recipe[postgresql::config_initdb]
+      - recipe[postgresql::config_pgtune]
+      - recipe[opennms::notemplates]
+      - recipe[onms_lwrp_test::webopts]
+      - recipe[onms_lwrp_test::eventconf]
+      - recipe[onms_lwrp_test::collection_graph_file]
+      - recipe[onms_lwrp_test::collection_graph]
+      - recipe[onms_lwrp_test::response_graph]
+    attributes:
+      opennms:
+        version: "16.0.0-1"
+  - name: upgrade_step2
+    run_list:
+      - recipe[postgresql::client]
+      - recipe[postgresql::server]
+      - recipe[postgresql::contrib]
+      - recipe[postgresql::config_initdb]
+      - recipe[postgresql::config_pgtune]
+      - recipe[opennms::notemplates]
+      - recipe[onms_lwrp_test::webopts]
+      - recipe[onms_lwrp_test::eventconf]
+      - recipe[onms_lwrp_test::collection_graph_file]
+      - recipe[onms_lwrp_test::collection_graph]
+      - recipe[onms_lwrp_test::response_graph]
+    attributes:
+      opennms:
+        version: "16.0.4-1"
+        upgrade: true
+  - name: change_notif
+    run_list:
+      - recipe[postgresql::client]
+      - recipe[postgresql::server]
+      - recipe[postgresql::contrib]
+      - recipe[postgresql::config_initdb]
+      - recipe[postgresql::config_pgtune]
+      - recipe[opennms::notemplates]
+      - recipe[onms_lwrp_test::destination_path]
+      - recipe[onms_lwrp_test::notification_command]
+      - recipe[onms_lwrp_test::notifd_autoack]
+      - recipe[onms_lwrp_test::notification]
+  - name: all
     run_list:
       - recipe[postgresql::client]
       - recipe[postgresql::server]
@@ -139,6 +193,21 @@ suites:
       - recipe[onms_lwrp_test::update_dashlet]
       - recipe[onms_lwrp_test::surveillance_view]
       - recipe[onms_lwrp_test::send_event]
+  - name: imports
+    run_list:
+      - recipe[postgresql::client]
+      - recipe[postgresql::server]
+      - recipe[postgresql::contrib]
+      - recipe[postgresql::config_initdb]
+      - recipe[postgresql::config_pgtune]
+      - recipe[opennms::notemplates]
+      - recipe[onms_lwrp_test::foreign_source]
+      - recipe[onms_lwrp_test::policy]
+      - recipe[onms_lwrp_test::service_detector]
+      - recipe[onms_lwrp_test::import]
+      - recipe[onms_lwrp_test::import_node]
+      - recipe[onms_lwrp_test::import_node_interface]
+      - recipe[onms_lwrp_test::import_node_interface_service]
   - name: notemplates
     run_list:
       - recipe[java]

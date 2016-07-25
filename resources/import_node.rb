@@ -1,10 +1,14 @@
 require 'rexml/document'
 
-actions :create
+actions :create, :create_if_missing, :delete
 default_action :create
 
-attribute :node_label, :kind_of => String, :name_attribute => true
+attribute :name, :kind_of => String, :name_attribute => true
+# name is used if node_label is omitted
+attribute :node_label, :kind_of => String
+# immutable / part of identity
 attribute :foreign_source_name, :kind_of => String, :required => true
+# immutable / part of identity
 attribute :foreign_id, :kind_of => String, :required => true
 attribute :parent_foreign_source, :kind_of => String
 attribute :parent_foreign_id, :kind_of => String
@@ -23,4 +27,4 @@ attribute :sync_import, :kind_of => [TrueClass, FalseClass], :default => false
 attribute :sync_wait_periods, :kind_of => Fixnum, :default => 30
 attribute :sync_wait_secs, :kind_of => Fixnum, :default => 10
 
-attr_accessor :exists, :import_exists
+attr_accessor :exists, :import_exists, :changed

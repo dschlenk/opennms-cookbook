@@ -43,7 +43,7 @@ def create_snmp_collection
   doc.context[:attribute_quote] = :quote 
   collection_el = doc.root.add_element 'snmp-collection', {'name' => new_resource.name,'snmpStorageFlag' => new_resource.snmp_stor_flag }
   if new_resource.max_vars_per_pdu
-    collection_el.add_attribute('maxVarsPerPdu' => new_resource.max_vars_per_pdu )
+    collection_el.add_attribute('maxVarsPerPdu', new_resource.max_vars_per_pdu )
   end
   rrd_el = collection_el.add_element 'rrd', { 'step' => new_resource.rrd_step }
   new_resource.rras.each { |rra|

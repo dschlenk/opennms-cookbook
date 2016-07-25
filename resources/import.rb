@@ -1,6 +1,6 @@
 require 'rexml/document'
 
-actions :create
+actions :create, :sync
 default_action :create
 
 # foreign_source must reference an existing foreign_source's name.

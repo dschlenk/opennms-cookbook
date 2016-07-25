@@ -1,5 +1,6 @@
 require 'json'
 require 'rexml/document'
+require 'uri'
 
 # Note that any of the methods that do work do not do any error handling as 
 # they assume you've used the test methods first to establish that you can 
@@ -44,8 +45,151 @@ module Provision
     end
     false
   end
+  def service_detector_changed?(current_resource, node)
+    detector = nil
+    if current_resource.foreign_source_name == 'default'
+      default_foreign_source(node)['detectors'].each do |d|
+        if d['name'] == current_resource.service_name
+          detector = d
+          break
+        end
+      end
+    else
+      foreign_sources(node).each do |source|
+        if source['name'] == current_resource.foreign_source_name
+          source['detectors'].each do |d|
+            if d['name'] == current_resource.service_name
+              detector = d
+              break
+            end
+          end
+        end
+      end
+    end
+    Chef::Log.debug detector
+    curr_retries = nil
+    curr_timeout = nil
+    curr_port = nil
+    curr_params = {}
+    curr_class = detector['class']
+    detector['parameter'].each do |p|
+      case(p['key'])
+      when 'retries'
+        curr_retries = p['value']
+      when 'timeout'
+        curr_timeout = p['value']
+      when 'port'
+        curr_port = p['value']
+      else
+        curr_params[p['key']] = p['value']
+      end
+    end
+
+    return true if thing_changed?(current_resource.retry_count, curr_retries)
+    return true if thing_changed?(current_resource.timeout, curr_timeout)
+    return true if thing_changed?(current_resource.port, curr_port)
+    return true if thing_changed?(current_resource.class_name, curr_class)
+    return true if things_changed?(current_resource.params, curr_params)
+    false
+  end
+
+  def service_detector(service_name, foreign_source_name, node)
+    detector = nil
+    if foreign_source_name == 'default'
+      default_foreign_source(node)['detectors'].each do |d|
+        if d['name'] == current_resource.service_name
+          detector = d
+          break
+        end
+      end
+    else
+      foreign_sources(node).each do |source|
+        if source['name'] == current_resource.foreign_source_name
+          source['detectors'].each do |d|
+            if d['name'] == current_resource.service_name
+              detector = d
+              break
+            end
+          end
+        end
+      end
+    end
+    detector
+  end
+
+  def thing_changed?(resource, current)
+    unless resource.nil?
+      Chef::Log.debug "thing_changed? #{resource} == #{current}?"
+      return true unless "#{resource}" == "#{current}"
+    end
+    false
+  end
+  def things_changed?(resource, current)
+    unless resource.nil?
+      Chef::Log.debug "things_changed? #{resource} == #{current}?"
+      return true unless resource == current
+    end
+    false
+  end
+
+  # {"name"=>"Router", 
+  #  "class"=>"org.opennms.netmgt.provision.detector.snmp.SnmpDetector", 
+  #  "parameter"=>[
+  #    {"key"=>"port", "value"=>"161"}, 
+  #    {"key"=>"retries", "value"=>"3"}, 
+  #    {"key"=>"timeout", "value"=>"5000"}, 
+  #    {"key"=>"vbname", "value"=>".1.3.6.1.2.1.4.1.0"}, 
+  #    {"key"=>"vbvalue", "value"=>"1"}]
+  # }
+  # new_resource only needs to define elements it wants to change.
+  def update_service_detector(new_resource, node)
+    require 'rest-client'
+    service_name = new_resource.service_name||new_resource.name
+    detector = service_detector(service_name, new_resource.foreign_source_name, node)
+    service_name = URI.escape(service_name)
+    unless new_resource.class_name.nil?
+      detector['class'] = new_resource.class_name
+    end
+    update_parameter(detector['parameter'], 'port', new_resource.port)
+    update_parameter(detector['parameter'], 'retries', new_resource.retry_count)
+    update_parameter(detector['parameter'], 'timeout', new_resource.timeout)
+    # don't change anything if no parameters specified in update resource
+    unless new_resource.params.nil? || new_resource.params.size == 0
+      # if you specify params, they replace all the current params. No merging of old and new occur.
+      detector['parameter'].delete_if do |p|
+        !['port', 'retries', 'timeout'].include? p['key']
+      end
+    end
+    new_resource.params.each do |k,v|
+      detector['parameter'].push({ 'key' => k, 'value' => v })
+    end
+    # seems easier to just delete the current then add the modified rather than grab the entire 
+    # foreign source and PUT that with the change.
+    RestClient.delete "#{baseurl(node)}/foreignSources/#{new_resource.foreign_source_name}/detectors/#{service_name}"
+    RestClient.post "#{baseurl(node)}/foreignSources/#{new_resource.foreign_source_name}/detectors", JSON.dump(detector), { :content_type => :json }
+  end
+
+  def update_parameter(curr_parameters, name, new_value)
+    updated = false
+    unless new_value.nil?
+      curr_parameters.each do |p|
+        if p['key'] == name
+          p['value'] = new_value
+          updated = true
+          break
+        end
+      end
+      # handle adding a previously undefined common param
+      unless updated
+        curr_parameters.push({ 'key' => name, 'value' => new_value })
+      end
+    end
+    curr_parameters
+  end
+
   def add_service_detector(name, class_name, port, retry_count, timeout, params, foreign_source_name, node)
     require 'rest_client'
+    foreign_source_name = URI.escape(foreign_source_name)
     sd = REXML::Document.new
     sd << REXML::XMLDecl.new
     sdel = sd.add_element 'detector', {'name' => name, 'class' => class_name}
@@ -85,6 +229,7 @@ module Provision
   end
   def add_policy(policy_name, class_name, params, foreign_source_name, node)
     require 'rest_client'
+    foreign_source_name = URI.escape(foreign_source_name)
     pd = REXML::Document.new
     pd << REXML::XMLDecl.new
     pel = pd.add_element 'policy', {'name' => policy_name, 'class' => class_name}
@@ -122,13 +267,10 @@ module Provision
       Chef::Log.debug "imports on this server: #{imports_mi}"
       unless imports_mi.nil?
         imports_mi.each do |import|
-          Chef::Log.debug "#{import['foreign-source']} == #{foreign_source_name}"
           if import['foreign-source'] == foreign_source_name
             nodes = import['node']
-            Chef::Log.debug "nodes: #{nodes}"
             unless nodes.nil?
               import['node'].each do |node|
-                Chef::Log.debug "#{node['foreign-id']} == #{foreign_id}"
                 return true if node['foreign-id'] == foreign_id
               end
             end
@@ -138,6 +280,83 @@ module Provision
     end
     false
   end
+
+  def import_node_changed?(current_resource, node)
+    require 'rest_client'
+    foreign_source_name = URI.escape(current_resource.foreign_source_name)
+    foreign_id = URI.escape(current_resource.foreign_id)
+    n = JSON.parse(RestClient.get("#{baseurl(node)}/requisitions/#{foreign_source_name}/nodes/#{foreign_id}", {:accept => :json}).to_s)
+    Chef::Log.debug("checking for changes in #{new_resource.foreign_id}.")
+    Chef::Log.debug("n is #{n.to_s}")
+    return true if thing_changed?(current_resource.node_label, n['node-label'])
+    return true if thing_changed?(current_resource.parent_foreign_source, n['parent-foreign-source'])
+    return true if thing_changed?(current_resource.parent_foreign_id, n['parent-foreign-id'])
+    return true if thing_changed?(current_resource.parent_node_label, n['parent-node-label'])
+    return true if thing_changed?(current_resource.city, n['city'])
+    return true if thing_changed?(current_resource.building, n['building'])
+    #TODO: support categories/assets return true if things_changed?(current_resource.categories, n[
+    curr_cats = []
+    n['category'].each do |cat|
+      Chef::Log.debug "current category membership includes #{cat['name']}"
+      curr_cats.push cat['name']
+    end
+    return true if things_changed?(current_resource.categories, curr_cats)
+    curr_assets = {}
+    n['asset'].each do |asset|
+      curr_assets[asset['name']] = asset['value']
+    end
+    return true if things_changed?(current_resource.assets, curr_assets)
+    false
+  end
+
+  def delete_imported_node(fsid, fsname, node)
+    require 'rest_client'
+    RestClient.delete "#{baseurl(node)}/requisitions/#{fsname}/nodes/#{fsid}"
+  end
+
+  def update_imported_node(new_resource, node)
+    require 'rest_client'
+    foreign_source_name = URI.escape(new_resource.foreign_source_name)
+    foreign_id = URI.escape(new_resource.foreign_id)
+    
+    n = REXML::Document.new(RestClient.get("#{baseurl(node)}/requisitions/#{foreign_source_name}/nodes/#{foreign_id}").to_s)
+    # you can't update a node label using the implied node label from the name of the resource
+    node_el = n.elements["node"]
+    if !new_resource.node_label.nil? && new_resource.node_label != node_el.attributes['node-label']
+      node_el.attributes['node-label'] = new_resource.node_label
+    end
+    unless new_resource.parent_foreign_source.nil?
+      node_el.attributes['parent-foreign-source'] = new_resource.parent_foreign_source
+    end
+    unless new_resource.parent_foreign_id.nil?
+      node_el.attributes['parent-foreign-id'] = new_resource.parent_foreign_id
+    end
+    unless new_resource.parent_node_label.nil?
+      node_el.attributes['parent-node-label'] = new_resource.parent_node_label
+    end
+    unless new_resource.city.nil?
+      node_el.attributes['city'] = new_resource.city
+    end
+    unless new_resource.building.nil?
+      node_el.attributes['building'] = new_resource.building
+    end
+    # TODO: categories
+    unless new_resource.categories.nil?
+      node_el.elements.delete_all 'category'
+      new_resource.categories.each do |c|
+        node_el.add_element('category', { 'name' => c })
+      end
+    end
+    # TODO: assets
+    unless new_resource.assets.nil?
+      node_el.elements.delete_all 'asset'
+      new_resource.assets.each do |k,v|
+        node_el.add_element 'asset', {'name' => k, 'value' => v}
+      end
+    end
+    RestClient.post "#{baseurl(node)}/requisitions/#{foreign_source_name}/nodes", n.to_s, {:content_type => :xml}
+  end
+
   def add_import_node(node_label, foreign_id, parent_foreign_source, parent_foreign_id, parent_node_label, city, building, categories, assets, foreign_source_name, node)
     require 'rest_client'
     nd = REXML::Document.new
@@ -170,6 +389,7 @@ module Provision
     end
     # clear current list from cache
     node.run_state[:imports] = nil
+    foreign_source_name = URI.escape(foreign_source_name)
     RestClient.post "#{baseurl(node)}/requisitions/#{foreign_source_name}/nodes", nd.to_s, {:content_type => :xml}
   end
   def import_node_interface_exists?(foreign_source_name, foreign_id, ip_addr, node)
@@ -201,6 +421,8 @@ module Provision
     i_el.attributes['snmp-primary'] = snmp_primary if !snmp_primary.nil?
     # clear current list from cache
     node.run_state[:imports] = nil
+    foreign_source_name = URI.escape(foreign_source_name)
+    foreign_id = URI.escape(foreign_id)
     RestClient.post "#{baseurl(node)}/requisitions/#{foreign_source_name}/nodes/#{foreign_id}/interfaces", id.to_s, {:content_type => :xml}
   end
   def import_node_interface_service_exists?(service_name, foreign_source_name, foreign_id, ip_addr, node)
@@ -230,6 +452,9 @@ module Provision
     s_el = sd.add_element 'monitored-service', {'service-name' => service_name}
     # clear current list from cache
     node.run_state[:imports] = nil
+    foreign_source_name = URI.escape(foreign_source_name)
+    foreign_id = URI.escape(foreign_id)
+    ip_addr = URI.escape(ip_addr)
     RestClient.post "#{baseurl(node)}/requisitions/#{foreign_source_name}/nodes/#{foreign_id}/interfaces/#{ip_addr}/services", sd.to_s, {:content_type => :xml}
   end
 
@@ -259,6 +484,7 @@ module Provision
 
   def sync_import(foreign_source_name, rescan, node)
     require 'rest_client'
+    foreign_source_name = URI.escape(foreign_source_name)
     url = "#{baseurl(node)}/requisitions/#{foreign_source_name}/import"
     if !rescan.nil? && rescan == false
       url = url + "?rescanExisting=false" 

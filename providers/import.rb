@@ -17,6 +17,18 @@ action :create do
   end
 end
 
+action :sync do
+  Chef::Application.fatal!("Missing foreign source #{@current_resource.foreign_source_name}.") if !@current_resource.foreign_source_exists
+  if @current_resource.exists
+    Chef::Log.info "#{ @new_resource } already exists - syncing."
+    converge_by("Sync #{ @new_resource }") do
+      sync_import_action
+      new_resource.updated_by_last_action(true)
+    end
+  end
+end
+
+
 def load_current_resource
   @current_resource = Chef::Resource::OpennmsImport.new(@new_resource.name)
   @current_resource.name(@new_resource.name)
@@ -40,4 +52,10 @@ def create_import
     wait_for_sync(new_resource.foreign_source_name, node, 
                   new_resource.sync_wait_periods, new_resource.sync_wait_secs)
   end
+end
+
+def sync_import_action
+  sync_import(new_resource.foreign_source_name, true, node)
+  wait_for_sync(new_resource.foreign_source_name, node, 
+                  new_resource.sync_wait_periods, new_resource.sync_wait_secs)
 end

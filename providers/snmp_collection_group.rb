@@ -64,7 +64,7 @@ def create_snmp_collection_group
   collection_el = doc.elements["/datacollection-config/snmp-collection[@name='#{new_resource.collection_name}']"]
   include_collection_el = collection_el.add_element 'include-collection', { 'dataCollectionGroup' => new_resource.name }
   if !new_resource.system_def.nil?
-    system_def_el = include_collection_el.add_attribute('systemDef' => new_resource.system_def)
+    system_def_el = include_collection_el.add_attribute('systemDef', new_resource.system_def)
   end
   new_resource.exclude_filters.each { |exclude_filter|
     exclude_filter_el = include_collection_el.add_element 'exclude-filter'

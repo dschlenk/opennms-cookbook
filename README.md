@@ -119,8 +119,8 @@ To enable, set `node['opennms']['upgrade']` to true. If this sounds like
 something you want to do, review the `upgrade` recipe. It roughly translates to:
 
 * New RPM is installed. 
-* Are there any files named `*.rpmnew` in `$ONMS_HOME/etc` or `$ONMS_HOME/jetty-webapp`? If so, overwrite the existing files with them. 
-* Are there any files named `*.rpmsave` in `$ONMS_HOME/etc` or `$ONMS_HOME/jetty-webapp`? If so, remove them.
+* Are there any files named `*.rpmnew` in `$ONMS_HOME`? If so, overwrite the existing files with them. 
+* Are there any files named `*.rpmsave` in `$ONMS_HOME`? If so, remove them.
 
 `rpmsave` files happen when there's a config file that you have changed that 
 was replaced with the new version because not replacing it would prevent 
@@ -170,7 +170,7 @@ The list of implemented LWRPs is as follows:
 These LWRPs use a cookbook library named Provision that I wrote to perform the work using the OpenNMS REST interface. As such, OpenNMS has to be running for the resources to converge. Also you'll notice that I used the term 'import' rather than the correct term 'requisition'. I can type 'import' a lot faster than 'requisition'. ;)
 
 * `opennms_foreign_source`: create a new foreign source optionally defining a scan interval (defaults to '1d'). 
-* `opennms_service_detector`: add a service detector to a foreign source.
+* `opennms_service_detector`: add a service detector to a foreign source. Supports updating and deleting.
 * `opennms_policy`: add a policy to a foreign source. 
 * `opennms_import`: Defines a requisition for a foreign source. This and all import* LWRPs include an option to synchronize the requisition - sync_import. 
 * `opennms_import_node`: Add a node to a requisition including categories (array of strings) and assets (key/value hash pairs). 
@@ -180,7 +180,7 @@ These LWRPs use a cookbook library named Provision that I wrote to perform the w
 #### Events
 
 * `opennms_eventconf`: adds an event-file element to events in etc/eventconf.xml.  Supports updating.
-* `opennms_event`: adds an event element to events in target eventconf file `file`. Not all elements from the eventconf schema are implemented, but the ones that seem to actually exist in the wild are. See resource for details and recipes `example_event` and `example_threshold` for example usage.
+* `opennms_event`: adds an event element to events in target eventconf file `file`. Not all elements from the eventconf schema are implemented, but the ones that seem to actually exist in the wild are. See resource for details and recipes `example_event` and `example_threshold` for example usage. Supports updating existing events, so if you want to change an event in an eventconf file distributed with OpenNMS, this is the resource for you - no more merging files after an upgrade! Look at the test/example recipe for details - you only need to provide the file, UEI, and the attribute(s) you want to change. If creating entirely new events, there are some attributes that are required by the eventconf schema but not enforced by the Chef resource (since they aren't required when doing an update).
 * `opennms_send_event`: creates an actual instance of an event using the `send-event.pl` script in `$ONMS_HOME/bin`. Used by the `send_events` recipe, which is included by `default` and `notemplates` recipes to cause config file reloads to take place when template resources make changes or an LWRP sends a notification.
 
 #### Notifications
@@ -188,7 +188,7 @@ These LWRPs use a cookbook library named Provision that I wrote to perform the w
 * `opennms_notification_command`: Create a new command in notificationCommands.xml. 
 * `opennms_destination_path`: creates a destination path element in destinationPaths.xml. Requires at a minimum a single target which can be defined with the following LWRP. 
 * `opennms_target`: Add a target or escalate target to a destination path (defined either in the default config or with the above LWRP). 
-* `opennms_notification`: Create notification elements in notifications.xml. 
+* `opennms_notification`: Create notification elements in notifications.xml.  Supports updating and deleting (action :delete).
 
 #### Node Service Credential Configuration
 
@@ -208,21 +208,21 @@ Currently implemented are:
 
 #### Data Collection
 
-* `opennms_resource_type`: adds a resourceType definition to a file in etc/datacollection and an include-collection element to the default snmp-collection. This LWRP supports a very limited form of updating - if the resource type already exists but isn't included in the default snmp-collection, an include-collection element will be added. The definition of the resource type won't be updated, however.  
+* `opennms_resource_type`: adds a resourceType definition to a file in etc/datacollection and an include-collection element to the default snmp-collection. This LWRP supports a very limited form of updating - if the resource type already exists but isn't included in the default snmp-collection, an include-collection element will be added. The definition of the resource type won't be updated, however.
 * `opennms_system_def`: add or remove pre-existing groups (`/datacollection-group/group[@name]`) to or from pre-existing systemDefs (`/datacollection-group/systemDef/collect/includeGroup[text()]`) in $ONMS_HOME/etc/datacollection/*.xml.
-* `opennms_snmp_collection`: adds an snmp-collection element to etc/datacollection-config.xml. 
-* `opennms_xml_collection`: adds an xml-collection element to etc/xml-datacollection-config.xml. 
-* `opennms_wmi_collection`: adds a wmi-collection element to etc/wmi-datacollection-config.xml. 
-* `opennms_jdbc_collection`: adds a jdbc-collection element to etc/jdbc-datacollection-config.xml. 
-* `opennms_collection_package`: adds a package element to etc/collectd-configuration.xml. 
-* `opennms_snmp_collection_service`: adds a service element to a package in etc/collectd-configuration.xml. 
-* `opennms_xml_collection_service`: adds a service element to a package in etc/collectd-configuration.xml. 
+* `opennms_snmp_collection`: adds an snmp-collection element to etc/datacollection-config.xml.
+* `opennms_xml_collection`: adds an xml-collection element to etc/xml-datacollection-config.xml.
+* `opennms_wmi_collection`: adds a wmi-collection element to etc/wmi-datacollection-config.xml.
+* `opennms_jdbc_collection`: adds a jdbc-collection element to etc/jdbc-datacollection-config.xml.
+* `opennms_collection_package`: adds a package element to etc/collectd-configuration.xml.
+* `opennms_snmp_collection_service`: adds a service element to a package in etc/collectd-configuration.xml.
+* `opennms_xml_collection_service`: adds a service element to a package in etc/collectd-configuration.xml. Supports update & delete.
 * `opennms_wmi_collection_service`: adds a service element to a package in etc/collectd-configuration.xml.
-* `opennms_jdbc_collection_service`: adds a service element to a package in etc/collectd-configuration.xml.
-* `opennms_snmp_collection_group`: adds an include-collection element to an snmp-collection in etc/datacollection-config.xml and drops off the specified cookbook file into etc/datacollection. 
-* `opennms_jdbc_query`: adds a query element to a jdbc-collection in etc/jdbc-datacollection-config.xml. 
-* `opennms_xml_source`: adds a xml-source element to a xml-collection in etc/xml-datacollection-config.xml. 
-* `opennms_xml_group`: adds a xml-source element to a xml-source in etc/xml-datacollection-config.xml. 
+* `opennms_jdbc_collection_service`: adds a service element to a package in etc/collectd-configuration.xml. Supports update & delete.
+* `opennms_snmp_collection_group`: adds an include-collection element to an snmp-collection in etc/datacollection-config.xml and drops off the specified cookbook file into etc/datacollection.
+* `opennms_jdbc_query`: adds a query element to a jdbc-collection in etc/jdbc-datacollection-config.xml.
+* `opennms_xml_source`: adds a xml-source element to a xml-collection in etc/xml-datacollection-config.xml.
+* `opennms_xml_group`: adds a xml-source element to a xml-source in etc/xml-datacollection-config.xml.
 
 #### Statistics Reports
 
@@ -243,8 +243,8 @@ See examples for all of these LWRPs are in a single recipe, `example_threshold`.
 
 * `opennms_threshd_package`: Create a new package in threshd-configuration.xml. 
 * `opennms_threshold_group`: Create a new threshold group in thresholds.xml. 
-* `opennms_threshold`: Create a new threshold in the specified group in thresholds.xml. 
-* `opennms_expression`: Create a new expression threshold in the specified group in thresholds.xml. 
+* `opennms_threshold`: Create a new threshold in the specified group in thresholds.xml. Supports updating.
+* `opennms_expression`: Create a new expression threshold in the specified group in thresholds.xml. Supports updating.
 
 #### Web UI
 

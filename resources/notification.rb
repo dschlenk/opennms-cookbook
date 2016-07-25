@@ -1,5 +1,5 @@
 require 'rexml/document'
-actions :create
+actions :create, :delete
 default_action :create
 
 attribute :name, :kind_of => String, :name_attribute => true
@@ -20,4 +20,4 @@ attribute :params, :kind_of => Hash
 attribute :vbname, :kind_of => String
 attribute :vbvalue, :kind_of => String
 
-attr_accessor :exists
+attr_accessor :exists, :changed
