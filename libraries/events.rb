@@ -193,7 +193,7 @@ module Events
         parameters = []
         event_el.elements.each("parameters") do |parm|
           p = { 'name' => parm.attributes['name'], 'value' => parm.attributes['value'] }
-          if node['opennms']['version_major'] > 17 && parm.has_key? 'expand'
+          if node['opennms']['version_major'] > 17 && parm.has_key?('expand')
             if parm.attributes['expand'] == 'true'
               p['expand'] = true
             else

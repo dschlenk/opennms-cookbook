@@ -8,6 +8,7 @@ driver:
 
 provisioner:
   name: chef_zero
+  log_level: debug
 
 platforms:
   - name: centos-6.7
@@ -55,6 +56,7 @@ suites:
         version: "16.0.4-1"
   - name: service_detector
     run_list:
+      - recipe[opennms::postgres]
       - recipe[postgresql::client]
       - recipe[postgresql::server]
       - recipe[postgresql::contrib]
@@ -62,8 +64,80 @@ suites:
       - recipe[postgresql::config_pgtune]
       - recipe[opennms::notemplates]
       - recipe[onms_lwrp_test::service_detector]
+  - name: events
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[postgresql::client]
+      - recipe[postgresql::server]
+      - recipe[postgresql::contrib]
+      - recipe[postgresql::config_initdb]
+      - recipe[postgresql::config_pgtune]
+      - recipe[opennms::notemplates]
+      - recipe[onms_lwrp_test::webopts]
+      - recipe[onms_lwrp_test::eventconf]
+      - recipe[onms_lwrp_test::event]
+  - name: events_16
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[postgresql::client]
+      - recipe[postgresql::server]
+      - recipe[postgresql::contrib]
+      - recipe[postgresql::config_initdb]
+      - recipe[postgresql::config_pgtune]
+      - recipe[opennms::notemplates]
+      - recipe[onms_lwrp_test::webopts]
+      - recipe[onms_lwrp_test::eventconf]
+      - recipe[onms_lwrp_test::event]
+    attributes:
+      opennms:
+        version: "16.0.4-1"
+  - name: events_17
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[postgresql::client]
+      - recipe[postgresql::server]
+      - recipe[postgresql::contrib]
+      - recipe[postgresql::config_initdb]
+      - recipe[postgresql::config_pgtune]
+      - recipe[opennms::notemplates]
+      - recipe[onms_lwrp_test::webopts]
+      - recipe[onms_lwrp_test::eventconf]
+      - recipe[onms_lwrp_test::event]
+    attributes:
+      opennms:
+        version: "17.1.1-1"
+  - name: disco
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[postgresql::client]
+      - recipe[postgresql::server]
+      - recipe[postgresql::contrib]
+      - recipe[postgresql::config_initdb]
+      - recipe[postgresql::config_pgtune]
+      - recipe[opennms::notemplates]
+      - recipe[onms_lwrp_test::webopts]
+      - recipe[onms_lwrp_test::disco_specific]
+      - recipe[onms_lwrp_test::disco_range]
+      - recipe[onms_lwrp_test::disco_url]
+  - name: disco_17
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[postgresql::client]
+      - recipe[postgresql::server]
+      - recipe[postgresql::contrib]
+      - recipe[postgresql::config_initdb]
+      - recipe[postgresql::config_pgtune]
+      - recipe[opennms::notemplates]
+      - recipe[onms_lwrp_test::webopts]
+      - recipe[onms_lwrp_test::disco_specific]
+      - recipe[onms_lwrp_test::disco_range]
+      - recipe[onms_lwrp_test::disco_url]
+    attributes:
+      opennms:
+        version: "17.1.1-1"
   - name: upgrade_step1
     run_list:
+      - recipe[opennms::postgres]
       - recipe[postgresql::client]
       - recipe[postgresql::server]
       - recipe[postgresql::contrib]
@@ -80,6 +154,7 @@ suites:
         version: "16.0.0-1"
   - name: upgrade_step2
     run_list:
+      - recipe[opennms::postgres]
       - recipe[postgresql::client]
       - recipe[postgresql::server]
       - recipe[postgresql::contrib]
@@ -97,6 +172,7 @@ suites:
         upgrade: true
   - name: change_notif
     run_list:
+      - recipe[opennms::postgres]
       - recipe[postgresql::client]
       - recipe[postgresql::server]
       - recipe[postgresql::contrib]
@@ -109,6 +185,7 @@ suites:
       - recipe[onms_lwrp_test::notification]
   - name: all
     run_list:
+      - recipe[opennms::postgres]
       - recipe[postgresql::client]
       - recipe[postgresql::server]
       - recipe[postgresql::contrib]
@@ -171,6 +248,7 @@ suites:
       - recipe[onms_lwrp_test::send_event]
   - name: imports
     run_list:
+      - recipe[opennms::postgres]
       - recipe[postgresql::client]
       - recipe[postgresql::server]
       - recipe[postgresql::contrib]
@@ -186,7 +264,7 @@ suites:
       - recipe[onms_lwrp_test::import_node_interface_service]
   - name: notemplates
     run_list:
-      - recipe[java]
+      - recipe[opennms::postgres]
       - recipe[postgresql::client]
       - recipe[postgresql::server]
       - recipe[postgresql::contrib]

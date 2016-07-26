@@ -22,9 +22,10 @@ end
 
 opennms_foreign_source 'disco-source'
 
-# with foreign source
+# with foreign source and location
 opennms_disco_range "anForeignSourceRange" do
   range_begin '10.1.0.1'
   range_end '10.1.0.254'
+  location 'Detroit'
   foreign_source 'disco-source'
 end

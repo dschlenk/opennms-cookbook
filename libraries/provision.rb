@@ -11,7 +11,10 @@ module Provision
   def foreign_source_exists?(name, node)
     return true if name == 'default'
     unless foreign_sources(node).nil?
-      foreign_sources(node).each do |source|
+      fs = foreign_sources(node)
+      Chef::Log.debug(fs)
+      fs.each do |source|
+        Chef::Log.debug source
         return true if !source.nil? && source.has_key?('name') && source['name'] == name
       end
     end
@@ -524,8 +527,13 @@ module Provision
     require 'rest_client'
     begin
       node.run_state[:foreign_sources] ||=
-        JSON.parse(RestClient.get("#{baseurl(node)}/foreignSources",
+        if node['opennms']['version_major'].to_i > 16
+          JSON.parse(RestClient.get("#{baseurl(node)}/foreignSources",
+                                  { :accept => :json }).to_str)['foreignSources']
+        else
+          JSON.parse(RestClient.get("#{baseurl(node)}/foreignSources",
                                   { :accept => :json }).to_str)
+        end
       node.run_state[:foreign_sources]
     rescue
       Chef::Log.warn "Cannot retrieve foreign sources via OpenNMS ReST API."

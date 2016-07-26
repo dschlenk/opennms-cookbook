@@ -17,5 +17,6 @@ opennms_foreign_source 'disco-url-source'
 
 # with foreign source
 opennms_disco_url "http://other.net/things" do
+  location 'Detroit'
   foreign_source 'disco-url-source'
 end

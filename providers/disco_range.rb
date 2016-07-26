@@ -24,14 +24,15 @@ def load_current_resource
   @current_resource.range_begin(@new_resource.range_begin)
   @current_resource.range_end(@new_resource.range_end)
   @current_resource.range_type(@new_resource.range_type)
+  @current_resource.location(@new_resource.location)
   @current_resource.foreign_source(@new_resource.foreign_source) unless @new_resource.foreign_source.nil?
 
   if @current_resource.foreign_source.nil?
-    if range_exists?(@current_resource.name, @current_resource.range_begin, @current_resource.range_end, @current_resource.range_type, nil)
+    if range_exists?(@current_resource.name, @current_resource.range_begin, @current_resource.range_end, @current_resource.range_type, @current_resource.location, nil)
       @current_resource.exists = true
     end
   else
-    if range_exists?(@current_resource.name, @current_resource.range_begin, @current_resource.range_end, @current_resource.range_type, @current_resource.foreign_source)
+    if range_exists?(@current_resource.name, @current_resource.range_begin, @current_resource.range_end, @current_resource.range_type, @current_resource.location, @current_resource.foreign_source)
       @current_resource.exists = true
     elsif foreign_source_exists?(@current_resource.foreign_source, node)
       @current_resource.foreign_source_exists = true
@@ -42,14 +43,22 @@ end
 
 private
 
-def range_exists?(name, range_begin, range_end, range_type, foreign_source)
+def range_exists?(name, range_begin, range_end, range_type, location, foreign_source)
   Chef::Log.debug "Checking to see if this discovery #{range_type} range exists: '#{range_begin} to #{range_end}'"
   file = ::File.new("#{node['opennms']['conf']['home']}/etc/discovery-configuration.xml", "r")
   doc = REXML::Document.new file
   if foreign_source.nil?
-    !doc.elements["/discovery-configuration/#{range_type}-range/begin[text() ='#{range_begin}']"].nil? && !doc.elements["/discovery-configuration/#{range_type}-range/end[text() = '#{range_end}']"].nil?
+    if location.nil? || node['opennms']['version_major'].to_i < 18
+      !doc.elements["/discovery-configuration/#{range_type}-range/begin[text() ='#{range_begin}']"].nil? && !doc.elements["/discovery-configuration/#{range_type}-range/end[text() = '#{range_end}']"].nil?
+    else
+      !doc.elements["/discovery-configuration/#{range_type}-range/[@location = '#{location}']/begin[text() ='#{range_begin}']"].nil? && !doc.elements["/discovery-configuration/#{range_type}-range/end[text() = '#{range_end}']"].nil?
+    end
   else
-    !doc.elements["/discovery-configuration/#{range_type}-range[@foreign-source = '#{foreign_source}']/begin[text() ='#{range_begin}']"].nil? && !doc.elements["/discovery-configuration/#{range_type}-range[@foreign-source = '#{foreign_source}']/end[text() = '#{range_end}']"].nil?
+    if location.nil? || node['opennms']['version_major'].to_i < 18
+      !doc.elements["/discovery-configuration/#{range_type}-range[@foreign-source = '#{foreign_source}']/begin[text() ='#{range_begin}']"].nil? && !doc.elements["/discovery-configuration/#{range_type}-range[@foreign-source = '#{foreign_source}']/end[text() = '#{range_end}']"].nil?
+    else
+      !doc.elements["/discovery-configuration/#{range_type}-range[@location = '#{location}' and @foreign-source = '#{foreign_source}']/begin[text() ='#{range_begin}']"].nil? && !doc.elements["/discovery-configuration/#{range_type}-range[@foreign-source = '#{foreign_source}']/end[text() = '#{range_end}']"].nil?
+    end
   end
 end
 
@@ -62,6 +71,9 @@ def create_range
   file.close
   new_el = REXML::Element.new("#{new_resource.range_type}-range")
   new_el.attributes['foreign-source'] = new_resource.foreign_source unless new_resource.foreign_source.nil?
+  if node['opennms']['version_major'].to_i > 17
+    new_el.attributes['location'] = new_resource.location unless new_resource.location.nil?
+  end
   begin_el = new_el.add_element 'begin'
   begin_el.add_text(new_resource.range_begin)
   end_el = new_el.add_element 'end'

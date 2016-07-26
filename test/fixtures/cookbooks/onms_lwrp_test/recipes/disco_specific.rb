@@ -16,5 +16,6 @@ opennms_foreign_source 'disco-specific-source'
 
 # with foreign source
 opennms_disco_specific "10.3.0.1" do
+  location 'Detroit'
   foreign_source 'disco-specific-source'
 end
