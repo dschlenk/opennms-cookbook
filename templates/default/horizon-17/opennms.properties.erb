@@ -8,12 +8,12 @@
 # ###### ICMP ######
 # OpenNMS provides three ICMP implementations. JICMP (legacy, IPv4-only),
 # JNA (supports both IPv4 and IPv6), and JICMP6.
-# 
+#
 # The JICMP implementation is what has traditionally been used in OpenNMS
 # since 1.0, uses JNI.  It requires you to install a separate package
 # (JICMP) which contains a shared library for interfacing with your system's
 # ICMP APIs.
-# 
+#
 # The JICMP6 core library is a version of the JICMP codebase which can speak
 # ICMPv6, instead of ICMPv4. The OpeNMS JICMP6 pinger supports both ICMPv4
 # and ICMPv6.  It delegates all ICMPv4 ping requests to the original JICMP
@@ -27,7 +27,7 @@
 # recommended unless you are in an environment which requires it.  This is
 # the default ICMP implementation used in the remote poller, since it does
 # not rely on any external native code to be installed outside of the JVM.
-# 
+#
 # To use the JNI ICMPv4 interface only, use the following property setting:
 #org.opennms.netmgt.icmp.pingerClass=org.opennms.netmgt.icmp.jni.JniPinger
 #
@@ -57,7 +57,7 @@ org.opennms.netmgt.icmp.requireV6=<%= @properties['icmp']['require_v6'] %>
 # OpenNMS provides two different SNMP implementations.  JoeSNMP is the
 # original OpenNMS # SNMP Library and provides SNMP v1 and v2 support.
 # SNMP4J is a new 100% Java SNMP library # that provides support for SNMP
-# v1, v2 and v3.  
+# v1, v2 and v3.
 #
 # To enable the JoeSnmp library uncomment the following line.
 #org.opennms.snmp.strategyClass=org.opennms.netmgt.snmp.joesnmp.JoeSnmpStrategy
@@ -82,11 +82,11 @@ org.snmp4j.smisyntaxes=<%= @properties['snmp']['smisyntaxes'] %>
 # always indicate a problem with an SNMP agent. Any that we don't catch will
 # end up in output.log, so they're disabled by default, but they may provide
 # more information (albeit without timestamps) than the messages that SNMP4J
-# logs (see snmp4j.LogFactory) 
+# logs (see snmp4j.LogFactory)
 org.opennms.snmp.snmp4j.forwardRuntimeExceptions=<%= @properties['snmp']['forward_runtime_exceptions'] %>
 
 # By default, SNMP4J does not do any logging internally, but it's easy to
-# enable.  See log4j.properties to adjust log levels for these messages. 
+# enable.  See log4j.properties to adjust log levels for these messages.
 snmp4j.LogFactory=<%= @properties['snmp']['log_factory'] %>
 
 # Net-SNMP agents prior to release 5.4.1 on 64-bit platforms exhibit a bug
@@ -126,7 +126,7 @@ org.opennms.snmp.snmp4j.allowSNMPv2InV1=<%= @properties['snmp']['allow_snmpv2_in
 # belonging to a single collection group to be stored together in a single
 # file.  To enable this setting uncomment the below line and change it to
 # 'true'.
-# 
+#
 # Default: false
 org.opennms.rrd.storeByGroup=<%= @properties['dc']['store_by_group'] %>
 
@@ -148,7 +148,7 @@ org.opennms.rrd.storeByGroup=<%= @properties['dc']['store_by_group'] %>
 # Default: false
 org.opennms.rrd.storeByForeignSource=<%= @properties['dc']['store_by_foreign_source'] %>
 
-# RRD base directory 
+# RRD base directory
 rrd.base.dir=<%= @properties['dc']['rrd_base_dir'] %>
 
 # RRD binary path (only used if the JniRrdStrategy is used)
@@ -194,7 +194,7 @@ org.opennms.utils.propertiesCache.enableCheckFileModified=<%=@properties['dc']['
 
 
 ###### TROUBLE TICKETING ######
-# The ticketer responsible for creating tickets from the Alarm details and passing these 
+# The ticketer responsible for creating tickets from the Alarm details and passing these
 # to the ticket plugin.
 opennms.ticketer.servicelayer=<%=@properties['ticket']['servicelayer']%>
 
@@ -205,14 +205,25 @@ opennms.ticketer.servicelayer=<%=@properties['ticket']['servicelayer']%>
 # $OPENNMS_HOME/jetty-webapps/opennms/WEB-INF/configuration.properties
 opennms.ticketer.plugin=<%=@properties['ticket']['plugin']%>
 
-# Comment out the NullTicketerPlugin line above and uncomment the lines below
-# to enable OtrsTicketerPlugin
-# You will need to adjust alarmTroubleTicketLinkTemplate to suit your OTRS Base URL
-# Note that you will need to install the OpenNMS module for OTRS in your OTRS server
+# Comment out the NullTicketerPlugin line above and uncomment one of the 
+# sections below to enable OtrsTicketerPlugin
+# You will need to adjust alarmTroubleTicketLinkTemplate URL
+
+# OTRS version 3.0.x and earlier
+# Requires the OpenNMS module for OTRS installed in the OTRS server
 
 #opennms.ticketer.plugin=org.opennms.netmgt.ticketer.otrs.OtrsTicketerPlugin
+#opennms.alarmTroubleTicketLinkTemplate = <a href="http://localhost/otrs/index.pl?Action=AgentTicketZoom&TicketID=org.opennms:opennms-base-assembly:pom:17.1.1">org.opennms:opennms-base-assembly:pom:17.1.1</a>
 #opennms.alarmTroubleTicketEnabled = true
+
+# OTRS version 3.1.x and later
+
+# Uses the OTRS Generic Ticket Connector and do not require any additional
+# Modules to be installed in OTRS.
+
+#opennms.ticketer.plugin=org.opennms.netmgt.ticketer.otrs31.Otrs31TicketerPlugin
 #opennms.alarmTroubleTicketLinkTemplate = <a href="http://localhost/otrs/index.pl?Action=AgentTicketZoom&TicketNumber=${id}">${id}</a>
+#opennms.alarmTroubleTicketEnabled = true
 
 # Comment out the NullTicketerPlugin line above and uncomment the lines below
 # to enable RtTicketerPlugin
@@ -249,7 +260,7 @@ java.awt.headless=<%=@properties['misc']['headless']%>
 org.opennms.dao.ipinterface.findByServiceType=<%=@properties['misc']['find_by_service_type_query']%>
 <% end -%>
 
-# If you change the above query to load the snmpInterfaces along with the if and node data then set this true 
+# If you change the above query to load the snmpInterfaces along with the if and node data then set this true
 # org.opennms.netmgt.collectd.DefaultCollectionAgent.loadSnmpDataOnInit=false
 <% unless @properties['misc']['load_snmp_data_on_init'].nil? -%>
 org.opennms.netmgt.collectd.DefaultCollectionAgent.loadSnmpDataOnInit=<%=@properties['misc']['load_snmp_data_on_init']%>
@@ -290,10 +301,10 @@ opennms.rtc.event.proxy.timeout=<%=@properties['eventd']['proxy_timeout']%>
 <% unless @properties['rancid']['enabled'].nil? -%>
 opennms.rancidIntegrationEnabled = <%=@properties['rancid']['enabled']%>
 <% end -%>
-# 
-# set to true the following property to use only RancidAdapter to write Clogin 
+#
+# set to true the following property to use only RancidAdapter to write Clogin
 # info in Rancid .cloginrc file
-# opennms.rancidIntegrationUseOnlyRancidAdapter = false   
+# opennms.rancidIntegrationUseOnlyRancidAdapter = false
 <% unless @properties['rancid']['only_rancid_adapter'].nil? -%>
 opennms.rancidIntegrationUseOnlyRancidAdapter = <%=@properties['rancid']['only_rancid_adapter']%>
 <% end -%>
@@ -337,7 +348,7 @@ org.opennms.netmgt.jetty.ajp-port = <%=@properties['jetty']['ajp']%>
 <% unless @properties['jetty']['host'].nil? -%>
 org.opennms.netmgt.jetty.host = <%=@properties['jetty']['host']%>
 <% end -%>
-# 
+#
 # This enables NCSA style request logging in ${opennm.home}/logs
 #
 # Uncomment this and change to true to enable this
@@ -346,13 +357,13 @@ org.opennms.netmgt.jetty.host = <%=@properties['jetty']['host']%>
 org.opennms.netmgt.jetty.enableRequestLogging=<%=@properties['jetty']['req_logging']%>
 <% end -%>
 
-# This sets the maximum size for a form submission in jetty.  
+# This sets the maximum size for a form submission in jetty.
 # The default value is 200000 bytes.  Setting it to -1 disables
 # the form limit
 # In 1.8 or earlier set
 #org.mortbay.jetty.Request.maxFormContentSize=200000
 #
-# in 1.9 or later set 
+# in 1.9 or later set
 #org.eclipse.jetty.server.Request.maxFormContentSize=200000
 <% unless @properties['jetty']['max_form_content_size'].nil? -%>
 org.eclipse.jetty.server.Request.maxFormContentSize=<%=@properties['jetty']['max_form_content_size']%>
@@ -506,7 +517,7 @@ org.opennms.netmgt.collectd.SnmpCollector.limitCollectionToInstances=<%=@propert
 
 #
 # This property is for enabling acl support in the webapp.  With ACLs enabled then Nodes, Alarms, Events etc
-# are filtered according to the authorzied groups list on onms categories.  In other words.  For a user to 
+# are filtered according to the authorzied groups list on onms categories.  In other words.  For a user to
 # set the events, outages etc for a particular node then that user has to be authorized for a category that the node
 # belongs to
 #org.opennms.web.aclsEnabled=false
@@ -522,7 +533,7 @@ importer.adapter.dns.server=<%=@properties['provisioning']['dns_server']%>
 
 ###### ASYNC DETECTOR SETUP ######
 # This property defines how many current async detetion attempts can be created at any given time.
-# 
+#
 # Setting this to zero removes any limits on the number of concurrent connection attempts.
 #org.opennms.netmgt.provision.maxConcurrentConnections=0
 <% unless @properties['provisioning']['max_concurrent_xtn'].nil? -%>
@@ -540,7 +551,7 @@ smslib.serial.polling=<%=@properties['sms']['polling']%>
 
 ###### PROVISIOND OPTIONS ######
 #
-# This property is used to enable/disable the handling of new suspect events 
+# This property is used to enable/disable the handling of new suspect events
 # in provisiond along with periodic scanning of discovered nodes.  The default
 # setting is true (See org.opennms.netmgt.provision.service.ProvisionService)
 #org.opennms.provisiond.enableDiscovery=true
@@ -549,12 +560,12 @@ org.opennms.provisiond.enableDiscovery=<%=@properties['provisioning']['enable_di
 <% end -%>
 
 # Prior to 1.10 it was possible to delete entities that have been provisioned as
-# part of a provisioning group.  In 1.10 we have disabled this so that in order to 
+# part of a provisioning group.  In 1.10 we have disabled this so that in order to
 # delete these entities you have to go back to the provisioning group and delete them
 # from there.  To reenable this deletion you can set this to true.
 # NOTE: if you do this then the object will be recreated when the provisioning group is
 # next imported/synchronized
-#org.opennms.provisiond.enableDeletionOfRequisitionedEntities=false
+org.opennms.provisiond.enableDeletionOfRequisitionedEntities=true
 <% unless @properties['provisioning']['enable_deletions'].nil? -%>
 org.opennms.provisiond.enableDeletionOfRequisitionedEntities=<%=@properties['provisioning']['enable_deletions']%>
 <% end -%>
@@ -580,8 +591,8 @@ org.opennms.provisiond.scheduleRescanForUpdatedNodes=<%=@properties['provisionin
 # Use this property to change the strategy used for managing deployed/pending requisitions.
 # Tested strategies:
 # - file (default)
-# - fastFile (recommended for fastest response, at expense of memory resources)
 # Experimental strategies:
+# - fastFile (recommended for fastest response, at expenses of memory resources)
 # - fused
 # - fastFused
 # - queueing
@@ -650,7 +661,7 @@ gwt.openlayers.url=<%=@properties['geo']['tile_url']%>
 ###### UI DISPLAY OPTIONS ######
 
 # This value allows you to show or hide the Acknowledge event button. This is only
-# here for those who still acknowledge events. We are moving away from this and 
+# here for those who still acknowledge events. We are moving away from this and
 # towards acknowledging alarms instead of events. Default is false
 opennms.eventlist.acknowledge=<%=@properties['ui']['ack']%>
 
@@ -709,10 +720,10 @@ org.opennms.security.disableLoginSuccessEvent=<%=@properties['ui']['disable_logi
 #### SERVER SETTINGS ####
 
 # This setting is the minimum amount of time between reloads of a remote poller configuration
-# in milliseconds because of global changes.  This value should never be set 
+# in milliseconds because of global changes.  This value should never be set
 # less the 300000 (5 minutes) except to set it to zero which means never only reload the
 # configuration if the location monitors status has been set to CONFIG_CHANGED.
-#opennms.pollerBackend.minimumConfigurationReloadInterval=300000 
+#opennms.pollerBackend.minimumConfigurationReloadInterval=300000
 <% unless @properties['remote']['min_config_reload_int'].nil? -%>
 opennms.pollerBackend.minimumConfigurationReloadInterval=<%=@properties['remote']['min_config_reload_int']%> 
 <% end -%>
@@ -736,19 +747,25 @@ opennms.poller.server.registryPort=<%=@properties['remote']['pb_registry_port']%
 
 #### REMOTE SETTINGS ####
 
-# All settings on the remote pollers are controlled via command-line options. Look at these 
+# All settings on the remote pollers are controlled via command-line options. Look at these
 # wiki pages for more details.
 #
 # http://www.opennms.org/wiki/Remote_Polling
 # http://www.opennms.org/wiki/Remote_Poller_Design_Overview
 
 
-###### JASPER REPORTS VERSION  ######
+###### JasperReports Properties ######
+# Defines the Version of the Jasperreports library
 org.opennms.jasperReportsVersion=<%=@properties['reporting']['jasper_version']%>
+
+# Define if duplicates are ignored when using pie charts within a JasperReport template (*.jrxml) file.
+# See http://jasperreports.sourceforge.net/config.reference.html for more details.
+net.sf.jasperreports.chart.pie.ignore.duplicated.key=true
 
 ###### Web Console - Front Page ######
 # This value controls the content that will be displayed in the middle box of the front page.
 # The default is the view of SLM/RTC categories: /includes/categories-box.jsp.
+# You can also use a comma-seperated list of files to include more than one content file.
 # Uncomment the following line to display the widget for the surveillance view from the dashboard.
 # (It uses the same rules for the dashboard)
 #org.opennms.web.console.centerUrl=/surveillance-box.jsp
@@ -766,7 +783,7 @@ org.opennms.web.console.centerUrl=<%=@properties['ui']['center_url']%>
 # services, you may need to add them to this list.
 excludeServiceMonitorsFromRemotePoller=<%=@properties['remote']['exclude_service_monitors']%>
 
-# ###### DASHBOARD/SURVEILLANCE VIEW IMPLEMENTATION ######
+###### DASHBOARD/SURVEILLANCE VIEW IMPLEMENTATION ######
 # OpenNMS provides two different dashboard/surveillance view implementations. The GWT
 # variant is the original. Later, the UI was rewitten using the VAADIN framework. So, the
 # two valid options fpr this option are 'vaadin' or 'gwt'. The VAADIN implementation is
@@ -774,9 +791,208 @@ excludeServiceMonitorsFromRemotePoller=<%=@properties['remote']['exclude_service
 # future versions.
 #org.opennms.dashboard.implementation=gwt
 
-# ###### DASHBOARD LANDING PAGE ######
+###### DASHBOARD LANDING PAGE ######
 # This setting controls whether users will be redirected to the dashboard page after
 # a successful login. The two valid options for this are 'true' or 'false' which is
 # the default value.
 #org.opennms.dashboard.redirect=false
 
+###### Time Series Strategy ####
+# Use this property to set the strategy used to persist and retrieve time series metrics:
+# Supported values are:
+#   rrd (default)
+#   newts
+#org.opennms.timeseries.strategy=rrd
+<% if node['opennms']['properties']['time_series']['strategy'] != 'rrd' -%>
+org.opennms.timeseries.strategy=<%=node['opennms']['properties']['time_series']['strategy']%>
+<% end -%>
+
+###### Graphing #####
+# Use this property to set the graph rendering engine type.  If set to 'auto', attempt
+# to choose the appropriate backend depending on org.opennms.timeseries.strategy above.
+# Supported values are:
+#   auto (default)
+#   png
+#   placeholder
+#   backshift
+#org.opennms.web.graphs.engine=backshift
+<% if node['opennms']['properties']['graph_engine'] != 'backshift' -%>
+org.opennms.web.graphs.engine=<%=node['opennms']['properties']['graph_engine']%>
+<% end -%>
+
+###### Newts #####
+# Use these properties to configure persistence using Newts
+# Note that Newts must be enabled using the 'org.opennms.timeseries.strategy' property
+# for these to take effect.
+#
+#org.opennms.newts.config.hostname=localhost
+<% if node['opennms']['properties']['time_series'] == 'newts' -%>
+org.opennms.newts.config.hostname=<%= node['opennms']['properties']['newts']['hostname'] %>
+<% end -%>
+#org.opennms.newts.config.keyspace=newts
+<% if node['opennms']['properties']['time_series'] == 'newts' -%>
+org.opennms.newts.config.keyspace=<%=node['opennms']['properties']['newts']['keyspace']%>
+<% end -%>
+#org.opennms.newts.config.port=9042
+<% if node['opennms']['properties']['time_series'] == 'newts' -%>
+org.opennms.newts.config.port=<%=node['opennms']['properties']['newts']['port']%>
+<% end -%>
+#org.opennms.newts.config.username=cassandra
+<% if node['opennms']['properties']['time_series'] == 'newts' -%>
+org.opennms.newts.config.username=<%=node['opennms']['properties']['newts']['username']%>
+<% end -%>
+#org.opennms.newts.config.password=cassandra
+<% if node['opennms']['properties']['time_series'] == 'newts' -%>
+org.opennms.newts.config.password=<%=node['opennms']['properties']['newts']['keyspace']%>
+<% end -%>
+#org.opennms.newts.config.read_consistency=ONE
+<% if node['opennms']['properties']['time_series'] == 'newts' -%>
+org.opennms.newts.config.read_consistency=<%=node['opennms']['properties']['newts']['read_consistency']%>
+<% end -%>
+#org.opennms.newts.config.write_consistency=ANY
+<% if node['opennms']['properties']['time_series'] == 'newts' -%>
+org.opennms.newts.config.write_consistency=<%=node['opennms']['properties']['newts']['write_consistency']%>
+<% end -%>
+# Depends the Cassandra cluster's batch_size_fail_threshold_in_kb property
+#org.opennms.newts.config.max_batch_size=16
+<% if node['opennms']['properties']['time_series'] == 'newts' -%>
+org.opennms.newts.config.max_batch_size=<%=node['opennms']['properties']['newts']['max_batch_size']%>
+<% end -%>
+#org.opennms.newts.config.ring_buffer_size=8192
+<% if node['opennms']['properties']['time_series'] == 'newts' -%>
+org.opennms.newts.config.ring_buffer_size=<%=node['opennms']['properties']['newts']['ring_buffer_size']%>
+<% end -%>
+# One year in seconds
+#org.opennms.newts.config.ttl=31540000
+<% if node['opennms']['properties']['time_series'] == 'newts' -%>
+org.opennms.newts.config.ttl=<%=node['opennms']['properties']['newts']['ttl']%>
+<% end -%>
+# Seven days in seconds
+#org.opennms.newts.config.resource_shard=604800
+<% if node['opennms']['properties']['time_series'] == 'newts' -%>
+org.opennms.newts.config.resource_shard=<%=node['opennms']['properties']['newts']['resource_shard']%>
+<% end -%>
+# Local In-Memory cache (default)
+#org.opennms.newts.config.cache.strategy=org.opennms.netmgt.newts.support.GuavaSearchableResourceMetadataCache
+#org.opennms.newts.config.cache.max_entries=8192
+<% if node['opennms']['properties']['time_series'] == 'newts' -%>
+org.opennms.newts.config.cache.strategy=<%=node['opennms']['properties']['newts']['cache_strategy']%>
+<% end -%>
+<% if node['opennms']['properties']['time_series'] == 'newts' && node['opennms']['properties']['newts']['cache_strategy'] == 'org.opennms.netmgt.newts.support.GuavaSearchableResourceMetadataCache'-%>
+org.opennms.newts.config.cache.max_entries=<%=node['opennms']['properties']['newts']['cache_max_entries']%>
+<% end -%>
+# External Redis cache
+#org.opennms.newts.config.cache.strategy=org.opennms.netmgt.newts.support.RedisResourceMetadataCache
+#org.opennms.newts.config.cache.redis_hostname=localhost
+<% if node['opennms']['properties']['time_series'] == 'newts' && node['opennms']['properties']['newts']['cache_strategy'] == 'org.opennms.netmgt.newts.support.RedisResourceMetadataCache'-%>
+org.opennms.newts.config.cache.redis_hostname=<%=node['opennms']['properties']['newts']['redis_hostname']%>
+<% end -%>
+#org.opennms.newts.config.cache.redis_port=6379
+<% if node['opennms']['properties']['time_series'] == 'newts' && node['opennms']['properties']['newts']['cache_strategy'] == 'org.opennms.netmgt.newts.support.RedisResourceMetadataCache'-%>
+org.opennms.newts.config.cache.redis_port=<%=node['opennms']['properties']['newts']['cache_redis_port']%>
+<% end -%>
+
+###### HEATMAP ######
+# The following options are used to configure the default behaviour of the
+# heatmap visualization of outages and alarms.
+#
+# There exist two modes for operating the heatmap. Valid options
+# are 'alarms' and 'outages'. The default is 'alarms'.
+#org.opennms.heatmap.defaultMode=alarms
+<% if node['opennms']['properties']['heatmap']['default_mode'] != 'alarms' -%>
+org.opennms.heatmap.defaultMode=<%=node['opennms']['properties']['heatmap']['default_mode']%>
+<% end -%>
+#
+# The heatmap will work with categories or foreign sources. The
+# default heatmap can be set here by choosing 'categories',
+# 'foreignSources' or 'monitoredServices'. The default is 'categories'.
+#org.opennms.heatmap.defaultHeatmap=categories
+<% if node['opennms']['properties']['heatmap']['default_heatmap'] != 'categories' -%>
+org.opennms.heatmap.defaultHeatmap=<%=node['opennms']['properties']['heatmap']['default_heatmap']%>
+<% end -%>
+#
+# The following option is used to filter for categories to be displayed in
+# the heatmap. This option uses the Java regular expression syntax. The default
+# is '.*' so all categories will be displayed.
+#org.opennms.heatmap.categoryFilter=.*
+<% if node['opennms']['properties']['heatmap']['category_filter'] != '.*' -%>
+org.opennms.heatmap.categoryFilter=<%=node['opennms']['properties']['heatmap']['category_filter']%>
+<% end -%>
+#
+# The following option is used to filter for foreign sources to be displayed in
+# the heatmap. This option uses the Java regular expression syntax. The default
+# is '.*' so all foreign sources will be displayed.
+#org.opennms.heatmap.foreignSourceFilter=.*
+<% if node['opennms']['properties']['heatmap']['foreign_source_filter'] != '.*' -%>
+org.opennms.heatmap.foreignSourceFilter=<%=node['opennms']['properties']['heatmap']['foreign_source_filter']%>
+<% end -%>
+#
+# The following option is used to filter for services to be displayed in
+# the heatmap. This option uses the Java regular expression syntax. The default
+# is '.*' so all services will be displayed.
+#org.opennms.heatmap.serviceFilter=.*
+<% if node['opennms']['properties']['heatmap']['service_filter'] != '.*' -%>
+org.opennms.heatmap.serviceFilter=<%=node['opennms']['properties']['heatmap']['service_filter']%>
+<% end -%>
+#
+# You can use negative lookahead expressions for excluding categories you wish
+# not to be displayed in the heatmap, e.g. by using an expression like '^(?!XY).*'
+# you can filter out entities with names starting with 'XY'.
+#
+# The next option configures whether only unacknowledged alarms will be taken into
+# account when generating the alarm-based heatmap.
+#org.opennms.heatmap.onlyUnacknowledged=false
+<% if node['opennms']['properties']['heatmap']['only_unacknowledged'] != false -%>
+org.opennms.heatmap.onlyUnacknowledged=<%=node['opennms']['properties']['heatmap']['only_unacknowledged']%>
+<% end -%>
+
+# ###### GRAFANA BOX ######
+# This setting controls whether a grafana box showing the available dashboards is
+# placed on the landing page. The two valid options for this are 'true' or 'false'
+# which is the default value.
+#org.opennms.grafanaBox.show=false
+<% if node['opennms']['properties']['grafana']['show'] -%>
+org.opennms.grafanaBox.show=true
+<% end -%>
+#
+# If the box is enabled you also need to specify hostname of the grafana server
+#org.opennms.grafanaBox.hostname=localhost
+<% if node['opennms']['properties']['grafana']['show'] -%>
+org.opennms.grafanaBox.hostname=<%=node['opennms']['properties']['grafana']['hostname'] -%>
+<% end -%>
+#
+# And also the port of the grafana server
+#org.opennms.grafanaBox.port=3000
+<% if node['opennms']['properties']['grafana']['show'] -%>
+org.opennms.grafanaBox.port=<%=node['opennms']['properties']['grafana']['port'] -%>
+<% end -%>
+#
+# The API key is needed for the ReST calls to work
+#org.opennms.grafanaBox.apiKey=
+<% if node['opennms']['properties']['grafana']['show'] -%>
+org.opennms.grafanaBox.apiKey=<%=node['opennms']['properties']['grafana']['api_key'] -%>
+<% end -%>
+#
+# When a tag is specified only dashboards with this given tag
+# will be displayed. When no tag is given all dashboards will
+# be displayed.
+#org.opennms.grafanaBox.tag=
+<% if node['opennms']['properties']['grafana']['show'] -%>
+org.opennms.grafanaBox.tag=<%=node['opennms']['properties']['grafana']['tag'] -%>
+<% end -%>
+#
+# The protocol for the ReST call can also be specified
+#org.opennms.grafanaBox.protocol=http
+<% if node['opennms']['properties']['grafana']['show'] -%>
+org.opennms.grafanaBox.protocol=<%=node['opennms']['properties']['grafana']['protocol'] -%>
+<% end -%>
+#
+# Timeouts for contacting the grafana server
+#org.opennms.grafanaBox.connectionTimeout=500
+<% if node['opennms']['properties']['grafana']['show'] -%>
+org.opennms.grafanaBox.connectionTimeout=<%=node['opennms']['properties']['grafana']['connection_timeout'] -%>
+<% end -%>
+#org.opennms.grafanaBox.soTimeout=500
+<% if node['opennms']['properties']['grafana']['show'] -%>
+org.opennms.grafanaBox.soTimeout=<%=node['opennms']['properties']['grafana']['so_timeout'] -%>
+<% end -%>

@@ -93,9 +93,6 @@
     <logger name="httpclient" additivity="false" level="INFO">
       <appender-ref ref="RoutingAppender"/>
     </logger>
-    <logger name="mx4j" additivity="false" level="INFO">
-      <appender-ref ref="RoutingAppender"/>
-    </logger>
     <logger name="net.sf.jasperreports" additivity="false" level="INFO">
       <appender-ref ref="RoutingAppender"/>
     </logger>
@@ -169,7 +166,6 @@
         <KeyValuePair key="alarmd"               value="<%=@log[:alarmd]%>" />
         <KeyValuePair key="asterisk-gateway"     value="<%=@log[:asterisk_gateway]%>" />
         <KeyValuePair key="archiver"             value="<%=@log[:archiver]%>" />
-        <KeyValuePair key="capsd"                value="<%=@log[:capsd]%>" />
         <KeyValuePair key="collectd"             value="<%=@log[:collectd]%>" />
         <KeyValuePair key="correlator"           value="<%=@log[:correlator]%>" />
         <KeyValuePair key="dhcpd"                value="<%=@log[:dhcpd]%>" />
@@ -178,7 +174,6 @@
         <KeyValuePair key="event-translator"     value="<%=@log[:event_translator]%>" />
         <KeyValuePair key="icmp"                 value="<%=@log[:icmp]%>" />
         <KeyValuePair key="jetty-server"         value="<%=@log[:jetty_server]%>" />
-        <KeyValuePair key="linkd"                value="<%=@log[:linkd]%>" />
         <KeyValuePair key="enlinkd"              value="<%=@log[:enlinkd]%>" />
         <KeyValuePair key="manager"              value="<%=@log[:manager]%>" />
         <KeyValuePair key="map"                  value="<%=@log[:map]%>" />
@@ -193,13 +188,14 @@
         <KeyValuePair key="reportd"              value="<%=@log[:reportd]%>" />
         <KeyValuePair key="reports"              value="<%=@log[:reports]%>" />
         <KeyValuePair key="rtc"                  value="<%=@log[:rtc]%>" />
-        <KeyValuePair key="syslogd"              value="<%=@log[:syslogd]%>" />
+        <KeyValuePair key="statsd"               value="<%=@log[:syslogd]%>" />
         <KeyValuePair key="scriptd"              value="<%=@log[:scriptd]%>" />
         <KeyValuePair key="snmp-poller"          value="<%=@log[:snmp_poller]%>" />
         <KeyValuePair key="syslogd"              value="<%=@log[:syslogd]%>" />
         <KeyValuePair key="threshd"              value="<%=@log[:threshd]%>" />
         <KeyValuePair key="tl1d"                 value="<%=@log[:tl1d]%>" />
         <KeyValuePair key="trapd"                value="<%=@log[:trapd]%>" />
+        <KeyValuePair key="trouble-ticketer"     value="<%=@log[:trouble_ticketer]%>" />
         <KeyValuePair key="vacuumd"              value="<%=@log[:vacuumd]%>" />
         <KeyValuePair key="web"                  value="<%=@log[:web]%>" />
       </DynamicThresholdFilter>

@@ -416,34 +416,36 @@ template "#{onms_home}/etc/jmx-datacollection-config.xml" do
   )
 end
 
-template "#{onms_home}/etc/linkd-configuration.xml" do
-  cookbook node[:opennms][:linkd][:cookbook]
-  source "#{template_dir}linkd-configuration.xml.erb"
-  mode 00664
-  owner "root"
-  group "root"
-  notifies :restart, "service[opennms]"
-  variables(
-    :threads                      => node[:opennms][:linkd][:threads],
-    :initial_sleep_time           => node[:opennms][:linkd][:initial_sleep_time],
-    :snmp_poll_interval           => node[:opennms][:linkd][:snmp_poll_interval],
-    :discovery_link_interval      => node[:opennms][:linkd][:discovery_link_interval],
-    :package                      => node[:opennms][:linkd][:package],
-    :filter                       => node[:opennms][:linkd][:filter],
-    :range_begin                  => node[:opennms][:linkd][:range_begin],
-    :range_end                    => node[:opennms][:linkd][:range_end],
-    :netscreen                    => node[:opennms][:linkd][:iproutes][:enable_netscreen],
-    :samsung                      => node[:opennms][:linkd][:iproutes][:enable_samsung],
-    :iproute_cisco                => node[:opennms][:linkd][:iproutes][:enable_cisco],
-    :darwin                       => node[:opennms][:linkd][:iproutes][:enable_darwin],
-    :vlan_3com                    => node[:opennms][:linkd][:vlan][:enable_3com],
-    :vlan_3com3870                => node[:opennms][:linkd][:vlan][:enable_3com3870],
-    :vlan_nortel                  => node[:opennms][:linkd][:vlan][:enable_nortel],
-    :vlan_intel                   => node[:opennms][:linkd][:vlan][:enable_intel],
-    :vlan_hp                      => node[:opennms][:linkd][:vlan][:enable_hp],
-    :vlan_cisco                   => node[:opennms][:linkd][:vlan][:enable_cisco],
-    :vlan_extreme                 => node[:opennms][:linkd][:vlan][:enable_extreme]
-  )
+if node['opennms']['version_major'] == '16'
+  template "#{onms_home}/etc/linkd-configuration.xml" do
+    cookbook node[:opennms][:linkd][:cookbook]
+    source "#{template_dir}linkd-configuration.xml.erb"
+    mode 00664
+    owner "root"
+    group "root"
+    notifies :restart, "service[opennms]"
+    variables(
+      :threads                      => node[:opennms][:linkd][:threads],
+      :initial_sleep_time           => node[:opennms][:linkd][:initial_sleep_time],
+      :snmp_poll_interval           => node[:opennms][:linkd][:snmp_poll_interval],
+      :discovery_link_interval      => node[:opennms][:linkd][:discovery_link_interval],
+      :package                      => node[:opennms][:linkd][:package],
+      :filter                       => node[:opennms][:linkd][:filter],
+      :range_begin                  => node[:opennms][:linkd][:range_begin],
+      :range_end                    => node[:opennms][:linkd][:range_end],
+      :netscreen                    => node[:opennms][:linkd][:iproutes][:enable_netscreen],
+      :samsung                      => node[:opennms][:linkd][:iproutes][:enable_samsung],
+      :iproute_cisco                => node[:opennms][:linkd][:iproutes][:enable_cisco],
+      :darwin                       => node[:opennms][:linkd][:iproutes][:enable_darwin],
+      :vlan_3com                    => node[:opennms][:linkd][:vlan][:enable_3com],
+      :vlan_3com3870                => node[:opennms][:linkd][:vlan][:enable_3com3870],
+      :vlan_nortel                  => node[:opennms][:linkd][:vlan][:enable_nortel],
+      :vlan_intel                   => node[:opennms][:linkd][:vlan][:enable_intel],
+      :vlan_hp                      => node[:opennms][:linkd][:vlan][:enable_hp],
+      :vlan_cisco                   => node[:opennms][:linkd][:vlan][:enable_cisco],
+      :vlan_extreme                 => node[:opennms][:linkd][:vlan][:enable_extreme]
+    )
+  end
 end
 
 template "#{onms_home}/etc/magic-users.properties" do
@@ -465,43 +467,45 @@ template "#{onms_home}/etc/magic-users.properties" do
   )
 end
 
-template "#{onms_home}/etc/map.properties" do
-  cookbook node[:opennms][:map][:cookbook]
-  source "#{template_dir}map.properties.erb"
-  mode 00664
-  owner "root"
-  group "root"
-  notifies :restart, "service[opennms]"
-  variables(
-    :critical           => node[:opennms][:map][:severity][:critical],
-    :major              => node[:opennms][:map][:severity][:major],
-    :minor              => node[:opennms][:map][:severity][:minor],
-    :warning            => node[:opennms][:map][:severity][:warning],
-    :normal             => node[:opennms][:map][:severity][:normal],
-    :cleared            => node[:opennms][:map][:severity][:cleared],
-    :indeterminate      => node[:opennms][:map][:severity][:indeterminate],
-    :default            => node[:opennms][:map][:severity][:default],
-    :ethernet_text      => node[:opennms][:map][:link][:ethernet][:text],
-    :fastethernet_text  => node[:opennms][:map][:link][:fastethernet][:text],
-    :fastethernet2_text => node[:opennms][:map][:link][:fastethernet2][:text],
-    :gigaethernet_text  => node[:opennms][:map][:link][:gigaethernet][:text],
-    :gigaethernet2_text => node[:opennms][:map][:link][:gigaethernet2][:text],
-    :serial_text        => node[:opennms][:map][:link][:serial][:text],
-    :framerelay_text    => node[:opennms][:map][:link][:framerelay][:text],
-    :ieee80211_text     => node[:opennms][:map][:link][:ieee80211][:text],
-    :unknown_text       => node[:opennms][:map][:link][:unknown][:text],
-    :dwo_text           => node[:opennms][:map][:link][:dwo][:text],
-    :summary_text       => node[:opennms][:map][:link][:summary][:text],
-    :link_default       => node[:opennms][:map][:link][:default],
-    :multilink          => node[:opennms][:map][:multilink],
-    :linkstatus         => node[:opennms][:map][:linkstatus],
-    :status             => node[:opennms][:map][:status],
-    :avail              => node[:opennms][:map][:avail],
-    :icon               => node[:opennms][:map][:icon],
-    :cmenu              => node[:opennms][:map][:cmenu],
-    :severity           => node[:opennms][:map][:severity],
-    :enable             => node[:opennms][:map][:enable]
-  )
+if node['opennms']['version_major'] == '16'
+  template "#{onms_home}/etc/map.properties" do
+    cookbook node[:opennms][:map][:cookbook]
+    source "#{template_dir}map.properties.erb"
+    mode 00664
+    owner "root"
+    group "root"
+    notifies :restart, "service[opennms]"
+    variables(
+      :critical           => node[:opennms][:map][:severity][:critical],
+      :major              => node[:opennms][:map][:severity][:major],
+      :minor              => node[:opennms][:map][:severity][:minor],
+      :warning            => node[:opennms][:map][:severity][:warning],
+      :normal             => node[:opennms][:map][:severity][:normal],
+      :cleared            => node[:opennms][:map][:severity][:cleared],
+      :indeterminate      => node[:opennms][:map][:severity][:indeterminate],
+      :default            => node[:opennms][:map][:severity][:default],
+      :ethernet_text      => node[:opennms][:map][:link][:ethernet][:text],
+      :fastethernet_text  => node[:opennms][:map][:link][:fastethernet][:text],
+      :fastethernet2_text => node[:opennms][:map][:link][:fastethernet2][:text],
+      :gigaethernet_text  => node[:opennms][:map][:link][:gigaethernet][:text],
+      :gigaethernet2_text => node[:opennms][:map][:link][:gigaethernet2][:text],
+      :serial_text        => node[:opennms][:map][:link][:serial][:text],
+      :framerelay_text    => node[:opennms][:map][:link][:framerelay][:text],
+      :ieee80211_text     => node[:opennms][:map][:link][:ieee80211][:text],
+      :unknown_text       => node[:opennms][:map][:link][:unknown][:text],
+      :dwo_text           => node[:opennms][:map][:link][:dwo][:text],
+      :summary_text       => node[:opennms][:map][:link][:summary][:text],
+      :link_default       => node[:opennms][:map][:link][:default],
+      :multilink          => node[:opennms][:map][:multilink],
+      :linkstatus         => node[:opennms][:map][:linkstatus],
+      :status             => node[:opennms][:map][:status],
+      :avail              => node[:opennms][:map][:avail],
+      :icon               => node[:opennms][:map][:icon],
+      :cmenu              => node[:opennms][:map][:cmenu],
+      :severity           => node[:opennms][:map][:severity],
+      :enable             => node[:opennms][:map][:enable]
+    )
+  end
 end
 
 template "#{onms_home}/etc/microblog-configuration.xml" do
@@ -1219,16 +1223,18 @@ template "#{onms_home}/etc/snmp-graph.properties.d/force10-graph.properties" do
   )
 end
 
-template "#{onms_home}/etc/snmp-graph.properties.d/fortinet-graph.properties" do
-  cookbook node[:opennms][:snmp_graph][:fortinet][:cookbook]
-  source "#{template_dir}snmp-graph.properties.d/fortinet-graph.properties.erb"
-  mode 0664
-  owner "root"
-  group "root"
-  notifies :restart, "service[opennms]"
-  variables(
-    :enabled => node[:opennms][:snmp_graph][:fortinet][:enabled]
-  )
+if node['opennms']['version_major'] == '16'
+  template "#{onms_home}/etc/snmp-graph.properties.d/fortinet-graph.properties" do
+    cookbook node[:opennms][:snmp_graph][:fortinet][:cookbook]
+    source "#{template_dir}snmp-graph.properties.d/fortinet-graph.properties.erb"
+    mode 0664
+    owner "root"
+    group "root"
+    notifies :restart, "service[opennms]"
+    variables(
+      :enabled => node[:opennms][:snmp_graph][:fortinet][:enabled]
+    )
+  end
 end
 
 template "#{onms_home}/etc/snmp-graph.properties.d/foundry-graph.properties" do

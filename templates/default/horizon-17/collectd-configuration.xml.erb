@@ -3,6 +3,44 @@
 <collectd-configuration
         threads="<%= @threads %>">
 
+    <package name="cassandra21x">
+        <filter><![CDATA[(IPADDR != '0.0.0.0') & (categoryName == 'Cassandra21x')]]></filter>
+        <service name="JMX-Cassandra" interval="300000" user-defined="false" status="on">
+            <parameter key="port" value="7199"/>
+            <parameter key="retry" value="2"/>
+            <parameter key="timeout" value="3000"/>
+            <parameter key="protocol" value="rmi"/>
+            <parameter key="urlPath" value="/jmxrmi"/>
+            <parameter key="rrd-base-name" value="cassandra21x"/>
+            <parameter key="ds-name" value="cassandra21x"/>
+            <parameter key="friendly-name" value="cassandra21x"/>
+            <parameter key="collection" value="cassandra21x"/>
+            <parameter key="thresholding-enabled" value="true"/>
+            <parameter key="factory" value="PASSWORD-CLEAR"/>
+            <parameter key="username" value="cassandra-username"/>
+            <parameter key="password" value="cassandra-password"/>
+        </service>
+    </package>
+
+    <package name="cassandra21x-newts">
+        <filter><![CDATA[(IPADDR != '0.0.0.0') & (catincCassandra21x& catincNewts)]]></filter>
+        <service name="JMX-Cassandra-Newts" interval="300000" user-defined="false" status="on">
+            <parameter key="port" value="7199"/>
+            <parameter key="retry" value="2"/>
+            <parameter key="timeout" value="3000"/>
+            <parameter key="protocol" value="rmi"/>
+            <parameter key="urlPath" value="/jmxrmi"/>
+            <parameter key="rrd-base-name" value="cassandra21x-newts"/>
+            <parameter key="ds-name" value="cassandra21x-newts"/>
+            <parameter key="friendly-name" value="cassandra21x-newts"/>
+            <parameter key="collection" value="cassandra21x-newts"/>
+            <parameter key="thresholding-enabled" value="true"/>
+            <parameter key="factory" value="PASSWORD-CLEAR"/>
+            <parameter key="username" value="cassandra-username"/>
+            <parameter key="password" value="cassandra-password"/>
+        </service>
+    </package>
+
     <% if @vmware3[:enabled] -%> 
     <package name="vmware3">
         <filter><![CDATA[<%=@vmware3[:filter]%>]]></filter>
@@ -98,18 +136,21 @@
         </service>
         <% end -%>
 
+        <service name="WS-Man" interval="300000" user-defined="false" status="on">
+            <parameter key="collection" value="default"/>
+            <parameter key="thresholding-enabled" value="true"/>
+        </service>
+
         <% if @example1[:service][:opennms_jvm][:enabled] -%> 
         <service name="OpenNMS-JVM" interval="<%=@example1[:service][:opennms_jvm][:interval]%>" user-defined="false" status="<%=@example1[:service][:opennms_jvm][:status]%>">
             <parameter key="port" value="<%=@example1[:service][:opennms_jvm][:port]%>"/>
             <parameter key="retry" value="<%=@example1[:service][:opennms_jvm][:retry]%>"/>
             <parameter key="timeout" value="<%=@example1[:service][:opennms_jvm][:timeout]%>"/>
-            <parameter key="protocol" value="<%=@example1[:service][:opennms_jvm][:protocol]%>"/>
-            <parameter key="urlPath" value="<%=@example1[:service][:opennms_jvm][:url_path]%>"/>
             <parameter key="rrd-base-name" value="<%=@example1[:service][:opennms_jvm][:rrd_base_name]%>"/>
-            <parameter key="ds-name" value="<%=@example1[:service][:opennms_jvm][:ds_name]%>"/>
-            <parameter key="friendly-name" value="<%=@example1[:service][:opennms_jvm][:friendly_name]%>"/>
             <parameter key="collection" value="<%=@example1[:service][:opennms_jvm][:collection]%>"/>
             <parameter key="thresholding-enabled" value="<%=@example1[:service][:opennms_jvm][:threshold]%>"/>
+            <parameter key="ds-name" value="<%=@example1[:service][:opennms_jvm][:ds_name]%>"/>
+            <parameter key="friendly-name" value="<%=@example1[:service][:opennms_jvm][:friendly_name]%>"/>
         </service>
         <% end -%>
 
@@ -127,12 +168,15 @@
     <% end -%>
 
 
+    <collector service="JMX-Cassandra" class-name="org.opennms.netmgt.collectd.Jsr160Collector"/>
+    <collector service="JMX-Cassandra-Newts" class-name="org.opennms.netmgt.collectd.Jsr160Collector"/>
     <% if ( @example1[:enabled] && @example1[:service][:snmp][:enabled]) -%>
     <collector service="SNMP" class-name="org.opennms.netmgt.collectd.SnmpCollector"/>
     <% end -%>
     <% if @example1[:enabled] && @example1[:service][:wmi][:enabled]  -%>
     <collector service="WMI" class-name="org.opennms.netmgt.collectd.WmiCollector"/>
     <% end -%>
+    <collector service="WS-Man" class-name="org.opennms.netmgt.collectd.WsManCollector"/>
     <% if @example1[:enabled] && @example1[:service][:opennms_jvm][:enabled]  -%>
     <collector service="OpenNMS-JVM" class-name="org.opennms.netmgt.collectd.Jsr160Collector"/>
     <% end -%>

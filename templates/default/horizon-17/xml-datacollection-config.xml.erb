@@ -1,5 +1,8 @@
 <xml-datacollection-config rrdRepository="<%=@rrd_repository%>" xmlns="http://xmlns.opennms.org/xsd/config/xml-datacollection">
-
+    <!--
+    To understand how the XML Collector works, and how to configure it, please check the following link:
+    http://www.opennms.org/wiki/XML_Collector
+    -->
     <% if @threegpp_full_5min[:enabled] -%>
     <!-- 
     The following package will collect all available 3GPP Data from a network element.
@@ -37,7 +40,6 @@
         </xml-source>
     </xml-collection>
     <% end -%>
-
     <% if @threegpp_sample[:enabled] -%>
     <!-- This is a standard sample configuration file to explain how to build the configuration.
          In this particular case, the XML groups are defined directly inside the XML source.

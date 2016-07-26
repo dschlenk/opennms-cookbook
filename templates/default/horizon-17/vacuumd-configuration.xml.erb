@@ -1,58 +1,4 @@
 <VacuumdConfiguration period="<%=@period%>" >
-  <% if @statement[:topo_delete_nodes] -%>
-  <statement>
-    <!-- removes references in topo maps to nodes that have been marked as deleted - cascading deletes cannot work here -->
-    DELETE FROM element
-     WHERE element.elementtype = 'N'
-       AND element.elementid IN
-           (SELECT nodeid
-              FROM node
-             WHERE nodetype = 'D');
-  </statement>
-  <% end -%>
-
-  <% if @statement[:delete_at_interfaces] -%>
-  <statement>
-    <!-- this deletes all entries in atInterface that have been marked as deleted -->
-    DELETE FROM atInterface WHERE atInterface.status = 'D';
-  </statement>
-  <% end -%>
-
-  <% if @statement[:delete_dl_interfaces] -%>
-  <statement>
-    <!-- this deletes all entries in datalinkInterface that have been marked as deleted -->
-    DELETE FROM datalinkInterface WHERE datalinkInterface.status = 'D';
-  </statement>
-  <% end -%>
-
-  <% if @statement[:delete_ipr_interfaces] -%>
-  <statement>
-    <!-- this deletes all entries in ipRouteInterface that have been marked as deleted -->
-    DELETE FROM ipRouteInterface WHERE ipRouteInterface.status = 'D';
-  </statement>
-  <% end -%>
-
-  <% if @statement[:delete_vlans] -%>
-  <statement>
-    <!-- this deletes all entries in vlan that have been marked as deleted -->
-    DELETE FROM vLan WHERE vLan.status = 'D';
-  </statement>
-  <% end -%>
-
-  <% if @statement[:delete_stp_interfaces] -%>
-  <statement>
-    <!-- this deletes all entries in stpInterface that have been marked as deleted -->
-    DELETE FROM stpInterface WHERE stpInterface.status = 'D';
-  </statement>
-  <% end -%>
-
-  <% if @statement[:delete_stp_nodes] -%>
-  <statement>
-    <!-- this deletes all entries in stpInterface that have been marked as deleted -->
-    DELETE FROM stpNode WHERE stpNode.status = 'D';
-  </statement>
-  <% end -%>
-   
   <% if @statement[:delete_snmp_interfaces] -%>
   <statement>
     <!-- this deletes all the snmpInterfaces that have been marked as deleted -->
@@ -567,10 +513,10 @@
         <!-- Remove expired locations specific status changes -->
         DELETE 
           FROM location_specific_status_changes
-         WHERE (locationmonitorid, ifserviceid, id) 
-        NOT IN (SELECT locationmonitorid, ifserviceid, max(id) 
+         WHERE (systemid, ifserviceid, id) 
+        NOT IN (SELECT systemid, ifserviceid, max(id) 
                   FROM location_specific_status_changes 
-              GROUP BY locationmonitorid, ifserviceid)
+              GROUP BY systemid, ifserviceid)
            AND statustime &lt; now() - interval '24 hours'
       </statement>
     </action>
