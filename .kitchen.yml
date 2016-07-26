@@ -19,60 +19,10 @@ platforms:
         plugin:
           xml: true
           nsclient: true
-      postgresql:
-        password:
-          postgres: md5c23797e9a303da48b792b4339c426700
-        enable_pgdg_yum: true
-        version: '9.3'
-        dir: /var/lib/pgsql/9.3/data
-        config:
-          data_directory: /var/lib/pgsql/9.3/data
-          shared_preload_libraries: pg_stat_statements
-          autovacuum: on
-          checkpoint_timeout: 15min
-          track_activities: on
-          track_counts: on
-          vacuum_cost_delay: 50
-        config_pgtune:
-          max_connections: 160
-        pg_hba:
-          - addr: ''
-            db: all
-            method: trust
-            type: local
-            user: all
-          - addr: 127.0.0.1/32
-            db: all
-            method: trust
-            type: host
-            user: all
-          - addr: '::1/128'
-            db: all
-            method: trust
-            type: host
-            user: all
-        client:
-          packages:
-            - postgresql93
-            - postgresql93-contrib
-            - postgresql93-devel
-        server:
-          packages:
-            - postgresql93-server
-          service_name: "postgresql-9.3"
-        contrib: 
-          packages:
-            - postgresql93-contrib
-          extensions: 
-            - pageinspect
-            - pg_buffercache
-            - pg_freespacemap
-            - pgrowlocks
-            - pg_stat_statements
-            - pgstattuple
 suites:
   - name: default_latest
     run_list:
+      - recipe[opennms::postgres]
       - recipe[postgresql::client]
       - recipe[postgresql::server]
       - recipe[postgresql::contrib]
@@ -81,6 +31,7 @@ suites:
       - recipe[opennms::default]
   - name: default_17
     run_list:
+      - recipe[opennms::postgres]
       - recipe[postgresql::client]
       - recipe[postgresql::server]
       - recipe[postgresql::contrib]
@@ -92,6 +43,7 @@ suites:
         version: "17.1.1-1"
   - name: default_16
     run_list:
+      - recipe[opennms::postgres]
       - recipe[postgresql::client]
       - recipe[postgresql::server]
       - recipe[postgresql::contrib]
@@ -101,55 +53,6 @@ suites:
     attributes:
       opennms:
         version: "16.0.4-1"
-      postgresql:
-        password:
-          postgres: md5c23797e9a303da48b792b4339c426700
-        enable_pgdg_yum: true
-        version: '9.3'
-        dir: /var/lib/pgsql/9.3/data
-        config:
-          data_directory: /var/lib/pgsql/9.3/data
-          shared_preload_libraries: pg_stat_statements
-          autovacuum: on
-          checkpoint_timeout: 15min
-          track_activities: on
-          track_counts: on
-          vacuum_cost_delay: 50
-        config_pgtune:
-          max_connections: 160
-        pg_hba:
-          - addr: ''
-            db: all
-            method: trust
-            type: local
-            user: all
-          - addr: 127.0.0.1/32
-            db: all
-            method: trust
-            type: host
-            user: all
-          - addr: '::1/128'
-            db: all
-            method: trust
-            type: host
-            user: all
-        client:
-          packages:
-            - postgresql93
-            - postgresql93-contrib
-            - postgresql93-devel
-        server:
-          packages:
-            - postgresql93-server
-          service_name: "postgresql-9.3"
-        contrib: 
-          extensions: 
-            - pageinspect
-            - pg_buffercache
-            - pg_freespacemap
-            - pgrowlocks
-            - pg_stat_statements
-            - pgstattuple
   - name: service_detector
     run_list:
       - recipe[postgresql::client]

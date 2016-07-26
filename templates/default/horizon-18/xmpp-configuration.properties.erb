@@ -1,0 +1,80 @@
+################################################################################
+# This file is the configuration for the the XMPPNotificationStrategy class.
+# It is used to specify the parameters required to make an XMPP (Jabber)
+# connection on behalf of OpenNMS.
+################################################################################
+
+# The hostname to connect to
+# For google talk, set to talk.google.com
+<% if !@server.nil? -%>
+xmpp.server = <%=@server%>
+<% else -%>
+#xmpp.server =
+<% end -%>
+
+# The service name to use; if unset, it will use the value of xmpp.server
+# For google talk, set to gmail.com
+<% if !@service_name.nil? -%>
+xmpp.servicename = <%=@service_name%>
+<% else -%>
+#xmpp.servicename =
+<% end -%>
+
+# The port to connect to; defaults to 5222 if unset
+<% if !@port.nil? -%>
+xmpp.port = <%=@port%>
+<% else -%>
+#xmpp.port = 5222
+<% end -%>
+
+# Whether to enable TLS encryption; defaults to false if unset
+<% if !@tls.nil? -%>
+xmpp.TLSEnabled = <%=@tls%>
+<% else -%>
+#xmpp.TLSEnabled = false
+<% end -%>
+
+# Whether to enable SASL authentication; defaults to true if unset
+<% if !@sasl.nil? -%>
+xmpp.SASLEnabled = <%=@sasl%>
+<% else -%>
+#xmpp.SASLEnabled = true
+<% end -%>
+
+# Whether to allow self-signed certificates; defaults to false if unset
+<% if !@self_signed_certs.nil? -%>
+xmpp.selfSignedCertificateEnabled = <%=@self_signed_certs%>
+<% else -%>
+#xmpp.selfSignedCertificateEnabled = false
+<% end -%>
+
+# The java XMPP libraries store certificates in a trust store.  It defines
+# the password used to protect the trust store; defaults to changeit if unset
+<% if !@truststore_password.nil? -%>
+xmpp.truststorePassword = <%=@truststore_password%>
+<% else -%>
+#xmpp.truststorePassword = changeit
+<% end -%>
+
+# Enable debugging; extremely high-volume, you probably should not turn
+# this on
+<% if !@debug.nil? -%>
+xmpp.debuggerEnabled = <%=@debug%>
+<% else -%>
+#xmpp.debuggerEnabled = false
+<% end -%>
+
+# The username to connect as; just the username, no @host
+<% if !@user.nil? -%>
+xmpp.user   = <%=@user%>
+<% else -%>
+#xmpp.user   =
+<% end -%>
+
+# The user's password
+<% if !@pass.nil? -%>
+xmpp.pass   = <%=@pass%>
+<% else -%>
+#xmpp.pass   =
+<% end -%>
+

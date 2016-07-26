@@ -520,22 +520,24 @@ template "#{onms_home}/etc/microblog-configuration.xml" do
   )
 end
 
-template "#{onms_home}/etc/model-importer.properties" do
-  cookbook node[:opennms][:importer][:cookbook]
-  source "#{template_dir}model-importer.properties.erb"
-  mode 00664
-  owner "root"
-  group "root"
-  notifies :restart, "service[opennms]"
-  variables(
-    :import_url => node[:opennms][:importer][:import_url],
-    :schedule => node[:opennms][:importer][:schedule],
-    :threads => node[:opennms][:importer][:threads],
-    :scan_threads => node[:opennms][:importer][:scan_threads],
-    :write_threads => node[:opennms][:importer][:write_threads],
-    :requisition_dir => node[:opennms][:importer][:requisition_dir],
-    :foreign_source_dir => node[:opennms][:importer][:foreign_source_dir]
-  )
+if node['opennms']['version_major'] != '18'
+  template "#{onms_home}/etc/model-importer.properties" do
+    cookbook node[:opennms][:importer][:cookbook]
+    source "#{template_dir}model-importer.properties.erb"
+    mode 00664
+    owner "root"
+    group "root"
+    notifies :restart, "service[opennms]"
+    variables(
+      :import_url => node[:opennms][:importer][:import_url],
+      :schedule => node[:opennms][:importer][:schedule],
+      :threads => node[:opennms][:importer][:threads],
+      :scan_threads => node[:opennms][:importer][:scan_threads],
+      :write_threads => node[:opennms][:importer][:write_threads],
+      :requisition_dir => node[:opennms][:importer][:requisition_dir],
+      :foreign_source_dir => node[:opennms][:importer][:foreign_source_dir]
+    )
+  end
 end
 
 template "#{onms_home}/etc/modemConfig.properties" do

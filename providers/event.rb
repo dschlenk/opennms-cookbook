@@ -55,6 +55,7 @@ def load_current_resource
   @current_resource.operinstruct(@new_resource.operinstruct)
   @current_resource.autoaction(@new_resource.autoaction)
   @current_resource.varbindsdecode(@new_resource.varbindsdecode)
+  @current_resource.parameters(@new_resource.parameters)
   @current_resource.tticket(@new_resource.tticket)
   @current_resource.forward(@new_resource.forward)
   @current_resource.script(@new_resource.script)
@@ -197,6 +198,19 @@ def create_event
       parmid_el.add_text(vbd['parmid'])
       vbd['decode'].each do |decode|
         vbd_el.add_element 'decode', {'varbindvalue' => decode['varbindvalue'], 'varbinddecodedstring' => decode['varbinddecodedstring']}
+      end
+    end
+  end
+  if node['opennms']['version_major'].to_i > 16
+    unless new_resource.parameters.nil?
+      event_el.elements.delete_all('parameters') if updating
+      new_resource.parameters.each do |param|
+        param_el = event_el.add_element 'parameter'
+        param_el.add_attribute('name', param['name'])
+        param_el.add_attribute('value', param['value'])
+        if node['opennms']['version_major'].to_i > 17 && param.has_key? 'expand'
+          param_el.add_attribute('expand', param['expand'])
+        end
       end
     end
   end

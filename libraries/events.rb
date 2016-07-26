@@ -177,6 +177,34 @@ module Events
         return true unless event.varbindsdecode == varbindsdecodes
       end
     end
+    unless event.parameters.nil?
+      if event.parameters.size == 0
+        unless event_el.elements['parameters'].nil?
+          Chef::Log.debug "Event parameters present but nil in new resource."
+          return true
+        end
+      end
+      if event_el.elements["parameters"].nil?
+        unless event.parameters.nil?
+          Chef::Log.debug "Event parameters not present but not nil in new resource."
+          return true
+        end
+      else
+        parameters = []
+        event_el.elements.each("parameters") do |parm|
+          p = { 'name' => parm.attributes['name'], 'value' => parm.attributes['value'] }
+          if node['opennms']['version_major'] > 17 && parm.has_key? 'expand'
+            if parm.attributes['expand'] == 'true'
+              p['expand'] = true
+            else
+              p['expand'] = false
+            end
+          end
+        end
+        Chef::Log.debug "parameters equal? New: #{event.parameters}, current #{parameters}"
+        return true unless event.parameters == parameters
+      end
+    end
     if !event.tticket.nil? || event.tticket == false
       if event.tticket == false
         unless event_el.elements['tticket'].nil?

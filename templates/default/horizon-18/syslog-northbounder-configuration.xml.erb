@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<syslog-northbounder-config>
+
+<% if @use_defaults -%>
+<!--
+The following are set to the default values.
+-->
+  <enabled>false</enabled>
+  <nagles-delay>1000</nagles-delay>
+  <batch-size>100</batch-size>
+  <queue-size>300000</queue-size>
+
+  <message-format>ALARM ID:${alarmId} NODE:${nodeLabel}; ${logMsg}</message-format>
+<% else -%>
+  <enabled><%=@enabled%></enabled>
+  <nagles-delay><%=@nagles_delay%></nagles-delay>
+  <batch-size><%=@batch_size%></batch-size>
+  <queue-size><%=@queue_size%></queue-size>
+
+  <message-format><%=@message_format%></message-format>
+<% end -%>
+
+<!-- You could do something like the following
+  <message-format>ALARM ID:${alarmId} NODE:${nodeLabel} IP:${ipAddr} 
+    FIRST:${firstOccurrence} LAST:${lastOccurrence} 
+    COUNT:${count} UEI:${alarmUei} SEV:${severity} 
+    x733Type:${x733AlarmType} x733Cause:${x733ProbableCause} 
+    ${logMsg}
+  </message-format>
+-->
+
+<!-- More than one destination is supported -->
+  <destination>
+    <destination-name><%=@destination[:name]%></destination-name>
+    <host><%=@destination[:host]%></host>
+    <port><%=@destination[:port]%></port>
+    <ip-protocol><%=@destination[:ip_protocol]%></ip-protocol>
+    <facility><%=@destination[:facility]%></facility>
+    <max-message-length><%=@destination[:max_length]%></max-message-length>
+    <send-local-name><%=@destination[:send_local_name]%></send-local-name>
+    <send-local-time><%=@destination[:send_local_time]%></send-local-time>
+    <truncate-message><%=@destination[:truncate]%></truncate-message>
+  </destination>
+
+
+<!-- Highly recommended, but not required, to only forward a set of Alarm UEIs -->
+<% if !@uei[:node_down] && !@uei[:node_up] -%>
+<!--
+  <uei>uei.opennms.org/nodes/nodeDown</uei>
+  <uei>uei.opennms.org/nodes/nodeUp</uei>
+-->
+<% elsif @uei[:node_down] && @uei[:node_up] -%>
+  <uei>uei.opennms.org/nodes/nodeDown</uei>
+  <uei>uei.opennms.org/nodes/nodeUp</uei>
+<% elsif @uei[:node_down] && !@uei[:node_up] -%>
+  <uei>uei.opennms.org/nodes/nodeDown</uei>
+<!--
+  <uei>uei.opennms.org/nodes/nodeUp</uei>
+-->
+<% else -%>
+<!--
+  <uei>uei.opennms.org/nodes/nodeDown</uei>
+-->
+  <uei>uei.opennms.org/nodes/nodeUp</uei>
+<% end -%>
+</syslog-northbounder-config>

@@ -51,6 +51,14 @@ attribute :autoaction, :kind_of => Array
 #       ...
 #     ]
 attribute :varbindsdecode, :kind_of => Array
+# Array of Hashes
+# ex: [
+#       { 'name' => 'paramName', 'value' => 'someString', 'expand' => true },
+#       ...
+#     ]
+# Support for parameters was added in 17 and enhanced with the 'expand' attribute in 18. 
+# They are ignored when using 16 and the expand attribute is ignored when using 17.
+attribute :parameters, :kind_of => Array
 #Array of Hashes
 #ex: [
 #      {'action' => String, 'state' => 'on|off', 'menutext' => String},
