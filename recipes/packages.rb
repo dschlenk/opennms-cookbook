@@ -80,7 +80,7 @@ ruby_block 'stop opennms before upgrade' do
   block do
     Opennms::Upgrade.stop_opennms(node)
   end
-  only_if { node['opennms']['upgrade'] && Opennms::Upgrade.is_upgrade?(node) }
+  only_if { node['opennms']['upgrade'] && Opennms::Upgrade.upgrade?(node) }
 end
 
 yum_package onms_packages do

@@ -38,7 +38,7 @@ module Opennms
       end
     end
 
-    def self.is_upgrade?(node)
+    def self.upgrade?(node)
       if ::File.exist?("#{node['opennms']['conf']['home']}/bin/opennms")
         version = shell_out!("/bin/rpm -q --queryformat '%{VERSION}-%{RELEASE}\n' opennms-core", returns: [0])
         Chef::Log.debug "Currently installed version of opennms-core: #{version.stdout.chomp}. Going to install #{node['opennms']['version']}."
