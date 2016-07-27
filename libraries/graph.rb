@@ -2,7 +2,7 @@
 module Graph
   def new_graph_file(file, node)
     f = ::File.new("#{node['opennms']['conf']['home']}/etc/snmp-graph.properties.d/#{file}", 'w')
-    ::File.open(f, 'w') { |file| file.puts(["reports=\n", "\n"]) }
+    ::File.open(f, 'w') { |new_file| new_file.puts(["reports=\n", "\n"]) }
   end
 
   def graph_file_exists?(filename, node)
@@ -12,21 +12,21 @@ module Graph
   def graph_exists?(name, type, node)
     found = false
     if type == 'collection'
-      found = checkFileForGraph("#{node['opennms']['conf']['home']}/etc/snmp-graph.properties", name)
+      found = check_file_for_graph("#{node['opennms']['conf']['home']}/etc/snmp-graph.properties", name)
       unless found
         Dir.foreach("#{node['opennms']['conf']['home']}/etc/snmp-graph.properties.d") do |gfile|
           next if gfile !~ /.*\.properties$/
-          found = checkFileForGraph("#{node['opennms']['conf']['home']}/etc/snmp-graph.properties.d/#{gfile}", name)
+          found = check_file_for_graph("#{node['opennms']['conf']['home']}/etc/snmp-graph.properties.d/#{gfile}", name)
           break if found
         end
       end
     elsif type == 'response'
-      found = checkFileForGraph("#{node['opennms']['conf']['home']}/etc/response-graph.properties", name)
+      found = check_file_for_graph("#{node['opennms']['conf']['home']}/etc/response-graph.properties", name)
     end
     found
   end
 
-  def checkFileForGraph(file, name)
+  def check_file_for_graph(file, name)
     require 'java_properties'
     props = JavaProperties::Properties.new(file)
     found = false
@@ -85,6 +85,7 @@ module Graph
   end
 
   # add report 'name' to the reports comma separated list in file 'fn'
+  # rubocop:disable Metrics/BlockNesting
   def add_report(fn, name)
     lines = []
     reports_start = false
@@ -119,4 +120,5 @@ module Graph
     end
     lines
   end
+  # rubocop:enable Metrics/BlockNesting
 end

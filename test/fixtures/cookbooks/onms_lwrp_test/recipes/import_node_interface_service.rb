@@ -9,10 +9,10 @@ log 'Start OpenNMS to perform ReST operations.' do
 end
 # need a node to add an interface to
 # make us a new foreign_id using the Provision library
-serviceNode_foreign_id = foreign_id_gen
+service_node_foreign_id = foreign_id_gen
 opennms_import_node 'serviceNode' do
   foreign_source_name 'dry-source'
-  foreign_id serviceNode_foreign_id
+  foreign_id service_node_foreign_id
   building 'HQ'
   categories %w(Servers Test)
   assets 'vendorPhone' => '411', 'serialNumber' => 'SN12838932'
@@ -21,13 +21,13 @@ end
 # minimal
 opennms_import_node_interface '72.72.72.74' do
   foreign_source_name 'dry-source'
-  foreign_id serviceNode_foreign_id
+  foreign_id service_node_foreign_id
 end
 
 # all options
 opennms_import_node_interface_service 'ICMP' do
   foreign_source_name 'dry-source'
-  foreign_id serviceNode_foreign_id
+  foreign_id service_node_foreign_id
   ip_addr '72.72.72.74'
   sync_import true
   sync_wait_periods 30

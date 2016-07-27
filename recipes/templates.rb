@@ -748,7 +748,6 @@ template "#{onms_home}/etc/response-graph.properties" do
     command_prefix: node[:opennms][:response_graph][:command_prefix],
     default_font_size: node[:opennms][:response_graph][:default_font_size],
     title_font_size: node[:opennms][:response_graph][:title_font_size],
-    title_font_size: node[:opennms][:response_graph][:title_font_size],
     icmp: node[:opennms][:response_graph][:icmp],
     avail: node[:opennms][:response_graph][:avail],
     dhcp: node[:opennms][:response_graph][:dhcp],

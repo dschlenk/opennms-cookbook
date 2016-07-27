@@ -40,6 +40,7 @@ action :create_if_missing do
   end
 end
 
+# rubocop:disable Metrics/BlockNesting
 def load_current_resource
   @current_resource = Chef::Resource::OpennmsEvent.new(@new_resource.name)
   @current_resource.name(@new_resource.name)
@@ -64,7 +65,7 @@ def load_current_resource
 
   if ::File.exist?("#{node['opennms']['conf']['home']}/etc/#{@current_resource.file}")
     @current_resource.file_exists = true
-    if is_event_file?(@current_resource.file, node)
+    if event_file?(@current_resource.file, node)
       @current_resource.is_event_file = true
       if uei_in_file?("#{node['opennms']['conf']['home']}/etc/#{@current_resource.file}", @current_resource.uei)
         Chef::Log.debug("uei #{@current_resource.uei} is in file already")
@@ -77,6 +78,7 @@ def load_current_resource
     end
   end
 end
+# rubocop:enable Metrics/BlockNesting
 
 private
 
@@ -94,6 +96,7 @@ def create_event_file
   add_file_to_eventconf(new_resource.file, 'bottom', node)
 end
 
+# rubocop:disable Metrics/BlockNesting
 def create_event
   uei = new_resource.uei || new_resource.name
   # new_resource.uei = new_resource.name if new_resource.uei.nil?
@@ -255,7 +258,7 @@ def create_event
       if ad.key? 'update_fields'
         ad['update_fields'].each do |field|
           uf_el = ad_el.add_element 'update-field', 'field-name' => field['field_name']
-          uf_el.attributes['update-on-reduction'] = 'false' if field.key? 'update_on_reduction' && field['update_on_reduction'] == false
+          uf_el.attributes['update-on-reduction'] = 'false' if field.key?('update_on_reduction') && field['update_on_reduction'] == false
         end
       end
     end
@@ -264,5 +267,6 @@ def create_event
   formatter = REXML::Formatters::Pretty.new(2)
   formatter.compact = true
   formatter.write(doc, out)
-  ::File.open("#{node['opennms']['conf']['home']}/etc/#{new_resource.file}", 'w') { |file| file.puts(out) }
+  ::File.open("#{node['opennms']['conf']['home']}/etc/#{new_resource.file}", 'w') { |f| f.puts(out) }
 end
+# rubocop:enable Metrics/BlockNesting

@@ -81,8 +81,7 @@ def update_node
 end
 
 def create_import_node
-  name = new_resource.node_label || new_resource.name
-  add_import_node(name, new_resource.foreign_id, new_resource.parent_foreign_source, new_resource.parent_foreign_id, new_resource.parent_node_label, new_resource.city, new_resource.building, new_resource.categories, new_resource.assets, new_resource.foreign_source_name, node)
+  add_import_node(new_resource, node)
   if !new_resource.sync_import.nil? && new_resource.sync_import
     sync_import(new_resource.foreign_source_name, true, node)
     wait_for_sync(new_resource.foreign_source_name, node,

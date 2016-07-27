@@ -61,7 +61,7 @@ module SystemDef
     formatter = REXML::Formatters::Pretty.new(2)
     formatter.compact = true
     formatter.write(doc, out)
-    ::File.open("#{onms_home}/etc/datacollection/#{system_def_file}", 'w') { |file| file.puts(out) }
+    ::File.open("#{onms_home}/etc/datacollection/#{system_def_file}", 'w') { |f| f.puts(out) }
   end
 
   def remove_groups(onms_home, groups, system_def)
@@ -78,6 +78,6 @@ module SystemDef
     formatter = REXML::Formatters::Pretty.new(2)
     formatter.compact = true
     formatter.write(doc, out)
-    ::File.open("#{onms_home}/etc/datacollection/#{system_def_file}", 'w') { |file| file.puts(out) }
+    ::File.open("#{onms_home}/etc/datacollection/#{system_def_file}", 'w') { |f| f.puts(out) }
   end
 end

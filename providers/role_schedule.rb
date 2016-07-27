@@ -19,6 +19,7 @@ action :create do
   end
 end
 
+# rubocop:disable Metrics/BlockNesting
 def load_current_resource
   @current_resource = Chef::Resource::OpennmsRoleSchedule.new(@new_resource.name)
   @current_resource.name(@new_resource.name)
@@ -71,6 +72,7 @@ def times_valid?(times)
   end
   validity
 end
+# rubocop:enable Metrics/BlockNesting
 
 def create_role_schedule
   add_schedule_to_role(new_resource, node)

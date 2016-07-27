@@ -57,13 +57,13 @@ module ResourceType
 
   def rt_exists?(onms_home, name)
     rtc = ResourceTypeClass.new
-    exists, included = rtc.resource_type_exists_included(onms_home, name)
+    exists, _included = rtc.resource_type_exists_included(onms_home, name)
     exists
   end
 
   def rt_included?(onms_home, name)
     rtc = ResourceTypeClass.new
-    exists, included = rtc.resource_type_exists_included(onms_home, name)
+    _exists, included = rtc.resource_type_exists_included(onms_home, name)
     included
   end
 

@@ -12,15 +12,8 @@ module Syslog
     ::File.exist?("#{node['opennms']['conf']['home']}/etc/syslog/#{name}")
   end
 
-  def syslog_file_included?(name, node)
-    Chef::Log.debug "Checking to see if this syslog file exists: '#{name}'"
-    file = ::File.new("#{node['opennms']['conf']['home']}/etc/syslogd-configuration.xml", 'r')
-    doc = REXML::Document.new file
-    !doc.elements["/syslogd-configuration/import-file[text() == 'syslog/#{name}' and not(text()[2])]"].nil?
-  end
-
   def add_file_to_syslog(file, position, node)
-    file = Regexp.last_match(1) if file =~ /^syslog\/(.*)$/
+    file = Regexp.last_match(1) if file =~ %r{^syslog/(.*)$}
     f = ::File.new("#{node['opennms']['conf']['home']}/etc/syslogd-configuration.xml")
     contents = f.read
     doc = REXML::Document.new(contents, respect_whitespace: :all)
@@ -55,6 +48,6 @@ module Syslog
     formatter = REXML::Formatters::Pretty.new(2)
     formatter.compact = true
     formatter.write(doc, out)
-    ::File.open("#{node['opennms']['conf']['home']}/etc/syslogd-configuration.xml", 'w') { |f| f.puts(out) }
+    ::File.open("#{node['opennms']['conf']['home']}/etc/syslogd-configuration.xml", 'w') { |new_file| new_file.puts(out) }
   end
 end

@@ -71,8 +71,5 @@ end
 private
 
 def create_service_detector
-  service_name = new_resource.service_name || new_resource.name
-  add_service_detector(service_name, new_resource.class_name,
-    new_resource.port, new_resource.retry_count, new_resource.timeout,
-    new_resource.params, new_resource.foreign_source_name, node)
+  add_service_detector(new_resource, node)
 end

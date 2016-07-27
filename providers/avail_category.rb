@@ -36,15 +36,7 @@ def load_current_resource
     @current_resource.catgroup_exists = true
     if category_exists?(@current_resource.category_group, @current_resource.label)
       @current_resource.exists = true
-      if category_changed?(@current_resource.label,
-                           @current_resource.category_group,
-                           @current_resource.comment,
-                           @current_resource.normal,
-                           @current_resource.warning,
-                           @current_resource.rule,
-                           @current_resource.services)
-        @current_resource.changed = true
-      end
+      @current_resource.changed = true if category_changed?(@current_resource)
     end
   end
 end
@@ -67,35 +59,35 @@ def category_exists?(group, label)
   !doc.elements["/catinfo/categorygroup[name[text()[contains(.,'#{group}')]]]/categories/category/label[text()[contains(.,'#{label}')]]"].nil?
 end
 
-def category_changed?(label, category_group, comment, normal, warning, rule, services)
+def category_changed?(current_resource)
   file = ::File.new("#{node['opennms']['conf']['home']}/etc/categories.xml", 'r')
   doc = REXML::Document.new file
   file.close
-  cat_el = doc.elements["/catinfo/categorygroup[name[text()[contains(.,'#{category_group}')]]]/categories/category[label[text()[contains(.,'#{label}')]]]"]
+  cat_el = doc.elements["/catinfo/categorygroup[name[text()[contains(.,'#{current_resource.category_group}')]]]/categories/category[label[text()[contains(.,'#{current_resource.label}')]]]"]
   label_el = cat_el.elements['label']
   comment_el = cat_el.elements['comment']
   normal_el = cat_el.elements['normal']
   warn_el = cat_el.elements['warning']
   rule_el = cat_el.elements['rule']
   return true if label_el.text.to_s != label.to_s
-  Chef::Log.debug("#{label_el.text} == #{label}")
-  return true if comment_el.text.to_s !=  comment.to_s
-  Chef::Log.debug("#{comment_el.text} ==  #{comment}")
-  return true if normal_el.text.to_s != normal.to_s
-  Chef::Log.debug("#{normal_el.text} == #{normal}")
-  return true if warn_el.text.to_s != warning.to_s
-  Chef::Log.debug("#{warn_el.text} == #{warning}")
+  Chef::Log.debug("#{label_el.text} == #{current_resource.label}")
+  return true if comment_el.text.to_s !=  current_resource.comment.to_s
+  Chef::Log.debug("#{comment_el.text} ==  #{current_resource.comment}")
+  return true if normal_el.text.to_s != current_resource.normal.to_s
+  Chef::Log.debug("#{normal_el.text} == #{current_resource.normal}")
+  return true if warn_el.text.to_s != current_resource.warning.to_s
+  Chef::Log.debug("#{warn_el.text} == #{current_resource.warning}")
   curr_services = []
   cat_el.elements.each 'service' do |s|
     curr_services.push s.text.to_s
   end
   curr_services.sort!
-  services.sort!
-  return true if curr_services != services
-  Chef::Log.debug("#{curr_services} == #{services}")
+  current_resource.services.sort!
+  return true if curr_services != current_resource.services
+  Chef::Log.debug("#{curr_services} == #{current_resource.services}")
   # return true if "#{service_els.text}" != "#{rule}"
-  return true if rule_el.text.to_s != rule.to_s
-  Chef::Log.debug("#{rule_el.text} == #{rule}")
+  return true if rule_el.text.to_s != current_resource.rule.to_s
+  Chef::Log.debug("#{rule_el.text} == #{current_resource.rule}")
   false
 end
 
@@ -126,7 +118,7 @@ def update_avail_category
   formatter = REXML::Formatters::Pretty.new(2)
   formatter.compact = true
   formatter.write(doc, out)
-  ::File.open("#{node['opennms']['conf']['home']}/etc/categories.xml", 'w') { |file| file.puts(out) }
+  ::File.open("#{node['opennms']['conf']['home']}/etc/categories.xml", 'w') { |f| f.puts(out) }
 end
 
 # order doesn't matter here - these just exist to be referenced by viewdisplay.xml
@@ -154,5 +146,5 @@ def create_avail_category
   formatter = REXML::Formatters::Pretty.new(2)
   formatter.compact = true
   formatter.write(doc, out)
-  ::File.open("#{node['opennms']['conf']['home']}/etc/categories.xml", 'w') { |file| file.puts(out) }
+  ::File.open("#{node['opennms']['conf']['home']}/etc/categories.xml", 'w') { |f| f.puts(out) }
 end

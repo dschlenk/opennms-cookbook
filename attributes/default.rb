@@ -121,12 +121,12 @@ default['opennms']['properties']['reporting']['template_dir']         = "#{defau
 default['opennms']['properties']['reporting']['report_dir']           = "#{default['opennms']['conf']['home']}/share/reports"
 default['opennms']['properties']['reporting']['report_logo']          = "#{default['opennms']['conf']['home']}/webapps/images/logo.gif"
 default['opennms']['properties']['reporting']['ksc_graphs_per_line']  = 1
-case node['opennms']['version_major']
-when '16'
-  default['opennms']['properties']['reporting']['jasper_version'] = '5.6.1'
-else '17'
-     default['opennms']['properties']['reporting']['jasper_version'] = '6.1.1'
-end
+default['opennms']['properties']['reporting']['jasper_version'] = case node['opennms']['version_major']
+                                                                  when '16'
+                                                                    '5.6.1'
+                                                                  else
+                                                                    '6.1.1'
+                                                                  end
 # Eventd IPC
 default['opennms']['properties']['eventd']['proxy_host']     = nil
 default['opennms']['properties']['eventd']['proxy_port']     = nil

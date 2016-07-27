@@ -15,23 +15,23 @@ end
 
 # make us a new foreign_id using the Provision library
 # (creates a new node with the same name every time it converges)
-nodeB_foreign_id = foreign_id_gen
+node_b_foreign_id = foreign_id_gen
 # common options
 opennms_import_node 'nodeB' do
   foreign_source_name 'dry-source'
-  foreign_id nodeB_foreign_id
+  foreign_id node_b_foreign_id
   building 'HQ'
   categories %w(Servers Test)
   assets 'vendorPhone' => '411', 'serialNumber' => 'SN12838931'
 end
 
-nodeC_foreign_id = 'nodeC'
+node_c_foreign_id = 'nodeC'
 # all options
 opennms_import_node 'nodeC' do
   foreign_source_name 'dry-source'
-  foreign_id nodeC_foreign_id
+  foreign_id node_c_foreign_id
   parent_foreign_source 'dry-source'
-  parent_foreign_id nodeB_foreign_id
+  parent_foreign_id node_b_foreign_id
   parent_node_label 'nodeB'
   city 'Tulsa'
   building 'Barn'
@@ -45,13 +45,13 @@ end
 opennms_import_node 'rename nodeC' do
   node_label 'node-c.example.net'
   foreign_source_name 'dry-source'
-  foreign_id nodeC_foreign_id
+  foreign_id node_c_foreign_id
   sync_import true
 end
 
 opennms_import_node 'change parent nodeC' do
   foreign_source_name 'dry-source'
-  foreign_id nodeC_foreign_id
+  foreign_id node_c_foreign_id
   parent_node_label 'nodeA'
   parent_foreign_id 'nodeA_ID'
   sync_import true
@@ -59,28 +59,28 @@ end
 
 opennms_import_node 'change city nodeC' do
   foreign_source_name 'dry-source'
-  foreign_id nodeC_foreign_id
+  foreign_id node_c_foreign_id
   city 'Brooklyn'
   sync_import true
 end
 
 opennms_import_node 'change building nodeC' do
   foreign_source_name 'dry-source'
-  foreign_id nodeC_foreign_id
+  foreign_id node_c_foreign_id
   building 'Big'
   sync_import true
 end
 
 opennms_import_node 'change categories nodeC' do
   foreign_source_name 'dry-source'
-  foreign_id nodeC_foreign_id
+  foreign_id node_c_foreign_id
   categories %w(Servers Dev)
   sync_import true
 end
 
 opennms_import_node 'change assets nodeC' do
   foreign_source_name 'dry-source'
-  foreign_id nodeC_foreign_id
+  foreign_id node_c_foreign_id
   assets 'vendorPhone' => '311'
   sync_import true
 end
@@ -89,7 +89,7 @@ end
 opennms_import_node 'nothing nodeC' do
   node_label 'node-c.example.net'
   foreign_source_name 'dry-source'
-  foreign_id nodeC_foreign_id
+  foreign_id node_c_foreign_id
   parent_node_label 'nodeA'
   parent_foreign_id 'nodeA_ID'
   city 'Brooklyn'
@@ -101,13 +101,13 @@ end
 
 opennms_import_node 'nothing for different reasons nodeC' do
   foreign_source_name 'dry-source'
-  foreign_id nodeC_foreign_id
+  foreign_id node_c_foreign_id
   sync_import true
   action :create_if_missing
 end
 
 opennms_import_node 'delete nodeB' do
   foreign_source_name 'dry-source'
-  foreign_id nodeB_foreign_id
+  foreign_id node_b_foreign_id
   action :delete
 end

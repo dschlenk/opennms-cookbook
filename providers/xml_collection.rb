@@ -49,5 +49,5 @@ def create_xml_collection
   formatter.compact = true
   formatter.width = 100_000
   formatter.write(doc, out)
-  ::File.open("#{node['opennms']['conf']['home']}/etc/xml-datacollection-config.xml", 'w') { |file| file.puts(out) }
+  ::File.open("#{node['opennms']['conf']['home']}/etc/xml-datacollection-config.xml", 'w') { |f| f.puts(out) }
 end

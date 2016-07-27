@@ -48,5 +48,5 @@ def create_statsd_package
   formatter = REXML::Formatters::Pretty.new(2)
   formatter.compact = true
   formatter.write(doc, out)
-  ::File.open("#{node['opennms']['conf']['home']}/etc/statsd-configuration.xml", 'w') { |file| file.puts(out) }
+  ::File.open("#{node['opennms']['conf']['home']}/etc/statsd-configuration.xml", 'w') { |f| f.puts(out) }
 end

@@ -148,7 +148,7 @@ def delete_jdbc_collection_service
   formatter = REXML::Formatters::Pretty.new(2)
   formatter.compact = true
   formatter.write(doc, out)
-  ::File.open("#{node['opennms']['conf']['home']}/etc/collectd-configuration.xml", 'w') { |file| file.puts(out) }
+  ::File.open("#{node['opennms']['conf']['home']}/etc/collectd-configuration.xml", 'w') { |f| f.puts(out) }
 end
 
 def create_jdbc_collection_service
@@ -216,7 +216,7 @@ def create_jdbc_collection_service
   formatter = REXML::Formatters::Pretty.new(2)
   formatter.compact = true
   formatter.write(doc, out)
-  ::File.open("#{node['opennms']['conf']['home']}/etc/collectd-configuration.xml", 'w') { |file| file.puts(out) }
+  ::File.open("#{node['opennms']['conf']['home']}/etc/collectd-configuration.xml", 'w') { |f| f.puts(out) }
 end
 
 def handle_optional_param(param_name, param_value, service_el)

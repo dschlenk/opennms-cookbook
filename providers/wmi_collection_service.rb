@@ -40,18 +40,7 @@ def load_current_resource
                      @current_resource.collection,
                      @current_resource.name)
     @current_resource.exists = true
-    if service_changed?(@current_resource.service_name,
-                        @current_resource.package_name,
-                        @current_resource.collection,
-                        @current_resource.interval,
-                        @current_resource.user_defined,
-                        @current_resource.status,
-                        @current_resource.timeout,
-                        @current_resource.retry_count,
-                        @current_resource.port,
-                        @current_resource.thresholding_enabled)
-      @current_resource.changed = true
-    end
+    @current_resource.changed = true if service_changed?(@current_resource)
   end
 end
 
@@ -65,40 +54,40 @@ def service_exists?(package_name, collection, service_name)
 end
 
 # assumes exists
-def service_changed?(service_name, package_name, collection, interval,
-                    user_defined, status, timeout, retry_count, port,
-                    thresholding_enabled)
-  Chef::Log.debug "Checking to see if this wmi collection service has changed: '#{service_name}'"
+def service_changed?(current_resource) # service_name, package_name, collection, interval,
+  # user_defined, status, timeout, retry_count, port,
+  # thresholding_enabled)
+  Chef::Log.debug "Checking to see if this wmi collection service has changed: '#{current_resource.service_name}'"
   file = ::File.new("#{node['opennms']['conf']['home']}/etc/collectd-configuration.xml", 'r')
   doc = REXML::Document.new file
-  service_el = doc.elements["/collectd-configuration/package[@name='#{package_name}']/service[@name='#{service_name}' and parameter[@key='collection' and @value='#{collection}']]"]
+  service_el = doc.elements["/collectd-configuration/package[@name='#{current_resource.package_name}']/service[@name='#{current_resource.service_name}' and parameter[@key='collection' and @value='#{current_resource.collection}']]"]
   old_interval = service_el.attributes['interval']
-  Chef::Log.debug "checking interval: #{old_interval} != #{interval} ?"
-  return true if old_interval.to_s != interval.to_s
+  Chef::Log.debug "checking interval: #{old_interval} != #{current_resource.interval} ?"
+  return true if old_interval.to_s != current_resource.interval.to_s
   old_user_defined = service_el.attributes['user-defined']
   Chef::Log.debug 'checking user-defined'
-  return true if old_user_defined.to_s != user_defined.to_s
+  return true if old_user_defined.to_s != current_resource.user_defined.to_s
   old_status = service_el.attributes['status']
   Chef::Log.debug 'checking status'
-  return true if old_status.to_s != status.to_s
+  return true if old_status.to_s != current_resource.status.to_s
   old_timeout = service_el.elements["parameter[@key='timeout']"]
   old_timeout = old_timeout.attributes['value'] unless old_timeout.nil?
   Chef::Log.debug 'checking timeout'
-  return true if old_timeout.to_s != timeout.to_s
+  return true if old_timeout.to_s != current_resource.timeout.to_s
   old_retry_count = service_el.elements["parameter[@key='retry']"]
   unless old_retry_count.nil?
     old_retry_count = old_retry_count.attributes['value']
   end
   Chef::Log.debug 'checking retry'
-  return true if old_retry_count.to_s != retry_count.to_s
+  return true if old_retry_count.to_s != current_resource.retry_count.to_s
   old_port = service_el.elements["parameter[@key='port']"]
   old_port = old_port.attributes['value'] unless old_port.nil?
   Chef::Log.debug 'checking port'
-  return true if old_port.to_s != port.to_s
+  return true if old_port.to_s != current_resource.port.to_s
   old_te = service_el.elements["parameter[@key='thresholding-enabled']"]
   old_te = old_te.attributes['value'] unless old_te.nil?
   Chef::Log.debug 'checking thresholding-enabled'
-  return true if old_te.to_s != thresholding_enabled.to_s
+  return true if old_te.to_s != current_resource.thresholding_enabled.to_s
   Chef::Log.debug 'not changed!'
   false
 end
@@ -167,7 +156,7 @@ def update_wmi_collection_service
   formatter = REXML::Formatters::Pretty.new(2)
   formatter.compact = true
   formatter.write(doc, out)
-  ::File.open("#{node['opennms']['conf']['home']}/etc/collectd-configuration.xml", 'w') { |file| file.puts(out) }
+  ::File.open("#{node['opennms']['conf']['home']}/etc/collectd-configuration.xml", 'w') { |f| f.puts(out) }
 end
 
 def create_wmi_collection_service
@@ -182,18 +171,18 @@ def create_wmi_collection_service
   unless new_resource.user_defined.nil?
     service_el.add_attribute('user-defined', new_resource.user_defined)
   end
-  collection_param_el = service_el.add_element 'parameter', 'key' => 'collection', 'value' => new_resource.collection
+  service_el.add_element 'parameter', 'key' => 'collection', 'value' => new_resource.collection
   if new_resource.port
-    port_el = service_el.add_element 'parameter', 'key' => 'port', 'value' => new_resource.port
+    service_el.add_element 'parameter', 'key' => 'port', 'value' => new_resource.port
   end
   if new_resource.timeout
-    timeout_el = service_el.add_element 'parameter', 'key' => 'timeout', 'value' => new_resource.timeout
+    service_el.add_element 'parameter', 'key' => 'timeout', 'value' => new_resource.timeout
   end
   if new_resource.retry_count
-    retries_el = service_el.add_element 'parameter', 'key' => 'retry', 'value' => new_resource.retry_count
+    service_el.add_element 'parameter', 'key' => 'retry', 'value' => new_resource.retry_count
   end
   unless new_resource.thresholding_enabled.nil?
-    thresh_enabled_el = service_el.add_element 'parameter', 'key' => 'thresholding-enabled', 'value' => new_resource.thresholding_enabled
+    service_el.add_element 'parameter', 'key' => 'thresholding-enabled', 'value' => new_resource.thresholding_enabled
   end
 
   # make sure we've got a service definition at the end of the file
@@ -204,5 +193,5 @@ def create_wmi_collection_service
   formatter = REXML::Formatters::Pretty.new(2)
   formatter.compact = true
   formatter.write(doc, out)
-  ::File.open("#{node['opennms']['conf']['home']}/etc/collectd-configuration.xml", 'w') { |file| file.puts(out) }
+  ::File.open("#{node['opennms']['conf']['home']}/etc/collectd-configuration.xml", 'w') { |f| f.puts(out) }
 end

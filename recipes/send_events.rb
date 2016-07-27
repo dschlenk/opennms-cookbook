@@ -2,9 +2,7 @@
 # the in-memory representation of changed config
 # files without full restarts of OpenNMS
 
-reload_uei = 'uei.opennms.org/internal/reloadDaemonConfig'
 onms_home = node['opennms']['conf']['home']
-send_event = "#{onms_home}/bin/send-event.pl"
 
 # things that support reloadDaemonConfig
 reload_daemons = {
@@ -23,7 +21,7 @@ reload_daemons = {
 }
 reload_daemons.each do |daemon, settings|
   params = ["daemonName #{daemon}"]
-  cmd = "#{send_event} -p 'daemonName #{daemon}' #{reload_uei}"
+  # "#{send_event} -p 'daemonName #{daemon}' #{reload_uei}"
   if daemon == 'Thresholds'
     params = ['daemonName Threshd', 'configFile thresholds.xml']
   end

@@ -71,7 +71,7 @@ def create_resource_type
   formatter = REXML::Formatters::Pretty.new(2)
   formatter.compact = true
   formatter.write(doc, out)
-  ::File.open(outfile_name, 'w') { |file| file.puts(out) }
+  ::File.open(outfile_name, 'w') { |f| f.puts(out) }
   # ensure there's an include-collection element in the default snmp-collection for this group
   opennms_snmp_collection_group new_resource.group_name do
     collection_name 'default'

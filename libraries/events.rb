@@ -2,7 +2,7 @@ require 'rexml/document'
 
 module Events
   def event_file_included?(file, node)
-    file = Regexp.last_match(1) if file =~ /^events\/(.*)$/
+    file = Regexp.last_match(1) if file =~ %r{^events/(.*)$}
 
     ecf = ::File.new("#{node['opennms']['conf']['home']}/etc/eventconf.xml", 'r')
     doc = REXML::Document.new ecf
@@ -41,7 +41,7 @@ module Events
     !doc.elements["/events/event/uei[text() = '#{uei}']"].nil?
   end
 
-  def is_event_file?(file, node)
+  def event_file?(file, node)
     fn = "#{node['opennms']['conf']['home']}/etc/#{file}"
     eventfile = false
     if ::File.exist?(fn)
@@ -222,7 +222,6 @@ module Events
         tticket_el = event_el.elements['tticket']
         tt_state = tticket_el.attributes['state'] || 'on'
         tt_info = tticket_el.texts.join('\n')
-        tticket = {}
         tticket = { 'info' => tt_info, 'state' => tt_state }
         Chef::Log.debug "ttickets equal? New: #{event.tticket}, current #{tticket}"
         return true unless event.tticket == tticket
@@ -345,7 +344,7 @@ module Events
 
   def add_file_to_eventconf(file, position, node)
     Chef::Log.debug "file is #{file}"
-    if file =~ /^events\/(.*)$/
+    if file =~ %r{^events/(.*)$}
       file = Regexp.last_match(1)
       Chef::Log.debug "file is now #{file}"
     end
@@ -369,6 +368,6 @@ module Events
     formatter = REXML::Formatters::Pretty.new(2)
     formatter.compact = true
     formatter.write(doc, out)
-    ::File.open("#{node['opennms']['conf']['home']}/etc/eventconf.xml", 'w') { |f| f.puts(out) }
+    ::File.open("#{node['opennms']['conf']['home']}/etc/eventconf.xml", 'w') { |new_file| new_file.puts(out) }
   end
 end

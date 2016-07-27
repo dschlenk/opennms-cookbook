@@ -64,7 +64,7 @@ def create_snmp_collection_group
   collection_el = doc.elements["/datacollection-config/snmp-collection[@name='#{new_resource.collection_name}']"]
   include_collection_el = collection_el.add_element 'include-collection', 'dataCollectionGroup' => new_resource.name
   unless new_resource.system_def.nil?
-    system_def_el = include_collection_el.add_attribute('systemDef', new_resource.system_def)
+    include_collection_el.add_attribute('systemDef', new_resource.system_def)
   end
   new_resource.exclude_filters.each do |exclude_filter|
     exclude_filter_el = include_collection_el.add_element 'exclude-filter'
@@ -85,7 +85,7 @@ def create_snmp_collection_group
   formatter = REXML::Formatters::Pretty.new(2)
   formatter.compact = true
   formatter.write(doc, out)
-  ::File.open("#{node['opennms']['conf']['home']}/etc/datacollection-config.xml", 'w') { |file| file.puts(out) }
+  ::File.open("#{node['opennms']['conf']['home']}/etc/datacollection-config.xml", 'w') { |f| f.puts(out) }
 end
 
 def restart_collectd

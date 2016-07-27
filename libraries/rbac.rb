@@ -1,5 +1,3 @@
-$LOAD_PATH.unshift *Dir[File.expand_path('../../files/default/vendor/gems/**/lib', __FILE__)]
-
 require 'rexml/document'
 require 'json'
 require 'fileutils'
@@ -104,7 +102,7 @@ module Rbac
     formatter = REXML::Formatters::Pretty.new(2)
     formatter.compact = true
     formatter.write(doc, out)
-    ::File.open("#{node['opennms']['conf']['home']}/etc/groups.xml", 'w') { |file| file.puts(out) }
+    ::File.open("#{node['opennms']['conf']['home']}/etc/groups.xml", 'w') { |f| f.puts(out) }
   end
 
   def role_exists?(role, node)
@@ -143,7 +141,7 @@ module Rbac
     formatter = REXML::Formatters::Pretty.new(2)
     formatter.compact = true
     formatter.write(doc, out)
-    ::File.open("#{node['opennms']['conf']['home']}/etc/groups.xml", 'w') { |file| file.puts(out) }
+    ::File.open("#{node['opennms']['conf']['home']}/etc/groups.xml", 'w') { |f| f.puts(out) }
   end
 
   # assumes validity of arguments
@@ -170,7 +168,7 @@ module Rbac
     formatter = REXML::Formatters::Pretty.new(2)
     formatter.compact = true
     formatter.write(doc, out)
-    ::File.open("#{node['opennms']['conf']['home']}/etc/groups.xml", 'w') { |file| file.puts(out) }
+    ::File.open("#{node['opennms']['conf']['home']}/etc/groups.xml", 'w') { |f| f.puts(out) }
   end
 
   def baseurl(node)

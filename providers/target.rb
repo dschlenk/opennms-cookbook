@@ -135,5 +135,5 @@ def create_target
   formatter = REXML::Formatters::Pretty.new(2)
   formatter.compact = true
   formatter.write(doc, out)
-  ::File.open("#{node['opennms']['conf']['home']}/etc/destinationPaths.xml", 'w') { |file| file.puts(out) }
+  ::File.open("#{node['opennms']['conf']['home']}/etc/destinationPaths.xml", 'w') { |f| f.puts(out) }
 end

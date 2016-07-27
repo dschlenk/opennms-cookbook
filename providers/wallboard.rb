@@ -77,7 +77,7 @@ def create_wallboard
   formatter = REXML::Formatters::Pretty.new(2)
   formatter.compact = true
   formatter.write(doc, out)
-  ::File.open("#{node['opennms']['conf']['home']}/etc/dashboard-config.xml", 'w') { |file| file.puts(out) }
+  ::File.open("#{node['opennms']['conf']['home']}/etc/dashboard-config.xml", 'w') { |f| f.puts(out) }
 end
 
 def update_wallboard
@@ -99,5 +99,5 @@ def update_wallboard
   formatter = REXML::Formatters::Pretty.new(2)
   formatter.compact = true
   formatter.write(doc, out)
-  ::File.open("#{node['opennms']['conf']['home']}/etc/dashboard-config.xml", 'w') { |file| file.puts(out) }
+  ::File.open("#{node['opennms']['conf']['home']}/etc/dashboard-config.xml", 'w') { |f| f.puts(out) }
 end

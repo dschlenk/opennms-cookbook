@@ -80,11 +80,12 @@ def load_current_resource
                                   end
   else
     @current_resource.different = true
- end
+  end
 end
 
 private
 
+# rubocop:disable Metrics/ParameterLists
 def matching_def(doc, retry_count, timeout, username, domain, password)
   definition = nil
   doc.elements.each('/wmi-config/definition') do |def_el|
@@ -98,6 +99,7 @@ def matching_def(doc, retry_count, timeout, username, domain, password)
   end
   definition
 end
+# rubocop:enable Metrics/ParameterLists
 
 def ranges_equal?(def_el, ranges)
   return true if def_el.elements['range'].nil? && (ranges.nil? || ranges.empty?)
@@ -182,7 +184,7 @@ def create_wmi_config_definition
   formatter = REXML::Formatters::Pretty.new(2)
   formatter.compact = true
   formatter.write(doc, out)
-  ::File.open("#{node['opennms']['conf']['home']}/etc/wmi-config.xml", 'w') { |file| file.puts(out) }
+  ::File.open("#{node['opennms']['conf']['home']}/etc/wmi-config.xml", 'w') { |f| f.puts(out) }
 end
 
 def update_wmi_config_definition
@@ -228,7 +230,7 @@ def update_wmi_config_definition
   formatter = REXML::Formatters::Pretty.new(2)
   formatter.compact = true
   formatter.write(doc, out)
-  ::File.open("#{node['opennms']['conf']['home']}/etc/wmi-config.xml", 'w') { |file| file.puts(out) }
+  ::File.open("#{node['opennms']['conf']['home']}/etc/wmi-config.xml", 'w') { |f| f.puts(out) }
 end
 
 def delete_wmi_config_definition
@@ -251,5 +253,5 @@ def delete_wmi_config_definition
   formatter = REXML::Formatters::Pretty.new(2)
   formatter.compact = true
   formatter.write(doc, out)
-  ::File.open("#{node['opennms']['conf']['home']}/etc/wmi-config.xml", 'w') { |file| file.puts(out) }
+  ::File.open("#{node['opennms']['conf']['home']}/etc/wmi-config.xml", 'w') { |f| f.puts(out) }
 end

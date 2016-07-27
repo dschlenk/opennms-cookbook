@@ -2,7 +2,7 @@ ruby_block 'Perform OpenNMS Upgrade If Necessary' do
   block do
     require 'fileutils'
     Chef::Resource::RubyBlock.send(:include, Chef::Mixin::ShellOut)
-    def checkForUpgrade(dir)
+    def check_for_upgrade(dir)
       found = false
       if ::File.exist?(dir)
         Chef::Log.debug "checking for upgraded files in #{dir}"
@@ -40,7 +40,7 @@ ruby_block 'Perform OpenNMS Upgrade If Necessary' do
     node['opennms']['upgrade_dirs'].each do |d|
       conf_dir = "#{onms_home}/#{d}"
       if ::File.exist?(conf_dir) # || ::File.exist?(jetty_dir) || ::File.exist?(etc_dc_dir)
-        upgraded = checkForUpgrade(conf_dir)
+        upgraded = check_for_upgrade(conf_dir)
         break
       end
     end
@@ -52,15 +52,15 @@ ruby_block 'Perform OpenNMS Upgrade If Necessary' do
         clean_dir(conf_dir, 'rpmsave')
       end
       unless ::File.exist?("#{onms_home}/etc/java.conf")
-        cmd = shell_out!("#{onms_home}/bin/runjava -s", returns: [0])
+        shell_out!("#{onms_home}/bin/runjava -s", returns: [0])
       end
 
       unless ::File.exist?("#{onms_home}/etc/configured")
-        cmd = shell_out!("#{onms_home}/bin/install -dis", returns: [0])
+        shell_out!("#{onms_home}/bin/install -dis", returns: [0])
       end
 
       # stop current service until we have important things reconverged
-      cmd = shell_out("#{onms_home}/bin/opennms stop", returns: [0])
+      shell_out("#{onms_home}/bin/opennms stop", returns: [0])
       Chef::Log.info 'All *.rpmnew and *.rpmsave files moved into place.'
     end
   end

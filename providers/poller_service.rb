@@ -39,14 +39,7 @@ def load_current_resource
   if service_exists?(@current_resource.package_name, @current_resource.name)
     @current_resource.exists = true
   end
-  if service_changed?(@current_resource.name, @current_resource.package_name,
-                      @current_resource.interval,
-                      @current_resource.user_defined,
-                      @current_resource.status, @current_resource.timeout,
-                      @current_resource.port, @current_resource.params,
-                      @current_resource.class_name)
-    @current_resource.changed = true
-  end
+  @current_resource.changed = true if service_changed?(@current_resource.name)
 end
 
 private
@@ -58,45 +51,44 @@ def service_exists?(package_name, name)
   !doc.elements["/poller-configuration/package[@name='#{package_name}']/service[@name='#{name}']"].nil?
 end
 
-def service_changed?(name, package_name, interval, user_defined, status,
-                     timeout, port, params, _class_name)
-  Chef::Log.debug "Checking to see if this poller service has changed: '#{name}'"
+def service_changed?(current_resource)
+  Chef::Log.debug "Checking to see if this poller service has changed: '#{current_resource.name}'"
   file = ::File.new("#{node['opennms']['conf']['home']}/etc/poller-configuration.xml", 'r')
   doc = REXML::Document.new file
-  service_el = doc.elements["/poller-configuration/package[@name='#{package_name}']/service[@name='#{name}']"]
+  service_el = doc.elements["/poller-configuration/package[@name='#{current_resource.package_name}']/service[@name='#{current_resource.name}']"]
   curr_interval = nil
   curr_interval = service_el.attributes['interval'] unless service_el.nil?
-  Chef::Log.debug "curr_interval: '#{curr_interval}'; interval: '#{interval}'"
-  return true if curr_interval.to_s != interval.to_s
+  Chef::Log.debug "curr_interval: '#{curr_interval}'; interval: '#{current_resource.interval}'"
+  return true if curr_interval.to_s != current_resource.interval.to_s
   curr_user_defined = service_el.attributes['user-defined']
   Chef::Log.debug "curr_user_defined: '#{curr_user_defined}'"
-  return true if curr_user_defined.to_s != user_defined.to_s
+  return true if curr_user_defined.to_s != current_resource.user_defined.to_s
   curr_status = service_el.attributes['status']
   Chef::Log.debug "curr_status: '#{curr_status}'"
-  return true if curr_status.to_s != status.to_s
+  return true if curr_status.to_s != current_resource.status.to_s
   tel = service_el.elements["parameter[@key = 'timeout']"]
   if tel.nil?
-    Chef::Log.debug "timeout: '#{timeout}'"
-    return true unless timeout.nil?
+    Chef::Log.debug "timeout: '#{current_resource.timeout}'"
+    return true unless current_resource.timeout.nil?
   else
     curr_timeout = tel.attributes['value']
     Chef::Log.debug "curr_timeout: '#{curr_timeout}'"
-    return true if curr_timeout.to_s != timeout.to_s
+    return true if curr_timeout.to_s != current_resource.timeout.to_s
   end
   pel = service_el.elements["parameter[@key = 'port']"]
   if pel.nil?
-    return true unless port.nil?
+    return true unless current_resource.port.nil?
   else
     curr_port = pel.attributes['value']
     Chef::Log.debug "curr_port: '#{curr_port}'"
-    return true if curr_port.to_s != port.to_s
+    return true if curr_port.to_s != current_resource.port.to_s
   end
   curr_params = {}
   params_str = {}
   # make a version of params that has strings for both keys and values
   # just so we can compare without forcing certain param values to
   # be specific types
-  params.each do |k, v|
+  current_resource.params.each do |k, v|
     params_str[k.to_s] = v.to_s
   end
   service_el.elements.each("parameter[@key != 'port' and @key != 'timeout']") do |p|
@@ -104,7 +96,7 @@ def service_changed?(name, package_name, interval, user_defined, status,
     curr_params[p.attributes['key']] = val
   end
   Chef::Log.debug "curr_params: '#{curr_params}'; params: #{params_str}"
-  return true if !params.nil? && curr_params != params_str
+  return true if !current_resource.params.nil? && curr_params != params_str
   false
 end
 
@@ -139,7 +131,7 @@ def update_poller_service
   formatter = REXML::Formatters::Pretty.new(2)
   formatter.compact = true
   formatter.write(doc, out)
-  ::File.open("#{node['opennms']['conf']['home']}/etc/poller-configuration.xml", 'w') { |file| file.puts(out) }
+  ::File.open("#{node['opennms']['conf']['home']}/etc/poller-configuration.xml", 'w') { |f| f.puts(out) }
 end
 
 def create_poller_service
@@ -183,5 +175,5 @@ def create_poller_service
   formatter = REXML::Formatters::Pretty.new(2)
   formatter.compact = true
   formatter.write(doc, out)
-  ::File.open("#{node['opennms']['conf']['home']}/etc/poller-configuration.xml", 'w') { |file| file.puts(out) }
+  ::File.open("#{node['opennms']['conf']['home']}/etc/poller-configuration.xml", 'w') { |f| f.puts(out) }
 end

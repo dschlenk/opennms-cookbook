@@ -52,18 +52,18 @@ def create_snmp_collection_service
   if new_resource.user_defined
     service_el.add_attribute('user-defined', new_resource.user_defined)
   end
-  collection_param_el = service_el.add_element 'parameter', 'key' => 'collection', 'value' => new_resource.collection
+  service_el.add_element 'parameter', 'key' => 'collection', 'value' => new_resource.collection
   unless new_resource.port.nil?
-    port_el = service_el.add_element 'parameter', 'key' => 'port', 'value' => new_resource.port
+    service_el.add_element 'parameter', 'key' => 'port', 'value' => new_resource.port
   end
   unless new_resource.timeout.nil?
-    timeout_el = service_el.add_element 'parameter', 'key' => 'timeout', 'value' => new_resource.timeout
+    service_el.add_element 'parameter', 'key' => 'timeout', 'value' => new_resource.timeout
   end
   unless new_resource.retry_count.nil?
-    retry_count_el = service_el.add_element 'parameter', 'key' => 'retry', 'value' => new_resource.retry_count
+    service_el.add_element 'parameter', 'key' => 'retry', 'value' => new_resource.retry_count
   end
   unless new_resource.thresholding_enabled.nil?
-    thresh_enabled_el = service_el.add_element 'parameter', 'key' => 'thresholding-enabled', 'value' => new_resource.thresholding_enabled
+    service_el.add_element 'parameter', 'key' => 'thresholding-enabled', 'value' => new_resource.thresholding_enabled
   end
   # make sure we've got a service definition at the end of the file
   unless doc.elements["/collectd-configuration/collector[@service='#{new_resource.service_name}']"]
@@ -75,5 +75,5 @@ def create_snmp_collection_service
   formatter = REXML::Formatters::Pretty.new(2)
   formatter.compact = true
   formatter.write(doc, out)
-  ::File.open("#{node['opennms']['conf']['home']}/etc/collectd-configuration.xml", 'w') { |file| file.puts(out) }
+  ::File.open("#{node['opennms']['conf']['home']}/etc/collectd-configuration.xml", 'w') { |f| f.puts(out) }
 end

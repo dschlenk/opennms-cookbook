@@ -78,26 +78,7 @@ def load_current_resource
 
   doc = REXML::Document.new(contents, respect_whitespace: :all)
   doc.context[:attribute_quote] = :quote
-  def_el = matching_def(doc, @current_resource.port,
-                        @current_resource.retry_count,
-                        @current_resource.timeout,
-                        @current_resource.read_community,
-                        @current_resource.write_community,
-                        @current_resource.proxy_host,
-                        @current_resource.version,
-                        @current_resource.max_vars_per_pdu,
-                        @current_resource.max_repetitions,
-                        @current_resource.max_request_size,
-                        @current_resource.security_name,
-                        @current_resource.security_level,
-                        @current_resource.auth_passphrase,
-                        @current_resource.auth_protocol,
-                        @current_resource.engine_id,
-                        @current_resource.context_engine_id,
-                        @current_resource.context_name,
-                        @current_resource.privacy_passphrase,
-                        @current_resource.privacy_protocol,
-                        @current_resource.enterprise_id)
+  def_el = matching_def(doc, @current_resource)
   if !def_el.nil?
     @current_resource.exists = true
     @current_resource.different = if ranges_equal?(def_el, @current_resource.ranges)\
@@ -114,35 +95,29 @@ end
 
 private
 
-def matching_def(doc, port, retry_count, timeout, read_community,
-                 write_community, proxy_host, version, max_vars_per_pdu,
-                 max_repetitions, max_request_size, security_name,
-                 security_level, auth_passphrase, auth_protocol,
-                 engine_id, context_engine_id, context_name,
-                 privacy_passphrase, privacy_protocol, enterprise_id)
-
+def matching_def(doc, current_resource)
   definition = nil
   doc.elements.each('/snmp-config/definition') do |def_el|
-    next unless def_el.attributes['port'].to_s == port.to_s\
-    && def_el.attributes['retry'].to_s == retry_count.to_s\
-    && def_el.attributes['timeout'].to_s == timeout.to_s\
-    && def_el.attributes['read-community'].to_s == read_community.to_s\
-    && def_el.attributes['write-community'].to_s == write_community.to_s\
-    && def_el.attributes['proxy-host'].to_s == proxy_host.to_s\
-    && def_el.attributes['version'].to_s == version.to_s\
-    && def_el.attributes['max-vars-per-pdu'].to_s == max_vars_per_pdu.to_s\
-    && def_el.attributes['max-repetitions'].to_s == max_repetitions.to_s\
-    && def_el.attributes['max-request-size'].to_s == max_request_size.to_s\
-    && def_el.attributes['security-name'].to_s == security_name.to_s\
-    && def_el.attributes['security-level'].to_s == security_level.to_s\
-    && def_el.attributes['auth-passphrase'].to_s == auth_passphrase.to_s\
-    && def_el.attributes['auth-protocol'].to_s == auth_protocol.to_s\
-    && def_el.attributes['engine-id'].to_s == engine_id.to_s\
-    && def_el.attributes['context-engine-id'].to_s == context_engine_id.to_s\
-    && def_el.attributes['context-name'].to_s == context_name.to_s\
-    && def_el.attributes['privacy-passphrase'].to_s == privacy_passphrase.to_s\
-    && def_el.attributes['privacy-protocol'].to_s == privacy_protocol.to_s\
-    && def_el.attributes['enterprise-id'].to_s == enterprise_id.to_s
+    next unless def_el.attributes['port'].to_s == current_resource.port.to_s\
+    && def_el.attributes['retry'].to_s == current_resource.retry_count.to_s\
+    && def_el.attributes['timeout'].to_s == current_resource.timeout.to_s\
+    && def_el.attributes['read-community'].to_s == current_resource.read_community.to_s\
+    && def_el.attributes['write-community'].to_s == current_resource.write_community.to_s\
+    && def_el.attributes['proxy-host'].to_s == current_resource.proxy_host.to_s\
+    && def_el.attributes['version'].to_s == current_resource.version.to_s\
+    && def_el.attributes['max-vars-per-pdu'].to_s == current_resource.max_vars_per_pdu.to_s\
+    && def_el.attributes['max-repetitions'].to_s == current_resource.max_repetitions.to_s\
+    && def_el.attributes['max-request-size'].to_s == current_resource.max_request_size.to_s\
+    && def_el.attributes['security-name'].to_s == current_resource.security_name.to_s\
+    && def_el.attributes['security-level'].to_s == current_resource.security_level.to_s\
+    && def_el.attributes['auth-passphrase'].to_s == current_resource.auth_passphrase.to_s\
+    && def_el.attributes['auth-protocol'].to_s == current_resource.auth_protocol.to_s\
+    && def_el.attributes['engine-id'].to_s == current_resource.engine_id.to_s\
+    && def_el.attributes['context-engine-id'].to_s == current_resource.context_engine_id.to_s\
+    && def_el.attributes['context-name'].to_s == current_resource.context_name.to_s\
+    && def_el.attributes['privacy-passphrase'].to_s == current_resource.privacy_passphrase.to_s\
+    && def_el.attributes['privacy-protocol'].to_s == current_resource.privacy_protocol.to_s\
+    && def_el.attributes['enterprise-id'].to_s == current_resource.enterprise_id.to_s
     definition = def_el
     break
   end
@@ -248,7 +223,7 @@ def create_snmp_config_definition
   formatter = REXML::Formatters::Pretty.new(2)
   formatter.compact = true
   formatter.write(doc, out)
-  ::File.open("#{node['opennms']['conf']['home']}/etc/snmp-config.xml", 'w') { |file| file.puts(out) }
+  ::File.open("#{node['opennms']['conf']['home']}/etc/snmp-config.xml", 'w') { |f| f.puts(out) }
 end
 
 def update_snmp_config_definition
@@ -259,26 +234,7 @@ def update_snmp_config_definition
   doc = REXML::Document.new(contents, respect_whitespace: :all)
   doc.context[:attribute_quote] = :quote
 
-  def_el = matching_def(doc, new_resource.port,
-                        new_resource.retry_count,
-                        new_resource.timeout,
-                        new_resource.read_community,
-                        new_resource.write_community,
-                        new_resource.proxy_host,
-                        new_resource.version,
-                        new_resource.max_vars_per_pdu,
-                        new_resource.max_repetitions,
-                        new_resource.max_request_size,
-                        new_resource.security_name,
-                        new_resource.security_level,
-                        new_resource.auth_passphrase,
-                        new_resource.auth_protocol,
-                        new_resource.engine_id,
-                        new_resource.context_engine_id,
-                        new_resource.context_name,
-                        new_resource.privacy_passphrase,
-                        new_resource.privacy_protocol,
-                        new_resource.enterprise_id)
+  def_el = matching_def(doc, new_resource)
 
   # put the new ones in
   unless new_resource.ranges.nil?
@@ -309,7 +265,7 @@ def update_snmp_config_definition
   formatter = REXML::Formatters::Pretty.new(2)
   formatter.compact = true
   formatter.write(doc, out)
-  ::File.open("#{node['opennms']['conf']['home']}/etc/snmp-config.xml", 'w') { |file| file.puts(out) }
+  ::File.open("#{node['opennms']['conf']['home']}/etc/snmp-config.xml", 'w') { |f| f.puts(out) }
 end
 
 def delete_snmp_config_definition
@@ -320,31 +276,12 @@ def delete_snmp_config_definition
   doc = REXML::Document.new(contents, respect_whitespace: :all)
   doc.context[:attribute_quote] = :quote
 
-  def_el = matching_def(doc, new_resource.port,
-                        new_resource.retry_count,
-                        new_resource.timeout,
-                        new_resource.read_community,
-                        new_resource.write_community,
-                        new_resource.proxy_host,
-                        new_resource.version,
-                        new_resource.max_vars_per_pdu,
-                        new_resource.max_repetitions,
-                        new_resource.max_request_size,
-                        new_resource.security_name,
-                        new_resource.security_level,
-                        new_resource.auth_passphrase,
-                        new_resource.auth_protocol,
-                        new_resource.engine_id,
-                        new_resource.context_engine_id,
-                        new_resource.context_name,
-                        new_resource.privacy_passphrase,
-                        new_resource.privacy_protocol,
-                        new_resource.enterprise_id)
+  def_el = matching_def(doc, new_resource)
   doc.root.delete(def_el)
 
   out = ''
   formatter = REXML::Formatters::Pretty.new(2)
   formatter.compact = true
   formatter.write(doc, out)
-  ::File.open("#{node['opennms']['conf']['home']}/etc/snmp-config.xml", 'w') { |file| file.puts(out) }
+  ::File.open("#{node['opennms']['conf']['home']}/etc/snmp-config.xml", 'w') { |f| f.puts(out) }
 end

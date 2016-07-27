@@ -24,6 +24,7 @@ action :create do
   end
 end
 
+# rubocop:disable Metrics/BlockNesting
 def load_current_resource
   @current_resource = Chef::Resource::OpennmsAvailViewSection.new(@new_resource.name)
   @current_resource.section(@new_resource.section)
@@ -51,6 +52,7 @@ def load_current_resource
     end
   end
 end
+# rubocop:enable Metrics/BlockNesting
 
 def categories_exist?(group, categories)
   file = ::File.new("#{node['opennms']['conf']['home']}/etc/categories.xml", 'r')
@@ -123,7 +125,7 @@ def update_avail_view_section
   formatter = REXML::Formatters::Pretty.new(2)
   formatter.compact = true
   formatter.write(doc, out)
-  ::File.open("#{node['opennms']['conf']['home']}/etc/viewsdisplay.xml", 'w') { |file| file.puts(out) }
+  ::File.open("#{node['opennms']['conf']['home']}/etc/viewsdisplay.xml", 'w') { |f| f.puts(out) }
 end
 
 def create_avail_view_section
@@ -138,13 +140,11 @@ def create_avail_view_section
   elsif !new_resource.after.nil?
     target_el = view_el.elements["section[section-name[text() = '#{new_resource.after}']]"]
     view_el.insert_after target_el, section_el
-  else # position
-    if new_resource.position == 'bottom'
-      view_el.add_element section_el
-    else
-      fvs_el = view_el.elements['section']
-      view_el.insert_before fvs_el, section_el
-    end
+  elsif new_resource.position == 'bottom'
+    view_el.add_element section_el
+  else
+    fvs_el = view_el.elements['section']
+    view_el.insert_before fvs_el, section_el
   end
   sn_el = section_el.add_element 'section-name'
   sn_el.add_text(REXML::CData.new(new_resource.section))
@@ -156,5 +156,5 @@ def create_avail_view_section
   formatter = REXML::Formatters::Pretty.new(2)
   formatter.compact = true
   formatter.write(doc, out)
-  ::File.open("#{node['opennms']['conf']['home']}/etc/viewsdisplay.xml", 'w') { |file| file.puts(out) }
+  ::File.open("#{node['opennms']['conf']['home']}/etc/viewsdisplay.xml", 'w') { |f| f.puts(out) }
 end

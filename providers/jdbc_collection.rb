@@ -43,11 +43,11 @@ def create_jdbc_collection
     rra_el = rrd_el.add_element 'rra'
     rra_el.add_text(rra)
   end
-  queries_el = collection_el.add_element 'queries'
+  collection_el.add_element 'queries'
 
   out = ''
   formatter = REXML::Formatters::Pretty.new(2)
   formatter.compact = true
   formatter.write(doc, out)
-  ::File.open("#{node['opennms']['conf']['home']}/etc/jdbc-datacollection-config.xml", 'w') { |file| file.puts(out) }
+  ::File.open("#{node['opennms']['conf']['home']}/etc/jdbc-datacollection-config.xml", 'w') { |f| f.puts(out) }
 end

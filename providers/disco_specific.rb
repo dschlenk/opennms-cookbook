@@ -28,12 +28,10 @@ def load_current_resource
     if specific_exists?(@current_resource.name, @current_resource.location, nil)
       @current_resource.exists = true
     end
-  else
-    if specific_exists?(@current_resource.name, @current_resource.location, @current_resource.foreign_source)
-      @current_resource.exists = true
-    elsif foreign_source_exists?(@current_resource.foreign_source, node)
-      @current_resource.foreign_source_exists = true
-    end
+  elsif specific_exists?(@current_resource.name, @current_resource.location, @current_resource.foreign_source)
+    @current_resource.exists = true
+  elsif foreign_source_exists?(@current_resource.foreign_source, node)
+    @current_resource.foreign_source_exists = true
   end
 end
 
@@ -49,12 +47,10 @@ def specific_exists?(name, location, foreign_source)
     else
       !doc.elements["/discovery-configuration/specific[@location = '#{location}' and text() = '#{name}]"].nil?
     end
+  elsif location.nil? || node['opennms']['version_major'].to_i < 18
+    !doc.elements["/discovery-configuration/specific[text() ='#{name} and @foreign-source = '#{foreign_source}']"].nil?
   else
-    if location.nil? || node['opennms']['version_major'].to_i < 18
-      !doc.elements["/discovery-configuration/specific[text() ='#{name} and @foreign-source = '#{foreign_source}']"].nil?
-    else
-      !doc.elements["/discovery-configuration/specific[@location = '#{location}' and text() = '#{name} and @foreign-source = '#{foreign_source}']"].nil?
-    end
+    !doc.elements["/discovery-configuration/specific[@location = '#{location}' and text() = '#{name} and @foreign-source = '#{foreign_source}']"].nil?
   end
 end
 
@@ -99,5 +95,5 @@ def create_specific
   formatter = REXML::Formatters::Pretty.new(2)
   formatter.compact = true
   formatter.write(doc, out)
-  ::File.open("#{node['opennms']['conf']['home']}/etc/discovery-configuration.xml", 'w') { |file| file.puts(out) }
+  ::File.open("#{node['opennms']['conf']['home']}/etc/discovery-configuration.xml", 'w') { |f| f.puts(out) }
 end

@@ -46,9 +46,7 @@ private
 
 def create_import_node_interface
   Chef::Log.debug 'Adding interface...'
-  add_import_node_interface(new_resource.name, new_resource.foreign_source_name,
-    new_resource.foreign_id, new_resource.status,
-    new_resource.managed, new_resource.snmp_primary, node)
+  add_import_node_interface(new_resource, node)
   Chef::Log.debug "Added interface. Doing import... syncing? #{new_resource.sync_import}"
 
   if !new_resource.sync_import.nil? && new_resource.sync_import
