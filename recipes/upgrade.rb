@@ -1,4 +1,4 @@
-ruby_block "Perform OpenNMS Upgrade If Necessary" do
+ruby_block 'Perform OpenNMS Upgrade If Necessary' do
   block do
     require 'fileutils'
     Chef::Resource::RubyBlock.send(:include, Chef::Mixin::ShellOut)
@@ -18,7 +18,7 @@ ruby_block "Perform OpenNMS Upgrade If Necessary" do
       Chef::Log.debug "found upgraded files? #{found}"
       found
     end
-    
+
     def clean_dir(dir, type)
       Dir.foreach(dir) do |file|
         if match = file.match(/^(.*)\.#{type}$/)
@@ -26,7 +26,7 @@ ruby_block "Perform OpenNMS Upgrade If Necessary" do
             FileUtils.rm("#{dir}/#{file}")
           elsif type == 'rpmnew'
             orig_file = match.captures[0]
-            FileUtils.cp("#{dir}/#{orig_file}",  "#{dir}/#{orig_file}.bak")
+            FileUtils.cp("#{dir}/#{orig_file}", "#{dir}/#{orig_file}.bak")
             FileUtils.mv("#{dir}/#{file}", "#{dir}/#{orig_file}")
           end
         end
@@ -39,7 +39,7 @@ ruby_block "Perform OpenNMS Upgrade If Necessary" do
 
     node['opennms']['upgrade_dirs'].each do |d|
       conf_dir = "#{onms_home}/#{d}"
-      if ::File.exist?(conf_dir)# || ::File.exist?(jetty_dir) || ::File.exist?(etc_dc_dir)
+      if ::File.exist?(conf_dir) # || ::File.exist?(jetty_dir) || ::File.exist?(etc_dc_dir)
         upgraded = checkForUpgrade(conf_dir)
         break
       end
@@ -52,16 +52,16 @@ ruby_block "Perform OpenNMS Upgrade If Necessary" do
         clean_dir(conf_dir, 'rpmsave')
       end
       unless ::File.exist?("#{onms_home}/etc/java.conf")
-        cmd = shell_out!("#{onms_home}/bin/runjava -s", {:returns => [0]})
+        cmd = shell_out!("#{onms_home}/bin/runjava -s", returns: [0])
       end
 
       unless ::File.exist?("#{onms_home}/etc/configured")
-        cmd = shell_out!("#{onms_home}/bin/install -dis", {:returns => [0]})
+        cmd = shell_out!("#{onms_home}/bin/install -dis", returns: [0])
       end
 
       # stop current service until we have important things reconverged
-      cmd = shell_out("#{onms_home}/bin/opennms stop", {:returns => [0]})
-      Chef::Log.info "All *.rpmnew and *.rpmsave files moved into place." 
+      cmd = shell_out("#{onms_home}/bin/opennms stop", returns: [0])
+      Chef::Log.info 'All *.rpmnew and *.rpmsave files moved into place.'
     end
   end
 end

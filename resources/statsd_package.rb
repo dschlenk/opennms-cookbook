@@ -7,7 +7,7 @@ require 'rexml/document'
 actions :create
 default_action :create
 
-attribute :package_name, :kind_of => String, :required => true, :name_attribute => true
-attribute :filter, :kind_of => String
+attribute :package_name, kind_of: String, required: true, name_attribute: true
+attribute :filter, kind_of: String
 
 attr_accessor :exists

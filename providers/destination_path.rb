@@ -6,9 +6,9 @@ use_inline_resources
 
 action :create do
   if @current_resource.exists
-    Chef::Log.info "#{ @new_resource } already exists - nothing to do."
+    Chef::Log.info "#{@new_resource} already exists - nothing to do."
   else
-    converge_by("Create #{ @new_resource }") do
+    converge_by("Create #{@new_resource}") do
       create_destination_path
       new_resource.updated_by_last_action(true)
     end
@@ -20,37 +20,36 @@ def load_current_resource
   @current_resource.name(@new_resource.name)
 
   if destination_path_exists?(@current_resource.name)
-     @current_resource.exists = true
+    @current_resource.exists = true
   end
 end
-
 
 private
 
 def destination_path_exists?(name)
-  Chef::Log.debug "Checking to see if this destination path exists: '#{ name }'"
-  file = ::File.new("#{node['opennms']['conf']['home']}/etc/destinationPaths.xml", "r")
+  Chef::Log.debug "Checking to see if this destination path exists: '#{name}'"
+  file = ::File.new("#{node['opennms']['conf']['home']}/etc/destinationPaths.xml", 'r')
   doc = REXML::Document.new file
   !doc.elements["/destinationPaths/path[@name='#{name}']"].nil?
 end
 
 def create_destination_path
-  Chef::Log.debug "Adding destination path: '#{ new_resource.name }'"
+  Chef::Log.debug "Adding destination path: '#{new_resource.name}'"
   file = ::File.new("#{node['opennms']['conf']['home']}/etc/destinationPaths.xml")
   contents = file.read
-  doc = REXML::Document.new(contents, { :respect_whitespace => :all })
+  doc = REXML::Document.new(contents, respect_whitespace: :all)
   doc.context[:attribute_quote] = :quote
   file.close
 
-  paths_el = doc.root.elements["/destinationPaths"]
-  path_el = paths_el.add_element 'path', {'name' => new_resource.name}
-  if !new_resource.initial_delay.nil? && !new_resource.initial_delay == "0s"
+  paths_el = doc.root.elements['/destinationPaths']
+  path_el = paths_el.add_element 'path', 'name' => new_resource.name
+  if !new_resource.initial_delay.nil? && !new_resource.initial_delay == '0s'
     path_el.attributes['initial-delay'] = new_resource.initial_delay
   end
 
-  out = ""
+  out = ''
   formatter = REXML::Formatters::Pretty.new(2)
   formatter.compact = true
   formatter.write(doc, out)
-  ::File.open("#{node['opennms']['conf']['home']}/etc/destinationPaths.xml", "w"){ |file| file.puts(out) }
+  ::File.open("#{node['opennms']['conf']['home']}/etc/destinationPaths.xml", 'w') { |file| file.puts(out) }
 end

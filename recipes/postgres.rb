@@ -30,10 +30,10 @@ node.default['postgresql']['config']['vacuum_cost_delay'] = 50
 node.default['postgresql']['config_pgtune']['max_connections'] = 160
 node.default['postgresql']['pg_hba'] = [
   { 'addr' => '',
-     'db' => 'all',
+    'db' => 'all',
     'method' => 'trust',
     'type' => 'local',
-    'user' => 'all',
+    'user' => 'all'
   },
   { 'addr' => '127.0.0.1/32',
     'db' => 'all',
@@ -48,22 +48,21 @@ node.default['postgresql']['pg_hba'] = [
     'user' => 'all'
   }]
 node.default['postgresql']['client']['packages'] = [
-    'postgresql93',
-    'postgresql93-contrib',
-    'postgresql93-devel'
-  ]
+  'postgresql93',
+  'postgresql93-contrib',
+  'postgresql93-devel'
+]
 node.default['postgresql']['server']['packages'] = [
-    'postgresql93-server'
-  ]
+  'postgresql93-server'
+]
 node.default['postgresql']['server']['service_name'] = 'postgresql-9.3'
 node.default['postgresql']['contrib']['packages'] = [
-    'postgresql93-contrib'
-  ]
-node.default['postgresql']['contrib']['extensions'] = [
-    'pageinspect',
-    'pg_buffercache',
-    'pg_freespacemap',
-    'pgrowlocks',
-    'pg_stat_statements',
-    'pgstattuple'
-  ]
+  'postgresql93-contrib'
+]
+node.default['postgresql']['contrib']['extensions'] = %w(
+  pageinspect
+  pg_buffercache
+  pg_freespacemap
+  pgrowlocks
+  pg_stat_statements
+  pgstattuple)

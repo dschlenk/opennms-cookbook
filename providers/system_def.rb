@@ -1,17 +1,17 @@
 include SystemDef
 
 def whyrun_supported?
-    true
+  true
 end
 
 use_inline_resources
 
 action :add do
-  Chef::Application.fatal!("Missing one of these data-collection groups: #{@current_resource.groups}.") if !@current_resource.groups_exist
+  Chef::Application.fatal!("Missing one of these data-collection groups: #{@current_resource.groups}.") unless @current_resource.groups_exist
   if @current_resource.exists
-    Chef::Log.info "#{ @new_resource } already in systemDef - nothing to do."
+    Chef::Log.info "#{@new_resource} already in systemDef - nothing to do."
   else
-    converge_by("Add #{ @new_resource }") do
+    converge_by("Add #{@new_resource}") do
       add_groups_to_system_def
       new_resource.updated_by_last_action(true)
     end
@@ -19,11 +19,11 @@ action :add do
 end
 
 action :remove do
-  Chef::Application.fatal!("Missing one of these data-collection groups: #{@current_resource.groups}.") if !@current_resource.groups_exist
+  Chef::Application.fatal!("Missing one of these data-collection groups: #{@current_resource.groups}.") unless @current_resource.groups_exist
   if !@current_resource.exists
-    Chef::Log.info "#{ @new_resource } not present - nothing to do."
+    Chef::Log.info "#{@new_resource} not present - nothing to do."
   else
-    converge_by("Remove #{ @new_resource }") do
+    converge_by("Remove #{@new_resource}") do
       remove_groups_from_system_def
       new_resource.updated_by_last_action(true)
     end
@@ -37,22 +37,20 @@ def load_current_resource
 
   ge = true
   @current_resource.groups.each do |group|
-    if !group_exists?(node['opennms']['conf']['home'], group)
-      Chef::Log.error "Missing data-collection group #{group}"
-      ge = false
-      break
-    end
+    next if group_exists?(node['opennms']['conf']['home'], group)
+    Chef::Log.error "Missing data-collection group #{group}"
+    ge = false
+    break
   end
   @current_resource.groups_exist = true if ge
   system_def_file = find_system_def(node['opennms']['conf']['home'], @current_resource.name)
-  if !system_def_file.nil?
-     @current_resource.system_def_exists = true
-     if groups_in_system_def?(node['opennms']['conf']['home'], @current_resource.name, system_def_file, @current_resource.groups)
-       @current_resource.exists = true
-     end
+  unless system_def_file.nil?
+    @current_resource.system_def_exists = true
+    if groups_in_system_def?(node['opennms']['conf']['home'], @current_resource.name, system_def_file, @current_resource.groups)
+      @current_resource.exists = true
+    end
   end
 end
-
 
 private
 

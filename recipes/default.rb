@@ -43,17 +43,15 @@ end
 include_recipe 'opennms::packages'
 include_recipe 'opennms::send_events'
 
-if node['opennms']['upgrade']
-  include_recipe 'opennms::upgrade'
-end
+include_recipe 'opennms::upgrade' if node['opennms']['upgrade']
 
-execute "runjava" do
+execute 'runjava' do
   cwd onms_home
   creates "#{onms_home}/etc/java.conf"
   command "#{onms_home}/bin/runjava -s"
 end
 
-execute "install" do
+execute 'install' do
   cwd onms_home
   creates "#{onms_home}/etc/configured"
   command "#{onms_home}/bin/install -dis"
@@ -62,7 +60,7 @@ end
 include_recipe 'opennms::base_templates'
 include_recipe 'opennms::templates'
 
-service "opennms" do
-  supports :status => true, :restart => true
-  action [ :enable]#, :start ]
+service 'opennms' do
+  supports status: true, restart: true
+  action [:enable] # , :start ]
 end
