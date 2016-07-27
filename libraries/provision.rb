@@ -29,7 +29,7 @@ module Provision
     siel = fsel.add_element 'scan-interval'
     siel.add_text(scan_interval)
     # clear current list from cache
-    node.run_state[:foreign_sources] = nil
+    node.run_state['foreign_sources'] = nil
     RestClient.post "#{baseurl(node)}/foreignSources", fs.to_s, content_type: :xml
   end
 
@@ -210,7 +210,7 @@ module Provision
       end
     end
     # clear current list from cache
-    node.run_state[:foreign_sources] = nil
+    node.run_state['foreign_sources'] = nil
     RestClient.post "#{baseurl(node)}/foreignSources/#{foreign_source_name}/detectors", sd.to_s, content_type: :xml
   end
 
@@ -241,7 +241,7 @@ module Provision
       end
     end
     # clear current list from cache
-    node.run_state[:foreign_sources] = nil
+    node.run_state['foreign_sources'] = nil
     RestClient.post "#{baseurl(node)}/foreignSources/#{foreign_source_name}/policies", pd.to_s, content_type: :xml
   end
 
@@ -260,7 +260,7 @@ module Provision
     id << REXML::XMLDecl.new
     id.add_element 'model-import', 'foreign-source' => foreign_source_name
     # clear current list from cache
-    node.run_state[:imports] = nil
+    node.run_state['imports'] = nil
     resp = RestClient.post "#{baseurl(node)}/requisitions", id.to_s, content_type: :xml
     Chef::Log.debug "add_import response is: #{resp}"
     resp
@@ -386,7 +386,7 @@ module Provision
       end
     end
     # clear current list from cache
-    node.run_state[:imports] = nil
+    node.run_state['imports'] = nil
     foreign_source_name = URI.escape(new_resource.foreign_source_name)
     RestClient.post "#{baseurl(node)}/requisitions/#{foreign_source_name}/nodes", nd.to_s, content_type: :xml
   end
@@ -417,7 +417,7 @@ module Provision
     i_el.attributes['managed'] = new_resource.managed unless new_resource.managed.nil?
     i_el.attributes['snmp-primary'] = new_resource.snmp_primary unless new_resource.snmp_primary.nil?
     # clear current list from cache
-    node.run_state[:imports] = nil
+    node.run_state['imports'] = nil
     foreign_source_name = URI.escape(new_resource.foreign_source_name)
     foreign_id = URI.escape(new_resource.foreign_id)
     RestClient.post "#{baseurl(node)}/requisitions/#{foreign_source_name}/nodes/#{foreign_id}/interfaces", id.to_s, content_type: :xml
@@ -447,7 +447,7 @@ module Provision
     sd << REXML::XMLDecl.new
     sd.add_element 'monitored-service', 'service-name' => service_name
     # clear current list from cache
-    node.run_state[:imports] = nil
+    node.run_state['imports'] = nil
     foreign_source_name = URI.escape(foreign_source_name)
     foreign_id = URI.escape(foreign_id)
     ip_addr = URI.escape(ip_addr)
@@ -506,10 +506,10 @@ module Provision
   def default_foreign_source(node)
     require 'rest_client'
     begin
-      node.run_state[:default_foreign_source] ||=
+      node.run_state['default_foreign_source'] ||=
         JSON.parse(RestClient.get("#{baseurl(node)}/foreignSources/default",
                                   accept: :json).to_str)
-      node.run_state[:default_foreign_source]
+      node.run_state['default_foreign_source']
     rescue
       Chef::Log.warn 'Cannot retrieve default foreign source via OpenNMS ReST API.'
     end
@@ -518,7 +518,7 @@ module Provision
   def foreign_sources(node)
     require 'rest_client'
     begin
-      node.run_state[:foreign_sources] ||=
+      node.run_state['foreign_sources'] ||=
         if node['opennms']['version_major'].to_i > 16
           JSON.parse(RestClient.get("#{baseurl(node)}/foreignSources",
                                   accept: :json).to_str)['foreignSources']
@@ -526,7 +526,7 @@ module Provision
           JSON.parse(RestClient.get("#{baseurl(node)}/foreignSources",
                                   accept: :json).to_str)
         end
-      node.run_state[:foreign_sources]
+      node.run_state['foreign_sources']
     rescue
       Chef::Log.warn 'Cannot retrieve foreign sources via OpenNMS ReST API.'
       return nil
@@ -536,7 +536,7 @@ module Provision
   def imports(node)
     require 'rest_client'
     begin
-      node.run_state[:imports] ||=
+      node.run_state['imports'] ||=
         JSON.parse(RestClient.get("#{baseurl(node)}/requisitions",
                                       accept: :json).to_str)
     rescue

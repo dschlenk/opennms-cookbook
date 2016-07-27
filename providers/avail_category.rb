@@ -69,7 +69,7 @@ def category_changed?(current_resource)
   normal_el = cat_el.elements['normal']
   warn_el = cat_el.elements['warning']
   rule_el = cat_el.elements['rule']
-  return true if label_el.text.to_s != label.to_s
+  return true if label_el.text.to_s != current_resource.label.to_s
   Chef::Log.debug("#{label_el.text} == #{current_resource.label}")
   return true if comment_el.text.to_s !=  current_resource.comment.to_s
   Chef::Log.debug("#{comment_el.text} ==  #{current_resource.comment}")

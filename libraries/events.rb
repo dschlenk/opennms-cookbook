@@ -1,6 +1,8 @@
 require 'rexml/document'
 
 module Events
+  include Chef::Mixin::ShellOut
+
   def event_file_included?(file, node)
     file = Regexp.last_match(1) if file =~ %r{^events/(.*)$}
 
@@ -14,12 +16,12 @@ module Events
   def uei_exists?(uei, node)
     exists = uei_in_file?("#{node['opennms']['conf']['home']}/etc/eventconf.xml", uei)
     # let's cheat!
-    eventfile = `grep -l #{uei} #{node['opennms']['conf']['home']}/etc/events/*.xml`
-    if eventfile != '' && eventfile.lines.to_a.length == 1
-      return uei_in_file?(eventfile.chomp, uei)
+    eventfile = shell_out("grep -l #{uei} #{node['opennms']['conf']['home']}/etc/events/*.xml")
+    if eventfile.stdout != '' && eventfile.stdout.lines.to_a.length == 1
+      return uei_in_file?(eventfile.stdout.chomp, uei)
     else
       # if multiple files match, only return if true since could be a regex false positive.
-      eventfile.lines.each do |file|
+      eventfile.stdout.lines.each do |file|
         return true if uei_in_file?(file.chomp, uei)
       end
     end

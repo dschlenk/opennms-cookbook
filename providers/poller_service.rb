@@ -39,7 +39,7 @@ def load_current_resource
   if service_exists?(@current_resource.package_name, @current_resource.name)
     @current_resource.exists = true
   end
-  @current_resource.changed = true if service_changed?(@current_resource.name)
+  @current_resource.changed = true if service_changed?(@current_resource)
 end
 
 private

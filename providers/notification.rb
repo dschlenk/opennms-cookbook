@@ -51,19 +51,7 @@ def load_current_resource
 
   if notification_exists?(@current_resource.name)
     @current_resource.exists = true
-    if notification_changed?(@current_resource.name, @current_resource.status,
-                            @current_resource.writeable, @current_resource.uei,
-                            @current_resource.description,
-                            @current_resource.rule,
-                            @current_resource.destination_path,
-                            @current_resource.text_message,
-                            @current_resource.subject,
-                            @current_resource.numeric_message,
-                            @current_resource.event_severity,
-                            @current_resource.params,
-                            @current_resource.vbname, @current_resource.vbvalue)
-      @current_resource.changed = true
-    end
+    @current_resource.changed = true if notification_changed?(@current_resource)
   end
 end
 

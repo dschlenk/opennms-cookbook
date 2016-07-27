@@ -200,13 +200,16 @@ def create_jdbc_collection_service
     te = true if new_resource.thresholding_enabled
     service_el.add_element 'parameter', 'key' => 'thresholding-enabled', 'value' => te
   end
-  if new_resource.driver_file
-    cookbook_file new_resource.driver_file do
-      path "#{node['opennms']['conf']['home']}/lib/#{new_resource.driver_file}"
-      mode 00644
-      owner 'root'
-      group 'root'
-    end
+  driver_file = 'foo'
+  Chef::Log.debug "driver_file is '#{new_resource.driver_file}'"
+  driver_file = new_resource.driver_file unless new_resource.driver_file == '' || new_resource.driver_file.nil?
+  cookbook_file "#{driver_file}_#{new_resource.name}" do
+    source new_resource.driver_file
+    path "#{node['opennms']['conf']['home']}/lib/#{new_resource.driver_file}"
+    mode 00644
+    owner 'root'
+    group 'root'
+    not_if { new_resource.driver_file.to_s == '' || new_resource.driver_file.nil? }
   end
   # make sure we've got a collector service definition at the end of the file
   unless doc.elements["/collectd-configuration/collector[@service='#{new_resource.service_name}']"]

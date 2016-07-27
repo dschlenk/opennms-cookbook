@@ -8,6 +8,7 @@ driver:
 
 provisioner:
   name: chef_zero
+  log_level: debug
 
 platforms:
   - name: centos-6.7
@@ -245,6 +246,9 @@ suites:
       - recipe[onms_lwrp_test::update_dashlet]
       - recipe[onms_lwrp_test::surveillance_view]
       - recipe[onms_lwrp_test::send_event]
+    attributes:
+      opennms:
+        upgrade: true
   - name: all_17
     run_list:
       - recipe[opennms::postgres]

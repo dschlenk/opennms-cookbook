@@ -7,14 +7,13 @@ require 'foodcritic'
 # # Style tests. cookstyle (rubocop) and Foodcritic
 namespace :style do
   desc 'Run Ruby style checks'
-  RuboCop::RakeTask.new(:ruby) do |task|
-    task.options = ['--auto-gen-config', '-a']
-  end
+  RuboCop::RakeTask.new(:ruby)
 
   desc 'Run Chef style checks'
   FoodCritic::Rake::LintTask.new(:chef) do |t|
     t.options = {
-      fail_tags: ['any']
+      fail_tags: ['any'],
+      progress: true
     }
   end
 end
@@ -32,5 +31,5 @@ namespace :integration do
   end
 end
 
-task default: ['style:ruby']
+task default: ['style']
 task integration: ['integration']

@@ -34,6 +34,11 @@ default['opennms']['upgrade_dirs'] = [
   'jetty-webapps/opennms/WEB-INF/jsp/ncs',
   'jetty-webapps/opennms-remoting/WEB-INF'
 ]
+# whether or not to use all templates or just base.
+# Once upon a time there were two different recipes
+# for installation (default and notemplates) but now
+# the latter just sets this attribute to false.
+default['opennms']['templates'] = true
 # whether or not to include the plugin packages
 default['opennms']['plugin']['xml'] = false
 default['opennms']['plugin']['nsclient'] = false

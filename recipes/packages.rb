@@ -76,19 +76,14 @@ if node['opennms']['plugin']['nsclient']
   onms_versions.push node['opennms']['version']
 end
 
-package onms_packages do
+yum_package onms_packages do
   version onms_versions
   allow_downgrade node['opennms']['allow_downgrade']
   action :install
 end
 
-package 'iplike' do
-  action :install
-end
-
-package 'perl-libwww-perl' do
-  action :install
-end
-package 'perl-XML-Twig' do
-  action :install
+%w(iplike perl-libwww-perl perl-XML-Twig).each do |p|
+  package p do
+    action :install
+  end
 end
