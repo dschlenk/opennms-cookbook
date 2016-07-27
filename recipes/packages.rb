@@ -76,6 +76,13 @@ if node['opennms']['plugin']['nsclient']
   onms_versions.push node['opennms']['version']
 end
 
+ruby_block 'stop opennms before upgrade' do
+  block do
+    Opennms::Upgrade.stop_opennms(node)
+  end
+  only_if { node['opennms']['upgrade'] && Opennms::Upgrade.is_upgrade?(node) }
+end
+
 yum_package onms_packages do
   version onms_versions
   allow_downgrade node['opennms']['allow_downgrade']

@@ -8,7 +8,7 @@ driver:
 
 provisioner:
   name: chef_zero
-  log_level: debug
+#  log_level: debug
 
 platforms:
   - name: centos-6.7
@@ -24,20 +24,10 @@ suites:
   - name: default_latest
     run_list:
       - recipe[opennms::postgres]
-      - recipe[postgresql::client]
-      - recipe[postgresql::server]
-      - recipe[postgresql::contrib]
-      - recipe[postgresql::config_initdb]
-      - recipe[postgresql::config_pgtune]
       - recipe[opennms::default]
   - name: default_17
     run_list:
       - recipe[opennms::postgres]
-      - recipe[postgresql::client]
-      - recipe[postgresql::server]
-      - recipe[postgresql::contrib]
-      - recipe[postgresql::config_initdb]
-      - recipe[postgresql::config_pgtune]
       - recipe[opennms::default]
     attributes:
       opennms:
@@ -45,11 +35,6 @@ suites:
   - name: default_16
     run_list:
       - recipe[opennms::postgres]
-      - recipe[postgresql::client]
-      - recipe[postgresql::server]
-      - recipe[postgresql::contrib]
-      - recipe[postgresql::config_initdb]
-      - recipe[postgresql::config_pgtune]
       - recipe[opennms::default]
     attributes:
       opennms:
@@ -57,21 +42,11 @@ suites:
   - name: service_detector
     run_list:
       - recipe[opennms::postgres]
-      - recipe[postgresql::client]
-      - recipe[postgresql::server]
-      - recipe[postgresql::contrib]
-      - recipe[postgresql::config_initdb]
-      - recipe[postgresql::config_pgtune]
       - recipe[opennms::notemplates]
       - recipe[onms_lwrp_test::service_detector]
   - name: events
     run_list:
       - recipe[opennms::postgres]
-      - recipe[postgresql::client]
-      - recipe[postgresql::server]
-      - recipe[postgresql::contrib]
-      - recipe[postgresql::config_initdb]
-      - recipe[postgresql::config_pgtune]
       - recipe[opennms::notemplates]
       - recipe[onms_lwrp_test::webopts]
       - recipe[onms_lwrp_test::eventconf]
@@ -79,11 +54,6 @@ suites:
   - name: events_16
     run_list:
       - recipe[opennms::postgres]
-      - recipe[postgresql::client]
-      - recipe[postgresql::server]
-      - recipe[postgresql::contrib]
-      - recipe[postgresql::config_initdb]
-      - recipe[postgresql::config_pgtune]
       - recipe[opennms::notemplates]
       - recipe[onms_lwrp_test::webopts]
       - recipe[onms_lwrp_test::eventconf]
@@ -94,11 +64,6 @@ suites:
   - name: events_17
     run_list:
       - recipe[opennms::postgres]
-      - recipe[postgresql::client]
-      - recipe[postgresql::server]
-      - recipe[postgresql::contrib]
-      - recipe[postgresql::config_initdb]
-      - recipe[postgresql::config_pgtune]
       - recipe[opennms::notemplates]
       - recipe[onms_lwrp_test::webopts]
       - recipe[onms_lwrp_test::eventconf]
@@ -109,11 +74,6 @@ suites:
   - name: disco
     run_list:
       - recipe[opennms::postgres]
-      - recipe[postgresql::client]
-      - recipe[postgresql::server]
-      - recipe[postgresql::contrib]
-      - recipe[postgresql::config_initdb]
-      - recipe[postgresql::config_pgtune]
       - recipe[opennms::notemplates]
       - recipe[onms_lwrp_test::webopts]
       - recipe[onms_lwrp_test::disco_specific]
@@ -122,11 +82,6 @@ suites:
   - name: disco_17
     run_list:
       - recipe[opennms::postgres]
-      - recipe[postgresql::client]
-      - recipe[postgresql::server]
-      - recipe[postgresql::contrib]
-      - recipe[postgresql::config_initdb]
-      - recipe[postgresql::config_pgtune]
       - recipe[opennms::notemplates]
       - recipe[onms_lwrp_test::webopts]
       - recipe[onms_lwrp_test::disco_specific]
@@ -138,28 +93,6 @@ suites:
   - name: upgrade_step1
     run_list:
       - recipe[opennms::postgres]
-      - recipe[postgresql::client]
-      - recipe[postgresql::server]
-      - recipe[postgresql::contrib]
-      - recipe[postgresql::config_initdb]
-      - recipe[postgresql::config_pgtune]
-      - recipe[opennms::notemplates]
-      - recipe[onms_lwrp_test::webopts]
-      - recipe[onms_lwrp_test::eventconf]
-      - recipe[onms_lwrp_test::collection_graph_file]
-      - recipe[onms_lwrp_test::collection_graph]
-      - recipe[onms_lwrp_test::response_graph]
-    attributes:
-      opennms:
-        version: "16.0.0-1"
-  - name: upgrade_step2
-    run_list:
-      - recipe[opennms::postgres]
-      - recipe[postgresql::client]
-      - recipe[postgresql::server]
-      - recipe[postgresql::contrib]
-      - recipe[postgresql::config_initdb]
-      - recipe[postgresql::config_pgtune]
       - recipe[opennms::notemplates]
       - recipe[onms_lwrp_test::webopts]
       - recipe[onms_lwrp_test::eventconf]
@@ -169,15 +102,34 @@ suites:
     attributes:
       opennms:
         version: "16.0.4-1"
+  - name: upgrade_step2
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[opennms::notemplates]
+      - recipe[onms_lwrp_test::webopts]
+      - recipe[onms_lwrp_test::eventconf]
+      - recipe[onms_lwrp_test::collection_graph_file]
+      - recipe[onms_lwrp_test::collection_graph]
+      - recipe[onms_lwrp_test::response_graph]
+    attributes:
+      opennms:
+        version: "17.1.1-1"
+        upgrade: true
+  - name: upgrade_step3
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[opennms::notemplates]
+      - recipe[onms_lwrp_test::webopts]
+      - recipe[onms_lwrp_test::eventconf]
+      - recipe[onms_lwrp_test::collection_graph_file]
+      - recipe[onms_lwrp_test::collection_graph]
+      - recipe[onms_lwrp_test::response_graph]
+    attributes:
+      opennms:
         upgrade: true
   - name: change_notif
     run_list:
       - recipe[opennms::postgres]
-      - recipe[postgresql::client]
-      - recipe[postgresql::server]
-      - recipe[postgresql::contrib]
-      - recipe[postgresql::config_initdb]
-      - recipe[postgresql::config_pgtune]
       - recipe[opennms::notemplates]
       - recipe[onms_lwrp_test::destination_path]
       - recipe[onms_lwrp_test::notification_command]
@@ -186,132 +138,18 @@ suites:
   - name: all
     run_list:
       - recipe[opennms::postgres]
-      - recipe[postgresql::client]
-      - recipe[postgresql::server]
-      - recipe[postgresql::contrib]
-      - recipe[postgresql::config_initdb]
-      - recipe[postgresql::config_pgtune]
       - recipe[opennms::notemplates]
       - recipe[opennms::nsclient]
-      - recipe[onms_lwrp_test::webopts]
-      - recipe[onms_lwrp_test::resource_type]
-      - recipe[onms_lwrp_test::snmp_collection]
-      - recipe[onms_lwrp_test::xml_collection]
-      - recipe[onms_lwrp_test::wmi_collection]
-      - recipe[onms_lwrp_test::jdbc_collection]
-      - recipe[onms_lwrp_test::collection_package]
-      - recipe[onms_lwrp_test::snmp_collection_service]
-      - recipe[onms_lwrp_test::xml_collection_service]
-      - recipe[onms_lwrp_test::wmi_collection_service]
-      - recipe[onms_lwrp_test::jdbc_collection_service]
-      - recipe[onms_lwrp_test::snmp_collection_group]
-      - recipe[onms_lwrp_test::jdbc_query]
-      - recipe[onms_lwrp_test::wmi_wpm]
-      - recipe[onms_lwrp_test::xml_source]
-      - recipe[onms_lwrp_test::xml_group]
-      - recipe[onms_lwrp_test::eventconf]
-      - recipe[onms_lwrp_test::event]
-      - recipe[onms_lwrp_test::poller]
-      - recipe[onms_lwrp_test::disco_specific]
-      - recipe[onms_lwrp_test::disco_range]
-      - recipe[onms_lwrp_test::disco_url]
-      - recipe[onms_lwrp_test::foreign_source]
-      - recipe[onms_lwrp_test::service_detector]
-      - recipe[onms_lwrp_test::policy]
-      - recipe[onms_lwrp_test::import]
-      - recipe[onms_lwrp_test::import_node]
-      - recipe[onms_lwrp_test::import_node_interface]
-      - recipe[onms_lwrp_test::import_node_interface_service]
-      - recipe[onms_lwrp_test::snmp_config_definition]
-      - recipe[onms_lwrp_test::update_snmp_config_definition]
-      - recipe[onms_lwrp_test::wmi_config_definition]
-      - recipe[onms_lwrp_test::update_wmi_config_definition]
-      - recipe[onms_lwrp_test::destination_path]
-      - recipe[onms_lwrp_test::notification_command]
-      - recipe[onms_lwrp_test::notifd_autoack]
-      - recipe[onms_lwrp_test::notification]
-      - recipe[onms_lwrp_test::user]
-      - recipe[onms_lwrp_test::group]
-      - recipe[onms_lwrp_test::role]
-      - recipe[onms_lwrp_test::statsd]
-      - recipe[onms_lwrp_test::collection_graph_file]
-      - recipe[onms_lwrp_test::collection_graph]
-      - recipe[onms_lwrp_test::response_graph]
-      - recipe[onms_lwrp_test::threshold]
-      - recipe[onms_lwrp_test::system_def]
-      - recipe[onms_lwrp_test::avail_category]
-      - recipe[onms_lwrp_test::avail_view_section]
-      - recipe[onms_lwrp_test::wallboard]
-      - recipe[onms_lwrp_test::dashlet]
-      - recipe[onms_lwrp_test::update_dashlet]
-      - recipe[onms_lwrp_test::surveillance_view]
-      - recipe[onms_lwrp_test::send_event]
+      - recipe[onms_lwrp_test::all]
     attributes:
       opennms:
         upgrade: true
   - name: all_17
     run_list:
       - recipe[opennms::postgres]
-      - recipe[postgresql::client]
-      - recipe[postgresql::server]
-      - recipe[postgresql::contrib]
-      - recipe[postgresql::config_initdb]
-      - recipe[postgresql::config_pgtune]
       - recipe[opennms::notemplates]
       - recipe[opennms::nsclient]
-      - recipe[onms_lwrp_test::webopts]
-      - recipe[onms_lwrp_test::resource_type]
-      - recipe[onms_lwrp_test::snmp_collection]
-      - recipe[onms_lwrp_test::xml_collection]
-      - recipe[onms_lwrp_test::wmi_collection]
-      - recipe[onms_lwrp_test::jdbc_collection]
-      - recipe[onms_lwrp_test::collection_package]
-      - recipe[onms_lwrp_test::snmp_collection_service]
-      - recipe[onms_lwrp_test::xml_collection_service]
-      - recipe[onms_lwrp_test::wmi_collection_service]
-      - recipe[onms_lwrp_test::jdbc_collection_service]
-      - recipe[onms_lwrp_test::snmp_collection_group]
-      - recipe[onms_lwrp_test::jdbc_query]
-      - recipe[onms_lwrp_test::wmi_wpm]
-      - recipe[onms_lwrp_test::xml_source]
-      - recipe[onms_lwrp_test::xml_group]
-      - recipe[onms_lwrp_test::eventconf]
-      - recipe[onms_lwrp_test::event]
-      - recipe[onms_lwrp_test::poller]
-      - recipe[onms_lwrp_test::disco_specific]
-      - recipe[onms_lwrp_test::disco_range]
-      - recipe[onms_lwrp_test::disco_url]
-      - recipe[onms_lwrp_test::foreign_source]
-      - recipe[onms_lwrp_test::service_detector]
-      - recipe[onms_lwrp_test::policy]
-      - recipe[onms_lwrp_test::import]
-      - recipe[onms_lwrp_test::import_node]
-      - recipe[onms_lwrp_test::import_node_interface]
-      - recipe[onms_lwrp_test::import_node_interface_service]
-      - recipe[onms_lwrp_test::snmp_config_definition]
-      - recipe[onms_lwrp_test::update_snmp_config_definition]
-      - recipe[onms_lwrp_test::wmi_config_definition]
-      - recipe[onms_lwrp_test::update_wmi_config_definition]
-      - recipe[onms_lwrp_test::destination_path]
-      - recipe[onms_lwrp_test::notification_command]
-      - recipe[onms_lwrp_test::notifd_autoack]
-      - recipe[onms_lwrp_test::notification]
-      - recipe[onms_lwrp_test::user]
-      - recipe[onms_lwrp_test::group]
-      - recipe[onms_lwrp_test::role]
-      - recipe[onms_lwrp_test::statsd]
-      - recipe[onms_lwrp_test::collection_graph_file]
-      - recipe[onms_lwrp_test::collection_graph]
-      - recipe[onms_lwrp_test::response_graph]
-      - recipe[onms_lwrp_test::threshold]
-      - recipe[onms_lwrp_test::system_def]
-      - recipe[onms_lwrp_test::avail_category]
-      - recipe[onms_lwrp_test::avail_view_section]
-      - recipe[onms_lwrp_test::wallboard]
-      - recipe[onms_lwrp_test::dashlet]
-      - recipe[onms_lwrp_test::update_dashlet]
-      - recipe[onms_lwrp_test::surveillance_view]
-      - recipe[onms_lwrp_test::send_event]
+      - recipe[onms_lwrp_test::all]
     attributes:
       opennms:
         version: "17.1.1-1"
@@ -319,66 +157,9 @@ suites:
   - name: all_16
     run_list:
       - recipe[opennms::postgres]
-      - recipe[postgresql::client]
-      - recipe[postgresql::server]
-      - recipe[postgresql::contrib]
-      - recipe[postgresql::config_initdb]
-      - recipe[postgresql::config_pgtune]
       - recipe[opennms::notemplates]
       - recipe[opennms::nsclient]
-      - recipe[onms_lwrp_test::webopts]
-      - recipe[onms_lwrp_test::resource_type]
-      - recipe[onms_lwrp_test::snmp_collection]
-      - recipe[onms_lwrp_test::xml_collection]
-      - recipe[onms_lwrp_test::wmi_collection]
-      - recipe[onms_lwrp_test::jdbc_collection]
-      - recipe[onms_lwrp_test::collection_package]
-      - recipe[onms_lwrp_test::snmp_collection_service]
-      - recipe[onms_lwrp_test::xml_collection_service]
-      - recipe[onms_lwrp_test::wmi_collection_service]
-      - recipe[onms_lwrp_test::jdbc_collection_service]
-      - recipe[onms_lwrp_test::snmp_collection_group]
-      - recipe[onms_lwrp_test::jdbc_query]
-      - recipe[onms_lwrp_test::wmi_wpm]
-      - recipe[onms_lwrp_test::xml_source]
-      - recipe[onms_lwrp_test::xml_group]
-      - recipe[onms_lwrp_test::eventconf]
-      - recipe[onms_lwrp_test::event]
-      - recipe[onms_lwrp_test::poller]
-      - recipe[onms_lwrp_test::disco_specific]
-      - recipe[onms_lwrp_test::disco_range]
-      - recipe[onms_lwrp_test::disco_url]
-      - recipe[onms_lwrp_test::foreign_source]
-      - recipe[onms_lwrp_test::service_detector]
-      - recipe[onms_lwrp_test::policy]
-      - recipe[onms_lwrp_test::import]
-      - recipe[onms_lwrp_test::import_node]
-      - recipe[onms_lwrp_test::import_node_interface]
-      - recipe[onms_lwrp_test::import_node_interface_service]
-      - recipe[onms_lwrp_test::snmp_config_definition]
-      - recipe[onms_lwrp_test::update_snmp_config_definition]
-      - recipe[onms_lwrp_test::wmi_config_definition]
-      - recipe[onms_lwrp_test::update_wmi_config_definition]
-      - recipe[onms_lwrp_test::destination_path]
-      - recipe[onms_lwrp_test::notification_command]
-      - recipe[onms_lwrp_test::notifd_autoack]
-      - recipe[onms_lwrp_test::notification]
-      - recipe[onms_lwrp_test::user]
-      - recipe[onms_lwrp_test::group]
-      - recipe[onms_lwrp_test::role]
-      - recipe[onms_lwrp_test::statsd]
-      - recipe[onms_lwrp_test::collection_graph_file]
-      - recipe[onms_lwrp_test::collection_graph]
-      - recipe[onms_lwrp_test::response_graph]
-      - recipe[onms_lwrp_test::threshold]
-      - recipe[onms_lwrp_test::system_def]
-      - recipe[onms_lwrp_test::avail_category]
-      - recipe[onms_lwrp_test::avail_view_section]
-      - recipe[onms_lwrp_test::wallboard]
-      - recipe[onms_lwrp_test::dashlet]
-      - recipe[onms_lwrp_test::update_dashlet]
-      - recipe[onms_lwrp_test::surveillance_view]
-      - recipe[onms_lwrp_test::send_event]
+      - recipe[onms_lwrp_test::all]
     attributes:
       opennms:
         version: "16.0.4-1"
@@ -386,11 +167,6 @@ suites:
   - name: imports
     run_list:
       - recipe[opennms::postgres]
-      - recipe[postgresql::client]
-      - recipe[postgresql::server]
-      - recipe[postgresql::contrib]
-      - recipe[postgresql::config_initdb]
-      - recipe[postgresql::config_pgtune]
       - recipe[opennms::notemplates]
       - recipe[onms_lwrp_test::foreign_source]
       - recipe[onms_lwrp_test::policy]
@@ -402,9 +178,4 @@ suites:
   - name: notemplates
     run_list:
       - recipe[opennms::postgres]
-      - recipe[postgresql::client]
-      - recipe[postgresql::server]
-      - recipe[postgresql::contrib]
-      - recipe[postgresql::config_initdb]
-      - recipe[postgresql::config_pgtune]
       - recipe[opennms::notemplates]

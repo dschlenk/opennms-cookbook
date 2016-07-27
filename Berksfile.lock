@@ -34,6 +34,7 @@ GRAPH
     build-essential (>= 0.0.0)
     hostsfile (>= 0.0.0)
     java (>= 0.0.0)
+    postgresql (>= 0.0.0)
     yum (>= 0.0.0)
   openssl (4.4.0)
     chef-sugar (>= 3.1.1)
