@@ -1,0 +1,60 @@
+<?xml version="1.0"?>
+<notifd-configuration 
+        status="<%=@status%>"
+	match-all="<%=@match_all%>">
+        
+        <% if @auto_ack[:service_unresponsive] -%>
+	<auto-acknowledge resolution-prefix="RESOLVED: " 
+                          uei="uei.opennms.org/nodes/serviceResponsive" 
+                          acknowledge="uei.opennms.org/nodes/serviceUnresponsive">
+                          <match>nodeid</match>
+                          <match>interfaceid</match>
+                          <match>serviceid</match>
+        </auto-acknowledge>
+        <% end -%>
+	
+        <% if @auto_ack[:service_lost] -%>
+        <auto-acknowledge resolution-prefix="RESOLVED: " 
+                          uei="uei.opennms.org/nodes/nodeRegainedService" 
+                          acknowledge="uei.opennms.org/nodes/nodeLostService">
+                          <match>nodeid</match>
+                          <match>interfaceid</match>
+                          <match>serviceid</match>
+        </auto-acknowledge>
+        <% end -%>
+        
+        <% if @auto_ack[:interface_down] -%>
+        <auto-acknowledge resolution-prefix="RESOLVED: " 
+                          uei="uei.opennms.org/nodes/interfaceUp" 
+                          acknowledge="uei.opennms.org/nodes/interfaceDown">
+                          <match>nodeid</match>
+                          <match>interfaceid</match>
+        </auto-acknowledge>
+        <% end -%>
+        
+        <% if @auto_ack[:node_down] -%>
+        <auto-acknowledge resolution-prefix="RESOLVED: " 
+                          uei="uei.opennms.org/nodes/nodeUp" 
+                          acknowledge="uei.opennms.org/nodes/nodeDown">
+                          <match>nodeid</match>
+        </auto-acknowledge>
+        <% end -%>
+        
+        <% if @auto_ack[:widespread_outage] -%>
+        <auto-acknowledge resolution-prefix="RESOLVED: "
+                          uei="uei.opennms.org/correlation/remote/wideSpreadOutageResolved"
+                          acknowledge="uei.opennms.org/correlation/remote/wideSpreadOutage">
+                          <match xmlns="">nodeid</match>
+                          <match xmlns="">interfaceid</match>
+                          <match xmlns="">serviceid</match>
+        </auto-acknowledge>
+        <% end -%>
+        
+        <queue>
+                <queue-id>default</queue-id>
+                <interval>20s</interval>
+                <handler-class>
+                        <name>org.opennms.netmgt.notifd.DefaultQueueHandler</name>
+                </handler-class>
+        </queue>
+</notifd-configuration>
