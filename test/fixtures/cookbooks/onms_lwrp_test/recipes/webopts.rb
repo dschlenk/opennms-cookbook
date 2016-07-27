@@ -5,7 +5,7 @@ cookbook_file 'jetty.keystore' do
   group 'root'
   mode 00644
   action :create_if_missing
-end 
+end
 
 node.default['opennms']['properties']['jetty']['https_port'] = 443
 node.default['opennms']['properties']['jetty']['https_host'] = '0.0.0.0'

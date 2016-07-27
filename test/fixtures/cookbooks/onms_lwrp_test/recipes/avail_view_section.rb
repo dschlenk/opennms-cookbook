@@ -5,12 +5,12 @@ end
 
 # Add a new section
 opennms_avail_view_section 'Animals' do
-  categories ['Cats', 'Dogs']
+  categories %w(Cats Dogs)
   before 'Categories'
 end
 
 opennms_avail_view_section 'Dogs First' do
-  categories ['Dogs', 'Cats']
+  categories %w(Dogs Cats)
   after 'Categories'
 end
 

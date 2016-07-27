@@ -1,16 +1,16 @@
 include Provision
 def whyrun_supported?
-    true
+  true
 end
 
 use_inline_resources
 
 action :create_if_missing do
-  Chef::Application.fatal!("Missing foreign source #{@current_resource.foreign_source_name}.") if !@current_resource.foreign_source_exists
+  Chef::Application.fatal!("Missing foreign source #{@current_resource.foreign_source_name}.") unless @current_resource.foreign_source_exists
   if @current_resource.exists
-    Chef::Log.info "#{ @new_resource } already exists - nothing to do."
+    Chef::Log.info "#{@new_resource} already exists - nothing to do."
   else
-    converge_by("Create #{ @new_resource }") do
+    converge_by("Create #{@new_resource}") do
       create_service_detector
       new_resource.updated_by_last_action(true)
     end
@@ -18,16 +18,16 @@ action :create_if_missing do
 end
 
 action :create do
-  Chef::Application.fatal!("Missing foreign source #{@current_resource.foreign_source_name}.") if !@current_resource.foreign_source_exists
+  Chef::Application.fatal!("Missing foreign source #{@current_resource.foreign_source_name}.") unless @current_resource.foreign_source_exists
   if @current_resource.exists && !@current_resource.changed
-    Chef::Log.info "#{ @new_resource } already exists and has not changed - nothing to do."
+    Chef::Log.info "#{@new_resource} already exists and has not changed - nothing to do."
   elsif @current_resource.exists && @current_resource.changed
-    converge_by("Update #{ @new_resource }") do
+    converge_by("Update #{@new_resource}") do
       update_service_detector(new_resource, node)
       new_resource.updated_by_last_action(true)
     end
   else
-    converge_by("Create #{ @new_resource }") do
+    converge_by("Create #{@new_resource}") do
       create_service_detector
       new_resource.updated_by_last_action(true)
     end
@@ -35,11 +35,11 @@ action :create do
 end
 
 action :delete do
-  Chef::Application.fatal!("Missing foreign source #{@current_resource.foreign_source_name}.") if !@current_resource.foreign_source_exists
+  Chef::Application.fatal!("Missing foreign source #{@current_resource.foreign_source_name}.") unless @current_resource.foreign_source_exists
   if @current_resource.exists
-    Chef::Log.info "#{ @new_resource } exists - deleting."
+    Chef::Log.info "#{@new_resource} exists - deleting."
   else
-    converge_by("Create #{ @new_resource }") do
+    converge_by("Create #{@new_resource}") do
       delete_service_detector
       new_resource.updated_by_last_action(true)
     end
@@ -49,7 +49,7 @@ end
 def load_current_resource
   @current_resource = Chef::Resource::OpennmsServiceDetector.new(@new_resource.name)
   @current_resource.name(@new_resource.name)
-  @current_resource.service_name(@new_resource.service_name||@new_resource.name)
+  @current_resource.service_name(@new_resource.service_name || @new_resource.name)
   @current_resource.foreign_source_name(@new_resource.foreign_source_name)
   @current_resource.class_name(@new_resource.class_name)
   @current_resource.port(@new_resource.port)
@@ -71,8 +71,5 @@ end
 private
 
 def create_service_detector
-  service_name = new_resource.service_name||new_resource.name
-  add_service_detector(service_name,new_resource.class_name, 
-    new_resource.port, new_resource.retry_count, new_resource.timeout, 
-    new_resource.params, new_resource.foreign_source_name, node)
+  add_service_detector(new_resource, node)
 end

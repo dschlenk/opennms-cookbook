@@ -18,21 +18,16 @@
 #
 
 include_recipe 'build-essential::default'
-chef_gem 'java_properties' do
-  compile_time true
-end
-chef_gem 'rest-client' do
-  compile_time true
-end
-
-chef_gem 'addressable' do
-  compile_time true
+%w(java_properties rest-client addressable).each do |g|
+  chef_gem g do
+    compile_time true
+  end
 end
 
-fqdn = node[:fqdn]
-fqdn ||= node[:hostname]
+fqdn = node['fqdn']
+fqdn ||= node['hostname']
 
-onms_home = node[:opennms][:conf][:home]
+onms_home = node['opennms']['conf']['home']
 onms_home ||= '/opt/opennms'
 
 hostsfile_entry node['ipaddress'] do
@@ -42,27 +37,24 @@ end
 
 include_recipe 'opennms::packages'
 include_recipe 'opennms::send_events'
+include_recipe 'opennms::upgrade' if node['opennms']['upgrade']
 
-if node['opennms']['upgrade']
-  include_recipe 'opennms::upgrade'
-end
-
-execute "runjava" do
+execute 'runjava' do
   cwd onms_home
   creates "#{onms_home}/etc/java.conf"
   command "#{onms_home}/bin/runjava -s"
 end
 
-execute "install" do
+execute 'install' do
   cwd onms_home
   creates "#{onms_home}/etc/configured"
   command "#{onms_home}/bin/install -dis"
 end
 
 include_recipe 'opennms::base_templates'
-include_recipe 'opennms::templates'
+include_recipe 'opennms::templates' if node['opennms']['templates']
 
-service "opennms" do
-  supports :status => true, :restart => true
-  action [ :enable]#, :start ]
+service 'opennms' do
+  supports status: true, restart: true
+  action [:enable]
 end

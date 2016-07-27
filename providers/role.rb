@@ -1,17 +1,17 @@
 include Rbac
 def whyrun_supported?
-    true
+  true
 end
 
 use_inline_resources
 
 action :create do
-  Chef::Application.fatal!("Missing group  #{@current_resource.membership_group}.") if !@current_resource.group_exists
-  Chef::Application.fatal!("Missing user  #{@current_resource.supervisor}.") if !@current_resource.supervisor_exists
+  Chef::Application.fatal!("Missing group  #{@current_resource.membership_group}.") unless @current_resource.group_exists
+  Chef::Application.fatal!("Missing user  #{@current_resource.supervisor}.") unless @current_resource.supervisor_exists
   if @current_resource.exists
-    Chef::Log.info "#{ @new_resource } already exists - nothing to do."
+    Chef::Log.info "#{@new_resource} already exists - nothing to do."
   else
-    converge_by("Create #{ @new_resource }") do
+    converge_by("Create #{@new_resource}") do
       create_role
       new_resource.updated_by_last_action(true)
     end
@@ -24,9 +24,7 @@ def load_current_resource
   @current_resource.membership_group(@new_resource.membership_group)
   @current_resource.supervisor(@new_resource.supervisor)
 
-  if role_exists?(@current_resource.name, node)
-    @current_resource.exists = true
-  end
+  @current_resource.exists = true if role_exists?(@current_resource.name, node)
   if group_exists?(@current_resource.membership_group, node)
     @current_resource.group_exists = true
   end
@@ -36,7 +34,6 @@ def load_current_resource
 end
 
 private
-
 
 def create_role
   add_role(new_resource, node)

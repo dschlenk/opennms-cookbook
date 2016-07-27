@@ -1,19 +1,19 @@
 def whyrun_supported?
-    true
+  true
 end
 
 use_inline_resources
 
 action :create do
   if @current_resource.changed
-    converge_by("Update #{ @new_resource }") do
+    converge_by("Update #{@new_resource}") do
       update_wallboard
       new_resource.updated_by_last_action(true)
     end
   elsif @current_resource.exists
-    Chef::Log.info "#{ @new_resource } already exists - nothing to do."
+    Chef::Log.info "#{@new_resource} already exists - nothing to do."
   else
-    converge_by("Create #{ @new_resource }") do
+    converge_by("Create #{@new_resource}") do
       create_wallboard
       new_resource.updated_by_last_action(true)
     end
@@ -33,28 +33,28 @@ def load_current_resource
   end
 end
 
-private 
+private
 
 def wallboard_exists?(title)
   return false unless ::File.exist? "#{node['opennms']['conf']['home']}/etc/dashboard-config.xml"
-  file = ::File.new("#{node['opennms']['conf']['home']}/etc/dashboard-config.xml", "r")
+  file = ::File.new("#{node['opennms']['conf']['home']}/etc/dashboard-config.xml", 'r')
   doc = REXML::Document.new file
   file.close
   !doc.elements["/wallboards/wallboard[@title = '#{title}']"].nil?
 end
 
 def wallboard_changed?(title, set_default)
-  file = ::File.new("#{node['opennms']['conf']['home']}/etc/dashboard-config.xml", "r")
+  file = ::File.new("#{node['opennms']['conf']['home']}/etc/dashboard-config.xml", 'r')
   doc = REXML::Document.new file
   file.close
   current_default = doc.elements["/wallboards/wallboard[@title = '#{title}']/default"].text.strip
-  return "#{current_default}" != "#{set_default}"
+  current_default.to_s != set_default.to_s
 end
 
 def create_wallboard
-  doc = nil 
+  doc = nil
   if ::File.exist? "#{node['opennms']['conf']['home']}/etc/dashboard-config.xml"
-    file = ::File.new("#{node['opennms']['conf']['home']}/etc/dashboard-config.xml", "r")
+    file = ::File.new("#{node['opennms']['conf']['home']}/etc/dashboard-config.xml", 'r')
     doc = REXML::Document.new file
     file.close
   else
@@ -62,42 +62,42 @@ def create_wallboard
     doc << REXML::XMLDecl.new
     doc.add_element 'wallboards'
   end
-  wbs = doc.elements["/wallboards"]
-  wb = wbs.add_element 'wallboard', { 'title' => new_resource.title }
+  wbs = doc.elements['/wallboards']
+  wb = wbs.add_element 'wallboard', 'title' => new_resource.title
   if new_resource.set_default == true
     wbs.elements.each 'wallboard' do |w|
-      if !w.elements["default"].nil? && w.elements["default"].text.strip == "true"
-        w.elements["default"].text = "false"
+      if !w.elements['default'].nil? && w.elements['default'].text.strip == 'true'
+        w.elements['default'].text = 'false'
       end
     end
   end
   wbd = wb.add_element 'default'
-  wbd.add_text "#{new_resource.set_default}"
-  out = ""
+  wbd.add_text new_resource.set_default.to_s
+  out = ''
   formatter = REXML::Formatters::Pretty.new(2)
   formatter.compact = true
   formatter.write(doc, out)
-  ::File.open("#{node['opennms']['conf']['home']}/etc/dashboard-config.xml", "w"){ |file| file.puts(out) } 
+  ::File.open("#{node['opennms']['conf']['home']}/etc/dashboard-config.xml", 'w') { |f| f.puts(out) }
 end
 
 def update_wallboard
-  file = ::File.new("#{node['opennms']['conf']['home']}/etc/dashboard-config.xml", "r")
+  file = ::File.new("#{node['opennms']['conf']['home']}/etc/dashboard-config.xml", 'r')
   doc = REXML::Document.new file
   file.close
-  wbs = doc.elements["/wallboards"]
+  wbs = doc.elements['/wallboards']
   if new_resource.set_default == true
     # find previous default if exists and change it to false
     wbs.elements.each 'wallboard' do |w|
-      if w.elements["default"].text.strip == "true"
-        w.elements["default"].text = "false"
+      if w.elements['default'].text.strip == 'true'
+        w.elements['default'].text = 'false'
       end
     end
   end
   wb = wbs.elements["wallboard[@title = '#{new_resource.title}']"]
-  wb.elements["default"].text = "#{new_resource.set_default}"
-  out = ""
+  wb.elements['default'].text = new_resource.set_default.to_s
+  out = ''
   formatter = REXML::Formatters::Pretty.new(2)
   formatter.compact = true
   formatter.write(doc, out)
-  ::File.open("#{node['opennms']['conf']['home']}/etc/dashboard-config.xml", "w"){ |file| file.puts(out) } 
+  ::File.open("#{node['opennms']['conf']['home']}/etc/dashboard-config.xml", 'w') { |f| f.puts(out) }
 end

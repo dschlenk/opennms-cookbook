@@ -1,7 +1,7 @@
 # modify the default view
 opennms_surveillance_view 'default' do
   rows 'Routers' => ['Routers'], 'Servers' => ['Servers']
-  columns 'PROD' => ['Production'], 'TEST' => ['Test', 'Development']
+  columns 'PROD' => ['Production'], 'TEST' => %w(Test Development)
 end
 
 # make another one, and make it default

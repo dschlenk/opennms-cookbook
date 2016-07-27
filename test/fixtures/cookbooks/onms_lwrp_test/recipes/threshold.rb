@@ -1,5 +1,5 @@
 # need to turn on thresholding on ICMP service first
-opennms_poller_service "ICMP" do
+opennms_poller_service 'ICMP' do
   package_name 'example1'
   params 'rrd-repository' => '/opt/opennms/share/rrd/response', 'rrd-base-name' => 'icmp', 'ds-name' => 'icmp', 'thresholding-enabled' => 'true'
   status 'on'
@@ -8,56 +8,56 @@ opennms_poller_service "ICMP" do
   notifies :restart, 'service[opennms]'
 end
 
-opennms_threshd_package "cheftest" do
+opennms_threshd_package 'cheftest' do
   filter "IPADDR != '0.0.0.0'"
   specifics ['172.17.16.1']
-  include_ranges [{'begin' => '172.17.13.1', 'end' => '172.17.13.254'}, {'begin' => '172.17.20.1', 'end' => '172.17.20.254'}]
-  exclude_ranges [{'begin' => '10.0.0.1', 'end' => '10.254.254.254'}]
+  include_ranges [{ 'begin' => '172.17.13.1', 'end' => '172.17.13.254' }, { 'begin' => '172.17.20.1', 'end' => '172.17.20.254' }]
+  exclude_ranges [{ 'begin' => '10.0.0.1', 'end' => '10.254.254.254' }]
   include_urls ['file:/opt/opennms/etc/include']
-  services [{'name' => 'ICMP', 'interval' => 300000, 'status' => 'on', 'params' => {'thresholding-group' => 'cheftest'}}]
+  services [{ 'name' => 'ICMP', 'interval' => 300_000, 'status' => 'on', 'params' => { 'thresholding-group' => 'cheftest' } }]
   notifies :run, 'opennms_send_event[restart_Threshd]'
 end
 
-opennms_threshold_group "cheftest" do
+opennms_threshold_group 'cheftest' do
   rrd_repository '/opt/opennms/share/rrd/response'
 end
 
 # common options
-opennms_threshold "icmp" do
+opennms_threshold 'icmp' do
   group 'cheftest'
   type 'high'
   description 'ping latency too high'
   ds_type 'if'
-  value 20000.0
-  rearm 18000.0
+  value 20_000.0
+  rearm 18_000.0
   trigger 2
   notifies :run, 'opennms_send_event[restart_Thresholds]'
 end
 
 # define events for triggered/rearmed
-opennms_event "uei.opennms.org/thresholdTest/testThresholdExceeded" do
-  file "events/chef.events.xml"
-  event_label "Chef defined event: testThresholdExceeded"
-  descr "<p>A threshold defined by a chef recipe that tests thresholds has been exceeded.</p>"
-  logmsg "Chef test threshold exceeded."
-  logmsg_dest "logndisplay"
+opennms_event 'uei.opennms.org/thresholdTest/testThresholdExceeded' do
+  file 'events/chef.events.xml'
+  event_label 'Chef defined event: testThresholdExceeded'
+  descr '<p>A threshold defined by a chef recipe that tests thresholds has been exceeded.</p>'
+  logmsg 'Chef test threshold exceeded.'
+  logmsg_dest 'logndisplay'
   logmsg_notify true
-  severity "Minor"
+  severity 'Minor'
   notifies :run, 'opennms_send_event[restart_Eventd]'
 end
 
-opennms_event "uei.opennms.org/thresholdTest/testThresholdRearmed" do
-  file "events/chef.events.xml"
-  event_label "Chef defined event: testThresholdRearmed"
-  descr "<p>A threshold defined by a chef recipe that tests thresholds has been rearmed.</p>"
-  logmsg "Chef test threshold rearmed."
-  logmsg_dest "logndisplay"
+opennms_event 'uei.opennms.org/thresholdTest/testThresholdRearmed' do
+  file 'events/chef.events.xml'
+  event_label 'Chef defined event: testThresholdRearmed'
+  descr '<p>A threshold defined by a chef recipe that tests thresholds has been rearmed.</p>'
+  logmsg 'Chef test threshold rearmed.'
+  logmsg_dest 'logndisplay'
   logmsg_notify true
-  severity "Normal"
+  severity 'Normal'
   notifies :run, 'opennms_send_event[restart_Eventd]'
 end
 # most options
-opennms_expression "icmp / 1000" do
+opennms_expression 'icmp / 1000' do
   group 'cheftest'
   type 'high'
   description 'ping latency too high expression'
@@ -68,7 +68,7 @@ opennms_expression "icmp / 1000" do
   triggered_uei 'uei.opennms.org/thresholdTest/testThresholdExceeded'
   rearmed_uei 'uei.opennms.org/thresholdTest/testThresholdRearmed'
   filter_operator 'and'
-  resource_filters [{'field' => 'ifHighSpeed', 'filter' => '^[1-9]+[0-9]*$'}]
+  resource_filters [{ 'field' => 'ifHighSpeed', 'filter' => '^[1-9]+[0-9]*$' }]
   notifies :run, 'opennms_send_event[restart_Thresholds]'
 end
 
@@ -79,7 +79,7 @@ opennms_expression 'change description on ping latency thing' do
   ds_type 'if'
   description 'ping latency too damn high expression'
   filter_operator 'and'
-  resource_filters [{'field' => 'ifHighSpeed', 'filter' => '^[1-9]+[0-9]*$'}]
+  resource_filters [{ 'field' => 'ifHighSpeed', 'filter' => '^[1-9]+[0-9]*$' }]
 end
 
 opennms_expression 'change value on ping latency thing' do
@@ -89,7 +89,7 @@ opennms_expression 'change value on ping latency thing' do
   ds_type 'if'
   value 30.0
   filter_operator 'and'
-  resource_filters [{'field' => 'ifHighSpeed', 'filter' => '^[1-9]+[0-9]*$'}]
+  resource_filters [{ 'field' => 'ifHighSpeed', 'filter' => '^[1-9]+[0-9]*$' }]
 end
 
 opennms_expression 'change rearm on ping latency thing' do
@@ -99,7 +99,7 @@ opennms_expression 'change rearm on ping latency thing' do
   ds_type 'if'
   rearm 20.0
   filter_operator 'and'
-  resource_filters [{'field' => 'ifHighSpeed', 'filter' => '^[1-9]+[0-9]*$'}]
+  resource_filters [{ 'field' => 'ifHighSpeed', 'filter' => '^[1-9]+[0-9]*$' }]
 end
 
 opennms_expression 'change trigger on ping latency thing' do
@@ -109,7 +109,7 @@ opennms_expression 'change trigger on ping latency thing' do
   ds_type 'if'
   trigger 5
   filter_operator 'and'
-  resource_filters [{'field' => 'ifHighSpeed', 'filter' => '^[1-9]+[0-9]*$'}]
+  resource_filters [{ 'field' => 'ifHighSpeed', 'filter' => '^[1-9]+[0-9]*$' }]
 end
 
 opennms_expression 'change relaxed on ping latency thing' do
@@ -119,7 +119,7 @@ opennms_expression 'change relaxed on ping latency thing' do
   ds_type 'if'
   relaxed true
   filter_operator 'and'
-  resource_filters [{'field' => 'ifHighSpeed', 'filter' => '^[1-9]+[0-9]*$'}]
+  resource_filters [{ 'field' => 'ifHighSpeed', 'filter' => '^[1-9]+[0-9]*$' }]
 end
 
 # create, then make some changes

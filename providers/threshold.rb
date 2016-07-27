@@ -3,16 +3,16 @@ include Threshold
 include Events
 
 def whyrun_supported?
-    true
+  true
 end
 
 use_inline_resources
 
 action :create_if_missing do
   if @current_resource.exists
-    Chef::Log.info "#{ @new_resource } already exists - nothing to do."
+    Chef::Log.info "#{@new_resource} already exists - nothing to do."
   else
-    converge_by("Create #{ @new_resource }") do
+    converge_by("Create #{@new_resource}") do
       create_threshold
       new_resource.updated_by_last_action(true)
     end
@@ -20,14 +20,14 @@ action :create_if_missing do
 end
 action :create do
   if @current_resource.exists && !@current_resource.changed
-    Chef::Log.info "#{ @new_resource } already exists, nothing changed - nothing to do."
+    Chef::Log.info "#{@new_resource} already exists, nothing changed - nothing to do."
   else
     if @current_resource.exists && @current_resource.changed
-      Chef::Log.info "#{ @new_resource } already exists, but has changed."
+      Chef::Log.info "#{@new_resource} already exists, but has changed."
     else
-      Chef::Log.info "#{ @new_resource } doesn't exist."
+      Chef::Log.info "#{@new_resource} doesn't exist."
     end
-    converge_by("Create/Update #{ @new_resource }") do
+    converge_by("Create/Update #{@new_resource}") do
       create_threshold
       new_resource.updated_by_last_action(true)
     end
@@ -60,9 +60,9 @@ def load_current_resource
       end
       if rt_exists?(node['opennms']['conf']['home'], @current_resource.ds_type) && rt_included?(node['opennms']['conf']['home'], @current_resource.ds_type)
         @current_resource.ds_type_exists = true
-        #if uei_exists?(@current_resource.triggered_uei, node) && uei_exists?(@current_resource.rearmed_uei, node)
+        # if uei_exists?(@current_resource.triggered_uei, node) && uei_exists?(@current_resource.rearmed_uei, node)
         @current_resource.ueis_exist = true
-        #end
+        # end
       end
     end
   end
@@ -70,13 +70,12 @@ end
 
 private
 
-
 def create_threshold
-  Chef::Log.debug "Adding threshold : '#{ new_resource.name }' to group: '#{new_resource.group}'"
+  Chef::Log.debug "Adding threshold : '#{new_resource.name}' to group: '#{new_resource.group}'"
   ds_name = new_resource.ds_name || new_resource.name
   file = ::File.new("#{node['opennms']['conf']['home']}/etc/thresholds.xml")
   contents = file.read
-  doc = REXML::Document.new(contents, { :respect_whitespace => :all })
+  doc = REXML::Document.new(contents, respect_whitespace: :all)
   doc.context[:attribute_quote] = :quote
   file.close
 
@@ -107,20 +106,20 @@ def create_threshold
   threshold_el.attributes['filterOperator'] = new_resource.filter_operator unless new_resource.filter_operator.nil? || new_resource.filter_operator == 'or'
   # filters are part of identity, so not necessary to attempt changing them
   unless updating
-    if !new_resource.resource_filters.nil?
+    unless new_resource.resource_filters.nil?
       new_resource.resource_filters.each do |filter|
-        filter_el = threshold_el.add_element 'resource-filter', {'field' => filter['field']}
+        filter_el = threshold_el.add_element 'resource-filter', 'field' => filter['field']
         filter_el.add_text(REXML::CData.new(filter['filter']))
       end
     end
     # proper group placement not needed for updates
     group_el = doc.root.elements["/thresholding-config/group[@name = '#{new_resource.group}']"]
     # see if there's an existing threshold element
-    last_threshold_el = group_el.elements["threshold[last()]"]
+    last_threshold_el = group_el.elements['threshold[last()]']
     if !last_threshold_el.nil?
       group_el.insert_after(last_threshold_el, threshold_el)
     else
-      first_expression_el = group_el.elements["expression[1]"]
+      first_expression_el = group_el.elements['expression[1]']
       if !first_expression_el.nil?
         group_el.insert_before(first_expression_el, threshold_el)
       else
@@ -128,9 +127,9 @@ def create_threshold
       end
     end
   end
-  out = ""
+  out = ''
   formatter = REXML::Formatters::Pretty.new(2)
   formatter.compact = true
   formatter.write(doc, out)
-  ::File.open("#{node['opennms']['conf']['home']}/etc/thresholds.xml", "w"){ |file| file.puts(out) }
+  ::File.open("#{node['opennms']['conf']['home']}/etc/thresholds.xml", 'w') { |f| f.puts(out) }
 end

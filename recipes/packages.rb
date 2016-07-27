@@ -33,39 +33,38 @@ def yum_attr(branch, platform, attr)
   node['yum']["opennms-#{branch}-#{platform}"][attr]
 end
 
-branches = ['stable', 'obsolete', 'snapshot']
-platforms = ['common', 'rhel6']
+branches = %w(stable obsolete snapshot)
+platforms = %w(common rhel6)
 branches.each do |branch|
   platforms.each do |platform|
     skip = false
     Chef::Log.debug "branch is '#{branch}' and stable is #{node['opennms']['stable']}"
-    if ((branch == 'stable' && !node['opennms']['stable']) ||
-      (branch == 'snapshot' && node['opennms']['stable']))
-      skip = true 
+    if (branch == 'stable' && !node['opennms']['stable']) ||
+       (branch == 'snapshot' && node['opennms']['stable'])
+      skip = true
     end
-    unless skip
-      bu = yum_attr(branch, platform, 'baseurl')
-      ml = yum_attr(branch, platform, 'url')
-      fom = yum_attr(branch, platform, 'failovermethod')
-      inc_pkgs = yum_attr(branch, platform, 'includepkgs')
-      ex = yum_attr(branch, platform, 'exclude')
-      yum_repository "opennms-#{branch}-#{platform}" do
-        description "#{platform} OpenNMS RPMs (#{branch})"
-        baseurl bu unless bu.nil? || '' == bu
-        mirrorlist ml unless ml.nil? || '' == ml
-        gpgkey 'file:///etc/yum.repos.d/OPENNMS-GPG-KEY'
-        failovermethod fom unless fom.nil? | '' == fom
-        includepkgs inc_pkgs unless inc_pkgs.nil? || '' == inc_pkgs
-        exclude ex unless ex.nil? || '' == ex
-        action :create
-      end
+    next if skip
+    bu = yum_attr(branch, platform, 'baseurl')
+    ml = yum_attr(branch, platform, 'url')
+    fom = yum_attr(branch, platform, 'failovermethod')
+    inc_pkgs = yum_attr(branch, platform, 'includepkgs')
+    ex = yum_attr(branch, platform, 'exclude')
+    yum_repository "opennms-#{branch}-#{platform}" do
+      description "#{platform} OpenNMS RPMs (#{branch})"
+      baseurl bu unless bu.nil? || '' == bu
+      mirrorlist ml unless ml.nil? || '' == ml
+      gpgkey 'file:///etc/yum.repos.d/OPENNMS-GPG-KEY'
+      failovermethod fom unless fom.nil? | '' == fom
+      includepkgs inc_pkgs unless inc_pkgs.nil? || '' == inc_pkgs
+      exclude ex unless ex.nil? || '' == ex
+      action :create
     end
   end
 end
 
 onms_packages = ['opennms-core', 'opennms-webapp-jetty', 'opennms-docs']
-onms_versions =  [node['opennms']['version'], node['opennms']['version'],
-  node['opennms']['version']]
+onms_versions = [node['opennms']['version'], node['opennms']['version'],
+                 node['opennms']['version']]
 
 if node['opennms']['plugin']['xml']
   onms_packages.push 'opennms-plugin-protocol-xml'
@@ -77,19 +76,21 @@ if node['opennms']['plugin']['nsclient']
   onms_versions.push node['opennms']['version']
 end
 
-package onms_packages do
+ruby_block 'stop opennms before upgrade' do
+  block do
+    Opennms::Upgrade.stop_opennms(node)
+  end
+  only_if { node['opennms']['upgrade'] && Opennms::Upgrade.upgrade?(node) }
+end
+
+yum_package onms_packages do
   version onms_versions
   allow_downgrade node['opennms']['allow_downgrade']
   action :install
 end
 
-package "iplike" do
-  action :install
-end
-
-package "perl-libwww-perl" do
-  action :install
-end
-package "perl-XML-Twig" do
-  action :install
+%w(iplike perl-libwww-perl perl-XML-Twig).each do |p|
+  package p do
+    action :install
+  end
 end

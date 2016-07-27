@@ -1,24 +1,25 @@
 include Rbac
 def whyrun_supported?
-    true
+  true
 end
 
 use_inline_resources
 
 action :create do
-  Chef::Application.fatal!("Missing role  #{@current_resource.role_name}.") if !@current_resource.role_exists
-  Chef::Application.fatal!("User #{@current_resource.username} not in role.") if !@current_resource.user_in_group
-  Chef::Application.fatal!("Times array not valid #{@current_resource.times}. See resource definition for required format.") if !@current_resource.times_valid
+  Chef::Application.fatal!("Missing role  #{@current_resource.role_name}.") unless @current_resource.role_exists
+  Chef::Application.fatal!("User #{@current_resource.username} not in role.") unless @current_resource.user_in_group
+  Chef::Application.fatal!("Times array not valid #{@current_resource.times}. See resource definition for required format.") unless @current_resource.times_valid
   if @current_resource.exists
-    Chef::Log.info "#{ @new_resource } already exists - nothing to do."
+    Chef::Log.info "#{@new_resource} already exists - nothing to do."
   else
-    converge_by("Create #{ @new_resource }") do
+    converge_by("Create #{@new_resource}") do
       create_role_schedule
       new_resource.updated_by_last_action(true)
     end
   end
 end
 
+# rubocop:disable Metrics/BlockNesting
 def load_current_resource
   @current_resource = Chef::Resource::OpennmsRoleSchedule.new(@new_resource.name)
   @current_resource.name(@new_resource.name)
@@ -46,19 +47,19 @@ private
 
 def times_valid?(times)
   validity = true
-  if !times.nil? && times.length > 0
+  if !times.nil? && !times.empty?
     times.each do |time|
-      if time.has_key?('begins') && time.has_key?('ends')
+      if time.key?('begins') && time.key?('ends')
         # check format of begins and ends
-        if ! (time['begins'] =~ /^[0-9]{1,2}-(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)-[0-9]{4} [0-9]{1,2}:[0-9]{2}:[0-9]{2}$/ || time['begins'] =~ /^[0-9]{1,2}:[0-9]{2}:[0-9]{2}$/)
+        unless time['begins'] =~ /^[0-9]{1,2}-(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)-[0-9]{4} [0-9]{1,2}:[0-9]{2}:[0-9]{2}$/ || time['begins'] =~ /^[0-9]{1,2}:[0-9]{2}:[0-9]{2}$/
           validity = false
         end
-        if ! (time['ends'] =~ /^[0-9]{1,2}-(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)-[0-9]{4} [0-9]{1,2}:[0-9]{2}:[0-9]{2}$/ || time['ends'] =~ /^[0-9]{1,2}:[0-9]{2}:[0-9]{2}$/)
+        unless time['ends'] =~ /^[0-9]{1,2}-(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)-[0-9]{4} [0-9]{1,2}:[0-9]{2}:[0-9]{2}$/ || time['ends'] =~ /^[0-9]{1,2}:[0-9]{2}:[0-9]{2}$/
           validity = false
         end
         # if has day, check that too
-        if time.has_key?('day')
-          validity = false if ! (time['day'] =~ /^(monday|tuesday|wednesday|thursday|friday|saturday|sunday|[1-3][0-9]|[1-9])$/)
+        if time.key?('day')
+          validity = false unless time['day'] =~ /^(monday|tuesday|wednesday|thursday|friday|saturday|sunday|[1-3][0-9]|[1-9])$/
         end
       else
         # because missing beings/ends keys
@@ -71,6 +72,7 @@ def times_valid?(times)
   end
   validity
 end
+# rubocop:enable Metrics/BlockNesting
 
 def create_role_schedule
   add_schedule_to_role(new_resource, node)

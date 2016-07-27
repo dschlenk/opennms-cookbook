@@ -1,18 +1,18 @@
 def whyrun_supported?
-    true
+  true
 end
 
 use_inline_resources
 
 action :create do
-  Chef::Application.fatal!("Missing destination path #{@current_resource.destination_path_name}.") if !@current_resource.destination_path_exists
-  Chef::Application.fatal!("Need at least 1 command per target. ") if !@current_resource.minimum_commands
-  Chef::Application.fatal!("At least one command in #{@current_resource.commands} does not exist in notificationCommands.xml.") if !@current_resource.commands_exist
-  Chef::Application.fatal!("Missing required escalate_delay attribute for escalate type target!") if !@current_resource.delay_defined
+  Chef::Application.fatal!("Missing destination path #{@current_resource.destination_path_name}.") unless @current_resource.destination_path_exists
+  Chef::Application.fatal!('Need at least 1 command per target. ') unless @current_resource.minimum_commands
+  Chef::Application.fatal!("At least one command in #{@current_resource.commands} does not exist in notificationCommands.xml.") unless @current_resource.commands_exist
+  Chef::Application.fatal!('Missing required escalate_delay attribute for escalate type target!') unless @current_resource.delay_defined
   if @current_resource.exists
-    Chef::Log.info "#{ @new_resource } already exists - nothing to do."
+    Chef::Log.info "#{@new_resource} already exists - nothing to do."
   else
-    converge_by("Create #{ @new_resource }") do
+    converge_by("Create #{@new_resource}") do
       create_target
       new_resource.updated_by_last_action(true)
     end
@@ -50,16 +50,16 @@ end
 private
 
 def destination_path_exists?(destination_path_name)
-  Chef::Log.debug "Checking to see if this destination path exists: '#{ destination_path_name }'"
-  file = ::File.new("#{node['opennms']['conf']['home']}/etc/destinationPaths.xml", "r")
+  Chef::Log.debug "Checking to see if this destination path exists: '#{destination_path_name}'"
+  file = ::File.new("#{node['opennms']['conf']['home']}/etc/destinationPaths.xml", 'r')
   doc = REXML::Document.new file
   file.close
   !doc.elements["/destinationPaths/path[@name='#{destination_path_name}']"].nil?
 end
 
 def target_exists?(destination_path_name, name, type)
-  Chef::Log.debug "Checking to see if this target exists: '#{ name }' of type '#{type}'"
-  file = ::File.new("#{node['opennms']['conf']['home']}/etc/destinationPaths.xml", "r")
+  Chef::Log.debug "Checking to see if this target exists: '#{name}' of type '#{type}'"
+  file = ::File.new("#{node['opennms']['conf']['home']}/etc/destinationPaths.xml", 'r')
   doc = REXML::Document.new file
   file.close
   if type == 'target'
@@ -70,16 +70,16 @@ def target_exists?(destination_path_name, name, type)
 end
 
 def minimum_commands?(commands)
-  !commands.nil? && commands.length > 0
+  !commands.nil? && !commands.empty?
 end
 
 def commands_exist?(commands)
-  file = ::File.new("#{node['opennms']['conf']['home']}/etc/notificationCommands.xml", "r")
+  file = ::File.new("#{node['opennms']['conf']['home']}/etc/notificationCommands.xml", 'r')
   doc = REXML::Document.new file
   file.close
   commands_exist = true
   commands.each do |command|
-    Chef::Log.debug "Checking to see if this command exists: '#{ command }'"
+    Chef::Log.debug "Checking to see if this command exists: '#{command}'"
     if doc.elements["/notification-commands/command/name[text() = '#{command}']"].nil?
       commands_exist = false
       break
@@ -89,10 +89,10 @@ def commands_exist?(commands)
 end
 
 def create_target
-   Chef::Log.debug "Creating target : '#{ new_resource.name }'"
-  file = ::File.new("#{node['opennms']['conf']['home']}/etc/destinationPaths.xml", "r")
+  Chef::Log.debug "Creating target : '#{new_resource.name}'"
+  file = ::File.new("#{node['opennms']['conf']['home']}/etc/destinationPaths.xml", 'r')
   contents = file.read
-  doc = REXML::Document.new(contents, { :respect_whitespace => :all })
+  doc = REXML::Document.new(contents, respect_whitespace: :all)
   doc.context[:attribute_quote] = :quote
   file.close
 
@@ -105,7 +105,7 @@ def create_target
   end
   name_el = target_el.add_element 'name'
   name_el.add_text(new_resource.target_name)
-  if !new_resource.auto_notify.nil?
+  unless new_resource.auto_notify.nil?
     an_el = target_el.add_element 'autoNotify'
     an_el.add_text(new_resource.auto_notify)
   end
@@ -117,24 +117,23 @@ def create_target
   # add target element to appropriate place in path
   if new_resource.type == 'target'
     path_el.add_element target_el
-    Chef::Log.debug "Added target element to path."
+    Chef::Log.debug 'Added target element to path.'
   elsif new_resource.type == 'escalate'
     # first see if an existing escalate element already exists
     escalate_el = path_el.elements["escalate[@delay='#{new_resource.escalate_delay}']"]
     # and create a new one if it doesn't
     if escalate_el.nil?
-      escalate_el = path_el.add_element 'escalate', { 'delay' => new_resource.escalate_delay }
-      Chef::Log.debug "Added target element to new escalate element that was added to path_el."
+      escalate_el = path_el.add_element 'escalate', 'delay' => new_resource.escalate_delay
+      Chef::Log.debug 'Added target element to new escalate element that was added to path_el.'
     end
     # add target! we're done!
     escalate_el.add_element target_el
-    Chef::Log.debug "Added target element to existing escalate element."
+    Chef::Log.debug 'Added target element to existing escalate element.'
   end
 
-  out = ""
+  out = ''
   formatter = REXML::Formatters::Pretty.new(2)
   formatter.compact = true
   formatter.write(doc, out)
-  ::File.open("#{node['opennms']['conf']['home']}/etc/destinationPaths.xml", "w"){ |file| file.puts(out) }
- 
+  ::File.open("#{node['opennms']['conf']['home']}/etc/destinationPaths.xml", 'w') { |f| f.puts(out) }
 end

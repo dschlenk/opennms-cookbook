@@ -1,26 +1,27 @@
 require 'rexml/document'
 
 module Events
-  def event_file_included?(file, node)
-    if file =~ /^events\/(.*)$/ 
-      file = $1
-    end
+  include Chef::Mixin::ShellOut
 
-    ecf = ::File.new("#{node['opennms']['conf']['home']}/etc/eventconf.xml", "r")
+  def event_file_included?(file, node)
+    file = Regexp.last_match(1) if file =~ %r{^events/(.*)$}
+
+    ecf = ::File.new("#{node['opennms']['conf']['home']}/etc/eventconf.xml", 'r')
     doc = REXML::Document.new ecf
     ecf.close
 
     !doc.elements["/events/event-file[text() = 'events/#{file}' and not(text()[2])]"].nil?
   end
+
   def uei_exists?(uei, node)
     exists = uei_in_file?("#{node['opennms']['conf']['home']}/etc/eventconf.xml", uei)
     # let's cheat!
-    eventfile = `grep -l #{uei} #{node['opennms']['conf']['home']}/etc/events/*.xml`
-    if eventfile != '' && eventfile.lines.to_a.length == 1
-      return uei_in_file?(eventfile.chomp, uei)
+    eventfile = shell_out("grep -l #{uei} #{node['opennms']['conf']['home']}/etc/events/*.xml")
+    if eventfile.stdout != '' && eventfile.stdout.lines.to_a.length == 1
+      return uei_in_file?(eventfile.stdout.chomp, uei)
     else
       # if multiple files match, only return if true since could be a regex false positive.
-      eventfile.lines.each do |file|
+      eventfile.stdout.lines.each do |file|
         return true if uei_in_file?(file.chomp, uei)
       end
     end
@@ -34,49 +35,52 @@ module Events
     Chef::Log.debug("dir search for uei #{uei} complete")
     exists
   end
+
   def uei_in_file?(file, uei)
-    file = ::File.new(file, "r")
+    file = ::File.new(file, 'r')
     doc = REXML::Document.new file
     file.close
     !doc.elements["/events/event/uei[text() = '#{uei}']"].nil?
   end
-  def is_event_file?(file, node)
+
+  def event_file?(file, node)
     fn = "#{node['opennms']['conf']['home']}/etc/#{file}"
     eventfile = false
-    if ::File.exists?(fn)
-      file = ::File.new(fn, "r")
+    if ::File.exist?(fn)
+      file = ::File.new(fn, 'r')
       doc = REXML::Document.new file
       file.close
-      eventfile = !doc.elements["/events"].nil?
+      eventfile = !doc.elements['/events'].nil?
     end
     eventfile
   end
+
   def event_changed?(event, node)
-    file = ::File.new("#{node['opennms']['conf']['home']}/etc/#{event.file}", "r")
+    file = ::File.new("#{node['opennms']['conf']['home']}/etc/#{event.file}", 'r')
     doc = REXML::Document.new file
     file.close
     event_el = doc.elements["/events/event[uei/text() = '#{event.uei}']"]
-    mask_el = event_el.elements["mask"]
+    mask_el = event_el.elements['mask']
     unless event.mask.nil?
-      if event.mask.size == 0
-        Chef::Log.debug "Mask not defined in new resource."
+      if event.mask.empty?
+        Chef::Log.debug 'Mask not defined in new resource.'
         if mask_el.nil?
           Chef::Log.debug "new resource's mask is nil, as is current file."
         else
-          Chef::Log.debug "Event mask in current file but nil in new resource."
+          Chef::Log.debug 'Event mask in current file but nil in new resource.'
           return true
         end
       end
       if mask_el.nil?
-        Chef::Log.debug "Mask element does not exist in current."
+        Chef::Log.debug 'Mask element does not exist in current.'
         if event.mask.nil?
           Chef::Log.debug "Mask doesn't exist in current and is nil in new resource."
         else
-          Chef::Log.debug "Event mask not present in current but is in new resource."
+          Chef::Log.debug 'Event mask not present in current but is in new resource.'
           return true
         end
       else
-        Chef::Log.debug "Neither current nor new masks were nil."
+        Chef::Log.debug 'Neither current nor new masks were nil.'
         mask = []
         mask_el.elements.each('maskelement') do |maskelement|
           mename = maskelement.elements['mename'].text
@@ -91,33 +95,33 @@ module Events
       end
     end
     unless event.event_label.nil?
-      el = event_el.elements["event-label"].text.to_s
+      el = event_el.elements['event-label'].text.to_s
       Chef::Log.debug "Event label equal? New: #{event.event_label}; Current: #{el}"
       return true unless event.event_label == el
     end
     unless event.descr.nil?
-      descr = event_el.elements["descr"].texts.join('\n')
+      descr = event_el.elements['descr'].texts.join('\n')
       Chef::Log.debug "Event descriptions equal? New: #{event.descr}; Current: #{descr}"
       return true unless event.descr == descr
     end
     unless event.logmsg.nil?
-      logmsg = event_el.elements["logmsg"].texts.join('\n')
+      logmsg = event_el.elements['logmsg'].texts.join('\n')
       Chef::Log.debug "Event logmsg equal? New: #{event.logmsg}; Current: #{logmsg}"
       return true unless event.logmsg == logmsg
     end
     unless event.logmsg_notify.nil?
-      logmsg_notify = event_el.elements["logmsg/@notify"].value unless event_el.elements["logmsg/@notify"].nil?
-      logmsg_notify = 'false' if "#{logmsg_notify}" == ''
+      logmsg_notify = event_el.elements['logmsg/@notify'].value unless event_el.elements['logmsg/@notify'].nil?
+      logmsg_notify = 'false' if logmsg_notify.to_s == ''
       Chef::Log.debug "Event logmsg notify equal? New: #{event.logmsg_notify}; Current #{logmsg_notify}"
-      return true unless "#{event.logmsg_notify}" == logmsg_notify
+      return true unless event.logmsg_notify.to_s == logmsg_notify
     end
     unless event.logmsg_dest.nil?
-      logmsg_dest = event_el.elements["logmsg/@dest"].value unless event_el.elements["logmsg/@dest"].nil?
+      logmsg_dest = event_el.elements['logmsg/@dest'].value unless event_el.elements['logmsg/@dest'].nil?
       Chef::Log.debug "Event logmsg dest equal? New: #{event.logmsg_dest}; Current #{logmsg_dest}"
-      return true unless "#{event.logmsg_dest}" == "#{logmsg_dest}"
+      return true unless event.logmsg_dest.to_s == logmsg_dest.to_s
     end
     unless event.severity.nil?
-      severity = event_el.elements["severity"].text.to_s
+      severity = event_el.elements['severity'].text.to_s
       Chef::Log.debug "Event severity equal? New: #{event.severity}; current #{severity}"
       return true unless event.severity == severity
     end
@@ -127,20 +131,20 @@ module Events
       return true unless event.operinstruct == operinstruct
     end
     unless event.autoaction.nil?
-      if event.autoaction.size == 0
+      if event.autoaction.empty?
         unless event_el.elements['autoaction'].nil?
           Chef::Log.debug 'New resource autoaction is nil but exists currently.'
-          return true;
+          return true
         end
       end
-      if event_el.elements["autoaction"].nil?
+      if event_el.elements['autoaction'].nil?
         unless event.autoaction.nil?
-          Chef::Log.debug "Event autoaction present but nil in new resource."
+          Chef::Log.debug 'Event autoaction present but nil in new resource.'
           return true
         end
       else
         autoactions = []
-        event_el.elements.each("autoaction") do |aa|
+        event_el.elements.each('autoaction') do |aa|
           action = aa.texts.join('\n')
           state = aa.attributes['state'] || 'on'
           autoactions.push 'state' => state, 'action' => action
@@ -150,20 +154,20 @@ module Events
       end
     end
     unless event.varbindsdecode.nil?
-      if event.varbindsdecode.size == 0
+      if event.varbindsdecode.empty?
         unless event_el.elements['varbindsdecode'].nil?
-          Chef::Log.debug "Event varbindsdecode present but nil in new resource."
+          Chef::Log.debug 'Event varbindsdecode present but nil in new resource.'
           return true
         end
       end
-      if event_el.elements["varbindsdecode"].nil?
+      if event_el.elements['varbindsdecode'].nil?
         unless event.varbindsdecode.nil?
-          Chef::Log.debug "Event varbindsdecode not present but not nil in new resource."
+          Chef::Log.debug 'Event varbindsdecode not present but not nil in new resource.'
           return true
         end
       else
         varbindsdecodes = []
-        event_el.elements.each("varbindsdecode") do |vbd|
+        event_el.elements.each('varbindsdecode') do |vbd|
           parmid = vbd.elements['parmid'].text.to_s
           decode = []
           vbd.elements.each('decode') do |d|
@@ -178,28 +182,27 @@ module Events
       end
     end
     unless event.parameters.nil?
-      if event.parameters.size == 0
+      if event.parameters.empty?
         unless event_el.elements['parameters'].nil?
-          Chef::Log.debug "Event parameters present but nil in new resource."
+          Chef::Log.debug 'Event parameters present but nil in new resource.'
           return true
         end
       end
-      if event_el.elements["parameters"].nil?
+      if event_el.elements['parameters'].nil?
         unless event.parameters.nil?
-          Chef::Log.debug "Event parameters not present but not nil in new resource."
+          Chef::Log.debug 'Event parameters not present but not nil in new resource.'
           return true
         end
       else
         parameters = []
-        event_el.elements.each("parameters") do |parm|
+        event_el.elements.each('parameters') do |parm|
           p = { 'name' => parm.attributes['name'], 'value' => parm.attributes['value'] }
-          if node['opennms']['version_major'] > 17 && parm.has_key?('expand')
-            if parm.attributes['expand'] == 'true'
-              p['expand'] = true
-            else
-              p['expand'] = false
-            end
-          end
+          next unless node['opennms']['version_major'] > 17 && parm.key?('expand')
+          p['expand'] = if parm.attributes['expand'] == 'true'
+                          true
+                        else
+                          false
+                        end
         end
         Chef::Log.debug "parameters equal? New: #{event.parameters}, current #{parameters}"
         return true unless event.parameters == parameters
@@ -208,40 +211,39 @@ module Events
     if !event.tticket.nil? || event.tticket == false
       if event.tticket == false
         unless event_el.elements['tticket'].nil?
-          Chef::Log.debug "Event tticket not present but not nil in new resource."
+          Chef::Log.debug 'Event tticket not present but not nil in new resource.'
           return true
         end
       end
-      if event_el.elements["tticket"].nil?
+      if event_el.elements['tticket'].nil?
         unless event.tticket.nil?
-          Chef::Log.debug "Event tticket present but nil in new resource."
+          Chef::Log.debug 'Event tticket present but nil in new resource.'
           return true
         end
       else
-        tticket_el = event_el.elements["tticket"]
+        tticket_el = event_el.elements['tticket']
         tt_state = tticket_el.attributes['state'] || 'on'
         tt_info = tticket_el.texts.join('\n')
-        tticket = {}
-        tticket = {'info' => tt_info, 'state' => tt_state}
+        tticket = { 'info' => tt_info, 'state' => tt_state }
         Chef::Log.debug "ttickets equal? New: #{event.tticket}, current #{tticket}"
         return true unless event.tticket == tticket
       end
     end
     unless event.forward.nil?
-      if event.forward.size == 0
+      if event.forward.empty?
         unless event_el.elements['forward'].nil?
-          Chef::Log.debug "Event forward present but nil in new resource."
+          Chef::Log.debug 'Event forward present but nil in new resource.'
           return true
         end
       end
-      if event_el.elements["forward"].nil?
+      if event_el.elements['forward'].nil?
         unless event.forward.nil?
-          Chef::Log.debug "Event forward not present but not nil in new resource."
+          Chef::Log.debug 'Event forward not present but not nil in new resource.'
           return true
         end
       else
         forwards = []
-        event_el.elements.each("forward") do |fwd|
+        event_el.elements.each('forward') do |fwd|
           info = fwd.texts.join('\n')
           state = fwd.attributes['state'] || 'on'
           mechanism = fwd.attributes['mechanism']
@@ -260,20 +262,20 @@ module Events
       end
     end
     unless event.script.nil?
-      if event.script.size == 0
+      if event.script.empty?
         unless event_el.elements['script'].nil?
-          Chef::Log.debug "Event script present but nil in new resource."
+          Chef::Log.debug 'Event script present but nil in new resource.'
           return true
         end
       end
-      if event_el.elements["script"].nil?
+      if event_el.elements['script'].nil?
         unless event.script.nil?
-          Chef::Log.debug "Event script not present but not nil in new resource."
+          Chef::Log.debug 'Event script not present but not nil in new resource.'
           return true
         end
       else
         scripts = []
-        event_el.elements.each("script") do |s|
+        event_el.elements.each('script') do |s|
           name = s.texts.join('\n')
           language = s.attributes['language']
           scripts.push 'name' => name, 'language' => language
@@ -283,21 +285,21 @@ module Events
       end
     end
     unless event.mouseovertext.nil?
-      motext = event_el.elements["mouseovertext"].texts.join('\n') unless event_el.elements['mouseovertext'].nil?
+      motext = event_el.elements['mouseovertext'].texts.join('\n') unless event_el.elements['mouseovertext'].nil?
       Chef::Log.debug "mouseovertext equal? New: #{event.mouseovertext}, current #{motext}"
       return true unless event.mouseovertext == motext
     end
     if !event.alarm_data.nil? || event.alarm_data == false
-      ad_el = event_el.elements["alarm-data"]
+      ad_el = event_el.elements['alarm-data']
       if event.alarm_data == false
         unless event_el.elements['alarm-data'].nil?
-          Chef::Log.debug "Event alarm-data present but false in new resource."
+          Chef::Log.debug 'Event alarm-data present but false in new resource.'
           return true
         end
       end
       if ad_el.nil?
         unless event.alarm_data.nil?
-          Chef::Log.debug "Event alarm-data not present but not nil in new resource."
+          Chef::Log.debug 'Event alarm-data not present but not nil in new resource.'
           return true
         end
       else
@@ -315,11 +317,11 @@ module Events
         update_fields = []
         ad_el.elements.each('update-field') do |uf|
           fn = uf.attributes['field-name']
-          if uf.attributes['update-on-reduction'] == 'false'
-            uor = false
-          else
-            uor = true
-          end
+          uor = if uf.attributes['update-on-reduction'] == 'false'
+                  false
+                else
+                  true
+                end
           if uor.nil?
             update_fields.push 'field_name' => fn
           else
@@ -333,30 +335,28 @@ module Events
         alarm_data['auto_clean'] = auto_clean unless auto_clean.nil?
         alarm_data['x733_alarm_type'] = x733_alarm_type unless x733_alarm_type.nil?
         alarm_data['x733_probable_cause'] = x733_probable_cause unless x733_probable_cause.nil?
-        if update_fields.size > 0
-          alarm_data['update_fields'] = update_fields
-        end
+        alarm_data['update_fields'] = update_fields unless update_fields.empty?
         Chef::Log.debug "alarm data changed? new: #{event.alarm_data}; current: #{alarm_data}"
         return true unless event.alarm_data == alarm_data
       end
     end
-    Chef::Log.debug "Nothing in this event has changed!"
+    Chef::Log.debug 'Nothing in this event has changed!'
     false
   end
 
   def add_file_to_eventconf(file, position, node)
     Chef::Log.debug "file is #{file}"
-    if file =~ /^events\/(.*)$/ 
-      file = $1
+    if file =~ %r{^events/(.*)$}
+      file = Regexp.last_match(1)
       Chef::Log.debug "file is now #{file}"
     end
     f = ::File.new("#{node['opennms']['conf']['home']}/etc/eventconf.xml")
     contents = f.read
-    doc = REXML::Document.new(contents, { :respect_whitespace => :all })
+    doc = REXML::Document.new(contents, respect_whitespace: :all)
     doc.context[:attribute_quote] = :quote
     f.close
 
-    events_el = doc.root.elements["/events"]
+    events_el = doc.root.elements['/events']
     eventconf_el = REXML::Element.new('event-file')
     eventconf_el.add_text(REXML::CData.new("events/#{file}"))
     ref_ef_el = doc.root.elements["/events/event-file[text() = 'events/ncs-component.events.xml']"]
@@ -366,10 +366,10 @@ module Events
     else
       events_el.insert_before(ref_ef_el, eventconf_el)
     end
-    out = ""
+    out = ''
     formatter = REXML::Formatters::Pretty.new(2)
     formatter.compact = true
     formatter.write(doc, out)
-    ::File.open("#{node['opennms']['conf']['home']}/etc/eventconf.xml", "w"){ |f| f.puts(out) }
+    ::File.open("#{node['opennms']['conf']['home']}/etc/eventconf.xml", 'w') { |new_file| new_file.puts(out) }
   end
 end
