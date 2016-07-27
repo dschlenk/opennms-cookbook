@@ -16,7 +16,8 @@ default['yum']['opennms-snapshot-rhel6']['baseurl']         = "http://yum.opennm
 default['yum']['opennms-snapshot-rhel6']['failovermethod']  = "roundrobin"
 default['build-essential']['compile_time'] = true
 default['opennms']['default_template_cookbook'] = 'opennms'
-default['opennms']['version'] = '16.0.4-1'
+default['opennms']['version'] = '18.0.1-1'
+default['opennms']['version_major'] = node['opennms']['version'].match(/(\d+)\..*/).captures[0]
 default['opennms']['allow_downgrade'] = false
 default['opennms']['stable'] = true
 # whether or not to attempt to automatically upgrade opennms
@@ -120,7 +121,12 @@ default['opennms']['properties']['reporting']['template_dir']         = "#{defau
 default['opennms']['properties']['reporting']['report_dir']           = "#{default['opennms']['conf']['home']}/share/reports"
 default['opennms']['properties']['reporting']['report_logo']          = "#{default['opennms']['conf']['home']}/webapps/images/logo.gif"
 default['opennms']['properties']['reporting']['ksc_graphs_per_line']  = 1
-default['opennms']['properties']['reporting']['jasper_version']       = "5.6.1"
+case node['opennms']['version_major']
+when '16'
+  default['opennms']['properties']['reporting']['jasper_version']       = '5.6.1' 
+else '17'
+  default['opennms']['properties']['reporting']['jasper_version']       = '6.1.1'
+end
 # Eventd IPC
 default['opennms']['properties']['eventd']['proxy_host']     = nil
 default['opennms']['properties']['eventd']['proxy_port']     = nil
@@ -186,6 +192,37 @@ default['opennms']['properties']['geo']['referrer']       = "http://localhost/"
 default['opennms']['properties']['geo']['min_quality']    = "ZIP"
 default['opennms']['properties']['geo']['email']          = ""
 default['opennms']['properties']['geo']['tile_url']       = nil #"http://otile1.mqcdn.com/tiles/1.0.0/osm/${z}/${x}/${y}.png"
+default['opennms']['properties']['time_series']['strategy'] = 'rrd' #newts
+default['opennms']['properties']['graph_engine'] = 'backshift' #auto, png, placeholder, backshift
+default['opennms']['properties']['newts']['hostname'] = 'localhost'
+default['opennms']['properties']['newts']['keyspace'] = 'newts'
+default['opennms']['properties']['newts']['port'] = 9042
+default['opennms']['properties']['newts']['username'] = 'cassandra'
+default['opennms']['properties']['newts']['password'] = 'cassandra'
+default['opennms']['properties']['newts']['read_consistency'] = 'ONE'
+default['opennms']['properties']['newts']['write_consistency'] = 'ANY'
+default['opennms']['properties']['newts']['max_batch_size'] = 16
+default['opennms']['properties']['newts']['ring_buffer_size'] = 8192
+default['opennms']['properties']['newts']['ttl'] = 31540000
+default['opennms']['properties']['newts']['resource_shard'] = 604800
+default['opennms']['properties']['newts']['cache_strategy'] = 'org.opennms.netmgt.newts.support.GuavaSearchableResourceMetadataCache'
+default['opennms']['properties']['newts']['cache_max_entries'] = 8192
+default['opennms']['properties']['newts']['cache_redis_host'] = 'localhost'
+default['opennms']['properties']['newts']['cache_redis_port'] = 6379
+default['opennms']['properties']['heatmap']['default_mode'] = 'alarms' #outages
+default['opennms']['properties']['heatmap']['default_heatmap'] = 'categories' # or 'foreignSources' or 'monitoredServices'
+default['opennms']['properties']['heatmap']['category_filter'] = '.*'
+default['opennms']['properties']['heatmap']['foreign_source_filter'] = '.*'
+default['opennms']['properties']['heatmap']['service_filter'] = '.*'
+default['opennms']['properties']['heatmap']['only_unacknowledged'] = false
+default['opennms']['properties']['grafana']['show'] = false
+default['opennms']['properties']['grafana']['hostname'] = 'localhost'
+default['opennms']['properties']['grafana']['port'] = 3000
+default['opennms']['properties']['grafana']['api_key'] = ''
+default['opennms']['properties']['grafana']['tag'] = ''
+default['opennms']['properties']['grafana']['protocol'] = 'http'
+default['opennms']['properties']['grafana']['connection_timeout'] = 500
+default['opennms']['properties']['grafana']['so_timeout'] = 500
 # access point monitor
 default['opennms']['apm']['threads']           = 30
 default['opennms']['apm']['pscan_interval']    = 1800000
@@ -660,6 +697,7 @@ default['opennms']['log4j2']['actiond'] = "WARN"
 default['opennms']['log4j2']['alarmd'] = "WARN"
 default['opennms']['log4j2']['asterisk_gateway'] = "WARN"
 default['opennms']['log4j2']['archiver'] = "WARN"
+default['opennms']['log4j2']['bsmd'] = "WARN"
 default['opennms']['log4j2']['capsd'] = "WARN"
 default['opennms']['log4j2']['collectd'] = "WARN"
 default['opennms']['log4j2']['correlator'] = "WARN"
@@ -691,6 +729,7 @@ default['opennms']['log4j2']['syslogd'] = "WARN"
 default['opennms']['log4j2']['threshd'] = "WARN"
 default['opennms']['log4j2']['tl1d'] = "WARN"
 default['opennms']['log4j2']['trapd'] = "WARN"
+default['opennms']['log4j2']['trouble_ticketer'] = "WARN"
 default['opennms']['log4j2']['vacuumd'] = "WARN"
 default['opennms']['log4j2']['web'] = "WARN"
 default['opennms']['log4j2']['xmlrpcd'] = "WARN"

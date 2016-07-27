@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<javamail-configuration xmlns:this="http://xmlns.opennms.org/xsd/config/javamail-configuration" 
+                        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+                        xsi:schemaLocation="http://xmlns.opennms.org/xsd/config/javamail-configuration "
+                        default-read-config-name="<%=@default_read_config_name%>" default-send-config-name="<%=@default_send_config_name%>" >
+
+  <!-- Sample localhost configuration using POP3 and SMTP -->
+
+  <sendmail-config name="<%=@default_send_config_name%>" 
+                   attempt-interval="<%=@ds_attempt_interval%>" use-authentication="<%=@ds_use_authentication%>" use-jmta="<%=@ds_use_jmta%>" 
+                   debug="<%=@ds_debug%>" >
+    <sendmail-host host="<%=@ds_host%>" port="<%=@ds_port%>"/>
+    
+    <!--  Subject and body are currently only used by the MTM -->
+    <sendmail-protocol char-set="<%=@ds_char_set%>" mailer="<%=@ds_mailer%>" 
+                       message-content-type="<%=@ds_content_type%>" message-encoding="<%=@ds_encoding%>" 
+                       quit-wait="<%=@ds_quit_wait%>" ssl-enable="<%=@ds_ssl_enable%>" start-tls="<%=@ds_start_tls%>" 
+                       transport="<%=@ds_transport%>"/>
+    <sendmail-message to="<%=@ds_to%>"
+                      from="<%=@ds_from%>" 
+                      subject="<%=@ds_subject%>"  
+                      body="<%=@ds_body%>" />
+                      
+    <user-auth user-name="<%=@ds_user%>" password="<%=@ds_password%>" />
+  </sendmail-config>
+
+  <!-- Sample gmail configuration using SSL and IMAPS and SMTPS
+       If you want to use either of these as a default, change the default attributes in the root element.
+   -->
+  <sendmail-config name="google" attempt-interval="3000" use-authentication="true" use-jmta="true" debug="true" >
+  
+    <sendmail-host host="smtp.gmail.com" port="465"/>
+
+    <sendmail-protocol char-set="us-ascii" mailer="smtpsend" 
+                       message-content-type="text/plain" message-encoding="7-bit" 
+                       quit-wait="true" ssl-enable="true" start-tls="false" 
+                       transport="smtps"/>
+
+    <sendmail-message to="noc@networksRus.com"
+                      from="networksRusNOC@gmail.com" 
+                      subject="OpenNMS Test Message"  
+                      body="This is an OpenNMS test message." />
+
+    <user-auth user-name="networksRusNOC" password="w00t" />
+    
+  </sendmail-config>
+
+  
+  <readmail-config name="<%=@default_read_config_name%>" 
+                   attempt-interval="<%=@dr_attempt_interval%>" delete-all-mail="<%=@dr_delete_all_mail%>" mail-folder="<%=@dr_mail_folder%>" 
+                   debug="<%=@dr_debug%>" >
+<% @dr_properties.each do |n,v| -%>
+    <javamail-property name="<%=n%>" value="<%=v%>"/>
+<% end -%>
+    <readmail-host host="<%=@dr_host%>" port="<%=@dr_port%>">
+      <readmail-protocol ssl-enable="<%=@dr_ssl_enable%>" start-tls="<%=@dr_start_tls%>"
+                         transport="<%=@dr_transport%>"/>
+    </readmail-host>
+    <user-auth user-name="<%=@dr_user%>" password="<%=@dr_password%>" />
+  </readmail-config>
+  
+  <readmail-config name="google" attempt-interval="1000" delete-all-mail="false" mail-folder="INBOX" debug="true" >
+  
+    <readmail-host host="imap.gmail.com" port="993">
+      <readmail-protocol ssl-enable="true" start-tls="true" transport="imaps"/>
+    </readmail-host>
+
+    <user-auth user-name="networksRusNOC" password="w00t" />
+    
+  </readmail-config>
+    
+  <end2end-mail-config name="default" readmail-config-name="<%=@default_read_config_name%>" sendmail-config-name="<%=@default_send_config_name%>" />
+  
+</javamail-configuration>

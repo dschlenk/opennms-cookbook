@@ -1,0 +1,87 @@
+################################################################################
+# This file is the configuration for the the JavaMailer class.  It is used to
+# specify the details of the JavaMailer system properties
+################################################################################
+#
+# Properties are defined but commented out indicating the default values.
+#
+
+#
+# This property defines system sender account.
+#
+# The default setting is root@[127.0.0.1]
+#org.opennms.core.utils.fromAddress=root@[127.0.0.1]
+<% if ! @from_address.nil? -%>
+org.opennms.core.utils.fromAddress=<%=@from_address%>
+<% end -%>
+
+#
+# These properties define the SMTP Host.
+#
+#org.opennms.core.utils.mailHost=127.0.0.1
+<% if ! @mail_host.nil? -%>
+org.opennms.core.utils.mailHost=<%=@mail_host%>
+<% end -%>
+#org.opennms.core.utils.mailer=smtpsend
+<% if ! @mailer.nil? -%>
+org.opennms.core.utils.mailer=<%=@mailer%>
+<% end -%>
+#org.opennms.core.utils.transport=smtp
+<% if ! @transport.nil? -%>
+org.opennms.core.utils.transport=<%=@transport%>
+<% end -%>
+#org.opennms.core.utils.debug=true
+<% if ! @debug.nil? -%>
+org.opennms.core.utils.debug=<%=@debug%>
+<% end -%>
+#org.opennms.core.utils.smtpport=25
+<% if ! @smtpport.nil? -%>
+org.opennms.core.utils.smtpport=<%=@smtpport%>
+<% end -%>
+#org.opennms.core.utils.smtpssl.enable=false
+<% if ! @smtpssl.nil? -%>
+org.opennms.core.utils.smtpssl.enable=<%=@smtpssl%>
+<% end -%>
+#org.opennms.core.utils.quitwait=true
+<% if ! @quitwait.nil? -%>
+org.opennms.core.utils.quitwait=<%=@quitwait%>
+<% end -%>
+#
+# This property controls the use of the JMTA
+# if it is true, mailHost will be ignored
+<% if ! @use_JMTA.nil? -%>
+org.opennms.core.utils.useJMTA=<%=@use_JMTA%>
+<% else -%>
+org.opennms.core.utils.useJMTA=false
+<% end -%>
+#
+# These properties define the Mail authentication.
+#
+#org.opennms.core.utils.authenticate=false
+<% if ! @authenticate.nil? -%>
+org.opennms.core.utils.authenticate=<%=@authenticate%>
+<% end -%>
+#org.opennms.core.utils.authenticateUser=opennms
+<% if ! @authenticate_user.nil? -%>
+org.opennms.core.utils.authenticateUser=<%=@authenticate_user%>
+<% end -%>
+#org.opennms.core.utils.authenticatePassword=opennms
+<% if ! @authenticate_password.nil? -%>
+org.opennms.core.utils.authenticatePassword=<%=@authenticate_password%>
+<% end -%>
+#org.opennms.core.utils.starttls.enable=false
+<% if ! @starttls.nil? -%>
+org.opennms.core.utils.starttls.enable=<%=@starttls%>
+<% end -%>
+
+#
+# These properties configure message content
+#
+#org.opennms.core.utils.messageContentType=text/plain
+<% if ! @message_content_type.nil? -%>
+org.opennms.core.utils.messageContentType=<%=@message_content_type%>
+<% end -%>
+#org.opennms.core.utils.charset=us-ascii
+<% if ! @charset.nil? -%>
+org.opennms.core.utils.charset=<%=@charset%>
+<% end -%>

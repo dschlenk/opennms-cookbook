@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?><discovery-configuration initial-sleep-time="<%= @init_sleep_ms %>" packets-per-second="<%= @pps %>" restart-sleep-time="<%= @restart_sleep_ms %>" retries="<%= @retries %>" timeout="<%= @timeout %>"<% if @foreign_source -%>foreign-source="<%= @foreign_source %><% end -%>>
+
+    <!-- see examples/discovery-configuration.xml for options
+    <include-range>
+        <begin>192.168.0.1</begin>
+        <end>192.168.0.254</end>
+    </include-range>
+    -->
+
+</discovery-configuration>
