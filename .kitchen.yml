@@ -190,3 +190,9 @@ suites:
     attributes:
       opennms:
         version: "17.1.1-1"
+  - name: grafana
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[opennms::notemplates]
+      - recipe[opennms::grafana]
+      - recipe[onms_lwrp_test::webopts]
