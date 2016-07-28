@@ -1897,3 +1897,7 @@ default['opennms']['xmpp']['truststore_password'] = nil
 default['opennms']['xmpp']['debug']               = nil
 default['opennms']['xmpp']['user']                = nil
 default['opennms']['xmpp']['pass']                = nil
+# web.xml
+default['opennms']['web']['cookbook'] = 'opennms'
+default['opennms']['cors']['origins']     = '*'
+default['opennms']['cors']['credentials'] = true

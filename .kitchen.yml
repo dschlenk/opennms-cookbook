@@ -2,12 +2,14 @@
 driver:
   name: vagrant
   network:
-    - ["forwarded_port", {guest: 8980, host: 8988}]
+    - ["forwarded_port", {guest: 8980, host: 8980, auto_correct: true}]
+    - ["forwarded_port", {guest: 3000, host: 3000, auto_correct: true}]
   customize: 
     memory: 1024
 
 provisioner:
   name: chef_zero
+  http_proxy: http://10.0.2.2:3128
 #  log_level: debug
 
 platforms:
@@ -179,3 +181,12 @@ suites:
     run_list:
       - recipe[opennms::postgres]
       - recipe[opennms::notemplates]
+  - name: grafana_17
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[opennms::notemplates]
+      - recipe[opennms::grafana]
+      - recipe[onms_lwrp_test::webopts]
+    attributes:
+      opennms:
+        version: "17.1.1-1"
