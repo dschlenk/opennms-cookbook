@@ -207,7 +207,7 @@ template "#{onms_home}/etc/xml-datacollection-config.xml" do
     threegpp_full_15min: node['opennms']['xml']['threegpp_full_15min'],
     threegpp_sample: node['opennms']['xml']['threegpp_sample']
   )
-  only_if node['opennms']['plugin']['xml']
+  only_if { node['opennms']['plugin']['xml'] }
 end
 
 template "#{onms_home}/etc/nsclient-datacollection-config.xml" do
@@ -231,7 +231,7 @@ template "#{onms_home}/etc/nsclient-datacollection-config.xml" do
     live: node['opennms']['nsclient_datacollection']['default']['live'],
     mailmarshal: node['opennms']['nsclient_datacollection']['default']['mailmarshal']
   )
-  only_if node['opennms']['plugin']['nsclient']
+  only_if { node['opennms']['plugin']['nsclient'] }
 end
 
 template "#{onms_home}/etc/discovery-configuration.xml" do
@@ -398,6 +398,25 @@ template "#{onms_home}/etc/jdbc-datacollection-config.xml" do
   )
 end
 
+template "#{onms_home}/etc/jms-northbounder-configuration.xml" do
+  source "#{template_dir}jms-northbounder-configuration.xml.erb"
+  cookbook node['opennms']['jms_nbi']['cookbook']
+  owner 'root'
+  group 'root'
+  variables(
+    enabled: node['opennms']['jms_nbi']['enabled'],
+    nagles_delay: node['opennms']['jms_nbi']['nagles_delay'],
+    batch_size: node['opennms']['jms_nbi']['batch_size'],
+    queue_size: node['opennms']['jms_nbi']['queue_size'],
+    message_format: node['opennms']['jms_nbi']['message_format'],
+    jms_destination: node['opennms']['jms_nbi']['jms_destination'],
+    send_as_object_message: node['opennms']['jms_nbi']['send_as_object_message'],
+    first_occurrence_only: node['opennms']['jms_nbi']['first_occurrence_only']
+  )
+  notifies :restart, 'service[opennms]'
+  not_if { node['opennms']['version_major'].to_i == 16 }
+end
+
 template "#{onms_home}/etc/jmx-datacollection-config.xml" do
   cookbook node['opennms']['jmx_dc']['cookbook']
   source "#{template_dir}jmx-datacollection-config.xml.erb"
@@ -442,7 +461,7 @@ template "#{onms_home}/etc/linkd-configuration.xml" do
     vlan_cisco: node['opennms']['linkd']['vlan']['enable_cisco'],
     vlan_extreme: node['opennms']['linkd']['vlan']['enable_extreme']
   )
-  only_if node['opennms']['version_major'] == '16'
+  only_if { node['opennms']['version_major'] == '16' }
 end
 
 template "#{onms_home}/etc/magic-users.properties" do
@@ -501,7 +520,7 @@ template "#{onms_home}/etc/map.properties" do
     severity: node['opennms']['map']['severity'],
     enable: node['opennms']['map']['enable']
   )
-  only_if node['opennms']['version_major'] == '16'
+  only_if { node['opennms']['version_major'] == '16' }
 end
 
 template "#{onms_home}/etc/microblog-configuration.xml" do
@@ -532,7 +551,7 @@ template "#{onms_home}/etc/model-importer.properties" do
     requisition_dir: node['opennms']['importer']['requisition_dir'],
     foreign_source_dir: node['opennms']['importer']['foreign_source_dir']
   )
-  not_if node['opennms']['version_major'] == '18'
+  not_if { node['opennms']['version_major'] == '18' }
 end
 
 template "#{onms_home}/etc/modemConfig.properties" do
@@ -1229,7 +1248,7 @@ template "#{onms_home}/etc/snmp-graph.properties.d/fortinet-graph.properties" do
   variables(
     enabled: node['opennms']['snmp_graph']['fortinet']['enabled']
   )
-  only_if node['opennms']['version_major'] == '16'
+  only_if { node['opennms']['version_major'] == '16' }
 end
 
 template "#{onms_home}/etc/snmp-graph.properties.d/foundry-graph.properties" do
@@ -2104,7 +2123,7 @@ template "#{onms_home}/etc/users.xml" do
   variables(
     name: node['opennms']['users']['admin']['name'],
     user_comments: node['opennms']['users']['admin']['user_comments'],
-    password: node['opennms']['users']['admin']['password']
+    password: node['opennms']['users']['admin']['pwhash']
   )
 end
 

@@ -996,3 +996,12 @@ org.opennms.grafanaBox.connectionTimeout=<%=node['opennms']['properties']['grafa
 <% if node['opennms']['properties']['grafana']['show'] -%>
 org.opennms.grafanaBox.soTimeout=<%=node['opennms']['properties']['grafana']['so_timeout'] -%>
 <% end -%>
+<% if node['opennms']['properties']['jms_nbi']['broker_url'] -%>
+opennms.alarms.northbound.jms.activemq.brokerURL=<%=node['opennms']['properties']['jms_nbi']['broker_url']%>
+<% end -%>
+<% if node['opennms']['properties']['jms_nbi']['activemq_username'] -%>
+opennms.alarms.northbound.jms.activemq.userName=<%=node['opennms']['properties']['jms_nbi']['username']%>
+<% end -%>
+<% if node['opennms']['properties']['jms_nbi']['broker_url'] -%>
+opennms.alarms.northbound.jms.activemq.password=<%=node['opennms']['properties']['jms_nbi']['password']%>
+<% end -%>

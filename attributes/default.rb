@@ -174,6 +174,10 @@ default['opennms']['properties']['jetty']['key_password']           = nil
 default['opennms']['properties']['jetty']['cert_alias']             = nil
 default['opennms']['properties']['jetty']['exclude_cipher_suites']  = nil
 default['opennms']['properties']['jetty']['https_baseurl']          = nil
+# JMS NB
+default['opennms']['properties']['jms_nbi']['broker_url'] = nil
+default['opennms']['properties']['jms_nbi']['activemq_username'] = nil
+default['opennms']['properties']['jms_nbi']['activemq_password'] = nil
 # UI
 default['opennms']['properties']['ui']['acls']                        = nil
 default['opennms']['properties']['ui']['ack']                         = false
@@ -638,6 +642,16 @@ default['opennms']['jdbc_dc']['pgsql']['rrd']['step']     = 300
 default['opennms']['jdbc_dc']['pgsql']['rrd']['rras']     = ['RRA:AVERAGE:0.5:1:2016', 'RRA:AVERAGE:0.5:12:1488', 'RRA:AVERAGE:0.5:288:366', 'RRA:MAX:0.5:288:366', 'RRA:MIN:0.5:288:366']
 default['opennms']['jdbc_dc']['pgsql']['tablespace_size'] = true
 default['opennms']['jdbc_dc']['pgsql']['stat_database']   = true
+# jms-northbounder-config.xml
+default['opennms']['jms_nbi']['cookbook']               = 'opennms'
+default['opennms']['jms_nbi']['enabled']                = false
+default['opennms']['jms_nbi']['nagles_delay']           = 1000
+default['opennms']['jms_nbi']['batch_size']             = 100
+default['opennms']['jms_nbi']['queue_size']             = 300_000
+default['opennms']['jms_nbi']['message_format']         = 'ALARM ID:${alarmId} NODE:${nodeLabel}; ${logMsg}'
+default['opennms']['jms_nbi']['send_as_object_message'] = false
+default['opennms']['jms_nbi']['first_occurence_only']   = true
+default['opennms']['jms_nbi']['jms_destination']        = 'SingleAlarmQueue'
 # jmx-datacollection-config.xml
 default['opennms']['jmx_dc']['cookbook'] = node['opennms']['default_template_cookbook']
 default['opennms']['jmx_dc']['rrd_repository']       = "#{default['opennms']['conf']['home']}/share/rrd/snmp/"
