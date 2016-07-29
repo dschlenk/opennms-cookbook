@@ -500,7 +500,7 @@ module Provision
   end
 
   def baseurl(node)
-    "http://admin:admin@localhost:#{node['opennms']['properties']['jetty']['port']}/opennms/rest"
+    "http://admin:#{node['opennms']['users']['admin']['password']}@localhost:#{node['opennms']['properties']['jetty']['port']}/opennms/rest"
   end
 
   def default_foreign_source(node)

@@ -43,6 +43,17 @@ default['opennms']['templates'] = true
 default['opennms']['plugin']['xml'] = false
 default['opennms']['plugin']['nsclient'] = false
 default['opennms']['addl_handlers'] = []
+# change to true to generate a random password
+default['opennms']['secure_admin'] = false
+# users.xml
+default['opennms']['users']['cookbook'] = node['opennms']['default_template_cookbook']
+default['opennms']['users']['admin']['name']          = 'Administrator'
+default['opennms']['users']['admin']['user_comments'] = 'Default administrator, do not delete'
+# if you want to change the admin password to something specific you
+# only need to change the password attribute - the hash will then get
+# changed for you.
+default['opennms']['users']['admin']['password']      = 'admin'
+default['opennms']['users']['admin']['pwhash']        = '21232F297A57A5A743894A0E4A801FC3'
 # opennms.conf
 default['opennms']['conf']['cookbook']       = node['opennms']['default_template_cookbook']
 default['opennms']['conf']['home']           = '/opt/opennms'
@@ -163,6 +174,10 @@ default['opennms']['properties']['jetty']['key_password']           = nil
 default['opennms']['properties']['jetty']['cert_alias']             = nil
 default['opennms']['properties']['jetty']['exclude_cipher_suites']  = nil
 default['opennms']['properties']['jetty']['https_baseurl']          = nil
+# JMS NB
+default['opennms']['properties']['jms_nbi']['broker_url'] = nil
+default['opennms']['properties']['jms_nbi']['activemq_username'] = nil
+default['opennms']['properties']['jms_nbi']['activemq_password'] = nil
 # UI
 default['opennms']['properties']['ui']['acls']                        = nil
 default['opennms']['properties']['ui']['ack']                         = false
@@ -627,6 +642,16 @@ default['opennms']['jdbc_dc']['pgsql']['rrd']['step']     = 300
 default['opennms']['jdbc_dc']['pgsql']['rrd']['rras']     = ['RRA:AVERAGE:0.5:1:2016', 'RRA:AVERAGE:0.5:12:1488', 'RRA:AVERAGE:0.5:288:366', 'RRA:MAX:0.5:288:366', 'RRA:MIN:0.5:288:366']
 default['opennms']['jdbc_dc']['pgsql']['tablespace_size'] = true
 default['opennms']['jdbc_dc']['pgsql']['stat_database']   = true
+# jms-northbounder-config.xml
+default['opennms']['jms_nbi']['cookbook']               = 'opennms'
+default['opennms']['jms_nbi']['enabled']                = false
+default['opennms']['jms_nbi']['nagles_delay']           = 1000
+default['opennms']['jms_nbi']['batch_size']             = 100
+default['opennms']['jms_nbi']['queue_size']             = 300_000
+default['opennms']['jms_nbi']['message_format']         = 'ALARM ID:${alarmId} NODE:${nodeLabel}; ${logMsg}'
+default['opennms']['jms_nbi']['send_as_object_message'] = false
+default['opennms']['jms_nbi']['first_occurence_only']   = true
+default['opennms']['jms_nbi']['jms_destination']        = 'SingleAlarmQueue'
 # jmx-datacollection-config.xml
 default['opennms']['jmx_dc']['cookbook'] = node['opennms']['default_template_cookbook']
 default['opennms']['jmx_dc']['rrd_repository']       = "#{default['opennms']['conf']['home']}/share/rrd/snmp/"
@@ -1203,7 +1228,7 @@ default['opennms']['poller']['example1']['opennms_jvm']['timeout']        = 3000
 default['opennms']['poller']['example1']['opennms_jvm']['port']           = 18_980
 default['opennms']['poller']['example1']['opennms_jvm']['factory']        = 'PASSWORD-CLEAR'
 default['opennms']['poller']['example1']['opennms_jvm']['username']       = 'admin'
-default['opennms']['poller']['example1']['opennms_jvm']['password']       = 'admin'
+default['opennms']['poller']['example1']['opennms_jvm']['password']       = node['opennms']['users']['admin']['password']
 default['opennms']['poller']['example1']['opennms_jvm']['rrd_repository'] = "#{default['opennms']['conf']['home']}/share/rrd/response"
 default['opennms']['poller']['example1']['opennms_jvm']['ds_name']        = 'opennms-jvm'
 default['opennms']['poller']['example1']['opennms_jvm']['friendly_name']  = 'opennms-jvm'
@@ -1696,11 +1721,6 @@ default['opennms']['translator']['juniper_cfg_change'] = true
 default['opennms']['trapd']['cookbook'] = node['opennms']['default_template_cookbook']
 default['opennms']['trapd']['port']        = 162
 default['opennms']['trapd']['new_suspect'] = false
-# users.xml
-default['opennms']['users']['cookbook'] = node['opennms']['default_template_cookbook']
-default['opennms']['users']['admin']['name']          = 'Administrator'
-default['opennms']['users']['admin']['user_comments'] = 'Default administrator, do not delete'
-default['opennms']['users']['admin']['password']      = '21232F297A57A5A743894A0E4A801FC3'
 # vacuumd-configuration.xml
 default['opennms']['vacuumd']['cookbook'] = node['opennms']['default_template_cookbook']
 default['opennms']['vacuumd']['period']                             = 86_400_000
@@ -1897,3 +1917,7 @@ default['opennms']['xmpp']['truststore_password'] = nil
 default['opennms']['xmpp']['debug']               = nil
 default['opennms']['xmpp']['user']                = nil
 default['opennms']['xmpp']['pass']                = nil
+# web.xml
+default['opennms']['web']['cookbook'] = 'opennms'
+default['opennms']['cors']['origins']     = '*'
+default['opennms']['cors']['credentials'] = true

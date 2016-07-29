@@ -969,19 +969,19 @@ org.opennms.grafanaBox.show=true
 # If the box is enabled you also need to specify hostname of the grafana server
 #org.opennms.grafanaBox.hostname=localhost
 <% if node['opennms']['properties']['grafana']['show'] -%>
-org.opennms.grafanaBox.hostname=<%=node['opennms']['properties']['grafana']['hostname'] -%>
+org.opennms.grafanaBox.hostname=<%=node['opennms']['properties']['grafana']['hostname']%>
 <% end -%>
 #
 # And also the port of the grafana server
 #org.opennms.grafanaBox.port=3000
 <% if node['opennms']['properties']['grafana']['show'] -%>
-org.opennms.grafanaBox.port=<%=node['opennms']['properties']['grafana']['port'] -%>
+org.opennms.grafanaBox.port=<%=node['opennms']['properties']['grafana']['port']%>
 <% end -%>
 #
 # The API key is needed for the ReST calls to work
 #org.opennms.grafanaBox.apiKey=
-<% if node['opennms']['properties']['grafana']['show'] -%>
-org.opennms.grafanaBox.apiKey=<%=node['opennms']['properties']['grafana']['api_key'] -%>
+<% if node['opennms']['properties']['grafana']['show']  && node['opennms']['properties']['grafana']['api_key'] != '' && (!node['recipes'].include?('opennms::grafana') || node['opennms']['version_major'].to_i < 18) -%>
+org.opennms.grafanaBox.apiKey=<%=node['opennms']['properties']['grafana']['api_key']%>
 <% end -%>
 #
 # When a tag is specified only dashboards with this given tag
@@ -989,21 +989,21 @@ org.opennms.grafanaBox.apiKey=<%=node['opennms']['properties']['grafana']['api_k
 # be displayed.
 #org.opennms.grafanaBox.tag=
 <% if node['opennms']['properties']['grafana']['show'] -%>
-org.opennms.grafanaBox.tag=<%=node['opennms']['properties']['grafana']['tag'] -%>
+org.opennms.grafanaBox.tag=<%=node['opennms']['properties']['grafana']['tag']%>
 <% end -%>
 #
 # The protocol for the ReST call can also be specified
 #org.opennms.grafanaBox.protocol=http
 <% if node['opennms']['properties']['grafana']['show'] -%>
-org.opennms.grafanaBox.protocol=<%=node['opennms']['properties']['grafana']['protocol'] -%>
+org.opennms.grafanaBox.protocol=<%=node['opennms']['properties']['grafana']['protocol']%>
 <% end -%>
 #
 # Timeouts for contacting the grafana server
 #org.opennms.grafanaBox.connectionTimeout=500
 <% if node['opennms']['properties']['grafana']['show'] -%>
-org.opennms.grafanaBox.connectionTimeout=<%=node['opennms']['properties']['grafana']['connection_timeout'] -%>
+org.opennms.grafanaBox.connectionTimeout=<%=node['opennms']['properties']['grafana']['connection_timeout']%>
 <% end -%>
 #org.opennms.grafanaBox.soTimeout=500
 <% if node['opennms']['properties']['grafana']['show'] -%>
-org.opennms.grafanaBox.soTimeout=<%=node['opennms']['properties']['grafana']['so_timeout'] -%>
+org.opennms.grafanaBox.soTimeout=<%=node['opennms']['properties']['grafana']['so_timeout']%>
 <% end -%>

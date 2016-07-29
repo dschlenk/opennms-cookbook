@@ -61,3 +61,17 @@ template "#{onms_home}/etc/log4j2.xml" do
     log: node['opennms']['log4j2']
   )
 end
+
+template "#{onms_home}/jetty-webapps/opennms/WEB-INF/web.xml" do
+  cookbook node['opennms']['web']['cookbook']
+  source "#{template_dir}web.xml.erb"
+  mode 00664
+  owner 'root'
+  group 'root'
+  notifies :restart, 'service[opennms]'
+  variables(
+    origins: node['opennms']['cors']['origins'],
+    credentials: node['opennms']['cors']['credentials']
+  )
+  not_if node['opennms']['version_major'].to_i < 17
+end

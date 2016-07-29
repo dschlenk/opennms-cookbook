@@ -51,6 +51,14 @@ execute 'install' do
   command "#{onms_home}/bin/install -dis"
 end
 
+# If you want a random password, just set secure_admin to true.
+# If you want to set the admin password yourself, populate
+# node['opennms']['users']['admin']['password'] with your password
+# and let the cookbook caclulate the hash and set it for you.
+if node['opennms']['secure_admin'] || node['opennms']['users']['admin']['password'] != 'admin'
+  include_recipe 'opennms::adminpw'
+end
+
 include_recipe 'opennms::base_templates'
 include_recipe 'opennms::templates' if node['opennms']['templates']
 

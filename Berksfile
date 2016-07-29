@@ -1,6 +1,9 @@
-source 'https://api.berkshelf.com'
+source 'https://supermarket.chef.io'
 
 metadata
+cookbook 'grafana', git: 'https://github.com/dschlenk/chef-grafana'
+# cookbook 'grafana', path: '/Users/schlazor/git/chef-grafana'
+
 group :integration do
   cookbook 'yum-centos'
   cookbook 'yum-epel'

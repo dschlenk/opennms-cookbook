@@ -1,4 +1,4 @@
-include Rbac
+include Opennms::Rbac
 def whyrun_supported?
   true
 end
