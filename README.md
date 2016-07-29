@@ -21,6 +21,8 @@ Requirements
   * hostsfile
   * build-essential
   * postgresql 
+  * grafana ([my fork](https://github.com/dschlenk/chef-grafana]) for now)
+  * openssl
 
 * In OpenNMS 17+ you will need a newer PostgreSQL than CentOS 6.x provides. Also, using Chef to install PostgreSQL makes tuning a lot easier. While you're free to install PostgreSQL in whatever manner pleases you, there is a `postgres` recipe that installs 9.3 from pgdg and does some basic tuning.
 
@@ -113,6 +115,8 @@ we want anyway, so we just overwrite the old file with the `rpmnew` version.
 
 * `opennms::default` Installs and configures OpenNMS with the standard configuration modified with any node attribute values changed from their defaults.
 * `opennms::notemplates` Everything default does except minimal templates are used - etc/opennms.conf, etc/opennms.properties and etc/log4j2.xml. Use this recipe if you intend to use any of the LWRPs in this cookbook.
+* `opennms::grafana` Installs [Grafana](http://grafana.org/) server and configures it for use with OpenNMS. Also turns on the Dashboard list box on the OpenNMS front page. Optionally changes admin password to a specific or randomly generated one.
+* `opennms::rrdtool` Installs rrdtool and configures OpenNMS to use it rather than JRobin for metrics storage.
 
 #### Deprecated
 The following recipes are deprecated. The preferred method to install these packages is by setting `node[:opennms][:plugin][:nsclient]` and/or `node[:opennms][:plugin][:xml]` to true. All these recipes do now is set those attributes at the default level. 
@@ -415,6 +419,10 @@ This is useful for something I'm sure, but I don't know what. See the template o
 #### etc/jdbc-datacollection-config.xml 
 
 Similar to other datacollection-config.xml files, you can change the RRD repository, step, RRA definitions and disable default collections and their queries.
+
+#### etc/jms-northbounder-configuration.xml
+
+Configures the JMS Northbounder introduced in version 17.0.0. See the default attributes under the `jms_nbi` key for configuration options. You may also need to set some JMS related attributes under the `properties` key.
 
 #### etc/jmx-datacollection-config.xml 
 
