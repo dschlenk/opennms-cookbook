@@ -1,7 +1,6 @@
 DEPENDENCIES
   grafana
-    git: https://github.com/dschlenk/chef-grafana
-    revision: e33d28299cf16a5dd6d42d2dc1f8c348f183eb3f
+    path: ../chef-grafana
   onms_lwrp_test
     path: test/fixtures/cookbooks/onms_lwrp_test
   opennms

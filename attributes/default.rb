@@ -43,6 +43,17 @@ default['opennms']['templates'] = true
 default['opennms']['plugin']['xml'] = false
 default['opennms']['plugin']['nsclient'] = false
 default['opennms']['addl_handlers'] = []
+# change to true to generate a random password
+default['opennms']['secure_admin'] = false
+# users.xml
+default['opennms']['users']['cookbook'] = node['opennms']['default_template_cookbook']
+default['opennms']['users']['admin']['name']          = 'Administrator'
+default['opennms']['users']['admin']['user_comments'] = 'Default administrator, do not delete'
+# if you want to change the admin password to something specific you
+# only need to change the password attribute - the hash will then get
+# changed for you.
+default['opennms']['users']['admin']['password']      = 'admin'
+default['opennms']['users']['admin']['pwhash']        = '21232F297A57A5A743894A0E4A801FC3'
 # opennms.conf
 default['opennms']['conf']['cookbook']       = node['opennms']['default_template_cookbook']
 default['opennms']['conf']['home']           = '/opt/opennms'
@@ -1203,7 +1214,7 @@ default['opennms']['poller']['example1']['opennms_jvm']['timeout']        = 3000
 default['opennms']['poller']['example1']['opennms_jvm']['port']           = 18_980
 default['opennms']['poller']['example1']['opennms_jvm']['factory']        = 'PASSWORD-CLEAR'
 default['opennms']['poller']['example1']['opennms_jvm']['username']       = 'admin'
-default['opennms']['poller']['example1']['opennms_jvm']['password']       = 'admin'
+default['opennms']['poller']['example1']['opennms_jvm']['password']       = node['opennms']['users']['admin']['password']
 default['opennms']['poller']['example1']['opennms_jvm']['rrd_repository'] = "#{default['opennms']['conf']['home']}/share/rrd/response"
 default['opennms']['poller']['example1']['opennms_jvm']['ds_name']        = 'opennms-jvm'
 default['opennms']['poller']['example1']['opennms_jvm']['friendly_name']  = 'opennms-jvm'
@@ -1696,11 +1707,6 @@ default['opennms']['translator']['juniper_cfg_change'] = true
 default['opennms']['trapd']['cookbook'] = node['opennms']['default_template_cookbook']
 default['opennms']['trapd']['port']        = 162
 default['opennms']['trapd']['new_suspect'] = false
-# users.xml
-default['opennms']['users']['cookbook'] = node['opennms']['default_template_cookbook']
-default['opennms']['users']['admin']['name']          = 'Administrator'
-default['opennms']['users']['admin']['user_comments'] = 'Default administrator, do not delete'
-default['opennms']['users']['admin']['password']      = '21232F297A57A5A743894A0E4A801FC3'
 # vacuumd-configuration.xml
 default['opennms']['vacuumd']['cookbook'] = node['opennms']['default_template_cookbook']
 default['opennms']['vacuumd']['period']                             = 86_400_000

@@ -9,7 +9,7 @@ driver:
 
 provisioner:
   name: chef_zero
-  http_proxy: http://10.0.2.2:3128
+#  http_proxy: http://10.0.2.2:3128
 #  log_level: debug
 
 platforms:
@@ -196,3 +196,35 @@ suites:
       - recipe[opennms::notemplates]
       - recipe[opennms::grafana]
       - recipe[onms_lwrp_test::webopts]
+    attributes:
+      opennms:
+        users:
+          admin:
+            password: devjam
+      grafana:
+        users:
+          admin:
+            password: superSecret
+  - name: grafana_autogen
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[opennms::notemplates]
+      - recipe[opennms::grafana]
+    attributes:
+      opennms:
+        secure_admin: true
+  - name: rrdtool_grafana
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[opennms::notemplates]
+      - recipe[opennms::rrdtool]
+      - recipe[opennms::grafana]
+    attributes:
+      opennms:
+        users:
+          admin:
+            password: devjam
+      grafana:
+        users:
+          admin:
+            password: superSecret
