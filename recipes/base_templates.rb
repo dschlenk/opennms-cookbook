@@ -73,5 +73,5 @@ template "#{onms_home}/jetty-webapps/opennms/WEB-INF/web.xml" do
     origins: node['opennms']['cors']['origins'],
     credentials: node['opennms']['cors']['credentials']
   )
-  not_if node['opennms']['version_major'].to_i < 17
+  not_if { node['opennms']['version_major'].to_i < 17 }
 end
