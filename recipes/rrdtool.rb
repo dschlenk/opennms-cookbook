@@ -27,7 +27,7 @@ node.default['opennms']['rrd']['interface_jar'] = '/usr/share/java/jrrd2.jar'
 node.default['opennms']['rrd']['jrrd'] = '/usr/lib64/libjrrd2.so'
 
 template "#{node['opennms']['conf']['home']}/etc/rrd-configuration.properties" do
-  source "horizon-#{node['opennms']['version_major']}/rrd-configuration.properties.erb"
+  source "horizon-#{Opennms::Helpers.major(node['opennms']['version'])}/rrd-configuration.properties.erb"
   cookbook 'opennms'
   mode 0664
   owner 'root'

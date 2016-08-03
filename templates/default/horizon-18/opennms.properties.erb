@@ -758,7 +758,7 @@ opennms.poller.server.registryPort=<%=@properties['remote']['pb_registry_port']%
 
 ###### JasperReports Properties ######
 # Defines the Version of the Jasperreports library
-org.opennms.jasperReportsVersion=<%=@properties['reporting']['jasper_version']%>
+org.opennms.jasperReportsVersion=<%=@properties['reporting']['jasper_version'] % {version: node['opennms']['version']}%>
 
 # Define if duplicates are ignored when using pie charts within a JasperReport template (*.jrxml) file.
 # See http://jasperreports.sourceforge.net/config.reference.html for more details.
@@ -980,7 +980,7 @@ org.opennms.grafanaBox.port=<%=node['opennms']['properties']['grafana']['port']%
 #
 # The API key is needed for the ReST calls to work
 #org.opennms.grafanaBox.apiKey=
-<% if node['opennms']['properties']['grafana']['show']  && node['opennms']['properties']['grafana']['api_key'] != '' && (!node['recipes'].include?('opennms::grafana') || node['opennms']['version_major'].to_i < 18) -%>
+<% if node['opennms']['properties']['grafana']['show']  && node['opennms']['properties']['grafana']['api_key'] != '' && (!node['recipes'].include?('opennms::grafana') || node['opennms']['version_major'] % {version: node['opennms']['version']}.to_i < 18) -%>
 org.opennms.grafanaBox.apiKey=<%=node['opennms']['properties']['grafana']['api_key']%>
 <% end -%>
 #

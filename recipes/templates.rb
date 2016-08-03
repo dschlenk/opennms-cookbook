@@ -20,8 +20,9 @@ onms_home = node['opennms']['conf']['home']
 onms_home ||= '/opt/opennms'
 
 # don't make wrappers that change templates support multiple versions
+mv = Opennms::Helpers.major('%{version}')
 template_dir = if node['opennms']['conf']['cookbook'] == 'opennms'
-                 "horizon-#{node['opennms']['version_major']}/"
+                 "horizon-#{mv % { version: node['opennms']['version'] }}/"
                else
                  ''
                end
@@ -414,7 +415,7 @@ template "#{onms_home}/etc/jms-northbounder-configuration.xml" do
     first_occurrence_only: node['opennms']['jms_nbi']['first_occurrence_only']
   )
   notifies :restart, 'service[opennms]'
-  not_if { node['opennms']['version_major'].to_i == 16 }
+  not_if { Opennms::Helpers.major(node['opennms']['version']).to_i == 16 }
 end
 
 template "#{onms_home}/etc/jmx-datacollection-config.xml" do
@@ -461,7 +462,7 @@ template "#{onms_home}/etc/linkd-configuration.xml" do
     vlan_cisco: node['opennms']['linkd']['vlan']['enable_cisco'],
     vlan_extreme: node['opennms']['linkd']['vlan']['enable_extreme']
   )
-  only_if { node['opennms']['version_major'] == '16' }
+  only_if { Opennms::Helpers.major(node['opennms']['version']).to_i == '16' }
 end
 
 template "#{onms_home}/etc/magic-users.properties" do
@@ -520,7 +521,7 @@ template "#{onms_home}/etc/map.properties" do
     severity: node['opennms']['map']['severity'],
     enable: node['opennms']['map']['enable']
   )
-  only_if { node['opennms']['version_major'] == '16' }
+  only_if { Opennms::Helpers.major(node['opennms']['version']).to_i == 16 }
 end
 
 template "#{onms_home}/etc/microblog-configuration.xml" do
@@ -551,7 +552,7 @@ template "#{onms_home}/etc/model-importer.properties" do
     requisition_dir: node['opennms']['importer']['requisition_dir'],
     foreign_source_dir: node['opennms']['importer']['foreign_source_dir']
   )
-  not_if { node['opennms']['version_major'] == '18' }
+  not_if { Opennms::Helpers.major(node['opennms']['version']).to_i == 18 }
 end
 
 template "#{onms_home}/etc/modemConfig.properties" do
@@ -1248,7 +1249,7 @@ template "#{onms_home}/etc/snmp-graph.properties.d/fortinet-graph.properties" do
   variables(
     enabled: node['opennms']['snmp_graph']['fortinet']['enabled']
   )
-  only_if { node['opennms']['version_major'] == '16' }
+  only_if { Opennms::Helpers.major(node['opennms']['version']).to_i == 16 }
 end
 
 template "#{onms_home}/etc/snmp-graph.properties.d/foundry-graph.properties" do

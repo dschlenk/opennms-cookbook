@@ -519,7 +519,7 @@ module Provision
     require 'rest_client'
     begin
       node.run_state['foreign_sources'] ||=
-        if node['opennms']['version_major'].to_i > 16
+        if Opennms::Helpers.major(node['opennms']['version']).to_i > 16
           JSON.parse(RestClient.get("#{baseurl(node)}/foreignSources",
                                   accept: :json).to_str)['foreignSources']
         else

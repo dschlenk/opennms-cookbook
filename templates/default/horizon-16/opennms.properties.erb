@@ -744,7 +744,7 @@ opennms.poller.server.registryPort=<%=@properties['remote']['pb_registry_port']%
 
 
 ###### JASPER REPORTS VERSION  ######
-org.opennms.jasperReportsVersion=<%=@properties['reporting']['jasper_version']%>
+org.opennms.jasperReportsVersion=<%=@properties['reporting']['jasper_version'] % {version: node['opennms']['version']}%>
 
 ###### Web Console - Front Page ######
 # This value controls the content that will be displayed in the middle box of the front page.

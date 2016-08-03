@@ -75,7 +75,7 @@ ruby_block 'create API key for OpenNMS' do
     Opennms::Grafana.create_api_key(node)
   end
   notifies :create, "template[#{node['opennms']['conf']['home']}/etc/opennms.properties]", :immediately
-  notifies :create, 'file[grafana api key]', :immediately if node['opennms']['version_major'].to_i >= 18
+  notifies :create, 'file[grafana api key]', :immediately if Opennms::Helpers.major(node['opennms']['version']).to_i >= 18
   not_if do
     Opennms::Grafana.api_key?(node)
   end
