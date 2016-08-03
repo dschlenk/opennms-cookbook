@@ -43,12 +43,12 @@ def range_exists?(current_resource) # _name, range_begin, range_end, range_type,
   file = ::File.new("#{node['opennms']['conf']['home']}/etc/discovery-configuration.xml", 'r')
   doc = REXML::Document.new file
   if current_resource.foreign_source.nil?
-    if current_resource.location.nil? || node['opennms']['version_major'].to_i < 18
+    if current_resource.location.nil? || Opennms::Helpers.major(node['opennms']['version']).to_i < 18
       !doc.elements["/discovery-configuration/#{current_resource.range_type}-range/begin[text() ='#{current_resource.range_begin}']"].nil? && !doc.elements["/discovery-configuration/#{current_resource.range_type}-range/end[text() = '#{current_resource.range_end}']"].nil?
     else
       !doc.elements["/discovery-configuration/#{current_resource.range_type}-range/[@location = '#{current_resource.location}']/begin[text() ='#{current_resource.range_begin}']"].nil? && !doc.elements["/discovery-configuration/#{current_resource.range_type}-range/end[text() = '#{current_resource.range_end}']"].nil?
     end
-  elsif current_resource.location.nil? || node['opennms']['version_major'].to_i < 18
+  elsif current_resource.location.nil? || Opennms::Helpers.major(node['opennms']['version']).to_i < 18
     !doc.elements["/discovery-configuration/#{current_resource.range_type}-range[@foreign-source = '#{current_resource.foreign_source}']/begin[text() ='#{current_resource.range_begin}']"].nil? && !doc.elements["/discovery-configuration/#{current_resource.range_type}-range[@foreign-source = '#{current_resource.foreign_source}']/end[text() = '#{current_resource.range_end}']"].nil?
   else
     !doc.elements["/discovery-configuration/#{current_resource.range_type}-range[@location = '#{current_resource.location}' and @foreign-source = '#{current_resource.foreign_source}']/begin[text() ='#{current_resource.range_begin}']"].nil? && !doc.elements["/discovery-configuration/#{current_resource.range_type}-range[@foreign-source = '#{current_resource.foreign_source}']/end[text() = '#{current_resource.range_end}']"].nil?
@@ -65,7 +65,7 @@ def create_range
   file.close
   new_el = REXML::Element.new("#{new_resource.range_type}-range")
   new_el.attributes['foreign-source'] = new_resource.foreign_source unless new_resource.foreign_source.nil?
-  if node['opennms']['version_major'].to_i > 17
+  if Opennms::Helpers.major(node['opennms']['version']).to_i > 17
     new_el.attributes['location'] = new_resource.location unless new_resource.location.nil?
   end
   begin_el = new_el.add_element 'begin'

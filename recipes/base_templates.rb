@@ -19,11 +19,17 @@ onms_home = node['opennms']['conf']['home']
 onms_home ||= '/opt/opennms'
 
 # don't make wrappers that change templates support multiple versions
-template_dir = if node['opennms']['conf']['cookbook'] == 'opennms'
-                 "horizon-#{node['opennms']['version_major']}/"
-               else
-                 ''
-               end
+case Opennms::Helpers.major(node['opennms']['version'])
+when '16'
+  template_dir = 'horizon-16/'
+  node.default['opennms']['properties']['reporting']['jasper_version'] = '5.6.1'
+when '17'
+  template_dir = 'horizon-17/'
+when '18'
+  template_dir = 'horizon-18/'
+end
+
+Chef::Log.debug "at compile time, version is #{node['opennms']['version']} and jasper_version is #{node['opennms']['properties']['reporting']['jasper_version']}."
 
 template "#{onms_home}/etc/opennms.conf" do
   cookbook node['opennms']['conf']['cookbook']
@@ -73,5 +79,5 @@ template "#{onms_home}/jetty-webapps/opennms/WEB-INF/web.xml" do
     origins: node['opennms']['cors']['origins'],
     credentials: node['opennms']['cors']['credentials']
   )
-  not_if { node['opennms']['version_major'].to_i < 17 }
+  not_if { Opennms::Helpers.major(node['opennms']['version']).to_i < 17 }
 end

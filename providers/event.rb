@@ -193,14 +193,14 @@ def create_event
       end
     end
   end
-  if node['opennms']['version_major'].to_i > 16
+  if Opennms::Helpers.major(node['opennms']['version']).to_i > 16
     unless new_resource.parameters.nil?
       event_el.elements.delete_all('parameter') if updating
       new_resource.parameters.each do |param|
         param_el = event_el.add_element 'parameter'
         param_el.add_attribute('name', param['name'])
         param_el.add_attribute('value', param['value'])
-        if node['opennms']['version_major'].to_i > 17 && param.key?('expand')
+        if Opennms::Helpers.major(node['opennms']['version']).to_i > 17 && param.key?('expand')
           param_el.add_attribute('expand', param['expand'])
         end
       end

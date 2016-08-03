@@ -42,12 +42,12 @@ def specific_exists?(name, location, foreign_source)
   file = ::File.new("#{node['opennms']['conf']['home']}/etc/discovery-configuration.xml", 'r')
   doc = REXML::Document.new file
   if foreign_source.nil?
-    if location.nil? || node['opennms']['version_major'].to_i < 18
+    if location.nil? || Opennms::Helpers.major(node['opennms']['version']).to_i < 18
       !doc.elements["/discovery-configuration/specific[text() ='#{name}]"].nil?
     else
       !doc.elements["/discovery-configuration/specific[@location = '#{location}' and text() = '#{name}]"].nil?
     end
-  elsif location.nil? || node['opennms']['version_major'].to_i < 18
+  elsif location.nil? || Opennms::Helpers.major(node['opennms']['version']).to_i < 18
     !doc.elements["/discovery-configuration/specific[text() ='#{name} and @foreign-source = '#{foreign_source}']"].nil?
   else
     !doc.elements["/discovery-configuration/specific[@location = '#{location}' and text() = '#{name} and @foreign-source = '#{foreign_source}']"].nil?
@@ -62,7 +62,7 @@ def create_specific
   doc.context[:attribute_quote] = :quote
   file.close
   new_el = REXML::Element.new('specific')
-  if node['opennms']['version_major'].to_i > 17
+  if Opennms::Helpers.major(node['opennms']['version']).to_i > 17
     new_el.attributes['location'] = new_resource.location unless new_resource.location.nil?
   end
   new_el.attributes['foreign-source'] = new_resource.foreign_source unless new_resource.foreign_source.nil?
