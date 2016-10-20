@@ -23,6 +23,7 @@ log 'start OpenNMS' do
   notifies :start, 'service[opennms]', :immediately
 end
 
+Chef::Recipe.send(:include, OpenSSLCookbook::RandomPassword)
 adminpw = random_password
 
 ruby_block 'maybe change admin password' do

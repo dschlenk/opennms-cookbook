@@ -86,6 +86,7 @@ end
 yum_package onms_packages do
   version onms_versions
   allow_downgrade node['opennms']['allow_downgrade']
+  timeout node['yum_timeout']
   action :install
 end
 
