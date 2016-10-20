@@ -23,19 +23,19 @@ execute 'install opennms plugin' do
   notifies :update, 'grafana_user[admin]', :immediately
 end
 
-node.default_unless['grafana']['opennms_datasource']['password'] = random_password
+node.normal_unless['grafana']['opennms_datasource']['password'] = random_password
 pwhash = Digest::MD5.hexdigest(node['grafana']['opennms_datasource']['password']).upcase
 
 # generate now when necessary, for possible use later
 adminpw = random_password
-# maybe it's hardcoded
+# maybe it's hardcoded or already exists
 if node['grafana'].key?('users') && node['grafana']['users'].key?('admin') && !node['grafana']['users']['admin']['password'].nil?
   adminpw = node['grafana']['users']['admin']['password']
 end
 
 ruby_block 'save admin password' do
   block do
-    node.default['grafana']['users']['admin']['password'] = adminpw
+    node.normal['grafana']['users']['admin']['password'] = adminpw
   end
   action :nothing
 end

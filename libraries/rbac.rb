@@ -9,21 +9,21 @@ module Opennms
       pwhash = Digest::MD5.hexdigest(adminpw).upcase
       admin = user('admin', node)
       if !admin.nil? && admin.is_a?(Hash) && admin.key?('password') && admin['password'] == '21232F297A57A5A743894A0E4A801FC3' && node['opennms']['users']['admin']['password'] != 'admin'
-        # hardcoded password not yet applied
+        Chef::Log.debug('Hardcoded password not yet applied')
         pwhash = Digest::MD5.hexdigest(node['opennms']['users']['admin']['password']).upcase
         change_admin_password('admin', pwhash, node)
       elsif node['opennms']['secure_admin'] && node['opennms']['secure_admin_password'].nil?
-        # random password not yet applied
+        Chef::Log.debug('random password not yet applied since secure_admin_password is nil')
         change_admin_password('admin', pwhash, node)
         node.default['opennms']['users']['admin']['password'] = adminpw
-        node.default['opennms']['secure_admin_password']      = adminpw
-      elsif !node['opennms']['secure_admin_password'].nil?
-        # random password already applied
-        pwhash = Digest::MD5.hexdigest(node['opennms']['secure_admin_password']).upcase
-        node.default['opennms']['users']['admin']['password'] = node['opennms']['secure_admin_password']
-      else
-        # hardcoded password already applied
+        node.normal['opennms']['secure_admin_password'] = adminpw
+      elsif node['opennms']['secure_admin'] && !node['opennms']['secure_admin_password'].nil?
+        Chef::Log.debug('Random password already applied. Why am I here?')
+      elsif node['opennms']['users']['admin']['password'] != 'admin' && !node['opennms']['secure_admin']
+        Chef::Log.debug('hardcoded password already applied.')
         pwhash = Digest::MD5.hexdigest(node['opennms']['users']['admin']['password']).upcase
+      else
+        Chef::Log.debug("Unhandled adminpw call. secure_admin? #{node['opennms']['secure_admin']} pwhash: #{node['opennms']['users']['admin']['pwhash']}.")
       end
       node.default['opennms']['users']['admin']['pwhash'] = pwhash
     end

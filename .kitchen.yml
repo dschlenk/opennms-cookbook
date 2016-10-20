@@ -9,15 +9,16 @@ driver:
 
 provisioner:
   name: chef_zero
+  require_chef_omnibus: 12.5.1
 #  http_proxy: http://10.0.2.2:3128
-#  log_level: debug
+  log_level: debug
 
 platforms:
-  - name: centos-6.7
+  - name: centos-6.8
     attributes:
       opennms:
         conf: 
-          start_timeout: 20
+          start_timeout: 50
         stable: true
         plugin:
           xml: true
@@ -196,6 +197,13 @@ suites:
       - recipe[opennms::notemplates]
       - recipe[opennms::grafana]
       - recipe[onms_lwrp_test::webopts]
+      - recipe[onms_lwrp_test::foreign_source]
+      - recipe[onms_lwrp_test::policy]
+      - recipe[onms_lwrp_test::service_detector]
+      - recipe[onms_lwrp_test::import]
+      - recipe[onms_lwrp_test::import_node]
+      - recipe[onms_lwrp_test::import_node_interface]
+      - recipe[onms_lwrp_test::import_node_interface_service]
     attributes:
       opennms:
         users:
@@ -210,9 +218,18 @@ suites:
       - recipe[opennms::postgres]
       - recipe[opennms::notemplates]
       - recipe[opennms::grafana]
+      - recipe[onms_lwrp_test::webopts]
+      - recipe[onms_lwrp_test::foreign_source]
+      - recipe[onms_lwrp_test::policy]
+      - recipe[onms_lwrp_test::service_detector]
+      - recipe[onms_lwrp_test::import]
+      - recipe[onms_lwrp_test::import_node]
+      - recipe[onms_lwrp_test::import_node_interface]
+      - recipe[onms_lwrp_test::import_node_interface_service]
     attributes:
       opennms:
         secure_admin: true
+        version: "18.0.2-1"
   - name: rrdtool_grafana
     run_list:
       - recipe[opennms::postgres]
