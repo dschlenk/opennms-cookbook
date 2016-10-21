@@ -55,7 +55,13 @@ end
 # If you want to set the admin password yourself, populate
 # node['opennms']['users']['admin']['password'] with your password
 # and let the cookbook caclulate the hash and set it for you.
-if node['opennms']['secure_admin'] || node['opennms']['users']['admin']['password'] != 'admin'
+unless node['opennms']['secure_admin_password'].nil?
+  require 'digest'
+  node.default['opennms']['users']['admin']['password'] = node['opennms']['secure_admin_password']
+  node.default['opennms']['users']['admin']['pwhash'] = Digest::MD5.hexdigest(node['opennms']['secure_admin_password']).upcase
+end
+Chef::Log.debug("secure_admin? #{node['opennms']['secure_admin']}; pwhash? #{node['opennms']['users']['admin']['pwhash']}; password? #{node['opennms']['users']['admin']['password']}")
+if (node['opennms']['secure_admin'] && node['opennms']['secure_admin_password'].nil?) || (!node['opennms']['secure_admin'] && node['opennms']['users']['admin']['password'] != 'admin')
   include_recipe 'opennms::adminpw'
 end
 
