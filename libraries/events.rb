@@ -36,6 +36,39 @@ module Events
     exists
   end
 
+  def event_xpath(event)
+    event_xpath = "/events/event[uei/text() = '#{event.uei}'"
+    unless event.mask.nil?
+      event.mask.each do |m|
+        if m.has_key?('mename') && m.has_key?('mevalue')
+          event_xpath += " and mask/maskelement/mename[text() = '#{m['mename']}']"
+          m['mevalue'].each do |value|
+            event_xpath += " and mask/maskelement/mevalue[text() = '#{value}']/preceding-sibling::mename[text() = '#{m['mename']}']"
+          end
+        elsif m.has_key?('vbnumber') && m.has_key?('vbvalue')
+          event_xpath += " and mask/varbind/vbnumber[text() = '#{m['vbnumber']}']"
+          m['vbvalue'].each do |value|
+            event_xpath += " and mask/varbind/vbvalue[text() = '#{value}']/preceding-sibling::vbnumber[text() = '#{m['vbnumber']}']"
+          end
+        end
+      end
+    end
+    event_xpath += ']'
+    Chef::Log.debug "event xpath is: #{event_xpath}"
+    event_xpath
+  end
+
+  def event_in_file?(file, event)
+    file = ::File.new(file, 'r')
+    doc = REXML::Document.new file
+    file.close
+    xpath = event_xpath(event)
+    Chef::Log.debug("xpath passing to doc.elements[]: '#{xpath}'")
+    !doc.elements["#{xpath}"].nil?
+  end
+
+  # DANGER: this only checks that some event with this UEI exists in this file, while UEI + mask determines identity for opennms_event.
+  # (useful in other resources, however, like opennms_threshold and opennms_expression). 
   def uei_in_file?(file, uei)
     file = ::File.new(file, 'r')
     doc = REXML::Document.new file
@@ -59,41 +92,7 @@ module Events
     file = ::File.new("#{node['opennms']['conf']['home']}/etc/#{event.file}", 'r')
     doc = REXML::Document.new file
     file.close
-    event_el = doc.elements["/events/event[uei/text() = '#{event.uei}']"]
-    mask_el = event_el.elements['mask']
-    unless event.mask.nil?
-      if event.mask.empty?
-        Chef::Log.debug 'Mask not defined in new resource.'
-        if mask_el.nil?
-          Chef::Log.debug "new resource's mask is nil, as is current file."
-        else
-          Chef::Log.debug 'Event mask in current file but nil in new resource.'
-          return true
-        end
-      end
-      if mask_el.nil?
-        Chef::Log.debug 'Mask element does not exist in current.'
-        if event.mask.nil?
-          Chef::Log.debug "Mask doesn't exist in current and is nil in new resource."
-        else
-          Chef::Log.debug 'Event mask not present in current but is in new resource.'
-          return true
-        end
-      else
-        Chef::Log.debug 'Neither current nor new masks were nil.'
-        mask = []
-        mask_el.elements.each('maskelement') do |maskelement|
-          mename = maskelement.elements['mename'].text
-          mevalues = []
-          maskelement.elements.each('mevalue') do |mev|
-            mevalues.push mev.text
-          end
-          mask.push 'mename' => mename.to_s, 'mevalue' => mevalues
-        end
-        Chef::Log.debug "Masks equal? New: #{event.mask}; Current: #{mask}"
-        return true unless event.mask == mask
-      end
-    end
+    event_el = doc.elements[event_xpath(event)]
     unless event.event_label.nil?
       el = event_el.elements['event-label'].text.to_s
       Chef::Log.debug "Event label equal? New: #{event.event_label}; Current: #{el}"
