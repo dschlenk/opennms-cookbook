@@ -42,14 +42,20 @@ module Events
       event.mask.each do |m|
         if m.has_key?('mename') && m.has_key?('mevalue')
           event_xpath += " and mask/maskelement/mename[text() = '#{m['mename']}']"
+          lastval = nil
           m['mevalue'].each do |value|
             event_xpath += " and mask/maskelement/mevalue[text() = '#{value}']/preceding-sibling::mename[text() = '#{m['mename']}']"
+            lastval = value
           end
+          event_xpath += " and not(mask/maskelement/mevalue[text() = '#{lastval}']/following-sibling::*)" unless lastval.nil?
         elsif m.has_key?('vbnumber') && m.has_key?('vbvalue')
           event_xpath += " and mask/varbind/vbnumber[text() = '#{m['vbnumber']}']"
+          lastval = nil
           m['vbvalue'].each do |value|
             event_xpath += " and mask/varbind/vbvalue[text() = '#{value}']/preceding-sibling::vbnumber[text() = '#{m['vbnumber']}']"
+            lastval = value
           end
+          event_xpath += " and not(mask/varbind/vbvalue[text() = '#{lastval}']/following-sibling::*)" unless lastval.nil?
         end
       end
     end
