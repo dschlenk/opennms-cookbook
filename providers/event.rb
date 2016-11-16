@@ -142,7 +142,7 @@ def create_event
       mask_container = 'maskelement'
       mask_id = 'mename'
       mask_val = 'mevalue'
-      if mask.has_key?('vbnumber') && mask.has_key?('vbvalue')
+      if mask.key?('vbnumber') && mask.key?('vbvalue')
         mask_container = 'varbind'
         mask_id = 'vbnumber'
         mask_val = 'vbvalue'
@@ -307,7 +307,6 @@ def delete_event
   doc = REXML::Document.new file
   file.close
   doc.context[:attribute_quote] = :quote
-  updating = false
   doc.root.delete_element(event_xpath(new_resource))
   out = ''
   formatter = REXML::Formatters::Pretty.new(2)

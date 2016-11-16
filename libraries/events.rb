@@ -40,7 +40,7 @@ module Events
     event_xpath = "/events/event[uei/text() = '#{event.uei}'"
     unless event.mask.nil?
       event.mask.each do |m|
-        if m.has_key?('mename') && m.has_key?('mevalue')
+        if m.key?('mename') && m.key?('mevalue')
           event_xpath += " and mask/maskelement/mename[text() = '#{m['mename']}']"
           lastval = nil
           m['mevalue'].each do |value|
@@ -48,7 +48,7 @@ module Events
             lastval = value
           end
           event_xpath += " and not(mask/maskelement/mevalue[text() = '#{lastval}']/following-sibling::*)" unless lastval.nil?
-        elsif m.has_key?('vbnumber') && m.has_key?('vbvalue')
+        elsif m.key?('vbnumber') && m.key?('vbvalue')
           event_xpath += " and mask/varbind/vbnumber[text() = '#{m['vbnumber']}']"
           lastval = nil
           m['vbvalue'].each do |value|
@@ -68,13 +68,11 @@ module Events
     file = ::File.new(file, 'r')
     doc = REXML::Document.new file
     file.close
-    xpath = event_xpath(event)
-    Chef::Log.debug("xpath passing to doc.elements[]: '#{xpath}'")
-    !doc.elements["#{xpath}"].nil?
+    !doc.elements[event_xpath(event)].nil?
   end
 
   # DANGER: this only checks that some event with this UEI exists in this file, while UEI + mask determines identity for opennms_event.
-  # (useful in other resources, however, like opennms_threshold and opennms_expression). 
+  # (useful in other resources, however, like opennms_threshold and opennms_expression).
   def uei_in_file?(file, uei)
     file = ::File.new(file, 'r')
     doc = REXML::Document.new file

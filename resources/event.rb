@@ -12,7 +12,7 @@ attribute :name, kind_of: String, name_attribute: true
 attribute :uei, kind_of: String
 # should include full relative path to file from $ONMS_HOME/etc
 attribute :file, kind_of: String, default: 'eventconf.xml', required: true
-# Array of hashes that contain key mename or vbnumber with a string value and mevalue or vbvalue with an array of string values. 'mename' indicates 'maskelement' while 'vbnumber' indicates 'varbind'.
+# Array of hashes that contain key mename or vbnumber with a string value and mevalue or vbvalue with an array of string values. 'mename' indicates 'maskelement' while 'vbnumber' indicates 'varbind'. All vbnumber/vbvalue hashes must follow the mename/mevalue hashes.
 # ex: [
 #      {'mename' => 'id', 'mevalue' => ['.1.3.6.1.4.1.9.10.14']},
 #      {'mename' => 'generic', 'mevalue' => ['6']},

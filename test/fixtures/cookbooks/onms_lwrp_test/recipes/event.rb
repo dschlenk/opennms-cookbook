@@ -298,7 +298,7 @@ opennms_event 'new event with diverse mask' do
   logmsg 'A threshold has been exceeded4.'
   logmsg_dest 'logndisplay'
   logmsg_notify true
-  mask [{ 'mename' => 'id', 'mevalue' => ['.1.3.6.1.4.1.11385.102.1'] }, { 'mename' => 'generic', 'mevalue' => ['6'] }, { 'mename' => 'specific', 'mevalue' => ['2'] }, { 'vbnumber' => '1', 'vbvalue' => ['1','2','3'] }]
+  mask [{ 'mename' => 'id', 'mevalue' => ['.1.3.6.1.4.1.11385.102.1'] }, { 'mename' => 'generic', 'mevalue' => ['6'] }, { 'mename' => 'specific', 'mevalue' => ['2'] }, { 'vbnumber' => '1', 'vbvalue' => %w(1 2 3) }]
   severity 'Minor'
   operinstruct 'the operinstruct'
   autoaction [{ 'action' => 'someaction', 'state' => 'off' }]
@@ -310,7 +310,7 @@ opennms_event 'new event with diverse mask' do
   alarm_data 'reduction_key' => '%uei%:%dpname%:%nodeid%:%interface%:%parm[ds]%:%parm[threshold]%:%parm[trigger]%:%parm[rearm]%:%parm[label]%', 'alarm_type' => 1, 'auto_clean' => false
   notifies :run, 'opennms_send_event[restart_Eventd]'
 end
-  
+
 opennms_event 'uei.opennms.org/anUeiForANewThingInANewFile' do
   file 'events/chef2.events.xml'
   event_label 'Chef defined event: thresholdExceeded'
