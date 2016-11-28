@@ -323,3 +323,11 @@ opennms_event 'uei.opennms.org/anUeiForANewThingInANewFile' do
   # tell Eventd to reload config
   notifies :run, 'opennms_send_event[restart_Eventd]'
 end
+
+# test delete
+opennms_event 'uei.opennms.org/anUeiForANewThingInANewFile' do
+  file 'events/chef2.events.xml'
+  action :delete
+  # tell Eventd to reload config
+  notifies :run, 'opennms_send_event[restart_Eventd]'
+end

@@ -3,6 +3,7 @@ require 'rexml/document'
 # Add an event to an eventconf file. Will create the event file if it does not exist. Fails if file exists but
 # is not an eventconf file.  If new file, will add it to main eventconf.xml file.
 # Supports updating existing events.
+# Identity is defined by uei/name + file + mask.
 
 actions :create, :create_if_missing, :delete
 default_action :create

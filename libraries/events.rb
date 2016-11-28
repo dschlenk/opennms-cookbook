@@ -37,7 +37,8 @@ module Events
   end
 
   def event_xpath(event)
-    event_xpath = "/events/event[uei/text() = '#{event.uei}'"
+    uei = event.uei || event.name
+    event_xpath = "/events/event[uei/text() = '#{uei}'"
     unless event.mask.nil?
       event.mask.each do |m|
         if m.key?('mename') && m.key?('mevalue')
@@ -345,6 +346,26 @@ module Events
     end
     Chef::Log.debug 'Nothing in this event has changed!'
     false
+  end
+
+  def remove_file_from_eventconf(file, node)
+    Chef::Log.debug "file is #{file}"
+    if file =~ %r{^events/(.*)$}
+      file = Regexp.last_match(1)
+      Chef::Log.debug "file is now #{file}"
+    end
+    f = ::File.new("#{node['opennms']['conf']['home']}/etc/eventconf.xml")
+    contents = f.read
+    doc = REXML::Document.new(contents, respect_whitespace: :all)
+    doc.context[:attribute_quote] = :quote
+    f.close
+
+    doc.root.delete_element("/events/event-file[text() = 'events/#{file}']")
+    out = ''
+    formatter = REXML::Formatters::Pretty.new(2)
+    formatter.compact = true
+    formatter.write(doc, out)
+    ::File.open("#{node['opennms']['conf']['home']}/etc/eventconf.xml", 'w') { |new_file| new_file.puts(out) }
   end
 
   def add_file_to_eventconf(file, position, node)

@@ -110,6 +110,7 @@ end
 # rubocop:disable Metrics/BlockNesting
 def create_event
   uei = new_resource.uei || new_resource.name
+  new_resource.uei = uei
   # new_resource.uei = new_resource.name if new_resource.uei.nil?
   # make sure event file is included in main eventconf
   unless event_file_included?(new_resource.file, node)
@@ -308,6 +309,13 @@ def delete_event
   file.close
   doc.context[:attribute_quote] = :quote
   doc.root.delete_element(event_xpath(new_resource))
+  # determine if that was the last event in the file.
+  # If so, delete it (an empty eventconf file isn't valid according to the schema).
+  # And remove it from the main eventconf file.
+  if doc.root.elements['/events/event'].nil?
+    ::File.delete("#{node['opennms']['conf']['home']}/etc/#{new_resource.file}")
+    remove_file_from_eventconf(new_resource.file, node)
+  end
   out = ''
   formatter = REXML::Formatters::Pretty.new(2)
   formatter.compact = true
