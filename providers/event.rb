@@ -5,6 +5,17 @@ end
 
 use_inline_resources
 
+action :delete do
+  if @current_resource.exists
+    converge_by("Delete #{@new_resource}") do
+      delete_event
+      new_resource.updated_by_last_action(true)
+    end
+  else
+    Chef::Log.info("#{new_resource} doesn't exist - nothing to do.")
+  end
+end
+
 action :create do
   Chef::Application.fatal!("File specified '#{@current_resource.file}' exists but is not an eventconf file!") if current_resource.file_exists && !current_resource.is_event_file
   if !@current_resource.file_exists
@@ -15,7 +26,7 @@ action :create do
   if @current_resource.exists && !@current_resource.changed
     Chef::Log.info "#{@new_resource} already exists and not changed - nothing to do."
   else
-    Chef::Log.info "#{@new_resource} changed - updating."
+    Chef::Log.info "#{@new_resource} changed or updating."
     converge_by("Create/Update #{@new_resource}") do
       create_event
       new_resource.updated_by_last_action(true)
@@ -67,7 +78,7 @@ def load_current_resource
     @current_resource.file_exists = true
     if event_file?(@current_resource.file, node)
       @current_resource.is_event_file = true
-      if uei_in_file?("#{node['opennms']['conf']['home']}/etc/#{@current_resource.file}", @current_resource.uei)
+      if event_in_file?("#{node['opennms']['conf']['home']}/etc/#{@current_resource.file}", @current_resource)
         Chef::Log.debug("uei #{@current_resource.uei} is in file already")
         @current_resource.exists = true
         if event_changed?(@current_resource, node)
@@ -99,6 +110,7 @@ end
 # rubocop:disable Metrics/BlockNesting
 def create_event
   uei = new_resource.uei || new_resource.name
+  new_resource.uei = uei
   # new_resource.uei = new_resource.name if new_resource.uei.nil?
   # make sure event file is included in main eventconf
   unless event_file_included?(new_resource.file, node)
@@ -111,21 +123,36 @@ def create_event
   file.close
   doc.context[:attribute_quote] = :quote
   updating = false
-  event_el = doc.root.elements["/events/event[uei/text() = '#{uei}']"]
+  event_el = doc.root.elements[event_xpath(new_resource)]
+  Chef::Log.debug("Current event_el for #{new_resource}: #{event_el}")
   if event_el.nil?
-    event_el = doc.root.add_element 'event'
+    if new_resource.position == 'top'
+      doc.root.insert_before('/events/event', REXML::Element.new('event'))
+      event_el = doc.root.elements['/events/event']
+    else
+      event_el = doc.root.add_element 'event'
+    end
   else
     updating = true
   end
-  unless new_resource.mask.nil?
-    event_el.elements.delete('mask') if updating
+  Chef::Log.debug "Updating #{new_resource}? #{updating}"
+  # masks are immutable as they are part of identity.
+  if !updating && !new_resource.mask.nil?
     mask_el = event_el.add_element 'mask'
     new_resource.mask.each do |mask|
-      me_el = mask_el.add_element 'maskelement'
-      name_el = me_el.add_element 'mename'
-      name_el.add_text mask['mename']
-      mask['mevalue'].each do |value|
-        vel = me_el.add_element 'mevalue'
+      mask_container = 'maskelement'
+      mask_id = 'mename'
+      mask_val = 'mevalue'
+      if mask.key?('vbnumber') && mask.key?('vbvalue')
+        mask_container = 'varbind'
+        mask_id = 'vbnumber'
+        mask_val = 'vbvalue'
+      end
+      me_el = mask_el.add_element mask_container
+      name_el = me_el.add_element mask_id
+      name_el.add_text mask[mask_id]
+      mask[mask_val].each do |value|
+        vel = me_el.add_element mask_val
         vel.add_text value
       end
     end
@@ -149,7 +176,9 @@ def create_event
   end
   if updating
     logmsg_el = event_el.elements['logmsg']
+    Chef::Log.debug("new_resource notify is: #{new_resource.logmsg_notify}")
     logmsg_el.attributes['notify'] = 'true' if new_resource.logmsg_notify == true
+    logmsg_el.attributes['notify'] = 'false' if new_resource.logmsg_notify == false
     logmsg_el.attributes['dest'] = new_resource.logmsg_dest unless new_resource.logmsg_dest.nil?
     unless new_resource.logmsg.nil?
       logmsg_el.text = nil while logmsg_el.has_text?
@@ -262,6 +291,30 @@ def create_event
         end
       end
     end
+  end
+  Chef::Log.debug("Converged event_el for #{new_resource}: #{event_el}")
+  out = ''
+  formatter = REXML::Formatters::Pretty.new(2)
+  formatter.compact = true
+  formatter.write(doc, out)
+  ::File.open("#{node['opennms']['conf']['home']}/etc/#{new_resource.file}", 'w') { |f| f.puts(out) }
+end
+
+def delete_event
+  uei = new_resource.uei || new_resource.name
+  Chef::Log.debug "Deleting an event with UEI '#{uei}' from '#{new_resource.file}'."
+
+  file = ::File.new("#{node['opennms']['conf']['home']}/etc/#{new_resource.file}", 'r')
+  doc = REXML::Document.new file
+  file.close
+  doc.context[:attribute_quote] = :quote
+  doc.root.delete_element(event_xpath(new_resource))
+  # determine if that was the last event in the file.
+  # If so, delete it (an empty eventconf file isn't valid according to the schema).
+  # And remove it from the main eventconf file.
+  if doc.root.elements['/events/event'].nil?
+    ::File.delete("#{node['opennms']['conf']['home']}/etc/#{new_resource.file}")
+    remove_file_from_eventconf(new_resource.file, node)
   end
   out = ''
   formatter = REXML::Formatters::Pretty.new(2)

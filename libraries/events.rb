@@ -36,6 +36,44 @@ module Events
     exists
   end
 
+  def event_xpath(event)
+    uei = event.uei || event.name
+    event_xpath = "/events/event[uei/text() = '#{uei}'"
+    unless event.mask.nil?
+      event.mask.each do |m|
+        if m.key?('mename') && m.key?('mevalue')
+          event_xpath += " and mask/maskelement/mename[text() = '#{m['mename']}']"
+          lastval = nil
+          m['mevalue'].each do |value|
+            event_xpath += " and mask/maskelement/mevalue[text() = '#{value}']/preceding-sibling::mename[text() = '#{m['mename']}']"
+            lastval = value
+          end
+          event_xpath += " and not(mask/maskelement/mevalue[text() = '#{lastval}']/following-sibling::*)" unless lastval.nil?
+        elsif m.key?('vbnumber') && m.key?('vbvalue')
+          event_xpath += " and mask/varbind/vbnumber[text() = '#{m['vbnumber']}']"
+          lastval = nil
+          m['vbvalue'].each do |value|
+            event_xpath += " and mask/varbind/vbvalue[text() = '#{value}']/preceding-sibling::vbnumber[text() = '#{m['vbnumber']}']"
+            lastval = value
+          end
+          event_xpath += " and not(mask/varbind/vbvalue[text() = '#{lastval}']/following-sibling::*)" unless lastval.nil?
+        end
+      end
+    end
+    event_xpath += ']'
+    Chef::Log.debug "event xpath is: #{event_xpath}"
+    event_xpath
+  end
+
+  def event_in_file?(file, event)
+    file = ::File.new(file, 'r')
+    doc = REXML::Document.new file
+    file.close
+    !doc.elements[event_xpath(event)].nil?
+  end
+
+  # DANGER: this only checks that some event with this UEI exists in this file, while UEI + mask determines identity for opennms_event.
+  # (useful in other resources, however, like opennms_threshold and opennms_expression).
   def uei_in_file?(file, uei)
     file = ::File.new(file, 'r')
     doc = REXML::Document.new file
@@ -59,41 +97,7 @@ module Events
     file = ::File.new("#{node['opennms']['conf']['home']}/etc/#{event.file}", 'r')
     doc = REXML::Document.new file
     file.close
-    event_el = doc.elements["/events/event[uei/text() = '#{event.uei}']"]
-    mask_el = event_el.elements['mask']
-    unless event.mask.nil?
-      if event.mask.empty?
-        Chef::Log.debug 'Mask not defined in new resource.'
-        if mask_el.nil?
-          Chef::Log.debug "new resource's mask is nil, as is current file."
-        else
-          Chef::Log.debug 'Event mask in current file but nil in new resource.'
-          return true
-        end
-      end
-      if mask_el.nil?
-        Chef::Log.debug 'Mask element does not exist in current.'
-        if event.mask.nil?
-          Chef::Log.debug "Mask doesn't exist in current and is nil in new resource."
-        else
-          Chef::Log.debug 'Event mask not present in current but is in new resource.'
-          return true
-        end
-      else
-        Chef::Log.debug 'Neither current nor new masks were nil.'
-        mask = []
-        mask_el.elements.each('maskelement') do |maskelement|
-          mename = maskelement.elements['mename'].text
-          mevalues = []
-          maskelement.elements.each('mevalue') do |mev|
-            mevalues.push mev.text
-          end
-          mask.push 'mename' => mename.to_s, 'mevalue' => mevalues
-        end
-        Chef::Log.debug "Masks equal? New: #{event.mask}; Current: #{mask}"
-        return true unless event.mask == mask
-      end
-    end
+    event_el = doc.elements[event_xpath(event)]
     unless event.event_label.nil?
       el = event_el.elements['event-label'].text.to_s
       Chef::Log.debug "Event label equal? New: #{event.event_label}; Current: #{el}"
@@ -342,6 +346,26 @@ module Events
     end
     Chef::Log.debug 'Nothing in this event has changed!'
     false
+  end
+
+  def remove_file_from_eventconf(file, node)
+    Chef::Log.debug "file is #{file}"
+    if file =~ %r{^events/(.*)$}
+      file = Regexp.last_match(1)
+      Chef::Log.debug "file is now #{file}"
+    end
+    f = ::File.new("#{node['opennms']['conf']['home']}/etc/eventconf.xml")
+    contents = f.read
+    doc = REXML::Document.new(contents, respect_whitespace: :all)
+    doc.context[:attribute_quote] = :quote
+    f.close
+
+    doc.root.delete_element("/events/event-file[text() = 'events/#{file}']")
+    out = ''
+    formatter = REXML::Formatters::Pretty.new(2)
+    formatter.compact = true
+    formatter.write(doc, out)
+    ::File.open("#{node['opennms']['conf']['home']}/etc/eventconf.xml", 'w') { |new_file| new_file.puts(out) }
   end
 
   def add_file_to_eventconf(file, position, node)
