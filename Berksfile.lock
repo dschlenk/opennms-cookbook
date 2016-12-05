@@ -38,7 +38,7 @@ GRAPH
     compat_resource (>= 12.10)
   onms_lwrp_test (0.1.0)
     opennms (>= 0.0.0)
-  opennms (18.3.0)
+  opennms (18.3.1)
     build-essential (>= 0.0.0)
     grafana (>= 0.0.0)
     hostsfile (>= 0.0.0)
