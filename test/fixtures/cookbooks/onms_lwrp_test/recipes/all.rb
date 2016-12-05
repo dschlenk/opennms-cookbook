@@ -5,6 +5,7 @@
    wmi_collection
    jdbc_collection
    collection_package
+   collection_service
    snmp_collection_service
    xml_collection_service
    wmi_collection_service
