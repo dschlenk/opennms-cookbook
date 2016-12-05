@@ -66,11 +66,11 @@ def create_collection_service
     service_el.add_element 'parameter', 'key' => 'thresholding-enabled', 'value' => new_resource.thresholding_enabled
   end
   unless new_resource.params.nil?
-    new_resource.params.each do |k,v|
+    new_resource.params.each do |k, v|
       service_el.add_element 'parameter', 'key' => k, 'value' => v
     end
   end
-    # make sure we've got a service definition at the end of the file - might already exist tho.
+  # make sure we've got a service definition at the end of the file - might already exist tho.
   unless doc.elements["/collectd-configuration/collector[@service='#{new_resource.service_name}']"]
     doc.elements['/collectd-configuration'].add_element 'collector', 'service' => new_resource.service_name, 'class-name' => new_resource.class_name
   end
