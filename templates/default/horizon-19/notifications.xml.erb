@@ -1,0 +1,129 @@
+<?xml version="1.0"?>
+<notifications xmlns="http://xmlns.opennms.org/xsd/notifications">
+    <header>
+        <rev>1.2</rev>
+        <created>Wednesday, February 6, 2002 10:10:00 AM EST</created>
+        <mstation>localhost</mstation>
+    </header>
+    <% if @interface_down[:enabled] -%>
+    <notification name="interfaceDown" status="<%=@interface_down[:status]%>">
+        <uei>uei.opennms.org/nodes/interfaceDown</uei>
+        <% if @interface_down[:description] -%>
+        <description><%=@interface_down[:description]%></description>
+        <% end -%>
+        <rule><%=@interface_down[:rule]%></rule>
+        <destinationPath><%=@interface_down[:destination_path]%></destinationPath>
+        <text-message><%=@interface_down[:text_message]%>
+	</text-message>
+        <subject><%=@interface_down[:subject]%></subject>
+        <numeric-message><%=@interface_down[:numeric_message]%></numeric-message>
+    </notification>
+    <% end -%>
+    <% if @node_down[:enabled] -%>
+    <notification name="nodeDown" status="on">
+        <uei>uei.opennms.org/nodes/nodeDown</uei>
+        <% if @node_down[:description] -%>
+        <description><%=@node_down[:description]%></description>
+        <% end -%>
+        <rule><%=@node_down[:rule]%></rule>
+        <destinationPath><%=@node_down[:destination_path]%></destinationPath>
+        <text-message><%=@node_down[:text_message]%>
+	</text-message>
+        <subject><%=@node_down[:subject]%></subject>
+        <numeric-message><%=@node_down[:numeric_message]%></numeric-message>
+    </notification>
+    <% end -%>
+    <% if @node_lost_service[:enabled] -%>
+    <notification name="nodeLostService" status="on">
+        <uei>uei.opennms.org/nodes/nodeLostService</uei>
+        <% if @node_lost_service[:description] -%>
+        <description><%=@node_lost_service[:description]%></description>
+        <% end -%>
+        <rule><%=@node_lost_service[:rule]%></rule>
+        <destinationPath><%=@node_lost_service[:destination_path]%></destinationPath>
+        <text-message><%=@node_lost_service[:text_message]%>
+	</text-message>
+        <subject><%=@node_lost_service[:subject]%></subject>
+        <numeric-message><%=@node_lost_service[:numeric_message]%></numeric-message>
+    </notification>
+    <% end -%>
+    <% if @node_added[:enabled] -%>
+    <notification name="nodeAdded" status="on">
+        <uei>uei.opennms.org/nodes/nodeAdded</uei>
+        <% if @node_added[:description] -%>
+        <description><%=@node_added[:description]%></description>
+        <% end -%>
+        <rule><%=@node_added[:rule]%></rule>
+        <destinationPath><%=@node_added[:destination_path]%></destinationPath>
+        <text-message><%=@node_added[:text_message]%></text-message>
+        <subject><%=@node_added[:subject]%></subject>
+        <numeric-message><%=@node_added[:numeric_message]%></numeric-message>
+    </notification>
+    <% end -%>
+    <% if @interface_deleted[:enabled] -%>
+    <notification name="interfaceDeleted" status="on">
+        <uei>uei.opennms.org/nodes/interfaceDeleted</uei>
+        <% if @interface_deleted[:description] -%>
+        <description><%=@interface_deleted[:description]%></description>
+        <% end -%>
+        <rule><%=@interface_deleted[:rule]%></rule>
+        <destinationPath><%=@interface_deleted[:destination_path]%></destinationPath>
+        <text-message><%=@interface_deleted[:text_message]%></text-message>
+        <subject><%=@interface_deleted[:subject]%></subject>
+        <numeric-message><%=@interface_deleted[:numeric_message]%></numeric-message>
+    </notification>
+    <% end -%>
+    <% if @high_threshold[:enabled] -%>
+    <notification name="High Threshold" status="off">
+        <uei>uei.opennms.org/threshold/highThresholdExceeded</uei>
+        <description><%=@high_threshold[:description]%></description>
+        <rule><%=@high_threshold[:rule]%></rule>
+        <destinationPath><%=@high_threshold[:destination_path]%></destinationPath>
+        <text-message><%=@high_threshold[:text_message]%></text-message>
+        <subject><%=@high_threshold[:subject]%></subject>
+        <% if !@high_threshold[:numeric_message].nil? -%>
+        <numeric-message><%=@high_threshold[:numeric_message]%></numeric-message>
+        <% end -%>
+    </notification>
+    <% end -%>
+    <% if @low_threshold[:enabled] -%>
+    <notification name="Low Threshold" status="off">
+        <uei>uei.opennms.org/threshold/lowThresholdExceeded</uei>
+        <description><%=@low_threshold[:description]%></description>
+        <rule><%=@low_threshold[:rule]%></rule>
+        <destinationPath><%=@low_threshold[:destination_path]%></destinationPath>
+        <text-message><%=@low_threshold[:text_message]%></text-message>
+        <subject><%=@low_threshold[:subject]%></subject>
+        <% if !@low_threshold[:numeric_message].nil? -%>
+        <numeric-message><%=@low_threshold[:numeric_message]%></numeric-message>
+        <% end -%>
+    </notification>
+    <% end -%>
+    <% if @low_threshold_rearmed[:enabled] -%>
+    <notification name="Low Threshold Rearmed" status="off">
+        <uei>uei.opennms.org/threshold/lowThresholdRearmed</uei>
+        <description><%=@low_threshold_rearmed[:description]%></description>
+        <rule><%=@low_threshold_rearmed[:rule]%></rule>
+        <destinationPath><%=@low_threshold_rearmed[:destination_path]%></destinationPath>
+        <text-message><%=@low_threshold_rearmed[:text_message]%></text-message>
+        <subject><%=@low_threshold_rearmed[:subject]%></subject>
+        <% if !@low_threshold_rearmed[:numeric_message].nil? -%>
+        <numeric-message><%=@low_threshold_rearmed[:numeric_message]%></numeric-message>
+        <% end -%>
+    </notification>
+    <% end -%>
+    <% if @high_threshold_rearmed[:enabled] -%>
+    <notification name="High Threshold Rearmed" status="off">
+        <uei>uei.opennms.org/threshold/highThresholdRearmed</uei>
+        <description><%=@high_threshold_rearmed[:description]%></description>
+        <rule><%=@high_threshold_rearmed[:rule]%></rule>
+        <destinationPath><%=@high_threshold_rearmed[:destination_path]%></destinationPath>
+        <text-message><%=@high_threshold_rearmed[:text_message]%></text-message>
+        <subject><%=@high_threshold_rearmed[:subject]%></subject>
+        <% if !@high_threshold_rearmed[:numeric_message].nil? -%>
+        <numeric-message><%=@high_threshold_rearmed[:numeric_message]%></numeric-message>
+        <% end -%>
+    </notification>
+    <% end -%>
+
+</notifications>

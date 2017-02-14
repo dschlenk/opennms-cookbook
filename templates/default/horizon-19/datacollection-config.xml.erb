@@ -1,0 +1,229 @@
+<?xml version="1.0"?>
+<datacollection-config rrdRepository="<%= @rrd_base_dir %><%= @rrd_dc_dir %>">
+  <% if @default['enabled'] -%>
+    <snmp-collection name="default" snmpStorageFlag="<%= @default['snmpStorageFlag'] %>">
+        <rrd step="<%= @default['rrd']['step'] %>">
+          <% @default['rrd']['rras'].each do |rra| -%>
+            <rra><%=rra%></rra>
+          <% end -%>
+        </rrd>
+
+    <% if @mib2 -%>
+        <include-collection dataCollectionGroup="MIB2"/>
+    <% end -%>
+    <% if @threecom -%>
+        <include-collection dataCollectionGroup="3Com"/>
+    <% end -%>
+    <% if @acme -%>
+        <include-collection dataCollectionGroup="Acme Packet"/>
+    <% end -%>
+    <% if @akcp -%>
+        <include-collection dataCollectionGroup="AKCP sensorProbe"/>
+    <% end -%>
+    <% if @alvarion -%>
+        <include-collection dataCollectionGroup="Alvarion"/>
+    <% end -%>
+    <% if @apc -%>
+        <include-collection dataCollectionGroup="APC"/>
+    <% end -%>
+    <% if @ascend -%>
+        <include-collection dataCollectionGroup="Ascend"/>
+    <% end -%>
+    <% if @asterisk -%>
+        <include-collection dataCollectionGroup="Asterisk"/>
+    <% end -%>
+    <% if @bluecat -%>
+        <include-collection dataCollectionGroup="Bluecat"/>
+    <% end -%>
+    <% if @bluecoat -%>
+        <include-collection dataCollectionGroup="Bluecoat"/>
+    <% end -%>
+    <% if @bridgewave -%>
+        <include-collection dataCollectionGroup="Bridgewave"/>
+    <% end -%>
+    <% if @brocade -%>
+        <include-collection dataCollectionGroup="Brocade"/>
+    <% end -%>
+    <% if @checkpoint -%>
+        <include-collection dataCollectionGroup="Checkpoint"/>
+    <% end -%>
+        <include-collection dataCollectionGroup="Ceragon"/>
+    <% if @cisco -%>
+        <include-collection dataCollectionGroup="Cisco"/>
+    <% end -%>
+    <% if @ciscoNexus -%>
+        <include-collection dataCollectionGroup="Cisco Nexus"/>
+    <% end -%>
+    <% if @clavister -%>
+        <include-collection dataCollectionGroup="CLAVISTER"/>
+    <% end -%>
+    <% if @colubris -%>
+        <include-collection dataCollectionGroup="Colubris"/>
+    <% end -%>
+    <% if @concord -%>
+        <include-collection dataCollectionGroup="Concord"/>
+    <% end -%>
+    <% if @cyclades -%>
+        <include-collection dataCollectionGroup="Cyclades"/>
+    <% end -%>
+    <% if @dell -%>
+        <include-collection dataCollectionGroup="Dell"/>
+    <% end -%>
+    <% if @ericsson -%>
+        <include-collection dataCollectionGroup="Ericsson"/>
+    <% end -%>
+    <% if @equallogic -%>
+        <include-collection dataCollectionGroup="Equallogic"/>
+    <% end -%>
+    <% if @extreme -%>
+        <include-collection dataCollectionGroup="Extreme Networks"/>
+    <% end -%>
+    <% if @f5 -%>
+        <include-collection dataCollectionGroup="F5"/>
+    <% end -%>
+    <% if @fortinet -%>
+        <include-collection dataCollectionGroup="Fortinet-Fortigate-Application-v5.2"/>
+        <include-collection dataCollectionGroup="Fortinet-Fortigate-ExplicitProxy-v5.2"/>
+        <include-collection dataCollectionGroup="Fortinet-Fortigate-HA-v5.2"/>
+        <include-collection dataCollectionGroup="Fortinet-Fortigate-System-v5.2"/>
+        <include-collection dataCollectionGroup="Fortinet-Fortigate-Security-v5.2"/>
+    <% end -%>
+    <% if @force10 -%>
+        <include-collection dataCollectionGroup="Force10"/>
+    <% end -%>
+    <% if @foundry -%>
+        <include-collection dataCollectionGroup="Foundry Networks"/>
+    <% end -%>
+    <% if @hp -%>
+        <include-collection dataCollectionGroup="HP"/>
+    <% end -%>
+    <% if @hwg -%>
+        <include-collection dataCollectionGroup="HWg"/>
+    <% end -%>
+    <% if @ibm -%>
+        <include-collection dataCollectionGroup="IBM"/>
+    <% end -%>
+    <% if @ipunity -%>
+        <include-collection dataCollectionGroup="IP Unity"/>
+    <% end -%>
+    <% if @juniper -%>
+        <include-collection dataCollectionGroup="Juniper"/>
+    <% end -%>
+    <% if @konica -%>
+        <include-collection dataCollectionGroup="Konica"/>
+    <% end -%>
+    <% if @kyocera -%>
+        <include-collection dataCollectionGroup="Kyocera"/>
+    <% end -%>
+    <% if @lexmark -%>
+        <include-collection dataCollectionGroup="Lexmark"/>
+    <% end -%>
+    <% if @liebert -%>
+        <include-collection dataCollectionGroup="Liebert"/>
+    <% end -%>
+    <% if @makelsan -%>
+        <include-collection dataCollectionGroup="Makelsan"/>
+    <% end -%>
+    <% if @mge -%>
+        <include-collection dataCollectionGroup="MGE"/>
+    <% end -%>
+    <% if @microsoft -%>
+        <include-collection dataCollectionGroup="Microsoft"/>
+    <% end -%>
+    <% if @mikrotik -%>
+        <include-collection dataCollectionGroup="Mikrotik"/>
+    <% end -%>
+    <% if @netapp -%>
+        <include-collection dataCollectionGroup="Network Appliance"/>
+    <% end -%>
+    <% if @netbotz -%>
+        <include-collection dataCollectionGroup="Netbotz"/>
+    <% end -%>
+    <% if @netenforcer -%>
+        <include-collection dataCollectionGroup="NetEnforcer"/>
+    <% end -%>
+    <% if @netscaler -%>
+        <include-collection dataCollectionGroup="Netscaler"/>
+    <% end -%>
+    <% if @netsnmp -%>
+        <include-collection dataCollectionGroup="Net-SNMP"/>
+    <% end -%>
+    <% if @nortel -%>
+        <include-collection dataCollectionGroup="Nortel"/>
+    <% end -%>
+    <% if @novell -%>
+        <include-collection dataCollectionGroup="Novell"/>
+    <% end -%>
+        <include-collection dataCollectionGroup="PaloAlto"/>
+    <% if @pfsense -%>
+        <include-collection dataCollectionGroup="pfSense"/>
+    <% end -%>
+    <% if @powerware -%>
+        <include-collection dataCollectionGroup="Powerware"/>
+    <% end -%>
+    <% if @postgres -%>
+        <include-collection dataCollectionGroup="PostgreSQL-JDBC"/>
+    <% end -%>
+        <include-collection dataCollectionGroup="Printers"/>
+    <% if @riverbed -%>
+        <include-collection dataCollectionGroup="Riverbed"/>
+    <% end -%>
+        <include-collection dataCollectionGroup="Routers"/>
+    <% if @savin -%>
+        <include-collection dataCollectionGroup="Savin or Ricoh Printers"/>
+    <% end -%>
+    <% if @servertech -%>
+        <include-collection dataCollectionGroup="ServerTech"/>
+    <% end -%>
+        <include-collection dataCollectionGroup="SNMP-Informant"/>
+    <% if @sofaware -%>
+        <include-collection dataCollectionGroup="SofaWare"/>
+    <% end -%>
+        <include-collection dataCollectionGroup="Sonicwall"/>
+    <% if @sun -%>
+        <include-collection dataCollectionGroup="SUN Microsystems"/>
+    <% end -%>
+    <% if @trango -%>
+        <include-collection dataCollectionGroup="Trango"/>
+    <% end -%>
+    <% if @wmi -%>
+        <include-collection dataCollectionGroup="WMI"/>
+    <% end -%>
+    <% if @xmp -%>
+        <include-collection dataCollectionGroup="XMP"/>
+    <% end -%>
+        <include-collection dataCollectionGroup="Zertico"/>
+    <% if @zeus -%>
+        <include-collection dataCollectionGroup="Zeus"/>
+    <% end -%>
+    <% if @vmware3 -%>
+        <include-collection dataCollectionGroup="VMware3"/>
+    <% end -%>
+    <% if @vmware4 -%>
+        <include-collection dataCollectionGroup="VMware4"/>
+    <% end -%>
+    <% if @vmware5 -%>
+        <include-collection dataCollectionGroup="VMware5"/>
+    <% end -%>
+    <% if @vmwarecim -%>
+        <include-collection dataCollectionGroup="VMware-Cim"/>
+    <% end -%>
+    </snmp-collection>
+    <% end -%>
+
+    <% if @ejn['enabled'] -%>
+    <!-- We need a dedicated collection with a different RRD setup for EJN equipment because
+  the data in the EJN SNMP MIB is only updated once every 15 min by default or alternatively
+  once every 3 min with the hidden "set services epg pgw snmp update-every-three-minutes"
+  config option -->
+    <snmp-collection name="ejn" snmpStorageFlag="<%= @ejn['snmpStorageFlag'] %>">
+        <rrd step="<%= @ejn['rrd']['step'] %>">
+	  <% @ejn['rrd']['rras'].each do |rra| -%>
+            <rra><%=rra%></rra>
+          <% end -%>
+        </rrd>
+
+        <include-collection dataCollectionGroup="ejn"/>
+    </snmp-collection>
+    <% end -%>
+</datacollection-config>

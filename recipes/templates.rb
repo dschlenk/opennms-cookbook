@@ -20,7 +20,8 @@ onms_home = node['opennms']['conf']['home']
 onms_home ||= '/opt/opennms'
 
 # don't make wrappers that change templates support multiple versions
-mv = Opennms::Helpers.major('%{version}')
+mv = Opennms::Helpers.major(node['opennms']['version'])
+puts "version: #{node['opennms']['version']}; mv: #{mv}"
 template_dir = if node['opennms']['conf']['cookbook'] == 'opennms'
                  "horizon-#{mv % { version: node['opennms']['version'] }}/"
                else
@@ -462,7 +463,7 @@ template "#{onms_home}/etc/linkd-configuration.xml" do
     vlan_cisco: node['opennms']['linkd']['vlan']['enable_cisco'],
     vlan_extreme: node['opennms']['linkd']['vlan']['enable_extreme']
   )
-  only_if { Opennms::Helpers.major(node['opennms']['version']).to_i == '16' }
+  only_if { Opennms::Helpers.major(node['opennms']['version']).to_i == 16 }
 end
 
 template "#{onms_home}/etc/magic-users.properties" do
@@ -482,6 +483,7 @@ template "#{onms_home}/etc/magic-users.properties" do
     remoting_users: node['opennms']['magic_users']['remoting_users'],
     rest_users: node['opennms']['magic_users']['rest_users']
   )
+  not_if { Opennms::Helpers.major(node['opennms']['version']).to_i >= 19 }
 end
 
 template "#{onms_home}/etc/map.properties" do
@@ -552,7 +554,7 @@ template "#{onms_home}/etc/model-importer.properties" do
     requisition_dir: node['opennms']['importer']['requisition_dir'],
     foreign_source_dir: node['opennms']['importer']['foreign_source_dir']
   )
-  not_if { Opennms::Helpers.major(node['opennms']['version']).to_i == 18 }
+  not_if { Opennms::Helpers.major(node['opennms']['version']).to_i >= 18 }
 end
 
 template "#{onms_home}/etc/modemConfig.properties" do
