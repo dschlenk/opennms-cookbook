@@ -48,6 +48,7 @@ branches.each do |branch|
     ml = yum_attr(branch, platform, 'url')
     fom = yum_attr(branch, platform, 'failovermethod')
     inc_pkgs = yum_attr(branch, platform, 'includepkgs')
+    repo_enabled = yum_attr(branch, platform, 'enabled')
     ex = yum_attr(branch, platform, 'exclude')
     yum_repository "opennms-#{branch}-#{platform}" do
       description "#{platform} OpenNMS RPMs (#{branch})"
@@ -55,6 +56,7 @@ branches.each do |branch|
       mirrorlist ml unless ml.nil? || '' == ml
       gpgkey 'file:///etc/yum.repos.d/OPENNMS-GPG-KEY'
       failovermethod fom unless fom.nil? | '' == fom
+      enabled repo_enabled
       includepkgs inc_pkgs unless inc_pkgs.nil? || '' == inc_pkgs
       exclude ex unless ex.nil? || '' == ex
       action :create
@@ -66,7 +68,7 @@ onms_packages = ['opennms-core', 'opennms-webapp-jetty', 'opennms-docs']
 onms_versions = [node['opennms']['version'], node['opennms']['version'],
                  node['opennms']['version']]
 
-if node['opennms']['plugin']['xml']
+if node['opennms']['plugin']['xml'] && Opennms::Helpers.major(node['opennms']['version']).to_i <= 18
   onms_packages.push 'opennms-plugin-protocol-xml'
   onms_versions.push node['opennms']['version']
 end

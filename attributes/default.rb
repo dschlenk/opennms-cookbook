@@ -1,3 +1,4 @@
+onms_home = '/opt/opennms'
 # change default yum_timeout to 1200 because opennms packages are slow sometimes.
 default['yum_timeout'] = 1200
 # yum repo stuff
@@ -15,7 +16,7 @@ default['yum']['opennms-snapshot-common']['failovermethod'] = 'roundrobin'
 default['yum']['opennms-snapshot-rhel6']['baseurl']         = 'http://yum.opennms.org/snapshot/rhel6'
 default['yum']['opennms-snapshot-rhel6']['failovermethod']  = 'roundrobin'
 default['build-essential']['compile_time'] = true
-default['opennms']['version'] = '18.0.2-1'
+default['opennms']['version'] = '19.0.0-1'
 # default['opennms']['version_major'] = "%{version}"
 default['opennms']['allow_downgrade'] = false
 default['opennms']['stable'] = true
@@ -39,6 +40,27 @@ default['opennms']['plugin']['nsclient'] = false
 default['opennms']['addl_handlers'] = []
 # change to true to generate a random password
 default['opennms']['secure_admin'] = false
+# opennms.conf
+default['opennms']['conf']['home']           = "#{onms_home}"
+
+default['opennms']['conf']['pidfile']        = "#{onms_home}/logs/opennms.pid"
+default['opennms']['conf']['logdir']         = "#{onms_home}/logs"
+default['opennms']['conf']['initdir']        = "#{onms_home}/bin"
+default['opennms']['conf']['redirect']       = '$LOG_DIRECTORY/output.log'
+default['opennms']['conf']['start_timeout']  = 35
+default['opennms']['conf']['status_wait']    = 5
+default['opennms']['conf']['heap_size']      = 512
+default['opennms']['conf']['addl_mgr_opts']  = ''
+default['opennms']['conf']['addl_classpath'] = ''
+default['opennms']['conf']['use_incgc']      = ''
+default['opennms']['conf']['hotspot']        = ''
+default['opennms']['conf']['verbose_gc']     = ''
+default['opennms']['conf']['runjava_opts']   = ''
+default['opennms']['conf']['invoke_url']     = 'http://127.0.0.1:8181/invoke?objectname=OpenNMS:Name=Manager'
+default['opennms']['conf']['runas']          = 'root'
+default['opennms']['conf']['max_file_descr'] = '20480'
+default['opennms']['conf']['max_stack_sgmt'] = '8192'
+default['opennms']['conf']['command']        = ''
 # TEMPLATES
 
 # whether or not to use all templates or just base.
@@ -188,36 +210,38 @@ sg['zeus']['cookbook']                 = node['opennms']['default_template_cookb
 
 # RRD locations
 # defaults
-default['opennms']['default_rrd_repository']          = "#{default['opennms']['conf']['home']}/share/rrd/snmp/"
-default['opennms']['default_response_rrd_repository'] = "#{default['opennms']['conf']['home']}/share/rrd/response/"
+default['opennms']['default_rrd_repository']          = "#{onms_home}/share/rrd/snmp/"
+def_rrd_repo = "#{onms_home}/share/rrd/snmp/"
+default['opennms']['default_response_rrd_repository'] = "#{onms_home}/share/rrd/response"
+def_rrd_resp_repo = "#{onms_home}/share/rrd/response"
 # specifics
-default['opennms']['poller']['example1']['icmp']['rrd_repository']            = node['opennms']['default_response_rrd_directory']
-default['opennms']['poller']['example1']['dns']['rrd_repository']             = node['opennms']['default_response_rrd_directory']
-default['opennms']['poller']['example1']['smtp']['rrd_repository']            = node['opennms']['default_response_rrd_directory']
-default['opennms']['poller']['example1']['http']['rrd_repository']            = node['opennms']['default_response_rrd_directory']
-default['opennms']['poller']['example1']['http_8080']['rrd_repository']       = node['opennms']['default_response_rrd_directory']
-default['opennms']['poller']['example1']['http_8000']['rrd_repository']       = node['opennms']['default_response_rrd_directory']
-default['opennms']['poller']['example1']['hyperichq']['rrd_repository']       = node['opennms']['default_response_rrd_directory']
-default['opennms']['poller']['example1']['ssh']['rrd_repository']             = node['opennms']['default_response_rrd_directory']
-default['opennms']['poller']['example1']['pop3']['rrd_repository']            = node['opennms']['default_response_rrd_directory']
-default['opennms']['poller']['example1']['nrpe']['rrd_repository']            = node['opennms']['default_response_rrd_directory']
-default['opennms']['poller']['example1']['nrpe_nossl']['rrd_repository']      = node['opennms']['default_response_rrd_directory']
-default['opennms']['poller']['example1']['opennms_jvm']['rrd_repository']     = node['opennms']['default_response_rrd_directory']
-default['opennms']['poller']['strafer']['strafeping']['rrd_repository']       = node['opennms']['default_response_rrd_directory']
-default['opennms']['jdbc_dc']['rrd_repository']                               = node['opennms']['default_rrd_repository']
-default['opennms']['jmx_dc']['rrd_repository']                                = node['opennms']['default_rrd_repository']
-default['opennms']['nsclient_datacollection']['rrd_repository']               = node['opennms']['default_rrd_repository']
-default['opennms']['thresholds']['mib2']['rrd_repository']                    = node['opennms']['default_rrd_repository']
-default['opennms']['thresholds']['hrstorage']['rrd_repository']               = node['opennms']['default_rrd_repository']
-default['opennms']['thresholds']['cisco']['rrd_repository']                   = node['opennms']['default_rrd_repository']
-default['opennms']['thresholds']['netsnmp']['rrd_repository']                 = node['opennms']['default_rrd_repository']
-default['opennms']['thresholds']['netsnmp_memory_linux']['rrd_repository']    = node['opennms']['default_rrd_repository']
-default['opennms']['thresholds']['netsnmp_memory_nonlinux']['rrd_repository'] = node['opennms']['default_rrd_repository']
-default['opennms']['thresholds']['coffee']['rrd_repository']                  = node['opennms']['default_rrd_repository']
-default['opennms']['vmware_cim']['rrd_repository']                            = node['opennms']['default_rrd_repository']
-default['opennms']['vmware']['rrd_repository']                                = node['opennms']['default_rrd_repository']
-default['opennms']['wmi']['rrd_repository']                                   = node['opennms']['default_rrd_repository']
-default['opennms']['xml']['rrd_repository']                                   = node['opennms']['default_rrd_repository']
+default['opennms']['poller']['example1']['icmp']['rrd_repository']            = def_rrd_resp_repo
+default['opennms']['poller']['example1']['dns']['rrd_repository']             = def_rrd_resp_repo
+default['opennms']['poller']['example1']['smtp']['rrd_repository']            = def_rrd_resp_repo
+default['opennms']['poller']['example1']['http']['rrd_repository']            = def_rrd_resp_repo
+default['opennms']['poller']['example1']['http_8080']['rrd_repository']       = def_rrd_resp_repo
+default['opennms']['poller']['example1']['http_8000']['rrd_repository']       = def_rrd_resp_repo
+default['opennms']['poller']['example1']['hyperichq']['rrd_repository']       = def_rrd_resp_repo
+default['opennms']['poller']['example1']['ssh']['rrd_repository']             = def_rrd_resp_repo
+default['opennms']['poller']['example1']['pop3']['rrd_repository']            = def_rrd_resp_repo
+default['opennms']['poller']['example1']['nrpe']['rrd_repository']            = def_rrd_resp_repo
+default['opennms']['poller']['example1']['nrpe_nossl']['rrd_repository']      = def_rrd_resp_repo
+default['opennms']['poller']['example1']['opennms_jvm']['rrd_repository']     = def_rrd_resp_repo
+default['opennms']['poller']['strafer']['strafeping']['rrd_repository']       = def_rrd_resp_repo
+default['opennms']['jdbc_dc']['rrd_repository']                               = def_rrd_repo
+default['opennms']['jmx_dc']['rrd_repository']                                = def_rrd_repo
+default['opennms']['nsclient_datacollection']['rrd_repository']               = def_rrd_repo
+default['opennms']['thresholds']['mib2']['rrd_repository']                    = def_rrd_repo
+default['opennms']['thresholds']['hrstorage']['rrd_repository']               = def_rrd_repo
+default['opennms']['thresholds']['cisco']['rrd_repository']                   = def_rrd_repo
+default['opennms']['thresholds']['netsnmp']['rrd_repository']                 = def_rrd_repo
+default['opennms']['thresholds']['netsnmp_memory_linux']['rrd_repository']    = def_rrd_repo
+default['opennms']['thresholds']['netsnmp_memory_nonlinux']['rrd_repository'] = def_rrd_repo
+default['opennms']['thresholds']['coffee']['rrd_repository']                  = def_rrd_repo
+default['opennms']['vmware_cim']['rrd_repository']                            = def_rrd_repo
+default['opennms']['vmware']['rrd_repository']                                = def_rrd_repo
+default['opennms']['wmi']['rrd_repository']                                   = def_rrd_repo
+default['opennms']['xml']['rrd_repository']                                   = def_rrd_repo
 
 # users.xml
 default['opennms']['users']['admin']['name']          = 'Administrator'
@@ -227,26 +251,6 @@ default['opennms']['users']['admin']['user_comments'] = 'Default administrator, 
 # changed for you.
 default['opennms']['users']['admin']['password']      = 'admin'
 default['opennms']['users']['admin']['pwhash']        = '21232F297A57A5A743894A0E4A801FC3'
-# opennms.conf
-default['opennms']['conf']['home']           = '/opt/opennms'
-default['opennms']['conf']['pidfile']        = "#{default['opennms']['conf']['home']}/logs/opennms.pid"
-default['opennms']['conf']['logdir']         = "#{default['opennms']['conf']['home']}/logs"
-default['opennms']['conf']['initdir']        = "#{default['opennms']['conf']['home']}/bin"
-default['opennms']['conf']['redirect']       = '$LOG_DIRECTORY/output.log'
-default['opennms']['conf']['start_timeout']  = 35
-default['opennms']['conf']['status_wait']    = 5
-default['opennms']['conf']['heap_size']      = 512
-default['opennms']['conf']['addl_mgr_opts']  = ''
-default['opennms']['conf']['addl_classpath'] = ''
-default['opennms']['conf']['use_incgc']      = ''
-default['opennms']['conf']['hotspot']        = ''
-default['opennms']['conf']['verbose_gc']     = ''
-default['opennms']['conf']['runjava_opts']   = ''
-default['opennms']['conf']['invoke_url']     = 'http://127.0.0.1:8181/invoke?objectname=OpenNMS:Name=Manager'
-default['opennms']['conf']['runas']          = 'root'
-default['opennms']['conf']['max_file_descr'] = '20480'
-default['opennms']['conf']['max_stack_sgmt'] = '8192'
-default['opennms']['conf']['command']        = ''
 
 # non-default daemons
 default['opennms']['services']['dhcpd']       = false
@@ -259,11 +263,11 @@ default['opennms']['services']['xmlrpcd']     = false
 default['opennms']['services']['asterisk_gw'] = false
 default['opennms']['services']['apm']         = false
 # opennms.properties
-default['opennms']['properties']['dc']['rrd_base_dir']        = "#{default['opennms']['conf']['home']}/share/rrd"
-default['opennms']['properties']['misc']['bin_dir']           = "#{default['opennms']['conf']['home']}/bin"
-default['opennms']['properties']['reporting']['template_dir'] = "#{default['opennms']['conf']['home']}/etc"
-default['opennms']['properties']['reporting']['report_dir']   = "#{default['opennms']['conf']['home']}/share/reports"
-default['opennms']['properties']['reporting']['report_logo']  = "#{default['opennms']['conf']['home']}/webapps/images/logo.gif"
+default['opennms']['properties']['dc']['rrd_base_dir']        = "#{onms_home}/share/rrd"
+default['opennms']['properties']['misc']['bin_dir']           = "#{onms_home}/bin"
+default['opennms']['properties']['reporting']['template_dir'] = "#{onms_home}/etc"
+default['opennms']['properties']['reporting']['report_dir']   = "#{onms_home}/share/reports"
+default['opennms']['properties']['reporting']['report_logo']  = "#{onms_home}/webapps/images/logo.gif"
 # ICMP
 default['opennms']['properties']['icmp']['pinger_class'] = nil # "org.opennms.netmgt.icmp.jni6.Jni6Pinger"
 default['opennms']['properties']['icmp']['require_v4']   = nil
@@ -306,7 +310,7 @@ default['opennms']['properties']['misc']['find_by_service_type_query']     = nil
 default['opennms']['properties']['misc']['load_snmp_data_on_init']         = nil
 default['opennms']['properties']['misc']['allow_html_fields']              = nil
 # Reporting
-default['opennms']['properties']['reporting']['jasper_version'] = '6.1.1'
+default['opennms']['properties']['reporting']['jasper_version'] = '6.3.0'
 default['opennms']['properties']['reporting']['ksc_graphs_per_line'] = 1
 # Eventd IPC
 default['opennms']['properties']['eventd']['proxy_host']     = nil
@@ -414,8 +418,8 @@ default['opennms']['apm']['pscan_interval']    = 1_800_000
 default['opennms']['apm']['aruba_enabled']     = true
 default['opennms']['apm']['moto_enabled']      = true
 # database reports - availability
-default['opennms']['db_reports']['avail']['cal']['logo']                    = "#{default['opennms']['conf']['home']}/etc/reports/logo.gif"
-default['opennms']['db_reports']['avail']['classic']['logo']                = "#{default['opennms']['conf']['home']}/etc/reports/logo.gif"
+default['opennms']['db_reports']['avail']['cal']['logo']                    = "#{onms_home}/etc/reports/logo.gif"
+default['opennms']['db_reports']['avail']['classic']['logo']                = "#{onms_home}/etc/reports/logo.gif"
 default['opennms']['db_reports']['avail']['cal']['endDate']['interval']     = 'day'
 default['opennms']['db_reports']['avail']['cal']['endDate']['count']        = 1
 default['opennms']['db_reports']['avail']['cal']['endDate']['hours']        = 23
@@ -883,6 +887,7 @@ default['opennms']['log4j2']['discovery'] = 'WARN'
 default['opennms']['log4j2']['eventd'] = 'WARN'
 default['opennms']['log4j2']['event_translator'] = 'WARN'
 default['opennms']['log4j2']['icmp'] = 'WARN'
+default['opennms']['log4j2']['ipc'] = 'WARN'
 default['opennms']['log4j2']['jetty_server'] = 'WARN'
 default['opennms']['log4j2']['linkd'] = 'WARN'
 default['opennms']['log4j2']['enlinkd'] = 'WARN'
@@ -1030,8 +1035,8 @@ default['opennms']['microblog']['default_profile']['oauth_csecret']       = nil 
 default['opennms']['microblog']['default_profile']['oauth_atoken']        = nil # relevant for twitter only
 default['opennms']['microblog']['default_profile']['oauth_atoken_secret'] = nil # relevant for twitter only
 # model-importer.properties / provisiond-configuration.xml
-default['opennms']['importer']['requisition_dir']    = "#{default['opennms']['conf']['home']}/etc/imports"
-default['opennms']['importer']['foreign_source_dir'] = "#{default['opennms']['conf']['home']}/etc/foreign-sources"
+default['opennms']['importer']['requisition_dir']    = "#{onms_home}/etc/imports"
+default['opennms']['importer']['foreign_source_dir'] = "#{onms_home}/etc/foreign-sources"
 default['opennms']['importer']['import_url']         = 'file:/path/to/dump.xml'
 default['opennms']['importer']['schedule']           = '0 0 0 1 1 ? 2023'
 default['opennms']['importer']['threads']            = 8
@@ -1418,7 +1423,7 @@ default['opennms']['remedy']['reason_resolved']              = 'Automated Resolu
 default['opennms']['remedy']['reason_cancelled']             = 'No longer a Causal CI'
 # reportd-configuration.xml
 default['opennms']['reportd']['persist_reports'] = 'yes'
-default['opennms']['reportd']['storage_location'] = "#{default['opennms']['conf']['home']}/share/reports/"
+default['opennms']['reportd']['storage_location'] = "#{onms_home}/share/reports/"
 # response adhoc graphs
 default['opennms']['response_adhoc_graph']['command_prefix'] = nil # lets you customize the entire command prefix
 # respons-graph.properties

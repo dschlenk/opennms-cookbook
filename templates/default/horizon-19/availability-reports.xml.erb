@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<opennms-reports
+	xmlns:this="http://xmlns.opennms.org/xsd/config/opennms-reports"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://xmlns.opennms.org/xsd/config/opennms-reports">
+	<report id="local_defaultCalendarReport" 
+		type="calendar">
+		<logo><%= @cal_logo %></logo>
+		<svg-template>file://<%= @onms_home %>/etc/reports/SVGAvailReport.xsl</svg-template>
+		<pdf-template>file://<%= @onms_home %>/etc/reports/PDFAvailReport.xsl</pdf-template>
+		<html-template>file://<%= @onms_home %>/etc/reports/HTMLAvailReport.xsl</html-template>
+		<parameters>
+			<string-parm name="reportCategory" display-name="report category" input-type="reportCategorySelector" />
+			<date-parm name="endDate" display-name="end date" use-absolute-date="false">
+				<default-interval><%=@cal_interval %></default-interval>
+				<default-count><%= @cal_count %></default-count>
+				<default-time>
+					<hours><%= @cal_hours %></hours>
+					<minutes><%= @cal_minutes %></minutes>
+				</default-time>
+			</date-parm>
+		</parameters>
+	</report>
+	<report id="local_defaultClassicReport" 
+		type="classic">
+		<logo><%= @classic_logo %></logo>
+		<svg-template>file://<%= @onms_home %>/etc/reports/SVGAvailReport.xsl</svg-template>
+		<pdf-template>file://<%= @onms_home %>/etc/reports/PDFAvailReport.xsl</pdf-template>
+		<html-template>file://<%= @onms_home %>/etc/reports/HTMLAvailReport.xsl</html-template>
+		<parameters>
+			<string-parm name="reportCategory" display-name="report category" input-type="reportCategorySelector" />
+			<date-parm name="endDate" display-name="end date" use-absolute-date="false">
+				<default-interval><%= @classic_interval %></default-interval>
+				<default-count><%= @classic_count %></default-count>
+				<default-time>
+					<hours><%= @classic_hours %></hours>
+					<minutes><%= @classic_minutes %></minutes>
+				</default-time>
+			</date-parm>
+		</parameters>
+	</report>
+</opennms-reports>

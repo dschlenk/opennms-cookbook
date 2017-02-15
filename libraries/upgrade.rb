@@ -71,14 +71,16 @@ module Opennms
     end
 
     def self.clean_dir(dir, type)
-      Dir.foreach(dir) do |file|
-        if match = file.match(/^(.*)\.#{type}$/)
-          if type == 'rpmsave'
-            FileUtils.rm("#{dir}/#{file}")
-          elsif type == 'rpmnew'
-            orig_file = match.captures[0]
-            FileUtils.cp("#{dir}/#{orig_file}", "#{dir}/#{orig_file}.bak")
-            FileUtils.mv("#{dir}/#{file}", "#{dir}/#{orig_file}")
+      if ::File.exist?(dir)
+        Dir.foreach(dir) do |file|
+          if match = file.match(/^(.*)\.#{type}$/)
+            if type == 'rpmsave'
+              FileUtils.rm("#{dir}/#{file}")
+            elsif type == 'rpmnew'
+              orig_file = match.captures[0]
+              FileUtils.cp("#{dir}/#{orig_file}", "#{dir}/#{orig_file}.bak")
+              FileUtils.mv("#{dir}/#{file}", "#{dir}/#{orig_file}")
+            end
           end
         end
       end
