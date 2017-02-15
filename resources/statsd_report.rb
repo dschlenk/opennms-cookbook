@@ -12,7 +12,7 @@ attribute :description, kind_of: String, required: true
 # default is daily at 01:20:00. No validation is done (currently).
 attribute :schedule, kind_of: String, default: '0 20 1 * * ?', required: true
 # defaults to 30 days
-attribute :retain_interval, kind_of: Fixnum, default: 2_592_000_000, required: true
+attribute :retain_interval, kind_of: Integer, default: 2_592_000_000, required: true
 attribute :status, kind_of: String, equal_to: %w(on off), default: 'on', required: true
 # key/value string pairs
 attribute :parameters, kind_of: Hash

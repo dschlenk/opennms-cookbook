@@ -9,9 +9,9 @@ attribute :service_name, kind_of: String
 # required for create
 attribute :class_name,   kind_of: String
 attribute :foreign_source_name, kind_of: String
-attribute :port,         kind_of: Fixnum
-attribute :retry_count,  kind_of: Fixnum
-attribute :timeout,      kind_of: Fixnum
+attribute :port,         kind_of: Integer
+attribute :retry_count,  kind_of: Integer
+attribute :timeout,      kind_of: Integer
 # If this is a changed resource and action is create, the params specified will replace all existing.
 # So even if you need to change just one param, you need to include the entire set for this detector.
 attribute :params,       kind_of: Hash

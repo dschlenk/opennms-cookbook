@@ -19,14 +19,14 @@ attribute :service_name, kind_of: String, default: 'JDBC', required: true
 attribute :package_name, kind_of: String, default: 'example1', required: true
 attribute :collection, kind_of: String, default: 'default', required: true
 # defaults to 300000 during create
-attribute :interval, kind_of: Fixnum # , :default => 300000
+attribute :interval, kind_of: Integer # , :default => 300000
 attribute :user_defined, kind_of: [FalseClass, TrueClass] # , :default => false
 # defaults to 'on' during create
 attribute :status, kind_of: String, equal_to: %w(on off) # , :default => 'on'
 # defaults to 3000 during create
-attribute :timeout, kind_of: Fixnum # , :default => 3000
+attribute :timeout, kind_of: Integer # , :default => 3000
 # defaults to 1 during create
-attribute :retry_count, kind_of: Fixnum # , :default => 1
+attribute :retry_count, kind_of: Integer # , :default => 1
 # defaults to false during create
 attribute :thresholding_enabled, kind_of: [FalseClass, TrueClass] # , :default => false
 # The rest of the attributes are generally required for create action, but not
@@ -36,7 +36,7 @@ attribute :driver, kind_of: String
 attribute :driver_file, kind_of: String
 attribute :user, kind_of: String
 attribute :password, kind_of: String
-attribute :port, kind_of: Fixnum
+attribute :port, kind_of: Integer
 attribute :url, kind_of: String
 
 attr_accessor :exists, :collection_exists, :changed

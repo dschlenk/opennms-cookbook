@@ -33,31 +33,31 @@ node.default['postgresql']['pg_hba'] = [
     'db' => 'all',
     'method' => 'trust',
     'type' => 'local',
-    'user' => 'all'
+    'user' => 'all',
   },
   { 'addr' => '127.0.0.1/32',
     'db' => 'all',
     'method' => 'trust',
     'type' => 'host',
-    'user' => 'all'
+    'user' => 'all',
   },
   { 'addr' => '::1/128',
     'db' => 'all',
     'method' => 'trust',
     'type' => 'host',
-    'user' => 'all'
+    'user' => 'all',
   }]
 node.default['postgresql']['client']['packages'] = [
   'postgresql93',
   'postgresql93-contrib',
-  'postgresql93-devel'
+  'postgresql93-devel',
 ]
 node.default['postgresql']['server']['packages'] = [
-  'postgresql93-server'
+  'postgresql93-server',
 ]
 node.default['postgresql']['server']['service_name'] = 'postgresql-9.3'
 node.default['postgresql']['contrib']['packages'] = [
-  'postgresql93-contrib'
+  'postgresql93-contrib',
 ]
 node.default['postgresql']['contrib']['extensions'] = %w(
   pageinspect

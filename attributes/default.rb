@@ -32,7 +32,7 @@ default['opennms']['upgrade_dirs'] = [
   'jetty-webapps/opennms/WEB-INF/',
   'jetty-webapps/opennms/WEB-INF/jsp/alarm',
   'jetty-webapps/opennms/WEB-INF/jsp/ncs',
-  'jetty-webapps/opennms-remoting/WEB-INF'
+  'jetty-webapps/opennms-remoting/WEB-INF',
 ]
 # whether or not to include the plugin packages
 default['opennms']['plugin']['xml'] = false
@@ -41,7 +41,7 @@ default['opennms']['addl_handlers'] = []
 # change to true to generate a random password
 default['opennms']['secure_admin'] = false
 # opennms.conf
-default['opennms']['conf']['home']           = "#{onms_home}"
+default['opennms']['conf']['home']           = onms_home
 
 default['opennms']['conf']['pidfile']        = "#{onms_home}/logs/opennms.pid"
 default['opennms']['conf']['logdir']         = "#{onms_home}/logs"
@@ -210,7 +210,7 @@ sg['zeus']['cookbook']                 = node['opennms']['default_template_cookb
 
 # RRD locations
 # defaults
-default['opennms']['default_rrd_repository']          = "#{onms_home}/share/rrd/snmp/"
+default['opennms']['default_rrd_repository'] = "#{onms_home}/share/rrd/snmp/"
 def_rrd_repo = "#{onms_home}/share/rrd/snmp/"
 default['opennms']['default_response_rrd_repository'] = "#{onms_home}/share/rrd/response"
 def_rrd_resp_repo = "#{onms_home}/share/rrd/response"

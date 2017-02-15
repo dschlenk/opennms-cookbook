@@ -4,8 +4,8 @@ actions :create, :delete, :create_if_missing
 default_action :create
 
 attribute :name, kind_of: String, name_attribute: true
-attribute :retry_count, kind_of: Fixnum
-attribute :timeout, kind_of: Fixnum
+attribute :retry_count, kind_of: Integer
+attribute :timeout, kind_of: Integer
 attribute :username, kind_of: String
 attribute :domain, kind_of: String
 attribute :password, kind_of: String

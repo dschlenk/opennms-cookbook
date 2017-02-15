@@ -6,7 +6,7 @@ default_action :create
 attribute :ip_addr, kind_of: String, name_attribute: true
 attribute :foreign_source_name, kind_of: String, required: true
 attribute :foreign_id, kind_of: String, required: true
-attribute :status, kind_of: Fixnum
+attribute :status, kind_of: Integer
 attribute :managed, kind_of: [TrueClass, FalseClass]
 attribute :snmp_primary, kind_of: String, equal_to: %w(P S N)
 # sync the import. Re-runs discovery.
@@ -18,7 +18,7 @@ attribute :sync_existing, kind_of: [TrueClass, FalseClass], default: false
 # you might want to do this is if a service restart happens at the
 # end of the converge before the syncs end, the pending syncs will
 # never happen.
-attribute :sync_wait_periods, kind_of: Fixnum, default: 30
-attribute :sync_wait_secs, kind_of: Fixnum, default: 10
+attribute :sync_wait_periods, kind_of: Integer, default: 30
+attribute :sync_wait_secs, kind_of: Integer, default: 10
 
 attr_accessor :exists, :import_exists, :node_exists
