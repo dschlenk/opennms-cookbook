@@ -6,6 +6,8 @@ DEPENDENCIES
   opennms
     path: .
     metadata: true
+  oracle_java8
+    path: test/fixtures/cookbooks/oracle_java8
   postgresql (>= 3.4.20)
   yum-centos
   yum-epel
@@ -24,7 +26,12 @@ GRAPH
     apt (>= 0.0.0)
     nginx (>= 0.0.0)
     yum (>= 0.0.0)
+  homebrew (3.0.0)
   hostsfile (2.4.5)
+  java (1.47.0)
+    apt (>= 0.0.0)
+    homebrew (>= 0.0.0)
+    windows (>= 0.0.0)
   mingw (1.2.3)
     compat_resource (>= 0.0.0)
     seven_zip (>= 0.0.0)
@@ -38,7 +45,7 @@ GRAPH
     compat_resource (>= 12.10)
   onms_lwrp_test (0.1.0)
     opennms (>= 0.0.0)
-  opennms (18.3.1)
+  opennms (19.0.0)
     build-essential (>= 0.0.0)
     grafana (>= 0.0.0)
     hostsfile (>= 0.0.0)
@@ -47,6 +54,8 @@ GRAPH
     yum (>= 0.0.0)
   openssl (4.4.0)
     chef-sugar (>= 3.1.1)
+  oracle_java8 (0.1.0)
+    java (>= 0.0.0)
   packagecloud (0.2.4)
   postgresql (4.0.6)
     apt (>= 1.9.0)

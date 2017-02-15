@@ -26,10 +26,12 @@ suites:
   - name: default_latest
     run_list:
       - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
       - recipe[opennms::default]
   - name: default_17
     run_list:
       - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
       - recipe[opennms::default]
     attributes:
       opennms:
@@ -42,6 +44,7 @@ suites:
   - name: default_16
     run_list:
       - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
       - recipe[opennms::default]
     attributes:
       opennms:
@@ -54,11 +57,13 @@ suites:
   - name: service_detector
     run_list:
       - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
       - recipe[opennms::notemplates]
       - recipe[onms_lwrp_test::service_detector]
   - name: events
     run_list:
       - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
       - recipe[opennms::notemplates]
       - recipe[onms_lwrp_test::webopts]
       - recipe[onms_lwrp_test::eventconf]
@@ -66,6 +71,7 @@ suites:
   - name: events_16
     run_list:
       - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
       - recipe[opennms::notemplates]
       - recipe[onms_lwrp_test::webopts]
       - recipe[onms_lwrp_test::eventconf]
@@ -81,6 +87,7 @@ suites:
   - name: events_17
     run_list:
       - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
       - recipe[opennms::notemplates]
       - recipe[onms_lwrp_test::webopts]
       - recipe[onms_lwrp_test::eventconf]
@@ -96,6 +103,7 @@ suites:
   - name: disco
     run_list:
       - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
       - recipe[opennms::notemplates]
       - recipe[onms_lwrp_test::webopts]
       - recipe[onms_lwrp_test::disco_specific]
@@ -104,6 +112,7 @@ suites:
   - name: disco_17
     run_list:
       - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
       - recipe[opennms::notemplates]
       - recipe[onms_lwrp_test::webopts]
       - recipe[onms_lwrp_test::disco_specific]
@@ -120,6 +129,7 @@ suites:
   - name: upgrade_step1
     run_list:
       - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
       - recipe[opennms::notemplates]
       - recipe[onms_lwrp_test::webopts]
       - recipe[onms_lwrp_test::eventconf]
@@ -137,6 +147,7 @@ suites:
   - name: upgrade_step2
     run_list:
       - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
       - recipe[opennms::notemplates]
       - recipe[onms_lwrp_test::webopts]
       - recipe[onms_lwrp_test::eventconf]
@@ -155,6 +166,7 @@ suites:
   - name: upgrade_step3
     run_list:
       - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
       - recipe[opennms::notemplates]
       - recipe[onms_lwrp_test::webopts]
       - recipe[onms_lwrp_test::eventconf]
@@ -173,6 +185,7 @@ suites:
   - name: upgrade_step4
     run_list:
       - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
       - recipe[opennms::notemplates]
       - recipe[onms_lwrp_test::webopts]
       - recipe[onms_lwrp_test::eventconf]
@@ -185,6 +198,7 @@ suites:
   - name: change_notif
     run_list:
       - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
       - recipe[opennms::notemplates]
       - recipe[onms_lwrp_test::destination_path]
       - recipe[onms_lwrp_test::notification_command]
@@ -193,6 +207,7 @@ suites:
   - name: all
     run_list:
       - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
       - recipe[opennms::notemplates]
       - recipe[opennms::nsclient]
       - recipe[onms_lwrp_test::all]
@@ -202,6 +217,7 @@ suites:
   - name: all_18
     run_list:
       - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
       - recipe[opennms::notemplates]
       - recipe[opennms::nsclient]
       - recipe[onms_lwrp_test::all]
@@ -217,6 +233,7 @@ suites:
   - name: all_17
     run_list:
       - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
       - recipe[opennms::notemplates]
       - recipe[opennms::nsclient]
       - recipe[onms_lwrp_test::all]
@@ -232,6 +249,7 @@ suites:
   - name: all_16
     run_list:
       - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
       - recipe[opennms::notemplates]
       - recipe[opennms::nsclient]
       - recipe[onms_lwrp_test::all]
@@ -247,6 +265,7 @@ suites:
   - name: imports
     run_list:
       - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
       - recipe[opennms::notemplates]
       - recipe[onms_lwrp_test::foreign_source]
       - recipe[onms_lwrp_test::policy]
@@ -258,10 +277,12 @@ suites:
   - name: notemplates
     run_list:
       - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
       - recipe[opennms::notemplates]
   - name: grafana_17
     run_list:
       - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
       - recipe[opennms::notemplates]
       - recipe[opennms::grafana]
       - recipe[onms_lwrp_test::webopts]
@@ -276,6 +297,7 @@ suites:
   - name: grafana
     run_list:
       - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
       - recipe[opennms::notemplates]
       - recipe[opennms::grafana]
       - recipe[onms_lwrp_test::webopts]
@@ -298,6 +320,7 @@ suites:
   - name: grafana_autogen
     run_list:
       - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
       - recipe[opennms::notemplates]
       - recipe[opennms::grafana]
       - recipe[onms_lwrp_test::webopts]
@@ -320,6 +343,7 @@ suites:
   - name: rrdtool_grafana
     run_list:
       - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
       - recipe[opennms::notemplates]
       - recipe[opennms::rrdtool]
       - recipe[opennms::grafana]
