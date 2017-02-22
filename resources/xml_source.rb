@@ -7,11 +7,16 @@ require 'rexml/document'
 # This LWRP supports either method using either the import_groups (array
 # of cookbook_file names) or xml_groups (hash object representing XML
 #  xml-group elements) attributes.
+#
+# Equivalence/identity determined by all attributes except request_content
 
-actions :create
+actions :create, :delete
 default_action :create
 
-attribute :url, name_attribute: true, kind_of: String, required: true
+
+attribute :name, name_attribute: true, kind_of: String, required: true
+# name used as url when url not specified
+attribute :url, name_attribute: true, kind_of: String
 attribute :collection_name, kind_of: String, required: true
 # GET or POST etc
 attribute :request_method, kind_of: String
