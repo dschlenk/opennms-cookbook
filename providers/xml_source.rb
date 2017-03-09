@@ -1,3 +1,4 @@
+include OpennmsXml
 def whyrun_supported?
   true
 end
@@ -59,59 +60,15 @@ def load_current_resource
   @current_resource.request_content(@new_resource.request_content) unless @new_resource.request_content.nil?
   @current_resource.import_groups(@new_resource.import_groups) unless @new_resource.import_groups.nil?
 
-  if collection_exists?(@current_resource.collection_name)
+  if collection_exists?(node, @current_resource.collection_name, 'xml')
     @current_resource.collection_exists = true
-    if source_exists?(@current_resource)
+    if xml_source_exists?(node, @current_resource)
       @current_resource.exists = true
     end
   end
 end
 
 private
-
-def collection_exists?(collection_name)
-  Chef::Log.debug "Checking to see if this xml collection exists: '#{collection_name}'"
-  file = ::File.new("#{node['opennms']['conf']['home']}/etc/xml-datacollection-config.xml", 'r')
-  doc = REXML::Document.new file
-  !doc.elements["/xml-datacollection-config/xml-collection[@name='#{collection_name}']"].nil?
-end
-
-def source_el(doc, resource, delete=false)
-  url = resource.url || resource.name
-  Chef::Log.debug("url is #{url}")
-  xpath = "/xml-datacollection-config/xml-collection[@name='#{resource.collection_name}']/xml-source[@url='#{url}'"
-  unless resource.request_method.nil?
-    xpath = "#{xpath} and request[@method='#{resource.request_method}']"
-  end
-  unless resource.request_params.nil?
-    resource.request_params.each do |k,v|
-      xpath = "#{xpath} and request/parameter[@name='#{k}' and @value='#{v}']"
-    end
-  end
-  unless resource.request_headers.nil?
-    resource.request_headers.each do |k,v|
-      xpath = "#{xpath} and request/header[@name='#{k}' and @value='#{v}']"
-    end
-  end
-  unless resource.import_groups.nil?
-    resource.import_groups.each do |ig|
-      xpath = "#{xpath} and import-groups[text()='xml-datacollection/#{ig}']"
-    end
-  end
-  xpath = "#{xpath}]"
-  Chef::Log.debug("Checking for XPath '#{xpath}' against document " + doc.to_s)
-  source_el = doc.root.elements[xpath]
-  Chef::Log.debug("found? #{source_el}")
-  doc.root.elements.delete(xpath) if delete
-  source_el
-end
-
-def source_exists?(resource)
-  Chef::Log.debug "Checking to see if this xml source exists: '#{resource.url}'"
-  file = ::File.new("#{node['opennms']['conf']['home']}/etc/xml-datacollection-config.xml", 'r')
-  doc = REXML::Document.new file
-  return !source_el(doc, resource).nil?
-end
 
 def delete_xml_source
   url = new_resource.url || new_resource.name
