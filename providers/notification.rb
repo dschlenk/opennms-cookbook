@@ -212,8 +212,10 @@ def create_notification
   else
     # if it already exists, remove all children, text and optional attributes
     notif_el.elements.delete_all '*'
-    while t = notif_el.get_text
+    t = notif_el.get_text
+    until t.nil?
       notif_el.delete t
+      t = notif_el.get_text
     end
     notif_el.attributes.delete 'writeable'
     # set status

@@ -15,7 +15,7 @@ attribute :value, kind_of: Float
 # required for new
 attribute :rearm, kind_of: Float
 # will default to 1 for creates
-attribute :trigger, kind_of: Fixnum
+attribute :trigger, kind_of: Integer
 attribute :ds_label, kind_of: String
 attribute :triggered_uei, kind_of: String
 attribute :rearmed_uei, kind_of: String

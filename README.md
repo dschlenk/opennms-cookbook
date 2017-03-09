@@ -4,18 +4,18 @@ Description
 ===========
 
 A Chef cookbook to manage the installation and configuration of OpenNMS Horizon.
-Current version supports releases 16.0.4-1, 17.1.1-1, 18.0.1-1 on CentOS 6.
+Current version supports releases 16, 17, 18 and 19 on CentOS 6.
 
 Versions
 ========
 
-Starting with OpenNMS Horizon 16, the MSB of the version of the cookbook matches the latest MSB of the version of OpenNMS Horizon it supports. Support for older versions will be noted. The version of OpenNMS Horizon is selected via node attribute.
+Starting with OpenNMS Horizon 16, the MSB of the version of the cookbook matches the latest MSB of the version of OpenNMS Horizon it supports. Support for older versions will be noted. The version of OpenNMS Horizon is selected via node attribute, defaulting to the latest supported release.
 
 Requirements
 ============
 
-* Chef 11.x+
-* CentOS 6.x. Debian/Ubuntu support shouldn't be too hard to do - if anyone wants to head that up let me know. 
+* Chef 12.5.1 or later (only tested on 12.5.1, however)
+* CentOS 6
 * Either use Berkshelf to satisfy dependencies or manually acquire the following cookbooks: 
   * yum
   * hostsfile
@@ -29,7 +29,7 @@ Requirements
 Usage
 =====
 
-Running the default recipe will install OpenNMS 18.0.1-1 (or a custom version using the attribute `node[:opennms][:version]`) on CentOS 6.x from the official repo with the default configuration. It will also execute `'$ONMS_HOME/bin/runjava -s` if `$ONMS_HOME/etc/java.conf` is not present and `$ONMS_HOME/bin/install -dis` if `$ONMS_HOME/etc/configured` is not present.
+Running the default recipe will install OpenNMS 19.0.0-1 (or a custom version using the attribute `node[:opennms][:version]`) on CentOS 6.x from the official repo with the default configuration. It will also execute `'$ONMS_HOME/bin/runjava -s` if `$ONMS_HOME/etc/java.conf` is not present and `$ONMS_HOME/bin/install -dis` if `$ONMS_HOME/etc/configured` is not present.
 
 There are two primary ways to use this cookbook: as an application cookbook or library cookbook. If you simply want to tweak a few settings to the default OpenNMS configuration, you can use the `default` recipe of this cookbook directly and modify node attributes to suit your needs. There are also a plethora of LWRPs that you can use to do more in depth customizations. If you go that route I recommend starting with the `notemplates` recipe and then using those LWRPs (and maybe a few of the templates in this cookbook) to define your run list. If your node's run list contains both the template and a resource that manages the same file you'll end up with a lot of churn during the chef client run, which is a waste of time and will probably cause unnecessary restarts of the application. 
 
@@ -37,9 +37,9 @@ Template resources for daemons that support configuration changes without a rest
 
 ### Java (Optional)
 
-While the current OpenNMS Yum repos contain a suitable JDK, you might want to check out the community java (https://github.com/socrata-cookbooks/java) cookbook. Oracle likes to change license terms on a whim and their RPM might not set up things (like alternatives priorities) to your liking, so you might want to get ahead of the curve and manage installing the JDK yourself. Here's an example using the community java cookbook. 
+While the current OpenNMS Yum repos contain a suitable JDK, you might want to check out the community java (https://github.com/socrata-cookbooks/java) cookbook. Oracle likes to change license terms on a whim and their RPM might not set up things (like alternatives priorities) to your liking, so you might want to get ahead of the curve and manage installing the JDK yourself. See `test/fixtures/cookbooks/oracle_java8` for a simple example method of installing Oracle Java via Chef.
 
-First, you need to download the appropriate RPM(s) from Oracle and make a yum repo available to your nodes. For example, on a CentOS server with Apache httpd installed you could do:
+If you want to install Java via RPM, you have to do a bit more work. First, you need to download the appropriate RPM(s) from Oracle and make a yum repo available to your nodes. For example, on a CentOS server with Apache httpd installed you could do:
 
 ```
 # mkdir /var/www/html/oracle-java
@@ -119,7 +119,7 @@ we want anyway, so we just overwrite the old file with the `rpmnew` version.
 * `opennms::rrdtool` Installs rrdtool and configures OpenNMS to use it rather than JRobin for metrics storage.
 
 #### Deprecated
-The following recipes are deprecated. The preferred method to install these packages is by setting `node[:opennms][:plugin][:nsclient]` and/or `node[:opennms][:plugin][:xml]` to true. All these recipes do now is set those attributes at the default level. 
+The following recipes are deprecated. The preferred method to install these packages is by setting `node[:opennms][:plugin][:nsclient]` and/or `node[:opennms][:plugin][:xml]` to true. As of 19.0.0, the XML plugin has been merged into the core package and therefore setting that attribute to true has no effect. All these recipes do now is set those attributes at the default level. 
 * `opennms::nsclient` installs the optional nsclient data collection plugin and uses the template for etc/nsclient-datacollection-config.xml. 
 * `opennms::xml` installs the optional xml data collection plugin and uses the template for etc/xml-datacollection-config.xml. 
 

@@ -73,7 +73,8 @@ module Opennms
     def self.clean_dir(dir, type)
       if ::File.exist?(dir)
         Dir.foreach(dir) do |file|
-          if match = file.match(/^(.*)\.#{type}$/)
+          match = file.match(/^(.*)\.#{type}$/)
+          unless match.nil?
             if type == 'rpmsave'
               FileUtils.rm("#{dir}/#{file}")
             elsif type == 'rpmnew'

@@ -10,7 +10,7 @@ attribute :specifics, kind_of: Array
 attribute :include_ranges, kind_of: Hash
 attribute :exclude_ranges, kind_of: Hash
 attribute :include_urls, kind_of: Array
-attribute :rrd_step, kind_of: Fixnum, default: 300
+attribute :rrd_step, kind_of: Integer, default: 300
 attribute :rras, kind_of: Array, default: ['RRA:AVERAGE:0.5:1:2016', 'RRA:AVERAGE:0.5:12:1488', 'RRA:AVERAGE:0.5:288:366', 'RRA:MAX:0.5:288:366', 'RRA:MIN:0.5:288:366']
 attribute :outage_calendars, kind_of: Array
 # BEGIN => {'interval' => 00000, 'end' => 00000, 'delete' => true}, ...

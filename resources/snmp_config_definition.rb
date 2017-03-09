@@ -6,18 +6,18 @@ default_action :create
 # not actually used anywhere, just needs to be unique in the resource collection
 attribute :name, kind_of: String, name_attribute: true
 # the following are element attributes - existance is determined by these attributes.
-attribute :port, kind_of: Fixnum
-attribute :retry_count, kind_of: Fixnum
-attribute :timeout, kind_of: Fixnum
+attribute :port, kind_of: Integer
+attribute :retry_count, kind_of: Integer
+attribute :timeout, kind_of: Integer
 attribute :read_community, kind_of: String
 attribute :write_community, kind_of: String
 attribute :proxy_host, kind_of: String
 attribute :version, kind_of: String, equal_to: %w(v1 v2c v3)
-attribute :max_vars_per_pdu, kind_of: Fixnum
-attribute :max_repetitions, kind_of: Fixnum
-attribute :max_request_size, kind_of: Fixnum
+attribute :max_vars_per_pdu, kind_of: Integer
+attribute :max_repetitions, kind_of: Integer
+attribute :max_request_size, kind_of: Integer
 attribute :security_name, kind_of: String
-attribute :security_level, kind_of: Fixnum, equal_to: [1, 2, 3]
+attribute :security_level, kind_of: Integer, equal_to: [1, 2, 3]
 attribute :auth_passphrase, kind_of: String
 attribute :auth_protocol, kind_of: String, equal_to: %w(MD5 SHA)
 attribute :engine_id, kind_of: String

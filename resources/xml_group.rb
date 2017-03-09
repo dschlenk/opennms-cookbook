@@ -1,9 +1,11 @@
 require 'rexml/document'
 
-actions :create
+actions :create, :delete
 default_action :create
 
 attribute :name, kind_of: String, required: true
+# name is used when group_name not specified
+attribute :group_name, kind_of: String
 attribute :source_url, kind_of: String, required: true
 attribute :collection_name, kind_of: String, required: true
 attribute :resource_type, kind_of: String, default: 'node', required: true

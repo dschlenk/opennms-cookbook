@@ -47,7 +47,7 @@ grafana_user 'admin' do
     lazy do
       {
         login: 'admin',
-        password: adminpw
+        password: adminpw,
       }
     end
   )
