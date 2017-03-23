@@ -51,6 +51,9 @@ execute 'install' do
   command "#{onms_home}/bin/install -dis"
 end
 
+# configure base templates before we get started
+include_recipe 'opennms::base_templates'
+
 # If you want a random password, just set secure_admin to true.
 # If you want to set the admin password yourself, populate
 # node['opennms']['users']['admin']['password'] with your password
@@ -65,7 +68,6 @@ if (node['opennms']['secure_admin'] && node['opennms']['secure_admin_password'].
   include_recipe 'opennms::adminpw'
 end
 
-include_recipe 'opennms::base_templates'
 include_recipe 'opennms::templates' if node['opennms']['templates']
 
 service 'opennms' do

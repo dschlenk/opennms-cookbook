@@ -26,19 +26,29 @@ module Opennms
         Chef::Log.debug("Unhandled adminpw call. secure_admin? #{node['opennms']['secure_admin']} pwhash: #{node['opennms']['users']['admin']['pwhash']}.")
       end
       node.default['opennms']['users']['admin']['pwhash'] = pwhash
+      # make sure any auto-generated attributes get saved, even when chef fails later
+      node.save
     end
 
     def self.user(user, node)
       require 'rest_client'
       begin
+        retries ||= 0
+        sleep(10) if retries > 0
         response = RestClient.get "#{baseurl(node)}/users/#{user}", accept: :json
         return JSON.parse(response.to_s)
-      rescue
+      rescue Exception => e
+        Chef::Log.warn "Unable to retrieve current admin user using supplied password: #{e}"
+        retry if (retries += 1) < 3 && e.to_s.match(/Connection refused.*/)
         begin
+          iretries ||= 0
+          sleep(10) if iretries > 0
+          Chef::Log.debug 'falling back to default password'
           response = RestClient.get "#{baseurl(node, 'admin')}/users/#{user}", accept: :json
           return JSON.parse(response.to_s)
-        rescue
-          Chef::Log.warn 'Unable to retrieve current admin user using supplied or default password.'
+        rescue Exception => e
+          Chef::Log.warn "Unable to retrieve current admin user using supplied or default password: #{e}"
+          retry if (iretries += 1) < 3 && e.to_s.match(/Connection refused.*/)
         end
       end
     end
@@ -63,6 +73,10 @@ module Opennms
       userid_el.add_text 'admin'
       pw_el = user_el.add_element 'password'
       pw_el.add_text new_pw_hash
+      if node['opennms']['version'].match(/(\d+)\..*/).captures[0].to_i >= 19
+        role_el = user_el.add_element 'role'
+        role_el.add_text 'ROLE_ADMIN'
+      end
       RestClient.post "#{baseurl(node, old_pw)}/users", cu.to_s, content_type: :xml
       FileUtils.touch "#{node['opennms']['conf']['home']}/etc/users.xml"
     end
