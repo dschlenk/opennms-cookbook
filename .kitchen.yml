@@ -28,6 +28,16 @@ suites:
       - recipe[opennms::postgres]
       - recipe[oracle_java8::default]
       - recipe[opennms::default]
+  - name: adminpw_latest
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::notemplates]
+    attributes:
+      opennms:
+        users:
+          admin:
+            password: superSecret
   - name: default_17
     run_list:
       - recipe[opennms::postgres]
