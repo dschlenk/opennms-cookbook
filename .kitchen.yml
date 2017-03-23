@@ -35,6 +35,17 @@ suites:
       - recipe[opennms::notemplates]
     attributes:
       opennms:
+        version: "16.0.4-1"
+        users:
+          admin:
+            password: superSecret
+  - name: adminpw_16
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::notemplates]
+    attributes:
+      opennms:
         users:
           admin:
             password: superSecret
