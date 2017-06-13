@@ -10,7 +10,6 @@ driver:
 provisioner:
   name: chef_zero
   require_chef_omnibus: 12.5.1
-  log_level: debug
 
 platforms:
   - name: centos-6.8
@@ -274,6 +273,62 @@ suites:
       - recipe[opennms::notemplates]
       - recipe[opennms::nsclient]
       - recipe[onms_lwrp_test::all]
+    attributes:
+      opennms:
+        version: "16.0.4-1"
+        upgrade: true
+      yum:
+        opennms-stable-common:
+          enabled: false
+        opennms-stable-rhel6:
+          enabled: false
+  - name: thresholds_latest
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::notemplates]
+      - recipe[opennms::nsclient]
+      - recipe[onms_lwrp_test::threshold]
+    attributes:
+  - name: thresholds_18
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::notemplates]
+      - recipe[opennms::nsclient]
+      - recipe[onms_lwrp_test::threshold]
+    attributes:
+      opennms:
+        version: "18.0.4-1"
+        upgrade: true
+      yum:
+        opennms-stable-common:
+          enabled: false
+        opennms-stable-rhel6:
+          enabled: false
+  - name: thresholds_17
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::notemplates]
+      - recipe[opennms::nsclient]
+      - recipe[onms_lwrp_test::threshold]
+    attributes:
+      opennms:
+        version: "17.1.1-1"
+        upgrade: true
+      yum:
+        opennms-stable-common:
+          enabled: false
+        opennms-stable-rhel6:
+          enabled: false
+  - name: thresholds_16
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::notemplates]
+      - recipe[opennms::nsclient]
+      - recipe[onms_lwrp_test::threshold]
     attributes:
       opennms:
         version: "16.0.4-1"

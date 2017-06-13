@@ -33,6 +33,16 @@ action :create do
     end
   end
 end
+action :delete do
+  if !@current_resource.exists
+    Chef::Log.info "#{@new_resource} does not exist - nothing to do."
+  else
+    converge_by("Delete #{@new_resource}") do
+      delete_threshold
+      new_resource.updated_by_last_action(true)
+    end
+  end
+end
 
 def load_current_resource
   @current_resource = Chef::Resource::OpennmsThreshold.new(@new_resource.name)
@@ -127,6 +137,23 @@ def create_threshold
       end
     end
   end
+  out = ''
+  formatter = REXML::Formatters::Pretty.new(2)
+  formatter.compact = true
+  formatter.write(doc, out)
+  ::File.open("#{node['opennms']['conf']['home']}/etc/thresholds.xml", 'w') { |f| f.puts(out) }
+end
+
+def delete_threshold
+  Chef::Log.debug "Deleting threshold: '#{new_resource.name}' from group: '#{new_resource.group}'"
+  ds_name = new_resource.ds_name || new_resource.name
+  file = ::File.new("#{node['opennms']['conf']['home']}/etc/thresholds.xml")
+  contents = file.read
+  doc = REXML::Document.new(contents, respect_whitespace: :all)
+  doc.context[:attribute_quote] = :quote
+  file.close
+
+  doc.root.delete_element(identity_xpath(new_resource))
   out = ''
   formatter = REXML::Formatters::Pretty.new(2)
   formatter.compact = true

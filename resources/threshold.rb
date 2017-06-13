@@ -1,6 +1,6 @@
 require 'rexml/document'
 
-actions :create, :create_if_missing
+actions :create, :create_if_missing, :delete
 default_action :create
 
 attribute :name, kind_of: String, name_attribute: true
