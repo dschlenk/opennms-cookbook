@@ -132,7 +132,6 @@ opennms_expression 'delete ping latency thing' do
   action :delete
 end
 
-
 # create, then make some changes
 opennms_threshold 'espresso' do # name is ds-name, and is part of identity
   group 'coffee' # part of identity

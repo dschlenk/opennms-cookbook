@@ -153,8 +153,6 @@ def delete_expression
   doc = REXML::Document.new(contents, respect_whitespace: :all)
   doc.context[:attribute_quote] = :quote
   file.close
-  expression = new_resource.expression || new_resource.name
-  updating = false
   doc.root.delete_element(expression_identity_xpath(new_resource))
   out = ''
   formatter = REXML::Formatters::Pretty.new(2)

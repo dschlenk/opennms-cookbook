@@ -146,7 +146,6 @@ end
 
 def delete_threshold
   Chef::Log.debug "Deleting threshold: '#{new_resource.name}' from group: '#{new_resource.group}'"
-  ds_name = new_resource.ds_name || new_resource.name
   file = ::File.new("#{node['opennms']['conf']['home']}/etc/thresholds.xml")
   contents = file.read
   doc = REXML::Document.new(contents, respect_whitespace: :all)
