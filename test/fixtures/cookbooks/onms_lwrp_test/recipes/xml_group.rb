@@ -42,7 +42,7 @@ end
 # note how only the name, source_url, collection, resource_xpath need to be populated
 opennms_xml_group 'delete fxa-sc' do
   group_name 'fxa-sc'
-  source_url 'http://{ipaddr}/get-example'
+  source_url 'http://{ipaddr}/group-example'
   collection_name 'foo'
   resource_xpath "/measCollecFile/measData/measInfo[@measInfoId='dns|dns']/measValue"
   action :delete
