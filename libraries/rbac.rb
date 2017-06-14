@@ -27,7 +27,7 @@ module Opennms
       end
       node.default['opennms']['users']['admin']['pwhash'] = pwhash
       # make sure any auto-generated attributes get saved, even when chef fails later
-      node.save
+      node.save # ~FC075
     end
 
     def self.user(user, node)

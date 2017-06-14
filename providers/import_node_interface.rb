@@ -12,7 +12,6 @@ action :create do
     if @new_resource.sync_import && @new_resource.sync_existing
       converge_by("Exists, but syncing import #{@new_resource}") do
         sync_import_node_interface
-        new_resource.updated_by_last_action(true)
       end
     else
       Chef::Log.info "#{@new_resource} already exists - nothing to do."
@@ -20,7 +19,6 @@ action :create do
   else
     converge_by("Create #{@new_resource}") do
       create_import_node_interface
-      new_resource.updated_by_last_action(true)
     end
   end
 end

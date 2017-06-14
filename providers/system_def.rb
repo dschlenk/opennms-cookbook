@@ -13,7 +13,6 @@ action :add do
   else
     converge_by("Add #{@new_resource}") do
       add_groups_to_system_def
-      new_resource.updated_by_last_action(true)
     end
   end
 end
@@ -25,7 +24,6 @@ action :remove do
   else
     converge_by("Remove #{@new_resource}") do
       remove_groups_from_system_def
-      new_resource.updated_by_last_action(true)
     end
   end
 end

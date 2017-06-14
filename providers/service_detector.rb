@@ -12,7 +12,6 @@ action :create_if_missing do
   else
     converge_by("Create #{@new_resource}") do
       create_service_detector
-      new_resource.updated_by_last_action(true)
     end
   end
 end
@@ -24,12 +23,10 @@ action :create do
   elsif @current_resource.exists && @current_resource.changed
     converge_by("Update #{@new_resource}") do
       update_service_detector(new_resource, node)
-      new_resource.updated_by_last_action(true)
     end
   else
     converge_by("Create #{@new_resource}") do
       create_service_detector
-      new_resource.updated_by_last_action(true)
     end
   end
 end
@@ -41,7 +38,6 @@ action :delete do
   else
     converge_by("Create #{@new_resource}") do
       delete_service_detector
-      new_resource.updated_by_last_action(true)
     end
   end
 end

@@ -20,15 +20,11 @@ action :create do
     if updated
       converge_by("Update #{@new_resource}") do
         restart_collectd
-        new_resource.updated_by_last_action(true)
       end
-    else
-      new_resource.updated_by_last_action(false)
     end
   else
     converge_by("Create #{@new_resource}") do
       create_snmp_collection_group
-      new_resource.updated_by_last_action(true)
     end
   end
 end

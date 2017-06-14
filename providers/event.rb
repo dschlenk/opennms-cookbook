@@ -9,7 +9,6 @@ action :delete do
   if @current_resource.exists
     converge_by("Delete #{@new_resource}") do
       delete_event
-      new_resource.updated_by_last_action(true)
     end
   else
     Chef::Log.info("#{new_resource} doesn't exist - nothing to do.")
@@ -29,7 +28,6 @@ action :create do
     Chef::Log.info "#{@new_resource} changed or updating."
     converge_by("Create/Update #{@new_resource}") do
       create_event
-      new_resource.updated_by_last_action(true)
     end
   end
 end
@@ -46,7 +44,6 @@ action :create_if_missing do
   else
     converge_by("Create #{@new_resource}") do
       create_event
-      new_resource.updated_by_last_action(true)
     end
   end
 end

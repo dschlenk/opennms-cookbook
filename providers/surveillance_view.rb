@@ -9,14 +9,12 @@ action :create do
     Chef::Log.info "#{@new_resource} already exists but has changed - updating."
     converge_by("Update #{@new_resource}") do
       update_surveillance_view
-      new_resource.updated_by_last_action(true)
     end
   elsif @current_resource.exists
     Chef::Log.info "#{@new_resource} already exists - nothing to do."
   else
     converge_by("Create #{@new_resource}") do
       create_surveillance_view
-      new_resource.updated_by_last_action(true)
     end
   end
 end

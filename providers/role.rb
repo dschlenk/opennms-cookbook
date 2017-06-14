@@ -13,7 +13,6 @@ action :create do
   else
     converge_by("Create #{@new_resource}") do
       create_role
-      new_resource.updated_by_last_action(true)
     end
   end
 end

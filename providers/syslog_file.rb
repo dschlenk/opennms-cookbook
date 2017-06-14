@@ -8,7 +8,6 @@ use_inline_resources
 action :create do
   if @current_resource.exists
     Chef::Log.info "#{@new_resource} already exists - updating file as necessary."
-    updated = false
     unless new_resource.filename.nil?
       f = cookbook_file new_resource.filename do
         path "#{node['opennms']['conf']['home']}/etc/syslog/#{new_resource.filename}"
@@ -16,13 +15,11 @@ action :create do
         group 'root'
         mode 00644
       end
-      updated = f.updated_by_last_action?
+      converge_by("Update #{@new_resource}") if f.updated_by_last_action?
     end
-    new_resource.updated_by_last_action(updated)
   else
     converge_by("Create #{@new_resource}") do
       create_syslog_file
-      new_resource.updated_by_last_action(true)
     end
   end
 end

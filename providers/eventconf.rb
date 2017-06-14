@@ -11,15 +11,11 @@ action :create do
     updated = update_eventconf
     if updated
       converge_by("Update #{@new_resource}") do
-        new_resource.updated_by_last_action(true)
       end
-    else
-      new_resource.updated_by_last_action(false)
     end
   else
     converge_by("Create #{@new_resource}") do
       create_eventconf
-      new_resource.updated_by_last_action(true)
     end
   end
 end

@@ -8,14 +8,12 @@ action :create do
   if @current_resource.changed
     converge_by("Create (update) #{@new_resource}") do
       create_notification
-      new_resource.updated_by_last_action(true)
     end
   elsif @current_resource.exists
     Chef::Log.info "#{@new_resource} already exists - nothing to do."
   else
     converge_by("Create #{@new_resource}") do
       create_notification
-      new_resource.updated_by_last_action(true)
     end
   end
 end
@@ -25,7 +23,6 @@ action :delete do
     Chef::Log.info "#{@new_resource} is being deleted."
     converge_by("Delete #{@new_resource}") do
       delete_notification
-      new_resource.updated_by_last_action(true)
     end
   else
     Chef::Log.info "#{@new_resource} doesn't exist - nothing to do."

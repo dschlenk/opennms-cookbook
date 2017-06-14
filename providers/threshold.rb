@@ -14,7 +14,6 @@ action :create_if_missing do
   else
     converge_by("Create #{@new_resource}") do
       create_threshold
-      new_resource.updated_by_last_action(true)
     end
   end
 end
@@ -29,7 +28,6 @@ action :create do
     end
     converge_by("Create/Update #{@new_resource}") do
       create_threshold
-      new_resource.updated_by_last_action(true)
     end
   end
 end
@@ -39,7 +37,6 @@ action :delete do
   else
     converge_by("Delete #{@new_resource}") do
       delete_threshold
-      new_resource.updated_by_last_action(true)
     end
   end
 end
