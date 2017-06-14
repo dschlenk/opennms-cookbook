@@ -7,7 +7,6 @@ use_inline_resources
 action :run do
   converge_by("Run #{@new_resource}") do
     send_event
-    new_resource.updated_by_last_action(true)
   end
 end
 

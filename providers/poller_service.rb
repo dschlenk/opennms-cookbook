@@ -10,7 +10,6 @@ action :create do
       Chef::Log.info "#{@new_resource} already exists - need to update."
       converge_by("Create #{@new_resource}") do
         update_poller_service
-        new_resource.updated_by_last_action(true)
       end
     else
       Chef::Log.info "#{@new_resource} already exists - not changed."
@@ -19,7 +18,6 @@ action :create do
     Chef::Log.info "#{@new_resource} doesn't exist - need to create."
     converge_by("Create #{@new_resource}") do
       create_poller_service
-      new_resource.updated_by_last_action(true)
     end
   end
 end

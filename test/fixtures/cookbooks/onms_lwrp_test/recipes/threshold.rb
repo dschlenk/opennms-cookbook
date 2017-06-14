@@ -122,6 +122,16 @@ opennms_expression 'change relaxed on ping latency thing' do
   resource_filters [{ 'field' => 'ifHighSpeed', 'filter' => '^[1-9]+[0-9]*$' }]
 end
 
+opennms_expression 'delete ping latency thing' do
+  expression 'icmp / 1000'
+  group 'cheftest'
+  type 'high'
+  ds_type 'if'
+  filter_operator 'and'
+  resource_filters [{ 'field' => 'ifHighSpeed', 'filter' => '^[1-9]+[0-9]*$' }]
+  action :delete
+end
+
 # create, then make some changes
 opennms_threshold 'espresso' do # name is ds-name, and is part of identity
   group 'coffee' # part of identity
@@ -211,4 +221,14 @@ opennms_threshold 'change rearmedUEI on espresso' do
   rearmed_uei 'uei.opennms.org/thresholdTest/testThresholdRearmed'
   filter_operator 'and'
   resource_filters [{ 'field' => 'ifHighSpeed', 'filter' => '^[1-9]+[0-9]*$' }]
+end
+# delete espresso
+opennms_threshold 'delete espresso' do
+  ds_name 'espresso'
+  group 'coffee'
+  type 'low'
+  ds_type 'if'
+  filter_operator 'and'
+  resource_filters [{ 'field' => 'ifHighSpeed', 'filter' => '^[1-9]+[0-9]*$' }]
+  action :delete
 end

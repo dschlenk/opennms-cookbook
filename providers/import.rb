@@ -12,7 +12,6 @@ action :create do
   else
     converge_by("Create #{@new_resource}") do
       create_import
-      new_resource.updated_by_last_action(true)
     end
   end
 end
@@ -23,7 +22,6 @@ action :sync do
     Chef::Log.info "#{@new_resource} already exists - syncing."
     converge_by("Sync #{@new_resource}") do
       sync_import_action
-      new_resource.updated_by_last_action(true)
     end
   end
 end

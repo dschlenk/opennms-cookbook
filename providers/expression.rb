@@ -14,7 +14,6 @@ action :create_if_missing do
   else
     converge_by("Create #{@new_resource}") do
       create_expression
-      new_resource.updated_by_last_action(true)
     end
   end
 end
@@ -29,7 +28,15 @@ action :create do
     end
     converge_by("Create #{@new_resource}") do
       create_expression
-      new_resource.updated_by_last_action(true)
+    end
+  end
+end
+action :delete do
+  if !@current_resource.exists
+    Chef::Log.info "#{@new_resource} does not exist - nothing to do."
+  else
+    converge_by("Delete #{@new_resource}") do
+      delete_expression
     end
   end
 end
@@ -129,6 +136,21 @@ def create_expression
     end
   end
 
+  out = ''
+  formatter = REXML::Formatters::Pretty.new(2)
+  formatter.compact = true
+  formatter.write(doc, out)
+  ::File.open("#{node['opennms']['conf']['home']}/etc/thresholds.xml", 'w') { |f| f.puts(out) }
+end
+
+def delete_expression
+  Chef::Log.debug "Deleting expression: '#{new_resource.name}' from group: '#{new_resource.group}'"
+  file = ::File.new("#{node['opennms']['conf']['home']}/etc/thresholds.xml")
+  contents = file.read
+  doc = REXML::Document.new(contents, respect_whitespace: :all)
+  doc.context[:attribute_quote] = :quote
+  file.close
+  doc.root.delete_element(expression_identity_xpath(new_resource))
   out = ''
   formatter = REXML::Formatters::Pretty.new(2)
   formatter.compact = true

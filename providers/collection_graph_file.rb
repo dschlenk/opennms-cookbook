@@ -13,16 +13,12 @@ action :create do
     if updated
       converge_by("Update #{@new_resource}") do
         touch_main_file
-        new_resource.updated_by_last_action(true)
       end
-    else
-      new_resource.updated_by_last_action(false)
     end
   else
     Chef::Log.info "#{@new_resource} doesn't exist - creating."
     converge_by("Create #{@new_resource}") do
       update_collection_graph_file
-      new_resource.updated_by_last_action(true)
     end
   end
 end
@@ -33,7 +29,6 @@ action :create_if_missing do
   else
     converge_by("Create if missing #{@new_resource}") do
       create_collection_graph_file
-      new_resource.updated_by_last_action(true)
     end
   end
 end
@@ -44,7 +39,6 @@ action :delete do
   else
     converge_by("Delete #{@new_resource}") do
       delete_collection_graph_file
-      new_resource.updated_by_last_action(true)
     end
   end
 end

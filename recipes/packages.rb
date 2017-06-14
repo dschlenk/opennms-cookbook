@@ -52,13 +52,13 @@ branches.each do |branch|
     ex = yum_attr(branch, platform, 'exclude')
     yum_repository "opennms-#{branch}-#{platform}" do
       description "#{platform} OpenNMS RPMs (#{branch})"
-      baseurl bu unless bu.nil? || '' == bu
-      mirrorlist ml unless ml.nil? || '' == ml
+      baseurl bu unless bu.nil? || bu == ''
+      mirrorlist ml unless ml.nil? || ml == ''
       gpgkey 'file:///etc/yum.repos.d/OPENNMS-GPG-KEY'
-      failovermethod fom unless fom.nil? | '' == fom
+      failovermethod fom unless fom.nil? | fom == ''
       enabled repo_enabled
-      includepkgs inc_pkgs unless inc_pkgs.nil? || '' == inc_pkgs
-      exclude ex unless ex.nil? || '' == ex
+      includepkgs inc_pkgs unless inc_pkgs.nil? || inc_pkgs == ''
+      exclude ex unless ex.nil? || ex == ''
       action :create
     end
   end

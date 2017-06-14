@@ -27,7 +27,7 @@ module Opennms
       end
       node.default['opennms']['users']['admin']['pwhash'] = pwhash
       # make sure any auto-generated attributes get saved, even when chef fails later
-      node.save
+      node.save # ~FC075
     end
 
     def self.user(user, node)
@@ -37,7 +37,7 @@ module Opennms
         sleep(10) if retries > 0
         response = RestClient.get "#{baseurl(node)}/users/#{user}", accept: :json
         return JSON.parse(response.to_s)
-      rescue Exception => e
+      rescue => e
         Chef::Log.warn "Unable to retrieve current admin user using supplied password: #{e}"
         retry if (retries += 1) < 3 && e.to_s.match(/Connection refused.*/)
         begin
@@ -46,7 +46,7 @@ module Opennms
           Chef::Log.debug 'falling back to default password'
           response = RestClient.get "#{baseurl(node, 'admin')}/users/#{user}", accept: :json
           return JSON.parse(response.to_s)
-        rescue Exception => e
+        rescue => e
           Chef::Log.warn "Unable to retrieve current admin user using supplied or default password: #{e}"
           retry if (iretries += 1) < 3 && e.to_s.match(/Connection refused.*/)
         end

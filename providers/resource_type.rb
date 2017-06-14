@@ -12,12 +12,10 @@ action :create do
     Chef::Log.debug "#{@new_resource} already exists - but not included."
     converge_by("Include #{@new_resource}") do
       include_resource_type
-      new_resource.updated_by_last_action(true)
     end
   else
     converge_by("Create #{@new_resource}") do
       create_resource_type
-      new_resource.updated_by_last_action(true)
     end
   end
 end

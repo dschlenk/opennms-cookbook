@@ -9,7 +9,6 @@ action :delete do
   if @current_resource.exists
     converge_by("Deleting #{@new_resource}") do
       delete_xml_source
-      new_resource.updated_by_last_action(true)
       unless new_resource.import_groups.nil?
         new_resource.import_groups.each do |file|
           file "#{node['opennms']['conf']['home']}/etc/xml-datacollection/#{file}" do
@@ -20,7 +19,6 @@ action :delete do
     end
   else
     Chef::Log.info("#{@new_resource} does not exist - nothing to do.")
-    new_resource.updated_by_last_action(false)
   end
 end
 
@@ -28,7 +26,6 @@ action :create do
   Chef::Application.fatal!("Missing xml-collection #{@current_resource.collection_name}.") unless @current_resource.collection_exists
   if @current_resource.exists
     Chef::Log.info "#{@new_resource} already exists - updating import-groups files as necessary."
-    updated = false
     unless new_resource.import_groups.nil?
       new_resource.import_groups.each do |file|
         f = cookbook_file file do
@@ -37,14 +34,12 @@ action :create do
           group 'root'
           mode 00644
         end
-        updated = f.updated_by_last_action? unless updated
+        converge_by("Update #{@new_resource}") if f.updated_by_last_action?
       end
     end
-    new_resource.updated_by_last_action(updated)
   else
     converge_by("Create #{@new_resource}") do
       create_xml_source
-      new_resource.updated_by_last_action(true)
     end
   end
 end

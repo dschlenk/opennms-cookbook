@@ -11,13 +11,11 @@ action :create do
       Chef::Log.info "#{@new_resource} has changed - updating."
       converge_by("Update #{@new_resource}") do
         update_wmi_collection_service
-        new_resource.updated_by_last_action(true)
       end
     end
   else
     converge_by("Create #{@new_resource}") do
       create_wmi_collection_service
-      new_resource.updated_by_last_action(true)
     end
   end
 end

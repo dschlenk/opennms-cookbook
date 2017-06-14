@@ -13,12 +13,10 @@ action :create do
     Chef::Log.info "#{@new_resource} already exists and has changed - updating."
     converge_by("Create #{@new_resource}") do
       update_node
-      new_resource.updated_by_last_action(true)
     end
   else
     converge_by("Create #{@new_resource}") do
       create_import_node
-      new_resource.updated_by_last_action(true)
     end
   end
 end
@@ -30,7 +28,6 @@ action :create_if_missing do
   else
     converge_by("Create #{@new_resource}") do
       create_import_node
-      new_resource.updated_by_last_action(true)
     end
   end
 end
@@ -39,7 +36,6 @@ action :delete do
   if @current_resource.exists
     converge_by("Delete #{@new_resource}") do
       delete_node
-      new_resource.updated_by_last_action(true)
     end
   end
 end

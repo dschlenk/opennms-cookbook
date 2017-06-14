@@ -10,11 +10,9 @@ action :delete do
   if @current_resource.exists
     converge_by("Deleting #{@new_resource}") do
       delete_xml_group
-      new_resource.updated_by_last_action(true)
     end
   else
     Chef::Log.info("#{@new_resource} does not exist - nothing to do.")
-    new_resource.updated_by_last_action(false)
   end
 end
 
@@ -27,7 +25,6 @@ action :create do
   else
     converge_by("Create #{@new_resource}") do
       create_xml_group
-      new_resource.updated_by_last_action(true)
     end
   end
 end

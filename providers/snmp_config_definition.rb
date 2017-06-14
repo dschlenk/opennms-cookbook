@@ -10,7 +10,6 @@ action :create do
     if @current_resource.different
       converge_by("Update #{@new_resource}") do
         update_snmp_config_definition
-        new_resource.updated_by_last_action(true)
       end
     else
       Chef::Log.info "#{@new_resource} hasn't changed - nothing to do."
@@ -18,7 +17,6 @@ action :create do
   else
     converge_by("Create #{@new_resource}") do
       create_snmp_config_definition
-      new_resource.updated_by_last_action(true)
     end
   end
 end
@@ -29,7 +27,6 @@ action :create_if_missing do
   else
     converge_by("Create #{@new_resource}") do
       create_snmp_config_definition
-      new_resource.updated_by_last_action(true)
     end
   end
 end
@@ -40,7 +37,6 @@ action :delete do
   else
     converge_by("Delete #{@new_resource}") do
       delete_snmp_config_definition
-      new_resource.updated_by_last_action(true)
     end
   end
 end
