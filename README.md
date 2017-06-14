@@ -216,12 +216,12 @@ See `opennms::example_statsd` for example usage of these LWRPs.
 
 #### Thresholds
 
-See examples for all of these LWRPs are in a single recipe, `example_threshold`. 
+See examples for all of these LWRPs are in a single recipe, `example_threshold`.
 
 * `opennms_threshd_package`: Create a new package in threshd-configuration.xml. 
 * `opennms_threshold_group`: Create a new threshold group in thresholds.xml. 
-* `opennms_threshold`: Create a new threshold in the specified group in thresholds.xml. Supports updating.
-* `opennms_expression`: Create a new expression threshold in the specified group in thresholds.xml. Supports updating.
+* `opennms_threshold`: Create a new threshold in the specified group in thresholds.xml. Supports updating and deleting.
+* `opennms_expression`: Create a new expression threshold in the specified group in thresholds.xml. Supports updating and deleting.
 
 #### Web UI
 
