@@ -1,6 +1,6 @@
 require 'rexml/document'
 
-# Defines data to be collected in a JMX collection in 
+# Defines data to be collected in a JMX collection in
 # $ONMS_HOME/etc/jmx-datacollection-config.xml. The collection_name must
 # reference an existing collection defined with the jmx_collection LWRP.
 

@@ -1,10 +1,10 @@
 require 'rexml/document'
 
-# Use this LWRP to include a JMX collection in the referenced collectd 
-# package_name. This LWRP simply adds the service to the package in 
-# $ONMS_HOME/etc/collectd-configuration.xml. You'll need to define the 
+# Use this LWRP to include a JMX collection in the referenced collectd
+# package_name. This LWRP simply adds the service to the package in
+# $ONMS_HOME/etc/collectd-configuration.xml. You'll need to define the
 # collection elements using the jmx_collection and jdbc_mbean LWRPs.
-# The package is created with the collection_package LWRP. 
+# The package is created with the collection_package LWRP.
 
 actions :create
 default_action :create
