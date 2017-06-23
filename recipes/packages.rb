@@ -29,55 +29,46 @@ bash 'import OpenNMS GPG key' do
   not_if 'rpm -qai "*gpg*" | grep -q OpenNMS'
 end
 
-if node['opennms']['stable']
-  yum_repository 'opennms-stable-common' do
-    description 'RPMs Common to All OpenNMS Architectures RPMs (stable)'
-    baseurl node['yum']['opennms-stable-common']['baseurl']
-    mirrorlist node['yum']['opennms-stable-common']['url']
-    gpgkey 'file:///etc/yum.repos.d/OPENNMS-GPG-KEY'
-    failovermethod node['yum']['opennms-stable-common']['failovermethod']
-    includepkgs node['yum']['opennms-stable-common']['includepkgs']
-    exclude node['yum']['opennms-stable-common']['exclude']
-    action :create
-  end
-  yum_repository 'opennms-stable-rhel6' do
-    description 'RedHat Enterprise Linux 6.x and CentOS 6.x RPMs (stable)'
-    baseurl node['yum']['opennms-stable-rhel6']['baseurl']
-    mirrorlist node['yum']['opennms-stable-rhel6']['url']
-    gpgkey 'file:///etc/yum.repos.d/OPENNMS-GPG-KEY'
-    includepkgs node['yum']['opennms-stable-rhel6']['includepkgs']
-    exclude node['yum']['opennms-stable-rhel6']['exclude']
-    action :create
-  end
-else
-  yum_repository 'opennms-snapshot-common' do
-      description 'RPMs Common to All OpenNMS Architectures RPMs (stable)'
-      baseurl node['yum']['opennms-snapshot-common']['baseurl']
-      mirrorlist node['yum']['opennms-snapshot-common']['url']
+def yum_attr(branch, platform, attr)
+  node['yum']["opennms-#{branch}-#{platform}"][attr]
+end
+
+branches = %w(stable obsolete snapshot)
+platforms = %w(common rhel6)
+branches.each do |branch|
+  platforms.each do |platform|
+    skip = false
+    Chef::Log.debug "branch is '#{branch}' and stable is #{node['opennms']['stable']}"
+    if (branch == 'stable' && !node['opennms']['stable']) ||
+       (branch == 'snapshot' && node['opennms']['stable'])
+      skip = true
+    end
+    next if skip
+    bu = yum_attr(branch, platform, 'baseurl')
+    ml = yum_attr(branch, platform, 'url')
+    fom = yum_attr(branch, platform, 'failovermethod')
+    inc_pkgs = yum_attr(branch, platform, 'includepkgs')
+    repo_enabled = yum_attr(branch, platform, 'enabled')
+    ex = yum_attr(branch, platform, 'exclude')
+    yum_repository "opennms-#{branch}-#{platform}" do
+      description "#{platform} OpenNMS RPMs (#{branch})"
+      baseurl bu unless bu.nil? || bu == ''
+      mirrorlist ml unless ml.nil? || ml == ''
       gpgkey 'file:///etc/yum.repos.d/OPENNMS-GPG-KEY'
-      failovermethod node['yum']['opennms-snapshot-common']['failovermethod']
-      includepkgs node['yum']['opennms-snapshot-common']['includepkgs']
-      exclude node['yum']['opennms-snapshot-common']['exclude']
-      gpgcheck false
+      failovermethod fom unless fom.nil? | fom == ''
+      enabled repo_enabled
+      includepkgs inc_pkgs unless inc_pkgs.nil? || inc_pkgs == ''
+      exclude ex unless ex.nil? || ex == ''
       action :create
-  end
-  yum_repository 'opennms-snapshot-rhel6' do
-    description 'RedHat Enterprise Linux 6.x and CentOS 6.x RPMs (stable)'
-    baseurl node['yum']['opennms-snapshot-rhel6']['baseurl']
-    mirrorlist node['yum']['opennms-snapshot-rhel6']['url']
-    gpgkey 'file:///etc/yum.repos.d/OPENNMS-GPG-KEY'
-    includepkgs node['yum']['opennms-snapshot-rhel6']['includepkgs']
-    exclude node['yum']['opennms-snapshot-rhel6']['exclude']
-      gpgcheck false
-    action :create
+    end
   end
 end
 
 onms_packages = ['opennms-core', 'opennms-webapp-jetty', 'opennms-docs']
-onms_versions =  [node['opennms']['version'], node['opennms']['version'],
-  node['opennms']['version']]
+onms_versions = [node['opennms']['version'], node['opennms']['version'],
+                 node['opennms']['version']]
 
-if node['opennms']['plugin']['xml']
+if node['opennms']['plugin']['xml'] && Opennms::Helpers.major(node['opennms']['version']).to_i <= 18
   onms_packages.push 'opennms-plugin-protocol-xml'
   onms_versions.push node['opennms']['version']
 end
@@ -87,19 +78,22 @@ if node['opennms']['plugin']['nsclient']
   onms_versions.push node['opennms']['version']
 end
 
-package onms_packages do
+ruby_block 'stop opennms before upgrade' do
+  block do
+    Opennms::Upgrade.stop_opennms(node)
+  end
+  only_if { node['opennms']['upgrade'] && Opennms::Upgrade.upgrade?(node) }
+end
+
+yum_package onms_packages do
   version onms_versions
   allow_downgrade node['opennms']['allow_downgrade']
+  timeout node['yum_timeout']
   action :install
 end
 
-package "iplike" do
-  action :install
-end
-
-package "perl-libwww-perl" do
-  action :install
-end
-package "perl-XML-Twig" do
-  action :install
+%w(iplike perl-libwww-perl perl-XML-Twig).each do |p|
+  package p do
+    action :install
+  end
 end

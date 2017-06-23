@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<?castor class-name="org.opennms.netmgt.snmpinterfacepoller.SnmpInterfacePollerConfiguration"?>
+<snmp-interface-poller-configuration threads="<%=@threads%>" service="<%=@service%>"> 
+  <node-outage>
+    <% @node_outage.each do |service| -%>
+    <critical-service name="<%=service%>" />
+    <% end -%>
+  </node-outage>
+  <package name="example1">
+    <filter><%=@example1[:filter]%></filter>
+    <include-range begin="<%=@example1[:ipv4_range][:begin]%>" end="<%=@example1[:ipv4_range][:end]%>" />
+    <include-range begin="<%=@example1[:ipv6_range][:begin]%>" end="<%=@example1[:ipv6_range][:end]%>" />
+    <interface name="<%=@example1[:interface][:name]%>" criteria="<%=@example1[:interface][:criteria]%>" interval="<%=@example1[:interface][:interval]%>" user-defined="<%=@example1[:interface][:user_defined]%>" status="<%=@example1[:interface][:status]%>"/>
+  </package>
+
+  <!--  package name="overwritesnmpvalues">
+    <filter>IPADDR != '0.0.0.0'</filter>
+    <include-range begin="1.1.1.1" end="254.254.254.254" />
+    <interface name="Ethernet" criteria="snmpiftype = 6" interval="300000" user-defined="false" status="on"
+    port="161" timeout="1000" retry="1" max-vars-per-pdu="10" />
+  </package-->
+
+</snmp-interface-poller-configuration>

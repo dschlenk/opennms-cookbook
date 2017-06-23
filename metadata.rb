@@ -1,13 +1,19 @@
 name             'opennms'
 maintainer       'David Schlenk'
 maintainer_email 'david.schlenk@spanlink.com'
-license          'Apache 2.0'
+license          'Apache-2.0'
 description      'Installs and Configures opennms and provides many useful LWRPs.'
 long_description IO.read(File.join(File.dirname(__FILE__), 'README.md'))
-supports         'centos', ">= 6.0"
-supports         'rhel', ">= 6.0"
-version          '16.2.0'
+issues_url       'https://github.com/dschlenk/opennms-cookbook/issues'
+source_url       'https://github.com/dschlenk/opennms-cookbook'
+supports         'centos', '>= 6.0'
+supports         'redhat', '>= 6.0'
+version          '19.2.2'
 depends          'yum'
 depends          'hostsfile'
-depends          'java'
 depends          'build-essential'
+depends          'postgresql'
+depends          'grafana'
+depends          'nginx', '~> 2.7'
+depends          'openssl'
+chef_version '>= 12.5' if respond_to?(:chef_version)

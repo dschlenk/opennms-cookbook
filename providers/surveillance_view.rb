@@ -1,28 +1,26 @@
 def whyrun_supported?
-    true
+  true
 end
 
 use_inline_resources
 
 action :create do
   if @current_resource.changed
-    Chef::Log.info "#{ @new_resource } already exists but has changed - updating."
-    converge_by("Update #{ @new_resource }") do
+    Chef::Log.info "#{@new_resource} already exists but has changed - updating."
+    converge_by("Update #{@new_resource}") do
       update_surveillance_view
-      new_resource.updated_by_last_action(true)
     end
   elsif @current_resource.exists
-    Chef::Log.info "#{ @new_resource } already exists - nothing to do."
+    Chef::Log.info "#{@new_resource} already exists - nothing to do."
   else
-    converge_by("Create #{ @new_resource }") do
+    converge_by("Create #{@new_resource}") do
       create_surveillance_view
-      new_resource.updated_by_last_action(true)
     end
   end
 end
 
 def load_current_resource
-  @current_resource = 
+  @current_resource =
     Chef::Resource::OpennmsSurveillanceView.new(@new_resource.name)
   @current_resource.name(@new_resource.name)
   @current_resource.rows(@new_resource.rows)
@@ -52,10 +50,10 @@ def view_changed?(name, rows, columns, default_view)
   return true if curr_rows != rows
   Chef::Log.debug "columns: #{curr_columns} == #{columns}?"
   return true if curr_columns != columns
-  curr_default = doc.elements["/surveillance-view-configuration"].attributes['default-view']
+  curr_default = doc.elements['/surveillance-view-configuration'].attributes['default-view']
   Chef::Log.debug "current default is #{curr_default}"
   return true if default_view == true && curr_default != name
-  return false
+  false
 end
 
 def update_surveillance_view
@@ -68,16 +66,16 @@ end
 
 def create_surveillance_view
   doc = surveillance_doc
-  views = doc.elements["/surveillance-view-configuration/views"]
-  view = views.add_element('view', { 'name' => new_resource.name,
-                                     'refresh-seconds' => '300' })
+  views = doc.elements['/surveillance-view-configuration/views']
+  view = views.add_element('view', 'name' => new_resource.name,
+                                   'refresh-seconds' => '300')
   converge_surveillance_view(doc, view, new_resource.rows, new_resource.columns,
                              new_resource.default_view)
   write(doc)
 end
 
 def surveillance_doc
-  file = ::File.new("#{node['opennms']['conf']['home']}/etc/surveillance-views.xml", "r")
+  file = ::File.new("#{node['opennms']['conf']['home']}/etc/surveillance-views.xml", 'r')
   doc = REXML::Document.new file
   file.close
   doc
@@ -95,10 +93,10 @@ def get_cells(view, path)
 end
 
 def add_cells(container, items, type)
-  items.each do |k,v|
-    cd = container.add_element(type, { 'label' => k })
+  items.each do |k, v|
+    cd = container.add_element(type, 'label' => k)
     v.each do |cat|
-      cd.add_element('category', { 'name' => cat })
+      cd.add_element('category', 'name' => cat)
     end
   end
 end
@@ -118,9 +116,9 @@ def converge_surveillance_view(doc, view, rows, columns, default_view)
 end
 
 def write(doc)
-  out = ""
+  out = ''
   formatter = REXML::Formatters::Pretty.new(2)
   formatter.compact = true
   formatter.write(doc, out)
-  ::File.open("#{node['opennms']['conf']['home']}/etc/surveillance-views.xml", "w"){ |file| file.puts(out) }
+  ::File.open("#{node['opennms']['conf']['home']}/etc/surveillance-views.xml", 'w') { |file| file.puts(out) }
 end

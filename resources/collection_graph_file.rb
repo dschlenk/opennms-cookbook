@@ -2,6 +2,6 @@
 actions :create, :create_if_missing, :delete, :touch
 default_action :create
 
-attribute :file, :kind_of => String, :name_attribute => true
+attribute :file, kind_of: String, name_attribute: true
 
 attr_accessor :exists

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<jms-northbounder-config>
+  <enabled><%=@enabled%></enabled>
+  <nagles-delay><%=@nagles_delay%></nagles-delay>
+  <batch-size><%=@batch_size%></batch-size>
+  <queue-size><%=@queue_size%></queue-size>
+  <message-format><%=@message_format%></message-format>
+  <destination>
+    <jms-destination><%=@jms_destination%></jms-destination>
+    <send-as-object-message><%=@send_as_object_message%></send-as-object-message>
+    <first-occurence-only><%=@first_occurence_only%></first-occurence-only>
+  </destination>
+  <!-- More than one destination can be specified 
+  <destination>
+    <jms-destination>AllAlarmQueue</jms-destination>
+    <send-as-object-message>false</send-as-object-message>
+    <first-occurence-only>false</first-occurence-only>
+  </destination> -->
+</jms-northbounder-config>

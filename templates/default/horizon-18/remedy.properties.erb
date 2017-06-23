@@ -1,0 +1,127 @@
+# this is the OpenNMS - Trouble Ticket Remedy Help Desk Integration properties file
+# The following values are used as an example and must be set according
+# with your remedy installation
+#
+# Remedy Authentication
+# to access remedy you need to set 
+# at least username and password
+# authentication, locale and timezone are optional
+# The username to access remedy
+remedy.username=<%=@username%>
+remedy.password=<%=@password%>
+remedy.authentication=<%=@authentication%>
+remedy.locale=<%=@locale%>
+remedy.timezone=<%=@timezone%>
+#
+# Remedy Web Service 
+# Default Web Service for Remedy Help Desk Module are used
+# the name of the Web services are: HPD_IncidentInterface_WS, HPD_IncidentInterface_Create_WS
+# the first is used for get and update while the second is to create the Ticket
+# The  end point location of the HPD web service
+remedy.endpoint=<%=@endpoint%>
+# The Port name of the HPD web service 
+remedy.portname=<%=@portname%>
+# The end point location of the Create-HPD web service
+remedy.createendpoint=<%=@createendpoint%>
+# The Port name of the Create-HPD web service
+remedy.createportname=<%=@createportname%>
+#
+# Remedy Ticket Creation Properties
+# This is used in web page to get the list
+# of assignable groups, the target group should
+# be in this set otherwise the assigned group property is used
+remedy.targetgroups=<%=@targetgroups%>
+# The specific values to be assigned for each target group
+<% @assignedgroups.each do |k,v| -%>
+remedy.assignedgroup.<%=k%>=<%=v%>
+<% end -%>
+<% @assignedsupportcompanies.each do |k,v| -%>
+remedy.assignedsupportcompany.<%=k%>=<%=v%>
+<% end -%>
+<% @assignedsupportorganizations.each do |k,v| -%>
+remedy.assignedsupportorganization.<%=k%>=<%=v%>
+<% end -%>
+ 
+#remedy.targetgroups=TNnet:Sensi:Frizen 
+#
+#remedy.assignedgroup.TNnet=TNnet
+#remedy.assignedgroup.Sensi=Sensi srl
+#remedy.assignedgroup.Frizen=Frizen sas
+#remedy.assignedsupportcompany.TNnet=Trentino Network srl
+#remedy.assignedsupportcompany.Sensi=Sensi srl
+#remedy.assignedsupportcompany.Frizen=Frizen sas
+#remedy.assignedsupportorganization.TNnet=Centro Gestione Rete
+#remedy.assignedsupportorganization.Sensi=Event Management
+#remedy.assignedsupportorganization.Frizen=Event Management
+#
+# This is the default group to assign the ticket in case the ticket itself 
+# does not carry any information about a target assigned group
+remedy.assignedgroup=<%=@assignedgroup%>
+#
+# Mandatory the first and last name must exist in remedy 
+remedy.firstname=<%=@firstname%>
+remedy.lastname=<%=@lastname%>
+#
+# Mandatory set a valid Remedy serviceCI
+#remedy.serviceCI=Trentino Network Event Management [I.TNEVT]
+remedy.serviceCI=<%=@serviceCI%>
+# Mandatory set a valid Remedy serviceCIReconID
+#remedy.serviceCIReconID=RE00505688005eP8Z3UAsLJIHg6EoR
+remedy.serviceCIReconID=<%=@serviceCIReconID%>
+# Mandatory set a valid assigned default support company
+remedy.assignedsupportcompany=<%=@assignedsupportcompany%>
+# Mandatory set a valid assigned default support organization
+remedy.assignedsupportorganization=<%=@assignedsupportorganization%>
+# Mandatory Set categorization tier
+remedy.categorizationtier1=<%=@categorizationtier1%>
+remedy.categorizationtier2=<%=@categorizationtier2%>
+remedy.categorizationtier3=<%=@categorizationtier3%>	
+#
+# Mandatory set serviceType choose one from the following values:
+#remedy.serviceType=User Service Restoration
+#remedy.serviceType=User Service Request
+#remedy.serviceType=Infrastructure Restoration
+remedy.serviceType=<%=@service_type%>
+#
+# Mandatory set reported Source, choose one among the following
+#
+remedy.reportedSource=<%=@reported_source%>
+#remedy.reportedSource=Email
+#remedy.reportedSource=External Escalation
+#remedy.reportedSource=Fax
+#remedy.reportedSource=Systems Management
+#remedy.reportedSource=Phone
+#remedy.reportedSource=Voice Mail
+#remedy.reportedSource=Walk In
+#remedy.reportedSource=Web
+#remedy.reportedSource=Other
+#
+# Mandatory set Impact, choose one among the following
+#remedy.impact=1-Extensive/Widespread
+#remedy.impact=2-Significant/Large
+#remedy.impact=3-Moderate/Limited
+remedy.impact=<%=@impact%>
+#
+
+# Set Urgency, choose one among the following
+# this is used is the OpenNMS Ticket
+# has not an urgenty property defined
+#remedy.urgency=1-Critical
+#remedy.urgency=2-High
+#remedy.urgency=3-Medium
+remedy.urgency=<%=@urgency%>
+#
+#
+# Set the following mandatory properties
+# this set the reason code in remedy when  
+# the ticket is reopend, closed, cancelled by 
+# the user in opennms	
+# this is used when a ticket is reopend by opennms
+remedy.reason.reopen=<%=@reason_reopen%>
+#there are used when the ticket is closed by opennms 
+# gui
+remedy.resolution=<%=@resolution%>
+remedy.reason.resolved=<%=@reason_resolved%>
+# this is used when the ticket is cancelled by 
+# opennms gui
+remedy.reason.cancelled=<%=@reason_cancelled%>

@@ -1,42 +1,45 @@
+[![Build Status](https://travis-ci.org/dschlenk/opennms-cookbook.svg?branch=master)](https://travis-ci.org/dschlenk/opennms-cookbook)
+
 Description
 ===========
 
-A Chef cookbook to manage the installation and configuration of OpenNMS.
-Current version of templates are based on OpenNMS release 16.0.3
+A Chef cookbook to manage the installation and configuration of OpenNMS Horizon.
+Current version supports releases 16, 17, 18 and 19 on CentOS 6.
 
 Versions
 ========
 
-Starting with OpenNMS 16, the MSB of the version of the cookbook matches the MSB of the version of OpenNMS it is meant to support. 
-
+Starting with OpenNMS Horizon 16, the MSB of the version of the cookbook matches the latest MSB of the version of OpenNMS Horizon it supports. Support for older versions will be noted. The version of OpenNMS Horizon is selected via node attribute, defaulting to the latest supported release.
 
 Requirements
 ============
 
-* Chef 11.x+
-* CentOS 6.x. Debian/Ubuntu support shouldn't be too hard to do - if anyone wants to head that up let me know. 
+* Chef 12.5.1 or later (only tested on 12.5.1, however)
+* CentOS 6
 * Either use Berkshelf to satisfy dependencies or manually acquire the following cookbooks: 
   * yum
   * hostsfile
   * build-essential
-* In OpenNMS 17+ you will need a newer PostgreSQL than CentOS 6.x provides. Also, using Chef to install PostgreSQL makes tuning a lot easier. While there's no explicit dependency, you most likely will want some combination of recipes from the `postgresql` cookbook.  See Usage for details.
+  * postgresql 
+  * grafana ([my fork](https://github.com/dschlenk/chef-grafana]) for now)
+  * openssl
+
+* In OpenNMS 17+ you will need a newer PostgreSQL than CentOS 6.x provides. Also, using Chef to install PostgreSQL makes tuning a lot easier. While you're free to install PostgreSQL in whatever manner pleases you, there is a `postgres` recipe that installs 9.3 from pgdg and does some basic tuning.
 
 Usage
 =====
 
-Running the default recipe will install OpenNMS 16.0.3 (or a custom version using the attribute `node[:opennms][:version]`) on CentOS 6.x from the official repo with the default configuration. It will also execute `'$ONMS_HOME/bin/runjava -s` if `$ONMS_HOME/etc/java.conf` is not present and `$ONMS_HOME/bin/install -dis` if `$ONMS_HOME/etc/configured` is not present.
+Running the default recipe will install OpenNMS 19.0.0-1 (or a custom version using the attribute `node[:opennms][:version]`) on CentOS 6.x from the official repo with the default configuration. It will also execute `'$ONMS_HOME/bin/runjava -s` if `$ONMS_HOME/etc/java.conf` is not present and `$ONMS_HOME/bin/install -dis` if `$ONMS_HOME/etc/configured` is not present.
 
-There are two primary ways to use this cookbook: as an application cookbook or library cookbook. If you simply want to tweak a few settings to the default OpenNMS configuration, you can use the `default` recipe of this cookbook directly and modify node attributes to suit your needs. There are also a plethora of LWRPs that you can use to do more in depth customizations. If you go that route I recommend starting with the `notemplates` recipe and then using those LWRPs (and maybe a few of the templates in this cookbook) to define your run list. If your node's run list contains both the template and a resource that manages the same file you'll end up with a lot of churn during the chef client run, which is a waste of time and will probably cause unnecessary restarts of OpenNMS. 
+There are two primary ways to use this cookbook: as an application cookbook or library cookbook. If you simply want to tweak a few settings to the default OpenNMS configuration, you can use the `default` recipe of this cookbook directly and modify node attributes to suit your needs. There are also a plethora of LWRPs that you can use to do more in depth customizations. If you go that route I recommend starting with the `notemplates` recipe and then using those LWRPs (and maybe a few of the templates in this cookbook) to define your run list. If your node's run list contains both the template and a resource that manages the same file you'll end up with a lot of churn during the chef client run, which is a waste of time and will probably cause unnecessary restarts of the application. 
 
-Template resources for daemons that support configuration changes without a restart will automatically send the proper event to activate changes. Add `notifies` to your resource for similar funcationality when using the LWRPs from this cookbook. See the example recipe for each LWRP for details.
+Template resources for daemons that support configuration changes without a restart will automatically send the proper event to activate changes. Add `notifies` to your resource for similar funcationality when using the LWRPs from this cookbook. A test cookbook in `test/fixtures` has a recipe that demonstrates this for each LWRP.
 
 ### Java (Optional)
 
-You might also want to check out the community java (https://github.com/socrata-cookbooks/java) and almost definitely postgresql (https://github.com/hw-cookbooks/postgresql) cookbooks. Here's an example of each:
+While the current OpenNMS Yum repos contain a suitable JDK, you might want to check out the community java (https://github.com/socrata-cookbooks/java) cookbook. Oracle likes to change license terms on a whim and their RPM might not set up things (like alternatives priorities) to your liking, so you might want to get ahead of the curve and manage installing the JDK yourself. See `test/fixtures/cookbooks/oracle_java8` for a simple example method of installing Oracle Java via Chef.
 
-At this time the OpenNMS yum repo includes a modern Oracle JDK. Since Oracle likes to change license terms on a whim (and their RPM doesn't necessarily set up things (like alternatives priorities) to your liking), you might want to get ahead of the curve and manage installing the JDK yourself. Here's an example using [dschlenk's fork](https://github.com/dschlenk/java/) of the community java cookbook. 
-
-First, you need to download the appropriate RPM(s) from Oracle and make a yum repo available to your nodes. For example, on a CentOS server with Apache httpd installed you could do:
+If you want to install Java via RPM, you have to do a bit more work. First, you need to download the appropriate RPM(s) from Oracle and make a yum repo available to your nodes. For example, on a CentOS server with Apache httpd installed you could do:
 
 ```
 # mkdir /var/www/html/oracle-java
@@ -73,34 +76,8 @@ end
 
 Then add the 'java::default' recipe to your run list. 
 
-### Postgresql
-
-Include the client, server, contrib, config_initdb, config_pgtune recipes 
-(in that order) in your run list. Then use these attributes for a fairly well
-tuned config:
-
-```
-node[:postgresql][:enable_pgdg_yum] = true,
-node[:postgresql][:version] = '9.3',
-node[:postgresql][:dir] = '/var/lib/pgsql/9.3/data',
-node[:postgresql][:pg_hba] = { :addr => '' :user => 'all', :type => 'local', :method => 'trust', :db => 'all' }
-node[:postgresql][:pg_hba] = { :addr => '127.0.0.1/32', :user => 'all', :type => 'host', :method => 'trust', :db => 'all'}
-node[:postgresql][:pg_hba] = { :addr => '::1/128', :user => 'all', :type => 'host', :method => 'trust', :db => 'all' }
-node[:postgresql][:config][:checkpoint_timeout] = '15min'
-node[:postgresql][:config][:data_directory] = '/var/lib/pgsql/9.3/data'
-node[:postgresql][:config][:autovacuum] = 'on'
-node[:postgresql][:config][:track_activities] = 'on'
-node[:postgresql][:config][:track_counts]  = 'on'
-node[:postgresql][:config][:shared_preload_libraries] = 'pg_stat_statements'
-node[:postgresql][:config][:vacuum_cost_delay] = 50
-node[:postgresql][:config_pgtune][:max_connections] = 160
-node[:postgresql][:contrib][:extensions] = ['pageinspect', 'pg_buffercache', 'pg_freespacemap', 'pgrowlocks', 'pg_stat_statements', 'pgstattuple']
-node[:postgresql][:client][:packages] = ["postgresql93", "postgresql93-contrib", "postgresql93-devel"]
-node[:postgresql][:server][:packages] = ["postgresql93-server"]
-node[:postgresql][:server][:service_name] = "postgresql-93
-```
-
 ### Recommended Tweaks
+
 There are also a couple OpenNMS attributes you'll probably want to override at a minimum: 
 
 ### opennms.conf
@@ -116,18 +93,18 @@ node[:opennms][:conf][:addl_mgr_opts] = '-XX:+UseConcMarkSweepGC -XX:MaxMetaspac
 Starting with version 2.0.0 there is now experimental support for handling 
 upgrades automatically. Use at your own risk. It is disabled by default. 
 To enable, set `node['opennms']['upgrade']` to true. If this sounds like 
-something you want to do, review the `upgrade` recipe. It roughly translates to:
+something you want to do, review the `upgrade` recipe and library. It roughly translates to:
 
-* New RPM is installed. 
-* Are there any files named `*.rpmnew` in `$ONMS_HOME/etc` or `$ONMS_HOME/jetty-webapp`? If so, overwrite the existing files with them. 
-* Are there any files named `*.rpmsave` in `$ONMS_HOME/etc` or `$ONMS_HOME/jetty-webapp`? If so, remove them.
+* New RPM is installed.
+* Are there any files named `*.rpmnew` in `$ONMS_HOME`? If so, overwrite the existing files with them.
+* Are there any files named `*.rpmsave` in `$ONMS_HOME`? If so, remove them.
 
-`rpmsave` files happen when there's a config file that you have changed that 
-was replaced with the new version because not replacing it would prevent 
+`rpmsave` files happen when there's a config file that you have changed that
+was replaced with the new version because not replacing it would prevent
 OpenNMS from working properly. But since we're using Chef, we don't care about
 the old version as any changes we made to it previously will be redone with the
-appropriate LWRP(s) or templates later in the converge. Since OpenNMS won't 
-start with these files in place we just remove them. 
+appropriate LWRP(s) or templates later in the converge. Since OpenNMS won't
+start with these files in place we just remove them.
 
 Similarly, `rpmnew` files are created when a newer version of a file exists, but 
 it doesn't contain breaking changes. Just like `rpmsave` files, OpenNMS won't 
@@ -138,17 +115,17 @@ we want anyway, so we just overwrite the old file with the `rpmnew` version.
 
 * `opennms::default` Installs and configures OpenNMS with the standard configuration modified with any node attribute values changed from their defaults.
 * `opennms::notemplates` Everything default does except minimal templates are used - etc/opennms.conf, etc/opennms.properties and etc/log4j2.xml. Use this recipe if you intend to use any of the LWRPs in this cookbook.
+* `opennms::grafana` Installs [Grafana](http://grafana.org/) server and configures it for use with OpenNMS. Also turns on the Dashboard list box on the OpenNMS front page. Optionally changes admin password to a specific or randomly generated one.
+* `opennms::rrdtool` Installs rrdtool and configures OpenNMS to use it rather than JRobin for metrics storage.
 
 #### Deprecated
-The following recipes are deprecated. The preferred method to install these packages is by setting `node[:opennms][:plugin][:nsclient]` and/or `node[:opennms][:plugin][:xml]` to true. All these recipes do now is set those attributes at the default level. 
+The following recipes are deprecated. The preferred method to install these packages is by setting `node[:opennms][:plugin][:nsclient]` and/or `node[:opennms][:plugin][:xml]` to true. As of 19.0.0, the XML plugin has been merged into the core package and therefore setting that attribute to true has no effect. All these recipes do now is set those attributes at the default level. 
 * `opennms::nsclient` installs the optional nsclient data collection plugin and uses the template for etc/nsclient-datacollection-config.xml. 
 * `opennms::xml` installs the optional xml data collection plugin and uses the template for etc/xml-datacollection-config.xml. 
 
 ### LWRPs
 
-As a general rule these LWRPs support a single action: `create` and many of them behave more like `create_if_missing` does in other cookbooks. In other words, updating is generally not supported. Exceptions are noted, and this behavior may change in future releases. 
-
-Also, there are example recipes in the cookbook for most every LWRP named `opennms::example_<LWRP_NAME>`. Eventually these will become tests. 
+As a general rule these LWRPs support a single action: `create` and many of them behave more like `create_if_missing` does in other cookbooks. In other words, updating is generally not supported. Exceptions are noted. This behavior will change in future releases (generally whenever I encounter a use case for update of that resource IRL).
 
 The list of implemented LWRPs is as follows: 
 
@@ -170,7 +147,7 @@ The list of implemented LWRPs is as follows:
 These LWRPs use a cookbook library named Provision that I wrote to perform the work using the OpenNMS REST interface. As such, OpenNMS has to be running for the resources to converge. Also you'll notice that I used the term 'import' rather than the correct term 'requisition'. I can type 'import' a lot faster than 'requisition'. ;)
 
 * `opennms_foreign_source`: create a new foreign source optionally defining a scan interval (defaults to '1d'). 
-* `opennms_service_detector`: add a service detector to a foreign source.
+* `opennms_service_detector`: add a service detector to a foreign source. Supports updating and deleting.
 * `opennms_policy`: add a policy to a foreign source. 
 * `opennms_import`: Defines a requisition for a foreign source. This and all import* LWRPs include an option to synchronize the requisition - sync_import. 
 * `opennms_import_node`: Add a node to a requisition including categories (array of strings) and assets (key/value hash pairs). 
@@ -179,8 +156,8 @@ These LWRPs use a cookbook library named Provision that I wrote to perform the w
 
 #### Events
 
-* `opennms_eventconf`: adds an event-file element to events in etc/eventconf.xml. 
-* `opennms_event`: adds an event element to events in target eventconf file `file`. Not all elements from the eventconf schema are implemented, but the ones that seem to actually exist in the wild are. See resource for details and recipes `example_event` and `example_threshold` for example usage.
+* `opennms_eventconf`: adds an event-file element to events in etc/eventconf.xml.  Supports updating.
+* `opennms_event`: adds an event element to events in target eventconf file `file`. Not all elements from the eventconf schema are implemented, but the ones that seem to actually exist in the wild are. See resource for details and recipes `example_event` and `example_threshold` for example usage. Supports updating existing events, so if you want to change an event in an eventconf file distributed with OpenNMS, this is the resource for you - no more merging files after an upgrade! Look at the test/example recipe for details - you only need to provide the file, UEI, the mask elements and the attribute(s) you want to change. If creating entirely new events, there are some attributes that are required by the eventconf schema but not enforced by the Chef resource (since they aren't required when doing an update). New in 18.2 is the ability to place new events at the top or bottom of an existing file with the 'position' attribute. Varbind filters are also now supported in masks. Also supports `:delete` action to remove existing events.
 * `opennms_send_event`: creates an actual instance of an event using the `send-event.pl` script in `$ONMS_HOME/bin`. Used by the `send_events` recipe, which is included by `default` and `notemplates` recipes to cause config file reloads to take place when template resources make changes or an LWRP sends a notification.
 
 #### Notifications
@@ -188,8 +165,7 @@ These LWRPs use a cookbook library named Provision that I wrote to perform the w
 * `opennms_notification_command`: Create a new command in notificationCommands.xml. 
 * `opennms_destination_path`: creates a destination path element in destinationPaths.xml. Requires at a minimum a single target which can be defined with the following LWRP. 
 * `opennms_target`: Add a target or escalate target to a destination path (defined either in the default config or with the above LWRP). 
-* `opennms_notification`: Create notification elements in notifications.xml. 
-* `opennms_notifd_autoack`: Create a auto acknowledge up/down pair in notifd-configuration.xml
+* `opennms_notification`: Create notification elements in notifications.xml.  Supports updating and deleting (action :delete).
 
 #### Node Service Credential Configuration
 
@@ -209,24 +185,24 @@ Currently implemented are:
 
 #### Data Collection
 
-* `opennms_resource_type`: adds a resourceType definition to a file in etc/datacollection and an include-collection element to the default snmp-collection. This LWRP supports a very limited form of updating - if the resource type already exists but isn't included in the default snmp-collection, an include-collection element will be added. The definition of the resource type won't be updated, however.  
+* `opennms_resource_type`: adds a resourceType definition to a file in etc/datacollection and an include-collection element to the default snmp-collection. This LWRP supports a very limited form of updating - if the resource type already exists but isn't included in the default snmp-collection, an include-collection element will be added. The definition of the resource type won't be updated, however.
 * `opennms_system_def`: add or remove pre-existing groups (`/datacollection-group/group[@name]`) to or from pre-existing systemDefs (`/datacollection-group/systemDef/collect/includeGroup[text()]`) in $ONMS_HOME/etc/datacollection/*.xml.
-* `opennms_snmp_collection`: adds an snmp-collection element to etc/datacollection-config.xml. 
-* `opennms_xml_collection`: adds an xml-collection element to etc/xml-datacollection-config.xml. 
-* `opennms_wmi_collection`: adds a wmi-collection element to etc/wmi-datacollection-config.xml. 
-* `opennms_jdbc_collection`: adds a jdbc-collection element to etc/jdbc-datacollection-config.xml. 
+* `opennms_snmp_collection`: adds an snmp-collection element to etc/datacollection-config.xml.
+* `opennms_xml_collection`: adds an xml-collection element to etc/xml-datacollection-config.xml.
+* `opennms_wmi_collection`: adds a wmi-collection element to etc/wmi-datacollection-config.xml.
+* `opennms_jdbc_collection`: adds a jdbc-collection element to etc/jdbc-datacollection-config.xml.
 * `opennms_jmx_collection`: adds a jmx-collection element to etc/jmx-datacollection-config.xml. 
-* `opennms_collection_package`: adds a package element to etc/collectd-configuration.xml. 
-* `opennms_snmp_collection_service`: adds a service element to a package in etc/collectd-configuration.xml. 
-* `opennms_xml_collection_service`: adds a service element to a package in etc/collectd-configuration.xml. 
+* `opennms_collection_package`: adds a package element to etc/collectd-configuration.xml.
+* `opennms_snmp_collection_service`: adds a service element to a package in etc/collectd-configuration.xml.
+* `opennms_xml_collection_service`: adds a service element to a package in etc/collectd-configuration.xml. Supports update & delete.
 * `opennms_wmi_collection_service`: adds a service element to a package in etc/collectd-configuration.xml.
-* `opennms_jdbc_collection_service`: adds a service element to a package in etc/collectd-configuration.xml.
+* `opennms_jdbc_collection_service`: adds a service element to a package in etc/collectd-configuration.xml. Supports update & delete.
 * `opennms_jmx_collection_service`: adds a service element to a package in etc/collectd-configuration.xml.
-* `opennms_snmp_collection_group`: adds an include-collection element to an snmp-collection in etc/datacollection-config.xml and drops off the specified cookbook file into etc/datacollection. 
-* `opennms_jdbc_query`: adds a query element to a jdbc-collection in etc/jdbc-datacollection-config.xml. 
+* `opennms_snmp_collection_group`: adds an include-collection element to an snmp-collection in etc/datacollection-config.xml and drops off the specified cookbook file into etc/datacollection.
+* `opennms_jdbc_query`: adds a query element to a jdbc-collection in etc/jdbc-datacollection-config.xml.
 * `opennms_jmx_mbean`: adds a mbean element to a jmx-collection in etc/jmx-datacollection-config.xml. 
-* `opennms_xml_source`: adds a xml-source element to a xml-collection in etc/xml-datacollection-config.xml. 
-* `opennms_xml_group`: adds a xml-source element to a xml-source in etc/xml-datacollection-config.xml. 
+* `opennms_xml_source`: adds a xml-source element to a xml-collection in etc/xml-datacollection-config.xml.
+* `opennms_xml_group`: adds a xml-source element to a xml-source in etc/xml-datacollection-config.xml.
 
 #### Statistics Reports
 
@@ -243,12 +219,12 @@ See `opennms::example_statsd` for example usage of these LWRPs.
 
 #### Thresholds
 
-See examples for all of these LWRPs are in a single recipe, `example_threshold`. 
+See examples for all of these LWRPs are in a single recipe, `example_threshold`.
 
 * `opennms_threshd_package`: Create a new package in threshd-configuration.xml. 
 * `opennms_threshold_group`: Create a new threshold group in thresholds.xml. 
-* `opennms_threshold`: Create a new threshold in the specified group in thresholds.xml. 
-* `opennms_expression`: Create a new expression threshold in the specified group in thresholds.xml. 
+* `opennms_threshold`: Create a new threshold in the specified group in thresholds.xml. Supports updating and deleting.
+* `opennms_expression`: Create a new expression threshold in the specified group in thresholds.xml. Supports updating and deleting.
 
 #### Web UI
 
@@ -446,6 +422,10 @@ This is useful for something I'm sure, but I don't know what. See the template o
 #### etc/jdbc-datacollection-config.xml 
 
 Similar to other datacollection-config.xml files, you can change the RRD repository, step, RRA definitions and disable default collections and their queries.
+
+#### etc/jms-northbounder-configuration.xml
+
+Configures the JMS Northbounder introduced in version 17.0.0. See the default attributes under the `jms_nbi` key for configuration options. You may also need to set some JMS related attributes under the `properties` key.
 
 #### etc/jmx-datacollection-config.xml 
 
@@ -719,41 +699,49 @@ Configure notifications to be sent via XMPP (aka Jabber, GTalk) with these attri
 * pass
 
 #### Others
+
 See the template and default attributes source for more details on using these templates:
 
-* etc/microblog-configuration.xml
-* etc/model-importer.properties
-* etc/modemConfig.properties
-* etc/nsclient-datacollection-config.xml
-* etc/poller-configuration.xml
-* etc/provisiond-configuration.xml
-* etc/remedy.properties
-* etc/reportd-configuration.xml
-* etc/rtc-configuration.xml
-* etc/smsPhonebook.properties
-* etc/snmp-interface-poller-configuration.xml
-* etc/support.properties
-* etc/surveillance-views.xml
-* etc/syslog-northbounder-configuration.xml
-* etc/syslogd-configuration.xml
-* etc/vacuumd-configuration.xml
-* etc/vmware-cim-datacollection-config.xml
-* etc/vmware-datacollection-config.xml
-* etc/wmi-datacollection-config.xml
-* etc/xml-datacollection-config.xml
-* etc/xmlrpcd-configuration.xml
+* etc/microblog-configuration.xml.erb
+* etc/model-importer.properties.erb
+* etc/modemConfig.properties.erb
+* etc/nsclient-datacollection-config.xml.erb
+* etc/poller-configuration.xml.erb
+* etc/provisiond-configuration.xml.erb
+* etc/remedy.properties.erb
+* etc/reportd-configuration.xml.erb
+* etc/rtc-configuration.xml.erb
+* etc/smsPhonebook.properties.erb
+* etc/snmp-interface-poller-configuration.xml.erb
+* etc/support.properties.erb
+* etc/surveillance-views.xml.erb
+* etc/syslog-northbounder-configuration.xml.erb
+* etc/syslogd-configuration.xml.erb
+* etc/vacuumd-configuration.xml.erb
+* etc/vmware-cim-datacollection-config.xml.erb
+* etc/vmware-datacollection-config.xml.erb
+* etc/wmi-datacollection-config.xml.erb
+* etc/xml-datacollection-config.xml.erb
+* etc/xmlrpcd-configuration.xml.erb
 
 License
 =======
 Apache 2.0
 
+OpenNMS and OpenNMS Horizon are &#8482; and &copy; The OpenNMS Group, Inc.
+
 Author
 ======
-David Schlenk (<dschlenk@converge-one.com>)
+David Schlenk (<dschlenk@convergeone.com>)
 
 Development
 ===========
 
-Please feel free to fork and send me pull requests!  The focus of my work will initially be on templates for configuration files that modify the default configuration and LWRPs to add new elements to configuration files. 
+So far, tests consist of:
 
-There's some kitchen suites available that exercise the main recipes and LWRPs. More testing will be a thing someday!
+* Style Checks using foodcritic and rubocop. 
+* Basic 'does-it-converge' test kitchen suites
+
+Use rake to run style checks.
+
+Pull requests welcome!
