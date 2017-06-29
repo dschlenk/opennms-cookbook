@@ -48,10 +48,5 @@ def create_wmi_collection
     rra_el.add_text(rra)
   end
   collection_el.add_element 'wpms'
-
-  out = ''
-  formatter = REXML::Formatters::Pretty.new(2)
-  formatter.compact = true
-  formatter.write(doc, out)
-  ::File.open("#{node['opennms']['conf']['home']}/etc/wmi-datacollection-config.xml", 'w') { |f| f.puts(out) }
+  Opennms::Helpers.write_xml_file(doc, "#{node['opennms']['conf']['home']}/etc/wmi-datacollection-config.xml")
 end

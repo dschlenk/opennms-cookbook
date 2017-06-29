@@ -110,11 +110,7 @@ def delete_xml_collection_service
   Chef::Log.debug "Deleted #{d}"
   d = doc.elements.delete "/collectd-configuration/collector[@service='#{new_resource.service_name}']"
   Chef::Log.debug "Deleted #{d}"
-  out = ''
-  formatter = REXML::Formatters::Pretty.new(2)
-  formatter.compact = true
-  formatter.write(doc, out)
-  ::File.open("#{node['opennms']['conf']['home']}/etc/collectd-configuration.xml", 'w') { |f| f.puts(out) }
+  Opennms::Helpers.write_xml_file(doc, "#{node['opennms']['conf']['home']}/etc/collectd-configuration.xml")
 end
 
 def create_xml_collection_service
@@ -191,9 +187,5 @@ def create_xml_collection_service
   unless doc.elements["/collectd-configuration/collector[@service='#{new_resource.service_name}']"]
     doc.elements['/collectd-configuration'].add_element 'collector', 'service' => new_resource.service_name, 'class-name' => 'org.opennms.protocols.xml.collector.XmlCollector'
   end
-  out = ''
-  formatter = REXML::Formatters::Pretty.new(2)
-  formatter.compact = true
-  formatter.write(doc, out)
-  ::File.open("#{node['opennms']['conf']['home']}/etc/collectd-configuration.xml", 'w') { |f| f.puts(out) }
+  Opennms::Helpers.write_xml_file(doc, "#{node['opennms']['conf']['home']}/etc/collectd-configuration.xml")
 end

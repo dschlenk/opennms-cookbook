@@ -216,11 +216,7 @@ def create_snmp_config_definition
       ipm_el.add_text(ip_match)
     end
   end
-  out = ''
-  formatter = REXML::Formatters::Pretty.new(2)
-  formatter.compact = true
-  formatter.write(doc, out)
-  ::File.open("#{node['opennms']['conf']['home']}/etc/snmp-config.xml", 'w') { |f| f.puts(out) }
+  Opennms::Helpers.write_xml_file(doc, "#{node['opennms']['conf']['home']}/etc/snmp-config.xml")
 end
 
 def update_snmp_config_definition
@@ -258,11 +254,7 @@ def update_snmp_config_definition
     end
   end
 
-  out = ''
-  formatter = REXML::Formatters::Pretty.new(2)
-  formatter.compact = true
-  formatter.write(doc, out)
-  ::File.open("#{node['opennms']['conf']['home']}/etc/snmp-config.xml", 'w') { |f| f.puts(out) }
+  Opennms::Helpers.write_xml_file(doc, "#{node['opennms']['conf']['home']}/etc/snmp-config.xml")
 end
 
 def delete_snmp_config_definition
@@ -276,9 +268,5 @@ def delete_snmp_config_definition
   def_el = matching_def(doc, new_resource)
   doc.root.delete(def_el)
 
-  out = ''
-  formatter = REXML::Formatters::Pretty.new(2)
-  formatter.compact = true
-  formatter.write(doc, out)
-  ::File.open("#{node['opennms']['conf']['home']}/etc/snmp-config.xml", 'w') { |f| f.puts(out) }
+  Opennms::Helpers.write_xml_file(doc, "#{node['opennms']['conf']['home']}/etc/snmp-config.xml")
 end

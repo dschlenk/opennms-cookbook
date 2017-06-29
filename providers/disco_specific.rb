@@ -91,9 +91,5 @@ def create_specific
       doc.root.insert_before(before_el, new_el)
     end
   end
-  out = ''
-  formatter = REXML::Formatters::Pretty.new(2)
-  formatter.compact = true
-  formatter.write(doc, out)
-  ::File.open("#{node['opennms']['conf']['home']}/etc/discovery-configuration.xml", 'w') { |f| f.puts(out) }
+  Opennms::Helpers.write_xml_file(doc, "#{node['opennms']['conf']['home']}/etc/discovery-configuration.xml")
 end

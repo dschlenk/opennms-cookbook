@@ -125,12 +125,7 @@ def update_poller_service
       service_el.add_element 'parameter', 'key' => key, 'value' => value
     end
   end
-  # don't need to bother checking if a monitor element exists - had to before or else broken!
-  out = ''
-  formatter = REXML::Formatters::Pretty.new(2)
-  formatter.compact = true
-  formatter.write(doc, out)
-  ::File.open("#{node['opennms']['conf']['home']}/etc/poller-configuration.xml", 'w') { |f| f.puts(out) }
+  Opennms::Helpers.write_xml_file(doc, "#{node['opennms']['conf']['home']}/etc/poller-configuration.xml")
 end
 
 def create_poller_service
@@ -168,11 +163,7 @@ def create_poller_service
     new_mon_el.attributes['class-name'] = new_resource.class_name
     doc.root.insert_after(last_monitor_el, new_mon_el)
   else
-    Chef::Log.warn 'Existing monitor service exists with possibly conflicting class name. Results not guaranteed. '
+    Chef::Log.warn 'Existing monitor service exists with possibly conflicting class name. Results not guaranteed.'
   end
-  out = ''
-  formatter = REXML::Formatters::Pretty.new(2)
-  formatter.compact = true
-  formatter.write(doc, out)
-  ::File.open("#{node['opennms']['conf']['home']}/etc/poller-configuration.xml", 'w') { |f| f.puts(out) }
+  Opennms::Helpers.write_xml_file(doc, "#{node['opennms']['conf']['home']}/etc/poller-configuration.xml")
 end

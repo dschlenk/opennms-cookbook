@@ -71,11 +71,5 @@ def create_wmi_wpm
     attrib_el.add_attribute('maxval', details['maxval']) if details['maxval']
     attrib_el.add_attribute('minval', details['minval']) if details['minval']
   end
-
-  out = ''
-  # doc.write(out,3)
-  formatter = REXML::Formatters::Pretty.new(2)
-  formatter.compact = true
-  formatter.write(doc, out)
-  ::File.open("#{node['opennms']['conf']['home']}/etc/wmi-datacollection-config.xml", 'w') { |f| f.puts(out) }
+  Opennms::Helpers.write_xml_file(doc, "#{node['opennms']['conf']['home']}/etc/wmi-datacollection-config.xml")
 end

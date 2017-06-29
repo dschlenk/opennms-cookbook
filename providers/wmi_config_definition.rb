@@ -177,11 +177,7 @@ def create_wmi_config_definition
       ipm_el.add_text(ip_match)
     end
   end
-  out = ''
-  formatter = REXML::Formatters::Pretty.new(2)
-  formatter.compact = true
-  formatter.write(doc, out)
-  ::File.open("#{node['opennms']['conf']['home']}/etc/wmi-config.xml", 'w') { |f| f.puts(out) }
+  Opennms::Helpers.write_xml_file(doc, "#{node['opennms']['conf']['home']}/etc/wmi-config.xml")
 end
 
 def update_wmi_config_definition
@@ -223,11 +219,7 @@ def update_wmi_config_definition
     end
   end
 
-  out = ''
-  formatter = REXML::Formatters::Pretty.new(2)
-  formatter.compact = true
-  formatter.write(doc, out)
-  ::File.open("#{node['opennms']['conf']['home']}/etc/wmi-config.xml", 'w') { |f| f.puts(out) }
+  Opennms::Helpers.write_xml_file(doc, "#{node['opennms']['conf']['home']}/etc/wmi-config.xml")
 end
 
 def delete_wmi_config_definition
@@ -246,9 +238,5 @@ def delete_wmi_config_definition
 
   doc.root.delete(def_el)
 
-  out = ''
-  formatter = REXML::Formatters::Pretty.new(2)
-  formatter.compact = true
-  formatter.write(doc, out)
-  ::File.open("#{node['opennms']['conf']['home']}/etc/wmi-config.xml", 'w') { |f| f.puts(out) }
+  Opennms::Helpers.write_xml_file(doc, "#{node['opennms']['conf']['home']}/etc/wmi-config.xml")
 end

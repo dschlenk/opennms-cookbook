@@ -71,12 +71,7 @@ def delete_xml_group
   doc.context[:attribute_quote] = :quote
   group_el = xml_group_el(doc, new_resource, true)
   Chef::Log.debug("element deleted is #{group_el}")
-  out = ''
-  formatter = REXML::Formatters::Pretty.new(2)
-  formatter.compact = true
-  formatter.width = 100_000
-  formatter.write(doc, out)
-  ::File.open("#{node['opennms']['conf']['home']}/etc/xml-datacollection-config.xml", 'w') { |f| f.puts(out) }
+  Opennms::Helpers.write_xml_file(doc, "#{node['opennms']['conf']['home']}/etc/xml-datacollection-config.xml")
 end
 
 # for now we don't support splitting into include-groups files. But if you use Chef you'll never need to read the file anyway, so who cares? ;)
@@ -107,10 +102,5 @@ def create_xml_group
       xg_el.add_element 'xml-object', 'name' => name, 'type' => details['type'], 'xpath' => details['xpath']
     end
   end
-  out = ''
-  formatter = REXML::Formatters::Pretty.new(2)
-  formatter.compact = true
-  formatter.width = 100_000
-  formatter.write(doc, out)
-  ::File.open("#{node['opennms']['conf']['home']}/etc/xml-datacollection-config.xml", 'w') { |f| f.puts(out) }
+  Opennms::Helpers.write_xml_file(doc, "#{node['opennms']['conf']['home']}/etc/xml-datacollection-config.xml")
 end

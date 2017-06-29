@@ -113,11 +113,7 @@ def update_avail_category
   rule_el = cat_el.elements['rule']
   rule_el.text = nil while rule_el.has_text?
   rule_el.add_text(REXML::CData.new(new_resource.rule))
-  out = ''
-  formatter = REXML::Formatters::Pretty.new(2)
-  formatter.compact = true
-  formatter.write(doc, out)
-  ::File.open("#{node['opennms']['conf']['home']}/etc/categories.xml", 'w') { |f| f.puts(out) }
+  Opennms::Helpers.write_xml_file(doc, "#{node['opennms']['conf']['home']}/etc/categories.xml")
 end
 
 # order doesn't matter here - these just exist to be referenced by viewdisplay.xml
@@ -141,9 +137,5 @@ def create_avail_category
   end
   rule_el = cat_el.add_element 'rule'
   rule_el.add_text(REXML::CData.new(new_resource.rule))
-  out = ''
-  formatter = REXML::Formatters::Pretty.new(2)
-  formatter.compact = true
-  formatter.write(doc, out)
-  ::File.open("#{node['opennms']['conf']['home']}/etc/categories.xml", 'w') { |f| f.puts(out) }
+  Opennms::Helpers.write_xml_file(doc, "#{node['opennms']['conf']['home']}/etc/categories.xml")
 end

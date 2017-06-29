@@ -58,11 +58,7 @@ module SystemDef
       ig_el = collect_el.add_element 'includeGroup'
       ig_el.add_text group
     end
-    out = ''
-    formatter = REXML::Formatters::Pretty.new(2)
-    formatter.compact = true
-    formatter.write(doc, out)
-    ::File.open("#{onms_home}/etc/datacollection/#{system_def_file}", 'w') { |f| f.puts(out) }
+    Opennms::Helpers.write_xml_file(doc, "#{node['opennms']['conf']['home']}/etc/datacollection/#{system_def_file}")
   end
 
   def remove_groups(onms_home, groups, system_def)
@@ -75,10 +71,6 @@ module SystemDef
         doc.delete_element "/datacollection-group/systemDef[@name='#{system_def}']/collect/includeGroup[text() = '#{group}']"
       end
     end
-    out = ''
-    formatter = REXML::Formatters::Pretty.new(2)
-    formatter.compact = true
-    formatter.write(doc, out)
-    ::File.open("#{onms_home}/etc/datacollection/#{system_def_file}", 'w') { |f| f.puts(out) }
+    Opennms::Helpers.write_xml_file(doc, "#{node['opennms']['conf']['home']}/etc/datacollection/#{system_def_file}")
   end
 end

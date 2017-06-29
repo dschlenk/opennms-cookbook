@@ -121,11 +121,7 @@ def create_dashlet
   pri.text = new_resource.priority.to_s
   title = dashlet.add_element 'title'
   title.text = new_resource.title
-  out = ''
-  formatter = REXML::Formatters::Pretty.new(2)
-  formatter.compact = true
-  formatter.write(doc, out)
-  ::File.open("#{node['opennms']['conf']['home']}/etc/dashboard-config.xml", 'w') { |f| f.puts(out) }
+  Opennms::Helpers.write_xml_file(doc, "#{node['opennms']['conf']['home']}/etc/dashboard-config.xml")
 end
 
 def update_dashlet
@@ -152,9 +148,5 @@ def update_dashlet
   end
   pri = dashlet.elements['priority']
   pri.text = new_resource.priority.to_s
-  out = ''
-  formatter = REXML::Formatters::Pretty.new(2)
-  formatter.compact = true
-  formatter.write(doc, out)
-  ::File.open("#{node['opennms']['conf']['home']}/etc/dashboard-config.xml", 'w') { |f| f.puts(out) }
+  Opennms::Helpers.write_xml_file(doc, "#{node['opennms']['conf']['home']}/etc/dashboard-config.xml")
 end

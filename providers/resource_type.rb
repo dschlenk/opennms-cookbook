@@ -66,11 +66,7 @@ def create_resource_type
     storage_el.add_element 'parameter', 'key' => param.keys[0], 'value' =>  param[param.keys[0]]
   end
 
-  out = ''
-  formatter = REXML::Formatters::Pretty.new(2)
-  formatter.compact = true
-  formatter.write(doc, out)
-  ::File.open(outfile_name, 'w') { |f| f.puts(out) }
+  Opennms::Helpers.write_xml_file(doc, outfile_name)
   # ensure there's an include-collection element in the default snmp-collection for this group
   opennms_snmp_collection_group new_resource.group_name do
     collection_name 'default'

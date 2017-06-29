@@ -120,11 +120,7 @@ def update_avail_view_section
     c_el = section_el.add_element 'category'
     c_el.add_text(REXML::CData.new(c))
   end
-  out = ''
-  formatter = REXML::Formatters::Pretty.new(2)
-  formatter.compact = true
-  formatter.write(doc, out)
-  ::File.open("#{node['opennms']['conf']['home']}/etc/viewsdisplay.xml", 'w') { |f| f.puts(out) }
+  Opennms::Helpers.write_xml_file(doc, "#{node['opennms']['conf']['home']}/etc/viewsdisplay.xml")
 end
 
 def create_avail_view_section
@@ -151,9 +147,5 @@ def create_avail_view_section
     c_el = section_el.add_element 'category'
     c_el.add_text(REXML::CData.new(c))
   end
-  out = ''
-  formatter = REXML::Formatters::Pretty.new(2)
-  formatter.compact = true
-  formatter.write(doc, out)
-  ::File.open("#{node['opennms']['conf']['home']}/etc/viewsdisplay.xml", 'w') { |f| f.puts(out) }
+  Opennms::Helpers.write_xml_file(doc, "#{node['opennms']['conf']['home']}/etc/viewsdisplay.xml")
 end

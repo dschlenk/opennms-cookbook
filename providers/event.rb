@@ -96,12 +96,7 @@ def create_event_file
   doc << REXML::XMLDecl.new
   events_el = doc.add_element 'events'
   events_el.add_namespace('http://xmlns.opennms.org/xsd/eventconf')
-  out = ''
-  formatter = REXML::Formatters::Pretty.new(2)
-  formatter.compact = true
-  formatter.write(doc, out)
-  ::File.open("#{node['opennms']['conf']['home']}/etc/#{new_resource.file}", 'w') { |file| file.puts(out) }
-  # include in eventconf.xml
+  Opennms::Helpers.write_xml_file(doc, "#{node['opennms']['conf']['home']}/etc/#{new_resource.file}")
   add_file_to_eventconf(new_resource.file, 'bottom', node)
 end
 
@@ -291,11 +286,7 @@ def create_event
     end
   end
   Chef::Log.debug("Converged event_el for #{new_resource}: #{event_el}")
-  out = ''
-  formatter = REXML::Formatters::Pretty.new(2)
-  formatter.compact = true
-  formatter.write(doc, out)
-  ::File.open("#{node['opennms']['conf']['home']}/etc/#{new_resource.file}", 'w') { |f| f.puts(out) }
+  Opennms::Helpers.write_xml_file(doc, "#{node['opennms']['conf']['home']}/etc/#{new_resource.file}")
 end
 
 def delete_event
@@ -314,10 +305,6 @@ def delete_event
     ::File.delete("#{node['opennms']['conf']['home']}/etc/#{new_resource.file}")
     remove_file_from_eventconf(new_resource.file, node)
   end
-  out = ''
-  formatter = REXML::Formatters::Pretty.new(2)
-  formatter.compact = true
-  formatter.write(doc, out)
-  ::File.open("#{node['opennms']['conf']['home']}/etc/#{new_resource.file}", 'w') { |f| f.puts(out) }
+  Opennms::Helpers.write_xml_file(doc, "#{node['opennms']['conf']['home']}/etc/#{new_resource.file}")
 end
 # rubocop:enable Metrics/BlockNesting
