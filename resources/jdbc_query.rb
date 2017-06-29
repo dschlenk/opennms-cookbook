@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require 'rexml/document'
 
 # Defines data to be collected in a JDBC collection in

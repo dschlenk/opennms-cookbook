@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require 'rexml/document'
 
 # Use this LWRP to include a JDBC collection in the referenced collectd

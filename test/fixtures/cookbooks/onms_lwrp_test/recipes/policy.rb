@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 # note that opennms needs to be running for provisioning commands to work
 # as they use the ReST interface.
 log 'Start OpenNMS to perform ReST operations.' do

@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 default['java']['oracle']['accept_oracle_download_terms'] = true
 default['java']['install_flavor']                         = 'oracle'
 default['java']['jdk']['8']['x86_64']['checksum']         = '97e30203f1aef324a07c94d9d078f5d19bb6c50e638e4492722debca588210bc'

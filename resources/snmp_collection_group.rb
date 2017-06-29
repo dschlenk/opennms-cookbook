@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require 'rexml/document'
 
 # Defines data to collect in an SNMP collection in

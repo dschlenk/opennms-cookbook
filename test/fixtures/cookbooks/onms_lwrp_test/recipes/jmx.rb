@@ -1,6 +1,7 @@
+# frozen_string_literal: true
 opennms_collection_package 'jmx1' do
   filter "IPADDR != '0.0.0.0'"
-  notifies :restart, "service[opennms]"
+  notifies :restart, 'service[opennms]'
 end
 
 opennms_jmx_collection 'jmxcollection'

@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 module SystemDef
   def groups_in_system_def?(onms_home, system_def_name, system_def_file, groups)
     Chef::Log.debug "Checking to see if groups #{groups} exist in '#{system_def_file}'"

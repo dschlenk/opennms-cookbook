@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 name             'opennms'
 maintainer       'David Schlenk'
 maintainer_email 'david.schlenk@spanlink.com'

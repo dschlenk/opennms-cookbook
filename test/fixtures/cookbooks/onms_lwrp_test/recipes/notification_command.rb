@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 # all options - only comment and arguments are optional although binary defaults to true if not defined.
 opennms_notification_command 'wallHost' do
   execute '/usr/bin/wall'

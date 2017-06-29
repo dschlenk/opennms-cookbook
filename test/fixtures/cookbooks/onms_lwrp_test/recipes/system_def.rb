@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 opennms_system_def 'Cisco Routers' do
   groups ['mib2-tcp', 'mib2-powerethernet']
   action :add

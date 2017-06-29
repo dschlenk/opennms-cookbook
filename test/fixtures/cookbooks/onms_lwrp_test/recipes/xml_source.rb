@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 # all options
 opennms_xml_source 'http://{ipaddr}/get-example' do
   collection_name 'foo'

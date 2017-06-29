@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 opennms_resource_type 'wmi_thing' do
   group_name 'metasyntactic'
   label 'wmi resource'

@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 # For now, only supports create. Existance is determined by role_name, username and type.
 # TODO:  An update action could be useful here to add new times to an existing role/user/type instance.
 require 'rexml/document'

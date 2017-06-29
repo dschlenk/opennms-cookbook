@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 # most options
 opennms_notification 'exampleDown' do
   status 'on'

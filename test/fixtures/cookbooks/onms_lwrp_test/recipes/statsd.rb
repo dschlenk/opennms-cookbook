@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 # all options - filter not required.
 opennms_statsd_package 'cheftest' do
   filter "IPADDR != '0.0.0.0'"

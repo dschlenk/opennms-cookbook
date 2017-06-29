@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require 'rexml/document'
 
 # this one supports updating. existance determined by service_name/package_name.

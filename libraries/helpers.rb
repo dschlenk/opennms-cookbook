@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 module Opennms
   module Helpers
     def self.major(version)

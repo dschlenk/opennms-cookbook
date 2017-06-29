@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 # most useful options
 # Note that package_name 'foo' must be defined somewhere else in your resource collection.
 opennms_wmi_collection_service 'WMIFoo Service' do

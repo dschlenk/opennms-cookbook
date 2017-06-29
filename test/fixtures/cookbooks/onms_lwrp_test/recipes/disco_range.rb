@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 # all options
 opennms_disco_range 'anRange' do
   range_begin '10.0.0.1'

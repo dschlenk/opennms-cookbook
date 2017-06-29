@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 actions :create
 default_action :create
 

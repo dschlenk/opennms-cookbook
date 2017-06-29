@@ -434,12 +434,8 @@ suites:
             password: superSecret
   - name: jmx
     run_list:
-      - recipe[java]
-      - recipe[postgresql::client]
-      - recipe[postgresql::server]
-      - recipe[postgresql::contrib]
-      - recipe[postgresql::config_initdb]
-      - recipe[postgresql::config_pgtune]
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
       - recipe[opennms::notemplates]
-      - recipe[opennms::example_jmx]
+      - recipe[onms_lwrp_test::jmx]
     attributes:

@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 include OpennmsXml
 include ResourceType
 def whyrun_supported?

@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require 'rexml/document'
 # Use this LWRP to include a collection in the referenced collectd
 # package_name. This LWRP simply adds the service to the package in

@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 module OpennmsXml
   def collection_exists?(node, collection_name, type = 'snmp')
     Chef::Log.debug "Checking to see if this #{type} collection exists: '#{collection_name}'"

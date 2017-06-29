@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 # most useful options
 # Note that package_name 'foo' must be defined somewhere else in your resource collection.
 opennms_snmp_collection_service 'SNMP' do

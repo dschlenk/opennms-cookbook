@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 # Adds/updates/deletes a graph in either the specified currently existing or
 # new graph file in $ONMS_HOME/etc/snmp-graph.properties.d/
 # or the default collection graph file, $ONMS_HOME/etc/snmp-graph.properties

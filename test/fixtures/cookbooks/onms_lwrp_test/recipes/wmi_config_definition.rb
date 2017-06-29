@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 # all options
 opennms_wmi_config_definition 'create_all' do
   retry_count 3
