@@ -24,19 +24,3 @@ opennms_notification 'example2Broken' do
   destination_path 'Email-Admin'
   text_message 'broken'
 end
-
-# make changes to the previous resource
-opennms_notification 'example2Broken' do
-  status 'off'
-  uei 'changedTheUei'
-  destination_path 'Email-Admin'
-  text_message 'broken'
-end
-
-opennms_notification 'example2Broken' do
-  status 'off'
-  uei 'changedTheUei'
-  destination_path 'Email-Admin'
-  text_message 'broken'
-  action :delete
-end

@@ -1,6 +1,6 @@
 # frozen_string_literal: true
+include_recipe 'onms_lwrp_test::collection_package'
 # most useful options
-# Note that package_name 'foo' must be defined somewhere else in your resource collection.
 opennms_collection_service 'JSON' do
   collection 'baz'
   package_name 'foo'
