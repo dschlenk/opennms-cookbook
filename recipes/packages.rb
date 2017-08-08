@@ -86,6 +86,34 @@ ruby_block 'stop opennms before upgrade' do
   only_if { node['opennms']['upgrade'] && Opennms::Upgrade.upgrade?(node) }
 end
 
+yum_package 'yum-versionlock'
+
+onms_packages.each do |pkg|
+  pv = "#{pkg}-#{node['opennms']['version']}"
+  # remove any version locks that don't match current version
+  execute "remove old versionlocks for #{pkg}" do
+    command "yum versionlock delete 0:#{pkg}*"
+    ignore_failure true
+    not_if "yum versionlock list #{pv} | grep -q #{pv}"
+    branches.each do |branch|
+      platforms.each do |platform|
+        skip = false
+        Chef::Log.debug "branch is '#{branch}' and stable is #{node['opennms']['stable']}"
+        if (branch == 'stable' && !node['opennms']['stable']) ||
+           (branch == 'snapshot' && node['opennms']['stable'])
+          skip = true
+        end
+        next if skip
+        notifies :makecache, "yum_repository[opennms-#{branch}-#{platform}]", :immediately
+      end
+    end
+  end
+  execute "add yum versionlock for #{pkg}" do
+    command "yum versionlock add #{pv}"
+    not_if "yum versionlock list #{pv} | grep -q #{pv}"
+  end
+end
+
 yum_package onms_packages do
   version onms_versions
   allow_downgrade node['opennms']['allow_downgrade']
