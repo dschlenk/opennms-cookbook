@@ -6,12 +6,12 @@ SUITES+=('default')
 for f in ${SUITES[@]}; do
   recipe=${f%.rb}
   for v in ${VERSIONS[@]}; do
-    if [ ! -d test/integration/${recipe}_${v%%.*-1}/inspec ]; then
-      mkdir -p test/integration/${recipe}_${v%%.*-1}/inspec
+    if [ ! -d test/integration/${recipe}/inspec ]; then
+      mkdir -p test/integration/${recipe}/inspec
     fi
-    if [ ! -f test/integration/${recipe}_${v%%.*-1}/inspec/${recipe}_spec.rb ]; then
-      echo "describe 'opennms::${recipe}' do" > test/integration/${recipe}_${v%%.*-1}/inspec/${recipe}_spec.rb
-      echo "end" >> test/integration/${recipe}_${v%%.*-1}/inspec/${recipe}_spec.rb
+    if [ ! -f test/integration/${recipe}/inspec/${recipe}_spec.rb ]; then
+      echo "describe 'opennms::${recipe}' do" > test/integration/${recipe}/inspec/${recipe}_spec.rb
+      echo "end" >> test/integration/${recipe}/inspec/${recipe}_spec.rb
     fi
     $(fgrep -q "  - name: ${recipe}_${v%%.*-1}" .kitchen.yml)
     if [ "$?" != "0" ]; then
@@ -21,14 +21,20 @@ for f in ${SUITES[@]}; do
       echo "      - recipe[oracle_java8::default]"
       echo "      - recipe[opennms::default]"
       if [ "$recipe" != "default" ]; then
-        echo "      - recipe[opennms::${recipe}]"
+        echo "      - recipe[onms_lwrp_test::${recipe}]"
       fi
       echo "    attributes:"
       echo "      opennms:"
       echo "        version: ${v}"
-      if [ "$recipe" == "default" ]; then
+      if [ "$recipe" = "default" ]; then
         echo "      upgrade: true"
       fi
+      echo "    verifier:"
+      echo "      inspec_tests:"
+      if [ "$recipe" != "default" ]; then
+        echo "        - path: test/integration/default"
+      fi
+      echo "        - path: test/integration/${recipe}"
     fi
   done
 done
