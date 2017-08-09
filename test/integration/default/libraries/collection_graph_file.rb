@@ -20,10 +20,18 @@ EOL
 
   def initialize(graph_file)
     @graph_file = graph_file
-    @contents = inspec.file("/opt/opennms/etc/snmp-graph.properties.d/#{graph_file}").content
+    gf = inspec.file("/opt/opennms/etc/snmp-graph.properties.d/#{graph_file}")
+    @exists = gf.exist?
+    if @exists
+      @contents = gf.content
+    end
   end
 
   def contents
     @contents
+  end
+
+  def exists
+    @exists
   end
 end
