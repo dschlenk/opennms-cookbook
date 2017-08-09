@@ -6,12 +6,41 @@ SUITES+=('default')
 for f in ${SUITES[@]}; do
   recipe=${f%.rb}
   for v in ${VERSIONS[@]}; do
-    if [ ! -d test/integration/${recipe}/inspec ]; then
-      mkdir -p test/integration/${recipe}/inspec
+    PROF_DIR="test/integration/${recipe}"
+    INSPEC_YML="${PROF_DIR}/inspec.yml"
+    if [ -d ${PROF_DIR}/inspec ]; then
+      mv ${PROF_DIR}/inspec/* ${PROF_DIR}/
+      rmdir ${PROF_DIR}/inspec
     fi
-    if [ ! -f test/integration/${recipe}/inspec/${recipe}_spec.rb ]; then
-      echo "describe 'opennms::${recipe}' do" > test/integration/${recipe}/inspec/${recipe}_spec.rb
-      echo "end" >> test/integration/${recipe}/inspec/${recipe}_spec.rb
+    if [ ! -d ${PROF_DIR}/controls ]; then
+      mkdir -p ${PROF_DIR}/controls
+    fi
+    if [ -f ${PROF_DIR}/${recipe}_spec.rb ]; then
+      mv ${PROF_DIR}/${recipe}_spec.rb ${PROF_DIR}/controls/
+    fi
+    if [ ! -f ${INSPEC_YML} ]; then
+      echo "name: opennms_${recipe}" > ${INSPEC_YML}
+      echo "title: OpenNMS ${recipe}" >> ${INSPEC_YML}
+      echo "maintainer: David Schlenk" >> ${INSPEC_YML}
+      echo "copyright: ConvergeOne" >> ${INSPEC_YML}
+      echo "copyright_email: dschlenk@convergeone.com" >> ${INSPEC_YML}
+      echo "license: Apache 2.0" >> ${INSPEC_YML}
+      echo "summary: Verify OpenNMS LWRP ${recipe} works." >> ${INSPEC_YML}
+      echo "version: 1.0.0" >> ${INSPEC_YML}
+      echo "supports:" >> ${INSPEC_YML}
+      echo "  - os-family: redhat" >> ${INSPEC_YML}
+      echo "depends:" >> ${INSPEC_YML}
+      echo "  - name: opennms" >> ${INSPEC_YML}
+      echo "    path: test/integration/default" >> ${INSPEC_YML}
+    fi
+    if [ ! -f ${PROF_DIR}/controls/${recipe}_spec.rb ]; then
+      echo "control '${recipe}' do" > ${PROF_DIR}/controls/${recipe}_spec.rb
+      echo "end" >> ${PROF_DIR}/controls/${recipe}_spec.rb
+    fi
+    fgrep -q "describe 'opennms::" ${PROF_DIR}/controls/${recipe}_spec.rb
+    if  [ "$?" = "0" ] && [ "${recipe}" != "default" ]; then
+      echo "control '${recipe}' do" > ${PROF_DIR}/controls/${recipe}_spec.rb
+      echo "end" >> ${PROF_DIR}/controls/${recipe}_spec.rb
     fi
     $(fgrep -q "  - name: ${recipe}_${v%%.*-1}" .kitchen.yml)
     if [ "$?" != "0" ]; then
