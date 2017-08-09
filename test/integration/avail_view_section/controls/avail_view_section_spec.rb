@@ -1,27 +1,27 @@
 control 'avail_view_section' do
   sections = { 'Topmost' => {
       'categories' => ['Database Servers'],
-      'position' => 4
+      'position' => 1
     },
     'Animals' => {
       'categories' => ['Cats', 'Dogs'],
-      'position' => 6
+      'position' => 2
     },
     'Categories' => {
       'categories' => ['Network Interfaces', 'Web Servers', 'Other Servers'],
-      'position' => 8
+      'position' => 3
     },
     'Dogs First' => {
       'categories' => ['Dogs', 'Cats'],
-      'position' => 10
+      'position' => 4
     },
     'Total' => {
       'categories' => ['Overall Service Availability'],
-      'position' => 12
+      'position' => 5
     },
     'Bottommost' => {
       'categories' => ['Other Servers'],
-      'position' => 14
+      'position' => 6
     }
   }
   sections.each do |section, properties|
