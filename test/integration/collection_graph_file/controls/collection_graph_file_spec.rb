@@ -6,12 +6,12 @@ control 'collection_graph_file' do
   notfiles = ['mailmarshal-graph.properties']
   files.each do |f|
     describe collection_graph_file f do
-      its('exists') { should eq true }
+      it { should exist }
     end
   end
   notfiles.each do |f|
     describe collection_graph_file f do
-      its('exists') { should eq false }
+      it { should_not exist }
     end
   end
 end

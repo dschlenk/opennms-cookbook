@@ -9,6 +9,7 @@ class CollectionGraph < Inspec.resource(1)
 
   example '
     describe collection_graph(\'mib2-graph.properties\', \'mib2.HCbits\') do
+      it { should exist }
       its(\'long_name\') { should eq \'Bits In/Out (High Speed)\' }
       its(\'columns\') { should eq %w(ifHCInOctets ifHCOutOctets) }
       its(\'type\') { should eq \'interfaceSnmp\' }
@@ -40,6 +41,10 @@ EOL
       @type = props["report.#{graph_name}.type"]
       @command = props["report.#{graph_name}.command"]
     end
+  end
+
+  def exist?
+    @exists
   end
 
   def long_name

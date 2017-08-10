@@ -7,8 +7,8 @@ class SnmpCollectionGroup < Inspec.resource(1)
   '
 
   example '
-    describe snmp_collection_group(\'MIB2\') do
-      its(\'file\') { should eq \'mib2.xml\' }
+    describe snmp_collection_group(\'MIB2\', \'mib2.xml\'[, \'default\']) do
+      it { should exist }
     end
   '
 
@@ -22,7 +22,7 @@ class SnmpCollectionGroup < Inspec.resource(1)
     end
   end
 
-  def exists
+  def exist?
     @exists
   end
 end

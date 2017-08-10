@@ -8,7 +8,8 @@ class CollectionGraphFile < Inspec.resource(1)
 
   example '
     describe collection_graph_file(\'mib2-graph.properties\') do
-      its(\'contents\') { 
+      it { should exist }
+      its(\'content\') { 
         should eq <<-EOL
 reports=mib2.HCbits, \\
 mib2.bits, \\
@@ -27,11 +28,11 @@ EOL
     end
   end
 
-  def contents
+  def content
     @contents
   end
 
-  def exists
+  def exist?
     @exists
   end
 end

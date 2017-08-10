@@ -1,9 +1,10 @@
 control 'collection_graph' do
   describe snmp_collection_group('coffee', 'coffee.xml') do
-    its('exists') { should be true }
+    it { should exist }
   end
 
   describe collection_graph_file('coffee.properties') do
+    it { should exist }
     its('contents') {
       should eq <<-EOL
 reports=coffee.temperature, \\
@@ -37,6 +38,7 @@ EOL
   end
 
   describe collection_graph('coffee.properties', 'coffee.potLevel') do
+    it { should exist }
     its('long_name') { should eq 'Coffee Pot Level' }
     its('columns') { should eq %w(coffeePotCapacity coffeePotLevel) }
     its('type') { should eq 'nodeSnmp' }
@@ -44,6 +46,7 @@ EOL
   end
 
   describe collection_graph('coffee2.properties', 'coffee.potLevel2') do
+    it { should exist }
     its('long_name') { should eq 'Coffee Pot Level2' }
     its('columns') { should eq %w(coffeePotCapacity coffeePotLevel) }
     its('type') { should eq 'nodeSnmp' }
