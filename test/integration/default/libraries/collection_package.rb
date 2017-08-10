@@ -7,7 +7,7 @@ class CollectionPackage < Inspec.resource(1)
   '
 
   example '
-    describe collection(\'example1\') do
+    describe collection_package(\'example1\') do
       its(\'filter\') { should eq \'IPADDR != \\\'0.0.0.0\\\'\' }
       its(\'include_ranges\') { should eq [{\'begin\' => \'1.1.1.1\', \'end\' => \'254.254.254.254\'}, {\'begin\' => \'::1\', \'end\' => \'ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff\'}]}
     end
