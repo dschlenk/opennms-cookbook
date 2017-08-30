@@ -1,0 +1,2 @@
+control 'webopts' do
+end

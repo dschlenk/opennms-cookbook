@@ -1,0 +1,2 @@
+control 'eventconf' do
+end

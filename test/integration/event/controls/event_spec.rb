@@ -1,0 +1,2 @@
+control 'event' do
+end

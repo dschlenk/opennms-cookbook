@@ -1,0 +1,2 @@
+control 'user' do
+end

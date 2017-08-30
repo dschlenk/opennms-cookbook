@@ -1,0 +1,2 @@
+control 'statsd' do
+end

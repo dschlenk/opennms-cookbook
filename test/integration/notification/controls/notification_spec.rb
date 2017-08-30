@@ -1,0 +1,2 @@
+control 'notification' do
+end

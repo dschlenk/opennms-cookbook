@@ -1,0 +1,13 @@
+name: opennms_notifd_autoack
+title: OpenNMS notifd_autoack
+maintainer: David Schlenk
+copyright: ConvergeOne
+copyright_email: dschlenk@convergeone.com
+license: Apache 2.0
+summary: Verify OpenNMS LWRP notifd_autoack works.
+version: 1.0.0
+supports:
+  - os-family: redhat
+depends:
+  - name: opennms
+    path: test/integration/default
