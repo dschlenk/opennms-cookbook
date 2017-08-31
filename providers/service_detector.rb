@@ -36,10 +36,11 @@ action :delete do
   Chef::Application.fatal!("Missing foreign source #{@current_resource.foreign_source_name}.") unless @current_resource.foreign_source_exists
   if @current_resource.exists
     Chef::Log.info "#{@new_resource} exists - deleting."
-  else
-    converge_by("Create #{@new_resource}") do
+    converge_by("Delete #{@new_resource}") do
       delete_service_detector
     end
+  else
+    Chef::Log.info "#{@new_resource} does not exist - nothing to do."
   end
 end
 
@@ -69,4 +70,8 @@ private
 
 def create_service_detector
   add_service_detector(new_resource, node)
+end
+
+def delete_service_detector
+  remove_service_detector(new_resource, node)
 end
