@@ -53,18 +53,18 @@ opennms_service_detector 'nochange Router' do
 end
 
 # minimal
-#opennms_service_detector 'ICMP' do
-#  class_name 'org.opennms.netmgt.provision.detector.icmp.IcmpDetector'
-#  foreign_source_name 'another-source'
-#end
+opennms_service_detector 'ICMP' do
+  class_name 'org.opennms.netmgt.provision.detector.icmp.IcmpDetector'
+  foreign_source_name 'another-source'
+end
 
 # modify by adding a previously missing things
-#opennms_service_detector 'change ICMP timeout' do
-#  service_name 'ICMP'
-#  foreign_source_name 'another-source'
-#  timeout 12_000
-#  params 'ipMatch' => '127.0.0.1'
-#end
+opennms_service_detector 'change ICMP timeout' do
+  service_name 'ICMP'
+  foreign_source_name 'another-source'
+  timeout 12_000
+  params 'ipMatch' => '127.0.0.1'
+end
 
 # delete
 opennms_service_detector 'delete ICMP' do
