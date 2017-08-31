@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 # Copy the example keystore file in place
 cookbook_file 'jetty.keystore' do
   path "#{node['opennms']['conf']['home']}/etc/jetty.keystore"

@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 module ResourceType
   class ResourceTypeClass
     def resource_type_exists_included(onms_home, name)

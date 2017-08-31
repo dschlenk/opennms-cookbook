@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 opennms_group 'rolegroup' do
   comments 'pocket protectors and such'
   users ['admin']

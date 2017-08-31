@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 # verious scripts that tell OpenNMS to update
 # the in-memory representation of changed config
 # files without full restarts of OpenNMS

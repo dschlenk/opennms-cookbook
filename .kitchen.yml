@@ -9,7 +9,7 @@ driver:
 
 provisioner:
   name: chef_zero
-  require_chef_omnibus: 12.5.1
+  require_chef_omnibus: 12.20.3
 
 platforms:
   - name: centos-6.8
@@ -432,3 +432,10 @@ suites:
         users:
           admin:
             password: superSecret
+  - name: jmx
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::notemplates]
+      - recipe[onms_lwrp_test::jmx]
+    attributes:

@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 # most useful options
 opennms_poller_package 'foo' do
   filter "(IPADDR != '0.0.0.0') & (categoryName == 'foo')"

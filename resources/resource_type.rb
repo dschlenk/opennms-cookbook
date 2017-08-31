@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require 'rexml/document'
 
 # Define a resource type in datacollection-config.xml

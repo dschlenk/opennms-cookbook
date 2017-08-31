@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require 'rexml/document'
 
 # Manages a dashlet in a wallboard element for the Ops Board feature.

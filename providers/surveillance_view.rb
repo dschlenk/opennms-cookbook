@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 def whyrun_supported?
   true
 end
@@ -61,7 +62,7 @@ def update_surveillance_view
   view = doc.elements["/surveillance-view-configuration/views/view[@name='#{new_resource.name}']"]
   converge_surveillance_view(doc, view, new_resource.rows, new_resource.columns,
                              new_resource.default_view)
-  write(doc)
+  Opennms::Helpers.write_xml_file(doc, "#{node['opennms']['conf']['home']}/etc/surveillance-views.xml")
 end
 
 def create_surveillance_view
@@ -71,7 +72,7 @@ def create_surveillance_view
                                    'refresh-seconds' => '300')
   converge_surveillance_view(doc, view, new_resource.rows, new_resource.columns,
                              new_resource.default_view)
-  write(doc)
+  Opennms::Helpers.write_xml_file(doc, "#{node['opennms']['conf']['home']}/etc/surveillance-views.xml")
 end
 
 def surveillance_doc
@@ -113,12 +114,4 @@ def converge_surveillance_view(doc, view, rows, columns, default_view)
   view.delete_element 'columns'
   cols_el = view.add_element 'columns'
   add_cells(cols_el, columns, 'column-def')
-end
-
-def write(doc)
-  out = ''
-  formatter = REXML::Formatters::Pretty.new(2)
-  formatter.compact = true
-  formatter.write(doc, out)
-  ::File.open("#{node['opennms']['conf']['home']}/etc/surveillance-views.xml", 'w') { |file| file.puts(out) }
 end

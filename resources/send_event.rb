@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 actions :run
 default_action :run
 

@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 # example with all options
 opennms_notifd_autoack 'uei.opennms.org/example/exampleUp' do
   acknowledge 'uei.opennms.org/example/exampleDown'

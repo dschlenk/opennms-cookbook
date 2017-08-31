@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 def whyrun_supported?
   true
 end
@@ -42,11 +43,5 @@ def create_xml_collection
     rra_el = rrd_el.add_element 'rra'
     rra_el.add_text(rra)
   end
-
-  out = ''
-  formatter = REXML::Formatters::Pretty.new(2)
-  formatter.compact = true
-  formatter.width = 100_000
-  formatter.write(doc, out)
-  ::File.open("#{node['opennms']['conf']['home']}/etc/xml-datacollection-config.xml", 'w') { |f| f.puts(out) }
+  Opennms::Helpers.write_xml_file(doc, "#{node['opennms']['conf']['home']}/etc/xml-datacollection-config.xml")
 end

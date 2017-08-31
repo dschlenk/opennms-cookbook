@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 include Provision
 def whyrun_supported?
   true
@@ -116,10 +117,6 @@ def create_range
       end
     end
   end
-  out = ''
-  formatter = REXML::Formatters::Pretty.new(2)
-  formatter.compact = true
-  formatter.write(doc, out)
-  ::File.open("#{node['opennms']['conf']['home']}/etc/discovery-configuration.xml", 'w') { |f| f.puts(out) }
+  Opennms::Helpers.write_xml_file(doc, "#{node['opennms']['conf']['home']}/etc/discovery-configuration.xml")
 end
 # rubocop:enable Metrics/BlockNesting

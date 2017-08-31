@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 # mixin our library
 class Chef::Recipe
   include Provision

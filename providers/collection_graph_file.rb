@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 include Graph
 
 def whyrun_supported?

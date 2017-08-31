@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require 'rexml/document'
 
 # Creates a package in $ONMS_HOME/etc/statsd-configuration.xml

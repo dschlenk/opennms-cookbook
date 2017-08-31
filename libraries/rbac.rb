@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require 'rexml/document'
 require 'json'
 require 'fileutils'
@@ -165,11 +166,7 @@ module Opennms
         end
       end
 
-      out = ''
-      formatter = REXML::Formatters::Pretty.new(2)
-      formatter.compact = true
-      formatter.write(doc, out)
-      ::File.open("#{node['opennms']['conf']['home']}/etc/groups.xml", 'w') { |f| f.puts(out) }
+      Opennms::Helpers.write_xml_file(doc, "#{node['opennms']['conf']['home']}/etc/groups.xml")
     end
 
     def role_exists?(role, node)
@@ -204,11 +201,7 @@ module Opennms
         role_el.attributes['description'] = new_resource.description
       end
 
-      out = ''
-      formatter = REXML::Formatters::Pretty.new(2)
-      formatter.compact = true
-      formatter.write(doc, out)
-      ::File.open("#{node['opennms']['conf']['home']}/etc/groups.xml", 'w') { |f| f.puts(out) }
+      Opennms::Helpers.write_xml_file(doc, "#{node['opennms']['conf']['home']}/etc/groups.xml")
     end
 
     # assumes validity of arguments
@@ -231,11 +224,7 @@ module Opennms
         time_el.attributes['day'] = time['day'] unless time['day'].nil?
       end
 
-      out = ''
-      formatter = REXML::Formatters::Pretty.new(2)
-      formatter.compact = true
-      formatter.write(doc, out)
-      ::File.open("#{node['opennms']['conf']['home']}/etc/groups.xml", 'w') { |f| f.puts(out) }
+      Opennms::Helpers.write_xml_file(doc, "#{node['opennms']['conf']['home']}/etc/groups.xml")
     end
 
     def baseurl(node, pw = nil)

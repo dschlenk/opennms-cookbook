@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 include ResourceType
 include Threshold
 include Events
@@ -136,11 +137,7 @@ def create_expression
     end
   end
 
-  out = ''
-  formatter = REXML::Formatters::Pretty.new(2)
-  formatter.compact = true
-  formatter.write(doc, out)
-  ::File.open("#{node['opennms']['conf']['home']}/etc/thresholds.xml", 'w') { |f| f.puts(out) }
+  Opennms::Helpers.write_xml_file(doc, "#{node['opennms']['conf']['home']}/etc/thresholds.xml")
 end
 
 def delete_expression
@@ -151,9 +148,5 @@ def delete_expression
   doc.context[:attribute_quote] = :quote
   file.close
   doc.root.delete_element(expression_identity_xpath(new_resource))
-  out = ''
-  formatter = REXML::Formatters::Pretty.new(2)
-  formatter.compact = true
-  formatter.write(doc, out)
-  ::File.open("#{node['opennms']['conf']['home']}/etc/thresholds.xml", 'w') { |f| f.puts(out) }
+  Opennms::Helpers.write_xml_file(doc, "#{node['opennms']['conf']['home']}/etc/thresholds.xml")
 end

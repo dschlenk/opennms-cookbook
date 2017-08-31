@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 def whyrun_supported?
   true
 end
@@ -130,9 +131,5 @@ def create_target
     Chef::Log.debug 'Added target element to existing escalate element.'
   end
 
-  out = ''
-  formatter = REXML::Formatters::Pretty.new(2)
-  formatter.compact = true
-  formatter.write(doc, out)
-  ::File.open("#{node['opennms']['conf']['home']}/etc/destinationPaths.xml", 'w') { |f| f.puts(out) }
+  Opennms::Helpers.write_xml_file(doc, "#{node['opennms']['conf']['home']}/etc/destinationPaths.xml")
 end

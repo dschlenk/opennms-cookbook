@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 # Defines a collection in $ONMS_HOME/etc/wmi-datacollection-config.xml.
 # Will be used by any packages in $ONMS_HOME/etc/collectd-configuration.xml
 # that have a WMI service with this collection name as the collection

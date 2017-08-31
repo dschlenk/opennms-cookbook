@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require 'rexml/document'
 
 actions :create, :create_if_missing, :delete

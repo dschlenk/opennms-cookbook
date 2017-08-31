@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 include Syslog
 def whyrun_supported?
   true

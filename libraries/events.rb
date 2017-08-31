@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require 'rexml/document'
 
 module Events
@@ -361,11 +362,7 @@ module Events
     f.close
 
     doc.root.delete_element("/events/event-file[text() = 'events/#{file}']")
-    out = ''
-    formatter = REXML::Formatters::Pretty.new(2)
-    formatter.compact = true
-    formatter.write(doc, out)
-    ::File.open("#{node['opennms']['conf']['home']}/etc/eventconf.xml", 'w') { |new_file| new_file.puts(out) }
+    Opennms::Helpers.write_xml_file(doc, "#{node['opennms']['conf']['home']}/etc/eventconf.xml")
   end
 
   def add_file_to_eventconf(file, position, node)
@@ -390,10 +387,6 @@ module Events
     else
       events_el.insert_before(ref_ef_el, eventconf_el)
     end
-    out = ''
-    formatter = REXML::Formatters::Pretty.new(2)
-    formatter.compact = true
-    formatter.write(doc, out)
-    ::File.open("#{node['opennms']['conf']['home']}/etc/eventconf.xml", 'w') { |new_file| new_file.puts(out) }
+    Opennms::Helpers.write_xml_file(doc, "#{node['opennms']['conf']['home']}/etc/eventconf.xml")
   end
 end

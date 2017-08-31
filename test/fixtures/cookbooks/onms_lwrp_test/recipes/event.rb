@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 opennms_event 'uei.opennms.org/cheftest/thresholdExceeded' do
   file 'events/chef.events.xml'
   event_label 'Chef defined event: thresholdExceeded'

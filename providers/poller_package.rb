@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 def whyrun_supported?
   true
 end
@@ -93,11 +94,5 @@ def create_poller_package
       end
     end
   end
-  # Write out changed content to file
-  out = ''
-  # doc.write(out,3)
-  formatter = REXML::Formatters::Pretty.new(2)
-  formatter.compact = true
-  formatter.write(doc, out)
-  ::File.open("#{node['opennms']['conf']['home']}/etc/poller-configuration.xml", 'w') { |f| f.puts(out) }
+  Opennms::Helpers.write_xml_file(doc, "#{node['opennms']['conf']['home']}/etc/poller-configuration.xml")
 end

@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 opennms_avail_category 'Cats' do
   comment 'Cats that are pingable and run web server somehow.'
   services %w(ICMP HTTP)

@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 %w(webopts
    resource_type
    snmp_collection
@@ -15,6 +16,7 @@
    wmi_wpm
    xml_source
    xml_group
+   jmx
    eventconf
    event
    poller

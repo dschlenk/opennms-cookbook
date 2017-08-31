@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 # A collectd package's service references the collection to store data in with
 # a collection parameter, so this resource must be defined earlier in the run
 # list than any package service that references it.

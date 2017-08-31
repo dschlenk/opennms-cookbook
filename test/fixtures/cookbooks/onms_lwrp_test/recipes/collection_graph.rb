@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 # let's implement the coffee mib - starting with adding a file to datacollection
 opennms_snmp_collection_group 'coffee' do
   file 'coffee.xml'

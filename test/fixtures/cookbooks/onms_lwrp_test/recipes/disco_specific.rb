@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 # all options
 opennms_disco_specific '10.10.1.1' do
   retry_count 13

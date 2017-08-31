@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 opennms_snmp_collection_group 'wibble-wobble' do
   collection_name 'baz'
   file 'wibble-wobble.xml'

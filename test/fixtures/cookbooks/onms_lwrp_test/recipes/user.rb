@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 log 'Start OpenNMS to perform ReST operations.' do
   notifies :start, 'service[opennms]', :immediately
 end

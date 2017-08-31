@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 opennms_resource_type 'opennms_node' do
   group_name 'metasyntactic'
   label 'opennms node'

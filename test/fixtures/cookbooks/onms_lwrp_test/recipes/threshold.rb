@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 # need to turn on thresholding on ICMP service first
 opennms_poller_service 'ICMP' do
   package_name 'example1'

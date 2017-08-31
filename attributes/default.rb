@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 onms_home = '/opt/opennms'
 # change default yum_timeout to 1200 because opennms packages are slow sometimes.
 default['yum_timeout'] = 1200

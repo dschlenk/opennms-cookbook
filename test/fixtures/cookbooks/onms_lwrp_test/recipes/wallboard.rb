@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 opennms_wallboard 'fooboard' do
   set_default true
 end

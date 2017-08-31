@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require 'rexml/document'
 
 # Add an event to an eventconf file. Will create the event file if it does not exist. Fails if file exists but

@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 # change some stuff in the OOTB view
 opennms_avail_view_section 'Categories' do
   categories ['Network Interfaces', 'Web Servers', 'Other Servers']

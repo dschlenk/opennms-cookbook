@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require 'rexml/document'
 
 # Use this LWRP to include a XML collection in the referenced collectd

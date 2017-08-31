@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 # all v1 & v2c options
 opennms_snmp_config_definition 'v1v2c_all' do
   port 161

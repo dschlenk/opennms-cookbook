@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 #
 # Cookbook Name:: opennms-cookbook
 # Recipe:: grafana

@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 name             'opennms'
 maintainer       'David Schlenk'
 maintainer_email 'david.schlenk@spanlink.com'
@@ -8,7 +9,7 @@ issues_url       'https://github.com/dschlenk/opennms-cookbook/issues'
 source_url       'https://github.com/dschlenk/opennms-cookbook'
 supports         'centos', '>= 6.0'
 supports         'redhat', '>= 6.0'
-version          '19.2.1'
+version          '19.3.0'
 depends          'yum'
 depends          'hostsfile'
 depends          'build-essential'

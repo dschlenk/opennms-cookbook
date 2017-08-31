@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 # note that opennms needs to be running for provisioning commands to work
 # as they use the ReST interface.
 log 'Start OpenNMS to perform ReST operations.' do
@@ -63,4 +64,12 @@ opennms_service_detector 'change ICMP timeout' do
   foreign_source_name 'another-source'
   timeout 12_000
   params 'ipMatch' => '127.0.0.1'
+end
+
+# delete
+opennms_service_detector 'delete ICMP' do
+  service_name 'ICMP'
+  class_name 'org.opennms.netmgt.provision.detector.icmp.IcmpDetector'
+  foreign_source_name 'another-source'
+  action :delete
 end

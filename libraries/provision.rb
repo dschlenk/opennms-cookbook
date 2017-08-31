@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require 'json'
 require 'rexml/document'
 require 'uri'
@@ -151,6 +152,7 @@ module Provision
     service_name = new_resource.service_name || new_resource.name
     detector = service_detector(service_name, new_resource.foreign_source_name, node)
     service_name = URI.escape(service_name)
+    foreign_source_name = URI.escape(new_resource.foreign_source_name)
     unless new_resource.class_name.nil?
       detector['class'] = new_resource.class_name
     end
@@ -169,8 +171,8 @@ module Provision
     end
     # seems easier to just delete the current then add the modified rather than grab the entire
     # foreign source and PUT that with the change.
-    RestClient.delete "#{baseurl(node)}/foreignSources/#{new_resource.foreign_source_name}/detectors/#{service_name}"
-    RestClient.post "#{baseurl(node)}/foreignSources/#{new_resource.foreign_source_name}/detectors", JSON.dump(detector), content_type: :json
+    RestClient.delete "#{baseurl(node)}/foreignSources/#{foreign_source_name}/detectors/#{service_name}"
+    RestClient.post "#{baseurl(node)}/foreignSources/#{foreign_source_name}/detectors", JSON.dump(detector), content_type: :json
   end
 
   def update_parameter(curr_parameters, name, new_value)
@@ -212,6 +214,14 @@ module Provision
     # clear current list from cache
     node.run_state['foreign_sources'] = nil
     RestClient.post "#{baseurl(node)}/foreignSources/#{foreign_source_name}/detectors", sd.to_s, content_type: :xml
+  end
+
+  def remove_service_detector(new_resource, node)
+    require 'rest_client'
+    service_name = new_resource.service_name || new_resource.name
+    foreign_source_name = URI.escape(new_resource.foreign_source_name)
+    node.run_state['foreign_sources'] = nil
+    RestClient.delete "#{baseurl(node)}/foreignSources/#{foreign_source_name}/detectors/#{service_name}"
   end
 
   def policy_exists?(policy_name, foreign_source_name, node)

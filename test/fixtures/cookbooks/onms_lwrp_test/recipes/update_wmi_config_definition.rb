@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 # either creates or updates by removing ip_matches eleemnts if test_wmi_config_definition is earlier in the run_list
 opennms_wmi_config_definition 'update_all' do
   retry_count 3

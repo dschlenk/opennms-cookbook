@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 # modify the default view
 opennms_surveillance_view 'default' do
   rows 'Routers' => ['Routers'], 'Servers' => ['Servers']

@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 # all options
 opennms_destination_path 'foo' do
   initial_delay '5s'

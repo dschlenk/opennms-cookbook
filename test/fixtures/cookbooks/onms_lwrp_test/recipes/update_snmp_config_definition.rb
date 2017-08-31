@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 # this will modify the existing definition from the standard test
 opennms_snmp_config_definition 'update_v1v2c_all' do
   port 161

@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 # Adds/updates/deletes a graph in $ONMS_HOME/etc/response-graph.properties
 actions :create, :create_if_missing, :delete
 default_action :create

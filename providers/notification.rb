@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 def whyrun_supported?
   true
 end
@@ -263,12 +264,7 @@ def create_notification
     vbvalue_el.add_text new_resource.vbvalue
   end
 
-  out = ''
-  formatter = REXML::Formatters::Pretty.new(2)
-  formatter.compact = true
-  formatter.width = 100_000
-  formatter.write(doc, out)
-  ::File.open("#{node['opennms']['conf']['home']}/etc/notifications.xml", 'w') { |f| f.puts(out) }
+  Opennms::Helpers.write_xml_file(doc, "#{node['opennms']['conf']['home']}/etc/notifications.xml")
 end
 
 def delete_notification
@@ -280,10 +276,5 @@ def delete_notification
   file.close
   # we've already established that the current resource is what we described to delete
   doc.elements.delete("/notifications/notification[@name = '#{new_resource.name}']")
-  out = ''
-  formatter = REXML::Formatters::Pretty.new(2)
-  formatter.compact = true
-  formatter.width = 100_000
-  formatter.write(doc, out)
-  ::File.open("#{node['opennms']['conf']['home']}/etc/notifications.xml", 'w') { |f| f.puts(out) }
+  Opennms::Helpers.write_xml_file(doc, "#{node['opennms']['conf']['home']}/etc/notifications.xml")
 end

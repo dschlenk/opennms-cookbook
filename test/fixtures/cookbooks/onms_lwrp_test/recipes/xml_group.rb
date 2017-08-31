@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 # required by group
 opennms_xml_source 'http://{ipaddr}/group-example' do
   collection_name 'foo'

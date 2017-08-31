@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 # Note that package_name and collection must be defined somewhere
 # else in your resource collection.
 #

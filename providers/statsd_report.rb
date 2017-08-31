@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 include Statsd
 
 def whyrun_supported?
@@ -59,9 +60,5 @@ def create_report
     doc.root.add_element 'report', 'name' => name, 'class-name' => new_resource.class_name
   end
 
-  out = ''
-  formatter = REXML::Formatters::Pretty.new(2)
-  formatter.compact = true
-  formatter.write(doc, out)
-  ::File.open("#{node['opennms']['conf']['home']}/etc/statsd-configuration.xml", 'w') { |f| f.puts(out) }
+  Opennms::Helpers.write_xml_file(doc, "#{node['opennms']['conf']['home']}/etc/statsd-configuration.xml")
 end

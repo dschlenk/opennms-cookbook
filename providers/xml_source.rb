@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 include OpennmsXml
 def whyrun_supported?
   true
@@ -74,12 +75,7 @@ def delete_xml_source
   doc.context[:attribute_quote] = :quote
   source_el = source_el(doc, new_resource, true)
   Chef::Log.debug("element deleted is a: #{source_el.class.name}")
-  out = ''
-  formatter = REXML::Formatters::Pretty.new(2)
-  formatter.compact = true
-  formatter.width = 100_000
-  formatter.write(doc, out)
-  ::File.open("#{node['opennms']['conf']['home']}/etc/xml-datacollection-config.xml", 'w') { |f| f.puts(out) }
+  Opennms::Helpers.write_xml_file(doc, "#{node['opennms']['conf']['home']}/etc/xml-datacollection-config.xml")
 end
 
 def create_xml_source
@@ -126,10 +122,5 @@ def create_xml_source
     end
   end
 
-  out = ''
-  formatter = REXML::Formatters::Pretty.new(2)
-  formatter.compact = true
-  formatter.width = 100_000
-  formatter.write(doc, out)
-  ::File.open("#{node['opennms']['conf']['home']}/etc/xml-datacollection-config.xml", 'w') { |f| f.puts(out) }
+  Opennms::Helpers.write_xml_file(doc, "#{node['opennms']['conf']['home']}/etc/xml-datacollection-config.xml")
 end
