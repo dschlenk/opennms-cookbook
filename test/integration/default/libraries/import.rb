@@ -1,4 +1,5 @@
 require 'rexml/document'
+require 'rest_client'
 class Import < Inspec.resource(1)
   name 'import'
 
@@ -13,7 +14,8 @@ class Import < Inspec.resource(1)
   '
 
   def initialize(name, foreign_source)
-    doc = REXML::Document.new(inspec.file("/opt/opennms/etc/imports/#{name}.xml").content)
+    req = RestClient.get("http://admin:admin@localhost:8980/opennms/rest/requisitions/#{name}")
+    doc = REXML::Document.new(req)
     i_el = doc.elements["/model-import[@foreign-source = '#{foreign_source}']"]
     @exists = !i_el.nil?
   end
