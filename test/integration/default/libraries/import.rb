@@ -9,7 +9,7 @@ class Import < Inspec.resource(1)
   '
 
   example '
-    describe import(\'node name\', \'foreign source name\') do
+    describe import(\'group name\', \'foreign source name\') do
       it { should exist }
     end
   '
