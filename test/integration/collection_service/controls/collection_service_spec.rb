@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 control 'collection_service' do
   describe collection_service('JSON', 'foo') do
     its('collection') { should eq 'baz' }
@@ -11,7 +12,7 @@ control 'collection_service' do
     its('params') { should eq 'handler-class' => 'org.opennms.protocols.json.collector.DefaultJsonCollectionHandler' }
     its('thresholding_enabled') { should eq true }
   end
-  
+
   describe collection_service('JSON-bar', 'bar') do
     its('collection') { should eq 'default' }
     its('class_name') { should eq 'org.opennms.protocols.xml.collector.XmlCollector' }

@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require 'rexml/document'
 class SnmpCollectionGroup < Inspec.resource(1)
   name 'snmp_collection_group'

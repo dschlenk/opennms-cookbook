@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require 'rexml/document'
 require 'rest_client'
 class Import < Inspec.resource(1)
@@ -23,5 +24,4 @@ class Import < Inspec.resource(1)
   def exist?
     @exists
   end
-
 end

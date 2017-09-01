@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 control 'dashlet' do
   describe wallboard('schlazorboard') do
     it { should exist }

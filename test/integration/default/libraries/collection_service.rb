@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require 'rexml/document'
 class CollectionService < Inspec.resource(1)
   name 'collection_service'
@@ -35,7 +36,7 @@ class CollectionService < Inspec.resource(1)
     @params[:retry_count] = s_el.elements["parameter[@key = 'retry']"].attributes['value'].to_i unless s_el.elements["parameter[@key = 'retry']"].nil?
     @params[:port] = s_el.elements["parameter[@key = 'port']"].attributes['value'].to_i unless s_el.elements["parameter[@key = 'port']"].nil?
     @params[:thresholding_enabled] = false
-    @params[:thresholding_enabled] = true if s_el.elements["parameter[@key = 'thresholding-enabled']"].attributes['value'] == 'true' unless s_el.elements["parameter[@key = 'thresholding-enabled']"].nil?
+    @params[:thresholding_enabled] = true unless s_el.elements["parameter[@key = 'thresholding-enabled']"].nil? || !(s_el.elements["parameter[@key = 'thresholding-enabled']"].attributes['value'] == 'true')
     @params[:params] = {}
     s_el.each_element('parameter') do |p|
       next if p.attributes['key'] == 'port'
@@ -50,5 +51,4 @@ class CollectionService < Inspec.resource(1)
   def method_missing(param)
     @params[param]
   end
-
 end

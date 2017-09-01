@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require 'rexml/document'
 class Dashlet < Inspec.resource(1)
   name 'dashlet'
@@ -24,14 +25,14 @@ class Dashlet < Inspec.resource(1)
     @exists = !d_el.nil?
     @params = {}
     if @exists
-      @params[:dashlet_name] = d_el.elements["dashletName"].text.to_s unless d_el.elements["dashletName"].nil?
-      @params[:boost_duration] = d_el.elements["boostDuration"].text.to_i unless d_el.elements["boostDuration"].nil?
-      @params[:boost_priority] = d_el.elements["boostPriority"].text.to_i unless d_el.elements["boostPriority"].nil?
-      @params[:duration] = d_el.elements["duration"].text.to_i unless d_el.elements["duration"].nil?
-      @params[:priority] = d_el.elements["priority"].text.to_i unless d_el.elements["priority"].nil?
+      @params[:dashlet_name] = d_el.elements['dashletName'].text.to_s unless d_el.elements['dashletName'].nil?
+      @params[:boost_duration] = d_el.elements['boostDuration'].text.to_i unless d_el.elements['boostDuration'].nil?
+      @params[:boost_priority] = d_el.elements['boostPriority'].text.to_i unless d_el.elements['boostPriority'].nil?
+      @params[:duration] = d_el.elements['duration'].text.to_i unless d_el.elements['duration'].nil?
+      @params[:priority] = d_el.elements['priority'].text.to_i unless d_el.elements['priority'].nil?
       @params[:parameters] = {}
-      d_el.each_element("parameters/entry") do |e|
-        @params[:parameters][e.elements["key"].text.to_s] = e.elements["value"].text.to_s
+      d_el.each_element('parameters/entry') do |e|
+        @params[:parameters][e.elements['key'].text.to_s] = e.elements['value'].text.to_s
       end
     end
   end
@@ -43,5 +44,4 @@ class Dashlet < Inspec.resource(1)
   def method_missing(name)
     @params[name]
   end
-
 end

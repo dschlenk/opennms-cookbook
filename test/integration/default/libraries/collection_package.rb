@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require 'rexml/document'
 class CollectionPackage < Inspec.resource(1)
   name 'collection_package'
@@ -18,7 +19,7 @@ class CollectionPackage < Inspec.resource(1)
     doc = REXML::Document.new(inspec.file('/opt/opennms/etc/collectd-configuration.xml').content)
     p_el = doc.elements["/collectd-configuration/package[@name = '#{@name}']"]
     @params = {}
-    @params[:filter] = p_el.elements["filter"].text.to_s
+    @params[:filter] = p_el.elements['filter'].text.to_s
     @params[:include_ranges] = []
     p_el.each_element('include-range') do |ir|
       @params[:include_ranges].push 'begin' => ir.attributes['begin'], 'end' => ir.attributes['end']
@@ -43,13 +44,12 @@ class CollectionPackage < Inspec.resource(1)
     unless p_el.elements['ifAliasDomain'].nil?
       @params[:if_alias_domain] = p_el.elements['ifAliasDomain'].text.to_s
     end
-    @params[:stor_flag_override] = false 
+    @params[:stor_flag_override] = false
     @params[:stor_flag_override] = true unless p_el.elements["storFlagOverride[contains(., 'true')]"].nil?
-    @params[:if_alias_comment] = p_el.elements["ifAliasComment"].text.to_s unless p_el.elements["ifAliasComment"].nil?
+    @params[:if_alias_comment] = p_el.elements['ifAliasComment'].text.to_s unless p_el.elements['ifAliasComment'].nil?
   end
 
   def method_missing(param)
     @params[param]
   end
-
 end

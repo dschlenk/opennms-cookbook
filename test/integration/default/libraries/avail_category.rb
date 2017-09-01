@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require 'rexml/document'
 class AvailCategory < Inspec.resource(1)
   name 'avail_category'
@@ -31,29 +32,19 @@ class AvailCategory < Inspec.resource(1)
     @rule = cat_el.elements['rule'].text.to_s
   end
 
-  def comment
-    @comment
-  end
+  attr_reader :comment
 
-  def normal
-    @normal
-  end
+  attr_reader :normal
 
-  def warning
-    @warning
-  end
+  attr_reader :warning
 
-  def service
-    @service
-  end
+  attr_reader :service
 
-  def rule
-    @rule
-  end
+  attr_reader :rule
 
   private
 
-  def category_path(name) 
+  def category_path(name)
     "/catinfo/categorygroup/categories/category[contains(.,'#{name}')]"
   end
 end

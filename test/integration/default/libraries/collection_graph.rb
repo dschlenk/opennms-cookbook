@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require 'java_properties'
 require 'tempfile'
 class CollectionGraph < Inspec.resource(1)
@@ -13,7 +14,7 @@ class CollectionGraph < Inspec.resource(1)
       its(\'long_name\') { should eq \'Bits In/Out (High Speed)\' }
       its(\'columns\') { should eq %w(ifHCInOctets ifHCOutOctets) }
       its(\'type\') { should eq \'interfaceSnmp\' }
-      its(\'command\') { 
+      its(\'command\') {
         should eq <<-EOL
 --title="Bits In/Out (High Speed)" \\
 ...
@@ -47,19 +48,11 @@ EOL
     @exists
   end
 
-  def long_name
-    @long_name
-  end
+  attr_reader :long_name
 
-  def columns
-    @columns
-  end
+  attr_reader :columns
 
-  def type
-    @type
-  end
+  attr_reader :type
 
-  def command
-    @command
-  end
+  attr_reader :command
 end

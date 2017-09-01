@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require 'rexml/document'
 class CollectionGraphFile < Inspec.resource(1)
   name 'collection_graph_file'
@@ -9,7 +10,7 @@ class CollectionGraphFile < Inspec.resource(1)
   example '
     describe collection_graph_file(\'mib2-graph.properties\') do
       it { should exist }
-      its(\'content\') { 
+      its(\'content\') {
         should eq <<-EOL
 reports=mib2.HCbits, \\
 mib2.bits, \\
@@ -23,9 +24,7 @@ EOL
     @graph_file = graph_file
     gf = inspec.file("/opt/opennms/etc/snmp-graph.properties.d/#{graph_file}")
     @exists = gf.exist?
-    if @exists
-      @contents = gf.content
-    end
+    @contents = gf.content if @exists
   end
 
   def content

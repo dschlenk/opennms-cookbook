@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require 'rexml/document'
 class Wallboard < Inspec.resource(1)
   name 'wallboard'
@@ -30,5 +31,4 @@ class Wallboard < Inspec.resource(1)
   def default?
     @default
   end
-
 end

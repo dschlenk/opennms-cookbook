@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 control 'collection_package' do
   describe collection_package('foo') do
     its('filter') { should eq "(IPADDR != '0.0.0.0') & (categoryName == 'foo')" }

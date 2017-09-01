@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 control 'wallboard' do
   describe wallboard('fooboard') do
     it { should exist }
