@@ -23,22 +23,32 @@ class ImportNode < Inspec.resource(1)
   '
 
   def initialize(id, foreign_source_name)
-    node = RestClient.get("http://admin:admin@localhost:8980/opennms/rest/requisitions/#{foreign_source_name}/nodes/#{id}")
-    doc = REXML::Document.new(node)
-    n_el = doc.elements["/node[@foreign-id = '#{id}']"]
-    @exists = !n_el.nil?
-    @params = {}
-    @params[:node_label] = n_el.attributes['node-label']
-    @params[:building] = n_el.attributes['building']
-    @params[:city] = n_el.attributes['city']
-    @params[:parent_foreign_source] = n_el.attributes['parent-foreign-source']
-    @params[:parent_node_label] = n_el.attributes['parent-node-label']
-    @params[:parent_foreign_id] = n_el.attributes['parent-foreign-id']
-    assets = {}
-    n_el.each_element("asset") do |a_el|
-      assets[a_el.attributes['name']] = a_el.attributes['value']
+    begin
+      node = RestClient.get("http://admin:admin@localhost:8980/opennms/rest/requisitions/#{foreign_source_name}/nodes/#{id}")
+      doc = REXML::Document.new(node)
+      n_el = doc.elements["/node[@foreign-id = '#{id}']"]
+    rescue
     end
-    @params[:assets] = assets
+    @exists = !n_el.nil?
+    if @exists
+      @params = {}
+      @params[:node_label] = n_el.attributes['node-label']
+      @params[:building] = n_el.attributes['building']
+      @params[:city] = n_el.attributes['city']
+      @params[:parent_foreign_source] = n_el.attributes['parent-foreign-source']
+      @params[:parent_node_label] = n_el.attributes['parent-node-label']
+      @params[:parent_foreign_id] = n_el.attributes['parent-foreign-id']
+      categories = []
+      n_el.each_element("category") do |c_el|
+        categories.push c_el.attributes['name']
+      end
+      @params[:categories] = categories
+      assets = {}
+      n_el.each_element("asset") do |a_el|
+        assets[a_el.attributes['name']] = a_el.attributes['value']
+      end
+      @params[:assets] = assets
+    end
   end
 
   def exist?

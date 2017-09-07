@@ -43,7 +43,7 @@ def create_destination_path
 
   paths_el = doc.root.elements['/destinationPaths']
   path_el = paths_el.add_element 'path', 'name' => new_resource.name
-  if !new_resource.initial_delay.nil? && !new_resource.initial_delay == '0s'
+  if !new_resource.initial_delay.nil? && new_resource.initial_delay != '0s'
     path_el.attributes['initial-delay'] = new_resource.initial_delay
   end
 
