@@ -8,7 +8,8 @@ class DestinationPath < Inspec.resource(1)
   '
 
   example '
-    describe destination_path(\'SNMP\') do
+    describe destination_path(\'Email-Admin\') do
+      it { should exist }
       its(\'initial_delay\') { should eq \'5s\' }
     end
   '
