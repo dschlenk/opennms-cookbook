@@ -202,7 +202,7 @@ module Events
         parameters = []
         event_el.elements.each('parameter') do |parm|
           p = { 'name' => parm.attributes['name'], 'value' => parm.attributes['value'] }
-          next unless Opennms::Helpers.major(node['opennms']['version']).to_i > 17 && parm.key?('expand')
+          next if Opennms::Helpers.major(node['opennms']['version']).to_i <= 17 || parm.attributes['expand'].nil?
           p['expand'] = if parm.attributes['expand'] == 'true'
                           true
                         else
