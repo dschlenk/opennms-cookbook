@@ -43,14 +43,14 @@ def specific_exists?(name, location, foreign_source)
   doc = REXML::Document.new file
   if foreign_source.nil?
     if location.nil? || Opennms::Helpers.major(node['opennms']['version']).to_i < 18
-      !doc.elements["/discovery-configuration/specific[text() ='#{name}]"].nil?
+      !doc.elements["/discovery-configuration/specific[text() ='#{name}']"].nil?
     else
-      !doc.elements["/discovery-configuration/specific[@location = '#{location}' and text() = '#{name}]"].nil?
+      !doc.elements["/discovery-configuration/specific[@location = '#{location}' and text() = '#{name}']"].nil?
     end
   elsif location.nil? || Opennms::Helpers.major(node['opennms']['version']).to_i < 18
-    !doc.elements["/discovery-configuration/specific[text() ='#{name} and @foreign-source = '#{foreign_source}']"].nil?
+    !doc.elements["/discovery-configuration/specific[text() ='#{name}' and @foreign-source = '#{foreign_source}']"].nil?
   else
-    !doc.elements["/discovery-configuration/specific[@location = '#{location}' and text() = '#{name} and @foreign-source = '#{foreign_source}']"].nil?
+    !doc.elements["/discovery-configuration/specific[@location = '#{location}' and text() = '#{name}' and @foreign-source = '#{foreign_source}']"].nil?
   end
 end
 

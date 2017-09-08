@@ -19,8 +19,7 @@ class DiscoRange < Inspec.resource(1)
 
   def initialize(type, range_begin, range_end)
     doc = REXML::Document.new(inspec.file('/opt/opennms/etc/discovery-configuration.xml').content)
-    xpath = "/discovery-configuration/#{type}-range[begin[text() = '#{range_begin}']]"# and end[text() = '#{range_end}']]"
-    puts xpath
+    xpath = "/discovery-configuration/#{type}-range[begin[text() = '#{range_begin}']]"
     r_el = nil
     # well this is ugly, but apparently REXML can't handle siblings in a compound predicate each with text equality checks
     doc.each_element(xpath) do |rr|
