@@ -25,15 +25,18 @@ class Event < Inspec.resource(1)
       its(\'script\') { should eq([{\'name\' => String, \'language\' => String}]) }
       its(\'mouseovertext\') { should eq \'mouseovertext\' }
       its(\'alarm_data\') { should eq({\'update_fields\' => [{\'field_name\' => String, \'update_on_reduction\' => true*|false}, ...], \'reduction_key\' => String, \'alarm_type\' => Fixnum, \'clear_key\' => String, \'auto_clean\' => true|false*, \'x733_alarm_type\' => \'CommunicationsAlarm|ProcessingErrorAlarm|EnvironmentalAlarm|QualityOfServiceAlarm|EquipmentAlarm|IntegrityViolation|SecurityViolation|TimeDomainViolation|OperationalViolation|PhysicalViolation\', \'x733_probable_cause\' => Fixnum})}
+      # indexed at 0
+      its(\'position\') { should be 1 }
     end
   '
 
   def initialize(uei, file, mask = nil)
-    doc = REXML::Document.new(inspec.file("/opt/opennms/etc/#{file}").content)
+    doc = REXML::Document.new(inspec.file("/opt/opennms/etc/#{file}").content, ignore_whitespace_nodes: ['events'])
     e_el = doc.elements[event_xpath(uei, mask)]
     @exists = !e_el.nil?
     @params = {}
     if @exists
+      @params[:position] = e_el.parent.index(e_el)
       @params[:event_label] = e_el.elements['event-label'].texts.join("\n")
       @params[:descr] = e_el.elements['descr'].texts.join("\n")
       @params[:logmsg] = e_el.elements['logmsg'].texts.join("\n")
@@ -107,7 +110,7 @@ class Event < Inspec.resource(1)
   end
 
   def varbindsdecodes(event_el)
-    vbds
+    vbds = []
     event_el.elements.each('varbindsdecode') do |vbd|
       parmid = vbd.elements['parmid'].text.to_s
       decode = []
@@ -175,7 +178,6 @@ class Event < Inspec.resource(1)
   def get_alarm_data(event_el)
     ad_el = event_el.elements['alarm-data']
     return nil if ad_el.nil?
-    puts "not nil"
     alarm_type = ad_el.attributes['alarm-type'].to_i
     reduction_key = ad_el.attributes['reduction-key']
     clear_key = ad_el.attributes['clear-key']
@@ -187,7 +189,6 @@ class Event < Inspec.resource(1)
     end
     x733_alarm_type = ad_el.attributes['x733-alarm-type']
     x733_probable_cause = ad_el.attributes['x733-probable-cause']
-    puts "still okay"
     update_fields = []
     ad_el.elements.each('update-field') do |uf|
       fn = uf.attributes['field-name']
@@ -202,7 +203,6 @@ class Event < Inspec.resource(1)
         update_fields.push 'field_name' => fn, 'update_on_reduction' => uor
       end
     end
-    puts "have i failed yet"
     alarm_data = {}
     alarm_data['alarm_type'] = alarm_type
     alarm_data['reduction_key'] = reduction_key
