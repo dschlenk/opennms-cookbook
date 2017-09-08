@@ -188,19 +188,19 @@ module Events
     end
     unless event.parameters.nil?
       if event.parameters.empty?
-        unless event_el.elements['parameters'].nil?
+        unless event_el.elements['parameter'].nil?
           Chef::Log.debug 'Event parameters present but nil in new resource.'
           return true
         end
       end
-      if event_el.elements['parameters'].nil?
+      if event_el.elements['parameter'].nil?
         unless event.parameters.nil?
           Chef::Log.debug 'Event parameters not present but not nil in new resource.'
           return true
         end
       else
         parameters = []
-        event_el.elements.each('parameters') do |parm|
+        event_el.elements.each('parameter') do |parm|
           p = { 'name' => parm.attributes['name'], 'value' => parm.attributes['value'] }
           next unless Opennms::Helpers.major(node['opennms']['version']).to_i > 17 && parm.key?('expand')
           p['expand'] = if parm.attributes['expand'] == 'true'
