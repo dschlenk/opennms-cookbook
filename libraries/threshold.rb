@@ -118,19 +118,25 @@ module Threshold
     ds_name = threshold.ds_name || threshold.name
     attrs = "/thresholding-config/group[@name = '#{threshold.group}']/threshold[@ds-name = '#{ds_name}' and @ds-type = '#{threshold.ds_type}' and @type = '#{threshold.type}'"
     attrs = "#{attrs} and @filterOperator = '#{threshold.filter_operator}'" unless threshold.filter_operator.nil? || threshold.filter_operator == 'or'
-    unless threshold.resource_filters.nil?
+    if threshold.resource_filters.nil? || threshold.resource_filters == []
+      attrs = "#{attrs} and not(resource-filter)"
+    else
       threshold.resource_filters.each do |rf|
         attrs = "#{attrs} and resource-filter/@field = '#{rf['field']}' and resource-filter/text() = '#{rf['filter']}'"
       end
     end
     attrs = "#{attrs}]"
+    Chef::Log.debug "threshold xpath: #{attrs}"
+    attrs
   end
 
   def expression_identity_xpath(expression)
     exp = expression.expression || expression.name
     attrs = "/thresholding-config/group[@name = '#{expression.group}']/expression[@expression = '#{exp}' and @ds-type = '#{expression.ds_type}' and @type = '#{expression.type}'"
     attrs = "#{attrs} and @filterOperator = '#{expression.filter_operator}'" unless expression.filter_operator.nil? || expression.filter_operator == 'or'
-    unless expression.resource_filters.nil?
+    if expression.resource_filters.nil? || expression.resource_filters == []
+      attrs = "#{attrs} and not(resource-filter)"
+    else
       expression.resource_filters.each do |rf|
         attrs = "#{attrs} and resource-filter/@field = '#{rf['field']}' and resource-filter/text() = '#{rf['filter']}'"
       end
