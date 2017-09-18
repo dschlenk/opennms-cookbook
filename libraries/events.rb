@@ -303,7 +303,7 @@ module Events
         end
       end
       if ad_el.nil?
-        unless event.alarm_data.nil?
+        if !event.alarm_data.nil? && event.alarm_data != false
           Chef::Log.debug 'Event alarm-data not present but not nil in new resource.'
           return true
         end
