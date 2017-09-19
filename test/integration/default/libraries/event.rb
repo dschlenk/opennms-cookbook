@@ -106,6 +106,7 @@ class Event < Inspec.resource(1)
       state = aa.attributes['state'] || 'on'
       autoactions.push 'state' => state, 'action' => action
     end
+    autoactions = nil if autoactions.length == 0
     autoactions
   end
 
@@ -121,6 +122,7 @@ class Event < Inspec.resource(1)
       end
       vbds.push 'parmid' => parmid, 'decode' => decode
     end
+    vbds = nil if vbds.length == 0
     vbds
   end
 
@@ -164,6 +166,7 @@ class Event < Inspec.resource(1)
         forwards.push 'info' => info, 'state' => state, 'mechanism' => mechanism
       end
     end
+    forwards = nil if forwards.length == 0
     forwards
   end
 
@@ -174,6 +177,7 @@ class Event < Inspec.resource(1)
       language = s.attributes['language']
       scripts.push 'name' => name, 'language' => language
     end
+    scripts = nil if scripts.length == 0
     scripts
   end
 
