@@ -18,6 +18,7 @@ platforms:
   - name: centos-6.8
     attributes:
       opennms:
+        templates: false
         conf: 
           start_timeout: 50
         stable: true
