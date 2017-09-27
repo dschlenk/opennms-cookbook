@@ -4,7 +4,7 @@ class Chef::Recipe
   include Provision
 end
 include_recipe 'onms_lwrp_test::foreign_source'
-service_node_foreign_id = foreign_id_gen
+service_node_foreign_id = 'svcNodeId'
 opennms_import_node 'serviceNode' do
   foreign_source_name 'dry-source'
   foreign_id service_node_foreign_id
