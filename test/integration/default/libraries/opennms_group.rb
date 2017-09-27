@@ -1,14 +1,14 @@
 # frozen_string_literal: true
 require 'rexml/document'
-class Group < Inspec.resource(1)
-  name 'group'
+class OpennmsGroup < Inspec.resource(1)
+  name 'opennms_group'
 
   desc '
     OpenNMS group
   '
 
   example '
-    describe group(\'nerds\') do
+    describe opennms_group(\'nerds\') do
       it { should exist }
       its(\'users\') { should eq [\'admin\'] }
       its(\'duty_schedules\') { should eq [\'MoTuWeThFrSaSu800-1700\'] }

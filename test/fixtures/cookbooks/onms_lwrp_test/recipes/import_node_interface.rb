@@ -4,7 +4,7 @@ class Chef::Recipe
 end
 include_recipe 'onms_lwrp_test::foreign_source'
 # need a node to add an interface to
-iface_node_foreign_id = foreign_id_gen
+iface_node_foreign_id = 'interfaceTestNodeID'
 opennms_import_node 'ifaceNode' do
   foreign_source_name 'dry-source'
   foreign_id iface_node_foreign_id
