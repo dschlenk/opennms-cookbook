@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 control 'destination_path' do
-
   describe destination_path('foo') do
     it { should exist }
     its('initial_delay') { should eq '5s' }
@@ -12,11 +11,11 @@ control 'destination_path' do
 
   describe target('foo', 'Admin') do
     it { should exist }
-    its('commands'){ should eq ['javaEmail'] }
+    its('commands') { should eq ['javaEmail'] }
   end
 
   describe target('bar', 'Admin') do
     it { should exist }
-    its('commands'){ should eq ['javaPagerEmail'] }
+    its('commands') { should eq ['javaPagerEmail'] }
   end
 end

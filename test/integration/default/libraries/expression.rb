@@ -7,8 +7,8 @@ class Expression < Inspec.resource(1)
     OpenNMS expression
   '
 
-  example '
-    describe expression(\'group\', \'expression\', \'ds-type\', \'type\', \'filter-operator\' = 'or', resource_filters = nil) do
+  example('
+    describe expression(\'group\', \'expression\', \'ds-type\', \'type\', \'filter-operator\' = ') || ', resource_filters = nil) do
       it { should exist }
       its(\'relaxed\') { should be true }
       its(\'description\') { should eq \'the description\' }
@@ -21,14 +21,16 @@ class Expression < Inspec.resource(1)
     end
   '
 
+  # rubocop:disable Metrics/ParameterLists
   def initialize(group, expression, ds_type, type, filter_operator = 'or', resource_filters = nil)
+    # rubocop:enable Metrics/ParameterLists
     @group = group
     @expression = expression
     @ds_type = ds_type
     @type = type
     @filter_operator = filter_operator
     @resource_filters = resource_filters
-    doc = REXML::Document.new(inspec.file("/opt/opennms/etc/thresholds.xml").content)
+    doc = REXML::Document.new(inspec.file('/opt/opennms/etc/thresholds.xml').content)
     ex_el = expression_el(doc) unless doc.nil?
     @exists = !ex_el.nil?
     if @exists

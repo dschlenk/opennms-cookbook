@@ -19,7 +19,7 @@ class Target < Inspec.resource(1)
     @exists = !t_el.nil?
     @params = {}
     commands = []
-    t_el.each_element("command") do |cel|
+    t_el.each_element('command') do |cel|
       commands.push cel.text.to_s
     end
     @params[:commands] = commands

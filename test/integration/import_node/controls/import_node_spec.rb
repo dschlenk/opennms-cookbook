@@ -12,7 +12,7 @@ control 'import_node' do
     its('parent_node_label') { should eq 'nodeB' }
     its('city') { should eq 'Tulsa' }
     its('building') { should eq 'Barn' }
-    its('categories') { should eq ['Servers', 'Test'] }
-    its('assets') { should eq({ 'vendorPhone' => '511', 'serialNumber' => 'SN12838932' }) }
+    its('categories') { should eq %w(Servers Test) }
+    its('assets') { should eq('vendorPhone' => '511', 'serialNumber' => 'SN12838932') }
   end
 end

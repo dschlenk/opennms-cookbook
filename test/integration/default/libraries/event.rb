@@ -70,7 +70,6 @@ class Event < Inspec.resource(1)
     @params[name]
   end
 
-
   private
 
   def event_xpath(uei, mask)
@@ -106,7 +105,7 @@ class Event < Inspec.resource(1)
       state = aa.attributes['state'] || 'on'
       autoactions.push 'state' => state, 'action' => action
     end
-    autoactions = nil if autoactions.length == 0
+    autoactions = nil if autoactions.empty?
     autoactions
   end
 
@@ -122,7 +121,7 @@ class Event < Inspec.resource(1)
       end
       vbds.push 'parmid' => parmid, 'decode' => decode
     end
-    vbds = nil if vbds.length == 0
+    vbds = nil if vbds.empty?
     vbds
   end
 
@@ -166,7 +165,7 @@ class Event < Inspec.resource(1)
         forwards.push 'info' => info, 'state' => state, 'mechanism' => mechanism
       end
     end
-    forwards = nil if forwards.length == 0
+    forwards = nil if forwards.empty?
     forwards
   end
 
@@ -177,7 +176,7 @@ class Event < Inspec.resource(1)
       language = s.attributes['language']
       scripts.push 'name' => name, 'language' => language
     end
-    scripts = nil if scripts.length == 0
+    scripts = nil if scripts.empty?
     scripts
   end
 
@@ -218,5 +217,5 @@ class Event < Inspec.resource(1)
     alarm_data['x733_probable_cause'] = x733_probable_cause unless x733_probable_cause.nil?
     alarm_data['update_fields'] = update_fields unless update_fields.empty?
     alarm_data
-  end 
+  end
 end

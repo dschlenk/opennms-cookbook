@@ -27,13 +27,13 @@ class OpennmsGroup < Inspec.resource(1)
       g_el.each_element('user') do |u|
         users.push u.text()
       end
-      @params[:users] = users unless users.length == 0
+      @params[:users] = users unless users.empty?
       dsched = []
       g_el.each_element('duty-schedule') do |ds|
         dsched.push ds.text()
       end
-      @params[:duty_schedules] = dsched unless dsched.length == 0
-      @params[:comments] = g_el.elements["comments"].text() unless g_el.elements["comments"].nil?
+      @params[:duty_schedules] = dsched unless dsched.empty?
+      @params[:comments] = g_el.elements['comments'].text() unless g_el.elements['comments'].nil?
     end
   end
 

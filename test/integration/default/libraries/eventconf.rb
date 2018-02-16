@@ -21,7 +21,7 @@ EOL
 
   def initialize(file_name)
     ef = inspec.file("/opt/opennms/etc/events/#{file_name}")
-    mef = inspec.file("/opt/opennms/etc/eventconf.xml")
+    mef = inspec.file('/opt/opennms/etc/eventconf.xml')
     mdoc = REXML::Document.new(mef.content, ignore_whitespace_nodes: ['events'])
     ef_el = mdoc.root.elements["/events/event-file[text() = 'events/#{file_name}']"]
     @exists = ef.exist? && !ef_el.nil?
@@ -37,7 +37,5 @@ EOL
     @exists
   end
 
-  def position
-    @position
-  end
+  attr_reader :position
 end

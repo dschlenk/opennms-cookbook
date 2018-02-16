@@ -17,18 +17,14 @@ class ImportNodeInterface < Inspec.resource(1)
   '
 
   def initialize(ip_addr, foreign_source_name, foreign_id)
-    begin
-      interface = RestClient.get("http://admin:admin@localhost:8980/opennms/rest/requisitions/#{foreign_source_name}/nodes/#{foreign_id}/interfaces/#{ip_addr}")
-      doc = REXML::Document.new(interface)
-      i_el = doc.elements["/interface"]
-    rescue Exception => e
-      puts "oh dam #{e}"
-    end
+    interface = RestClient.get("http://admin:admin@localhost:8980/opennms/rest/requisitions/#{foreign_source_name}/nodes/#{foreign_id}/interfaces/#{ip_addr}")
+    doc = REXML::Document.new(interface)
+    i_el = doc.elements['/interface']
     @exists = !i_el.nil?
     if @exists
       @params = {}
       @params[:managed] = true
-      @params[:managed] = false if "false" == i_el.attributes['managed']
+      @params[:managed] = false if i_el.attributes['managed'] == 'false'
       @params[:snmp_primary] = i_el.attributes['snmp-primary'] unless i_el.attributes['snmp-primary'].nil?
     end
   end

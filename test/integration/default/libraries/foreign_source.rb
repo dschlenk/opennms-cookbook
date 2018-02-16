@@ -20,7 +20,7 @@ class ForeignSource < Inspec.resource(1)
     doc = REXML::Document.new(fs)
     fs_el = doc.elements["/foreign-source[@name = '#{name}']"]
     @exists = !fs_el.nil?
-    @scan_interval = fs_el.elements["scan-interval"].texts.join('\n')
+    @scan_interval = fs_el.elements['scan-interval'].texts.join('\n')
   end
 
   def exist?
@@ -28,5 +28,4 @@ class ForeignSource < Inspec.resource(1)
   end
 
   attr_reader :scan_interval
-
 end

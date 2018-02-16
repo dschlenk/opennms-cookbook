@@ -15,13 +15,9 @@ class ImportNodeInterfaceService < Inspec.resource(1)
   '
 
   def initialize(service, ip_addr, foreign_source_name, foreign_id)
-    begin
-      service = RestClient.get("http://admin:admin@localhost:8980/opennms/rest/requisitions/#{foreign_source_name}/nodes/#{foreign_id}/interfaces/#{ip_addr}/services/#{service}")
-      doc = REXML::Document.new(service)
-      s_el = doc.elements["/monitored-service"]
-    rescue Exception => e
-      puts "oh dam #{e}"
-    end
+    service = RestClient.get("http://admin:admin@localhost:8980/opennms/rest/requisitions/#{foreign_source_name}/nodes/#{foreign_id}/interfaces/#{ip_addr}/services/#{service}")
+    doc = REXML::Document.new(service)
+    s_el = doc.elements['/monitored-service']
     @exists = !s_el.nil?
   end
 

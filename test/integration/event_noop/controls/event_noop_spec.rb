@@ -11,10 +11,10 @@ control 'event_noop' do
     its('operinstruct') { should eq 'the operinstruct' }
     its('autoaction') { should eq([{ 'action' => 'someaction', 'state' => 'off' }]) }
     its('varbindsdecode') { should eq([{ 'parmid' => 'theParmId', 'decode' => [{ 'varbindvalue' => 'theVarBindValue', 'varbinddecodedstring' => 'theVarBindDecodedString' }] }]) }
-    its('tticket') { should eq({'info' => 'tticketInfo', 'state' => 'off'}) }
+    its('tticket') { should eq('info' => 'tticketInfo', 'state' => 'off') }
     its('forward') { should eq([{ 'info' => 'fwdInfo', 'state' => 'off', 'mechanism' => 'snmptcp' }]) }
     its('script') { should eq([{ 'name' => 'anScript', 'language' => 'groovy' }]) }
     its('mouseovertext') { should eq 'mouseOverText' }
-    its('alarm_data') { should eq({ 'reduction_key' => '%uei%:%dpname%:%nodeid%:%interface%:%parm[ds]%:%parm[threshold]%:%parm[trigger]%:%parm[rearm]%:%parm[label]%', 'alarm_type' => 1, 'auto_clean' => false }) }
+    its('alarm_data') { should eq('reduction_key' => '%uei%:%dpname%:%nodeid%:%interface%:%parm[ds]%:%parm[threshold]%:%parm[trigger]%:%parm[rearm]%:%parm[label]%', 'alarm_type' => 1, 'auto_clean' => false) }
   end
 end
