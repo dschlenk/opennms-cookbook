@@ -29,7 +29,7 @@ class JdbcQuery < Inspec.resource(1)
       @params[:recheck_interval] = q_el.attributes['recheckInterval'].to_s.to_i
       @params[:resource_type] = q_el.attributes['resourceType'].to_s
       @params[:instance_column] = q_el.attributes['instance-column'].to_s
-      @params[:query_string] = q_el.elements["statement/queryString"].texts.join('\n')
+      @params[:query_string] = q_el.elements['statement/queryString'].texts.join('\n')
       columns = {}
       q_el.each_element('columns/column') do |c_el|
         cname = c_el.attributes['name'].to_s
