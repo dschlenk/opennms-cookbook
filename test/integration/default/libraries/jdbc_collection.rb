@@ -18,12 +18,19 @@ class JdbcCollection < Inspec.resource(1)
   def initialize(name)
     doc = REXML::Document.new(inspec.file('/opt/opennms/etc/jdbc-datacollection-config.xml').content)
     c_el = doc.elements["/jdbc-datacollection-config/jdbc-collection[@name='#{name}']"]
+    @exists = !c_el.nil?
     @params = {}
-    @params[:rrd_step] = c_el.elements['rrd'].attributes['step'].to_i
-    @params[:rras] = []
-    c_el.each_element('rrd/rra') do |rra|
-      @params[:rras].push rra.texts.join('\n') # lord I hope no one has ever split one of these on multiple lines
+    if @exists
+      @params[:rrd_step] = c_el.elements['rrd'].attributes['step'].to_i
+      @params[:rras] = []
+      c_el.each_element('rrd/rra') do |rra|
+        @params[:rras].push rra.texts.join('\n') # lord I hope no one has ever split one of these on multiple lines
+      end
     end
+  end
+
+  def exist?
+    @exists
   end
 
   def method_missing(param)

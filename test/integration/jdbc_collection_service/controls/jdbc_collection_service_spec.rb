@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 control 'jdbc_collection_service' do
   describe jdbc_collection_service('JDBCFoo', 'foo', 'foo') do
+    it { should exist }
     its('interval') { should eq 400000 }
     its('user_defined') { should eq true }
     its('status') { should eq 'off' }
@@ -15,6 +16,7 @@ control 'jdbc_collection_service' do
   end
 
   describe jdbc_collection_service('JDBC', 'default', 'example1') do
+    it { should exist }
     its('driver') { should eq 'org.postgresql.Driver' }
     its('user') { should eq 'wibble' }
     its('password') { should eq 'wobble' }
