@@ -3,6 +3,8 @@ include_recipe 'onms_lwrp_test::rename_imported_node'
 include_recipe 'onms_lwrp_test::reparent_imported_node'
 include_recipe 'onms_lwrp_test::edit_imported_node'
 
+node_c_foreign_id = 'nodeC'
+
 opennms_import_node 'nothing nodeC' do
   node_label 'node-c.example.net'
   foreign_source_name 'dry-source'

@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 include_recipe 'onms_lwrp_test::import_node'
+node_c_foreign_id = 'nodeC'
 opennms_import_node 'rename nodeC' do
   node_label 'node-c.example.net'
   foreign_source_name 'dry-source'
