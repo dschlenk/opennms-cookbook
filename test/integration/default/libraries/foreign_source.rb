@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 require 'rexml/document'
 require 'rest_client'
+require 'addressable/uri'
 class ForeignSource < Inspec.resource(1)
   name 'foreign_source'
 
@@ -16,7 +17,8 @@ class ForeignSource < Inspec.resource(1)
   '
 
   def initialize(name)
-    fs = RestClient.get("http://admin:admin@localhost:8980/opennms/rest/foreignSources/#{name}")
+    parsed_url = Addressable::URI.parse("http://admin:admin@localhost:8980/opennms/rest/foreignSources/#{name}").normalize.to_str
+    fs = RestClient.get(parsed_url)
     doc = REXML::Document.new(fs)
     fs_el = doc.elements["/foreign-source[@name = '#{name}']"]
     @exists = !fs_el.nil?
