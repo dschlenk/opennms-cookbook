@@ -17,7 +17,12 @@ class Import < Inspec.resource(1)
 
   def initialize(name, foreign_source)
     parsed_url = Addressable::URI.parse("http://admin:admin@localhost:8980/opennms/rest/requisitions/#{name}").normalize.to_str
-    req = RestClient.get(parsed_url)
+    begin
+      req = RestClient.get(parsed_url)
+    rescue StandardError
+      @exists = false
+      return
+    end
     doc = REXML::Document.new(req)
     i_el = doc.elements["/model-import[@foreign-source = '#{foreign_source}']"]
     @exists = !i_el.nil?

@@ -19,7 +19,12 @@ class ImportNodeInterface < Inspec.resource(1)
 
   def initialize(ip_addr, foreign_source_name, foreign_id)
     parsed_url = Addressable::URI.parse("http://admin:admin@localhost:8980/opennms/rest/requisitions/#{foreign_source_name}/nodes/#{foreign_id}/interfaces/#{ip_addr}").normalize.to_str
-    interface = RestClient.get(parsed_url)
+    begin
+      interface = RestClient.get(parsed_url)
+    rescue StandardError
+      @exists = false
+      return
+    end
     doc = REXML::Document.new(interface)
     i_el = doc.elements['/interface']
     @exists = !i_el.nil?

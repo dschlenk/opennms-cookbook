@@ -1,8 +1,5 @@
 # frozen_string_literal: true
-# mixin our library
-class Chef::Recipe
-  include Provision
-end
+
 # opennms needs to be running for provisioning commands to work
 # as they use the ReST interface.
 log 'Start OpenNMS to perform ReST operations.' do
@@ -20,7 +17,7 @@ opennms_import 'dry-source' do
   foreign_source_name 'dry-source'
 end
 # make us a new foreign_id using the Provision library
-rgfsid = foreign_id_gen
+rgfsid = '20180220151655'
 # make a node to add an interface to
 opennms_import_node 'responseGraphTestNode' do
   foreign_source_name 'dry-source'

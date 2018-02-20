@@ -25,7 +25,13 @@ class ImportNode < Inspec.resource(1)
 
   def initialize(id, foreign_source_name)
     parsed_url = Addressable::URI.parse("http://admin:admin@localhost:8980/opennms/rest/requisitions/#{foreign_source_name}/nodes/#{id}").normalize.to_str
-    node = RestClient.get(parsed_url)
+    begin
+      node = RestClient.get(parsed_url)
+    rescue StandardError
+      puts "node #{id} in #{foreign_source_name} not found"
+      @exists = false
+      return
+    end
     doc = REXML::Document.new(node)
     n_el = doc.elements["/node[@foreign-id = '#{id}']"]
     @exists = !n_el.nil?
