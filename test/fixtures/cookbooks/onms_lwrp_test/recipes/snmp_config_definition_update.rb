@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 include_recipe 'onms_lwrp_test::snmp_config_definition'
-# this will modify the existing definition from the standard test
+# doesn't do anything, because those IPs are already present and we merge, not replace specifics, ranges, etc.
 opennms_snmp_config_definition 'update_v1v2c_all' do
   port 161
   retry_count 3
