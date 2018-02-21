@@ -32,7 +32,7 @@ class SnmpCollectionGroup < Inspec.resource(1)
   def exist?
     @exists
   end
-  
+
   def method_missing(name)
     @params[name]
   end
