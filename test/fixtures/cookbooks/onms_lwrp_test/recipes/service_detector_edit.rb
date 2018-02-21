@@ -1,5 +1,5 @@
 # frozen_string_literal: true
-include_recipe 'onms_lwrp_test::service_detector.rb'
+include_recipe 'onms_lwrp_test::service_detector'
 opennms_service_detector 'change Router class' do
   service_name 'Router'
   class_name 'org.opennms.netmgt.provision.detector.simple.TcpDetector'
