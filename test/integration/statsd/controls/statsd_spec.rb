@@ -19,7 +19,7 @@ control 'statsd' do
     its('class_name') { should eq 'org.opennms.netmgt.dao.support.BottomNAttributeStatisticVisitor' }
   end
 
-  describe statsd_report('testDefaultsReport', 'cheftest')  do
+  describe statsd_report('testDefaultsReport', 'cheftest') do
     it { should exist }
     its('description') { should eq 'testing report lwrp defaults' }
     its('parameters') { should eq 'count' => '20', 'consolidationFunction' => 'AVERAGE', 'relativeTime' => 'YESTERDAY', 'resourceTypeMatch' => 'interfaceSnmp', 'attributeMatch' => 'ifOutOctets' }

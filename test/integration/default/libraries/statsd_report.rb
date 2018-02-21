@@ -32,7 +32,7 @@ class StatsdReport < Inspec.resource(1)
     @params[:retain_interval] = r_el.attributes['retainInterval'].to_i
     @params[:status] = r_el.attributes['status'].to_s
     unless r_el.elements['parameter'].nil?
-      @params[:parameters] = {} 
+      @params[:parameters] = {}
       r_el.each_element('parameter') do |p|
         @params[:parameters][p.attributes['key'].to_s] = p.attributes['value'].to_s
       end
