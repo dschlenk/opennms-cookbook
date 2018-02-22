@@ -19,7 +19,6 @@ class OpennmsGroup < Inspec.resource(1)
   def initialize(name)
     doc = REXML::Document.new(inspec.file('/opt/opennms/etc/groups.xml').content)
     g_el = doc.elements["/groupinfo/groups/group[name/text() = '#{name}']"]
-    puts g_el
     @exists = !g_el.nil?
     @params = {}
     if @exists
