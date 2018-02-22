@@ -8,5 +8,4 @@ control 'webopts' do
     it { should be_listening }
     its('processes') { should include 'java' }
   end
-
 end
