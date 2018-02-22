@@ -7,29 +7,34 @@ class Expression < Inspec.resource(1)
     OpenNMS expression
   '
 
-  example('
-    describe expression(\'group\', \'expression\', \'ds-type\', \'type\', \'filter-operator\' = ') || ', resource_filters = nil) do
+  example '
+    expr = {
+      \'expression\' => \'icmp / 1000\',
+      \'group\' => \'cheftest\',
+      \'type\' => \'high\',
+      \'ds_type\' => \'if\',
+      \'filter_operator\' => \'and\',
+      \'resource_filters\' => [{ \'field\' => \'ifHighSpeed\', \'filter\' => \'^[1-9]+[0-9]*$\' }],
+    }
+    describe expression(expr) do
       it { should exist }
-      its(\'relaxed\') { should be true }
-      its(\'description\') { should eq \'the description\' }
-      its(\'value\') { should eq 1.0 }
-      its(\'rearm\') { should eq 0.9 }
-      its(\'trigger\') { should eq 1 }
-      its(\'ds_label\') { should eq \'ds-label\' }
-      its(\'triggered_uei]\') { should eq \'uei.opennms.org/triggeredUEI\' }
-      its(\'rearmed_uei\') { should eq \'uei.opennms.org/rearmedUEI\' }
+      its(\'relaxed\') { should be false }
+      its(\'description\') { should eq \'ping latency too high expression\' }
+      its(\'value\') { should eq 20.0 }
+      its(\'rearm\') { should eq 18.0 }
+      its(\'trigger\') { should eq 3 }
+      its(\'triggered_uei\') { should eq \'uei.opennms.org/thresholdTest/testThresholdExceeded\' }
+      its(\'rearmed_uei\') { should eq \'uei.opennms.org/thresholdTest/testThresholdRearmed\' }
     end
   '
 
-  # rubocop:disable Metrics/ParameterLists
-  def initialize(group, expression, ds_type, type, filter_operator = 'or', resource_filters = nil)
-    # rubocop:enable Metrics/ParameterLists
-    @group = group
-    @expression = expression
-    @ds_type = ds_type
-    @type = type
-    @filter_operator = filter_operator
-    @resource_filters = resource_filters
+  def initialize(expr)
+    @group = expr['group']
+    @expression = expr['expression']
+    @ds_type = expr['ds_type']
+    @type = expr['type']
+    @filter_operator = expr['filter_operator']
+    @resource_filters = expr['resource_filters']
     doc = REXML::Document.new(inspec.file('/opt/opennms/etc/thresholds.xml').content)
     ex_el = expression_el(doc) unless doc.nil?
     @exists = !ex_el.nil?
