@@ -11,10 +11,10 @@ opennms_xml_collection_service 'XMLFoo still nothing' do
   service_name 'XMLFoo'
   collection 'foo'
   package_name 'foo'
-  thresholding_enabled false
-  port 12
-  retry_count 11
-  timeout 6000
-  status 'on'
-  interval 500_000
+  thresholding_enabled true
+  port 8181
+  retry_count 10
+  timeout 5000
+  status 'off'
+  interval 400_000
 end
