@@ -5,18 +5,17 @@ control 'event_add_parameters' do
     describe e do
       it { should exist }
     end
+  elsif e.parameters[1].key? 'expand'
+    # > 16 supports parameters
+    describe e do
+      it { should exist }
+      its('parameters') { should eq([{ 'name' => 'param1', 'value' => 'paramValue1' }, { 'name' => 'param2', 'value' => 'paramValue2', 'expand' => true }]) }
+    end
   else
-    if e.parameters[1].key? 'expand'
-      describe e do
-        it { should exist }
-        its('parameters') { should eq([{ 'name' => 'param1', 'value' => 'paramValue1' }, { 'name' => 'param2', 'value' => 'paramValue2', 'expand' => true }]) }
-      end
-    else
-      # 17 didn't have the expand attribute
-      describe e do
-        it { should exist }
-        its('parameters') { should eq([{ 'name' => 'param1', 'value' => 'paramValue1' }, { 'name' => 'param2', 'value' => 'paramValue2'}]) }
-      end
+    # except 17 didn't have the expand attribute
+    describe e do
+      it { should exist }
+      its('parameters') { should eq([{ 'name' => 'param1', 'value' => 'paramValue1' }, { 'name' => 'param2', 'value' => 'paramValue2' }]) }
     end
   end
 end

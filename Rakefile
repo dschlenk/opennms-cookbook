@@ -35,7 +35,7 @@ namespace :integration do
   desc 'Run Test Kitchen with Vagrant'
   task :vagrant do
     options = {
-      :versions => %w(16 17 18 19)
+      versions: %w(16 17 18 19),
     }
     opts = OptionParser.new
     opts.banner = 'Usage: rake integration:vagrant [options]'
@@ -53,16 +53,14 @@ namespace :integration do
       old_instance = nil
       first_instance = nil
       Kitchen::Config.new.instances.each do |instance|
-        next unless instance.name =~ %r{-#{ver}-centos-68}
-        if skipping 
+        next unless instance.name =~ /-#{ver}-centos-68/
+        if skipping
           if instance.name == options[:resume]
             puts 'Resuming'
             resuming = true
             skipping = false
           else
-            if old_instance.nil?
-              first_instance = instance 
-            end
+            first_instance = instance if old_instance.nil?
             old_instance = instance
             next
           end

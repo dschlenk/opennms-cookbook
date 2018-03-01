@@ -27,9 +27,7 @@ EOL
     @contents = gf.content if @exists
   end
 
-  def contents
-    @contents
-  end
+  attr_reader :contents
 
   def exist?
     @exists

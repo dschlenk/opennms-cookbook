@@ -5,17 +5,15 @@ control 'event_change_parameters' do
     describe e do
       it { should exist }
     end
+  elsif e.parameters[1].key? 'expand'
+    describe e do
+      it { should exist }
+      its('parameters') { should eq([{ 'name' => 'param1', 'value' => 'value1' }, { 'name' => 'param2', 'value' => 'value2', 'expand' => false }]) }
+    end
   else
-    if e.parameters[1].key? 'expand'
-      describe e do
-        it { should exist }
-        its('parameters') { should eq([{ 'name' => 'param1', 'value' => 'value1' }, { 'name' => 'param2', 'value' => 'value2', 'expand' => false }]) }
-      end
-    else
-      describe e do
-        it { should exist }
-        its('parameters') { should eq([{ 'name' => 'param1', 'value' => 'value1' }, { 'name' => 'param2', 'value' => 'value2'}]) }
-      end
+    describe e do
+      it { should exist }
+      its('parameters') { should eq([{ 'name' => 'param1', 'value' => 'value1' }, { 'name' => 'param2', 'value' => 'value2' }]) }
     end
   end
 end
