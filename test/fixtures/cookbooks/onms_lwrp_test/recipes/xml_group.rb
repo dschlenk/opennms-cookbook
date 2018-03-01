@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+include_recipe 'onms_lwrp_test::xml_source'
 # required by group
 opennms_xml_source 'http://{ipaddr}/group-example' do
   collection_name 'foo'

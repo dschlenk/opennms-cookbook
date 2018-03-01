@@ -126,17 +126,20 @@ class Event < Inspec.resource(1)
   end
 
   def get_parameters(event_el)
-    parameters = []
-    event_el.elements.each('parameter') do |parm|
-      p = { 'name' => parm.attributes['name'], 'value' => parm.attributes['value'] }
-      unless parm.attributes['expand'].nil?
-        p['expand'] = if parm.attributes['expand'] == 'true'
-                        true
-                      else
-                        false
-                      end
+    parameters = nil
+    unless event_el.elements['parameter'].nil?
+      parameters = []
+      event_el.elements.each('parameter') do |parm|
+        p = { 'name' => parm.attributes['name'], 'value' => parm.attributes['value'] }
+        unless parm.attributes['expand'].nil?
+          p['expand'] = if parm.attributes['expand'] == 'true'
+                          true
+                        else
+                          false
+                        end
+        end
+        parameters.push p
       end
-      parameters.push p
     end
     parameters
   end

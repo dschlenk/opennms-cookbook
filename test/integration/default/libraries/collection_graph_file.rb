@@ -27,7 +27,7 @@ EOL
     @contents = gf.content if @exists
   end
 
-  def content
+  def contents
     @contents
   end
 

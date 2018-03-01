@@ -51,6 +51,8 @@ for f in ${SUITES[@]}; do
       echo "      - recipe[opennms::default]"
       if [ "$recipe" != "default" ]; then
         echo "      - recipe[onms_lwrp_test::${recipe}]"
+      else
+        echo "      - recipe[onms_lwrp_test::webopts]"
       fi
       echo "    attributes:"
       echo "      opennms:"

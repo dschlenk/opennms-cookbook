@@ -31,8 +31,23 @@ class SendEvent < Inspec.resource(1)
     if @exists
       @params = {}
       @params[:parameters] = []
-      s_el.each_element('parameters/parameter') do |p|
-        @params[:parameters].push p.attributes['name'].to_s + ' ' + p.attributes['value'].to_s
+      if s_el.elements['parameters/parameter'].nil?
+        # 16
+        if !s_el.elements['parms'].nil?
+          parmstr = s_el.elements['parms'].texts.join('')
+          parms = parmstr.split(';')
+          parms.each do |p|
+            key, value = p.split('=')
+            value = value[0,value.rindex('(')]
+            @params[:parameters].push key + ' ' + value
+          end
+        #else dunno!
+        end
+      else
+        # 17+
+        s_el.each_element('parameters/parameter') do |p|
+          @params[:parameters].push p.attributes['name'].to_s + ' ' + p.attributes['value'].to_s
+        end
       end
     end
   end

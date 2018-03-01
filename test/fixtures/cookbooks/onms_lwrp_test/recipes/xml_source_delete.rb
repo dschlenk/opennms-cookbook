@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+include_recipe 'onms_lwrp_test::xml_collection'
 include_recipe 'onms_lwrp_test::xml_source'
 
 # test deletion

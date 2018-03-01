@@ -10,10 +10,17 @@ control 'disco_url' do
   describe disco_url('http://example.com/include') do
     it { should exist }
   end
-
-  describe disco_url('http://other.net/things') do
-    it { should exist }
-    its('location') { should eq 'Detroit' }
-    its('foreign_source') { should eq 'disco-url-source' }
+  du = disco_url('http://other.net/things')
+  if du.location.nil?
+    describe du do
+      it { should exist }
+      its('foreign_source') { should eq 'disco-url-source' }
+    end
+  else
+    describe du do
+      it { should exist }
+      its('location') { should eq 'Detroit' }
+      its('foreign_source') { should eq 'disco-url-source' }
+    end
   end
 end

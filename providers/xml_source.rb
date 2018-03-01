@@ -10,13 +10,14 @@ action :delete do
   if @current_resource.exists
     converge_by("Deleting #{@new_resource}") do
       delete_xml_source
-      unless new_resource.import_groups.nil?
-        new_resource.import_groups.each do |file|
-          file "#{node['opennms']['conf']['home']}/etc/xml-datacollection/#{file}" do
-            action :delete
-          end
-        end
-      end
+      # don't do this - other sources might use the same file
+      # unless new_resource.import_groups.nil?
+      #  new_resource.import_groups.each do |file|
+      #    file "#{node['opennms']['conf']['home']}/etc/xml-datacollection/#{file}" do
+      #      action :delete
+      #    end
+      #  end
+      # end
     end
   else
     Chef::Log.info("#{@new_resource} does not exist - nothing to do.")

@@ -10,9 +10,18 @@ control 'disco_range' do
     it { should exist }
   end
 
-  describe disco_range('include', '10.1.0.1', '10.1.0.254') do
-    it { should exist }
-    its('location') { should eq 'Detroit' }
-    its('foreign_source') { should eq 'disco-source' }
+  # horizon <- 16 doesn't do location
+  dr = disco_range('include', '10.1.0.1', '10.1.0.254')
+  if dr.location.nil?
+    describe dr do
+      it { should exist }
+      its('foreign_source') { should eq 'disco-source' }
+    end
+  else
+    describe dr do
+      it { should exist }
+      its('location') { should eq 'Detroit' }
+      its('foreign_source') { should eq 'disco-source' }
+    end
   end
 end

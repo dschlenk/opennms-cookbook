@@ -6427,6 +6427,7 @@ suites:
       - recipe[opennms::postgres]
       - recipe[oracle_java8::default]
       - recipe[opennms::default]
+      - recipe[onms_lwrp_test::webopts]
     attributes:
       opennms:
         version: 16.0.4-1
@@ -6439,6 +6440,7 @@ suites:
       - recipe[opennms::postgres]
       - recipe[oracle_java8::default]
       - recipe[opennms::default]
+      - recipe[onms_lwrp_test::webopts]
     attributes:
       opennms:
         version: 17.1.1-1
@@ -6451,6 +6453,7 @@ suites:
       - recipe[opennms::postgres]
       - recipe[oracle_java8::default]
       - recipe[opennms::default]
+      - recipe[onms_lwrp_test::webopts]
     attributes:
       opennms:
         version: 18.0.4-1
@@ -6463,6 +6466,7 @@ suites:
       - recipe[opennms::postgres]
       - recipe[oracle_java8::default]
       - recipe[opennms::default]
+      - recipe[onms_lwrp_test::webopts]
     attributes:
       opennms:
         version: 19.1.0-1
