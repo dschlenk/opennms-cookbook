@@ -1,10 +1,12 @@
 # frozen_string_literal: true
 source 'https://rubygems.org'
 
-gem 'berkshelf', '~> 5.6'
+gem 'kitchen-inspec'
+gem 'java_properties'
+gem 'rest-client'
 gem 'cookstyle'
-gem 'foodcritic'
 gem 'rake'
-gem 'test-kitchen'
-gem 'kitchen-vagrant'
+gem 'foodcritic'
 gem 'stove'
+gem 'kitchen-vagrant'
+gem 'berkshelf', '~> 5.6'

@@ -52,17 +52,17 @@ def create_poller_package
     end
   end
   unless new_resource.include_ranges.nil?
-    new_resource.include_ranges.each do |range_begin, range_end|
+    new_resource.include_ranges.each do |range|
       include_range_el = package_el.add_element('include-range')
-      include_range_el.add_attribute('begin', range_begin)
-      include_range_el.add_attribute('end', range_end)
+      include_range_el.add_attribute('begin', range['begin'])
+      include_range_el.add_attribute('end', range['end'])
     end
   end
   unless new_resource.exclude_ranges.nil?
-    new_resource.exclude_ranges.each do |range_begin, range_end|
+    new_resource.exclude_ranges.each do |range|
       exclude_range_el = package_el.add_element('exclude-range')
-      exclude_range_el.add_attribute('begin', range_begin)
-      exclude_range_el.add_attribute('end', range_end)
+      exclude_range_el.add_attribute('begin', range['begin'])
+      exclude_range_el.add_attribute('end', range['end'])
     end
   end
   unless new_resource.include_urls.nil?

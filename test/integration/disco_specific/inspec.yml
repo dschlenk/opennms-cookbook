@@ -1,0 +1,13 @@
+name: opennms_disco_specific
+title: OpenNMS disco_specific
+maintainer: David Schlenk
+copyright: ConvergeOne
+copyright_email: dschlenk@convergeone.com
+license: Apache 2.0
+summary: Verify OpenNMS LWRP disco_specific works.
+version: 1.0.0
+supports:
+  - os-family: redhat
+depends:
+  - name: opennms
+    path: test/integration/default

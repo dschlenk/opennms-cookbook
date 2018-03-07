@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+include_recipe 'onms_lwrp_test::snmp_collection'
 opennms_snmp_collection_group 'wibble-wobble' do
   collection_name 'baz'
   file 'wibble-wobble.xml'

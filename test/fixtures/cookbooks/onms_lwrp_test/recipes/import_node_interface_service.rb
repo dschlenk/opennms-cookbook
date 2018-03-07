@@ -3,14 +3,8 @@
 class Chef::Recipe
   include Provision
 end
-# note that opennms needs to be running for provisioning commands to work
-# as they use the ReST interface.
-log 'Start OpenNMS to perform ReST operations.' do
-  notifies :start, 'service[opennms]', :immediately
-end
-# need a node to add an interface to
-# make us a new foreign_id using the Provision library
-service_node_foreign_id = foreign_id_gen
+include_recipe 'onms_lwrp_test::foreign_source'
+service_node_foreign_id = 'svcNodeId'
 opennms_import_node 'serviceNode' do
   foreign_source_name 'dry-source'
   foreign_id service_node_foreign_id

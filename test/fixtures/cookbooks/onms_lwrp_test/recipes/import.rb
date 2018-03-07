@@ -1,9 +1,5 @@
 # frozen_string_literal: true
-# note that opennms needs to be running for provisioning commands to work
-# as they use the ReST interface.
-log 'Start OpenNMS to perform ReST operations.' do
-  notifies :start, 'service[opennms]', :immediately
-end
+include_recipe 'onms_lwrp_test::foreign_source'
 # all options
 opennms_import 'saucy-source' do
   foreign_source_name 'saucy-source'

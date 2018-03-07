@@ -1,0 +1,13 @@
+name: opennms_update_wmi_config_definition
+title: OpenNMS update_wmi_config_definition
+maintainer: David Schlenk
+copyright: ConvergeOne
+copyright_email: dschlenk@convergeone.com
+license: Apache 2.0
+summary: Verify OpenNMS LWRP update_wmi_config_definition works.
+version: 1.0.0
+supports:
+  - os-family: redhat
+depends:
+  - name: opennms
+    path: test/integration/default

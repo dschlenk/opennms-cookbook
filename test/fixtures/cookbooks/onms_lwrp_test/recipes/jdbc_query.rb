@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+include_recipe 'onms_lwrp_test::jdbc_collection_service'
 opennms_resource_type 'opennms_node' do
   group_name 'metasyntactic'
   label 'opennms node'

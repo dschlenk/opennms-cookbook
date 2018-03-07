@@ -1,4 +1,6 @@
 # frozen_string_literal: true
+include_recipe 'onms_lwrp_test::collection_package'
+include_recipe 'onms_lwrp_test::wmi_collection'
 # most useful options
 # Note that package_name 'foo' must be defined somewhere else in your resource collection.
 opennms_wmi_collection_service 'WMIFoo Service' do

@@ -1,0 +1,13 @@
+name: opennms_event_logmsg_dest
+title: OpenNMS event_logmsg_dest
+maintainer: David Schlenk
+copyright: ConvergeOne
+copyright_email: dschlenk@convergeone.com
+license: Apache 2.0
+summary: Verify OpenNMS LWRP event_logmsg_dest works.
+version: 1.0.0
+supports:
+  - os-family: redhat
+depends:
+  - name: opennms
+    path: test/integration/default

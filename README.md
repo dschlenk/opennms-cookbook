@@ -741,6 +741,7 @@ So far, tests consist of:
 
 * Style Checks using foodcritic and rubocop. 
 * Basic 'does-it-converge' test kitchen suites
+* You may need to increase your open file limit for test kitchen to work since there are an awful lot of suites.
 
 Use rake to run style checks.
 

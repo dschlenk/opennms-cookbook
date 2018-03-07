@@ -1,4 +1,6 @@
 # frozen_string_literal: true
+include_recipe 'onms_lwrp_test::wallboard'
+
 opennms_dashlet 'summary2' do
   wallboard 'schlazorboard'
   dashlet_name 'Summary'

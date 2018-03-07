@@ -43,14 +43,14 @@ def specific_exists?(name, location, foreign_source)
   doc = REXML::Document.new file
   if foreign_source.nil?
     if location.nil? || Opennms::Helpers.major(node['opennms']['version']).to_i < 18
-      !doc.elements["/discovery-configuration/specific[text() ='#{name}]"].nil?
+      !doc.elements["/discovery-configuration/specific[text() ='#{name}']"].nil?
     else
-      !doc.elements["/discovery-configuration/specific[@location = '#{location}' and text() = '#{name}]"].nil?
+      !doc.elements["/discovery-configuration/specific[@location = '#{location}' and text() = '#{name}']"].nil?
     end
   elsif location.nil? || Opennms::Helpers.major(node['opennms']['version']).to_i < 18
-    !doc.elements["/discovery-configuration/specific[text() ='#{name} and @foreign-source = '#{foreign_source}']"].nil?
+    !doc.elements["/discovery-configuration/specific[text() ='#{name}' and @foreign-source = '#{foreign_source}']"].nil?
   else
-    !doc.elements["/discovery-configuration/specific[@location = '#{location}' and text() = '#{name} and @foreign-source = '#{foreign_source}']"].nil?
+    !doc.elements["/discovery-configuration/specific[@location = '#{location}' and text() = '#{name}' and @foreign-source = '#{foreign_source}']"].nil?
   end
 end
 
@@ -78,16 +78,20 @@ def create_specific
     doc.root.insert_after(last_el, new_el)
   else
     # see if there are any other discovery elements. Specifics should be first.
-    before_el = doc.root.elements['/discovery-configuration/include_range[1]']
+    before_el = doc.root.elements['/discovery-configuration/include-range[1]']
     if before_el.nil?
-      before_el = doc.root.elements['/discovery-configuration/exclude_range[1]']
+      Chef::Log.warn 'no include ranges'
+      before_el = doc.root.elements['/discovery-configuration/exclude-range[1]']
     end
     if before_el.nil?
+      Chef::Log.warn 'no exclude ranges'
       before_el = doc.root.elements['/discovery-configuration/include-url[1]']
     end
     if before_el.nil?
+      Chef::Log.warn 'adding at the end'
       doc.root.elements['/discovery-configuration'].add_element new_el
     else
+      Chef::Log.warn "adding before #{before_el}"
       doc.root.insert_before(before_el, new_el)
     end
   end
