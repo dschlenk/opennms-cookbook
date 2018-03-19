@@ -4,7 +4,7 @@ def whyrun_supported?
   true
 end
 
-use_inline_resources
+use_inline_resources # ~FC113
 
 action :delete do
   if @current_resource.exists
@@ -51,8 +51,7 @@ end
 
 # rubocop:disable Metrics/BlockNesting
 def load_current_resource
-  @current_resource = Chef::Resource::OpennmsEvent.new(@new_resource.name)
-  @current_resource.name(@new_resource.name)
+  @current_resource = Chef::Resource.resource_for_node(:opennms_event, node).new(@new_resource.name)
   @current_resource.uei(@new_resource.uei || @new_resource.name)
   @current_resource.file(@new_resource.file)
   @current_resource.mask(@new_resource.mask)

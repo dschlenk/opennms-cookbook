@@ -15,7 +15,7 @@ class ServiceDetector < Inspec.resource(1)
       its(\'port\') { should eq 161 }
       its(\'retry_count\') { should eq 3 }
       its(\'time_out\') { should eq 5000 }
-      its(\'params\') { should eq \'vbname\' => \'.1.3.6.1.2.1.4.1.0\', \'vbvalue\' => \'1\' }
+      its(\'parameters\') { should eq \'vbname\' => \'.1.3.6.1.2.1.4.1.0\', \'vbvalue\' => \'1\' }
     end
   '
 
@@ -34,10 +34,10 @@ class ServiceDetector < Inspec.resource(1)
     @params[:port] = doc.elements["/detector/parameter[@key = 'port']"].attributes['value'].to_i unless doc.elements["/detector/parameter[@key = 'port']"].nil?
     @params[:retry_count] = doc.elements["/detector/parameter[@key = 'retries']"].attributes['value'].to_i unless doc.elements["/detector/parameter[@key = 'retries']"].nil?
     @params[:time_out] = doc.elements["/detector/parameter[@key = 'timeout']"].attributes['value'].to_i unless doc.elements["/detector/parameter[@key = 'timeout']"].nil?
-    @params[:params] = {}
+    @params[:parameters] = {}
     doc.each_element('detector/parameter') do |p|
       next if %w(port retries timeout).include?(p.attributes['key'])
-      @params[:params][p.attributes['key'].to_s] = p.attributes['value'].to_s
+      @params[:parameters][p.attributes['key'].to_s] = p.attributes['value'].to_s
     end
   end
 

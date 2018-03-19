@@ -3,7 +3,7 @@ def whyrun_supported?
   true
 end
 
-use_inline_resources
+use_inline_resources # ~FC113
 
 action :create do
   if @current_resource.exists
@@ -24,15 +24,14 @@ action :create do
 end
 
 def load_current_resource
-  @current_resource = Chef::Resource::OpennmsPollerService.new(@new_resource.name)
-  @current_resource.name(@new_resource.name)
+  @current_resource = Chef::Resource.resource_for_node(:opennms_poller_service, node).new(@new_resource.name)
   @current_resource.package_name(@new_resource.package_name)
   @current_resource.interval(@new_resource.interval)
   @current_resource.user_defined(@new_resource.user_defined)
   @current_resource.status(@new_resource.status)
   @current_resource.timeout(@new_resource.timeout)
   @current_resource.port(@new_resource.port) unless @new_resource.port.nil?
-  @current_resource.params(@new_resource.params)
+  @current_resource.parameters(@new_resource.parameters)
   @current_resource.class_name(@new_resource.class_name)
 
   if service_exists?(@current_resource.package_name, @current_resource.name)
@@ -87,7 +86,7 @@ def service_changed?(current_resource)
   # make a version of params that has strings for both keys and values
   # just so we can compare without forcing certain param values to
   # be specific types
-  current_resource.params.each do |k, v|
+  current_resource.parameters.each do |k, v|
     params_str[k.to_s] = v.to_s
   end
   service_el.elements.each("parameter[@key != 'port' and @key != 'timeout']") do |p|
@@ -95,7 +94,7 @@ def service_changed?(current_resource)
     curr_params[p.attributes['key']] = val
   end
   Chef::Log.debug "curr_params: '#{curr_params}'; params: #{params_str}"
-  return true if !current_resource.params.nil? && curr_params != params_str
+  return true if !current_resource.parameters.nil? && curr_params != params_str
   false
 end
 
@@ -120,8 +119,8 @@ def update_poller_service
   unless new_resource.port.nil?
     service_el.add_element 'parameter', 'key' => 'port', 'value' => new_resource.port
   end
-  unless new_resource.params.nil?
-    new_resource.params.each do |key, value|
+  unless new_resource.parameters.nil?
+    new_resource.parameters.each do |key, value|
       service_el.add_element 'parameter', 'key' => key, 'value' => value
     end
   end
@@ -151,8 +150,8 @@ def create_poller_service
   unless new_resource.port.nil?
     service_el.add_element 'parameter', 'key' => 'port', 'value' => new_resource.port
   end
-  unless new_resource.params.nil?
-    new_resource.params.each do |key, value|
+  unless new_resource.parameters.nil?
+    new_resource.parameters.each do |key, value|
       service_el.add_element 'parameter', 'key' => key, 'value' => value
     end
   end

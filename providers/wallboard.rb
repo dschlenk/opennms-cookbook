@@ -3,7 +3,7 @@ def whyrun_supported?
   true
 end
 
-use_inline_resources
+use_inline_resources # ~FC113
 
 action :create do
   if @current_resource.changed
@@ -20,7 +20,7 @@ action :create do
 end
 
 def load_current_resource
-  @current_resource = Chef::Resource::OpennmsWallboard.new(@new_resource.name)
+  @current_resource = Chef::Resource.resource_for_node(:opennms_wallboard, node).new(@new_resource.name)
   @current_resource.title(@new_resource.title)
   @current_resource.set_default(@new_resource.set_default)
 

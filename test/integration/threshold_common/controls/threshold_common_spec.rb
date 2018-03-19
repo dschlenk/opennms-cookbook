@@ -2,7 +2,7 @@
 control 'threshold_common' do
   describe poller_service('ICMP', 'example1') do
     it { should exist }
-    its('params') { should eq 'rrd-repository' => '/opt/opennms/share/rrd/response', 'rrd-base-name' => 'icmp', 'ds-name' => 'icmp', 'thresholding-enabled' => 'true' }
+    its('parameters') { should eq 'rrd-repository' => '/opt/opennms/share/rrd/response', 'rrd-base-name' => 'icmp', 'ds-name' => 'icmp', 'thresholding-enabled' => 'true' }
     its('status') { should eq 'on' }
     its('time_out') { should eq 3000 }
     its('class_name') { should eq 'org.opennms.netmgt.poller.monitors.IcmpMonitor' }

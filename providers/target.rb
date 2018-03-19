@@ -3,7 +3,7 @@ def whyrun_supported?
   true
 end
 
-use_inline_resources
+use_inline_resources # ~FC113
 
 action :create do
   Chef::Application.fatal!("Missing destination path #{@current_resource.destination_path_name}.") unless @current_resource.destination_path_exists
@@ -20,8 +20,7 @@ action :create do
 end
 
 def load_current_resource
-  @current_resource = Chef::Resource::OpennmsTarget.new(@new_resource.name)
-  @current_resource.name(@new_resource.name)
+  @current_resource = Chef::Resource.resource_for_node(:opennms_target, node).new(@new_resource.name)
   @current_resource.target_name(@new_resource.target_name)
   @current_resource.type(@new_resource.type)
   @current_resource.destination_path_name(@new_resource.destination_path_name)

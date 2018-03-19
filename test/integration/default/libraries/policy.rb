@@ -13,7 +13,7 @@ class Policy < Inspec.resource(1)
     describe policy(\'name\', \'foreign_source\') do
       it { should exist }
       its(\'class_name\') { should eq \'org.opennms.netmgt.provision.persist.policies.NodeCategorySettingPolicy\' }
-      its(\'params\') { should eq \'category\' => \'Test\', \'matchBehavior\' => \'ALL_PARAMETERS\' }
+      its(\'parameters\') { should eq \'category\' => \'Test\', \'matchBehavior\' => \'ALL_PARAMETERS\' }
     end
   '
 
@@ -26,10 +26,10 @@ class Policy < Inspec.resource(1)
     if @exists
       @params = {}
       @params[:class_name] = p_el.attributes['class'].to_s
-      @params[:params] = {}
+      @params[:parameters] = {}
       unless p_el.elements['parameter'].nil?
         p_el.each_element('parameter') do |p|
-          @params[:params][p.attributes['key'].to_s] = p.attributes['value'].to_s
+          @params[:parameters][p.attributes['key'].to_s] = p.attributes['value'].to_s
         end
       end
     end

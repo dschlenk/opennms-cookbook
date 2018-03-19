@@ -22,12 +22,14 @@ onms_home ||= '/opt/opennms'
 
 # don't make wrappers that change templates support multiple versions
 mv = Opennms::Helpers.major(node['opennms']['version'])
-puts "version: #{node['opennms']['version']}; mv: #{mv}"
 template_dir = if node['opennms']['conf']['cookbook'] == 'opennms'
                  "horizon-#{mv % { version: node['opennms']['version'] }}/"
                else
                  ''
                end
+if mv.to_i >= 20
+  node.default['opennms']['threshd']['hrstorage']['filter'] = "IPADDR != '0.0.0.0' &amp; (nodeSysOID LIKE '.1.3.6.1.4.1.311.%' | nodeSysOID LIKE '.1.3.6.1.4.1.2.3.1.2.1.1.3.%' | nodeSysOID LIKE '.1.3.6.1.4.1.8072.%')"
+end
 
 template "#{onms_home}/etc/availability-reports.xml" do
   cookbook node['opennms']['db_reports']['avail']['cookbook']
@@ -115,6 +117,7 @@ template "#{onms_home}/etc/collectd-configuration.xml" do
     vmware3: node['opennms']['collectd']['vmware3'],
     vmware4: node['opennms']['collectd']['vmware4'],
     vmware5: node['opennms']['collectd']['vmware5'],
+    vmware6: node['opennms']['collectd']['vmware6'],
     example1: node['opennms']['collectd']['example1']
   )
 end
@@ -192,6 +195,7 @@ template "#{onms_home}/etc/datacollection-config.xml" do
     vmware3: node['opennms']['datacollection']['default']['vmware3'],
     vmware4: node['opennms']['datacollection']['default']['vmware4'],
     vmware5: node['opennms']['datacollection']['default']['vmware5'],
+    vmware6: node['opennms']['datacollection']['default']['vmware6'],
     vmwarecim: node['opennms']['datacollection']['default']['vmwarecim'],
     ejn: node['opennms']['datacollection']['ejn']
   )
@@ -771,6 +775,7 @@ template "#{onms_home}/etc/response-graph.properties" do
     dhcp: node['opennms']['response_graph']['dhcp'],
     dns: node['opennms']['response_graph']['dns'],
     http: node['opennms']['response_graph']['http'],
+    https: node['opennms']['response_graph']['https'],
     http_8080: node['opennms']['response_graph']['http_8080'],
     http_8000: node['opennms']['response_graph']['http_8000'],
     mail: node['opennms']['response_graph']['mail'],

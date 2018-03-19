@@ -3,7 +3,7 @@ def whyrun_supported?
   true
 end
 
-use_inline_resources
+use_inline_resources # ~FC113
 
 action :run do
   converge_by("Run #{@new_resource}") do
@@ -16,8 +16,7 @@ end
 # end
 
 def load_current_resource
-  @current_resource = Chef::Resource::OpennmsSendEvent.new(@new_resource.name)
-  @current_resource.name(@new_resource.name)
+  @current_resource = Chef::Resource.resource_for_node(:opennms_send_event, node).new(@new_resource.name)
   @current_resource.uei(@new_resource.uei)
   @current_resource.parameters(@new_resource.parameters) unless @new_resource.parameters.nil?
 end

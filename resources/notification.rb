@@ -17,7 +17,7 @@ attribute :subject, kind_of: String
 attribute :numeric_message, kind_of: String
 attribute :event_severity, kind_of: String
 # string key/value pairs
-attribute :params, kind_of: Hash
+attribute :parameters, kind_of: Hash
 attribute :vbname, kind_of: String
 attribute :vbvalue, kind_of: String
 

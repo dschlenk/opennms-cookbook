@@ -18,7 +18,7 @@ attribute :status, kind_of: String, equal_to: %w(on off), default: 'on', require
 attribute :timeout, kind_of: Integer, default: 3000
 attribute :retry_count, kind_of: Integer, default: 1
 attribute :port, kind_of: Integer, default: 161
-attribute :params, kind_of: Hash
+attribute :parameters, kind_of: Hash
 attribute :thresholding_enabled, kind_of: [FalseClass, TrueClass], default: false
 
 attr_accessor :exists

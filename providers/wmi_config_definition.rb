@@ -3,7 +3,7 @@ def whyrun_supported?
   true
 end
 
-use_inline_resources
+use_inline_resources # ~FC113
 
 action :create do
   if @current_resource.exists
@@ -43,8 +43,7 @@ action :delete do
 end
 
 def load_current_resource
-  @current_resource = Chef::Resource::OpennmsWmiConfigDefinition.new(@new_resource.name)
-  @current_resource.name(@new_resource.name)
+  @current_resource = Chef::Resource.resource_for_node(:opennms_wmi_config_definition, node).new(@new_resource.name)
   @current_resource.retry_count(@new_resource.retry_count) unless @new_resource.retry_count.nil?
   @current_resource.timeout(@new_resource.timeout) unless @new_resource.timeout.nil?
   @current_resource.username(@new_resource.username) unless @new_resource.username.nil?

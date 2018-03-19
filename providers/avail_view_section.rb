@@ -3,7 +3,7 @@ def whyrun_supported?
   true
 end
 
-use_inline_resources
+use_inline_resources # ~FC113
 
 action :create do
   Chef::Application.fatal!("view_name specified '#{@current_resource.view_name}' doesn't exist!") unless @current_resource.view_name_exists
@@ -25,7 +25,7 @@ end
 
 # rubocop:disable Metrics/BlockNesting
 def load_current_resource
-  @current_resource = Chef::Resource::OpennmsAvailViewSection.new(@new_resource.name)
+  @current_resource = Chef::Resource.resource_for_node(:opennms_avail_view_section, node).new(@new_resource.name)
   @current_resource.section(@new_resource.section)
   @current_resource.view_name(@new_resource.view_name)
   @current_resource.category_group(@new_resource.category_group)

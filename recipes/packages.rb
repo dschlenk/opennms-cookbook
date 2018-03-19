@@ -56,8 +56,8 @@ branches.each do |branch|
       baseurl bu unless bu.nil? || bu == ''
       mirrorlist ml unless ml.nil? || ml == ''
       gpgkey 'file:///etc/yum.repos.d/OPENNMS-GPG-KEY'
-      failovermethod fom unless fom.nil? | fom == ''
-      enabled repo_enabled
+      failovermethod fom unless fom.nil? || fom == ''
+      enabled false if repo_enabled == false
       includepkgs inc_pkgs unless inc_pkgs.nil? || inc_pkgs == ''
       exclude ex unless ex.nil? || ex == ''
       action :create

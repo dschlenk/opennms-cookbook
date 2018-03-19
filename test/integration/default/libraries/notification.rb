@@ -81,9 +81,9 @@ class Notification < Inspec.resource(1)
         end
         @params[:event_severity] = estext unless estext == ''
       end
-      @params[:params] = {}
+      @params[:parameters] = {}
       n_el.elements.each('parameter') do |p|
-        @params[:params][p.attributes['name'].to_s] = p.attributes['value'].to_s
+        @params[:parameters][p.attributes['name'].to_s] = p.attributes['value'].to_s
       end
       unless n_el.elements['varbind/vbname'].nil?
         vntext = ''

@@ -6,6 +6,6 @@ control 'service_detector' do
     its('port') { should eq 80 }
     its('retry_count') { should eq 5 }
     its('time_out') { should eq 6000 }
-    its('params') { should eq 'banner' => 'heaven' }
+    its('parameters') { should eq 'banner' => 'heaven' }
   end
 end

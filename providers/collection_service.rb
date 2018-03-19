@@ -3,7 +3,7 @@ def whyrun_supported?
   true
 end
 
-use_inline_resources
+use_inline_resources # ~FC113
 
 action :create do
   if @current_resource.exists
@@ -16,8 +16,7 @@ action :create do
 end
 
 def load_current_resource
-  @current_resource = Chef::Resource::OpennmsCollectionService.new(@new_resource.name)
-  @current_resource.name(@new_resource.name)
+  @current_resource = Chef::Resource.resource_for_node(:opennms_collection_service, node).new(@new_resource.name)
   @current_resource.package_name(@new_resource.package_name)
   @current_resource.collection(@new_resource.collection)
 
@@ -65,8 +64,8 @@ def create_collection_service
   unless new_resource.thresholding_enabled.nil?
     service_el.add_element 'parameter', 'key' => 'thresholding-enabled', 'value' => new_resource.thresholding_enabled
   end
-  unless new_resource.params.nil?
-    new_resource.params.each do |k, v|
+  unless new_resource.parameters.nil?
+    new_resource.parameters.each do |k, v|
       service_el.add_element 'parameter', 'key' => k, 'value' => v
     end
   end

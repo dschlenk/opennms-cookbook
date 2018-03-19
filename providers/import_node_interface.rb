@@ -4,7 +4,7 @@ def whyrun_supported?
   true
 end
 
-use_inline_resources
+use_inline_resources # ~FC113
 
 action :create do
   Chef::Application.fatal!("Missing requisition #{@current_resource.foreign_source_name}.") unless @current_resource.import_exists
@@ -25,8 +25,7 @@ action :create do
 end
 
 def load_current_resource
-  @current_resource = Chef::Resource::OpennmsImportNodeInterface.new(@new_resource.name)
-  @current_resource.name(@new_resource.name)
+  @current_resource = Chef::Resource.resource_for_node(:opennms_import_node_interface, node).new(@new_resource.name)
   @current_resource.foreign_source_name(@new_resource.foreign_source_name)
   @current_resource.foreign_id(@new_resource.foreign_id)
 

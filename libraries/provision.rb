@@ -94,7 +94,7 @@ module Provision
     return true if thing_changed?(current_resource.timeout, curr_timeout)
     return true if thing_changed?(current_resource.port, curr_port)
     return true if thing_changed?(current_resource.class_name, curr_class)
-    return true if things_changed?(current_resource.params, curr_params)
+    return true if things_changed?(current_resource.parameters, curr_params)
     false
   end
 
@@ -160,14 +160,16 @@ module Provision
     update_parameter(detector['parameter'], 'retries', new_resource.retry_count)
     update_parameter(detector['parameter'], 'timeout', new_resource.timeout)
     # don't change anything if no parameters specified in update resource
-    unless new_resource.params.nil? || new_resource.params.empty?
+    unless new_resource.parameters.nil? || new_resource.parameters.empty?
       # if you specify params, they replace all the current params. No merging of old and new occur.
       detector['parameter'].delete_if do |p|
         !%w(port retries timeout).include? p['key']
       end
     end
-    new_resource.params.each do |k, v|
-      detector['parameter'].push('key' => k, 'value' => v)
+    unless new_resource.parameters.nil?
+      new_resource.parameters.each do |k, v|
+        detector['parameter'].push('key' => k, 'value' => v)
+      end
     end
     # seems easier to just delete the current then add the modified rather than grab the entire
     # foreign source and PUT that with the change.
@@ -206,8 +208,8 @@ module Provision
     unless new_resource.timeout.nil?
       sdel.add_element 'parameter', 'key' => 'timeout', 'value' => new_resource.timeout
     end
-    unless new_resource.params.nil?
-      new_resource.params.each do |key, value|
+    unless new_resource.parameters.nil?
+      new_resource.parameters.each do |key, value|
         sdel.add_element 'parameter', 'key' => key, 'value' => value
       end
     end

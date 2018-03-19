@@ -23,5 +23,5 @@ end
 opennms_service_detector 'change Router params' do
   service_name 'Router'
   foreign_source_name 'another-source'
-  params 'banner' => 'heaven'
+  parameters 'banner' => 'heaven'
 end

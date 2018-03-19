@@ -7,6 +7,6 @@ control 'policy' do
   describe policy('Production Category', 'policy-source') do
     it { should exist }
     its('class_name') { should eq 'org.opennms.netmgt.provision.persist.policies.NodeCategorySettingPolicy' }
-    its('params') { should eq 'category' => 'Test', 'matchBehavior' => 'ALL_PARAMETERS' }
+    its('parameters') { should eq 'category' => 'Test', 'matchBehavior' => 'ALL_PARAMETERS' }
   end
 end
