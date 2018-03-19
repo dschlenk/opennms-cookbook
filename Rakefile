@@ -35,7 +35,7 @@ namespace :integration do
   desc 'Run Test Kitchen with Vagrant'
   task :vagrant do
     options = {
-      versions: %w(16 17 18 19),
+      versions: %w(16 17 18 19 20 21),
     }
     opts = OptionParser.new
     opts.banner = 'Usage: rake integration:vagrant [options]'

@@ -2125,7 +2125,8 @@ end
 template "#{onms_home}/etc/users.xml" do
   cookbook node['opennms']['users']['cookbook']
   source "#{template_dir}users.xml.erb"
-  mode 0664
+  mode 0664 if mv.to_i <= 20
+  mode 0640 if mv.to_i > 20
   owner 'root'
   group 'root'
   notifies :restart, 'service[opennms]'

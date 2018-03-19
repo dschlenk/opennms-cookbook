@@ -6509,7 +6509,7 @@ suites:
       - recipe[onms_lwrp_test::webopts]
     attributes:
       opennms:
-        version: 21.0.4-1
+        version: 21.0.5-1
         upgrade: true
     verifier:
       inspec_tests:
@@ -6522,7 +6522,7 @@ suites:
       - recipe[onms_lwrp_test::webopts]
     attributes:
       opennms:
-        version: 21.0.4-1
+        version: 21.0.5-1
         templates: true
         upgrade: true
     verifier:
