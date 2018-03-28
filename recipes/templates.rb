@@ -106,6 +106,11 @@ template "#{onms_home}/etc/chart-configuration.xml" do
   )
 end
 
+if mv.to_i == 20
+  node.default['opennms']['collectd']['vmware3']['filter'] = "(IPADDR != '0.0.0.0') & (categoryName == 'VMware3')"
+  node.default['opennms']['collectd']['vmware4']['filter'] = "(IPADDR != '0.0.0.0') & (categoryName == 'VMware4')"
+  node.default['opennms']['collectd']['vmware5']['filter'] = "(IPADDR != '0.0.0.0') & (categoryName == 'VMware5')"
+end
 template "#{onms_home}/etc/collectd-configuration.xml" do
   cookbook node['opennms']['collectd']['cookbook']
   source "#{template_dir}collectd-configuration.xml.erb"
@@ -2125,8 +2130,8 @@ end
 template "#{onms_home}/etc/users.xml" do
   cookbook node['opennms']['users']['cookbook']
   source "#{template_dir}users.xml.erb"
-  mode 0664 if mv.to_i <= 20
-  mode 0640 if mv.to_i > 20
+  mode 0664 if mv.to_i <= 19
+  mode 0640 if mv.to_i > 19
   owner 'root'
   group 'root'
   notifies :restart, 'service[opennms]'

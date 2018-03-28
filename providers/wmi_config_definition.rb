@@ -196,24 +196,74 @@ def update_wmi_config_definition
   # put the new ones in
   unless new_resource.ranges.nil?
     new_resource.ranges.each do |r_begin, r_end|
+      last_range = def_el.elements['range[last()]']
       if !def_el.nil? && def_el.elements["range[@begin = '#{r_begin}' and @end = '#{r_end}']"].nil?
-        def_el.add_element 'range', 'begin' => r_begin, 'end' => r_end
+        new_el = REXML::Element.new('range')
+        new_el.attributes['begin'] = r_begin
+        new_el.attributes['end'] = r_end
+        if last_range.nil?
+          first_specific = fsp = def_el.elements['specific[first()]']
+          if first_specific.nil?
+            fmatch = def_el.elements['ip-match[first()]']
+            if fmatch.nil?
+              def_el.add_element(new_el)
+            else
+              def_el.insert_before(fmatch, new_el)
+            end
+          else
+            def_el.insert_before(first_specific, new_el)
+          end
+        else
+          def_el.insert_after(last_range, new_el)
+        end
       end
     end
   end
   unless new_resource.specifics.nil?
     new_resource.specifics.each do |specific|
       if def_el.elements["specific[text() = '#{specific}']"].nil?
-        sel = def_el.add_element 'specific'
-        sel.add_text(specific)
+        new_el = REXML::Element.new('specific')
+        new_el.add_text(specific)
+        ls = def_el.elements['specific[last()]']
+        if ls.nil?
+          lr = def_el.elements['range[last()]']
+          if lr.nil?
+            li = def_el.elements['ip-match[last()]']
+            if li.nil?
+              def_el.add_element new_el
+            else
+              def_el.insert_before(li, new_el)
+            end
+          else
+            def_el.insert_after(lr, new_el)
+          end
+        else
+          def_el.insert_after(ls, new_el)
+        end
       end
     end
   end
   unless new_resource.ip_matches.nil?
     new_resource.ip_matches.each do |ip_match|
       if def_el.elements["ip-match[text() = '#{ip_match}']"].nil?
-        ipm_el = def_el.add_element 'ip-match'
-        ipm_el.add_text(ip_match)
+        new_el = REXML::Element.new('ip-match')
+        new_el.add_text(ip_match)
+        li = def_el.elements['ip-match[last()]']
+        if li.nil?
+          ls = def_el.elements['specific[last()]']
+          if ls.nil?
+            lr = def_el.elements['range[last()]']
+            if lr.nil?
+              def_el.add_element new_el
+            else
+              def_el.insert_after(lr, new_el)
+            end
+          else
+            def_el.insert_after(ls, new_el)
+          end
+        else
+          def_el.insert_after(li, new_el)
+        end
       end
     end
   end

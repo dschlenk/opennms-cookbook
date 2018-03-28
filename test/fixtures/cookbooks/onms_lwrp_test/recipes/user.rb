@@ -14,5 +14,7 @@ opennms_user 'jimmy' do
   notifies :restart, 'service[opennms]'
 end
 
-# minimal
-opennms_user 'johnny'
+# minimal - password is required
+opennms_user 'johnny' do
+  password '6D639656F5EAC2E799D32870DD86046D'
+end

@@ -367,6 +367,7 @@ module Provision
         node_el.add_element 'asset', 'name' => k, 'value' => v
       end
     end
+    Chef::Log.debug "Updating node with #{n.to_s} to #{baseurl(node)}/requisitions/#{foreign_source_name}/nodes with content type xml"
     RestClient.post "#{baseurl(node)}/requisitions/#{foreign_source_name}/nodes", n.to_s, content_type: :xml
   end
 
@@ -482,11 +483,30 @@ module Provision
     complete = false
     require 'rest-client'
     require 'addressable/uri'
-    url = "#{baseurl(node)}/events?eventUei=uei.opennms.org/internal/importer/importSuccessful&eventParms=%25#{foreign_source_name}%25&comparator=like&query=eventcreatetime >= '#{after}'"
+    api = 'v1'
+    m = node['opennms']['version'].match(/^(\d+)\.(\d+)\.(\d+)-(\d+)$/)
+    unless m.nil?
+      if m[1].to_i > 20
+        api = 'v2'
+      elsif m[1].to_i == 20 && m[2].to_i == 0 && m[3].to_i >= '2'
+        api = 'v2'
+      elsif m[1].to_i == 20 && m[2].to_i > 0
+        api = 'v2'
+      end
+    end
+    case(api)
+    when 'v1'
+      url = "#{baseurl(node)}/events?eventUei=uei.opennms.org/internal/importer/importSuccessful&eventParms=%25#{foreign_source_name}%25&comparator=like&query=eventcreatetime >= '#{after}'"
+    when 'v2'
+      url =  "#{baseurlv2(node)}/events?_s=eventCreateTime=ge=#{Time.parse(after + " " + Time.now.zone).utc.strftime("%FT%T.%LZ")};eventUei==uei.opennms.org/internal/importer/importSuccessful"
+    end
     parsed_url = Addressable::URI.parse(url).normalize.to_str
-    Chef::Log.debug("sync_complete? URL: #{parsed_url}")
-    events = JSON.parse(RestClient.get(parsed_url, accept: :json).to_str)
+    Chef::Log.debug("sync_complete? URL: '#{parsed_url}'")
+    response = RestClient.get(parsed_url, accept: :json).to_str
+    # apiv2 returns empty response (204) when nothing found
+    events = JSON.parse(response) unless response.nil? || response == ''
     complete = true if !events.nil? && events.key?('totalCount') && events['totalCount'].to_i > 0
+    complete = false if events.nil? || (api == 'v2' && events['event'].select { |e| mp = e['parameters'].select { |p| p['value'].include?(foreign_source_name) }; !(mp.nil? || mp.empty?) }.empty?)
     complete
   end
 
@@ -513,6 +533,10 @@ module Provision
 
   def baseurl(node)
     "http://admin:#{node['opennms']['users']['admin']['password']}@localhost:#{node['opennms']['properties']['jetty']['port']}/opennms/rest"
+  end
+
+  def baseurlv2(node)
+    "http://admin:#{node['opennms']['users']['admin']['password']}@localhost:#{node['opennms']['properties']['jetty']['port']}/opennms/api/v2"
   end
 
   def default_foreign_source(node)

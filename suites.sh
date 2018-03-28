@@ -1,8 +1,37 @@
 #!/bin/bash
-VERSIONS=(16.0.4-1 17.1.1-1 18.0.4-1 19.1.0-1)
-STABLE_VERSION=(20.0.1-1)
+echo "---"
+echo "verifier:"
+echo "  name: inspec"
+echo ""
+echo "driver:"
+echo "  name: vagrant"
+echo "  network:"
+echo "    - [\"forwarded_port\", {guest: 8980, host: 8980, auto_correct: true}]"
+echo "  customize:"
+echo "    memory: 1024"
+echo ""
+echo "provisioner:"
+echo "  name: chef_zero"
+echo "  deprecations_as_errors: true"
+echo "  product_version: 12.21.4"
+echo ""
+echo "platforms:"
+echo "  - name: centos-6.8"
+echo "    attributes:"
+echo "      opennms:"
+echo "        templates: false"
+echo "        conf:"
+echo "          start_timeout: 50"
+echo "        stable: true"
+echo "        plugin:"
+echo "          xml: true"
+echo "          nsclient: true"
+echo "suites:"
+VERSIONS=(16.0.4-1 17.1.1-1 18.0.4-1 19.1.0-1 20.1.0-1 21.0.5-1)
+STABLE_VERSION=(21.0.5-1)
 SUITES=$(ls test/fixtures/cookbooks/onms_lwrp_test/recipes/)
 SUITES+=('default')
+SUITES+=('templates')
 for f in ${SUITES[@]}; do
   recipe=${f%.rb}
   for v in ${VERSIONS[@]}; do
@@ -49,23 +78,28 @@ for f in ${SUITES[@]}; do
       echo "      - recipe[opennms::postgres]"
       echo "      - recipe[oracle_java8::default]"
       echo "      - recipe[opennms::default]"
-      if [ "$recipe" != "default" ]; then
+      if [ "$recipe" != "default" ] && [ "$recipe" != "templates" ]; then
         echo "      - recipe[onms_lwrp_test::${recipe}]"
       else
+        if [ "$recipe" == "templates" ]; then
+          echo "      - recipe[opennms::default]"
+        fi
         echo "      - recipe[onms_lwrp_test::webopts]"
       fi
       echo "    attributes:"
       echo "      opennms:"
       echo "        version: ${v}"
       if [ "$recipe" = "default" ]; then
-        echo "      upgrade: true"
+        echo "        upgrade: true"
       fi
       echo "    verifier:"
       echo "      inspec_tests:"
       if [ "$recipe" != "default" ]; then
         echo "        - path: test/integration/default"
       fi
-      echo "        - path: test/integration/${recipe}"
+      if [ "$recipe" != "templates" ]; then
+        echo "        - path: test/integration/${recipe}"
+      fi
     fi
   done
 done

@@ -15,7 +15,7 @@ Chef::Log.warn "mv is #{mv}"
 cookbook_file 'jetty.xml' do
   path '/opt/opennms/etc/jetty.xml'
   notifies :restart, 'service[opennms]'
-  only_if { mv <= 19 }
+  only_if { mv >= 19 }
 end
 cookbook_file 'jetty-16.xml' do
   path '/opt/opennms/etc/jetty.xml'

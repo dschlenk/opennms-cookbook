@@ -1,5 +1,5 @@
 # frozen_string_literal: true
-include_recipe 'onms_lwrp_test::service_detector.rb'
+include_recipe 'onms_lwrp_test::service_detector'
 
 # delete
 opennms_service_detector 'delete ICMP' do
