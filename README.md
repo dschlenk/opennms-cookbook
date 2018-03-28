@@ -4,7 +4,7 @@ Description
 ===========
 
 A Chef cookbook to manage the installation and configuration of OpenNMS Horizon.
-Current version supports releases 16, 17, 18 and 19 on CentOS 6.
+Current version supports releases 16, 17, 18, 19, 20 and 21 on CentOS 6.
 
 Versions
 ========
@@ -14,21 +14,22 @@ Starting with OpenNMS Horizon 16, the MSB of the version of the cookbook matches
 Requirements
 ============
 
-* Chef 12.5.1 or later (only tested on 12.5.1, however)
+* Chef 12.5.1 or later
 * CentOS 6
 * Either use Berkshelf to satisfy dependencies or manually acquire the following cookbooks: 
   * yum
   * hostsfile
   * build-essential
-  * postgresql 
+  * postgresql
   * openssl
 
 * In OpenNMS 17+ you will need a newer PostgreSQL than CentOS 6.x provides. Also, using Chef to install PostgreSQL makes tuning a lot easier. While you're free to install PostgreSQL in whatever manner pleases you, there is a `postgres` recipe that installs 9.3 from pgdg and does some basic tuning.
+  * You might also be interested in [the six-fixups branch of my fork of the public postgresql cookbook](https://github.com/dschlenk/postgresql/tree/six-fixups). It's based on v6.1.1 and fixes Chef 13+ deprecation errors and a couple minor bugs.
 
 Usage
 =====
 
-Running the default recipe will install OpenNMS 19.0.0-1 (or a custom version using the attribute `node[:opennms][:version]`) on CentOS 6.x from the official repo with the default configuration. It will also execute `'$ONMS_HOME/bin/runjava -s` if `$ONMS_HOME/etc/java.conf` is not present and `$ONMS_HOME/bin/install -dis` if `$ONMS_HOME/etc/configured` is not present.
+Running the default recipe will install OpenNMS 21.0.5-1 (or a custom version using the attribute `node[:opennms][:version]`) on CentOS 6.x from the official repo with the default configuration. It will also execute `'$ONMS_HOME/bin/runjava -s` if `$ONMS_HOME/etc/java.conf` is not present and `$ONMS_HOME/bin/install -dis` if `$ONMS_HOME/etc/configured` is not present.
 
 There are two primary ways to use this cookbook: as an application cookbook or library cookbook. If you simply want to tweak a few settings to the default OpenNMS configuration, you can use the `default` recipe of this cookbook directly and modify node attributes to suit your needs. There are also a plethora of LWRPs that you can use to do more in depth customizations. If you go that route I recommend starting with the `notemplates` recipe and then using those LWRPs (and maybe a few of the templates in this cookbook) to define your run list. If your node's run list contains both the template and a resource that manages the same file you'll end up with a lot of churn during the chef client run, which is a waste of time and will probably cause unnecessary restarts of the application. 
 
@@ -89,10 +90,10 @@ node[:opennms][:conf][:addl_mgr_opts] = '-XX:+UseConcMarkSweepGC -XX:MaxMetaspac
 
 ### Upgrades
 
-Starting with version 2.0.0 there is now experimental support for handling 
-upgrades automatically. Use at your own risk. It is disabled by default. 
-To enable, set `node['opennms']['upgrade']` to true. If this sounds like 
-something you want to do, review the `upgrade` recipe and library. It roughly translates to:
+Starting with version 2.0.0 there is now support for handling upgrades
+automatically. It is disabled by default. To enable, set
+`node['opennms']['upgrade']` to true. If this sounds like something you want
+to do, review the `upgrade` recipe and library. It roughly translates to:
 
 * New RPM is installed.
 * Are there any files named `*.rpmnew` in `$ONMS_HOME`? If so, overwrite the existing files with them.
@@ -108,7 +109,7 @@ start with these files in place we just remove them.
 Similarly, `rpmnew` files are created when a newer version of a file exists, but 
 it doesn't contain breaking changes. Just like `rpmsave` files, OpenNMS won't 
 start with these files present, and the rest of the converge will make the changes
-we want anyway, so we just overwrite the old file with the `rpmnew` version. 
+we want anyway, so we just remove the old file.
  
 ### Recipes
 
@@ -132,54 +133,54 @@ The list of implemented LWRPs is as follows:
 * `opennms_user`: add a user. Uses the REST API. 
 * `opennms_group`: add a group and populate it with users. You can even set the default SVG map and duty schedules.
 * `opennms_role`: add a role.
-* `opennms_role_schedule`: Add schedules to a role. See an example for this and the role LWRP in recipe `opennms::example_role`.
+* `opennms_role_schedule`: Add schedules to a role.
 
 #### Discovery
 
 * `opennms_disco_specific`: add a specific IP to be discovered. 
-* `opennms_disco_range`: add a include or exclude range  discovery. 
+* `opennms_disco_range`: add a include or exclude range of IPs for discovery. 
 * `opennms_disco_url`: add a include-url to discovery and if it's a file deploy it where specified. 
 
 #### Provisioning Requisitions
 
-These LWRPs use a cookbook library named Provision that I wrote to perform the work using the OpenNMS REST interface. As such, OpenNMS has to be running for the resources to converge. Also you'll notice that I used the term 'import' rather than the correct term 'requisition'. I can type 'import' a lot faster than 'requisition'. ;)
+These LWRPs use the OpenNMS REST interface. As such, OpenNMS has to be running for the resources to converge. (I used the term 'import' rather than the correct term 'requisition'. I can type 'import' a lot faster than 'requisition').
 
-* `opennms_foreign_source`: create a new foreign source optionally defining a scan interval (defaults to '1d'). 
+* `opennms_foreign_source`: create a new foreign source optionally defining a scan interval (defaults to '1d').
 * `opennms_service_detector`: add a service detector to a foreign source. Supports updating and deleting.
-* `opennms_policy`: add a policy to a foreign source. 
-* `opennms_import`: Defines a requisition for a foreign source. This and all import* LWRPs include an option to synchronize the requisition - sync_import. 
-* `opennms_import_node`: Add a node to a requisition including categories (array of strings) and assets (key/value hash pairs). 
-* `opennms_import_node_interface`: Add an interface to a node in a requisition. 
-* `opennms_import_node_interface_service`: Add a service to an interface on a node in a requisition. 
+* `opennms_policy`: add a policy to a foreign source.
+* `opennms_import`: Defines a requisition for a foreign source. This and all import* LWRPs include an option to synchronize the requisition - sync_import.
+* `opennms_import_node`: Add a node to a requisition including categories (array of strings) and assets (key/value hash pairs).
+* `opennms_import_node_interface`: Add an interface to a node in a requisition.
+* `opennms_import_node_interface_service`: Add a service to an interface on a node in a requisition.
 
 #### Events
 
 * `opennms_eventconf`: adds an event-file element to events in etc/eventconf.xml.  Supports updating.
-* `opennms_event`: adds an event element to events in target eventconf file `file`. Not all elements from the eventconf schema are implemented, but the ones that seem to actually exist in the wild are. See resource for details and recipes `example_event` and `example_threshold` for example usage. Supports updating existing events, so if you want to change an event in an eventconf file distributed with OpenNMS, this is the resource for you - no more merging files after an upgrade! Look at the test/example recipe for details - you only need to provide the file, UEI, the mask elements and the attribute(s) you want to change. If creating entirely new events, there are some attributes that are required by the eventconf schema but not enforced by the Chef resource (since they aren't required when doing an update). New in 18.2 is the ability to place new events at the top or bottom of an existing file with the 'position' attribute. Varbind filters are also now supported in masks. Also supports `:delete` action to remove existing events.
+* `opennms_event`: adds an event element to events in target eventconf file `file`. Not all elements from the eventconf schema are implemented, but the ones that seem to actually exist in the wild are. See resource for details and test recipes `event` and `threshold` for example usage. Supports updating and deleting existing events, so if you want to change an event in an eventconf file distributed with OpenNMS, this is the resource for you - no more merging files after an upgrade! For existing events you need to provide the file, UEI, the mask elements and the attribute(s) you want to change in your resource. If creating entirely new events, there are some attributes that are required by the eventconf schema but not enforced by the Chef resource (since they aren't required when doing an update). New in 18.2 is the ability to place new events at the top or bottom of an existing file with the 'position' attribute. Varbind filters are also now supported in masks.
 * `opennms_send_event`: creates an actual instance of an event using the `send-event.pl` script in `$ONMS_HOME/bin`. Used by the `send_events` recipe, which is included by `default` and `notemplates` recipes to cause config file reloads to take place when template resources make changes or an LWRP sends a notification.
 
 #### Notifications
 
-* `opennms_notification_command`: Create a new command in notificationCommands.xml. 
-* `opennms_destination_path`: creates a destination path element in destinationPaths.xml. Requires at a minimum a single target which can be defined with the following LWRP. 
-* `opennms_target`: Add a target or escalate target to a destination path (defined either in the default config or with the above LWRP). 
+* `opennms_notification_command`: Create a new command in notificationCommands.xml.
+* `opennms_destination_path`: creates a destination path element in destinationPaths.xml. Requires at a minimum a single target which can be defined with the following LWRP.
+* `opennms_target`: Add a target or escalate target to a destination path (defined either in the default config or with the above LWRP).
 * `opennms_notification`: Create notification elements in notifications.xml.  Supports updating and deleting (action :delete).
 
 #### Node Service Credential Configuration
 
-These LWRPs allow you to define the credentials necessary to connect to services on monitored nodes. These are some of the few that currently implement updating and deleting. Action `:create` will update if changes are detected but `:create_if_missing` will do nothing. To determine if a resource needs to be updated or deleted, existance is determined by all definition element attributes being equal (so all resource attributes except `ranges`, `specifics`, `ip_matches` and `position`). 
+These LWRPs allow you to define the credentials necessary to connect to services on monitored nodes. These are some of the few that currently implement updating and deleting. Action `:create` will update if changes are detected but `:create_if_missing` will do nothing. To determine if a resource needs to be updated or deleted, existance is determined by all definition element attributes being equal (so all resource attributes except `ranges`, `specifics`, `ip_matches` and `position`).
 
-If an update occurs, the values contained in the new resource will be used. Note that all `range`, `specific` and `ip-match` elements that exist currently in the definition will be removed before the new elements are added. 
+If an update occurs, the values contained in the new resource will be used. Note that all `range`, `specific` and `ip-match` elements that exist currently in the definition will be removed before the new elements are added.
 
 Currently implemented are: 
 
-* `opennms_snmp_config_definition`: add a definition element to snmp-config.xml. 
+* `opennms_snmp_config_definition`: add a definition element to snmp-config.xml.
 * `opennms_wmi_config_definition`: add a definition element to wmi-config.xml.
 
 #### Polling
 
-* `opennms_poller_package`: add a package to etc/poller-configuration.xml. Note that an instance of this resource without use of an accompanying `opennms_poller_service` resource will result in a failure to start opennms. 
-* `opennms_poller_service`: add a service to poller package named `poller_name`.  See `opennms::example_poller` for example usage of this and the `opennms_poller_package` resource. 
+* `opennms_poller_package`: add a package to etc/poller-configuration.xml. Note that an instance of this resource without use of an accompanying `opennms_poller_service` resource will result in a failure to start opennms.
+* `opennms_poller_service`: add a service to poller package named `poller_name`.
 
 #### Data Collection
 
@@ -199,28 +200,28 @@ Currently implemented are:
 * `opennms_snmp_collection_group`: adds an include-collection element to an snmp-collection in etc/datacollection-config.xml and drops off the specified cookbook file into etc/datacollection.
 * `opennms_jdbc_query`: adds a query element to a jdbc-collection in etc/jdbc-datacollection-config.xml.
 * `opennms_jmx_mbean`: adds a mbean element to a jmx-collection in etc/jmx-datacollection-config.xml.
-* `opennms_xml_source`: adds a xml-source element to a xml-collection in etc/xml-datacollection-config.xml.
-* `opennms_xml_group`: adds a xml-source element to a xml-source in etc/xml-datacollection-config.xml.
+* `opennms_xml_source`: adds a xml-source element to a xml-collection in etc/xml-datacollection-config.xml. Supports deleting.
+* `opennms_xml_group`: adds a xml-source element to a xml-source in etc/xml-datacollection-config.xml. Supports deleting.
 
 #### Statistics Reports
 
 See `opennms::example_statsd` for example usage of these LWRPs. 
 
 * `opennms_statsd_package`: create a new package optionally with a filter in statsd-configuration.xml.
-* `opennms_statsd_report`: add a report to a package in statsd-configuration.xml. 
+* `opennms_statsd_report`: add a report to a package in statsd-configuration.xml.
 
 #### Graphs
 
-* `opennms_collection_graph_file`: Add a cookbook file containing graph definitions (perhaps generated by the mib compiler) to $ONMS_HOME/etc/snmp-graph.properties.d/. 
+* `opennms_collection_graph_file`: Add a cookbook file containing graph definitions (perhaps generated by the mib compiler) to $ONMS_HOME/etc/snmp-graph.properties.d/.
 * `opennms_collection_graph`: Add a new graph definition to the main (bad idea), new or an existing graph file.
-* `opennms_response_graph`: Add a response graph to $ONMS_HOME/etc/response-graph.properties. Since there's a pretty well defined pattern to these, you can define these with just the name of the data source and it'll create a graph with min, max and average response times. 
+* `opennms_response_graph`: Add a response graph to $ONMS_HOME/etc/response-graph.properties. Since there's a pretty well defined pattern to these, you can define these with just the name of the data source and it'll create a graph with min, max and average response times.
 
 #### Thresholds
 
 See examples for all of these LWRPs are in a single recipe, `example_threshold`.
 
-* `opennms_threshd_package`: Create a new package in threshd-configuration.xml. 
-* `opennms_threshold_group`: Create a new threshold group in thresholds.xml. 
+* `opennms_threshd_package`: Create a new package in threshd-configuration.xml.
+* `opennms_threshold_group`: Create a new threshold group in thresholds.xml.
 * `opennms_threshold`: Create a new threshold in the specified group in thresholds.xml. Supports updating and deleting.
 * `opennms_expression`: Create a new expression threshold in the specified group in thresholds.xml. Supports updating and deleting.
 
@@ -230,15 +231,26 @@ There are a couple LWRPs for managing the Web UI. All of these support updating.
 
 * `opennms_avail_category`: Define categories for use in the Availability box on the main page (and the Summary dashlet in Ops Board).
 * `opennms_avail_view`: Define the list of categories in each view sections displayed in the Availability box on the main page (and the Summary dashlet in Ops Board).
-* `opennms_wallboard`: Create a wallboard. 
+* `opennms_wallboard`: Create a wallboard.
 * `opennms_dashlet`: Add a dashlet to a wallboard.
-* `opennms_surveillance_view`: Manage surveillance views used in the legacy dashboard, Ops Board, and optionally on the front page. Note: does not verify that the categories you reference exist, because there's no ReST interface (yet). 
+* `opennms_surveillance_view`: Manage surveillance views used in the legacy dashboard, Ops Board, and optionally on the front page. Note: does not verify that the categories you reference exist, because there's no ReST interface (yet).
 
 ### Template Overview
 
 Most configuration files are templated and can be overridden with environment, role, or node attributes.  See the default attributes file for a list of configuration items that can be changed in this manner, or keep reading for a brief overview of each template available. Default attribute values set to `nil` mean that the file's default value is commented out in the original file and will remain so unless set to a non-nil value.
 
-Each template can also be overridden in a wrapper cookbook by manipulating the appropriate node attribute. For example, if you've got a pretty heavily customized collectd-configuration.xml file and you don't want to move to the LWRP/library cookbook workflow, turn your custom version into a template (append `.erb` to the filename and optionally add some templating logic to it) and add it to `templates/default` in your wrapper cookbook. Then set `default[:opennms][:collectd][:cookbook]` to the name of your wrapper cookbook. You could also copy all of the templates from this cookbook to your wrapper, edit them all as desired and set `default[:opennms][:default_template_cookbook]` to your wrapper cookbook's name.  
+Each template can also be overridden in a wrapper cookbook by manipulating the appropriate node attribute. For example, if you've got a pretty heavily customized collectd-configuration.xml file and you don't want to move to the LWRP/library cookbook workflow, turn your custom version into a template (append `.erb` to the filename and optionally add some templating logic to it) and add it to `templates/default` in your wrapper cookbook. Then set `default[:opennms][:collectd][:cookbook]` to the name of your wrapper cookbook. You could also copy all of the templates from this cookbook to your wrapper, edit them all as desired and set `default[:opennms][:default_template_cookbook]` to your wrapper cookbook's name.
+
+If you want to skip some of the templates you can get the resource for each out of the resource collection and then set the action to :nothing. Example:
+
+```
+begin
+  sct = resources('template[/opt/opennms/etc/service-configuration.xml')
+  sct.action(:nothing)
+rescue
+  Chef::Log.warn("Unable to find service-configuration.xml template in the resource collection!")
+end
+```
 
 #### etc/availability-reports.xml
 
@@ -469,6 +481,8 @@ default['opennms']['magic_users']['remoting_users']  = ""
 default['opennms']['magic_users']['rest_users']      = "iphone"
 ```
 
+Note that this file isn't a thing in versions >= 19.
+
 #### etc/map.properties
 
 Do you love the old SVG maps but are a contrarian when it comes to color schemes? Have we got the template for you! I guess also useful for translating labels?  Check out the default attributes for details on what you can change.
@@ -514,7 +528,7 @@ can be overridden to alter any of these default notifications:
 * high_threshold
 * low_threshold
 
-in `node['opennms']['notifications']`. Stay tuned for a notification LWRP.
+in `node['opennms']['notifications']`.
 
 #### etc/response-graph.properties
 Change the image format from the default `png` to `gif` or `jpg` (if using jrobin or you like broken images) with `node['response_graph']['image_format']`. Font sizes can also be changed with `node['response_graph']['default_font_size']` and `node['response_graph']['title_font_size']` (defaults are 7 and 10 respectively). Setting these attributes to false removes them from the file:
@@ -567,9 +581,10 @@ Tobi enthusiasts will want to set some attributes in `node['opennms']['rrd']` to
   }
 }
 ```
-TODO: automatically install the appropriate JNI stuff for the target architecture/platform.
 
-You can also change a multitude of queue settings or change the jrobin backend factory, but unless you know what you're doing that's probably a mistake. Look at the template for details if you're curious.
+There's now a recipe that does this for you, named rrdtool. Probably just use that. 
+
+If you're a unique snowflake you can change a multitude of queue settings or change the jrobin backend factory, but unless you know what you're doing that's probably a mistake. Look at the template for details if you're curious.
 
 Finally, to turn on the Google protobuf export thing described at http://www.opennms.org/wiki/Performance_Data_TCP_Export, set these attributes accordingly:
 
@@ -602,8 +617,7 @@ Similar to other *-graph.properties files, you can change the image format used 
 
 #### etc/snmp-graph.properties & snmp-graph.properties.d/*
 
-Similar to other *-graph.properties files, you can change the image format used in predefined graphs by setting the attribute `node['opennms']['snmp_adhoc_graph']['image_format']` t
-o `gif` or `jpg` rather than the default `png`. Note that the intersection of formats supported by both jrobin and rrdtool is `png`, though.
+Similar to other *-graph.properties files, you can change the image format used in predefined graphs by setting the attribute `node['opennms']['snmp_adhoc_graph']['image_format']` to `gif` or `jpg` rather than the default `png`. Note that the intersection of formats supported by both jrobin and rrdtool is `png`, though.
 You can also set the default and title font sizes like you can in the response graphs. Since these graphs are now split up by manufacturer, you can disable graphs for a manufacturer like you can in snmp-datacollection-config.xml. This example disables Dell graphs:
 
 ```
@@ -622,6 +636,8 @@ You can also set the default and title font sizes like you can in the response g
 Note that this doesn't delete that file, it merely comments out the `reports=...` line(s) in the file.
 
 You can also change the default KSC graph by setting `node['snmp_graph']['default_ksc_graph']` to the name of a valid graph.
+
+Also note that releases that use backshift instead of displaying generated images (17+) won't be affected by these changes.
 
 #### etc/statsd-configuration.xml
 
@@ -738,9 +754,10 @@ Development
 So far, tests consist of:
 
 * Style Checks using foodcritic and rubocop. 
-* Basic 'does-it-converge' test kitchen suites
-* You may need to increase your open file limit for test kitchen to work since there are an awful lot of suites.
+* InSpec tests for all the LWRPs.
 
-Use rake to run style checks.
+The default rake task will run the style checks. 
+
+Use `rake integration:vagrant` to run the LWRP tests. You may need to increase your open file limit for test kitchen to work since there are an awful lot of suites. By default it'll run all the suites on all the supported versions, which will probably take a day or more (and rake will for sure run out of RAM before then), or you can specify specific major versions with `-- -v 20,21`. There's also a `-r <INSTANCE_NAME>` option that lets you resume testing after fixing something that failed. 
 
 Pull requests welcome!
