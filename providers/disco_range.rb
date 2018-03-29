@@ -54,7 +54,6 @@ def range_exists?(current_resource) # _name, range_begin, range_end, range_type,
   end
 end
 
-# rubocop:disable Metrics/BlockNesting
 def create_range
   Chef::Log.debug "Adding #{new_resource.range_type}-range to discovery: '#{new_resource.range_begin} - #{new_resource.range_end}'"
   file = ::File.new("#{node['opennms']['conf']['home']}/etc/discovery-configuration.xml")
@@ -118,4 +117,3 @@ def create_range
   end
   Opennms::Helpers.write_xml_file(doc, "#{node['opennms']['conf']['home']}/etc/discovery-configuration.xml")
 end
-# rubocop:enable Metrics/BlockNesting

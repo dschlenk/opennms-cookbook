@@ -382,7 +382,7 @@ module Events
     eventconf_el.add_text(REXML::CData.new("events/#{file}"))
     bottom_ref = 'events/ncs-component.events.xml'
     bottom_ref = 'events/opennms.catch-all.events.xml' if Opennms::Helpers.major(node['opennms']['version']).to_i >= 20
-    ref_ef_el = doc.root.elements["/events/event-file[text() = 'events/ncs-component.events.xml']"]
+    ref_ef_el = doc.root.elements["/events/event-file[text() = '#{bottom_ref}']"]
     if position == 'top'
       top_ref = 'events/Translator.default.events.xml'
       top_ref = 'events/opennms.snmp.trap.translator.events.xml' if Opennms::Helpers.major(node['opennms']['version']).to_i >= 20

@@ -23,7 +23,6 @@ action :create do
   end
 end
 
-# rubocop:disable Metrics/BlockNesting
 def load_current_resource
   @current_resource = Chef::Resource.resource_for_node(:opennms_avail_view_section, node).new(@new_resource.name)
   @current_resource.section(@new_resource.section)
@@ -51,7 +50,6 @@ def load_current_resource
     end
   end
 end
-# rubocop:enable Metrics/BlockNesting
 
 def categories_exist?(group, categories)
   file = ::File.new("#{node['opennms']['conf']['home']}/etc/categories.xml", 'r')

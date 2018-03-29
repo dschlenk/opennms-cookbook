@@ -367,7 +367,7 @@ module Provision
         node_el.add_element 'asset', 'name' => k, 'value' => v
       end
     end
-    Chef::Log.debug "Updating node with #{n.to_s} to #{baseurl(node)}/requisitions/#{foreign_source_name}/nodes with content type xml"
+    Chef::Log.debug "Updating node with #{n} to #{baseurl(node)}/requisitions/#{foreign_source_name}/nodes with content type xml"
     RestClient.post "#{baseurl(node)}/requisitions/#{foreign_source_name}/nodes", n.to_s, content_type: :xml
   end
 
@@ -480,7 +480,6 @@ module Provision
 
   # after must be in SQL query format: '2015-12-17 21:00:00'
   def sync_complete?(foreign_source_name, after, node)
-    complete = false
     require 'rest-client'
     require 'addressable/uri'
     api = 'v1'
@@ -494,20 +493,33 @@ module Provision
         api = 'v2'
       end
     end
-    case(api)
+    case api
     when 'v1'
       url = "#{baseurl(node)}/events?eventUei=uei.opennms.org/internal/importer/importSuccessful&eventParms=%25#{foreign_source_name}%25&comparator=like&query=eventcreatetime >= '#{after}'"
     when 'v2'
-      url =  "#{baseurlv2(node)}/events?_s=eventCreateTime=ge=#{Time.parse(after + " " + Time.now.zone).utc.strftime("%FT%T.%LZ")};eventUei==uei.opennms.org/internal/importer/importSuccessful"
+      url = "#{baseurlv2(node)}/events?_s=eventCreateTime=ge=#{Time.parse(after + ' ' + Time.now.zone).utc.strftime('%FT%T.%LZ')};eventUei==uei.opennms.org/internal/importer/importSuccessful"
     end
     parsed_url = Addressable::URI.parse(url).normalize.to_str
     Chef::Log.debug("sync_complete? URL: '#{parsed_url}'")
     response = RestClient.get(parsed_url, accept: :json).to_str
     # apiv2 returns empty response (204) when nothing found
     events = JSON.parse(response) unless response.nil? || response == ''
-    complete = true if !events.nil? && events.key?('totalCount') && events['totalCount'].to_i > 0
-    complete = false if events.nil? || (api == 'v2' && events['event'].select { |e| mp = e['parameters'].select { |p| p['value'].include?(foreign_source_name) }; !(mp.nil? || mp.empty?) }.empty?)
+    complete = true
+    complete = false if !events.nil? && events.key?('totalCount') && events['totalCount'].to_i == 0
+    if events.nil? || (api == 'v2' && !apiv2synced?(events, foreign_source_name))
+      complete = false
+    end
     complete
+  end
+
+  def apiv2synced?(events, foreign_source_name)
+    events = events['event'].select do |e|
+      mp = e['parameters'].select do |p|
+        p['value'].include?(foreign_source_name)
+      end
+      !(mp.nil? || mp.empty?)
+    end
+    !events.empty?
   end
 
   def sync_import(foreign_source_name, rescan, node)
