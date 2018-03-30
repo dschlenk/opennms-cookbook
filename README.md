@@ -197,10 +197,10 @@ Currently implemented are:
 * `opennms_wmi_collection_service`: adds a service element to a package in etc/collectd-configuration.xml.
 * `opennms_jdbc_collection_service`: adds a service element to a package in etc/collectd-configuration.xml. Supports update & delete.
 * `opennms_jmx_collection_service`: adds a service element to a package in etc/collectd-configuration.xml.
-* `opennms_snmp_collection_group`: adds an include-collection element to an snmp-collection in etc/datacollection-config.xml and drops off the specified cookbook file into etc/datacollection.
+* `opennms_snmp_collection_group`: adds an include-collection element to an snmp-collection in etc/datacollection-config.xml and drops off the specified file into etc/datacollection. Can pull file from remote URL. Supports deleting.
 * `opennms_jdbc_query`: adds a query element to a jdbc-collection in etc/jdbc-datacollection-config.xml.
 * `opennms_jmx_mbean`: adds a mbean element to a jmx-collection in etc/jmx-datacollection-config.xml.
-* `opennms_xml_source`: adds a xml-source element to a xml-collection in etc/xml-datacollection-config.xml. Supports deleting.
+* `opennms_xml_source`: adds a xml-source element to a xml-collection in etc/xml-datacollection-config.xml. Supports deleting. Groups can be imported from files in the cookbook or a URL. 
 * `opennms_xml_group`: adds a xml-source element to a xml-source in etc/xml-datacollection-config.xml. Supports deleting.
 
 #### Statistics Reports
