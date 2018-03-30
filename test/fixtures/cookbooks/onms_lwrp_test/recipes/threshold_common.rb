@@ -2,7 +2,7 @@
 # need to turn on thresholding on ICMP service first
 opennms_poller_service 'ICMP' do
   package_name 'example1'
-  params 'rrd-repository' => '/opt/opennms/share/rrd/response', 'rrd-base-name' => 'icmp', 'ds-name' => 'icmp', 'thresholding-enabled' => 'true'
+  parameters 'rrd-repository' => '/opt/opennms/share/rrd/response', 'rrd-base-name' => 'icmp', 'ds-name' => 'icmp', 'thresholding-enabled' => 'true'
   status 'on'
   timeout 3000
   class_name 'org.opennms.netmgt.poller.monitors.IcmpMonitor'

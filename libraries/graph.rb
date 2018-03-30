@@ -86,7 +86,6 @@ module Graph
   end
 
   # add report 'name' to the reports comma separated list in file 'fn'
-  # rubocop:disable Metrics/BlockNesting
   def add_report(fn, name)
     lines = []
     reports_start = false
@@ -121,5 +120,4 @@ module Graph
     end
     lines
   end
-  # rubocop:enable Metrics/BlockNesting
 end

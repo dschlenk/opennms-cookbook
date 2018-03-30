@@ -4,7 +4,7 @@ def whyrun_supported?
   true
 end
 
-use_inline_resources
+use_inline_resources # ~FC113
 
 action :delete do
   if @current_resource.exists
@@ -49,10 +49,8 @@ action :create_if_missing do
   end
 end
 
-# rubocop:disable Metrics/BlockNesting
 def load_current_resource
-  @current_resource = Chef::Resource::OpennmsEvent.new(@new_resource.name)
-  @current_resource.name(@new_resource.name)
+  @current_resource = Chef::Resource.resource_for_node(:opennms_event, node).new(@new_resource.name)
   @current_resource.uei(@new_resource.uei || @new_resource.name)
   @current_resource.file(@new_resource.file)
   @current_resource.mask(@new_resource.mask)
@@ -87,7 +85,6 @@ def load_current_resource
     end
   end
 end
-# rubocop:enable Metrics/BlockNesting
 
 private
 
@@ -100,7 +97,6 @@ def create_event_file
   add_file_to_eventconf(new_resource.file, 'bottom', node)
 end
 
-# rubocop:disable Metrics/BlockNesting
 def create_event
   uei = new_resource.uei || new_resource.name
   new_resource.uei = uei
@@ -307,4 +303,3 @@ def delete_event
   end
   Opennms::Helpers.write_xml_file(doc, "#{node['opennms']['conf']['home']}/etc/#{new_resource.file}")
 end
-# rubocop:enable Metrics/BlockNesting

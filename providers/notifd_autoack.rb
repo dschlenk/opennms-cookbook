@@ -3,7 +3,7 @@ def whyrun_supported?
   true
 end
 
-use_inline_resources
+use_inline_resources # ~FC113
 
 action :create do
   if @current_resource.exists
@@ -16,8 +16,7 @@ action :create do
 end
 
 def load_current_resource
-  @current_resource = Chef::Resource::OpennmsNotifdAutoack.new(@new_resource.name)
-  @current_resource.name(@new_resource.name)
+  @current_resource = Chef::Resource.resource_for_node(:opennms_notifd_autoack, node).new(@new_resource.name)
   @current_resource.acknowledge(@new_resource.acknowledge)
 
   if autoack_exists?(@current_resource.name, @current_resource.acknowledge)

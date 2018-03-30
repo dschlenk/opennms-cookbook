@@ -3,7 +3,7 @@ def whyrun_supported?
   true
 end
 
-use_inline_resources
+use_inline_resources # ~FC113
 
 action :create do
   if @current_resource.changed
@@ -22,8 +22,7 @@ end
 
 def load_current_resource
   @current_resource =
-    Chef::Resource::OpennmsSurveillanceView.new(@new_resource.name)
-  @current_resource.name(@new_resource.name)
+    Chef::Resource.resource_for_node(:opennms_surveillance_view, node).new(@new_resource.name)
   @current_resource.rows(@new_resource.rows)
   @current_resource.columns(@new_resource.columns)
   @current_resource.default_view(@new_resource.default_view)

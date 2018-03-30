@@ -1,0 +1,2203 @@
+# Log4j Configuration
+#=======================================================
+# Each category is set to a specific logging level. The
+# levels are cumulative, ie. if you set logging to WARN,
+# you will receive all WARN, ERROR, and FATAL messages
+# for that category.
+#
+# FATAL - Very severe error events that will presumably
+#   lead the application to abort
+# ERROR - Error events that might still allow the appli-
+#   cation to continue running
+# WARN  - Potentially harmful situations
+# INFO  - Informational messages that highlight the
+#   progress of the application at coarse-grained level
+# DEBUG - Fine-grained informational events that are most
+#   useful to debug an application
+#
+# The categories also have appenders which designate the
+# location of the log file, output format, etc. More
+# documentation on the options can be found at:
+#
+#   http://jakarta.apache.org/log4j/
+
+#
+# Uncategorized ----------------------------------------
+
+#   The uncategorized log is the catch-all for all Log4j output
+#   that is not appended elsewhere.
+
+log4j.rootCategory=WARN, STDS, UNCATEGORIZED
+
+# stdout,stderr
+<% if @stds.has_key?("level") -%>
+log4j.category.OpenNMS.Stds=<%=@stds[:level]%>, STDS
+<% else -%>
+log4j.category.OpenNMS.Stds=WARN, STDS
+<% end -%>
+log4j.additivity.OpenNMS.Stds=false
+<% if @stds.has_key?("appender") -%>
+log4j.appender.STDS=<%=@stds[:appender]%>
+<% else -%>
+log4j.appender.STDS=org.apache.log4j.RollingFileAppender
+<% end -%>
+<% if @stds.has_key?("max_file_size") -%>
+log4j.appender.STDS.MaxFileSize=<%=@stds[:max_file_size]%>
+<% else -%>
+log4j.appender.STDS.MaxFileSize=50MB
+<% end -%>
+<% if @stds.has_key?("max_backup_index") -%>
+log4j.appender.STDS.MaxBackupIndex=<%=@stds[:max_backup_index]%>
+<% else -%>
+log4j.appender.STDS.MaxBackupIndex=4
+<% end -%>
+<% if @stds.has_key?("file") -%>
+log4j.appender.STDS.File=<%=@stds[:file]%>
+<% else -%>
+log4j.appender.STDS.File=<%=@onms_home%>/logs/daemon/stds.log
+<% end -%>
+<% if @stds.has_key?("layout") -%>
+log4j.appender.STDS.layout=<%=@stds[:layout]%>
+<% else -%>
+log4j.appender.STDS.layout=org.apache.log4j.PatternLayout
+<% end -%>
+<% if @stds.has_key?("conversion_pattern") -%>
+log4j.appender.STDS.layout.ConversionPattern=<%=@stds[:conversion_pattern]%>
+<% else -%>
+log4j.appender.STDS.layout.ConversionPattern=%d %-5p [%t] %c: %m%n
+<% end -%>
+
+<% if @uncategorized.has_key?("appender") -%>
+log4j.appender.UNCATEGORIZED=<%=@uncategorized[:appender]%>
+<% else -%>
+log4j.appender.UNCATEGORIZED=org.apache.log4j.RollingFileAppender
+<% end -%>
+<% if @uncategorized.has_key?("max_file_size") -%>
+log4j.appender.UNCATEGORIZED.MaxFileSize=<%=@uncategorized[:max_file_size]%>
+<% else -%>
+log4j.appender.UNCATEGORIZED.MaxFileSize=100MB
+<% end -%>
+<% if @uncategorized.has_key?("max_backup_index") -%>
+log4j.appender.UNCATEGORIZED.MaxBackupIndex=<%=@uncategorized[:max_backup_index]%>
+<% else -%>
+log4j.appender.UNCATEGORIZED.MaxBackupIndex=4
+<% end -%>
+<% if @uncategorized.has_key?("file") -%>
+log4j.appender.UNCATEGORIZED.File=<%=@uncategorized[:file]%>
+<% else -%>
+log4j.appender.UNCATEGORIZED.File=<%=@onms_home%>/logs/daemon/uncategorized.log
+<% end -%>
+<% if @uncategorized.has_key?("layout") -%>
+log4j.appender.UNCATEGORIZED.layout=<%=@uncategorized[:layout]%>
+<% else -%>
+log4j.appender.UNCATEGORIZED.layout=org.apache.log4j.PatternLayout
+<% end -%>
+<% if @uncategorized.has_key?("conversion_pattern") -%>
+log4j.appender.UNCATEGORIZED.layout.ConversionPattern=<%=@uncategorized[:conversion_pattern]%>
+<% else -%>
+log4j.appender.UNCATEGORIZED.layout.ConversionPattern=%d %-5p [%t] %c: %m%n
+<% end -%>
+
+# Turn logging down on particularly verbose packages
+log4j.logger.OpenNMS.Collectd.org.opennms.netmgt.collectd.DataCollectionConfigFactory=INFO
+log4j.logger.OpenNMS.Collectd.org.opennms.netmgt.collectd.NumericAttributeType=INFO
+log4j.logger.OpenNMS.Collectd.org.opennms.netmgt.collectd.OnmsSnmpCollection=INFO
+
+# Miscellaneous
+<% if @misc.has_key?("level") -%>
+log4j.category.OpenNMS.Miscellaneous=<%=@misc[:level]%>, MISC
+<% else -%>
+log4j.category.OpenNMS.Miscellaneous=INFO, MISC
+<% end -%>
+log4j.additivity.OpenNMS.Miscellaneous=false
+log4j.category.com.mchange=INFO, MISC
+log4j.additivity.com.mchange=false
+log4j.category.mx4j=INFO, MISC
+log4j.additivity.mx4j=false
+log4j.category.org.springframework.security=INFO, MISC
+log4j.additivity.org.springframework.security=false
+log4j.category.org.exolab.castor=INFO, MISC
+log4j.additivity.org.exolab.castor=false
+log4j.category.org.gwtwidgets=INFO, MISC
+log4j.additivity.org.gwtwidgets=false
+log4j.category.org.quartz=INFO, MISC
+log4j.additivity.org.quartz=false
+log4j.category.org.quartz=INFO, MISC
+log4j.additivity.org.quartz=false
+log4j.category.httpclient=INFO, MISC
+log4j.additivity.httpclient=false
+log4j.category.snaq.db=INFO, MISC
+log4j.additivity.snaq.db=false
+log4j.category.org.apache.bsf=INFO, MISC
+log4j.additivity.org.apache.bsf=false
+<% if @misc.has_key?("appender") -%>
+log4j.appender.MISC=<%=@misc[:appender]%>
+<% else -%>
+log4j.appender.MISC=org.apache.log4j.RollingFileAppender
+<% end -%>
+<% if @misc.has_key?("max_file_size") -%>
+log4j.appender.MISC.MaxFileSize=<%=@misc[:max_file_size]%>
+<% else -%>
+log4j.appender.MISC.MaxFileSize=50MB
+<% end -%>
+<% if @misc.has_key?("max_backup_index") -%>
+log4j.appender.MISC.MaxBackupIndex=<%=@misc[:max_backup_index]%>
+<% else -%>
+log4j.appender.MISC.MaxBackupIndex=4
+<% end -%>
+<% if @misc.has_key?("file") -%>
+log4j.appender.MISC.File=<%=@misc[:file]%>
+<% else -%>
+log4j.appender.MISC.File=<%=@onms_home%>/logs/daemon/misc.log
+<% end -%>
+<% if @misc.has_key?("layout") -%>
+log4j.appender.MISC.layout=<%=@misc[:layout]%>
+<% else -%>
+log4j.appender.MISC.layout=org.apache.log4j.PatternLayout
+<% end -%>
+<% if @misc.has_key?("conversion_pattern") -%>
+log4j.appender.MISC.layout.ConversionPattern=<%=@misc[:conversion_pattern]%>
+<% else -%>
+log4j.appender.MISC.layout.ConversionPattern=%d %-5p [%t] %c{1}: %m%n
+<% end -%>
+
+# Hibernate
+log4j.category.OpenNMS.Hibernate=WARN, HIBERNATE
+log4j.additivity.OpenNMS.Hibernate=false
+<% if @hibernate.has_key?("level") -%>
+log4j.category.org.hibernate=<%=@hibernate[:level]%>, HIBERNATE
+<% else -%>
+log4j.category.org.hibernate=INFO, HIBERNATE
+<% end -%>
+log4j.additivity.org.hibernate=false
+log4j.category.org.hibernate.SQL=WARN, HIBERNATE
+log4j.additivity.org.hibernate.SQL=false
+<% if @hibernate.has_key?("appender") -%>
+log4j.appender.HIBERNATE=<%=@hibernate[:appender]%>
+<% else -%>
+log4j.appender.HIBERNATE=org.apache.log4j.RollingFileAppender
+<% end -%>
+<% if @hibernate.has_key?("max_file_size") -%>
+log4j.appender.HIBERNATE.MaxFileSize=<%=@hibernate[:max_file_size]%>
+<% else -%>
+log4j.appender.HIBERNATE.MaxFileSize=50MB
+<% end -%>
+<% if @hibernate.has_key?("max_backup_index") -%>
+log4j.appender.HIBERNATE.MaxBackupIndex=<%=@hibernate[:max_backup_index]%>
+<% else -%>
+log4j.appender.HIBERNATE.MaxBackupIndex=4
+<% end -%>
+<% if @hibernate.has_key?("file") -%>
+log4j.appender.HIBERNATE.File=<%=@hibernate[:file]%>
+<% else -%>
+log4j.appender.HIBERNATE.File=<%=@onms_home%>/logs/daemon/hibernate.log
+<% end -%>
+<% if @hibernate.has_key?("layout") -%>
+log4j.appender.HIBERNATE.layout=<%=@hibernate[:layout]%>
+<% else -%>
+log4j.appender.HIBERNATE.layout=org.apache.log4j.PatternLayout
+<% end -%>
+<% if @hibernate.has_key?("conversion_pattern") -%>
+log4j.appender.HIBERNATE.layout.ConversionPattern=<%=@hibernate[:conversion_pattern]%>
+<% else -%>
+log4j.appender.HIBERNATE.layout.ConversionPattern=%d %-5p [%t] %c{1}: %m%n
+<% end -%>
+
+# Spring
+log4j.category.OpenNMS.Spring=WARN, SPRING
+log4j.additivity.OpenNMS.Spring=false
+<% if @spring.has_key?("level") -%>
+log4j.category.org.springframework=<%=@spring[:level]%>, SPRING
+<% else -%>
+log4j.category.org.springframework=INFO, SPRING
+<% end -%>
+log4j.additivity.org.springframework=false
+<% if @spring.has_key?("appender") -%>
+log4j.appender.SPRING=<%=@spring[:appender]%>
+<% else -%>
+log4j.appender.SPRING=org.apache.log4j.RollingFileAppender
+<% end -%>
+<% if @spring.has_key?("max_file_size") -%>
+log4j.appender.SPRING.MaxFileSize=<%=@spring[:max_file_size]%>
+<% else -%>
+log4j.appender.SPRING.MaxFileSize=50MB
+<% end -%>
+<% if @spring.has_key?("max_backup_index") -%>
+log4j.appender.SPRING.MaxBackupIndex=<%=@spring[:max_backup_index]%>
+<% else -%>
+log4j.appender.SPRING.MaxBackupIndex=4
+<% end -%>
+<% if @spring.has_key?("file") -%>
+log4j.appender.SPRING.File=<%=@spring[:file]%>
+<% else -%>
+log4j.appender.SPRING.File=<%=@onms_home%>/logs/daemon/spring.log
+<% end -%>
+<% if @spring.has_key?("layout") -%>
+log4j.appender.SPRING.layout=<%=@spring[:layout]%>
+<% else -%>
+log4j.appender.SPRING.layout=org.apache.log4j.PatternLayout
+<% end -%>
+<% if @spring.has_key?("conversion_pattern") -%>
+log4j.appender.SPRING.layout.ConversionPattern=<%=@spring[:conversion_pattern]%>
+<% else -%>
+log4j.appender.SPRING.layout.ConversionPattern=%d %-5p [%t] %c{1}: %m%n
+<% end -%>
+
+# Provisiond
+<% if @provisiond.has_key?("level") -%>
+log4j.category.Provisiond=<%=@provisiond[:level]%>, PROVISIOND
+<% else -%>
+log4j.category.Provisiond=INFO, PROVISIOND
+<% end -%>
+log4j.additivity.Provisiond=false
+<% if @provisiond.has_key?("appender") -%>
+log4j.appender.PROVISIOND=<%=@provisiond[:appender]%>
+<% else -%>
+log4j.appender.PROVISIOND=org.apache.log4j.RollingFileAppender
+<% end -%>
+<% if @provisiond.has_key?("max_file_size") -%>
+log4j.appender.PROVISIOND.MaxFileSize=<%=@provisiond[:max_file_size]%>
+<% else -%>
+log4j.appender.PROVISIOND.MaxFileSize=50MB
+<% end -%>
+<% if @provisiond.has_key?("max_backup_index") -%>
+log4j.appender.PROVISIOND.MaxBackupIndex=<%=@provisiond[:max_backup_index]%>
+<% else -%>
+log4j.appender.PROVISIOND.MaxBackupIndex=4
+<% end -%>
+<% if @provisiond.has_key?("file") -%>
+log4j.appender.PROVISIOND.File=<%=@provisiond[:file]%>
+<% else -%>
+log4j.appender.PROVISIOND.File=<%=@onms_home%>/logs/daemon/provisiond.log
+<% end -%>
+<% if @provisiond.has_key?("layout") -%>
+log4j.appender.PROVISIOND.layout=<%=@provisiond[:layout]%>
+<% else -%>
+log4j.appender.PROVISIOND.layout=org.apache.log4j.PatternLayout
+<% end -%>
+<% if @provisiond.has_key?("conversion_pattern") -%>
+log4j.appender.PROVISIOND.layout.ConversionPattern=<%=@provisiond[:conversion_pattern]%>
+<% else -%>
+log4j.appender.PROVISIOND.layout.ConversionPattern=%d %-5p [%t] %c{1}: %m%n
+<% end -%>
+
+# Pinger
+
+log4j.category.OpenNMS.Pinger=WARN, PINGER
+log4j.additivity.OpenNMS.Pinger=false
+<% if @pinger.has_key?("level") -%>
+log4j.category.org.opennms.netmgt.icmp=<%=@pinger[:level]%>, PINGER
+<% else -%>
+log4j.category.org.opennms.netmgt.icmp=WARN, PINGER
+<% end -%>
+log4j.additivity.org.opennms.netmgt.icmp=false
+<% if @pinger.has_key?("appender") -%>
+log4j.appender.PINGER=<%=@pinger[:appender]%>
+<% else -%>
+log4j.appender.PINGER=org.apache.log4j.RollingFileAppender
+<% end -%>
+<% if @pinger.has_key?("max_file_size") -%>
+log4j.appender.PINGER.MaxFileSize=<%=@pinger[:max_file_size]%>
+<% else -%>
+log4j.appender.PINGER.MaxFileSize=100MB
+<% end -%>
+<% if @pinger.has_key?("max_backup_index") -%>
+log4j.appender.PINGER.MaxBackupIndex=<%=@pinger[:max_backup_index]%>
+<% else -%>
+log4j.appender.PINGER.MaxBackupIndex=4
+<% end -%>
+<% if @pinger.has_key?("file") -%>
+log4j.appender.PINGER.File=<%=@pinger[:file]%>
+<% else -%>
+log4j.appender.PINGER.File=<%=@onms_home%>/logs/daemon/pinger.log
+<% end -%>
+<% if @pinger.has_key?("layout") -%>
+log4j.appender.PINGER.layout=<%=@pinger[:layout]%>
+<% else -%>
+log4j.appender.PINGER.layout=org.apache.log4j.PatternLayout
+<% end -%>
+<% if @pinger.has_key?("conversion_pattern") -%>
+log4j.appender.PINGER.layout.ConversionPattern=<%=@pinger[:conversion_pattern]%>
+<% else -%>
+log4j.appender.PINGER.layout.ConversionPattern=%d %-5p [%t] %c{1}: %m%n
+<% end -%>
+
+# Reportd
+<% if @reportd.has_key?("level") -%>
+log4j.category.Reportd=<%=@reportd[:level]%>, REPORTD
+<% else -%>
+log4j.category.Reportd=WARN, REPORTD
+<% end -%>
+log4j.additivity.Reportd=false
+<% if @reportd.has_key?("appender") -%>
+log4j.appender.REPORTD=<%=@reportd[:appender]%>
+<% else -%>
+log4j.appender.REPORTD=org.apache.log4j.RollingFileAppender
+<% end -%>
+<% if @reportd.has_key?("max_file_size") -%>
+log4j.appender.REPORTD.MaxFileSize=<%=@reportd[:max_file_size]%>
+<% else -%>
+log4j.appender.REPORTD.MaxFileSize=50MB
+<% end -%>
+<% if @reportd.has_key?("max_backup_index") -%>
+log4j.appender.REPORTD.MaxBackupIndex=<%=@reportd[:max_backup_index]%>
+<% else -%>
+log4j.appender.REPORTD.MaxBackupIndex=4
+<% end -%>
+<% if @reportd.has_key?("file") -%>
+log4j.appender.REPORTD.File=<%=@reportd[:file]%>
+<% else -%>
+log4j.appender.REPORTD.File=<%=@onms_home%>/logs/daemon/reportd.log
+<% end -%>
+<% if @reportd.has_key?("layout") -%>
+log4j.appender.REPORTD.layout=<%=@reportd[:layout]%>
+<% else -%>
+log4j.appender.REPORTD.layout=org.apache.log4j.PatternLayout
+<% end -%>
+<% if @reportd.has_key?("conversion_pattern") -%>
+log4j.appender.REPORTD.layout.ConversionPattern=<%=@reportd[:conversion_pattern]%>
+<% else -%>
+log4j.appender.REPORTD.layout.ConversionPattern=%d %-5p [%t] %c{1}: %m%n
+<% end -%>
+
+# Ticketer
+<% if @ticketer.has_key?("level") -%>
+log4j.category.OpenNMS.TroubleTicketer=<%=@ticketer[:level]%>, TICKETER
+<% else -%>
+log4j.category.OpenNMS.TroubleTicketer=WARN, TICKETER
+<% end -%>
+log4j.additivity.OpenNMS.TroubleTicketer=false
+<% if @ticketer.has_key?("appender") -%>
+log4j.appender.TICKETER=<%=@ticketer[:appender]%>
+<% else -%>
+log4j.appender.TICKETER=org.apache.log4j.RollingFileAppender
+<% end -%>
+<% if @ticketer.has_key?("max_file_size") -%>
+log4j.appender.TICKETER.MaxFileSize=<%=@ticketer[:max_file_size]%>
+<% else -%>
+log4j.appender.TICKETER.MaxFileSize=100MB
+<% end -%>
+<% if @ticketer.has_key?("max_backup_index") -%>
+log4j.appender.TICKETER.MaxBackupIndex=<%=@ticketer[:max_backup_index]%>
+<% else -%>
+log4j.appender.TICKETER.MaxBackupIndex=4
+<% end -%>
+<% if @ticketer.has_key?("file") -%>
+log4j.appender.TICKETER.File=<%=@ticketer[:file]%>
+<% else -%>
+log4j.appender.TICKETER.File=<%=@onms_home%>/logs/daemon/ticketer.log
+<% end -%>
+<% if @ticketer.has_key?("layout") -%>
+log4j.appender.TICKETER.layout=<%=@ticketer[:layout]%>
+<% else -%>
+log4j.appender.TICKETER.layout=org.apache.log4j.PatternLayout
+<% end -%>
+<% if @ticketer.has_key?("conversion_pattern") -%>
+log4j.appender.TICKETER.layout.ConversionPattern=<%=@ticketer[:conversion_pattern]%>
+<% else -%>
+log4j.appender.TICKETER.layout.ConversionPattern=%d %-5p [%t] %c{1}: %m%n
+<% end -%>
+
+# Eventd
+<% if @eventd.has_key?("level") -%>
+log4j.category.OpenNMS.Eventd=<%=@eventd[:level]%>, EVENTD
+<% else -%>
+log4j.category.OpenNMS.Eventd=WARN, EVENTD
+<% end -%>
+log4j.additivity.OpenNMS.Eventd=false
+<% if @eventd.has_key?("appender") -%>
+log4j.appender.EVENTD=<%=@eventd[:appender]%>
+<% else -%>
+log4j.appender.EVENTD=org.apache.log4j.RollingFileAppender
+<% end -%>
+<% if @eventd.has_key?("max_file_size") -%>
+log4j.appender.EVENTD.MaxFileSize=<%=@eventd[:max_file_size]%>
+<% else -%>
+log4j.appender.EVENTD.MaxFileSize=100MB
+<% end -%>
+<% if @eventd.has_key?("max_backup_index") -%>
+log4j.appender.EVENTD.MaxBackupIndex=<%=@eventd[:max_backup_index]%>
+<% else -%>
+log4j.appender.EVENTD.MaxBackupIndex=4
+<% end -%>
+<% if @eventd.has_key?("file") -%>
+log4j.appender.EVENTD.File=<%=@eventd[:file]%>
+<% else -%>
+log4j.appender.EVENTD.File=<%=@onms_home%>/logs/daemon/eventd.log
+<% end -%>
+<% if @eventd.has_key?("layout") -%>
+log4j.appender.EVENTD.layout=<%=@eventd[:layout]%>
+<% else -%>
+log4j.appender.EVENTD.layout=org.apache.log4j.PatternLayout
+<% end -%>
+<% if @eventd.has_key?("conversion_pattern") -%>
+log4j.appender.EVENTD.layout.ConversionPattern=<%=@eventd[:conversion_pattern]%>
+<% else -%>
+log4j.appender.EVENTD.layout.ConversionPattern=%d %-5p [%t] %c{1}: %m%n
+<% end -%>
+ 
+# Alarmd
+<% if @alarmd.has_key?("level") -%>
+log4j.category.Alarmd=<%=@alarmd[:level]%>, ALARMD
+<% else -%>
+log4j.category.Alarmd=WARN, ALARMD
+<% end -%>
+log4j.additivity.Alarmd=false
+<% if @alarmd.has_key?("appender") -%>
+log4j.appender.ALARMD=<%=@alarmd[:appender]%>
+<% else -%>
+log4j.appender.ALARMD=org.apache.log4j.RollingFileAppender
+<% end -%>
+<% if @alarmd.has_key?("max_file_size") -%>
+log4j.appender.ALARMD.MaxFileSize=<%=@alarmd[:max_file_size]%>
+<% else -%>
+log4j.appender.ALARMD.MaxFileSize=50MB
+<% end -%>
+<% if @alarmd.has_key?("max_backup_index") -%>
+log4j.appender.ALARMD.MaxBackupIndex=<%=@alarmd[:max_backup_index]%>
+<% else -%>
+log4j.appender.ALARMD.MaxBackupIndex=4
+<% end -%>
+<% if @alarmd.has_key?("file") -%>
+log4j.appender.ALARMD.File=<%=@alarmd[:file]%>
+<% else -%>
+log4j.appender.ALARMD.File=<%=@onms_home%>/logs/daemon/alarmd.log
+<% end -%>
+<% if @alarmd.has_key?("layout") -%>
+log4j.appender.ALARMD.layout=<%=@alarmd[:layout]%>
+<% else -%>
+log4j.appender.ALARMD.layout=org.apache.log4j.PatternLayout
+<% end -%>
+<% if @alarmd.has_key?("conversion_pattern") -%>
+log4j.appender.ALARMD.layout.ConversionPattern=<%=@alarmd[:conversion_pattern]%>
+<% else -%>
+log4j.appender.ALARMD.layout.ConversionPattern=%d %-5p [%t] %c{1}: %m%n
+<% end -%>
+
+# Ackd
+<% if @ackd.has_key?("level") -%>
+log4j.category.Ackd=<%=@ackd[:level]%>, ACKD
+<% else -%>
+log4j.category.Ackd=WARN, ACKD
+<% end -%>
+log4j.additivity.Ackd=false
+<% if @ackd.has_key?("appender") -%>
+log4j.appender.ACKD=<%=@ackd[:appender]%>
+<% else -%>
+log4j.appender.ACKD=org.apache.log4j.RollingFileAppender
+<% end -%>
+<% if @ackd.has_key?("max_file_size") -%>
+log4j.appender.ACKD.MaxFileSize=<%=@ackd[:max_file_size]%>
+<% else -%>
+log4j.appender.ACKD.MaxFileSize=50MB
+<% end -%>
+<% if @ackd.has_key?("max_backup_index") -%>
+log4j.appender.ACKD.MaxBackupIndex=<%=@ackd[:max_backup_index]%>
+<% else -%>
+log4j.appender.ACKD.MaxBackupIndex=4
+<% end -%>
+<% if @ackd.has_key?("file") -%>
+log4j.appender.ACKD.File=<%=@ackd[:file]%>
+<% else -%>
+log4j.appender.ACKD.File=<%=@onms_home%>/logs/daemon/ackd.log
+<% end -%>
+<% if @ackd.has_key?("layout") -%>
+log4j.appender.ACKD.layout=<%=@ackd[:layout]%>
+<% else -%>
+log4j.appender.ACKD.layout=org.apache.log4j.PatternLayout
+<% end -%>
+<% if @ackd.has_key?("conversion_pattern") -%>
+log4j.appender.ACKD.layout.ConversionPattern=<%=@ackd[:conversion_pattern]%>
+<% else -%>
+log4j.appender.ACKD.layout.ConversionPattern=%d %-5p [%t] %c{1}: %m%n
+<% end -%>
+
+# Discovery
+<% if @discovery.has_key?("level") -%>
+log4j.category.OpenNMS.Discovery=<%=@discovery[:level]%>, DISCOVERY
+<% else -%>
+log4j.category.OpenNMS.Discovery=WARN, DISCOVERY
+<% end -%>
+log4j.additivity.OpenNMS.Discovery=false
+<% if @discovery.has_key?("appender") -%>
+log4j.appender.DISCOVERY=<%=@discovery[:appender]%>
+<% else -%>
+log4j.appender.DISCOVERY=org.apache.log4j.RollingFileAppender
+<% end -%>
+<% if @discovery.has_key?("max_file_size") -%>
+log4j.appender.DISCOVERY.MaxFileSize=<%=@discovery[:max_file_size]%>
+<% else -%>
+log4j.appender.DISCOVERY.MaxFileSize=100MB
+<% end -%>
+<% if @discovery.has_key?("max_backup_index") -%>
+log4j.appender.DISCOVERY.MaxBackupIndex=<%=@discovery[:max_backup_index]%>
+<% else -%>
+log4j.appender.DISCOVERY.MaxBackupIndex=4
+<% end -%>
+<% if @discovery.has_key?("file") -%>
+log4j.appender.DISCOVERY.File=<%=@discovery[:file]%>
+<% else -%>
+log4j.appender.DISCOVERY.File=<%=@onms_home%>/logs/daemon/discovery.log
+<% end -%>
+<% if @discovery.has_key?("layout") -%>
+log4j.appender.DISCOVERY.layout=<%=@discovery[:layout]%>
+<% else -%>
+log4j.appender.DISCOVERY.layout=org.apache.log4j.PatternLayout
+<% end -%>
+<% if @discovery.has_key?("conversion_pattern") -%>
+log4j.appender.DISCOVERY.layout.ConversionPattern=<%=@discovery[:conversion_pattern]%>
+<% else -%>
+log4j.appender.DISCOVERY.layout.ConversionPattern=%d %-5p [%t] %c{1}: %m%n
+<% end -%>
+
+# Capsd
+<% if @capsd.has_key?("level") -%>
+log4j.category.OpenNMS.Capsd=<%=@capsd[:level]%>, CAPSD
+<% else -%>
+log4j.category.OpenNMS.Capsd=WARN, CAPSD
+<% end -%>
+log4j.additivity.OpenNMS.Capsd=false
+<% if @capsd.has_key?("appender") -%>
+log4j.appender.CAPSD=<%=@capsd[:appender]%>
+<% else -%>
+log4j.appender.CAPSD=org.apache.log4j.RollingFileAppender
+<% end -%>
+<% if @capsd.has_key?("max_file_size") -%>
+log4j.appender.CAPSD.MaxFileSize=<%=@capsd[:max_file_size]%>
+<% else -%>
+log4j.appender.CAPSD.MaxFileSize=100MB
+<% end -%>
+<% if @capsd.has_key?("max_backup_index") -%>
+log4j.appender.CAPSD.MaxBackupIndex=<%=@capsd[:max_backup_index]%>
+<% else -%>
+log4j.appender.CAPSD.MaxBackupIndex=4
+<% end -%>
+<% if @capsd.has_key?("file") -%>
+log4j.appender.CAPSD.File=<%=@capsd[:file]%>
+<% else -%>
+log4j.appender.CAPSD.File=<%=@onms_home%>/logs/daemon/capsd.log
+<% end -%>
+<% if @capsd.has_key?("layout") -%>
+log4j.appender.CAPSD.layout=<%=@capsd[:layout]%>
+<% else -%>
+log4j.appender.CAPSD.layout=org.apache.log4j.PatternLayout
+<% end -%>
+<% if @capsd.has_key?("conversion_pattern") -%>
+log4j.appender.CAPSD.layout.ConversionPattern=<%=@capsd[:conversion_pattern]%>
+<% else -%>
+log4j.appender.CAPSD.layout.ConversionPattern=%d %-5p [%t] %c{1}: %m%n
+<% end -%>
+
+# Notifd
+<% if @notifd.has_key?("level") -%>
+log4j.category.OpenNMS.Notifd=<%=@notifd[:level]%>, NOTIFD
+<% else -%>
+log4j.category.OpenNMS.Notifd=WARN, NOTIFD
+<% end -%>
+log4j.additivity.OpenNMS.Notifd=false
+<% if @notifd.has_key?("appender") -%>
+log4j.appender.NOTIFD=<%=@notifd[:appender]%>
+<% else -%>
+log4j.appender.NOTIFD=org.apache.log4j.RollingFileAppender
+<% end -%>
+<% if @notifd.has_key?("max_file_size") -%>
+log4j.appender.NOTIFD.MaxFileSize=<%=@notifd[:max_file_size]%>
+<% else -%>
+log4j.appender.NOTIFD.MaxFileSize=100MB
+<% end -%>
+<% if @notifd.has_key?("max_backup_index") -%>
+log4j.appender.NOTIFD.MaxBackupIndex=<%=@notifd[:max_backup_index]%>
+<% else -%>
+log4j.appender.NOTIFD.MaxBackupIndex=4
+<% end -%>
+<% if @notifd.has_key?("file") -%>
+log4j.appender.NOTIFD.File=<%=@notifd[:file]%>
+<% else -%>
+log4j.appender.NOTIFD.File=<%=@onms_home%>/logs/daemon/notifd.log
+<% end -%>
+<% if @notifd.has_key?("layout") -%>
+log4j.appender.NOTIFD.layout=<%=@notifd[:layout]%>
+<% else -%>
+log4j.appender.NOTIFD.layout=org.apache.log4j.PatternLayout
+<% end -%>
+<% if @notifd.has_key?("conversion_pattern") -%>
+log4j.appender.NOTIFD.layout.ConversionPattern=<%=@notifd[:conversion_pattern]%>
+<% else -%>
+log4j.appender.NOTIFD.layout.ConversionPattern=%d %-5p [%t] %c{1}: %m%n
+<% end -%>
+
+# Pollers
+<% if @poller.has_key?("level") -%>
+log4j.category.OpenNMS.Poller=<%=@poller[:level]%>, POLLERS
+log4j.additivity.OpenNMS.Poller=false
+log4j.category.PollerBackEnd=<%=@poller[:level]%>, POLLERS
+log4j.additivity.PollerBackEnd=false
+log4j.category.org.opennms.netmgt.poller=<%=@poller[:level]%>, POLLERS
+log4j.additivity.org.opennms.netmgt.poller=false
+log4j.category.org.opennms.sms.monitor=<%=@poller[:level]%>, POLLERS
+log4j.additivity.org.opennms.sms.monitor=false
+log4j.category.org.opennms.features.poller.remote=<%=@poller[:level]%>, POLLERS
+log4j.additivity.org.opennms.features.poller.remote=false
+log4j.category.org.opennms.netmgt.poller.remote=<%=@poller[:level]%>, POLLERS
+log4j.additivity.org.opennms.netmgt.poller.remote=false
+log4j.category.org.opennms.protocols.rt=<%=@poller[:level]%>, POLLERS
+log4j.additivity.org.opennms.protocols.rt=false
+<% else -%>
+log4j.category.OpenNMS.Poller=WARN, POLLERS
+log4j.additivity.OpenNMS.Poller=false
+log4j.category.PollerBackEnd=WARN, POLLERS
+log4j.additivity.PollerBackEnd=false
+log4j.category.org.opennms.netmgt.poller=WARN, POLLERS
+log4j.additivity.org.opennms.netmgt.poller=false
+log4j.category.org.opennms.sms.monitor=WARN, POLLERS
+log4j.additivity.org.opennms.sms.monitor=false
+log4j.category.org.opennms.features.poller.remote=WARN, POLLERS
+log4j.additivity.org.opennms.features.poller.remote=false
+log4j.category.org.opennms.netmgt.poller.remote=WARN, POLLERS
+log4j.additivity.org.opennms.netmgt.poller.remote=false
+log4j.category.org.opennms.protocols.rt=WARN, POLLERS
+log4j.additivity.org.opennms.protocols.rt=false
+<% end -%>
+<% if @poller.has_key?("appender") -%>
+log4j.appender.POLLERS=<%=@poller[:appender]%>
+<% else -%>
+log4j.appender.POLLERS=org.apache.log4j.RollingFileAppender
+<% end -%>
+<% if @poller.has_key?("max_file_size") -%>
+log4j.appender.POLLERS.MaxFileSize=<%=@poller[:max_file_size]%>
+<% else -%>
+log4j.appender.POLLERS.MaxFileSize=100MB
+<% end -%>
+<% if @poller.has_key?("max_backup_index") -%>
+log4j.appender.POLLERS.MaxBackupIndex=<%=@poller[:max_backup_index]%>
+<% else -%>
+log4j.appender.POLLERS.MaxBackupIndex=4
+<% end -%>
+<% if @poller.has_key?("file") -%>
+log4j.appender.POLLERS.File=<%=@poller[:file]%>
+<% else -%>
+log4j.appender.POLLERS.File=<%=@onms_home%>/logs/daemon/poller.log
+<% end -%>
+<% if @poller.has_key?("layout") -%>
+log4j.appender.POLLERS.layout=<%=@poller[:layout]%>
+<% else -%>
+log4j.appender.POLLERS.layout=org.apache.log4j.PatternLayout
+<% end -%>
+<% if @poller.has_key?("conversion_pattern") -%>
+log4j.appender.POLLERS.layout.ConversionPattern=<%=@poller[:conversion_pattern]%>
+<% else -%>
+log4j.appender.POLLERS.layout.ConversionPattern=%d %-5p [%t] %c{1}: %m%n
+<% end -%>
+
+# Snmp Interface Pollers
+<% if @snmpinterfacepoller.has_key?("level") -%>
+log4j.category.OpenNMS.SnmpPoller=<%=@snmpinterfacepoller[:level]%>, SIPOLLERS
+log4j.additivity.OpenNMS.SnmpPoller=false
+log4j.category.org.opennms.netmgt.snmpinterfacepoller=<%=@snmpinterfacepoller[:level]%>, SIPOLLERS
+log4j.additivity.org.opennms.netmgt.snmpinterfacepoller=false
+<% else -%>
+log4j.category.OpenNMS.SnmpPoller=WARN, SIPOLLERS
+log4j.additivity.OpenNMS.SnmpPoller=false
+log4j.category.org.opennms.netmgt.snmpinterfacepoller=WARN, SIPOLLERS
+log4j.additivity.org.opennms.netmgt.snmpinterfacepoller=false
+<% end -%>
+<% if @snmpinterfacepoller.has_key?("appender") -%>
+log4j.appender.SIPOLLERS=<%=@snmpinterfacepoller[:appender]%>
+<% else -%>
+log4j.appender.SIPOLLERS=org.apache.log4j.RollingFileAppender
+<% end -%>
+<% if @snmpinterfacepoller.has_key?("max_file_size") -%>
+log4j.appender.SIPOLLERS.MaxFileSize=<%=@snmpinterfacepoller[:max_file_size]%>
+<% else -%>
+log4j.appender.SIPOLLERS.MaxFileSize=100MB
+<% end -%>
+<% if @snmpinterfacepoller.has_key?("max_backup_index") -%>
+log4j.appender.SIPOLLERS.MaxBackupIndex=<%=@snmpinterfacepoller[:max_backup_index]%>
+<% else -%>
+log4j.appender.SIPOLLERS.MaxBackupIndex=4
+<% end -%>
+<% if @snmpinterfacepoller.has_key?("file") -%>
+log4j.appender.SIPOLLERS.File=<%=@snmpinterfacepoller[:file]%>
+<% else -%>
+log4j.appender.SIPOLLERS.File=<%=@onms_home%>/logs/daemon/snmpinterfacepoller.log
+<% end -%>
+<% if @snmpinterfacepoller.has_key?("layout") -%>
+log4j.appender.SIPOLLERS.layout=<%=@snmpinterfacepoller[:layout]%>
+<% else -%>
+log4j.appender.SIPOLLERS.layout=org.apache.log4j.PatternLayout
+<% end -%>
+<% if @snmpinterfacepoller.has_key?("conversion_pattern") -%>
+log4j.appender.SIPOLLERS.layout.ConversionPattern=<%=@snmpinterfacepoller[:conversion_pattern]%>
+<% else -%>
+log4j.appender.SIPOLLERS.layout.ConversionPattern=%d %-5p [%t] %c{1}: %m%n
+<% end -%>
+
+# Collectd
+<% if @collectd.has_key?("level") -%>
+log4j.category.OpenNMS.Collectd=<%=@collectd[:level]%>, COLLECTD
+<% else -%>
+log4j.category.OpenNMS.Collectd=WARN, COLLECTD
+<% end -%>
+log4j.additivity.OpenNMS.Collectd=false
+<% if @collectd.has_key?("appender") -%>
+log4j.appender.COLLECTD=<%=@collectd[:appender]%>
+<% else -%>
+log4j.appender.COLLECTD=org.apache.log4j.RollingFileAppender
+<% end -%>
+<% if @collectd.has_key?("max_file_size") -%>
+log4j.appender.COLLECTD.MaxFileSize=<%=@collectd[:max_file_size]%>
+<% else -%>
+log4j.appender.COLLECTD.MaxFileSize=100MB
+<% end -%>
+<% if @collectd.has_key?("max_backup_index") -%>
+log4j.appender.COLLECTD.MaxBackupIndex=<%=@collectd[:max_backup_index]%>
+<% else -%>
+log4j.appender.COLLECTD.MaxBackupIndex=4
+<% end -%>
+<% if @collectd.has_key?("file") -%>
+log4j.appender.COLLECTD.File=<%=@collectd[:file]%>
+<% else -%>
+log4j.appender.COLLECTD.File=<%=@onms_home%>/logs/daemon/collectd.log
+<% end -%>
+<% if @collectd.has_key?("layout") -%>
+log4j.appender.COLLECTD.layout=<%=@collectd[:layout]%>
+<% else -%>
+log4j.appender.COLLECTD.layout=org.apache.log4j.PatternLayout
+<% end -%>
+<% if @collectd.has_key?("conversion_pattern") -%>
+log4j.appender.COLLECTD.layout.ConversionPattern=<%=@collectd[:conversion_pattern]%>
+<% else -%>
+log4j.appender.COLLECTD.layout.ConversionPattern=%d %-5p [%t] %c{1}: %m%n
+<% end -%>
+
+# Correlation
+<% if @correlation.has_key?("level") -%>
+log4j.category.OpenNMS.Correlation=<%=@correlation[:level]%>, CORRELATION
+log4j.additivity.OpenNMS.Correlation=false
+log4j.category.org.opennms.netmgt.correlation=<%=@correlation[:level]%>, CORRELATION
+log4j.additivity.org.opennms.netmgt.correlation=false
+<% else -%>
+log4j.category.OpenNMS.Correlation=WARN, CORRELATION
+log4j.additivity.OpenNMS.Correlation=false
+log4j.category.org.opennms.netmgt.correlation=WARN, CORRELATION
+log4j.additivity.org.opennms.netmgt.correlation=false
+<% end -%>
+<% if @correlation.has_key?("appender") -%>
+log4j.appender.CORRELATION=<%=@correlation[:appender]%>
+<% else -%>
+log4j.appender.CORRELATION=org.apache.log4j.RollingFileAppender
+<% end -%>
+<% if @correlation.has_key?("max_file_size") -%>
+log4j.appender.CORRELATION.MaxFileSize=<%=@correlation[:max_file_size]%>
+<% else -%>
+log4j.appender.CORRELATION.MaxFileSize=100MB
+<% end -%>
+<% if @correlation.has_key?("max_backup_index") -%>
+log4j.appender.CORRELATION.MaxBackupIndex=<%=@correlation[:max_backup_index]%>
+<% else -%>
+log4j.appender.CORRELATION.MaxBackupIndex=4
+<% end -%>
+<% if @correlation.has_key?("file") -%>
+log4j.appender.CORRELATION.File=<%=@correlation[:file]%>
+<% else -%>
+log4j.appender.CORRELATION.File=<%=@onms_home%>/logs/daemon/correlation.log
+<% end -%>
+<% if @correlation.has_key?("layout") -%>
+log4j.appender.CORRELATION.layout=<%=@correlation[:layout]%>
+<% else -%>
+log4j.appender.CORRELATION.layout=org.apache.log4j.PatternLayout
+<% end -%>
+<% if @correlation.has_key?("conversion_pattern") -%>
+log4j.appender.CORRELATION.layout.ConversionPattern=<%=@correlation[:conversion_pattern]%>
+<% else -%>
+log4j.appender.CORRELATION.layout.ConversionPattern=%d %-5p [%t] %c{1}: %m%n
+<% end -%>
+
+# Drools engines
+<% if @drools.has_key?("level") -%>
+log4j.category.Drools.Engine=<%=@drools[:level]%>, DROOLSENGINE
+log4j.additivity.Drools.Engine=false
+<% else -%>
+log4j.category.Drools.Engine=WARN, DROOLSENGINE
+log4j.additivity.Drools.Engine=false
+<% end -%>
+<% if @drools.has_key?("appender") -%>
+log4j.appender.DROOLSENGINE=<%=@drools[:appender]%>
+<% else -%>
+log4j.appender.DROOLSENGINE=org.apache.log4j.RollingFileAppender
+<% end -%>
+<% if @drools.has_key?("max_file_size") -%>
+log4j.appender.DROOLSENGINE.MaxFileSize=<%=@drools[:max_file_size]%>
+<% else -%>
+log4j.appender.DROOLSENGINE.MaxFileSize=100MB
+<% end -%>
+<% if @drools.has_key?("max_backup_index") -%>
+log4j.appender.DROOLSENGINE.MaxBackupIndex=<%=@drools[:max_backup_index]%>
+<% else -%>
+log4j.appender.DROOLSENGINE.MaxBackupIndex=4
+<% end -%>
+<% if @drools.has_key?("file") -%>
+log4j.appender.DROOLSENGINE.File=<%=@drools[:file]%>
+<% else -%>
+log4j.appender.DROOLSENGINE.File=<%=@onms_home%>/logs/daemon/drools-engines.log
+<% end -%>
+<% if @drools.has_key?("layout") -%>
+log4j.appender.DROOLSENGINE.layout=<%=@drools[:layout]%>
+<% else -%>
+log4j.appender.DROOLSENGINE.layout=org.apache.log4j.PatternLayout
+<% end -%>
+<% if @drools.has_key?("conversion_pattern") -%>
+log4j.appender.DROOLSENGINE.layout.ConversionPattern=<%=@drools[:conversion_pattern]%>
+<% else -%>
+log4j.appender.DROOLSENGINE.layout.ConversionPattern=%d %-5p [%t] %c{1}: %m%n
+<% end -%>
+
+# Passive Status Keeper
+<% if @passive.has_key?("level") -%>
+log4j.category.OpenNMS.PassiveStatusKeeper=<%=@passive[:level]%>, PASSIVE
+log4j.additivity.OpenNMS.PassiveStatusKeeper=false
+log4j.category.org.opennms.netmgt.passive=<%=@passive[:level]%>, PASSIVE
+log4j.additivity.org.opennms.netmgt.passive=false
+<% else -%>
+log4j.category.OpenNMS.PassiveStatusKeeper=WARN, PASSIVE
+log4j.additivity.OpenNMS.PassiveStatusKeeper=false
+log4j.category.org.opennms.netmgt.passive=WARN, PASSIVE
+log4j.additivity.org.opennms.netmgt.passive=false
+<% end -%>
+<% if @passive.has_key?("appender") -%>
+log4j.appender.PASSIVE=<%=@passive[:appender]%>
+<% else -%>
+log4j.appender.PASSIVE=org.apache.log4j.RollingFileAppender
+<% end -%>
+<% if @passive.has_key?("max_file_size") -%>
+log4j.appender.PASSIVE.MaxFileSize=<%=@passive[:max_file_size]%>
+<% else -%>
+log4j.appender.PASSIVE.MaxFileSize=100MB
+<% end -%>
+<% if @passive.has_key?("max_backup_index") -%>
+log4j.appender.PASSIVE.MaxBackupIndex=<%=@passive[:max_backup_index]%>
+<% else -%>
+log4j.appender.PASSIVE.MaxBackupIndex=4
+<% end -%>
+<% if @passive.has_key?("file") -%>
+log4j.appender.PASSIVE.File=<%=@passive[:file]%>
+<% else -%>
+log4j.appender.PASSIVE.File=<%=@onms_home%>/logs/daemon/passive.log
+<% end -%>
+<% if @passive.has_key?("layout") -%>
+log4j.appender.PASSIVE.layout=<%=@passive[:layout]%>
+<% else -%>
+log4j.appender.PASSIVE.layout=org.apache.log4j.PatternLayout
+<% end -%>
+<% if @passive.has_key?("conversion_pattern") -%>
+log4j.appender.PASSIVE.layout.ConversionPattern=<%=@passive[:conversion_pattern]%>
+<% else -%>
+log4j.appender.PASSIVE.layout.ConversionPattern=%d %-5p [%t] %c{1}: %m%n
+<% end -%>
+
+# Threshd 
+<% if @threshd.has_key?("level") -%>
+log4j.category.OpenNMS.Threshd=<%=@threshd[:level]%>, THRESHD
+log4j.additivity.OpenNMS.Threshd=false
+<% else -%>
+log4j.category.OpenNMS.Threshd=WARN, THRESHD
+log4j.additivity.OpenNMS.Threshd=false
+<% end -%>
+<% if @threshd.has_key?("appender") -%>
+log4j.appender.THRESHD=<%=@threshd[:appender]%>
+<% else -%>
+log4j.appender.THRESHD=org.apache.log4j.RollingFileAppender
+<% end -%>
+<% if @threshd.has_key?("max_file_size") -%>
+log4j.appender.THRESHD.MaxFileSize=<%=@threshd[:max_file_size]%>
+<% else -%>
+log4j.appender.THRESHD.MaxFileSize=100MB
+<% end -%>
+<% if @threshd.has_key?("max_backup_index") -%>
+log4j.appender.THRESHD.MaxBackupIndex=<%=@threshd[:max_backup_index]%>
+<% else -%>
+log4j.appender.THRESHD.MaxBackupIndex=4
+<% end -%>
+<% if @threshd.has_key?("file") -%>
+log4j.appender.THRESHD.File=<%=@threshd[:file]%>
+<% else -%>
+log4j.appender.THRESHD.File=<%=@onms_home%>/logs/daemon/threshd.log
+<% end -%>
+<% if @threshd.has_key?("layout") -%>
+log4j.appender.THRESHD.layout=<%=@threshd[:layout]%>
+<% else -%>
+log4j.appender.THRESHD.layout=org.apache.log4j.PatternLayout
+<% end -%>
+<% if @threshd.has_key?("conversion_pattern") -%>
+log4j.appender.THRESHD.layout.ConversionPattern=<%=@threshd[:conversion_pattern]%>
+<% else -%>
+log4j.appender.THRESHD.layout.ConversionPattern=%d %-5p [%t] %c{1}: %m%n
+<% end -%>
+
+# Trapd
+<% if @trapd.has_key?("level") -%>
+log4j.category.OpenNMS.Trapd=<%=@trapd[:level]%>, TRAPD
+log4j.additivity.OpenNMS.Trapd=false
+<% else -%>
+log4j.category.OpenNMS.Trapd=WARN, TRAPD
+log4j.additivity.OpenNMS.Trapd=false
+<% end -%>
+<% if @trapd.has_key?("appender") -%>
+log4j.appender.TRAPD=<%=@trapd[:appender]%>
+<% else -%>
+log4j.appender.TRAPD=org.apache.log4j.RollingFileAppender
+<% end -%>
+<% if @trapd.has_key?("max_file_size") -%>
+log4j.appender.TRAPD.MaxFileSize=<%=@trapd[:max_file_size]%>
+<% else -%>
+log4j.appender.TRAPD.MaxFileSize=100MB
+<% end -%>
+<% if @trapd.has_key?("max_backup_index") -%>
+log4j.appender.TRAPD.MaxBackupIndex=<%=@trapd[:max_backup_index]%>
+<% else -%>
+log4j.appender.TRAPD.MaxBackupIndex=4
+<% end -%>
+<% if @trapd.has_key?("file") -%>
+log4j.appender.TRAPD.File=<%=@trapd[:file]%>
+<% else -%>
+log4j.appender.TRAPD.File=<%=@onms_home%>/logs/daemon/trapd.log
+<% end -%>
+<% if @trapd.has_key?("layout") -%>
+log4j.appender.TRAPD.layout=<%=@trapd[:layout]%>
+<% else -%>
+log4j.appender.TRAPD.layout=org.apache.log4j.PatternLayout
+<% end -%>
+<% if @trapd.has_key?("conversion_pattern") -%>
+log4j.appender.TRAPD.layout.ConversionPattern=<%=@trapd[:conversion_pattern]%>
+<% else -%>
+log4j.appender.TRAPD.layout.ConversionPattern=%d %-5p [%t] %c{1}: %m%n
+<% end -%>
+ 
+# Actiond
+<% if @actiond.has_key?("level") -%>
+log4j.category.OpenNMS.Actiond=<%=@actiond[:level]%>, ACTIOND
+log4j.additivity.OpenNMS.Actiond=false
+<% else -%>
+log4j.category.OpenNMS.Actiond=WARN, ACTIOND
+log4j.additivity.OpenNMS.Actiond=false
+<% end -%>
+<% if @actiond.has_key?("appender") -%>
+log4j.appender.ACTIOND=<%=@actiond[:appender]%>
+<% else -%>
+log4j.appender.ACTIOND=org.apache.log4j.RollingFileAppender
+<% end -%>
+<% if @actiond.has_key?("max_file_size") -%>
+log4j.appender.ACTIOND.MaxFileSize=<%=@actiond[:max_file_size]%>
+<% else -%>
+log4j.appender.ACTIOND.MaxFileSize=100MB
+<% end -%>
+<% if @actiond.has_key?("max_backup_index") -%>
+log4j.appender.ACTIOND.MaxBackupIndex=<%=@actiond[:max_backup_index]%>
+<% else -%>
+log4j.appender.ACTIOND.MaxBackupIndex=4
+<% end -%>
+<% if @actiond.has_key?("file") -%>
+log4j.appender.ACTIOND.File=<%=@actiond[:file]%>
+<% else -%>
+log4j.appender.ACTIOND.File=<%=@onms_home%>/logs/daemon/actiond.log
+<% end -%>
+<% if @actiond.has_key?("layout") -%>
+log4j.appender.ACTIOND.layout=<%=@actiond[:layout]%>
+<% else -%>
+log4j.appender.ACTIOND.layout=org.apache.log4j.PatternLayout
+<% end -%>
+<% if @actiond.has_key?("conversion_pattern") -%>
+log4j.appender.ACTIOND.layout.ConversionPattern=<%=@actiond[:conversion_pattern]%>
+<% else -%>
+log4j.appender.ACTIOND.layout.ConversionPattern=%d %-5p [%t] %c{1}: %m%n
+<% end -%>
+
+# Scriptd
+<% if @scriptd.has_key?("level") -%>
+log4j.category.OpenNMS.Scriptd=<%=@scriptd[:level]%>, SCRIPTD
+log4j.additivity.OpenNMS.Scriptd=false
+<% else -%>
+log4j.category.OpenNMS.Scriptd=WARN, SCRIPTD
+log4j.additivity.OpenNMS.Scriptd=false
+<% end -%>
+<% if @scriptd.has_key?("appender") -%>
+log4j.appender.SCRIPTD=<%=@scriptd[:appender]%>
+<% else -%>
+log4j.appender.SCRIPTD=org.apache.log4j.RollingFileAppender
+<% end -%>
+<% if @scriptd.has_key?("max_file_size") -%>
+log4j.appender.SCRIPTD.MaxFileSize=<%=@scriptd[:max_file_size]%>
+<% else -%>
+log4j.appender.SCRIPTD.MaxFileSize=100MB
+<% end -%>
+<% if @scriptd.has_key?("max_backup_index") -%>
+log4j.appender.SCRIPTD.MaxBackupIndex=<%=@scriptd[:max_backup_index]%>
+<% else -%>
+log4j.appender.SCRIPTD.MaxBackupIndex=4
+<% end -%>
+<% if @scriptd.has_key?("file") -%>
+log4j.appender.SCRIPTD.File=<%=@scriptd[:file]%>
+<% else -%>
+log4j.appender.SCRIPTD.File=<%=@onms_home%>/logs/daemon/scriptd.log
+<% end -%>
+<% if @scriptd.has_key?("layout") -%>
+log4j.appender.SCRIPTD.layout=<%=@scriptd[:layout]%>
+<% else -%>
+log4j.appender.SCRIPTD.layout=org.apache.log4j.PatternLayout
+<% end -%>
+<% if @scriptd.has_key?("conversion_pattern") -%>
+log4j.appender.SCRIPTD.layout.ConversionPattern=<%=@scriptd[:conversion_pattern]%>
+<% else -%>
+log4j.appender.SCRIPTD.layout.ConversionPattern=%d %-5p [%t] %c{1}: %m%n
+<% end -%>
+
+# RTC
+<% if @rtc.has_key?("level") -%>
+log4j.category.OpenNMS.RTCManager=<%=@rtc[:level]%>, RTC
+log4j.additivity.OpenNMS.RTCManager=false
+<% else -%>
+log4j.category.OpenNMS.RTCManager=WARN, RTC
+log4j.additivity.OpenNMS.RTCManager=false
+<% end -%>
+<% if @rtc.has_key?("appender") -%>
+log4j.appender.RTC=<%=@rtc[:appender]%>
+<% else -%>
+log4j.appender.RTC=org.apache.log4j.RollingFileAppender
+<% end -%>
+<% if @rtc.has_key?("max_file_size") -%>
+log4j.appender.RTC.MaxFileSize=<%=@rtc[:max_file_size]%>
+<% else -%>
+log4j.appender.RTC.MaxFileSize=100MB
+<% end -%>
+<% if @rtc.has_key?("max_backup_index") -%>
+log4j.appender.RTC.MaxBackupIndex=<%=@rtc[:max_backup_index]%>
+<% else -%>
+log4j.appender.RTC.MaxBackupIndex=4
+<% end -%>
+<% if @rtc.has_key?("file") -%>
+log4j.appender.RTC.File=<%=@rtc[:file]%>
+<% else -%>
+log4j.appender.RTC.File=<%=@onms_home%>/logs/daemon/rtc.log
+<% end -%>
+<% if @rtc.has_key?("layout") -%>
+log4j.appender.RTC.layout=<%=@rtc[:layout]%>
+<% else -%>
+log4j.appender.RTC.layout=org.apache.log4j.PatternLayout
+<% end -%>
+<% if @rtc.has_key?("conversion_pattern") -%>
+log4j.appender.RTC.layout.ConversionPattern=<%=@rtc[:conversion_pattern]%>
+<% else -%>
+log4j.appender.RTC.layout.ConversionPattern=%d %-5p [%t] %c{1}: %m%n
+<% end -%>
+ 
+# RTC post data log (do not change conversion pattern)
+<% if @rtcdata.has_key?("level") -%>
+log4j.category.POSTDATALOG=<%=@rtcdata[:level]%>, RTCDATA
+log4j.additivity.POSTDATALOG=false
+<% else -%>
+log4j.category.POSTDATALOG=WARN, RTCDATA
+log4j.additivity.POSTDATALOG=false
+<% end -%>
+<% if @rtcdata.has_key?("appender") -%>
+log4j.appender.RTCDATA=<%=@rtcdata[:appender]%>
+<% else -%>
+log4j.appender.RTCDATA=org.apache.log4j.RollingFileAppender
+<% end -%>
+<% if @rtcdata.has_key?("max_file_size") -%>
+log4j.appender.RTCDATA.MaxFileSize=<%=@rtcdata[:max_file_size]%>
+<% else -%>
+log4j.appender.RTCDATA.MaxFileSize=100MB
+<% end -%>
+<% if @rtcdata.has_key?("max_backup_index") -%>
+log4j.appender.RTCDATA.MaxBackupIndex=<%=@rtcdata[:max_backup_index]%>
+<% else -%>
+log4j.appender.RTCDATA.MaxBackupIndex=4
+<% end -%>
+<% if @rtcdata.has_key?("file") -%>
+log4j.appender.RTCDATA.File=<%=@rtcdata[:file]%>
+<% else -%>
+log4j.appender.RTCDATA.File=<%=@onms_home%>/logs/daemon/rtcdata.log
+<% end -%>
+<% if @rtcdata.has_key?("layout") -%>
+log4j.appender.RTCDATA.layout=<%=@rtcdata[:layout]%>
+<% else -%>
+log4j.appender.RTCDATA.layout=org.apache.log4j.PatternLayout
+<% end -%>
+<% if @rtcdata.has_key?("conversion_pattern") -%>
+log4j.appender.RTCDATA.layout.ConversionPattern=<%=@rtcdata[:conversion_pattern]%>
+<% else -%>
+log4j.appender.RTCDATA.layout.ConversionPattern=%m
+<% end -%>
+ 
+# OutageManager
+<% if @outage.has_key?("level") -%>
+log4j.category.OpenNMS.Outage=WARN, OUTAGE
+log4j.additivity.OpenNMS.Outage=false
+<%=@outage[:level]%>
+<% else -%>
+log4j.category.OpenNMS.Outage=WARN, OUTAGE
+log4j.additivity.OpenNMS.Outage=false
+<% end -%>
+<% if @outage.has_key?("appender") -%>
+log4j.appender.OUTAGE=<%=@outage[:appender]%>
+<% else -%>
+log4j.appender.OUTAGE=org.apache.log4j.RollingFileAppender
+<% end -%>
+<% if @outage.has_key?("max_file_size") -%>
+log4j.appender.OUTAGE.MaxFileSize=<%=@outage[:max_file_size]%>
+<% else -%>
+log4j.appender.OUTAGE.MaxFileSize=100MB
+<% end -%>
+<% if @outage.has_key?("max_backup_index") -%>
+log4j.appender.OUTAGE.MaxBackupIndex=<%=@outage[:max_backup_index]%>
+<% else -%>
+log4j.appender.OUTAGE.MaxBackupIndex=4
+<% end -%>
+<% if @outage.has_key?("file") -%>
+log4j.appender.OUTAGE.File=<%=@outage[:file]%>
+<% else -%>
+log4j.appender.OUTAGE.File=<%=@onms_home%>/logs/daemon/outage.log
+<% end -%>
+<% if @outage.has_key?("layout") -%>
+log4j.appender.OUTAGE.layout=<%=@outage[:layout]%>
+<% else -%>
+log4j.appender.OUTAGE.layout=org.apache.log4j.PatternLayout
+<% end -%>
+<% if @outage.has_key?("conversion_pattern") -%>
+log4j.appender.OUTAGE.layout.ConversionPattern=<%=@outage[:conversion_pattern]%>
+<% else -%>
+log4j.appender.OUTAGE.layout.ConversionPattern=%d %-5p [%t] %c{1}: %m%n
+<% end -%>
+
+# EventTranslator
+<% if @translator.has_key?("level") -%>
+log4j.category.OpenNMS.EventTranslator=<%=@translator[:level]%>, TRANSLATOR
+log4j.additivity.OpenNMS.EventTranslator=false
+<% else -%>
+log4j.category.OpenNMS.EventTranslator=WARN, TRANSLATOR
+log4j.additivity.OpenNMS.EventTranslator=false
+<% end -%>
+<% if @translator.has_key?("appender") -%>
+log4j.appender.TRANSLATOR=<%=@translator[:appender]%>
+<% else -%>
+log4j.appender.TRANSLATOR=org.apache.log4j.RollingFileAppender
+<% end -%>
+<% if @translator.has_key?("max_file_size") -%>
+log4j.appender.TRANSLATOR.MaxFileSize=<%=@translator[:max_file_size]%>
+<% else -%>
+log4j.appender.TRANSLATOR.MaxFileSize=100MB
+<% end -%>
+<% if @translator.has_key?("max_backup_index") -%>
+log4j.appender.TRANSLATOR.MaxBackupIndex=<%=@translator[:max_backup_index]%>
+<% else -%>
+log4j.appender.TRANSLATOR.MaxBackupIndex=4
+<% end -%>
+<% if @translator.has_key?("file") -%>
+log4j.appender.TRANSLATOR.File=<%=@translator[:file]%>
+<% else -%>
+log4j.appender.TRANSLATOR.File=<%=@onms_home%>/logs/daemon/translator.log
+<% end -%>
+<% if @translator.has_key?("layout") -%>
+log4j.appender.TRANSLATOR.layout=<%=@translator[:layout]%>
+<% else -%>
+log4j.appender.TRANSLATOR.layout=org.apache.log4j.PatternLayout
+<% end -%>
+<% if @translator.has_key?("conversion_pattern") -%>
+log4j.appender.TRANSLATOR.layout.ConversionPattern=<%=@translator[:conversion_pattern]%>
+<% else -%>
+log4j.appender.TRANSLATOR.layout.ConversionPattern=%d %-5p [%t] %c{1}: %m%n
+<% end -%>
+
+# Vacuumd
+<% if @vacuum.has_key?("level") -%>
+log4j.category.OpenNMS.Vacuumd=<%=@vacuum[:level]%>, VACUUM
+log4j.additivity.OpenNMS.Vacuumd=false
+<% else -%>
+log4j.category.OpenNMS.Vacuumd=WARN, VACUUM
+log4j.additivity.OpenNMS.Vacuumd=false
+<% end -%>
+<% if @vacuum.has_key?("appender") -%>
+log4j.appender.VACUUM=<%=@vacuum[:appender]%>
+<% else -%>
+log4j.appender.VACUUM=org.apache.log4j.RollingFileAppender
+<% end -%>
+<% if @vacuum.has_key?("max_file_size") -%>
+log4j.appender.VACUUM.MaxFileSize=<%=@vacuum[:max_file_size]%>
+<% else -%>
+log4j.appender.VACUUM.MaxFileSize=100MB
+<% end -%>
+<% if @vacuum.has_key?("max_backup_index") -%>
+log4j.appender.VACUUM.MaxBackupIndex=<%=@vacuum[:max_backup_index]%>
+<% else -%>
+log4j.appender.VACUUM.MaxBackupIndex=4
+<% end -%>
+<% if @vacuum.has_key?("file") -%>
+log4j.appender.VACUUM.File=<%=@vacuum[:file]%>
+<% else -%>
+log4j.appender.VACUUM.File=<%=@onms_home%>/logs/daemon/vacuumd.log
+<% end -%>
+<% if @vacuum.has_key?("layout") -%>
+log4j.appender.VACUUM.layout=<%=@vacuum[:layout]%>
+<% else -%>
+log4j.appender.VACUUM.layout=org.apache.log4j.PatternLayout
+<% end -%>
+<% if @vacuum.has_key?("conversion_pattern") -%>
+log4j.appender.VACUUM.layout.ConversionPattern=<%=@vacuum[:conversion_pattern]%>
+<% else -%>
+log4j.appender.VACUUM.layout.ConversionPattern=%d %-5p [%t] %c{1}: %m%n
+<% end -%>
+
+# Manager
+<% if @manager.has_key?("level") -%>
+log4j.category.OpenNMS.Manager=<%=@manager[:level]%>, MANAGER
+log4j.additivity.OpenNMS.Manager=false
+<% else -%>
+log4j.category.OpenNMS.Manager=DEBUG, MANAGER
+log4j.additivity.OpenNMS.Manager=false
+<% end -%>
+<% if @manager.has_key?("appender") -%>
+log4j.appender.MANAGER=<%=@manager[:appender]%>
+<% else -%>
+log4j.appender.MANAGER=org.apache.log4j.RollingFileAppender
+<% end -%>
+<% if @manager.has_key?("max_file_size") -%>
+log4j.appender.MANAGER.MaxFileSize=<%=@manager[:max_file_size]%>
+<% else -%>
+log4j.appender.MANAGER.MaxFileSize=100MB
+<% end -%>
+<% if @manager.has_key?("max_backup_index") -%>
+log4j.appender.MANAGER.MaxBackupIndex=<%=@manager[:max_backup_index]%>
+<% else -%>
+log4j.appender.MANAGER.MaxBackupIndex=4
+<% end -%>
+<% if @manager.has_key?("file") -%>
+log4j.appender.MANAGER.File=<%=@manager[:file]%>
+<% else -%>
+log4j.appender.MANAGER.File=<%=@onms_home%>/logs/daemon/manager.log
+<% end -%>
+<% if @manager.has_key?("layout") -%>
+log4j.appender.MANAGER.layout=<%=@manager[:layout]%>
+<% else -%>
+log4j.appender.MANAGER.layout=org.apache.log4j.PatternLayout
+<% end -%>
+<% if @manager.has_key?("conversion_pattern") -%>
+log4j.appender.MANAGER.layout.ConversionPattern=<%=@manager[:conversion_pattern]%>
+<% else -%>
+log4j.appender.MANAGER.layout.ConversionPattern=%d %-5p [%t] %c{1}: %m%n
+<% end -%>
+ 
+# Queued
+<% if @queued.has_key?("level") -%>
+log4j.category.OpenNMS.Queued=<%=@queued[:level]%>, QUEUED
+log4j.additivity.OpenNMS.Queued=false
+<% else -%>
+log4j.category.OpenNMS.Queued=WARN, QUEUED
+log4j.additivity.OpenNMS.Queued=false
+<% end -%>
+<% if @queued.has_key?("appender") -%>
+log4j.appender.QUEUED=<%=@queued[:appender]%>
+<% else -%>
+log4j.appender.QUEUED=org.apache.log4j.RollingFileAppender
+<% end -%>
+<% if @queued.has_key?("max_file_size") -%>
+log4j.appender.QUEUED.MaxFileSize=<%=@queued[:max_file_size]%>
+<% else -%>
+log4j.appender.QUEUED.MaxFileSize=100MB
+<% end -%>
+<% if @queued.has_key?("max_backup_index") -%>
+log4j.appender.QUEUED.MaxBackupIndex=<%=@queued[:max_backup_index]%>
+<% else -%>
+log4j.appender.QUEUED.MaxBackupIndex=4
+<% end -%>
+<% if @queued.has_key?("file") -%>
+log4j.appender.QUEUED.File=<%=@queued[:file]%>
+<% else -%>
+log4j.appender.QUEUED.File=<%=@onms_home%>/logs/daemon/queued.log
+<% end -%>
+<% if @queued.has_key?("layout") -%>
+log4j.appender.QUEUED.layout=<%=@queued[:layout]%>
+<% else -%>
+log4j.appender.QUEUED.layout=org.apache.log4j.PatternLayout
+<% end -%>
+<% if @queued.has_key?("conversion_pattern") -%>
+log4j.appender.QUEUED.layout.ConversionPattern=<%=@queued[:conversion_pattern]%>
+<% else -%>
+log4j.appender.QUEUED.layout.ConversionPattern=%d %-5p [%t] %c{1}: %m%n
+<% end -%>
+
+# Jetty Server
+<% if @jetty.has_key?("level") -%>
+log4j.category.OpenNMS.JettyServer=<%=@jetty[:level]%>, JETTY
+log4j.additivity.OpenNMS.JettyServer=false
+log4j.category.org.opennms.netmgt.jetty=<%=@jetty[:level]%>, JETTY
+log4j.additivity.org.opennms.netmgt.jetty=false
+<% else -%>
+log4j.category.OpenNMS.JettyServer=WARN, JETTY
+log4j.additivity.OpenNMS.JettyServer=false
+log4j.category.org.opennms.netmgt.jetty=WARN, JETTY
+log4j.additivity.org.opennms.netmgt.jetty=false
+<% end -%>
+log4j.category.org.mortbay=INFO, JETTY
+log4j.additivity.org.mortbay=false
+log4j.category.org.eclipse.jetty=INFO, JETTY
+log4j.additivity.org.eclipse.jetty=false
+<% if @jetty.has_key?("appender") -%>
+log4j.appender.JETTY=<%=@jetty[:appender]%>
+<% else -%>
+log4j.appender.JETTY=org.apache.log4j.RollingFileAppender
+<% end -%>
+<% if @jetty.has_key?("max_file_size") -%>
+log4j.appender.JETTY.MaxFileSize=<%=@jetty[:max_file_size]%>
+<% else -%>
+log4j.appender.JETTY.MaxFileSize=100MB
+<% end -%>
+<% if @jetty.has_key?("max_backup_index") -%>
+log4j.appender.JETTY.MaxBackupIndex=<%=@jetty[:max_backup_index]%>
+<% else -%>
+log4j.appender.JETTY.MaxBackupIndex=4
+<% end -%>
+<% if @jetty.has_key?("file") -%>
+log4j.appender.JETTY.File=<%=@jetty[:file]%>
+<% else -%>
+log4j.appender.JETTY.File=<%=@onms_home%>/logs/webapp/jetty.log
+<% end -%>
+<% if @jetty.has_key?("layout") -%>
+log4j.appender.JETTY.layout=<%=@jetty[:layout]%>
+<% else -%>
+log4j.appender.JETTY.layout=org.apache.log4j.PatternLayout
+<% end -%>
+<% if @jetty.has_key?("conversion_pattern") -%>
+log4j.appender.JETTY.layout.ConversionPattern=<%=@jetty[:conversion_pattern]%>
+<% else -%>
+log4j.appender.JETTY.layout.ConversionPattern=%d %-5p [%t] %c{1}: %m%n
+<% end -%>
+
+# Web UI (main)
+<% if @web.has_key?("level") -%>
+log4j.category.OpenNMS.WEB=<%=@web[:level]%>, WEB
+log4j.additivity.OpenNMS.WEB=false
+log4j.category.org.opennms.web=<%=@web[:level]%>, WEB
+log4j.additivity.org.opennms.web=false
+log4j.category.com.google.gwt.user.server=<%=@web[:level]%>, WEB
+log4j.additivity.com.google.gwt.user.server=false
+<% else -%>
+log4j.category.OpenNMS.WEB=WARN, WEB
+log4j.additivity.OpenNMS.WEB=false
+log4j.category.org.opennms.web=WARN, WEB
+log4j.additivity.org.opennms.web=false
+log4j.category.com.google.gwt.user.server=WARN, WEB
+log4j.additivity.com.google.gwt.user.server=false
+<% end -%>
+<% if @web.has_key?("appender") -%>
+log4j.appender.WEB=<%=@web[:appender]%>
+<% else -%>
+log4j.appender.WEB=org.apache.log4j.RollingFileAppender
+<% end -%>
+<% if @web.has_key?("max_file_size") -%>
+log4j.appender.WEB.MaxFileSize=<%=@web[:max_file_size]%>
+<% else -%>
+log4j.appender.WEB.MaxFileSize=100MB
+<% end -%>
+<% if @web.has_key?("max_backup_index") -%>
+log4j.appender.WEB.MaxBackupIndex=<%=@web[:max_backup_index]%>
+<% else -%>
+log4j.appender.WEB.MaxBackupIndex=4
+<% end -%>
+<% if @web.has_key?("file") -%>
+log4j.appender.WEB.File=<%=@web[:file]%>
+<% else -%>
+log4j.appender.WEB.File=<%=@onms_home%>/logs/webapp/web.log
+<% end -%>
+<% if @web.has_key?("layout") -%>
+log4j.appender.WEB.layout=<%=@web[:layout]%>
+<% else -%>
+log4j.appender.WEB.layout=org.apache.log4j.PatternLayout
+<% end -%>
+<% if @web.has_key?("conversion_pattern") -%>
+log4j.appender.WEB.layout.ConversionPattern=<%=@web[:conversion_pattern]%>
+<% else -%>
+log4j.appender.WEB.layout.ConversionPattern=%d %-5p [%t] %c{1}: %m%n
+<% end -%>
+
+# Web UI (Authentication)
+<% if @webauth.has_key?("level") -%>
+log4j.category.OpenNMS.WEB.AUTH=<%=@webauth[:level]%>, WEBAUTH
+log4j.additivity.OpenNMS.WEB.AUTH=false
+<% else -%>
+log4j.category.OpenNMS.WEB.AUTH=WARN, WEBAUTH
+log4j.additivity.OpenNMS.WEB.AUTH=false
+<% end -%>
+<% if @webauth.has_key?("appender") -%>
+log4j.appender.WEBAUTH=<%=@webauth[:appender]%>
+<% else -%>
+log4j.appender.WEBAUTH=org.apache.log4j.RollingFileAppender
+<% end -%>
+<% if @webauth.has_key?("max_file_size") -%>
+log4j.appender.WEBAUTH.MaxFileSize=<%=@webauth[:max_file_size]%>
+<% else -%>
+log4j.appender.WEBAUTH.MaxFileSize=2MB
+<% end -%>
+<% if @webauth.has_key?("max_backup_index") -%>
+log4j.appender.WEBAUTH.MaxBackupIndex=<%=@webauth[:max_backup_index]%>
+<% else -%>
+log4j.appender.WEBAUTH.MaxBackupIndex=2
+<% end -%>
+<% if @webauth.has_key?("file") -%>
+log4j.appender.WEBAUTH.File=<%=@webauth[:file]%>
+<% else -%>
+log4j.appender.WEBAUTH.File=<%=@onms_home%>/logs/webapp/webauth.log
+<% end -%>
+<% if @webauth.has_key?("layout") -%>
+log4j.appender.WEBAUTH.layout=<%=@webauth[:layout]%>
+<% else -%>
+log4j.appender.WEBAUTH.layout=org.apache.log4j.PatternLayout
+<% end -%>
+<% if @webauth.has_key?("conversion_pattern") -%>
+log4j.appender.WEBAUTH.layout.ConversionPattern=<%=@webauth[:conversion_pattern]%>
+<% else -%>
+log4j.appender.WEBAUTH.layout.ConversionPattern=%d %-5p [%t] %c{1}: %m%n
+<% end -%>
+
+# Web UI (RTC communication)
+<% if @web_rtc.has_key?("level") -%>
+log4j.category.OpenNMS.WEB.RTC=<%=@web_rtc[:level]%>, WEBRTC
+log4j.additivity.OpenNMS.WEB.RTC=false
+<% else -%>
+log4j.category.OpenNMS.WEB.RTC=WARN, WEBRTC
+log4j.additivity.OpenNMS.WEB.RTC=false
+<% end -%>
+<% if @web_rtc.has_key?("appender") -%>
+log4j.appender.WEBRTC=<%=@web_rtc[:appender]%>
+<% else -%>
+log4j.appender.WEBRTC=org.apache.log4j.RollingFileAppender
+<% end -%>
+<% if @web_rtc.has_key?("max_file_size") -%>
+log4j.appender.WEBRTC.MaxFileSize=<%=@web_rtc[:max_file_size]%>
+<% else -%>
+log4j.appender.WEBRTC.MaxFileSize=2MB
+<% end -%>
+<% if @web_rtc.has_key?("max_backup_index") -%>
+log4j.appender.WEBRTC.MaxBackupIndex=<%=@web_rtc[:max_backup_index]%>
+<% else -%>
+log4j.appender.WEBRTC.MaxBackupIndex=2
+<% end -%>
+<% if @web_rtc.has_key?("file") -%>
+log4j.appender.WEBRTC.File=<%=@web_rtc[:file]%>
+<% else -%>
+log4j.appender.WEBRTC.File=<%=@onms_home%>/logs/webapp/web-rtc.log
+<% end -%>
+<% if @web_rtc.has_key?("layout") -%>
+log4j.appender.WEBRTC.layout=<%=@web_rtc[:layout]%>
+<% else -%>
+log4j.appender.WEBRTC.layout=org.apache.log4j.PatternLayout
+<% end -%>
+<% if @web_rtc.has_key?("conversion_pattern") -%>
+log4j.appender.WEBRTC.layout.ConversionPattern=<%=@web_rtc[:conversion_pattern]%>
+<% else -%>
+log4j.appender.WEBRTC.layout.ConversionPattern=%d %-5p [%t] %c{1}: %m%n
+<% end -%>
+
+# Tomcat internal logs (xml readers, etc)
+<% if @tomcat_internal.has_key?("level") -%>
+log4j.category.org.apache.commons=<%=@tomcat_internal[:level]%>, TOMCAT-INTERNAL 
+log4j.additivity.org.apache.commons=false
+log4j.category.org.apache.coyote=<%=@tomcat_internal[:level]%>, TOMCAT-INTERNAL
+log4j.additivity.org.apache.coyote=false
+<% else -%>
+log4j.category.org.apache.commons=WARN, TOMCAT-INTERNAL 
+log4j.additivity.org.apache.commons=false
+log4j.category.org.apache.coyote=WARN, TOMCAT-INTERNAL
+log4j.additivity.org.apache.coyote=false
+<% end -%>
+<% if @tomcat_internal.has_key?("appender") -%>
+log4j.appender.TOMCAT-INTERNAL=<%=@tomcat_internal[:appender]%>
+<% else -%>
+log4j.appender.TOMCAT-INTERNAL=org.apache.log4j.RollingFileAppender
+<% end -%>
+<% if @tomcat_internal.has_key?("max_file_size") -%>
+log4j.appender.TOMCAT-INTERNAL.MaxFileSize=<%=@tomcat_internal[:max_file_size]%>
+<% else -%>
+log4j.appender.TOMCAT-INTERNAL.MaxFileSize=100MB
+<% end -%>
+<% if @tomcat_internal.has_key?("max_backup_index") -%>
+log4j.appender.TOMCAT-INTERNAL.MaxBackupIndex=<%=@tomcat_internal[:max_backup_index]%>
+<% else -%>
+log4j.appender.TOMCAT-INTERNAL.MaxBackupIndex=2
+<% end -%>
+<% if @tomcat_internal.has_key?("file") -%>
+log4j.appender.TOMCAT-INTERNAL.File=<%=@tomcat_internal[:file]%>
+<% else -%>
+log4j.appender.TOMCAT-INTERNAL.File=<%=@onms_home%>/logs/webapp/tomcat-internal.log
+<% end -%>
+<% if @tomcat_internal.has_key?("layout") -%>
+log4j.appender.TOMCAT-INTERNAL.layout=<%=@tomcat_internal[:layout]%>
+<% else -%>
+log4j.appender.TOMCAT-INTERNAL.layout=org.apache.log4j.PatternLayout
+<% end -%>
+<% if @tomcat_internal.has_key?("conversion_pattern") -%>
+log4j.appender.TOMCAT-INTERNAL.layout.ConversionPattern=<%=@tomcat_internal[:conversion_pattern]%>
+<% else -%>
+log4j.appender.TOMCAT-INTERNAL.layout.ConversionPattern=%d %-5p [%t] %c: %m%n
+<% end -%>
+
+# DHCP daemon server
+<% if @dhcpd.has_key?("level") -%>
+log4j.category.OpenNMS.Dhcpd=<%=@dhcpd[:level]%>, DHCPD
+log4j.additivity.OpenNMS.Dhcpd=false
+<% else -%>
+log4j.category.OpenNMS.Dhcpd=WARN, DHCPD
+log4j.additivity.OpenNMS.Dhcpd=false
+<% end -%>
+<% if @dhcpd.has_key?("appender") -%>
+log4j.appender.DHCPD<%=@dhcpd[:appender]%>
+<% else -%>
+log4j.appender.DHCPD=org.apache.log4j.RollingFileAppender
+<% end -%>
+<% if @dhcpd.has_key?("max_file_size") -%>
+log4j.appender.DHCPD.MaxFileSize=<%=@dhcpd[:max_file_size]%>
+<% else -%>
+log4j.appender.DHCPD.MaxFileSize=100MB
+<% end -%>
+<% if @dhcpd.has_key?("max_backup_index") -%>
+log4j.appender.DHCPD.MaxBackupIndex=<%=@dhcpd[:max_backup_index]%>
+<% else -%>
+log4j.appender.DHCPD.MaxBackupIndex=4
+<% end -%>
+<% if @dhcpd.has_key?("file") -%>
+log4j.appender.DHCPD.File=<%=@dhcpd[:file]%>
+<% else -%>
+log4j.appender.DHCPD.File=<%=@onms_home%>/logs/daemon/dhcpd.log
+<% end -%>
+<% if @dhcpd.has_key?("layout") -%>
+log4j.appender.DHCPD.layout=<%=@dhcpd[:layout]%>
+<% else -%>
+log4j.appender.DHCPD.layout=org.apache.log4j.PatternLayout
+<% end -%>
+<% if @dhcpd.has_key?("conversion_pattern") -%>
+log4j.appender.DHCPD.layout.ConversionPattern=<%=@dhcpd[:conversion_pattern]%>
+<% else -%>
+log4j.appender.DHCPD.layout.ConversionPattern=%d %-5p [%t] %c{1}: %m%n
+<% end -%>
+
+# Vulnerability scanning daemon
+<% if @vulnscand.has_key?("level") -%>
+log4j.category.OpenNMS.Vulnscand=<%=@vulnscand[:level]%>, VULNSCAND
+log4j.additivity.OpenNMS.Vulnscand=false
+<% else -%>
+log4j.category.OpenNMS.Vulnscand=WARN, VULNSCAND
+log4j.additivity.OpenNMS.Vulnscand=false
+<% end -%>
+<% if @vulnscand.has_key?("appender") -%>
+log4j.appender.VULNSCAND=<%=@vulnscand[:appender]%>
+<% else -%>
+log4j.appender.VULNSCAND=org.apache.log4j.RollingFileAppender
+<% end -%>
+<% if @vulnscand.has_key?("max_file_size") -%>
+log4j.appender.VULNSCAND.MaxFileSize=<%=@vulnscand[:max_file_size]%>
+<% else -%>
+log4j.appender.VULNSCAND.MaxFileSize=50MB
+<% end -%>
+<% if @vulnscand.has_key?("max_backup_index") -%>
+log4j.appender.VULNSCAND.MaxBackupIndex=<%=@vulnscand[:max_backup_index]%>
+<% else -%>
+log4j.appender.VULNSCAND.MaxBackupIndex=4
+<% end -%>
+<% if @vulnscand.has_key?("file") -%>
+log4j.appender.VULNSCAND.File=<%=@vulnscand[:file]%>
+<% else -%>
+log4j.appender.VULNSCAND.File=<%=@onms_home%>/logs/daemon/vulnscand.log
+<% end -%>
+<% if @vulnscand.has_key?("layout") -%>
+log4j.appender.VULNSCAND.layout=<%=@vulnscand[:layout]%>
+<% else -%>
+log4j.appender.VULNSCAND.layout=org.apache.log4j.PatternLayout
+<% end -%>
+<% if @vulnscand.has_key?("conversion_pattern") -%>
+log4j.appender.VULNSCAND.layout.ConversionPattern=<%=@vulnscand[:conversion_pattern]%>
+<% else -%>
+log4j.appender.VULNSCAND.layout.ConversionPattern=%d %-5p [%t] %c{1}: %m%n
+<% end -%>
+
+# Syslogd
+<% if @syslogd.has_key?("level") -%>
+log4j.category.OpenNMS.Syslogd=<%=@syslogd[:level]%>, SYSLOGD
+log4j.additivity.OpenNMS.Syslogd=false
+<% else -%>
+log4j.category.OpenNMS.Syslogd=WARN, SYSLOGD
+log4j.additivity.OpenNMS.Syslogd=false
+<% end -%>
+<% if @syslogd.has_key?("appender") -%>
+log4j.appender.SYSLOGD=<%=@syslogd[:appender]%>
+<% else -%>
+log4j.appender.SYSLOGD=org.apache.log4j.RollingFileAppender
+<% end -%>
+<% if @syslogd.has_key?("max_file_size") -%>
+log4j.appender.SYSLOGD.MaxFileSize=<%=@syslogd[:max_file_size]%>
+<% else -%>
+log4j.appender.SYSLOGD.MaxFileSize=100MB
+<% end -%>
+<% if @syslogd.has_key?("max_backup_index") -%>
+log4j.appender.SYSLOGD.MaxBackupIndex=<%=@syslogd[:max_backup_index]%>
+<% else -%>
+log4j.appender.SYSLOGD.MaxBackupIndex=4
+<% end -%>
+<% if @syslogd.has_key?("file") -%>
+log4j.appender.SYSLOGD.File=<%=@syslogd[:file]%>
+<% else -%>
+log4j.appender.SYSLOGD.File=<%=@onms_home%>/logs/daemon/syslogd.log
+<% end -%>
+<% if @syslogd.has_key?("layout") -%>
+log4j.appender.SYSLOGD.layout=<%=@syslogd[:layout]%>
+<% else -%>
+log4j.appender.SYSLOGD.layout=org.apache.log4j.PatternLayout
+<% end -%>
+<% if @syslogd.has_key?("conversion_pattern") -%>
+log4j.appender.SYSLOGD.layout.ConversionPattern=<%=@syslogd[:conversion_pattern]%>
+<% else -%>
+log4j.appender.SYSLOGD.layout.ConversionPattern=%d %-5p [%t] %c{1}: %m%n
+<% end -%>
+
+# Xmlrpcd
+<% if @xmlrpcd.has_key?("level") -%>
+log4j.category.OpenNMS.Xmlrpcd=<%=@xmlrpcd[:level]%>, XMLRPCD
+log4j.additivity.OpenNMS.Xmlrpcd=false
+<% else -%>
+log4j.category.OpenNMS.Xmlrpcd=WARN, XMLRPCD
+log4j.additivity.OpenNMS.Xmlrpcd=false
+<% end -%>
+<% if @xmlrpcd.has_key?("appender") -%>
+log4j.appender.XMLRPCD=<%=@xmlrpcd[:appender]%>
+<% else -%>
+log4j.appender.XMLRPCD=org.apache.log4j.RollingFileAppender
+<% end -%>
+<% if @xmlrpcd.has_key?("max_file_size") -%>
+log4j.appender.XMLRPCD.MaxFileSize=<%=@xmlrpcd[:max_file_size]%>
+<% else -%>
+log4j.appender.XMLRPCD.MaxFileSize=100MB
+<% end -%>
+<% if @xmlrpcd.has_key?("max_backup_index") -%>
+log4j.appender.XMLRPCD.MaxBackupIndex=<%=@xmlrpcd[:max_backup_index]%>
+<% else -%>
+log4j.appender.XMLRPCD.MaxBackupIndex=4
+<% end -%>
+<% if @xmlrpcd.has_key?("file") -%>
+log4j.appender.XMLRPCD.File=<%=@xmlrpcd[:file]%>
+<% else -%>
+log4j.appender.XMLRPCD.File=<%=@onms_home%>/logs/daemon/xmlrpcd.log
+<% end -%>
+<% if @xmlrpcd.has_key?("layout") -%>
+log4j.appender.XMLRPCD.layout=<%=@xmlrpcd[:layout]%>
+<% else -%>
+log4j.appender.XMLRPCD.layout=org.apache.log4j.PatternLayout
+<% end -%>
+<% if @xmlrpcd.has_key?("conversion_pattern") -%>
+log4j.appender.XMLRPCD.layout.ConversionPattern=<%=@xmlrpcd[:conversion_pattern]%>
+<% else -%>
+log4j.appender.XMLRPCD.layout.ConversionPattern=%d %-5p [%t] %c{1}: %m%n
+<% end -%>
+
+# ModelImporter - this is deprecated, the model import is now handled by the provisiond
+
+# Report
+<% if @report.has_key?("level") -%>
+log4j.category.OpenNMS.Report=<%=@report[:level]%>, REPORT
+<% else -%>
+log4j.category.OpenNMS.Report=WARN, REPORT
+<% end -%>
+log4j.additivity.OpenNMS.Report=false
+log4j.category.net.sf.jasperreports=INFO, REPORT
+log4j.additivity.net.sf.jasperreports=false
+<% if @report.has_key?("appender") -%>
+log4j.appender.REPORT=<%=@report[:appender]%>
+<% else -%>
+log4j.appender.REPORT=org.apache.log4j.RollingFileAppender
+<% end -%>
+<% if @report.has_key?("max_file_size") -%>
+log4j.appender.REPORT.MaxFileSize=<%=@report[:max_file_size]%>
+<% else -%>
+log4j.appender.REPORT.MaxFileSize=1MB
+<% end -%>
+<% if @report.has_key?("max_backup_index") -%>
+log4j.appender.REPORT.MaxBackupIndex=<%=@report[:max_backup_index]%>
+<% else -%>
+log4j.appender.REPORT.MaxBackupIndex=2
+<% end -%>
+<% if @report.has_key?("file") -%>
+log4j.appender.REPORT.File=<%=@report[:file]%>
+<% else -%>
+log4j.appender.REPORT.File=<%=@onms_home%>/logs/daemon/report.log
+<% end -%>
+<% if @report.has_key?("layout") -%>
+log4j.appender.REPORT.layout=<%=@report[:layout]%>
+<% else -%>
+log4j.appender.REPORT.layout=org.apache.log4j.PatternLayout
+<% end -%>
+<% if @report.has_key?("conversion_pattern") -%>
+log4j.appender.REPORT.layout.ConversionPattern=<%=@report[:conversion_pattern]%>
+<% else -%>
+log4j.appender.REPORT.layout.ConversionPattern=%d %-5p [%t] %c{1}: %m%n
+<% end -%>
+
+# VMware integration logging for polling, provisioning and data collection
+<% if @vmware.has_key?("level") -%>
+log4j.category.OpenNMS.VMware=<%=@vmware[:level]%>, VMWARE
+<% else -%>
+log4j.category.OpenNMS.VMware=WARN, VMWARE
+<% end -%>
+log4j.additivity.OpenNMS.VMware=false
+<% if @vmware.has_key?("appender") -%>
+log4j.appender.VMWARE=<%=@vmware[:appender]%>
+<% else -%>
+log4j.appender.VMWARE=org.apache.log4j.RollingFileAppender
+<% end -%>
+<% if @vmware.has_key?("max_file_size") -%>
+log4j.appender.VMWARE.MaxFileSize=<%=@vmware[:max_file_size]%>
+<% else -%>
+log4j.appender.VMWARE.MaxFileSize=1MB
+<% end -%>
+<% if @vmware.has_key?("max_backup_index") -%>
+log4j.appender.VMWARE.MaxBackupIndex=<%=@vmware[:max_backup_index]%>
+<% else -%>
+log4j.appender.VMWARE.MaxBackupIndex=2
+<% end -%>
+<% if @vmware.has_key?("file") -%>
+log4j.appender.VMWARE.File=<%=@vmware[:file]%>
+<% else -%>
+log4j.appender.VMWARE.File=<%=@onms_home%>/logs/daemon/vmware.log
+<% end -%>
+<% if @vmware.has_key?("layout") -%>
+log4j.appender.VMWARE.layout=<%=@vmware[:layout]%>
+<% else -%>
+log4j.appender.VMWARE.layout=org.apache.log4j.PatternLayout
+<% end -%>
+<% if @vmware.has_key?("conversion_pattern") -%>
+log4j.appender.VMWARE.layout.ConversionPattern=<%=@vmware[:conversion_pattern]%>
+<% else -%>
+log4j.appender.VMWARE.layout.ConversionPattern=%d %-5p [%t] %c{1}: %m%n
+<% end -%>
+
+# rancid
+<% if @rancid.has_key?("level") -%>
+log4j.category.Rancid=<%=@rancid[:level]%>, RANCID
+<% else -%>
+log4j.category.Rancid=WARN, RANCID
+<% end -%>
+log4j.additivity.Rancid=false
+<% if @rancid.has_key?("appender") -%>
+log4j.appender.RANCID=<%=@rancid[:appender]%>
+<% else -%>
+log4j.appender.RANCID=org.apache.log4j.RollingFileAppender
+<% end -%>
+<% if @rancid.has_key?("max_file_size") -%>
+log4j.appender.RANCID.MaxFileSize=<%=@rancid[:max_file_size]%>
+<% else -%>
+log4j.appender.RANCID.MaxFileSize=50MB
+<% end -%>
+<% if @rancid.has_key?("max_backup_index") -%>
+log4j.appender.RANCID.MaxBackupIndex=<%=@rancid[:max_backup_index]%>
+<% else -%>
+log4j.appender.RANCID.MaxBackupIndex=4
+<% end -%>
+<% if @rancid.has_key?("file") -%>
+log4j.appender.RANCID.File=<%=@rancid[:file]%>
+<% else -%>
+log4j.appender.RANCID.File=<%=@onms_home%>/logs/webapp/rancid.log
+<% end -%>
+<% if @rancid.has_key?("layout") -%>
+log4j.appender.RANCID.layout=<%=@rancid[:layout]%>
+<% else -%>
+log4j.appender.RANCID.layout=org.apache.log4j.PatternLayout
+<% end -%>
+<% if @rancid.has_key?("conversion_pattern") -%>
+log4j.appender.RANCID.layout.ConversionPattern=<%=@rancid[:conversion_pattern]%>
+<% else -%>
+log4j.appender.RANCID.layout.ConversionPattern=%d %-5p [%t] %c{1}: %m%n
+<% end -%>
+
+<% if @jmx.has_key?("level") -%>
+log4j.category.jmx=<%=@jmx[:level]%>, JMX
+<% else -%>
+log4j.category.jmx=WARN, JMX
+<% end -%>
+log4j.additivity.jmx=false
+<% if @jmx.has_key?("appender") -%>
+log4j.appender.JMX=<%=@jmx[:appender]%>
+<% else -%>
+log4j.appender.JMX=org.apache.log4j.RollingFileAppender
+<% end -%>
+<% if @jmx.has_key?("max_file_size") -%>
+log4j.appender.JMX.MaxFileSize=<%=@jmx[:max_file_size]%>
+<% else -%>
+log4j.appender.JMX.MaxFileSize=1MB
+<% end -%>
+<% if @jmx.has_key?("max_backup_index") -%>
+log4j.appender.JMX.MaxBackupIndex=<%=@jmx[:max_backup_index]%>
+<% else -%>
+log4j.appender.JMX.MaxBackupIndex=2
+<% end -%>
+<% if @jmx.has_key?("file") -%>
+log4j.appender.JMX.File=<%=@jmx[:file]%>
+<% else -%>
+log4j.appender.JMX.File=<%=@onms_home%>/logs/daemon/jmx.log
+<% end -%>
+<% if @jmx.has_key?("layout") -%>
+log4j.appender.JMX.layout=<%=@jmx[:layout]%>
+<% else -%>
+log4j.appender.JMX.layout=org.apache.log4j.PatternLayout
+<% end -%>
+<% if @jmx.has_key?("conversion_pattern") -%>
+log4j.appender.JMX.layout.ConversionPattern=<%=@jmx[:conversion_pattern]%>
+<% else -%>
+log4j.appender.JMX.layout.ConversionPattern=%d %-5p [%t] %c{1}: %m%n
+<% end -%>
+
+# Linkd
+<% if @linkd.has_key?("level") -%>
+log4j.category.OpenNMS.Linkd=<%=@linkd[:level]%>, LINKS
+<% else -%>
+log4j.category.OpenNMS.Linkd=WARN, LINKS
+<% end -%>
+log4j.additivity.OpenNMS.Linkd=false
+<% if @linkd.has_key?("appender") -%>
+log4j.appender.LINKS=<%=@linkd[:appender]%>
+<% else -%>
+log4j.appender.LINKS=org.apache.log4j.RollingFileAppender
+<% end -%>
+<% if @linkd.has_key?("max_file_size") -%>
+log4j.appender.LINKS.MaxFileSize=<%=@linkd[:max_file_size]%>
+<% else -%>
+log4j.appender.LINKS.MaxFileSize=100MB
+<% end -%>
+<% if @linkd.has_key?("max_backup_index") -%>
+log4j.appender.LINKS.MaxBackupIndex=<%=@linkd[:max_backup_index]%>
+<% else -%>
+log4j.appender.LINKS.MaxBackupIndex=4
+<% end -%>
+<% if @linkd.has_key?("file") -%>
+log4j.appender.LINKS.File=<%=@linkd[:file]%>
+<% else -%>
+log4j.appender.LINKS.File=<%=@onms_home%>/logs/daemon/link.log
+<% end -%>
+<% if @linkd.has_key?("layout") -%>
+log4j.appender.LINKS.layout=<%=@linkd[:layout]%>
+<% else -%>
+log4j.appender.LINKS.layout=org.apache.log4j.PatternLayout
+<% end -%>
+<% if @linkd.has_key?("conversion_pattern") -%>
+log4j.appender.LINKS.layout.ConversionPattern=<%=@linkd[:conversion_pattern]%>
+<% else -%>
+log4j.appender.LINKS.layout.ConversionPattern=%d %-5p [%t] %c{1}: %m%n
+<% end -%>
+
+# Map
+<% if @web_map.has_key?("level") -%>
+log4j.category.OpenNMS.Map=<%=@web_map[:level]%>, MAP
+<% else -%>
+log4j.category.OpenNMS.Map=WARN, MAP
+<% end -%>
+log4j.additivity.OpenNMS.Map=false
+<% if @web_map.has_key?("appender") -%>
+log4j.appender.MAP=<%=@web_map[:appender]%>
+<% else -%>
+log4j.appender.MAP=org.apache.log4j.RollingFileAppender
+<% end -%>
+<% if @web_map.has_key?("max_file_size") -%>
+log4j.appender.MAP.MaxFileSize=<%=@web_map[:max_file_size]%>
+<% else -%>
+log4j.appender.MAP.MaxFileSize=100MB
+<% end -%>
+<% if @web_map.has_key?("max_backup_index") -%>
+log4j.appender.MAP.MaxBackupIndex=<%=@web_map[:max_backup_index]%>
+<% else -%>
+log4j.appender.MAP.MaxBackupIndex=4
+<% end -%>
+<% if @web_map.has_key?("file") -%>
+log4j.appender.MAP.File=<%=@web_map[:file]%>
+<% else -%>
+log4j.appender.MAP.File=<%=@onms_home%>/logs/webapp/web-map.log
+<% end -%>
+<% if @web_map.has_key?("layout") -%>
+log4j.appender.MAP.layout=<%=@web_map[:layout]%>
+<% else -%>
+log4j.appender.MAP.layout=org.apache.log4j.PatternLayout
+<% end -%>
+<% if @web_map.has_key?("conversion_pattern") -%>
+log4j.appender.MAP.layout.ConversionPattern=<%=@web_map[:conversion_pattern]%>
+<% else -%>
+log4j.appender.MAP.layout.ConversionPattern=%d %-5p [%t] %c{1}: %m%n
+<% end -%>
+
+# Statsd
+<% if @statsd.has_key?("level") -%>
+log4j.category.OpenNMS.Statsd=<%=@statsd[:level]%>, STATSD
+<% else -%>
+log4j.category.OpenNMS.Statsd=WARN, STATSD
+<% end -%>
+log4j.additivity.OpenNMS.Statsd=false
+<% if @statsd.has_key?("appender") -%>
+log4j.appender.STATSD=<%=@statsd[:appender]%>
+<% else -%>
+log4j.appender.STATSD=org.apache.log4j.RollingFileAppender
+<% end -%>
+<% if @statsd.has_key?("max_file_size") -%>
+log4j.appender.STATSD.MaxFileSize=<%=@statsd[:max_file_size]%>
+<% else -%>
+log4j.appender.STATSD.MaxFileSize=100MB
+<% end -%>
+<% if @statsd.has_key?("max_backup_index") -%>
+log4j.appender.STATSD.MaxBackupIndex=<%=@statsd[:max_backup_index]%>
+<% else -%>
+log4j.appender.STATSD.MaxBackupIndex=4
+<% end -%>
+<% if @statsd.has_key?("file") -%>
+log4j.appender.STATSD.File=<%=@statsd[:file]%>
+<% else -%>
+log4j.appender.STATSD.File=<%=@onms_home%>/logs/daemon/statsd.log
+<% end -%>
+<% if @statsd.has_key?("layout") -%>
+log4j.appender.STATSD.layout=<%=@statsd[:layout]%>
+<% else -%>
+log4j.appender.STATSD.layout=org.apache.log4j.PatternLayout
+<% end -%>
+<% if @statsd.has_key?("conversion_pattern") -%>
+log4j.appender.STATSD.layout.ConversionPattern=<%=@statsd[:conversion_pattern]%>
+<% else -%>
+log4j.appender.STATSD.layout.ConversionPattern=%d %-5p [%t] %c{1}: %m%n
+<% end -%>
+
+# Instrumentation
+<% if @instrumentation.has_key?("level") -%>
+log4j.category.Instrumentation=<%=@instrumentation[:level]%>, INSTRUMENT
+<% else -%>
+log4j.category.Instrumentation=DEBUG, INSTRUMENT
+<% end -%>
+log4j.additivity.Instrumentation=false
+<% if @instrumentation.has_key?("appender") -%>
+log4j.appender.INSTRUMENT=<%=@instrumentation[:appender]%>
+<% else -%>
+log4j.appender.INSTRUMENT=org.apache.log4j.RollingFileAppender
+<% end -%>
+<% if @instrumentation.has_key?("max_file_size") -%>
+log4j.appender.INSTRUMENT.MaxFileSize=<%=@instrumentation[:max_file_size]%>
+<% else -%>
+log4j.appender.INSTRUMENT.MaxFileSize=100MB
+<% end -%>
+<% if @instrumentation.has_key?("max_backup_index") -%>
+log4j.appender.INSTRUMENT.MaxBackupIndex=<%=@instrumentation[:max_backup_index]%>
+<% else -%>
+log4j.appender.INSTRUMENT.MaxBackupIndex=4
+<% end -%>
+<% if @instrumentation.has_key?("file") -%>
+log4j.appender.INSTRUMENT.File=<%=@instrumentation[:file]%>
+<% else -%>
+log4j.appender.INSTRUMENT.File=<%=@onms_home%>/logs/daemon/instrumentation.log
+<% end -%>
+<% if @instrumentation.has_key?("layout") -%>
+log4j.appender.INSTRUMENT.layout=<%=@instrumentation[:layout]%>
+<% else -%>
+log4j.appender.INSTRUMENT.layout=org.apache.log4j.PatternLayout
+<% end -%>
+<% if @instrumentation.has_key?("conversion_pattern") -%>
+log4j.appender.INSTRUMENT.layout.ConversionPattern=<%=@instrumentation[:conversion_pattern]%>
+<% else -%>
+log4j.appender.INSTRUMENT.layout.ConversionPattern=%d %-5p [%t] %c{1}: %m%n
+<% end -%>
+
+# SNMP4J internal logs (if enabled in opennms.properties)
+<% if @snmp4j_internal.has_key?("level") -%>
+log4j.category.org.snmp4j=<%=@snmp4j_internal[:level]%>, SNMP4J-INTERNAL
+<% else -%>
+log4j.category.org.snmp4j=WARN, SNMP4J-INTERNAL 
+<% end -%>
+log4j.additivity.org.snmp4j=false
+<% if @snmp4j_internal.has_key?("appender") -%>
+log4j.appender.SNMP4J-INTERNAL=<%=@snmp4j_internal[:appender]%>
+<% else -%>
+log4j.appender.SNMP4J-INTERNAL=org.apache.log4j.RollingFileAppender
+<% end -%>
+<% if @snmp4j_internal.has_key?("max_file_size") -%>
+log4j.appender.SNMP4J-INTERNAL.MaxFileSize=<%=@snmp4j_internal[:max_file_size]%>
+<% else -%>
+log4j.appender.SNMP4J-INTERNAL.MaxFileSize=100MB
+<% end -%>
+<% if @snmp4j_internal.has_key?("max_backup_index") -%>
+log4j.appender.SNMP4J-INTERNAL.MaxBackupIndex=<%=@snmp4j_internal[:max_backup_index]%>
+<% else -%>
+log4j.appender.SNMP4J-INTERNAL.MaxBackupIndex=2
+<% end -%>
+<% if @snmp4j_internal.has_key?("file") -%>
+log4j.appender.SNMP4J-INTERNAL.File=<%=@snmp4j_internal[:file]%>
+<% else -%>
+log4j.appender.SNMP4J-INTERNAL.File=<%=@onms_home%>/logs/daemon/snmp4j-internal.log
+<% end -%>
+<% if @snmp4j_internal.has_key?("layout") -%>
+log4j.appender.SNMP4J-INTERNAL.layout=<%=@snmp4j_internal[:layout]%>
+<% else -%>
+log4j.appender.SNMP4J-INTERNAL.layout=org.apache.log4j.PatternLayout
+<% end -%>
+<% if @snmp4j_internal.has_key?("conversion_pattern") -%>
+log4j.appender.SNMP4J-INTERNAL.layout.ConversionPattern=<%=@snmp4j_internal[:conversion_pattern]%>
+<% else -%>
+log4j.appender.SNMP4J-INTERNAL.layout.ConversionPattern=%d %-5p [%t] %c: %m%n
+<% end -%>
+
+# TL-1 Message Processing Daemon
+<% if @tl1d.has_key?("level") -%>
+log4j.category.OpenNMS.Tl1d=<%=@tl1d[:level]%>, TL1D
+<% else -%>
+log4j.category.OpenNMS.Tl1d=WARN, TL1D
+<% end -%>
+log4j.additivity.OpenNMS.Tl1d=false
+<% if @tl1d.has_key?("appender") -%>
+log4j.appender.TL1D=<%=@tl1d[:appender]%>
+<% else -%>
+log4j.appender.TL1D=org.apache.log4j.RollingFileAppender
+<% end -%>
+<% if @tl1d.has_key?("max_file_size") -%>
+log4j.appender.TL1D.MaxFileSize=<%=@tl1d[:max_file_size]%>
+<% else -%>
+log4j.appender.TL1D.MaxFileSize=100MB
+<% end -%>
+<% if @tl1d.has_key?("max_backup_index") -%>
+log4j.appender.TL1D.MaxBackupIndex=<%=@tl1d[:max_backup_index]%>
+<% else -%>
+log4j.appender.TL1D.MaxBackupIndex=4
+<% end -%>
+<% if @tl1d.has_key?("file") -%>
+log4j.appender.TL1D.File=<%=@tl1d[:file]%>
+<% else -%>
+log4j.appender.TL1D.File=<%=@onms_home%>/logs/daemon/tl1d.log
+<% end -%>
+<% if @tl1d.has_key?("layout") -%>
+log4j.appender.TL1D.layout=<%=@tl1d[:layout]%>
+<% else -%>
+log4j.appender.TL1D.layout=org.apache.log4j.PatternLayout
+<% end -%>
+<% if @tl1d.has_key?("conversion_pattern") -%>
+log4j.appender.TL1D.layout.ConversionPattern=<%=@tl1d[:conversion_pattern]%>
+<% else -%>
+log4j.appender.TL1D.layout.ConversionPattern=%d %-5p [%t] %c{1}: %m%n
+<% end -%>
+
+# Asterisk AGI Server and Asterisk-Java internal logs
+<% if @asterisk.has_key?("level") -%>
+log4j.category.org.asteriskjava=<%=@asterisk[:level]%>, ASTERISK
+log4j.additivity.org.asteriskjava=false
+log4j.category.OpenNMS.AsteriskGateway=<%=@asterisk[:level]%>, ASTERISK
+log4j.additivity.OpenNMS.AsteriskGateway=false
+log4j.category.org.opennms.netmgt.asterisk=<%=@asterisk[:level]%>, ASTERISK
+log4j.additivity.org.opennms.netmgt.asterisk.agi=false
+<% else -%>
+log4j.category.org.asteriskjava=WARN, ASTERISK
+log4j.additivity.org.asteriskjava=false
+log4j.category.OpenNMS.AsteriskGateway=WARN, ASTERISK
+log4j.additivity.OpenNMS.AsteriskGateway=false
+log4j.category.org.opennms.netmgt.asterisk=WARN, ASTERISK
+log4j.additivity.org.opennms.netmgt.asterisk.agi=false
+<% end -%>
+<% if @asterisk.has_key?("appender") -%>
+log4j.appender.ASTERISK=<%=@asterisk[:appender]%>
+<% else -%>
+log4j.appender.ASTERISK=org.apache.log4j.RollingFileAppender
+<% end -%>
+<% if @asterisk.has_key?("max_file_size") -%>
+log4j.appender.ASTERISK.MaxFileSize=<%=@asterisk[:max_file_size]%>
+<% else -%>
+log4j.appender.ASTERISK.MaxFileSize=100MB
+<% end -%>
+<% if @asterisk.has_key?("max_backup_index") -%>
+log4j.appender.ASTERISK.MaxBackupIndex=<%=@asterisk[:max_backup_index]%>
+<% else -%>
+log4j.appender.ASTERISK.MaxBackupIndex=2
+<% end -%>
+<% if @asterisk.has_key?("file") -%>
+log4j.appender.ASTERISK.File=<%=@asterisk[:file]%>
+<% else -%>
+log4j.appender.ASTERISK.File=<%=@onms_home%>/logs/daemon/asterisk.log
+<% end -%>
+<% if @asterisk.has_key?("layout") -%>
+log4j.appender.ASTERISK.layout=<%=@asterisk[:layout]%>
+<% else -%>
+log4j.appender.ASTERISK.layout=org.apache.log4j.PatternLayout
+<% end -%>
+<% if @asterisk.has_key?("conversion_pattern") -%>
+log4j.appender.ASTERISK.layout.ConversionPattern=<%=@asterisk[:conversion_pattern]%>
+<% else -%>
+log4j.appender.ASTERISK.layout.ConversionPattern=%d %-5p [%t] %c: %m%n
+<% end -%>
+
+# Ins Event Proxy internal logs
+<% if @insproxy.has_key?("level") -%>
+log4j.category.OpenNMS.InsProxy=<%=@insproxy[:level]%>, INS
+<% else -%>
+log4j.category.OpenNMS.InsProxy=WARN, INS
+<% end -%>
+log4j.additivity.OpenNMS.InsProxy=false
+<% if @insproxy.has_key?("appender") -%>
+log4j.appender.INS=<%=@insproxy[:appender]%>
+<% else -%>
+log4j.appender.INS=org.apache.log4j.RollingFileAppender
+<% end -%>
+<% if @insproxy.has_key?("max_file_size") -%>
+log4j.appender.INS.MaxFileSize=<%=@insproxy[:max_file_size]%>
+<% else -%>
+log4j.appender.INS.MaxFileSize=100MB
+<% end -%>
+<% if @insproxy.has_key?("max_backup_index") -%>
+log4j.appender.INS.MaxBackupIndex=<%=@insproxy[:max_backup_index]%>
+<% else -%>
+log4j.appender.INS.MaxBackupIndex=4
+<% end -%>
+<% if @insproxy.has_key?("file") -%>
+log4j.appender.INS.File=<%=@insproxy[:file]%>
+<% else -%>
+log4j.appender.INS.File=<%=@onms_home%>/logs/daemon/insproxy.log
+<% end -%>
+<% if @insproxy.has_key?("layout") -%>
+log4j.appender.INS.layout=<%=@insproxy[:layout]%>
+<% else -%>
+log4j.appender.INS.layout=org.apache.log4j.PatternLayout
+<% end -%>
+<% if @insproxy.has_key?("conversion_pattern") -%>
+log4j.appender.INS.layout.ConversionPattern=<%=@insproxy[:conversion_pattern]%>
+<% else -%>
+log4j.appender.INS.layout.ConversionPattern=%d %-5p [%t] %c{1}: %m%n
+<% end -%>
+
+# AccessPointMonitor
+<% if @accesspointmonitor.has_key?("level") -%>
+log4j.category.OpenNMS.AccessPointMonitor=<%=@accesspointmonitor[:level]%>, APM
+<% else -%>
+log4j.category.OpenNMS.AccessPointMonitor=WARN, APM
+<% end -%>
+log4j.additivity.OpenNMS.AccessPointMonitor=false
+<% if @accesspointmonitor.has_key?("appender") -%>
+log4j.appender.APM=<%=@accesspointmonitor[:appender]%>
+<% else -%>
+log4j.appender.APM=org.apache.log4j.RollingFileAppender
+<% end -%>
+<% if @accesspointmonitor.has_key?("max_file_size") -%>
+log4j.appender.APM.MaxFileSize=<%=@accesspointmonitor[:max_file_size]%>
+<% else -%>
+log4j.appender.APM.MaxFileSize=100MB
+<% end -%>
+<% if @accesspointmonitor.has_key?("max_backup_index") -%>
+log4j.appender.APM.MaxBackupIndex=<%=@accesspointmonitor[:max_backup_index]%>
+<% else -%>
+log4j.appender.APM.MaxBackupIndex=4
+<% end -%>
+<% if @accesspointmonitor.has_key?("file") -%>
+log4j.appender.APM.File=<%=@accesspointmonitor[:file]%>
+<% else -%>
+log4j.appender.APM.File=<%=@onms_home%>/logs/daemon/accesspointmonitor.log
+<% end -%>
+<% if @accesspointmonitor.has_key?("layout") -%>
+log4j.appender.APM.layout=<%=@accesspointmonitor[:layout]%>
+<% else -%>
+log4j.appender.APM.layout=org.apache.log4j.PatternLayout
+<% end -%>
+<% if @accesspointmonitor.has_key?("conversion_pattern") -%>
+log4j.appender.APM.layout.ConversionPattern=<%=@accesspointmonitor[:conversion_pattern]%>
+<% else -%>
+log4j.appender.APM.layout.ConversionPattern=%d %-5p [%t] %c{1}: %m%n
+<% end -%>

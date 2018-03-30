@@ -3,7 +3,7 @@ def whyrun_supported?
   true
 end
 
-use_inline_resources
+use_inline_resources # ~FC113
 
 action :create do
   if @current_resource.changed
@@ -31,8 +31,7 @@ action :delete do
 end
 
 def load_current_resource
-  @current_resource = Chef::Resource::OpennmsNotification.new(@new_resource.name)
-  @current_resource.name(@new_resource.name)
+  @current_resource = Chef::Resource.resource_for_node(:opennms_notification, node).new(@new_resource.name)
   @current_resource.status(@new_resource.status)
   @current_resource.writeable(@new_resource.writeable)
   @current_resource.uei(@new_resource.uei)
@@ -43,7 +42,7 @@ def load_current_resource
   @current_resource.subject(@new_resource.subject)
   @current_resource.numeric_message(@new_resource.numeric_message)
   @current_resource.event_severity(@new_resource.event_severity)
-  @current_resource.params(@new_resource.params)
+  @current_resource.parameters(@new_resource.parameters)
   @current_resource.vbname(@new_resource.vbname)
   @current_resource.vbvalue(@new_resource.vbvalue)
 
@@ -88,17 +87,19 @@ def notification_changed?(current_resource)
   end
   Chef::Log.debug "#{ueitext} != #{REXML::Text.new(current_resource.uei)}?"
   return true if ueitext.to_s != REXML::Text.new(current_resource.uei).to_s
-  d_el = notif_el.elements['description']
-  if d_el.nil?
-    Chef::Log.debug "no existing description, new is #{current_resource.description}"
-    return true unless current_resource.description.nil?
-  else
-    detext = ''
-    d_el.texts.each do |t|
-      detext += t.to_s.strip # .gsub(/\t/, ' ').gsub(/\n/, ' ').squeeze(' ')
+  unless current_resource.description.nil?
+    d_el = notif_el.elements['description']
+    if d_el.nil?
+      Chef::Log.debug "no existing description, new is #{current_resource.description}"
+      return true
+    else
+      detext = ''
+      d_el.texts.each do |t|
+        detext += t.to_s.strip # .gsub(/\t/, ' ').gsub(/\n/, ' ').squeeze(' ')
+      end
+      Chef::Log.debug "#{detext} != #{REXML::Text.new(current_resource.description)}?"
+      return true if detext.to_s != REXML::Text.new(current_resource.description).to_s
     end
-    Chef::Log.debug "#{detext} != #{REXML::Text.new(current_resource.description)}?"
-    return true if detext.to_s != REXML::Text.new(current_resource.description).to_s
   end
   rtext = ''
   notif_el.elements['rule'].texts.each do |t|
@@ -120,77 +121,89 @@ def notification_changed?(current_resource)
   # we use CData for text messages
   Chef::Log.debug "#{tmtext} != #{current_resource.text_message}?"
   return true if tmtext.to_s != current_resource.text_message.to_s
-  sub_el = notif_el.elements['subject']
-  if sub_el.nil?
-    Chef::Log.debug "no existing subject, new is #{current_resource.subject}"
-    return true unless current_resource.subject.nil?
-  else
-    stext = ''
-    sub_el.texts.each do |t|
-      stext += t.to_s.strip # .gsub(/\t/, ' ').gsub(/\n/, ' ').squeeze(' ')
+  unless current_resource.subject.nil?
+    sub_el = notif_el.elements['subject']
+    if sub_el.nil?
+      Chef::Log.debug "no existing subject, new is #{current_resource.subject}"
+      return true
+    else
+      stext = ''
+      sub_el.texts.each do |t|
+        stext += t.to_s.strip # .gsub(/\t/, ' ').gsub(/\n/, ' ').squeeze(' ')
+      end
+      Chef::Log.debug "#{stext} != #{REXML::Text.new(current_resource.subject)}?"
+      return true if stext.to_s != REXML::Text.new(current_resource.subject).to_s
     end
-    Chef::Log.debug "#{stext} != #{REXML::Text.new(current_resource.subject)}?"
-    return true if stext.to_s != REXML::Text.new(current_resource.subject).to_s
   end
-  nm_el = notif_el.elements['numeric-message']
-  if nm_el.nil?
-    Chef::Log.debug "no existing numeric message, new is #{current_resource.numeric_message}"
-    return true unless current_resource.numeric_message.nil?
-  else
-    nmtext = ''
-    nm_el.texts.each do |t|
-      nmtext += t.to_s.strip # .gsub(/\t/, ' ').gsub(/\n/, ' ').squeeze(' ')
+  unless current_resource.numeric_message.nil?
+    nm_el = notif_el.elements['numeric-message']
+    if nm_el.nil?
+      Chef::Log.debug "no existing numeric message, new is #{current_resource.numeric_message}"
+      return true
+    else
+      nmtext = ''
+      nm_el.texts.each do |t|
+        nmtext += t.to_s.strip # .gsub(/\t/, ' ').gsub(/\n/, ' ').squeeze(' ')
+      end
+      Chef::Log.debug "#{nmtext} != #{REXML::Text.new(current_resource.numeric_message)}?"
+      return true if nmtext.to_s != REXML::Text.new(current_resource.numeric_message).to_s
     end
-    Chef::Log.debug "#{nmtext} != #{REXML::Text.new(current_resource.numeric_message)}?"
-    return true if nmtext.to_s != REXML::Text.new(current_resource.numeric_message).to_s
   end
-  es_el = notif_el.elements['event-severity']
-  if es_el.nil?
-    Chef::Log.debug "no existing event_severity, new is #{current_resource.event_severity}"
-    return true unless current_resource.event_severity.nil?
-  else
-    estext = ''
-    es_el.texts.each do |t|
-      estext += t.to_s.strip # .gsub(/\t/, ' ').gsub(/\n/, ' ').squeeze(' ')
+  unless current_resource.event_severity.nil?
+    es_el = notif_el.elements['event-severity']
+    if es_el.nil?
+      Chef::Log.debug "no existing event_severity, new is #{current_resource.event_severity}"
+      return true
+    else
+      estext = ''
+      es_el.texts.each do |t|
+        estext += t.to_s.strip # .gsub(/\t/, ' ').gsub(/\n/, ' ').squeeze(' ')
+      end
+      Chef::Log.debug "#{estext} != #{REXML::Text.new(current_resource.event_severity)}?"
+      return true if estext.to_s != REXML::Text.new(current_resource.event_severity).to_s
     end
-    Chef::Log.debug "#{estext} != #{REXML::Text.new(current_resource.event_severity)}?"
-    return true if estext.to_s != REXML::Text.new(current_resource.event_severity).to_s
   end
-  curr_params = {}
-  params_str = {}
-  current_resource.params.each do |k, v|
-    params_str[k.to_s] = v.to_s
-  end
-  notif_el.elements.each('parameter') do |p|
-    curr_params[p.attributes['name'].to_s] = p.attributes['value'].to_s
-  end
-  Chef::Log.debug "new params: #{current_resource.params}; curr_params: #{curr_params}"
-  return true if current_resource.params.nil? && !curr_params.empty?
-  return true if !current_resource.params.nil? && !current_resource.params.empty? && curr_params.empty?
-  return true if curr_params != params_str
-  vn_el = notif_el.elements['varbind/vbname']
-  if vn_el.nil?
-    Chef::Log.debug "no existing vbname, new is #{current_resource.vbname}"
-    return true unless current_resource.vbname.nil?
-  else
-    vntext = ''
-    vn_el.texts.each do |t|
-      vntext += t.to_s.strip # .gsub(/\t/, ' ').gsub(/\n/, ' ').squeeze(' ')
+  unless current_resource.parameters.nil?
+    curr_params = {}
+    params_str = {}
+    current_resource.parameters.each do |k, v|
+      params_str[k.to_s] = v.to_s
     end
-    Chef::Log.debug "#{vntext} != #{REXML::Text.new(current_resource.vbname)}?"
-    return true if vntext.to_s != REXML::Text.new(current_resource.vbname).to_s
-  end
-  vv_el = notif_el.elements['varbind/vbvalue']
-  if vv_el.nil?
-    Chef::Log.debug "no existing vbvalue, new is #{current_resource.vbvalue}"
-    return true unless current_resource.vbvalue.nil?
-  else
-    vvtext = ''
-    vv_el.texts.each do |t|
-      vvtext += t.to_s.strip # .gsub(/\t/, ' ').gsub(/\n/, ' ').squeeze(' ')
+    notif_el.elements.each('parameter') do |p|
+      curr_params[p.attributes['name'].to_s] = p.attributes['value'].to_s
     end
-    Chef::Log.debug "#{vvtext} != #{REXML::Text.new(current_resource.vbvalue)}?"
-    return true if vvtext.to_s != REXML::Text.new(current_resource.vbvalue).to_s
+    Chef::Log.debug "new params: #{current_resource.parameters}; curr_params: #{curr_params}"
+    return true if current_resource.parameters.nil? && !curr_params.empty?
+    return true if !current_resource.parameters.nil? && !current_resource.parameters.empty? && curr_params.empty?
+    return true if curr_params != params_str
+  end
+  unless current_resource.vbname.nil?
+    vn_el = notif_el.elements['varbind/vbname']
+    if vn_el.nil?
+      Chef::Log.debug "no existing vbname, new is #{current_resource.vbname}"
+      return true
+    else
+      vntext = ''
+      vn_el.texts.each do |t|
+        vntext += t.to_s.strip # .gsub(/\t/, ' ').gsub(/\n/, ' ').squeeze(' ')
+      end
+      Chef::Log.debug "#{vntext} != #{REXML::Text.new(current_resource.vbname)}?"
+      return true if vntext.to_s != REXML::Text.new(current_resource.vbname).to_s
+    end
+  end
+  unless current_resource.vbvalue.nil?
+    vv_el = notif_el.elements['varbind/vbvalue']
+    if vv_el.nil?
+      Chef::Log.debug "no existing vbvalue, new is #{current_resource.vbvalue}"
+      return true
+    else
+      vvtext = ''
+      vv_el.texts.each do |t|
+        vvtext += t.to_s.strip # .gsub(/\t/, ' ').gsub(/\n/, ' ').squeeze(' ')
+      end
+      Chef::Log.debug "#{vvtext} != #{REXML::Text.new(current_resource.vbvalue)}?"
+      return true if vvtext.to_s != REXML::Text.new(current_resource.vbvalue).to_s
+    end
   end
   false
 end
@@ -251,8 +264,8 @@ def create_notification
     es_el = notif_el.add_element 'event-severity'
     es_el.add_text new_resource.event_severity
   end
-  unless new_resource.params.nil?
-    new_resource.params.each do |name, value|
+  unless new_resource.parameters.nil?
+    new_resource.parameters.each do |name, value|
       notif_el.add_element 'parameter', 'name' => name, 'value' => value
     end
   end

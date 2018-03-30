@@ -1,0 +1,2 @@
+control 'templates' do
+end

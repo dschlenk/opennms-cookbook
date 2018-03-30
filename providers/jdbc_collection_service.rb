@@ -3,7 +3,7 @@ def whyrun_supported?
   true
 end
 
-use_inline_resources
+use_inline_resources # ~FC113
 
 action :create do
   if @current_resource.exists && !@current_resource.changed
@@ -36,8 +36,7 @@ action :delete do
 end
 
 def load_current_resource
-  @current_resource = Chef::Resource::OpennmsJdbcCollectionService.new(@new_resource.name)
-  @current_resource.name(@new_resource.name)
+  @current_resource = Chef::Resource.resource_for_node(:opennms_jdbc_collection_service, node).new(@new_resource.name)
   @current_resource.package_name(@new_resource.package_name)
   @current_resource.service_name(@new_resource.service_name)
   @current_resource.collection(@new_resource.collection)
@@ -198,7 +197,7 @@ def create_jdbc_collection_service
   Chef::Log.debug "driver_file is '#{new_resource.driver_file}'"
   driver_file = new_resource.driver_file unless new_resource.driver_file == '' || new_resource.driver_file.nil?
   cookbook_file "#{driver_file}_#{new_resource.name}" do
-    source new_resource.driver_file
+    source new_resource.driver_file unless new_resource.driver_file.nil?
     path "#{node['opennms']['conf']['home']}/lib/#{new_resource.driver_file}"
     mode 00644
     owner 'root'

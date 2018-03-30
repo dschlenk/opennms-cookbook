@@ -3,7 +3,7 @@ def whyrun_supported?
   true
 end
 
-use_inline_resources
+use_inline_resources # ~FC113
 
 action :create do
   if @current_resource.exists && !@current_resource.changed
@@ -36,8 +36,7 @@ action :delete do
 end
 
 def load_current_resource
-  @current_resource = Chef::Resource::OpennmsXmlCollectionService.new(@new_resource.name)
-  @current_resource.name(@new_resource.name)
+  @current_resource = Chef::Resource.resource_for_node(:opennms_xml_collection_service, node).new(@new_resource.name)
   @current_resource.service_name(@new_resource.service_name)
   @current_resource.package_name(@new_resource.package_name)
   @current_resource.collection(@new_resource.collection)

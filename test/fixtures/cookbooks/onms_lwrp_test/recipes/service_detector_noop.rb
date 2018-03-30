@@ -6,5 +6,5 @@ opennms_service_detector 'nochange Router' do
   port 80
   retry_count 5
   timeout 6000
-  params 'banner' => 'heaven'
+  parameters 'banner' => 'heaven'
 end

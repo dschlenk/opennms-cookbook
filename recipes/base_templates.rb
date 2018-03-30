@@ -30,6 +30,10 @@ when '18'
   template_dir = 'horizon-18/'
 when '19'
   template_dir = 'horizon-19/'
+when '20'
+  template_dir = 'horizon-20/'
+when '21'
+  template_dir = 'horizon-21/'
 end
 
 Chef::Log.debug "at compile time, version is #{node['opennms']['version']} and jasper_version is #{node['opennms']['properties']['reporting']['jasper_version']}."

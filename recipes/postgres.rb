@@ -68,6 +68,6 @@ node.default['postgresql']['contrib']['extensions'] = %w(
   pg_stat_statements
   pgstattuple)
 
-%w(client server contrib config_initdb config_pgtune).each do |r|
+%w(client contrib server config_initdb config_pgtune).each do |r|
   include_recipe "postgresql::#{r}"
 end

@@ -4,7 +4,7 @@ def whyrun_supported?
   true
 end
 
-use_inline_resources
+use_inline_resources # ~FC113
 
 action :create do
   if @current_resource.exists
@@ -22,8 +22,7 @@ action :create do
 end
 
 def load_current_resource
-  @current_resource = Chef::Resource::OpennmsEventconf.new(@new_resource.name)
-  @current_resource.name(@new_resource.name)
+  @current_resource = Chef::Resource.resource_for_node(:opennms_eventconf, node).new(@new_resource.name)
 
   @current_resource.exists = true if eventconf_exists?(@current_resource.name)
 end

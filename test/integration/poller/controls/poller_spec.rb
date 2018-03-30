@@ -18,7 +18,7 @@ control 'poller' do
     its('status') { should eq 'off' }
     its('time_out') { should eq 5000 }
     its('port') { should eq 161 }
-    its('params') { should eq 'oid' => '.1.3.6.1.2.1.1.2.0' }
+    its('parameters') { should eq 'oid' => '.1.3.6.1.2.1.1.2.0' }
     its('class_name') { should eq 'org.opennms.netmgt.poller.monitors.SnmpMonitor' }
   end
 

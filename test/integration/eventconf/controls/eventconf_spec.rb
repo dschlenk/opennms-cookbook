@@ -2,7 +2,8 @@
 control 'eventconf' do
   describe eventconf('bogus-events.xml') do
     it { should exist }
-    its('position') { should eq 3 }
+    # 20+ is position 2
+    its('position') { should be <= 3 }
     content = <<-EOL
 <events xmlns="http://xmlns.opennms.org/xsd/eventconf">
   <event>

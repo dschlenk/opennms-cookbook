@@ -7,7 +7,7 @@ def whyrun_supported?
   true
 end
 
-use_inline_resources
+use_inline_resources # ~FC113
 
 action :create_if_missing do
   if @current_resource.exists
@@ -43,8 +43,7 @@ action :delete do
 end
 
 def load_current_resource
-  @current_resource = Chef::Resource::OpennmsExpression.new(@new_resource.name)
-  @current_resource.name(@new_resource.name)
+  @current_resource = Chef::Resource.resource_for_node(:opennms_expression, node).new(@new_resource.name)
   @current_resource.expression(@new_resource.expression || @new_resource.name)
   @current_resource.group(@new_resource.group)
   @current_resource.relaxed(@new_resource.relaxed)

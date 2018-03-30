@@ -13,7 +13,7 @@ attribute :status, kind_of: String, equal_to: %w(on off), default: 'on', require
 attribute :timeout, kind_of: Integer, default: 3000, required: false
 attribute :port, kind_of: Integer
 # key/value pairs for other service parameters
-attribute :params, kind_of: Hash, default: {}
+attribute :parameters, kind_of: Hash, default: {}
 attribute :class_name, kind_of: String, required: true
 
 attr_accessor :exists, :package_exists, :changed

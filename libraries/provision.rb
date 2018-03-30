@@ -94,7 +94,7 @@ module Provision
     return true if thing_changed?(current_resource.timeout, curr_timeout)
     return true if thing_changed?(current_resource.port, curr_port)
     return true if thing_changed?(current_resource.class_name, curr_class)
-    return true if things_changed?(current_resource.params, curr_params)
+    return true if things_changed?(current_resource.parameters, curr_params)
     false
   end
 
@@ -160,14 +160,16 @@ module Provision
     update_parameter(detector['parameter'], 'retries', new_resource.retry_count)
     update_parameter(detector['parameter'], 'timeout', new_resource.timeout)
     # don't change anything if no parameters specified in update resource
-    unless new_resource.params.nil? || new_resource.params.empty?
+    unless new_resource.parameters.nil? || new_resource.parameters.empty?
       # if you specify params, they replace all the current params. No merging of old and new occur.
       detector['parameter'].delete_if do |p|
         !%w(port retries timeout).include? p['key']
       end
     end
-    new_resource.params.each do |k, v|
-      detector['parameter'].push('key' => k, 'value' => v)
+    unless new_resource.parameters.nil?
+      new_resource.parameters.each do |k, v|
+        detector['parameter'].push('key' => k, 'value' => v)
+      end
     end
     # seems easier to just delete the current then add the modified rather than grab the entire
     # foreign source and PUT that with the change.
@@ -206,8 +208,8 @@ module Provision
     unless new_resource.timeout.nil?
       sdel.add_element 'parameter', 'key' => 'timeout', 'value' => new_resource.timeout
     end
-    unless new_resource.params.nil?
-      new_resource.params.each do |key, value|
+    unless new_resource.parameters.nil?
+      new_resource.parameters.each do |key, value|
         sdel.add_element 'parameter', 'key' => key, 'value' => value
       end
     end
@@ -365,6 +367,7 @@ module Provision
         node_el.add_element 'asset', 'name' => k, 'value' => v
       end
     end
+    Chef::Log.debug "Updating node with #{n} to #{baseurl(node)}/requisitions/#{foreign_source_name}/nodes with content type xml"
     RestClient.post "#{baseurl(node)}/requisitions/#{foreign_source_name}/nodes", n.to_s, content_type: :xml
   end
 
@@ -477,15 +480,46 @@ module Provision
 
   # after must be in SQL query format: '2015-12-17 21:00:00'
   def sync_complete?(foreign_source_name, after, node)
-    complete = false
     require 'rest-client'
     require 'addressable/uri'
-    url = "#{baseurl(node)}/events?eventUei=uei.opennms.org/internal/importer/importSuccessful&eventParms=%25#{foreign_source_name}%25&comparator=like&query=eventcreatetime >= '#{after}'"
+    api = 'v1'
+    m = node['opennms']['version'].match(/^(\d+)\.(\d+)\.(\d+)-(\d+)$/)
+    unless m.nil?
+      if m[1].to_i > 20
+        api = 'v2'
+      elsif m[1].to_i == 20 && m[2].to_i == 0 && m[3].to_i >= '2'
+        api = 'v2'
+      elsif m[1].to_i == 20 && m[2].to_i > 0
+        api = 'v2'
+      end
+    end
+    case api
+    when 'v1'
+      url = "#{baseurl(node)}/events?eventUei=uei.opennms.org/internal/importer/importSuccessful&eventParms=%25#{foreign_source_name}%25&comparator=like&query=eventcreatetime >= '#{after}'"
+    when 'v2'
+      url = "#{baseurlv2(node)}/events?_s=eventCreateTime=ge=#{Time.parse(after + ' ' + Time.now.zone).utc.strftime('%FT%T.%LZ')};eventUei==uei.opennms.org/internal/importer/importSuccessful"
+    end
     parsed_url = Addressable::URI.parse(url).normalize.to_str
-    Chef::Log.debug("sync_complete? URL: #{parsed_url}")
-    events = JSON.parse(RestClient.get(parsed_url, accept: :json).to_str)
-    complete = true if !events.nil? && events.key?('totalCount') && events['totalCount'].to_i > 0
+    Chef::Log.debug("sync_complete? URL: '#{parsed_url}'")
+    response = RestClient.get(parsed_url, accept: :json).to_str
+    # apiv2 returns empty response (204) when nothing found
+    events = JSON.parse(response) unless response.nil? || response == ''
+    complete = true
+    complete = false if !events.nil? && events.key?('totalCount') && events['totalCount'].to_i == 0
+    if events.nil? || (api == 'v2' && !apiv2synced?(events, foreign_source_name))
+      complete = false
+    end
     complete
+  end
+
+  def apiv2synced?(events, foreign_source_name)
+    events = events['event'].select do |e|
+      mp = e['parameters'].select do |p|
+        p['value'].include?(foreign_source_name)
+      end
+      !(mp.nil? || mp.empty?)
+    end
+    !events.empty?
   end
 
   def sync_import(foreign_source_name, rescan, node)
@@ -511,6 +545,10 @@ module Provision
 
   def baseurl(node)
     "http://admin:#{node['opennms']['users']['admin']['password']}@localhost:#{node['opennms']['properties']['jetty']['port']}/opennms/rest"
+  end
+
+  def baseurlv2(node)
+    "http://admin:#{node['opennms']['users']['admin']['password']}@localhost:#{node['opennms']['properties']['jetty']['port']}/opennms/api/v2"
   end
 
   def default_foreign_source(node)

@@ -15,5 +15,5 @@ attribute :retry_count,  kind_of: Integer
 attribute :timeout,      kind_of: Integer
 # If this is a changed resource and action is create, the params specified will replace all existing.
 # So even if you need to change just one param, you need to include the entire set for this detector.
-attribute :params,       kind_of: Hash
+attribute :parameters, kind_of: Hash
 attr_accessor :exists, :changed, :foreign_source_exists

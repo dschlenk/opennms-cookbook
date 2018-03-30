@@ -3,7 +3,7 @@ def whyrun_supported?
   true
 end
 
-use_inline_resources
+use_inline_resources # ~FC113
 
 action :create do
   Chef::Application.fatal!("view_name specified '#{@current_resource.view_name}' doesn't exist!") unless @current_resource.view_name_exists
@@ -23,9 +23,8 @@ action :create do
   end
 end
 
-# rubocop:disable Metrics/BlockNesting
 def load_current_resource
-  @current_resource = Chef::Resource::OpennmsAvailViewSection.new(@new_resource.name)
+  @current_resource = Chef::Resource.resource_for_node(:opennms_avail_view_section, node).new(@new_resource.name)
   @current_resource.section(@new_resource.section)
   @current_resource.view_name(@new_resource.view_name)
   @current_resource.category_group(@new_resource.category_group)
@@ -51,7 +50,6 @@ def load_current_resource
     end
   end
 end
-# rubocop:enable Metrics/BlockNesting
 
 def categories_exist?(group, categories)
   file = ::File.new("#{node['opennms']['conf']['home']}/etc/categories.xml", 'r')

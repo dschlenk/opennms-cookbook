@@ -19,7 +19,7 @@ opennms_poller_service 'SNMP' do
   status 'off'
   timeout 5000
   port 161
-  params 'oid' => '.1.3.6.1.2.1.1.2.0'
+  parameters 'oid' => '.1.3.6.1.2.1.1.2.0'
   class_name 'org.opennms.netmgt.poller.monitors.SnmpMonitor'
 end
 

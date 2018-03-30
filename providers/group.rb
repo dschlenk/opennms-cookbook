@@ -5,7 +5,7 @@ def whyrun_supported?
   true
 end
 
-use_inline_resources
+use_inline_resources # ~FC113
 
 action :create do
   Chef::Application.fatal!("Missing a user in #{@current_resource.users}.") unless @current_resource.users_exist
@@ -20,8 +20,7 @@ action :create do
 end
 
 def load_current_resource
-  @current_resource = Chef::Resource::OpennmsGroup.new(@new_resource.name)
-  @current_resource.name(@new_resource.name)
+  @current_resource = Chef::Resource.resource_for_node(:opennms_group, node).new(@new_resource.name)
   @current_resource.default_svg_map(@new_resource.default_svg_map) unless @new_resource.default_svg_map.nil?
   @current_resource.users(@new_resource.users) unless @new_resource.users.nil?
 

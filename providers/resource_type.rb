@@ -4,7 +4,7 @@ def whyrun_supported?
   true
 end
 
-use_inline_resources
+use_inline_resources # ~FC113
 
 action :create do
   if @current_resource.exists && @current_resource.included
@@ -22,8 +22,7 @@ action :create do
 end
 
 def load_current_resource
-  @current_resource = Chef::Resource::OpennmsResourceType.new(@new_resource.name)
-  @current_resource.name(@new_resource.name)
+  @current_resource = Chef::Resource.resource_for_node(:opennms_resource_type, node).new(@new_resource.name)
 
   @current_resource.exists = rt_exists?(node['opennms']['conf']['home'], @current_resource.name)
   @current_resource.included = rt_included?(node['opennms']['conf']['home'], @current_resource.name)

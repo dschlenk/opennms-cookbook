@@ -15,7 +15,7 @@ class PollerService < Inspec.resource(1)
       its(\'status\') { should eq \'off\' }
       its(\'time_out\') { should eq 5000 }
       its(\'port\') { should eq 161 }
-      its(\'params\') { should eq \'oid\' => \'.1.3.6.1.2.1.1.2.0\' }
+      its(\'parameters\') { should eq \'oid\' => \'.1.3.6.1.2.1.1.2.0\' }
       its(\'class_name\') { should eq \'org.opennms.netmgt.poller.monitors.SnmpMonitor\' }
     end
   '
@@ -33,11 +33,11 @@ class PollerService < Inspec.resource(1)
       @params[:status] = s_el.attributes['status']
       @params[:time_out] = s_el.elements["parameter[@key = 'timeout']"].attributes['value'].to_i unless s_el.elements["parameter[@key = 'timeout']"].nil?
       @params[:port] = s_el.elements["parameter[@key = 'port']"].attributes['value'].to_i unless s_el.elements["parameter[@key = 'port']"].nil?
-      @params[:params] = {}
+      @params[:parameters] = {}
       s_el.each_element('parameter') do |p|
         next if p.attributes['key'] == 'port'
         next if p.attributes['key'] == 'timeout'
-        @params[:params][p.attributes['key']] = p.attributes['value']
+        @params[:parameters][p.attributes['key']] = p.attributes['value']
       end
     end
   end

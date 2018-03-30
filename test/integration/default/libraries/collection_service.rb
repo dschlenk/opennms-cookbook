@@ -39,14 +39,14 @@ class CollectionService < Inspec.resource(1)
       @params[:port] = s_el.elements["parameter[@key = 'port']"].attributes['value'].to_i unless s_el.elements["parameter[@key = 'port']"].nil?
       @params[:thresholding_enabled] = false
       @params[:thresholding_enabled] = true unless s_el.elements["parameter[@key = 'thresholding-enabled']"].nil? || !(s_el.elements["parameter[@key = 'thresholding-enabled']"].attributes['value'] == 'true')
-      @params[:params] = {}
+      @params[:parameters] = {}
       s_el.each_element('parameter') do |p|
         next if p.attributes['key'] == 'port'
         next if p.attributes['key'] == 'retry'
         next if p.attributes['key'] == 'collection'
         next if p.attributes['key'] == 'thresholding-enabled'
         next if p.attributes['key'] == 'timeout'
-        @params[:params][p.attributes['key']] = p.attributes['value']
+        @params[:parameters][p.attributes['key']] = p.attributes['value']
       end
     end
   end
