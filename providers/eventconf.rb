@@ -21,6 +21,17 @@ action :create do
   end
 end
 
+action :delete do
+  if @current_resource.exists
+    Chef::Log.info "#{@new_resource} already exists - deleting."
+    converge_by("Create #{@new_resource}") do
+      delete_eventconf
+    end
+  else
+    Chef::Log.info "#{@new_resource} already does not exist - nothing to do."
+  end
+end
+
 def load_current_resource
   @current_resource = Chef::Resource.resource_for_node(:opennms_eventconf, node).new(@new_resource.name)
   @current_resource.source(@new_resource.source)
@@ -78,4 +89,11 @@ def update_eventconf
         end
       end
   f.updated_by_last_action?
+end
+
+def delete_eventconf
+  file new_resource.name do
+    path "#{node['opennms']['conf']['home']}/etc/events/#{new_resource.name}"
+    action :delete
+  end
 end

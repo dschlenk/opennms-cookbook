@@ -243,4 +243,8 @@ EOL
 EOL
     its('content') { should eq tlcontent }
   end
+
+  describe eventconf('apache.httpd.syslog.events.xml') do
+    it { should_not exist }
+  end
 end
