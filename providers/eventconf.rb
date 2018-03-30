@@ -61,21 +61,21 @@ def create_eventconf
 end
 
 def update_eventconf
-  if new_resource.source == 'cookbook_file'
-    f = cookbook_file new_resource.name do
-      path "#{node['opennms']['conf']['home']}/etc/events/#{new_resource.name}"
-      owner 'root'
-      group 'root'
-      mode 00644
-    end
-  else
-    f = remote_file new_resource.name do
-      path "#{node['opennms']['conf']['home']}/etc/events/#{new_resource.name}"
-      source new_resource.source
-      owner 'root'
-      group 'root'
-      mode 00644
-    end
-  end
+  f = if new_resource.source == 'cookbook_file'
+        cookbook_file new_resource.name do
+          path "#{node['opennms']['conf']['home']}/etc/events/#{new_resource.name}"
+          owner 'root'
+          group 'root'
+          mode 00644
+        end
+      else
+        remote_file new_resource.name do
+          path "#{node['opennms']['conf']['home']}/etc/events/#{new_resource.name}"
+          source new_resource.source
+          owner 'root'
+          group 'root'
+          mode 00644
+        end
+      end
   f.updated_by_last_action?
 end
