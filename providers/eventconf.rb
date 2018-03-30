@@ -24,7 +24,7 @@ end
 action :delete do
   if @current_resource.exists
     Chef::Log.info "#{@new_resource} already exists - deleting."
-    converge_by("Create #{@new_resource}") do
+    converge_by("Delete #{@new_resource}") do
       delete_eventconf
     end
   else
@@ -92,6 +92,7 @@ def update_eventconf
 end
 
 def delete_eventconf
+  remove_file_from_eventconf(new_resource.name, node)
   file new_resource.name do
     path "#{node['opennms']['conf']['home']}/etc/events/#{new_resource.name}"
     action :delete
