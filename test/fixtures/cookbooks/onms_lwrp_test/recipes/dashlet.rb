@@ -8,3 +8,10 @@ opennms_dashlet 'summary2' do
   # dashboard config get read only once unless editied via WebUI
   notifies :restart, 'service[opennms]'
 end
+
+# no parameters
+opennms_dashlet 'summary3' do
+  wallboard 'schlazorboard'
+  dashlet_name 'Summary3'
+  notifies :restart, 'service[opennms]'
+end
