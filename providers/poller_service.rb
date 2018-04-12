@@ -24,7 +24,7 @@ action :create do
 end
 
 def load_current_resource
-  @current_resource = Chef::Resource.resource_for_node(:opennms_poller_service, node).new(@new_resource.name)
+  @current_resource = Chef::Resource.resource_for_node(:opennms_poller_service, node).new(@new_resource.service_name || @new_resource.name)
   @current_resource.package_name(@new_resource.package_name)
   @current_resource.interval(@new_resource.interval)
   @current_resource.user_defined(@new_resource.user_defined)
@@ -99,14 +99,15 @@ def service_changed?(current_resource)
 end
 
 def update_poller_service
-  Chef::Log.debug "Updating poller service: '#{new_resource.name}' in package '#{new_resource.package_name}'"
+  service_name = new_resource.service_name || new_resource.name
+  Chef::Log.debug "Updating poller service: '#{service_name}' in package '#{new_resource.package_name}'"
   file = ::File.new("#{node['opennms']['conf']['home']}/etc/poller-configuration.xml")
   contents = file.read
   doc = REXML::Document.new(contents, respect_whitespace: :all)
   doc.context[:attribute_quote] = :quote
   file.close
 
-  service_el = doc.elements["/poller-configuration/package[@name='#{new_resource.package_name}']/service[@name='#{new_resource.name}']"]
+  service_el = doc.elements["/poller-configuration/package[@name='#{new_resource.package_name}']/service[@name='#{service_name}']"]
   service_el.attributes['interval'] = new_resource.interval
   service_el.attributes['user-defined'] = new_resource.user_defined
   service_el.attributes['status'] = new_resource.status
@@ -128,7 +129,8 @@ def update_poller_service
 end
 
 def create_poller_service
-  Chef::Log.debug "Adding poller service: '#{new_resource.name}'"
+  service_name = new_resource.service_name || new_resource.name
+  Chef::Log.debug "Adding poller service: '#{service_name}'"
   # Open file
   file = ::File.new("#{node['opennms']['conf']['home']}/etc/poller-configuration.xml")
   contents = file.read
@@ -139,7 +141,7 @@ def create_poller_service
   package_el = doc.elements["/poller-configuration/package[@name='#{new_resource.package_name}']"]
   first_downtime_el = doc.elements["/poller-configuration/package[@name='#{new_resource.package_name}']/downtime[1]"]
   service_el = REXML::Element.new('service')
-  service_el.attributes['name'] = new_resource.name
+  service_el.attributes['name'] = service_name
   service_el.attributes['interval'] = new_resource.interval
   service_el.attributes['user-defined'] = new_resource.user_defined
   service_el.attributes['status'] = new_resource.status
@@ -155,10 +157,10 @@ def create_poller_service
       service_el.add_element 'parameter', 'key' => key, 'value' => value
     end
   end
-  if doc.elements["/poller-configuration/monitor[@service='#{new_resource.name}']"].nil?
+  if doc.elements["/poller-configuration/monitor[@service='#{service_name}']"].nil?
     last_monitor_el = doc.elements['/poller-configuration/monitor[last()]']
     new_mon_el = REXML::Element.new('monitor')
-    new_mon_el.attributes['service'] = new_resource.name
+    new_mon_el.attributes['service'] = service_name
     new_mon_el.attributes['class-name'] = new_resource.class_name
     doc.root.insert_after(last_monitor_el, new_mon_el)
   else
