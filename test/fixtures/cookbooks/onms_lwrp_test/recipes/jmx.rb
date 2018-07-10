@@ -21,3 +21,43 @@ opennms_jmx_mbean 'org.apache.activemq.Queue' do
     'InFlightCount' => { 'alias' => '5InFlightCnt', 'type' => 'gauge' }
   )
 end
+
+opennms_jmx_collection_service 'jmx_url' do
+  package_name 'jmx1'
+  collection 'jmxcollection'
+  ds_name 'jmx-ds-name'
+  friendly_name 'jmx-friendly-name'
+  url 'service:jmx:rmi:${ipaddr}:18980'
+  factory 'SASL'
+  username 'bart'
+  password 'simpson'
+end
+
+opennms_jmx_collection_service 'jmx_url_path' do
+  package_name 'jmx1'
+  collection 'jmxcollection'
+  ds_name 'jmx-ds-name'
+  friendly_name 'jmx-friendly-name'
+  url_path '/jmxrmi'
+  protocol 'rmi'
+  rmi_server_port 45444
+  remote_jmx true
+  factory 'SASL'
+  username 'bart'
+  password 'simpson'
+end
+
+opennms_jmx_collection_service 'jmx_url_ignore_path' do
+  package_name 'jmx1'
+  collection 'jmxcollection'
+  ds_name 'jmx-ds-name'
+  friendly_name 'jmx-friendly-name'
+  url 'service:jmx:rmi:${ipaddr}:18980'
+  url_path '/jmxrmi'
+  protocol 'rmi'
+  rmi_server_port 45444
+  remote_jmx true
+  factory 'SASL'
+  username 'bart'
+  password 'simpson'
+end

@@ -7,7 +7,14 @@ require 'rexml/document'
 # collection elements using the jmx_collection and jdbc_mbean LWRPs.
 # The package is created with the collection_package LWRP.
 
-actions :create
+# The parameters port, protocol, url_path, rmi_server_port and remote_jmx are
+# deprecated and should be replaced with the url parameter. If url is not
+# defined then the deprecated attributes are used instead.
+
+# Note that configuration of a particular service can can be overwritten by
+# an entry in $OPENNMS_HOME/etc/jmx-config.xml.
+
+actions :create, :delete
 default_action :create
 
 attribute :service_name, name_attribute: true, kind_of: String
@@ -19,9 +26,15 @@ attribute :status, kind_of: String, equal_to: %w(on off), default: 'on'
 attribute :timeout, kind_of: Integer, default: 3000
 attribute :retry_count, kind_of: Integer, default: 1
 attribute :thresholding_enabled, kind_of: [FalseClass, TrueClass], default: false
+attribute :factory, kind_of: String, equal_to: %w(STANDARD PASSWORD_CLEAR SASL)
+attribute :username, kind_of: String
+attribute :password, kind_of: String
 attribute :port, kind_of: Integer, default: 1099
 attribute :protocol, kind_of: String, default: 'rmi'
 attribute :url_path, kind_of: String, default: '/jmxrmi'
+attribute :url, kind_of: String
+attribute :rmi_server_port, kind_of: Integer
+attribute :remote_jmx, kind_of: [TrueClass, FalseClass]
 attribute :rrd_base_name, kind_of: String, default: 'java'
 attribute :ds_name, kind_of: String, required: true
 attribute :friendly_name, kind_of: String, required: true
