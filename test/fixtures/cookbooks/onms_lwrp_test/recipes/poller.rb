@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+include_recipe 'onms_lwrp_test::poll_outage'
 # most useful options
 opennms_poller_package 'foo' do
   filter "(IPADDR != '0.0.0.0') & (categoryName == 'foo')"
@@ -7,6 +8,8 @@ opennms_poller_package 'foo' do
   exclude_ranges ['begin' => '10.0.2.1', 'end' => '10.0.2.254']
   include_urls ['file:/opt/opennms/etc/foo']
   rrd_step 600
+  remote true
+  outage_calendars ['ignore localhost on mondays']
   rras ['RRA:AVERAGE:0.5:2:4032', 'RRA:AVERAGE:0.5:24:2976', 'RRA:AVERAGE:0.5:576:732', 'RRA:MAX:0.5:576:732', 'RRA:MIN:0.5:576:732']
   notifies :restart, 'service[opennms]', :delayed
 end

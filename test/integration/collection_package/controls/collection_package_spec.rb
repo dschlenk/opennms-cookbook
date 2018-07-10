@@ -8,6 +8,8 @@ control 'collection_package' do
     its('include_urls') { should eq ['file:/opt/opennms/etc/foo'] }
     its('store_by_if_alias') { should eq true }
     its('if_alias_domain') { should eq 'foo.com' }
+    its('remote') { should eq true }
+    its('outage_calendars') { should eq ['ignore localhost on mondays'] }
   end
 
   describe collection_package('bar') do

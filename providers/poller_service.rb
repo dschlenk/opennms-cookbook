@@ -140,12 +140,20 @@ def create_poller_service
 
   package_el = doc.elements["/poller-configuration/package[@name='#{new_resource.package_name}']"]
   first_downtime_el = doc.elements["/poller-configuration/package[@name='#{new_resource.package_name}']/downtime[1]"]
+  first_oc = doc.elements["/poller-configuration/package[@name='#{new_resource.package_name}']/outage-calendar[1]"]
+  Chef::Log.debug("first_oc: #{first_oc}")
   service_el = REXML::Element.new('service')
   service_el.attributes['name'] = service_name
   service_el.attributes['interval'] = new_resource.interval
   service_el.attributes['user-defined'] = new_resource.user_defined
   service_el.attributes['status'] = new_resource.status
-  package_el.insert_before(first_downtime_el, service_el)
+  if !first_oc
+    Chef::Log.debug("first_oc is false so adding #{service_name} before first downtime element")
+    package_el.insert_before(first_downtime_el, service_el)
+  else
+    Chef::Log.debug("first_oc not nil so adding #{service_name} before first outage-calendar element")
+    package_el.insert_before(first_oc, service_el)
+  end
   unless new_resource.timeout.nil?
     service_el.add_element 'parameter', 'key' => 'timeout', 'value' => new_resource.timeout
   end

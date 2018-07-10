@@ -11,3 +11,5 @@ attribute :times, kind_of: Hash, required: true, default: {}
 attribute :type, kind_of: String, equal_to: %w(specific daily weekly monthly), required: true
 attribute :interfaces, kind_of: Array, default: [] # of IP addresses as strings
 attribute :nodes, kind_of: Array, default: [] # of node IDs
+
+attr_accessor :exists

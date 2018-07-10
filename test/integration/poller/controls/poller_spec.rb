@@ -8,6 +8,8 @@ control 'poller' do
     its('exclude_ranges') { should eq [{ 'begin' => '10.0.2.1', 'end' => '10.0.2.254' }] }
     its('include_urls') { should eq ['file:/opt/opennms/etc/foo'] }
     its('rrd_step') { should eq 600 }
+    its('remote') { should eq true }
+    its('outage_calendars') { should eq ['ignore localhost on mondays'] }
     its('rras') { should eq ['RRA:AVERAGE:0.5:2:4032', 'RRA:AVERAGE:0.5:24:2976', 'RRA:AVERAGE:0.5:576:732', 'RRA:MAX:0.5:576:732', 'RRA:MIN:0.5:576:732'] }
   end
 

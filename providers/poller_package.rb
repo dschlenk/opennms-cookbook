@@ -42,6 +42,7 @@ def create_poller_package
   doc.root.insert_after(last_pkg_el, REXML::Element.new('package'))
   package_el = doc.root.elements['/poller-configuration/package[last()]']
   package_el.attributes['name'] = new_resource.name
+  package_el.attributes['remote'] = 'true' if new_resource.remote
   filter_el = package_el.add_element('filter')
   filter_el.add_text(REXML::CData.new(new_resource.filter))
   unless new_resource.specifics.nil?
@@ -77,7 +78,7 @@ def create_poller_package
   end
   unless new_resource.outage_calendars.nil?
     new_resource.outage_calendars.each do |outage_calendar|
-      outage_el = package_el.add_element 'outage_calendar'
+      outage_el = package_el.add_element 'outage-calendar'
       outage_el.add_text(outage_calendar)
     end
   end

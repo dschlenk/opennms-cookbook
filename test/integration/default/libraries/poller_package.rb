@@ -15,6 +15,8 @@ class PollerPackage < Inspec.resource(1)
       its(\'include_ranges\') { should eq [{ \'begin\' => \'10.0.1.1\', \'end\' => \'10.0.1.254\' }] }
       its(\'exclude_ranges\') { should eq [{ \'begin\' => \'10.0.2.1\', \'end\' => \'10.0.2.254\' }] }
       its(\'include_urls\') { should eq [\'file:/opt/opennms/etc/foo\'] }
+      its(\'remote\') { should eq true }
+      its(\'outage_calendars\') { should eq [\'ignore localhost on mondays\'] }
       its(\'rrd_step\') { should eq 600 }
       its(\'rras\') { should eq [\'RRA:AVERAGE:0.5:2:4032\', \'RRA:AVERAGE:0.5:24:2976\', \'RRA:AVERAGE:0.5:576:732\', \'RRA:MAX:0.5:576:732\', \'RRA:MIN:0.5:576:732\'] }
     end
@@ -49,9 +51,11 @@ class PollerPackage < Inspec.resource(1)
       p_el.each_element('rrd/rra') do |rra|
         @params[:rras].push rra.texts.join('\n')
       end
-      unless p_el.elements['outage_calendar'].nil?
+      @params[:remote] = false
+      @params[:remote] = true if p_el.attributes['remote'].to_s == 'true'
+      unless p_el.elements['outage-calendar'].nil?
         @params[:outage_calendars] = []
-        p_el.each_element('outage_calendar') do |oc|
+        p_el.each_element('outage-calendar') do |oc|
           @params[:outage_calendars].push oc.texts.join('\n')
         end
       end
