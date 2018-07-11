@@ -12,6 +12,6 @@ end
 # no parameters
 opennms_dashlet 'summary3' do
   wallboard 'schlazorboard'
-  dashlet_name 'Summary3'
+  dashlet_name 'Summary'
   notifies :restart, 'service[opennms]'
 end
