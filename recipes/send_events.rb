@@ -19,6 +19,7 @@ reload_daemons = {
   'Threshd' => { 'template' => 'threshd-configuration.xml' },
   'Thresholds' => { 'template' => 'thresholds.xml' },
   'Vacuumd' => { 'template' => 'vacuumd-configuration.xml' },
+  'Telemetryd' => { 'template' => 'telemetryd-configuration.xml' },
 }
 reload_daemons.each do |daemon, settings|
   params = ["daemonName #{daemon}"]

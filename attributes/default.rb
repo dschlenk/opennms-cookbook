@@ -8,16 +8,22 @@ default['yum']['opennms-stable-common']['baseurl']        = 'http://yum.opennms.
 default['yum']['opennms-stable-common']['failovermethod'] = 'roundrobin'
 default['yum']['opennms-stable-rhel6']['baseurl']         = 'http://yum.opennms.org/stable/rhel6'
 default['yum']['opennms-stable-rhel6']['failovermethod']  = 'roundrobin'
+default['yum']['opennms-stable-rhel7']['baseurl']         = 'http://yum.opennms.org/stable/rhel7'
+default['yum']['opennms-stable-rhel7']['failovermethod']  = 'roundrobin'
 default['yum']['opennms-obsolete-common']['baseurl']        = 'http://yum.opennms.org/obsolete/common'
 default['yum']['opennms-obsolete-common']['failovermethod'] = 'roundrobin'
 default['yum']['opennms-obsolete-rhel6']['baseurl']         = 'http://yum.opennms.org/obsolete/rhel6'
 default['yum']['opennms-obsolete-rhel6']['failovermethod']  = 'roundrobin'
+default['yum']['opennms-obsolete-rhel7']['baseurl']         = 'http://yum.opennms.org/obsolete/rhel7'
+default['yum']['opennms-obsolete-rhel7']['failovermethod']  = 'roundrobin'
 default['yum']['opennms-snapshot-common']['baseurl']        = 'http://yum.opennms.org/snapshot/common'
 default['yum']['opennms-snapshot-common']['failovermethod'] = 'roundrobin'
 default['yum']['opennms-snapshot-rhel6']['baseurl']         = 'http://yum.opennms.org/snapshot/rhel6'
 default['yum']['opennms-snapshot-rhel6']['failovermethod']  = 'roundrobin'
+default['yum']['opennms-snapshot-rhel7']['baseurl']         = 'http://yum.opennms.org/snapshot/rhel7'
+default['yum']['opennms-snapshot-rhel7']['failovermethod']  = 'roundrobin'
 default['build-essential']['compile_time'] = true
-default['opennms']['version'] = '21.0.5-1'
+default['opennms']['version'] = '22.0.0-1'
 # default['opennms']['version_major'] = "%{version}"
 default['opennms']['allow_downgrade'] = false
 default['opennms']['stable'] = true
@@ -401,6 +407,8 @@ default['opennms']['properties']['newts']['cache_max_entries'] = 8192
 default['opennms']['properties']['newts']['cache_redis_host'] = 'localhost'
 default['opennms']['properties']['newts']['cache_redis_port'] = 6379
 default['opennms']['properties']['newts']['nan_on_counter_wrap'] = true
+default['opennms']['properties']['newts']['cache_priming_disable'] = false
+default['opennms']['properties']['newts']['cache_priming_block_ms'] = 120000
 default['opennms']['properties']['statusbox']['elements'] = nil # defaults to 'business-services,nodes-by-alarms,nodes-by-outages' in 21
 default['opennms']['properties']['heatmap']['default_mode'] = 'alarms' # outages
 default['opennms']['properties']['heatmap']['default_heatmap'] = 'categories' # or 'foreignSources' or 'monitoredServices'
@@ -417,9 +425,11 @@ default['opennms']['properties']['grafana']['protocol'] = 'http'
 default['opennms']['properties']['grafana']['connection_timeout'] = 500
 default['opennms']['properties']['grafana']['so_timeout'] = 500
 default['opennms']['properties']['grafana']['dashboard_limit'] = 0
+default['opennms']['properties']['grafana']['base_path'] = ''
 default['opennms']['properties']['alarmlist']['sound_enable'] = false
 default['opennms']['properties']['alarmlist']['sound_status'] = 'off' # newalarm, newalarmcount
 default['opennms']['properties']['alarmlist']['unackflash'] = false
+default['opennms']['properties']['rest_aliases'] = '/rest,/api/v2'
 # access point monitor
 default['opennms']['apm']['threads']           = 30
 default['opennms']['apm']['pscan_interval']    = 1_800_000
@@ -668,6 +678,9 @@ default['opennms']['datacollection']['default']['novell']           = true
 default['opennms']['datacollection']['default']['pfsense']          = true
 default['opennms']['datacollection']['default']['powerware']        = true
 default['opennms']['datacollection']['default']['postgres']         = true
+default['opennms']['datacollection']['default']['ref_cpq_im']       = false # these are true >= 22, see base_templates recipe
+default['opennms']['datacollection']['default']['ref_mib2_if']      = false
+default['opennms']['datacollection']['default']['ref_mib2_pe']      = false
 default['opennms']['datacollection']['default']['riverbed']         = true
 default['opennms']['datacollection']['default']['savin']            = true
 default['opennms']['datacollection']['default']['servertech']       = true
@@ -856,6 +869,7 @@ default['opennms']['jmx_dc']['jsr160']['rrd']['step'] = 300
 default['opennms']['jmx_dc']['jsr160']['rrd']['rras'] = ['RRA:AVERAGE:0.5:1:2016', 'RRA:AVERAGE:0.5:12:1488', 'RRA:AVERAGE:0.5:288:366', 'RRA:MAX:0.5:288:366', 'RRA:MIN:0.5:288:366']
 default['opennms']['jmx_dc']['jsr160']['queued']['enabled']                         = true
 default['opennms']['jmx_dc']['jsr160']['pollerd']['enabled']                        = true
+default['opennms']['jmx_dc']['jsr160']['kafka']['enabled']                          = true
 default['opennms']['jmx_dc']['jsr160']['vacuumd']['enabled']                        = true
 default['opennms']['jmx_dc']['jsr160']['collectd']['enabled']                       = true
 default['opennms']['jmx_dc']['jsr160']['capsd']['enabled']                          = true
@@ -933,6 +947,7 @@ default['opennms']['log4j2']['rtc'] = 'WARN'
 default['opennms']['log4j2']['syslogd'] = 'WARN'
 default['opennms']['log4j2']['telemetryd'] = 'WARN'
 default['opennms']['log4j2']['scriptd'] = 'WARN'
+default['opennms']['log4j2']['snmp'] = 'WARN'
 default['opennms']['log4j2']['snmp_poller'] = 'WARN'
 default['opennms']['log4j2']['syslogd'] = 'WARN'
 default['opennms']['log4j2']['threshd'] = 'WARN'
@@ -1969,3 +1984,66 @@ default['opennms']['xmpp']['pass']                = nil
 default['opennms']['web']['cookbook'] = 'opennms'
 default['opennms']['cors']['origins']     = '*'
 default['opennms']['cors']['credentials'] = true
+
+case node['platform_family']
+when 'rhel'
+  default['opennms']['repos']['branches'] = %w(stable obsolete snapshot)
+  default['opennms']['repos']['platforms'] = %w(common)
+  if node['platform_version'].to_f >= 6.0 && node['platform_version'].to_f < 7.0
+    Chef::Log.debug("i am 6 because #{node['platform_version']}")
+    default['opennms']['repos']['platforms'].push 'rhel6'
+  end
+  if node['platform_version'].to_f >= 7.0 && node['platform_version'].to_f < 8.0
+    Chef::Log.debug("i am 7 because #{node['platform_version']}")
+    default['opennms']['repos']['platforms'].push 'rhel7'
+  end
+end
+
+default['opennms']['telemetryd']['jti']['enabled'] = false
+default['opennms']['telemetryd']['jti']['port'] = 50000
+default['opennms']['telemetryd']['netflow5']['enabled'] = false
+default['opennms']['telemetryd']['netflow5']['port'] = 8877
+default['opennms']['telemetryd']['netflow9']['enabled'] = false
+default['opennms']['telemetryd']['netflow9']['port'] = 4729
+default['opennms']['telemetryd']['ipfix']['enabled'] = false
+default['opennms']['telemetryd']['ipfix']['port'] = 4730
+default['opennms']['telemetryd']['sflow']['enabled'] = false
+default['opennms']['telemetryd']['sflow']['port'] = 6343
+default['opennms']['telemetryd']['nxos']['enabled'] = false
+default['opennms']['telemetryd']['nxos']['port'] = 50001
+# 'protocol_name' => {
+#   'description' => 'xxx',
+#   'enabled' => true|false,
+#   'listeners' => {
+#     'listener_name' => {
+#       'class_name' => 'org.opennms.blah.blah',
+#       'parameters' => {
+#         'key' => 'value',
+#         ...
+#       }
+#      },
+#      ...
+#    },
+#    ...
+#    'adapters' => {
+#      'adapter_name' => {
+#        'class_name' => 'org.opennms.blah.blah',
+#        'parameters' => {
+#          'key' => 'value',
+#         ...
+#        }
+#      },
+#      ...
+#    },
+#    'package' => {
+#      'rrd' => {
+#        'step' => 300,
+#        'rras' => ['strings'],
+#      }
+#    }
+# },
+# ...
+default['opennms']['telemetryd']['protocols'] = {}
+default['opennms']['telemetryd']['cookbook'] = 'opennms'
+default['opennms']['es']['hosts'] = {}
+default['opennms']['manage_repos'] = true
