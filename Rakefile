@@ -70,7 +70,7 @@ namespace :integration do
               puts "Going to skip #{instance.name}"
               if old_instance.nil?
                 puts "Setting #{instance.name} to first_instance."
-                first_instance = instance 
+                first_instance = instance
               end
               puts "Setting #{instance.name} to old_instance."
               old_instance = instance
@@ -85,7 +85,7 @@ namespace :integration do
               puts "Not resuming. Moving #{old_instance.name}.yml to #{instance.name}.yml."
               File.rename(".kitchen/#{old_instance.name}.yml", ".kitchen/#{instance.name}.yml")
             else
-              puts "Resuming, not moving yml file."
+              puts 'Resuming, not moving yml file.'
               resuming = false
             end
             instance.converge
