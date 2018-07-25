@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 # most useful options
 # Note that package_name 'foo' must be defined somewhere else in your resource collection.
+include_recipe 'onms_lwrp_test::collection_package'
 opennms_snmp_collection_service 'SNMP' do
   collection 'baz'
   package_name 'foo'

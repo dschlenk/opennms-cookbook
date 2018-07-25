@@ -7,7 +7,7 @@ def whyrun_supported?
   true
 end
 
-use_inline_resources
+use_inline_resources # ~FC113
 
 action :create_if_missing do
   if @current_resource.exists
@@ -43,8 +43,7 @@ action :delete do
 end
 
 def load_current_resource
-  @current_resource = Chef::Resource::OpennmsThreshold.new(@new_resource.name)
-  @current_resource.name(@new_resource.name)
+  @current_resource = Chef::Resource.resource_for_node(:opennms_threshold, node).new(@new_resource.name)
   @current_resource.ds_name(@new_resource.ds_name || @new_resource.name)
   @current_resource.group(@new_resource.group)
   @current_resource.ds_type(@new_resource.ds_type)

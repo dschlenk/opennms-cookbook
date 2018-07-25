@@ -4,7 +4,7 @@ def whyrun_supported?
   true
 end
 
-use_inline_resources
+use_inline_resources # ~FC113
 
 action :create do
   Chef::Application.fatal!("Missing group  #{@current_resource.membership_group}.") unless @current_resource.group_exists
@@ -19,8 +19,7 @@ action :create do
 end
 
 def load_current_resource
-  @current_resource = Chef::Resource::OpennmsRole.new(@new_resource.name)
-  @current_resource.name(@new_resource.name)
+  @current_resource = Chef::Resource.resource_for_node(:opennms_role, node).new(@new_resource.name)
   @current_resource.membership_group(@new_resource.membership_group)
   @current_resource.supervisor(@new_resource.supervisor)
 

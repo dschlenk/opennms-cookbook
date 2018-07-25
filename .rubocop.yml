@@ -15,3 +15,5 @@ Style/FormatString:
     - 'recipes/templates.rb'
 Style/GuardClause:
   Enabled: false
+Metrics/BlockNesting:
+  Max: 4

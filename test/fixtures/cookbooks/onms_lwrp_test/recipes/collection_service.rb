@@ -1,6 +1,6 @@
 # frozen_string_literal: true
+include_recipe 'onms_lwrp_test::collection_package'
 # most useful options
-# Note that package_name 'foo' must be defined somewhere else in your resource collection.
 opennms_collection_service 'JSON' do
   collection 'baz'
   package_name 'foo'
@@ -11,7 +11,7 @@ opennms_collection_service 'JSON' do
   timeout 5000
   retry_count 10
   port 1161
-  params 'handler-class' => 'org.opennms.protocols.json.collector.DefaultJsonCollectionHandler'
+  parameters 'handler-class' => 'org.opennms.protocols.json.collector.DefaultJsonCollectionHandler'
   thresholding_enabled true
   notifies :restart, 'service[opennms]', :delayed
 end
@@ -21,6 +21,6 @@ opennms_collection_service 'JSON-bar' do
   package_name 'bar'
   collection 'default'
   class_name 'org.opennms.protocols.xml.collector.XmlCollector'
-  params 'handler-class' => 'org.opennms.protocols.json.collector.DefaultJsonCollectionHandler'
+  parameters 'handler-class' => 'org.opennms.protocols.json.collector.DefaultJsonCollectionHandler'
   notifies :restart, 'service[opennms]', :delayed
 end

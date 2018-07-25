@@ -4,7 +4,7 @@ def whyrun_supported?
   true
 end
 
-use_inline_resources
+use_inline_resources # ~FC113
 
 action :create do
   Chef::Application.fatal!("Missing role  #{@current_resource.role_name}.") unless @current_resource.role_exists
@@ -19,10 +19,8 @@ action :create do
   end
 end
 
-# rubocop:disable Metrics/BlockNesting
 def load_current_resource
-  @current_resource = Chef::Resource::OpennmsRoleSchedule.new(@new_resource.name)
-  @current_resource.name(@new_resource.name)
+  @current_resource = Chef::Resource.resource_for_node(:opennms_role_schedule, node).new(@new_resource.name)
   @current_resource.role_name(@new_resource.role_name)
   @current_resource.type(@new_resource.type)
   @current_resource.username(@new_resource.username)
@@ -72,7 +70,6 @@ def times_valid?(times)
   end
   validity
 end
-# rubocop:enable Metrics/BlockNesting
 
 def create_role_schedule
   add_schedule_to_role(new_resource, node)

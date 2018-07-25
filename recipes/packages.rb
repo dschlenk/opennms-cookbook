@@ -3,7 +3,7 @@
 # Cookbook Name:: opennms-cookbook
 # Recipe:: packages
 #
-# Copyright 2015, Spanlink Communications, Inc
+# Copyright 2015-2018, ConvergeOne
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -17,54 +17,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-
-cookbook_file '/etc/yum.repos.d/OPENNMS-GPG-KEY' do
-  source 'OPENNMS-GPG-KEY'
-  mode 00644
-  owner 'root'
-  group 'root'
-end
-
-bash 'import OpenNMS GPG key' do
-  code 'rpm --import /etc/yum.repos.d/OPENNMS-GPG-KEY'
-  not_if 'rpm -qai "*gpg*" | grep -q OpenNMS'
-end
-
-def yum_attr(branch, platform, attr)
-  node['yum']["opennms-#{branch}-#{platform}"][attr]
-end
-
-branches = %w(stable obsolete snapshot)
-platforms = %w(common rhel6)
-branches.each do |branch|
-  platforms.each do |platform|
-    skip = false
-    Chef::Log.debug "branch is '#{branch}' and stable is #{node['opennms']['stable']}"
-    if (branch == 'stable' && !node['opennms']['stable']) ||
-       (branch == 'snapshot' && node['opennms']['stable'])
-      skip = true
-    end
-    next if skip
-    bu = yum_attr(branch, platform, 'baseurl')
-    ml = yum_attr(branch, platform, 'url')
-    fom = yum_attr(branch, platform, 'failovermethod')
-    inc_pkgs = yum_attr(branch, platform, 'includepkgs')
-    repo_enabled = yum_attr(branch, platform, 'enabled')
-    ex = yum_attr(branch, platform, 'exclude')
-    yum_repository "opennms-#{branch}-#{platform}" do
-      description "#{platform} OpenNMS RPMs (#{branch})"
-      baseurl bu unless bu.nil? || bu == ''
-      mirrorlist ml unless ml.nil? || ml == ''
-      gpgkey 'file:///etc/yum.repos.d/OPENNMS-GPG-KEY'
-      failovermethod fom unless fom.nil? | fom == ''
-      enabled repo_enabled
-      includepkgs inc_pkgs unless inc_pkgs.nil? || inc_pkgs == ''
-      exclude ex unless ex.nil? || ex == ''
-      action :create
-    end
-  end
-end
-
+include_recipe 'opennms::repositories' if node['opennms']['manage_repos']
 onms_packages = ['opennms-core', 'opennms-webapp-jetty', 'opennms-docs']
 onms_versions = [node['opennms']['version'], node['opennms']['version'],
                  node['opennms']['version']]
@@ -95,8 +48,8 @@ onms_packages.each do |pkg|
     command "yum versionlock delete 0:#{pkg}*"
     ignore_failure true
     not_if "yum versionlock list #{pv} | grep -q #{pv}"
-    branches.each do |branch|
-      platforms.each do |platform|
+    node['opennms']['repos']['branches'].each do |branch|
+      node['opennms']['repos']['platforms'].each do |platform|
         skip = false
         Chef::Log.debug "branch is '#{branch}' and stable is #{node['opennms']['stable']}"
         if (branch == 'stable' && !node['opennms']['stable']) ||

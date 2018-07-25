@@ -3,7 +3,7 @@ def whyrun_supported?
   true
 end
 
-use_inline_resources
+use_inline_resources # ~FC113
 
 action :create do
   if @current_resource.exists
@@ -22,8 +22,7 @@ action :create do
 end
 
 def load_current_resource
-  @current_resource = Chef::Resource::OpennmsWmiCollectionService.new(@new_resource.name)
-  @current_resource.name(@new_resource.name)
+  @current_resource = Chef::Resource.resource_for_node(:opennms_wmi_collection_service, node).new(@new_resource.name)
   @current_resource.service_name(@new_resource.service_name)
   @current_resource.package_name(@new_resource.package_name)
   @current_resource.collection(@new_resource.collection)
@@ -37,7 +36,7 @@ def load_current_resource
 
   if service_exists?(@current_resource.package_name,
                      @current_resource.collection,
-                     @current_resource.name)
+                     @current_resource.service_name)
     @current_resource.exists = true
     @current_resource.changed = true if service_changed?(@current_resource)
   end
@@ -162,7 +161,11 @@ def create_wmi_collection_service
   file.close
 
   package_el = doc.elements["/collectd-configuration/package[@name='#{new_resource.package_name}']"]
-  service_el = package_el.add_element 'service', 'name' => new_resource.service_name, 'status' => new_resource.status, 'interval' => new_resource.interval
+  first_oc = doc.elements["/collectd-configuration/package[@name='#{new_resource.package_name}']/outage-calendar[1]"]
+  service_el = REXML::Element.new('service')
+  service_el.attributes['name'] = new_resource.service_name
+  service_el.attributes['interval'] = new_resource.interval
+  service_el.attributes['status'] = new_resource.status
   unless new_resource.user_defined.nil?
     service_el.add_attribute('user-defined', new_resource.user_defined)
   end
@@ -180,6 +183,11 @@ def create_wmi_collection_service
     service_el.add_element 'parameter', 'key' => 'thresholding-enabled', 'value' => new_resource.thresholding_enabled
   end
 
+  if !first_oc
+    package_el.add_element(service_el)
+  else
+    package_el.insert_before(first_oc, service_el)
+  end
   # make sure we've got a service definition at the end of the file
   unless doc.elements["/collectd-configuration/collector[@service='#{new_resource.service_name}']"]
     doc.elements['/collectd-configuration'].add_element 'collector', 'service' => new_resource.service_name, 'class-name' => 'org.opennms.netmgt.collectd.WmiCollector'

@@ -3,7 +3,7 @@ def whyrun_supported?
   true
 end
 
-use_inline_resources
+use_inline_resources # ~FC113
 
 action :create do
   if @current_resource.exists
@@ -16,8 +16,7 @@ action :create do
 end
 
 def load_current_resource
-  @current_resource = Chef::Resource::OpennmsDestinationPath.new(@new_resource.name)
-  @current_resource.name(@new_resource.name)
+  @current_resource = Chef::Resource.resource_for_node(:opennms_destination_path, node).new(@new_resource.name)
 
   if destination_path_exists?(@current_resource.name)
     @current_resource.exists = true
@@ -43,7 +42,7 @@ def create_destination_path
 
   paths_el = doc.root.elements['/destinationPaths']
   path_el = paths_el.add_element 'path', 'name' => new_resource.name
-  if !new_resource.initial_delay.nil? && !new_resource.initial_delay == '0s'
+  if !new_resource.initial_delay.nil? && new_resource.initial_delay != '0s'
     path_el.attributes['initial-delay'] = new_resource.initial_delay
   end
 

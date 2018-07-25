@@ -3,7 +3,7 @@ def whyrun_supported?
   true
 end
 
-use_inline_resources
+use_inline_resources # ~FC113
 
 action :create do
   if @current_resource.exists
@@ -16,8 +16,7 @@ action :create do
 end
 
 def load_current_resource
-  @current_resource = Chef::Resource::OpennmsCollectionPackage.new(@new_resource.name)
-  @current_resource.name(@new_resource.name)
+  @current_resource = Chef::Resource.resource_for_node(:opennms_collection_package, node).new(@new_resource.name)
 
   @current_resource.exists = true if package_exists?(@current_resource.name)
 end
@@ -43,6 +42,7 @@ def create_collection_package
   doc.root.insert_after(last_pkg_el, REXML::Element.new('package'))
   package_el = doc.root.elements['/collectd-configuration/package[last()]']
   package_el.attributes['name'] = new_resource.name
+  package_el.attributes['remote'] = new_resource.remote unless new_resource.remote.nil?
   filter_el = package_el.add_element('filter')
   filter_el.add_text(REXML::CData.new(new_resource.filter))
   new_resource.specifics.each do |specific|
@@ -82,6 +82,12 @@ def create_collection_package
   unless new_resource.if_alias_comment.nil?
     ifalias_comment_el = package_el.add_element('ifAliasComment')
     ifalias_comment_el.add_text(new_resource.if_alias_comment)
+  end
+  unless new_resource.outage_calendars.nil?
+    new_resource.outage_calendars.each do |oc|
+      oc_el = package_el.add_element('outage-calendar')
+      oc_el.add_text(oc)
+    end
   end
 
   Opennms::Helpers.write_xml_file(doc, "#{node['opennms']['conf']['home']}/etc/collectd-configuration.xml")

@@ -12,5 +12,5 @@ opennms_foreign_source 'policy-source'
 opennms_policy 'Production Category' do
   class_name 'org.opennms.netmgt.provision.persist.policies.NodeCategorySettingPolicy'
   foreign_source_name 'policy-source'
-  params 'category' => 'Test', 'matchBehavior' => 'ALL_PARAMETERS'
+  parameters 'category' => 'Test', 'matchBehavior' => 'ALL_PARAMETERS'
 end

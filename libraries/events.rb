@@ -188,21 +188,21 @@ module Events
     end
     unless event.parameters.nil?
       if event.parameters.empty?
-        unless event_el.elements['parameters'].nil?
+        unless event_el.elements['parameter'].nil?
           Chef::Log.debug 'Event parameters present but nil in new resource.'
           return true
         end
       end
-      if event_el.elements['parameters'].nil?
+      if event_el.elements['parameter'].nil?
         unless event.parameters.nil?
           Chef::Log.debug 'Event parameters not present but not nil in new resource.'
           return true
         end
       else
         parameters = []
-        event_el.elements.each('parameters') do |parm|
+        event_el.elements.each('parameter') do |parm|
           p = { 'name' => parm.attributes['name'], 'value' => parm.attributes['value'] }
-          next unless Opennms::Helpers.major(node['opennms']['version']).to_i > 17 && parm.key?('expand')
+          next if Opennms::Helpers.major(node['opennms']['version']).to_i <= 17 || parm.attributes['expand'].nil?
           p['expand'] = if parm.attributes['expand'] == 'true'
                           true
                         else
@@ -380,9 +380,13 @@ module Events
     events_el = doc.root.elements['/events']
     eventconf_el = REXML::Element.new('event-file')
     eventconf_el.add_text(REXML::CData.new("events/#{file}"))
-    ref_ef_el = doc.root.elements["/events/event-file[text() = 'events/ncs-component.events.xml']"]
+    bottom_ref = 'events/ncs-component.events.xml'
+    bottom_ref = 'events/opennms.catch-all.events.xml' if Opennms::Helpers.major(node['opennms']['version']).to_i >= 20
+    ref_ef_el = doc.root.elements["/events/event-file[text() = '#{bottom_ref}']"]
     if position == 'top'
-      ref_ef_el = doc.root.elements["/events/event-file[text() = 'events/Translator.default.events.xml']"]
+      top_ref = 'events/Translator.default.events.xml'
+      top_ref = 'events/opennms.snmp.trap.translator.events.xml' if Opennms::Helpers.major(node['opennms']['version']).to_i >= 20
+      ref_ef_el = doc.root.elements["/events/event-file[text() = '#{top_ref}']"]
       events_el.insert_after(ref_ef_el, eventconf_el)
     else
       events_el.insert_before(ref_ef_el, eventconf_el)

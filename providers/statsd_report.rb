@@ -5,7 +5,7 @@ def whyrun_supported?
   true
 end
 
-use_inline_resources
+use_inline_resources # ~FC113
 
 action :create do
   Chef::Application.fatal!("Missing statsd package #{@current_resource.package_name}.") unless @current_resource.package_exists
@@ -19,8 +19,7 @@ action :create do
 end
 
 def load_current_resource
-  @current_resource = Chef::Resource::OpennmsStatsdReport.new(@new_resource.name)
-  @current_resource.name(@new_resource.name)
+  @current_resource = Chef::Resource.resource_for_node(:opennms_statsd_report, node).new(@new_resource.name)
   @current_resource.report_name(@new_resource.report_name) unless @new_resource.report_name.nil?
   @current_resource.package_name(@new_resource.package_name)
 

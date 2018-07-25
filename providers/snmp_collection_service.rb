@@ -3,7 +3,7 @@ def whyrun_supported?
   true
 end
 
-use_inline_resources
+use_inline_resources # ~FC113
 
 action :create do
   if @current_resource.exists
@@ -16,8 +16,7 @@ action :create do
 end
 
 def load_current_resource
-  @current_resource = Chef::Resource::OpennmsSnmpCollectionService.new(@new_resource.name)
-  @current_resource.name(@new_resource.name)
+  @current_resource = Chef::Resource.resource_for_node(:opennms_snmp_collection_service, node).new(@new_resource.name)
   @current_resource.package_name(@new_resource.package_name)
   @current_resource.collection(@new_resource.collection)
 
@@ -48,7 +47,11 @@ def create_snmp_collection_service
   file.close
 
   package_el = doc.elements["/collectd-configuration/package[@name='#{new_resource.package_name}']"]
-  service_el = package_el.add_element 'service', 'name' => new_resource.service_name, 'status' => new_resource.status, 'interval' => new_resource.interval
+  first_oc = doc.elements["/collectd-configuration/package[@name='#{new_resource.package_name}']/outage-calendar[1]"]
+  service_el = REXML::Element.new('service')
+  service_el.attributes['name'] = new_resource.service_name
+  service_el.attributes['interval'] = new_resource.interval
+  service_el.attributes['status'] = new_resource.status
   if new_resource.user_defined
     service_el.add_attribute('user-defined', new_resource.user_defined)
   end
@@ -64,6 +67,11 @@ def create_snmp_collection_service
   end
   unless new_resource.thresholding_enabled.nil?
     service_el.add_element 'parameter', 'key' => 'thresholding-enabled', 'value' => new_resource.thresholding_enabled
+  end
+  if !first_oc
+    package_el.add_element(service_el)
+  else
+    package_el.insert_before(first_oc, service_el)
   end
   # make sure we've got a service definition at the end of the file
   unless doc.elements["/collectd-configuration/collector[@service='#{new_resource.service_name}']"]

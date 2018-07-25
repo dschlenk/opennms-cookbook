@@ -20,4 +20,6 @@ attribute :store_by_node_id, kind_of: [String, TrueClass, FalseClass], default: 
 attribute :if_alias_domain, kind_of: String
 attribute :stor_flag_override, kind_of: [TrueClass, FalseClass], default: false
 attribute :if_alias_comment, kind_of: String
+attribute :remote, kind_of: [TrueClass, FalseClass]
+attribute :outage_calendars, kind_of: Array
 attr_accessor :exists

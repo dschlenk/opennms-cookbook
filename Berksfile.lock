@@ -1,73 +1,71 @@
 DEPENDENCIES
-  grafana
-    git: https://github.com/dschlenk/chef-grafana
-    revision: efec1c4464d0add8a6036ff77a462a837014a73a
-  nginx (~> 2.7)
-  ohai (~> 2.0)
+  hsflowd
+    path: test/fixtures/cookbooks/hsflowd
   onms_lwrp_test
     path: test/fixtures/cookbooks/onms_lwrp_test
   opennms
     path: .
     metadata: true
+  opennms-elasticsearch
+    path: test/fixtures/cookbooks/opennms-elasticsearch
+  opennms_helm
   oracle_java8
     path: test/fixtures/cookbooks/oracle_java8
-  postgresql (>= 3.4.20)
+  postgresql
+    git: https://github.com/dschlenk/postgresql.git
+    revision: 9815f30ac6fe4bdf688ddb799101b2e24038860d
+    branch: release/6.1.2
+  snmp
+    path: test/fixtures/cookbooks/snmp
   yum-centos
   yum-epel
 
 GRAPH
-  7-zip (1.0.2)
-    windows (>= 1.2.2)
-  apt (2.9.2)
-  bluepill (2.4.3)
-    rsyslog (>= 2.0)
-  build-essential (2.4.0)
-    7-zip (>= 0.0.0)
-  compat_resource (12.16.3)
-  grafana (2.1.3)
+  apt (6.1.4)
+  ark (3.1.0)
+    build-essential (>= 0.0.0)
+    seven_zip (>= 0.0.0)
+    windows (>= 0.0.0)
+  build-essential (8.0.4)
+    mingw (>= 1.1)
+    seven_zip (>= 0.0.0)
+  chef-sugar (4.0.0)
+  compat_resource (12.19.1)
+  elasticsearch (4.0.1)
     apt (>= 0.0.0)
-    nginx (>= 0.0.0)
+    ark (>= 0.0.0)
+    chef-sugar (>= 0.0.0)
     yum (>= 0.0.0)
-  homebrew (3.0.0)
-  hostsfile (2.4.5)
-  java (1.47.0)
+  homebrew (4.3.0)
+  hostsfile (3.0.1)
+  hsflowd (0.1.0)
+  java (1.50.0)
     apt (>= 0.0.0)
     homebrew (>= 0.0.0)
     windows (>= 0.0.0)
-  nginx (2.7.6)
-    apt (~> 2.2)
-    bluepill (~> 2.3)
-    build-essential (~> 2.0)
-    ohai (~> 2.0)
-    runit (~> 1.2)
-    yum-epel (~> 0.3)
-  ohai (2.1.0)
+  mingw (2.0.2)
+    seven_zip (>= 0.0.0)
   onms_lwrp_test (0.1.0)
     opennms (>= 0.0.0)
-  opennms (19.3.1)
+  opennms (22.0.0)
     build-essential (>= 0.0.0)
-    grafana (>= 0.0.0)
     hostsfile (>= 0.0.0)
-    nginx (~> 2.7)
     openssl (>= 0.0.0)
     postgresql (>= 0.0.0)
-    yum (>= 0.0.0)
-  openssl (6.1.1)
+  opennms-elasticsearch (0.1.0)
+    elasticsearch (>= 0.0.0)
+  opennms_helm (0.1.0)
+  openssl (8.1.2)
   oracle_java8 (0.1.0)
     java (>= 0.0.0)
-  packagecloud (0.2.5)
-  postgresql (6.0.1)
+  postgresql (6.1.2)
     build-essential (>= 2.0.0)
     compat_resource (>= 12.16.3)
-    openssl (>= 4.0)
-  rsyslog (5.1.0)
-    compat_resource (>= 12.14.6)
-  runit (1.8.0)
-    packagecloud (>= 0.0.0)
-    yum-epel (>= 0.0.0)
-  windows (2.0.2)
-  yum (5.0.0)
-  yum-centos (2.1.0)
-    compat_resource (>= 12.16.3)
-  yum-epel (0.7.1)
-    yum (>= 3.6.3)
+    openssl (>= 4.0.0)
+  seven_zip (2.0.2)
+    windows (>= 1.2.2)
+  snmp (0.1.0)
+  windows (4.0.1)
+  yum (5.1.0)
+  yum-centos (3.0.0)
+  yum-epel (3.1.0)

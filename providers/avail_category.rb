@@ -3,7 +3,7 @@ def whyrun_supported?
   true
 end
 
-use_inline_resources
+use_inline_resources # ~FC113
 
 action :create do
   Chef::Application.fatal!("CategoryGroup specified '#{@current_resource.category_group}' doesn't exist!") unless @current_resource.catgroup_exists
@@ -22,8 +22,8 @@ action :create do
 end
 
 def load_current_resource
-  @current_resource = Chef::Resource::OpennmsAvailCategory.new(@new_resource.name)
-  @current_resource.label(@new_resource.name)
+  @current_resource = Chef::Resource.resource_for_node(:opennms_avail_category, node).new(@new_resource.label)
+  # @current_resource.name(@new_resource.name)
   @current_resource.category_group(@new_resource.category_group)
   @current_resource.comment(@new_resource.comment)
   @current_resource.normal(@new_resource.normal)

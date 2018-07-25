@@ -4,7 +4,7 @@ def whyrun_supported?
   true
 end
 
-use_inline_resources
+use_inline_resources # ~FC113
 
 action :create_if_missing do
   Chef::Application.fatal!("Missing foreign source #{@current_resource.foreign_source_name}.") unless @current_resource.foreign_source_exists
@@ -45,15 +45,14 @@ action :delete do
 end
 
 def load_current_resource
-  @current_resource = Chef::Resource::OpennmsServiceDetector.new(@new_resource.name)
-  @current_resource.name(@new_resource.name)
+  @current_resource = Chef::Resource.resource_for_node(:opennms_service_detector, node).new(@new_resource.name)
   @current_resource.service_name(@new_resource.service_name || @new_resource.name)
   @current_resource.foreign_source_name(@new_resource.foreign_source_name)
   @current_resource.class_name(@new_resource.class_name)
   @current_resource.port(@new_resource.port)
   @current_resource.retry_count(@new_resource.retry_count)
   @current_resource.timeout(@new_resource.timeout)
-  @current_resource.params(@new_resource.params)
+  @current_resource.parameters(@new_resource.parameters)
 
   if foreign_source_exists?(@current_resource.foreign_source_name, node)
     @current_resource.foreign_source_exists = true

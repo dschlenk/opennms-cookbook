@@ -4,19 +4,20 @@ def whyrun_supported?
   true
 end
 
-use_inline_resources
+use_inline_resources # ~FC113
 
 action :delete do
   if @current_resource.exists
     converge_by("Deleting #{@new_resource}") do
       delete_xml_source
-      unless new_resource.import_groups.nil?
-        new_resource.import_groups.each do |file|
-          file "#{node['opennms']['conf']['home']}/etc/xml-datacollection/#{file}" do
-            action :delete
-          end
-        end
-      end
+      # don't do this - other sources might use the same file
+      # unless new_resource.import_groups.nil?
+      #  new_resource.import_groups.each do |file|
+      #    file "#{node['opennms']['conf']['home']}/etc/xml-datacollection/#{file}" do
+      #      action :delete
+      #    end
+      #  end
+      # end
     end
   else
     Chef::Log.info("#{@new_resource} does not exist - nothing to do.")
@@ -46,8 +47,7 @@ action :create do
 end
 
 def load_current_resource
-  @current_resource = Chef::Resource::OpennmsXmlSource.new(@new_resource.name)
-  @current_resource.name(@new_resource.name)
+  @current_resource = Chef::Resource.resource_for_node(:opennms_xml_source, node).new(@new_resource.name)
   @current_resource.url(@new_resource.url || @new_resource.name)
   @current_resource.collection_name(@new_resource.collection_name)
   @current_resource.request_method(@new_resource.request_method) unless @new_resource.request_method.nil?

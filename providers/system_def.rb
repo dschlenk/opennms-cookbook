@@ -5,7 +5,7 @@ def whyrun_supported?
   true
 end
 
-use_inline_resources
+use_inline_resources # ~FC113
 
 action :add do
   Chef::Application.fatal!("Missing one of these data-collection groups: #{@current_resource.groups}.") unless @current_resource.groups_exist
@@ -30,8 +30,7 @@ action :remove do
 end
 
 def load_current_resource
-  @current_resource = Chef::Resource::OpennmsSystemDef.new(@new_resource.name)
-  @current_resource.name(@new_resource.name)
+  @current_resource = Chef::Resource.resource_for_node(:opennms_system_def, node).new(@new_resource.name)
   @current_resource.groups(@new_resource.groups)
 
   ge = true

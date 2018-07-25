@@ -4,7 +4,7 @@ def whyrun_supported?
   true
 end
 
-use_inline_resources
+use_inline_resources # ~FC113
 
 action :create do
   Chef::Application.fatal!("Missing jdbc-collection #{@current_resource.collection_name}.") unless @current_resource.collection_exists
@@ -19,8 +19,7 @@ action :create do
 end
 
 def load_current_resource
-  @current_resource = Chef::Resource::OpennmsJdbcQuery.new(@new_resource.name)
-  @current_resource.name(@new_resource.name)
+  @current_resource = Chef::Resource.resource_for_node(:opennms_jdbc_query, node).new(@new_resource.name)
   @current_resource.collection_name(@new_resource.collection_name)
   @current_resource.resource_type(@new_resource.resource_type)
 

@@ -3,11 +3,7 @@
 class Chef::Recipe
   include Provision
 end
-# note that opennms needs to be running for provisioning commands to work
-# as they use the ReST interface.
-log 'Start OpenNMS to perform ReST operations.' do
-  notifies :start, 'service[opennms]', :immediately
-end
+include_recipe 'onms_lwrp_test::import'
 # minimal
 opennms_import_node 'nodeA' do
   foreign_source_name 'dry-source'
@@ -41,74 +37,4 @@ opennms_import_node 'nodeC' do
   sync_import true
   sync_wait_periods 30
   sync_wait_secs 10
-end
-
-opennms_import_node 'rename nodeC' do
-  node_label 'node-c.example.net'
-  foreign_source_name 'dry-source'
-  foreign_id node_c_foreign_id
-  sync_import true
-end
-
-opennms_import_node 'change parent nodeC' do
-  foreign_source_name 'dry-source'
-  foreign_id node_c_foreign_id
-  parent_node_label 'nodeA'
-  parent_foreign_id 'nodeA_ID'
-  sync_import true
-end
-
-opennms_import_node 'change city nodeC' do
-  foreign_source_name 'dry-source'
-  foreign_id node_c_foreign_id
-  city 'Brooklyn'
-  sync_import true
-end
-
-opennms_import_node 'change building nodeC' do
-  foreign_source_name 'dry-source'
-  foreign_id node_c_foreign_id
-  building 'Big'
-  sync_import true
-end
-
-opennms_import_node 'change categories nodeC' do
-  foreign_source_name 'dry-source'
-  foreign_id node_c_foreign_id
-  categories %w(Servers Dev)
-  sync_import true
-end
-
-opennms_import_node 'change assets nodeC' do
-  foreign_source_name 'dry-source'
-  foreign_id node_c_foreign_id
-  assets 'vendorPhone' => '311'
-  sync_import true
-end
-
-# should do nothing
-opennms_import_node 'nothing nodeC' do
-  node_label 'node-c.example.net'
-  foreign_source_name 'dry-source'
-  foreign_id node_c_foreign_id
-  parent_node_label 'nodeA'
-  parent_foreign_id 'nodeA_ID'
-  city 'Brooklyn'
-  building 'Big'
-  categories %w(Servers Dev)
-  assets 'vendorPhone' => '311'
-  sync_import true
-end
-
-opennms_import_node 'nothing for different reasons nodeC' do
-  foreign_source_name 'dry-source'
-  foreign_id node_c_foreign_id
-  sync_import true
-  action :create_if_missing
-end
-
-opennms_import_node 'delete nodeB' do
-  foreign_source_name 'dry-source'
-  foreign_id node_b_foreign_id
-  action :delete
 end

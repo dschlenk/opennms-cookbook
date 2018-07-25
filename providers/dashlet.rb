@@ -3,7 +3,7 @@ def whyrun_supported?
   true
 end
 
-use_inline_resources
+use_inline_resources # ~FC113
 
 action :create do
   Chef::Application.fatal!("Wallboard specified '#{@current_resource.wallboard}' doesn't exist!") unless @current_resource.wallboard_exists
@@ -21,8 +21,8 @@ action :create do
 end
 
 def load_current_resource
-  @current_resource = Chef::Resource::OpennmsDashlet.new(@new_resource.name)
-  @current_resource.title(@new_resource.title)
+  @current_resource = Chef::Resource.resource_for_node(:opennms_dashlet, node).new(@new_resource.name)
+  @current_resource.title(@new_resource.title || @new_resource.name)
   @current_resource.wallboard(@new_resource.wallboard)
   @current_resource.boost_duration(@new_resource.boost_duration)
   @current_resource.boost_priority(@new_resource.boost_priority)
@@ -78,17 +78,20 @@ def dashlet_changed?(current_resource)
   curr_dn = dashlet.elements['dashletName'].text.strip
   Chef::Log.debug "#{curr_dn} != #{current_resource.dashlet_name}?"
   return true if curr_dn.to_s != current_resource.dashlet_name.to_s
-  curr_parameters = {}
-  dashlet.elements['parameters'].elements.each 'entry' do |entry|
-    key = entry.elements['key'].text.strip
-    # it's valid to have no text for the value
-    value = entry.elements['value'].text
-    value.strip! unless value.nil?
-    value = '' if value.nil?
-    curr_parameters[key] = value
+  # if nil, we arent' trying to change them
+  unless current_resource.parameters.nil?
+    curr_parameters = {}
+    dashlet.elements['parameters'].elements.each 'entry' do |entry|
+      key = entry.elements['key'].text.strip
+      # it's valid to have no text for the value
+      value = entry.elements['value'].text
+      value.strip! unless value.nil?
+      value = '' if value.nil?
+      curr_parameters[key] = value
+    end
+    Chef::Log.debug "#{curr_parameters} != #{current_resource.parameters}?"
+    return true if curr_parameters != current_resource.parameters
   end
-  Chef::Log.debug "#{curr_parameters} != #{current_resource.parameters}?"
-  return true if curr_parameters != current_resource.parameters
   false
 end
 
@@ -110,17 +113,19 @@ def create_dashlet
   d = dashlet.add_element 'duration'
   d.text = new_resource.duration.to_s
   p = dashlet.add_element 'parameters'
-  new_resource.parameters.each do |k, v|
-    entry = p.add_element 'entry'
-    key = entry.add_element 'key'
-    key.text = k
-    value = entry.add_element 'value'
-    value.text = v
+  unless new_resource.parameters.nil?
+    new_resource.parameters.each do |k, v|
+      entry = p.add_element 'entry'
+      key = entry.add_element 'key'
+      key.text = k
+      value = entry.add_element 'value'
+      value.text = v
+    end
   end
   pri = dashlet.add_element 'priority'
   pri.text = new_resource.priority.to_s
   title = dashlet.add_element 'title'
-  title.text = new_resource.title
+  title.text = new_resource.title || new_resource.name
   Opennms::Helpers.write_xml_file(doc, "#{node['opennms']['conf']['home']}/etc/dashboard-config.xml")
 end
 
@@ -137,14 +142,16 @@ def update_dashlet
   dn.text = new_resource.dashlet_name
   d = dashlet.elements['duration']
   d.text = new_resource.duration.to_s
-  dashlet.delete_element 'parameters'
-  p = dashlet.add_element 'parameters'
-  new_resource.parameters.each do |k, v|
-    entry = p.add_element 'entry'
-    key = entry.add_element 'key'
-    key.text = k
-    value = entry.add_element 'value'
-    value.text = v
+  unless new_resource.parameters.nil?
+    dashlet.delete_element 'parameters'
+    p = dashlet.add_element 'parameters'
+    new_resource.parameters.each do |k, v|
+      entry = p.add_element 'entry'
+      key = entry.add_element 'key'
+      key.text = k
+      value = entry.add_element 'value'
+      value.text = v
+    end
   end
   pri = dashlet.elements['priority']
   pri.text = new_resource.priority.to_s

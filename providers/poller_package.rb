@@ -3,7 +3,7 @@ def whyrun_supported?
   true
 end
 
-use_inline_resources
+use_inline_resources # ~FC113
 
 action :create do
   if @current_resource.exists
@@ -16,8 +16,7 @@ action :create do
 end
 
 def load_current_resource
-  @current_resource = Chef::Resource::OpennmsPollerPackage.new(@new_resource.name)
-  @current_resource.name(@new_resource.name)
+  @current_resource = Chef::Resource.resource_for_node(:opennms_poller_package, node).new(@new_resource.name)
 
   @current_resource.exists = true if package_exists?(@current_resource.name)
 end
@@ -43,6 +42,7 @@ def create_poller_package
   doc.root.insert_after(last_pkg_el, REXML::Element.new('package'))
   package_el = doc.root.elements['/poller-configuration/package[last()]']
   package_el.attributes['name'] = new_resource.name
+  package_el.attributes['remote'] = 'true' if new_resource.remote
   filter_el = package_el.add_element('filter')
   filter_el.add_text(REXML::CData.new(new_resource.filter))
   unless new_resource.specifics.nil?
@@ -52,17 +52,17 @@ def create_poller_package
     end
   end
   unless new_resource.include_ranges.nil?
-    new_resource.include_ranges.each do |range_begin, range_end|
+    new_resource.include_ranges.each do |range|
       include_range_el = package_el.add_element('include-range')
-      include_range_el.add_attribute('begin', range_begin)
-      include_range_el.add_attribute('end', range_end)
+      include_range_el.add_attribute('begin', range['begin'])
+      include_range_el.add_attribute('end', range['end'])
     end
   end
   unless new_resource.exclude_ranges.nil?
-    new_resource.exclude_ranges.each do |range_begin, range_end|
+    new_resource.exclude_ranges.each do |range|
       exclude_range_el = package_el.add_element('exclude-range')
-      exclude_range_el.add_attribute('begin', range_begin)
-      exclude_range_el.add_attribute('end', range_end)
+      exclude_range_el.add_attribute('begin', range['begin'])
+      exclude_range_el.add_attribute('end', range['end'])
     end
   end
   unless new_resource.include_urls.nil?
@@ -78,7 +78,7 @@ def create_poller_package
   end
   unless new_resource.outage_calendars.nil?
     new_resource.outage_calendars.each do |outage_calendar|
-      outage_el = package_el.add_element 'outage_calendar'
+      outage_el = package_el.add_element 'outage-calendar'
       outage_el.add_text(outage_calendar)
     end
   end

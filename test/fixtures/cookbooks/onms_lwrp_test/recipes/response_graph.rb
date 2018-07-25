@@ -1,8 +1,5 @@
 # frozen_string_literal: true
-# mixin our library
-class Chef::Recipe
-  include Provision
-end
+
 # opennms needs to be running for provisioning commands to work
 # as they use the ReST interface.
 log 'Start OpenNMS to perform ReST operations.' do
@@ -12,7 +9,7 @@ end
 opennms_poller_service 'ONMS' do
   class_name 'org.opennms.netmgt.poller.monitors.HttpMonitor'
   port 8980
-  params 'url' => '/opennms/login.jsp', 'rrd-repository' => '/opt/opennms/share/rrd/response', 'rrd-base-name' => 'onms', 'ds-name' => 'onms'
+  parameters 'url' => '/opennms/login.jsp', 'rrd-repository' => '/opt/opennms/share/rrd/response', 'rrd-base-name' => 'onms', 'ds-name' => 'onms'
   notifies :restart, 'service[opennms]'
 end
 opennms_foreign_source 'dry-source'
@@ -20,7 +17,7 @@ opennms_import 'dry-source' do
   foreign_source_name 'dry-source'
 end
 # make us a new foreign_id using the Provision library
-rgfsid = foreign_id_gen
+rgfsid = '20180220151655'
 # make a node to add an interface to
 opennms_import_node 'responseGraphTestNode' do
   foreign_source_name 'dry-source'
