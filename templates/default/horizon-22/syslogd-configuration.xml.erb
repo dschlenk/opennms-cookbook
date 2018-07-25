@@ -1,5 +1,10 @@
 <?xml version="1.0"?>
 <syslogd-configuration>
+    <!--
+      optional attribute "timezone":
+          - if set it will be used as default timezone if no timezone is given
+          - if not set the system time zone will be used
+    -->
     <configuration
             syslog-port="<%=@port%>"
             new-suspect-on-message="<%=@new_suspect%>"
@@ -8,6 +13,7 @@
             matching-group-host="<%=@matching_group_host%>"
             matching-group-message="<%=@matching_group_message%>"
             discard-uei="<%=@discard_uei%>"
+            timezone="<%=@timezone%>"
             />
 
     <!--

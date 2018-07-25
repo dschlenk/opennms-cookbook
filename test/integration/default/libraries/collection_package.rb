@@ -43,7 +43,7 @@ class CollectionPackage < Inspec.resource(1)
       @params[:store_by_node_id] = false
       @params[:store_by_node_id] = true unless p_el.elements["storeByNodeID[contains(., 'true')]"].nil?
       @params[:remote] = false
-      @params[:remote] = true if p_el.attributes["remote"].to_s == "true"
+      @params[:remote] = true if p_el.attributes['remote'].to_s == 'true'
       @params[:outage_calendars] = []
       p_el.each_element('outage-calendar') do |oc|
         @params[:outage_calendars].push oc.text.to_s

@@ -283,7 +283,10 @@ template "#{onms_home}/etc/enlinkd-configuration.xml" do
     bridge: node['opennms']['enlinkd']['bridge'],
     lldp: node['opennms']['enlinkd']['lldp'],
     ospf: node['opennms']['enlinkd']['ospf'],
-    isis: node['opennms']['enlinkd']['isis']
+    isis: node['opennms']['enlinkd']['isis'],
+    bridge_topo_interval: node['opennms']['enlinkd']['bridge_topo_interval'],
+    max_bft: node['opennms']['enlinkd']['max_bft'],
+    disco_bridge_threads: node['opennms']['enlinkd']['disco_bridge_threads']
   )
 end
 
@@ -1953,6 +1956,7 @@ template "#{onms_home}/etc/syslogd-configuration.xml" do
     matching_group_host: node['opennms']['syslogd']['matching_group_host'],
     matching_group_message: node['opennms']['syslogd']['matching_group_message'],
     discard_uei: node['opennms']['syslogd']['discard_uei'],
+    timezone: node['opennms']['syslogd']['timezone'],
     apache_httpd: node['opennms']['syslogd']['apache_httpd'],
     linux_kernel: node['opennms']['syslogd']['linux_kernel'],
     openssh: node['opennms']['syslogd']['openssh'],
@@ -2135,4 +2139,6 @@ template "#{onms_home}/etc/xmpp-configuration.properties" do
   )
 end
 
-include_recipe 'opennms::telemetryd' if mv.to_i >= 22
+if mv.to_i >= 22 && node['opennms']['telemetryd']['managed']
+  include_recipe 'opennms::telemetryd'
+end

@@ -21,7 +21,7 @@
 
 mv = Opennms::Helpers.major(node['opennms']['version'])
 template_dir = if node['opennms']['conf']['cookbook'] == 'opennms'
-                 "horizon-#{mv % { version: node['opennms']['version'] }}/"
+                 "horizon-#{format(mv, version: node['opennms']['version'])}/"
                else
                  ''
                end

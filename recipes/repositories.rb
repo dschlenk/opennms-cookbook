@@ -64,4 +64,3 @@ branches.each do |branch|
     end
   end
 end
-

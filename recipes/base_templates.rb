@@ -45,6 +45,23 @@ end
 
 Chef::Log.debug "at compile time, version is #{node['opennms']['version']} and jasper_version is #{node['opennms']['properties']['reporting']['jasper_version']}."
 
+case node['platform_family']
+when 'rhel'
+  if node['platform_version'].to_i > 6
+    template '/usr/lib/systemd/system/opennms.service' do
+      source "#{template_dir}opennms.service.erb"
+      mode 00664
+      owner 'root'
+      group 'root'
+      variables(
+        start_opts: node['opennms']['start_opts'],
+        timeout_start_sec: node['opennms']['timeout_start_sec'],
+      )
+      notifies :run, 'execute[reload systemd]', :immediately
+    end
+  end
+end
+
 template "#{onms_home}/etc/opennms.conf" do
   cookbook node['opennms']['conf']['cookbook']
   source "#{template_dir}opennms.conf.erb"

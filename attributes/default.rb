@@ -23,7 +23,11 @@ default['yum']['opennms-snapshot-rhel6']['failovermethod']  = 'roundrobin'
 default['yum']['opennms-snapshot-rhel7']['baseurl']         = 'http://yum.opennms.org/snapshot/rhel7'
 default['yum']['opennms-snapshot-rhel7']['failovermethod']  = 'roundrobin'
 default['build-essential']['compile_time'] = true
-default['opennms']['version'] = '22.0.0-1'
+# set to -Q to mimic OOTB quick start behavior on RHEL7+ (but you should not do this if using any of the opennms resources)
+default['opennms']['start_opts'] = ''
+# set to '' if you want to re-enable OOTB behavior (but you should not do this if using any of the opennms resources)
+default['opennms']['timeout_start_sec'] = '10min'
+default['opennms']['version'] = '22.0.2-1'
 # default['opennms']['version_major'] = "%{version}"
 default['opennms']['allow_downgrade'] = false
 default['opennms']['stable'] = true
@@ -717,6 +721,9 @@ default['opennms']['enlinkd']['bridge'] = true
 default['opennms']['enlinkd']['lldp'] = true
 default['opennms']['enlinkd']['ospf'] = true
 default['opennms']['enlinkd']['isis'] = true
+default['opennms']['enlinkd']['bridge_topo_interval'] = 300000
+default['opennms']['enlinkd']['max_bft'] = 100
+default['opennms']['enlinkd']['disco_bridge_threads'] = 1
 
 # eventd-configuration.xml
 default['opennms']['eventd']['tcp_address']            = '127.0.0.1'
@@ -1715,6 +1722,7 @@ default['opennms']['syslogd']['forwarding_regexp']      = '^.*\s(19|20)\d\d([-/.
 default['opennms']['syslogd']['matching_group_host']    = 6
 default['opennms']['syslogd']['matching_group_message'] = 8
 default['opennms']['syslogd']['discard_uei']            = 'DISCARD-MATCHING-MESSAGES'
+default['opennms']['syslogd']['timezone']               = ''
 default['opennms']['syslogd']['apache_httpd']           = true
 default['opennms']['syslogd']['linux_kernel']           = true
 default['opennms']['syslogd']['openssh']                = true
@@ -1999,6 +2007,7 @@ when 'rhel'
   end
 end
 
+default['opennms']['telemetryd']['managed'] = false
 default['opennms']['telemetryd']['jti']['enabled'] = false
 default['opennms']['telemetryd']['jti']['port'] = 50000
 default['opennms']['telemetryd']['netflow5']['enabled'] = false

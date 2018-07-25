@@ -11,7 +11,6 @@ end
 ver = node['opennms']['version']
 m = ver.match(/(\d+)\..*/)
 mv = m.captures[0].to_i
-Chef::Log.warn "mv is #{mv}"
 cookbook_file 'jetty.xml' do
   path '/opt/opennms/etc/jetty.xml'
   notifies :restart, 'service[opennms]'

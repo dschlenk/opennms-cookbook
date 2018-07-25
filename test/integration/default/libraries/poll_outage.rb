@@ -27,17 +27,18 @@ class PollOutage < Inspec.resource(1)
       @params[:type] = o_el.attributes['type'].to_s
       @params[:times] = {}
       o_el.each_element('time') do |time|
+        @params[:times][time.attributes['id']] = {}
         @params[:times][time.attributes['id']]['day'] = time.attributes['day'].to_s unless time.attributes['day'].nil?
         @params[:times][time.attributes['id']]['begins'] = time.attributes['begins'].to_s
         @params[:times][time.attributes['id']]['ends'] = time.attributes['ends'].to_s
       end
       @params[:interfaces] = []
-      o_el.each_element('interfaces') do |iface|
+      o_el.each_element('interface') do |iface|
         @params[:interfaces].push iface.attributes['address']
       end
       @params[:nodes] = []
       o_el.each_element('node') do |n|
-        @params[:nodes].push n.attributes['id']
+        @params[:nodes].push n.attributes['id'].to_s.to_i
       end
     end
   end
