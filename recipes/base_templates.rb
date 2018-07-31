@@ -55,7 +55,7 @@ when 'rhel'
       group 'root'
       variables(
         start_opts: node['opennms']['start_opts'],
-        timeout_start_sec: node['opennms']['timeout_start_sec'],
+        timeout_start_sec: node['opennms']['timeout_start_sec']
       )
       notifies :run, 'execute[reload systemd]', :immediately
     end

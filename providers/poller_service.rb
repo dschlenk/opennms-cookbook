@@ -23,6 +23,16 @@ action :create do
   end
 end
 
+action :delete do
+  if @current_resource.exists
+    converge_by("Delete #{@new_resource}") do
+      delete_poller_service
+    end
+  else
+    Chef::Log.info "#{@new_resource} does not exist - nothing to do."
+  end
+end
+
 def load_current_resource
   @current_resource = Chef::Resource.resource_for_node(:opennms_poller_service, node).new(@new_resource.service_name || @new_resource.name)
   @current_resource.package_name(@new_resource.package_name)
@@ -174,5 +184,19 @@ def create_poller_service
   else
     Chef::Log.warn 'Existing monitor service exists with possibly conflicting class name. Results not guaranteed.'
   end
+  Opennms::Helpers.write_xml_file(doc, "#{node['opennms']['conf']['home']}/etc/poller-configuration.xml")
+end
+
+def delete_poller_service
+  service_name = new_resource.service_name || new_resource.name
+  Chef::Log.debug "Deleting poller service: '#{service_name}'"
+  file = ::File.new("#{node['opennms']['conf']['home']}/etc/poller-configuration.xml")
+  contents = file.read
+  doc = REXML::Document.new(contents, respect_whitespace: :all)
+  doc.context[:attribute_quote] = :quote
+  file.close
+
+  deleted = doc.root.elements.delete("/poller-configuration/package[@name='#{new_resource.package_name}']/service[@name='#{service_name}']")
+  Chef::Log.debug "Deleted poller service #{deleted}."
   Opennms::Helpers.write_xml_file(doc, "#{node['opennms']['conf']['home']}/etc/poller-configuration.xml")
 end

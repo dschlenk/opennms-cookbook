@@ -37,3 +37,10 @@ opennms_poller_service 'SNMPBar' do
   package_name 'bar'
   class_name 'org.opennms.netmgt.poller.monitors.SnmpMonitor'
 end
+
+# create this so we can delete it later
+opennms_poller_service 'create SNMPBar2' do
+  service_name 'SNMPBar2'
+  package_name 'bar'
+  class_name 'org.opennms.netmgt.poller.monitors.SnmpMonitor'
+end

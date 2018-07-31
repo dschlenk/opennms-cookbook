@@ -183,7 +183,7 @@ Currently implemented are:
 #### Polling
 
 * `opennms_poller_package`: add a package to etc/poller-configuration.xml. Note that an instance of this resource without use of an accompanying `opennms_poller_service` resource will result in a failure to start opennms.
-* `opennms_poller_service`: add a service to poller package named `poller_name`.
+* `opennms_poller_service`: add a service to poller package named `poller_name`. Supports updating and deleting.
 * `opennms_poll_outage`:  add a poll outage schedule that can be used by poller and collection package resources to prevent data collection and monitoring during set times.
 
 #### Data Collection

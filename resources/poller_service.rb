@@ -2,7 +2,7 @@
 require 'rexml/document'
 
 # this one supports updating. existance determined by service_name/package_name.
-actions :create
+actions :create, :delete
 default_action :create
 
 attribute :name, name_attribute: true, kind_of: String

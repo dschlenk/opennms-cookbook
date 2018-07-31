@@ -33,4 +33,9 @@ control 'poller' do
     it { should exist }
     its('class_name') { should eq 'org.opennms.netmgt.poller.monitors.SnmpMonitor' }
   end
+
+  describe poller_service('SNMPBar2', 'bar') do
+    it { should exist }
+    its('class_name') { should eq 'org.opennms.netmgt.poller.monitors.SnmpMonitor' }
+  end
 end
