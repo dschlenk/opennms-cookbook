@@ -6862,6 +6862,97 @@ suites:
       inspec_tests:
         - path: test/integration/default
         - path: test/integration/poller
+  - name: poller_delete_16
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::poller_delete]
+    attributes:
+      opennms:
+        version: 16.0.4-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/poller_delete
+  - name: poller_delete_17
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::poller_delete]
+    attributes:
+      opennms:
+        version: 17.1.1-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/poller_delete
+  - name: poller_delete_18
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::poller_delete]
+    attributes:
+      opennms:
+        version: 18.0.4-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/poller_delete
+  - name: poller_delete_19
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::poller_delete]
+    attributes:
+      opennms:
+        version: 19.1.0-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/poller_delete
+  - name: poller_delete_20
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::poller_delete]
+    attributes:
+      opennms:
+        version: 20.1.0-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/poller_delete
+  - name: poller_delete_21
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::poller_delete]
+    attributes:
+      opennms:
+        version: 21.1.0-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/poller_delete
+  - name: poller_delete_22
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::poller_delete]
+    attributes:
+      opennms:
+        version: 22.0.2-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/poller_delete
   - name: rename_imported_node_16
     run_list:
       - recipe[opennms::postgres]
