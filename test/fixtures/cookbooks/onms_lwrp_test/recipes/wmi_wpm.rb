@@ -1,4 +1,6 @@
 # frozen_string_literal: true
+include_recipe 'onms_lwrp_test::collection_package'
+include_recipe 'onms_lwrp_test::wmi_collection'
 opennms_resource_type 'wmi_thing' do
   group_name 'metasyntactic'
   label 'wmi resource'
