@@ -1995,7 +1995,7 @@ default['opennms']['cors']['credentials'] = true
 
 case node['platform_family']
 when 'rhel'
-  default['opennms']['repos']['branches'] = %w(stable obsolete snapshot)
+  default['opennms']['repos']['branches'] = %w(obsolete snapshot stable)
   default['opennms']['repos']['platforms'] = %w(common)
   if node['platform_version'].to_f >= 6.0 && node['platform_version'].to_f < 7.0
     Chef::Log.debug("i am 6 because #{node['platform_version']}")
