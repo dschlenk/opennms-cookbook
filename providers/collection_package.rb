@@ -223,7 +223,7 @@ end
 
 def matching_package_name(doc, current_resource)
 	definition = nil
-	doc.elements.each('/collectd-configuration') do |package_name|
+	doc.elements.each('/collectd-configuration/package') do |package_name|
 		next unless package_name.attributes['name'].to_s == current_resource.name.to_s\
     && package_name.attributes['remote'].to_s == current_resource.remote.to_s
 		definition = package_name
