@@ -6,7 +6,7 @@ require 'rexml/cdata'
 # You don't define services here but rather using the appropriate
 # service LWRP (snmp, wmi, nsclient, jmx,  http, xml, jdbc).
 
-actions :create
+actions :create, :create_if_missing, :delete
 default_action :create
 
 attribute :package_name, kind_of: String, required: true, name_attribute: true
@@ -22,4 +22,4 @@ attribute :stor_flag_override, kind_of: [TrueClass, FalseClass], default: false
 attribute :if_alias_comment, kind_of: String
 attribute :remote, kind_of: [TrueClass, FalseClass]
 attribute :outage_calendars, kind_of: Array
-attr_accessor :exists
+attr_accessor :exists, :different
