@@ -44,6 +44,17 @@ end
 
 def load_current_resource
 	@current_resource = Chef::Resource.resource_for_node(:opennms_collection_package, node).new(@new_resource.name)
+	@current_resource.filter(@new_resource.filter)
+	@current_resource.specifics(@new_resource.specifics)
+	@current_resource.include_ranges(@new_resource.include_ranges)
+	@current_resource.exclude_ranges(@new_resource.exclude_ranges)
+	@current_resource.include_urls(@new_resource.include_urls)
+	@current_resource.store_by_if_alias(@new_resource.store_by_if_alias)
+	@current_resource.store_by_node_id(@new_resource.store_by_node_id)
+	@current_resource.if_alias_domain(@new_resource.if_alias_domain)
+	@current_resource.stor_flag_override(@new_resource.stor_flag_override)
+	@current_resource.if_alias_comment(@new_resource.if_alias_comment)
+	@current_resource.outage_calendars(@new_resource.outage_calendars)
 	
 	file = ::File.new("#{node['opennms']['conf']['home']}/etc/collectd-configuration.xml", 'r')
 	contents = file.read
@@ -52,69 +63,58 @@ def load_current_resource
 	doc = REXML::Document.new(contents, respect_whitespace: :all)
 	doc.context[:attribute_quote] = :quote
 	package_el = matching_package_name(doc, @current_resource)
+	
 	if !package_el.nil?
 		@current_resource.exists = true
-		@current_resource.different = if filter_equal?(package_el, @current_resource.filter)\
-     && specifics_equal?(package_el, @current_resource.specifics)\
-     && include_ranges_equal?(package_el, @current_resource.include_ranges)
-			                              false
-			                            else
-				                            true
-		                              end
-	else
-		@current_resource.different = true
+	  if filter_change?(package_el, @current_resource.filter) || specifics_change?(package_el, @current_resource.specifics) || include_ranges_change?(package_el, @current_resource.include_ranges)
+			Chef::Log.debug("uei #{@current_resource.name} has changed.")
+			@current_resource.different = true
+	  end
 	end
 end
+
+
 
 private
 
 def matching_package_name(doc, current_resource)
 	definition = nil
 	doc.elements.each('/collectd-configuration/package') do |package_name|
-		next unless package_name.attributes['name'].to_s == current_resource.name.to_s\
-     && package_name.attributes['remote'].to_s == current_resource.remote.to_s
+		next unless package_name.attributes['name'].to_s == current_resource.to_s
 		definition = package_name
 		break
 	end
 	definition
 end
 
-def filter_equal?(package_el, filter)
-	Chef::Log.debug("Check for no ranges: #{package_el.elements['filter'].nil?} && #{filter}")
-	return true if def_el.elements['filter'].nil? && (filter.nil? || filter.empty?)
-	curr_filter = {}
-	def_el.elements.each('filter') do |fil_el|
-		curr_filter.push fil_el.text
-	end
-	curr_filter.sort!
-	Chef::Log.debug("filter_equal?? #{curr_filter} == #{filter}")
-	sorted_filter = nil
-	sorted_filter = filter.sort unless filter.nil?
-	curr_filter == sorted_filter
+def filter_change?(package_el, current_filter)
+	filter_el = package_el.elements['filter'].text.to_s
+	Chef::Log.debug "Filter ? New: #{current_filter.filter}; Current: #{filter_el}"
+	return true unless filter_el == current_filter.filter
 end
 
-def specifics_equal?(package_el, specifics)
+def specifics_change?(package_el, specifics)
 	Chef::Log.debug("Check for no specifics: #{package_el.elements['specific'].nil?} && #{specifics}")
-	return true if package_el.elements['specific'].nil? && (specifics.nil? || specifics.empty?)
+	return false if package_el.elements['specific'].nil? && (specifics.nil? || specifics.empty?)
 	curr_specifics = []
-	def_el.elements.each('specific') do |specific|
+	package_el.elements.each('specific') do |specific|
 		curr_specifics.push specific.text
 	end
 	curr_specifics.sort!
 	Chef::Log.debug("specifics equal? #{curr_specifics} == #{specifics}")
 	sorted_specifics = nil
 	sorted_specifics = specifics.sort unless specifics.nil?
-	curr_specifics == sorted_specifics
+	return true unless curr_specifics == sorted_specifics
 end
 
-def include_ranges_equal?(package_el, include_ranges)
+def include_ranges_change?(package_el, include_ranges)
 	Chef::Log.debug("Check for no ranges: #{package_el.elements['include-range'].nil?} && #{include_ranges}")
-	return true if package_el.elements['include-range'].nil? && (include_ranges.nil? || include_ranges.empty?)
+	return false if package_el.elements['include-range'].nil? && (include_ranges.nil? || include_ranges.empty?)
 	curr_include_ranges = {}
 	package_el.elements.each('include-range') do |ncr_el|
 		curr_include_ranges[ncr_el.attributes['begin']] = ncr_el.attributes['end']
 	end
-	curr_include_ranges == include_ranges
+	return true unless curr_include_ranges == include_ranges
 end
 
 def package_exists?(name)
@@ -195,17 +195,11 @@ def update_collection_package
 	doc.context[:attribute_quote] = :quote
 	file.close
 	
-	package_el = matching_package_name(doc, new_resource)
+	package_el = matching_package_name(doc, new_resource.name)
 	
-	# put the new ones in
-	unless new_resource.filter.nil?
-		new_resource.filter.each do |filter|
-			if package_el.elements["filter[text() = '#{filter}']"].nil?
-				filter_el = package_el.add_element 'filter'
-				filter_el.add_text(filter)
-			end
-		end
-	end
+	filter_el = package_el.add_element('filter')
+	filter_el.add_text(REXML::CData.new(new_resource.filter))
+
 	unless new_resource.specifics.nil?
 		new_resource.specifics.each do |specific|
 			if package_el.elements["specific[text() = '#{specific}']"].nil?
@@ -236,55 +230,34 @@ def update_collection_package
 			end
 		end
 	end
-	unless new_resource.store_by_if_alias.nil?
-		new_resource.store_by_if_alias.each do |storeByIfAlias|
-			if package_el.elements["storeByIfAlias[text() = '#{storeByIfAlias}']"].nil?
-				sb_ifalias_el = package_el.add_element 'storeByIfAlias'
-				sb_ifalias_el.add_text(storeByIfAlias)
-			end
-		end
+	if new_resource.store_by_if_alias == true
+		sb_ifalias_el = package_el.add_element('storeByIfAlias')
+		sb_ifalias_el.add_text('true')
 	end
-	unless new_resource.store_by_node_id.nil?
-		new_resource.store_by_node_id.each do |storeByNodeID|
-			if package_el.elements["storeByNodeID[text() = '#{storeByNodeID}']"].nil?
-				sb_nodeid_el = package_el.add_element 'storeByNodeID'
-				sb_nodeid_el.add_text(storeByNodeID)
-			end
-		end
+	if new_resource.store_by_node_id != 'normal'
+		sb_nodeid_el = package_el.add_element('storeByNodeID')
+		sb_nodeid_el.add_text(new_resource.store_by_node_id)
 	end
 	unless new_resource.if_alias_domain.nil?
-		new_resource.if_alias_domain.each do |ifAliasDomain|
-			if package_el.elements["ifAliasDomain[text() = '#{ifAliasDomain}']"].nil?
-				ifalias_domain_el = package_el.add_element 'ifAliasDomain'
-				ifalias_domain_el.add_text(storeByNodeID)
-			end
-		end
+		ifalias_domain_el = package_el.add_element('ifAliasDomain')
+		ifalias_domain_el.add_text(new_resource.if_alias_domain)
 	end
-	unless new_resource.stor_flag_override.nil?
-		new_resource.stor_flag_override.each do |storFlagOverride|
-			if package_el.elements["storFlagOverride[text() = '#{storFlagOverride}']"].nil?
-				stor_flag_override_el = package_el.add_element 'storFlagOverride'
-				stor_flag_override_el.add_text(storFlagOverride)
-			end
-		end
+	if new_resource.stor_flag_override == true
+		stor_flag_override_el = package_el.add_element('storFlagOverride')
+		stor_flag_override_el.add_text('true')
 	end
 	unless new_resource.if_alias_comment.nil?
-		new_resource.if_alias_comment.each do |ifAliasComment|
-			if package_el.elements["ifAliasComment[text() = '#{ifAliasComment}']"].nil?
-				ifalias_comment_el = package_el.add_element 'ifAliasComment'
-				ifalias_comment_el.add_text(ifAliasComment)
-			end
-		end
+		ifalias_comment_el = package_el.add_element('ifAliasComment')
+		ifalias_comment_el.add_text(new_resource.if_alias_comment)
 	end
 	unless new_resource.outage_calendars.nil?
 		new_resource.outage_calendars.each do |oc|
 			if package_el.elements["outage-calendar[text() = '#{oc}']"].nil?
-				oc_el = package_el.add_element 'outage-calendar'
+				oc_el = package_el.add_element ('outage-calendar')
 				oc_el.add_text(oc)
 			end
 		end
 	end
-	
 	Opennms::Helpers.write_xml_file(doc, "#{node['opennms']['conf']['home']}/etc/collectd-configuration.xml")
 end
 
