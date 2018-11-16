@@ -70,16 +70,16 @@ def load_current_resource
 	if !package_el.nil?
 		@current_resource.exists = true if package_exists?(@current_resource.name)
 		@current_resource.different = if filter_equal?(package_el, @current_resource.filter) \
-	                 && specifics_equal?(package_el, @current_resource.specifics) \
-	                 && include_ranges_equal?(package_el, @current_resource.include_ranges) \
-	                 && exclude_ranges_equal?(package_el, @current_resource.exclude_ranges) \
-	                 && include_urls_equal?(package_el, @current_resource.include_urls) \
-	                 && store_by_if_alias_equal?(package_el, @current_resource.store_by_if_alias) \
-	                 && store_by_node_id_equal?(package_el, @current_resource.store_by_node_id) \
-	                 && if_alias_domain_equal?(package_el, @current_resource.if_alias_domain) \
-	                 && stor_flag_override_equal?(package_el, @current_resource.stor_flag_override) \
-	                 && if_alias_comment_equal?(package_el, @current_resource.if_alias_comment) \
-	                 && outage_calendars_equal?(package_el, @current_resource.outage_calendars)
+	                                   && specifics_equal?(package_el, @current_resource.specifics) \
+	                                   && include_ranges_equal?(package_el, @current_resource.include_ranges) \
+	                                   && exclude_ranges_equal?(package_el, @current_resource.exclude_ranges) \
+	                                   && include_urls_equal?(package_el, @current_resource.include_urls) \
+	                                   && store_by_if_alias_equal?(package_el, @current_resource.store_by_if_alias) \
+	                                   && store_by_node_id_equal?(package_el, @current_resource.store_by_node_id) \
+	                                   && if_alias_domain_equal?(package_el, @current_resource.if_alias_domain) \
+	                                   && stor_flag_override_equal?(package_el, @current_resource.stor_flag_override) \
+	                                   && if_alias_comment_equal?(package_el, @current_resource.if_alias_comment) \
+	                                   && outage_calendars_equal?(package_el, @current_resource.outage_calendars)
 			                              false
 			                            else
 				                            true
@@ -95,12 +95,13 @@ def matching_package(doc, current_resource)
 	package = nil
 	doc.elements.each('/collectd-configuration/package') do |package_el|
 		next unless package_el.attributes['name'].to_s == current_resource.name.to_s\
-                    && package_el.attributes['remote'].to_s == current_resource.remote.to_s
+                              && package_el.attributes['remote'].to_s == current_resource.remote.to_s
 		package = package_el
 		break
 	end
 	package
 end
+
 
 def filter_equal?(doc, current_filter)
 	Chef::Log.debug("Filter ? New: #{doc.elements['filter'].nil?} && #{current_filter}")
@@ -160,12 +161,12 @@ def include_urls_equal?(doc, include_urls)
 	curr_include_urls == sorted_include_urls
 end
 
-def store_by_if_alias_equal?(doc, store_by_if_alias)
-	return true if doc.elements['storeByIfAlias'].nil? && (store_by_if_alias.nil? || store_by_if_alias.empty?)
+def store_by_if_alias_equal?(doc, store_by_if_alia)
+	return true if doc.elements['storeByIfAlias'].nil? && (store_by_if_alia.nil? || store_by_if_alia.empty?)
 	
 	store_by_if_alias_el = doc.elements['storeByIfAlias'].to_s
-	Chef::Log.debug "storeByIfAlias ? New: #{store_by_if_alias}; Current: #{store_by_if_alias_el}"
-	store_by_if_alias_el == store_by_if_alias
+	Chef::Log.debug "storeByIfAlias ? New: #{store_by_if_alia}; Current: #{store_by_if_alias_el}"
+	store_by_if_alias_el == store_by_if_alia
 end
 
 def store_by_node_id_equal?(doc, store_by_node_id)
@@ -291,84 +292,95 @@ def update_collection_package
 	
 	if !package_el.nil?
 		unless new_resource.filter.nil?
-			if package_el.elements["filter[text()  = '#{new_resource.filter}']"].nil?
-				filter_el = package_el.add_element 'filter'
-				filter_el.add_text(REXML::CData.new(new_resource.filter))
-			end
+			package_el.delete_element "filter"
+			filter_el = package_el.add_element 'filter'
+			filter_el.add_text(REXML::CData.new(new_resource.filter))
 		end
 		unless new_resource.specifics.nil?
 			new_resource.specifics.each do |specific|
-				if package_el.elements["specific[text() = '#{specific}']"].nil?
-					sel = package_el.add_element 'specific'
-					sel.add_text(specific)
+				unless specific.nil? && specific.empty?
+					package_el.delete_element "specific"
 				end
+			end
+			new_resource.specifics.each do |specific|
+				sel = package_el.add_element 'specific'
+				sel.add_text(specific)
 			end
 		end
 		unless new_resource.include_ranges.nil?
-			new_resource.include_ranges.each do |r_begin, r_end|
-				if package_el.elements["include-range[@begin = '#{r_begin}' @end = '#{r_end}']"].nil?
-					package_el.add_element 'include-range', 'begin' => r_begin, 'end' => r_end
+			new_resource.include_ranges.each do |include_range|
+				unless include_range.nil? && include_range.empty?
+					package_el.delete_element "include-range"
 				end
+			end
+			new_resource.include_ranges.each do |include_range|
+				include_range_el = package_el.add_element('include-range')
+				include_range_el.add_attribute('begin', include_range['begin'])
+				include_range_el.add_attribute('end', include_range['end'])
 			end
 		end
 		unless new_resource.exclude_ranges.nil?
-			new_resource.exclude_ranges.each do |r_begin, r_end|
-				if package_el.elements["exclude-range[@begin = '#{r_begin}'  @end = '#{r_end}']"].nil?
-					package_el.add_element 'exclude-range', 'begin' => r_begin, 'end' => r_end
+			new_resource.exclude_ranges.each do |exclude_range|
+				unless exclude_range.nil? && exclude_range.empty?
+					package_el.delete_element "exclude-range"
 				end
+			end
+			new_resource.exclude_ranges.each do |exclude_range|
+				exclude_range_el = package_el.add_element('exclude-range')
+				exclude_range_el.add_attribute('begin', exclude_range['begin'])
+				exclude_range_el.add_attribute('end', exclude_range['end'])
 			end
 		end
 		unless new_resource.include_urls.nil?
 			new_resource.include_urls.each do |include_url|
-				if package_el.elements["include-url[text() = '#{new_resource.include_urls}']"].nil?
-					include_url_el = package_el.add_element 'include-url'
-					include_url_el.add_text(include_url)
+				unless include_url.nil? && include_url.empty?
+					package_el.delete_element 'include-url'
 				end
+			end
+			new_resource.include_urls.each do |include_url|
+				include_url_el = package_el.add_element 'include-url'
+				include_url_el.add_text(include_url)
 			end
 		end
 		unless new_resource.store_by_if_alias.nil?
-			if package_el.elements["storeByIfAlias[text() = '#{new_resource.store_by_if_alias}']"].nil?
-				if new_resource.store_by_if_alias == true
-					sb_ifalias_el = package_el.add_element 'storeByIfAlias'
-					sb_ifalias_el.add_text('true')
-				end
+			if new_resource.store_by_if_alias == true
+				sb_ifalias_el = package_el.add_element 'storeByIfAlias'
+				sb_ifalias_el.add_text('true')
 			end
 		end
 		unless new_resource.store_by_node_id.nil?
-			if package_el.elements["storeByNodeID[text() = '#{new_resource.store_by_node_id}']"].nil?
-				if new_resource.store_by_node_id != 'normal'
-					sb_nodeid_el = package_el.add_element 'storeByNodeID'
-					sb_nodeid_el.add_text(new_resource.store_by_node_id)
-				end
-			end
+			package_el.delete_element 'storeByNodeID'
+			sb_nodeid_el = package_el.add_element 'storeByNodeID'
+			sb_nodeid_el.add_text(new_resource.store_by_node_id)
 		end
-		unless new_resource.if_alias_domain.nil?
-			if package_el.elements["ifAliasDomain[text() = '#{new_resource.if_alias_domain}']"].nil?
-				dm_ifalias_el = package_el.add_element 'ifAliasDomain'
-				dm_ifalias_el.add_text(new_resource.if_alias_domain)
-			end
+		unless new_resource.if_alias_domain.nil? || new_resource.if_alias_domain.empty?
+			package_el.delete_element 'ifAliasDomain'
+			dm_ifalias_el = package_el.add_element 'ifAliasDomain'
+			dm_ifalias_el.add_text(new_resource.if_alias_domain)
 		end
-		unless new_resource.stor_flag_override.nil?
-			if package_el.elements["storFlagOverride[text() = '#{new_resource.stor_flag_override}']"].nil?
-				stor_flag_override_el = package_el.add_element 'storFlagOverride'
-				stor_flag_override_el.add_text(new_resource.stor_flag_override)
-			end
+		unless new_resource.stor_flag_override.nil? || new_resource.stor_flag_override.empty?
+			package_el.delete_element 'storFlagOverride'
+			stor_flag_override_el = package_el.add_element 'storFlagOverride'
+			stor_flag_override_el.add_text(new_resource.stor_flag_override)
 		end
-		unless new_resource.if_alias_comment.nil?
-			if package_el.elements["storFlagOverride[text() = '#{new_resource.stor_flag_override}']"].nil?
-				ifalias_comment_el = package_el.add_element 'ifAliasComment'
-				ifalias_comment_el.add_text(new_resource.if_alias_comment)
-			end
+		unless new_resource.if_alias_comment.nil? || new_resource.if_alias_comment.empty?
+			package_el.delete_element 'ifAliasComment'
+			ifalias_comment_el = package_el.add_element 'ifAliasComment'
+			ifalias_comment_el.add_text(new_resource.if_alias_comment)
 		end
 		unless new_resource.outage_calendars.nil?
 			new_resource.outage_calendars.each do |oc|
-				if package_el.elements["outage-calendar[text() = '#{oc}']"].nil?
+				unless oc.nil? && oc.empty?
+					package_el.delete_element 'outage-calendar'
+				end
+				new_resource.outage_calendars.each do |oc|
 					oc_el = package_el.add_element 'outage-calendar'
 					oc_el.add_text(oc)
 				end
 			end
 		end
 	end
+	
 	Opennms::Helpers.write_xml_file(doc, "#{node['opennms']['conf']['home']}/etc/collectd-configuration.xml")
 end
 
