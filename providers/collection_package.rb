@@ -65,9 +65,9 @@ def load_current_resource
 	
 	doc = REXML::Document.new(contents, respect_whitespace: :all)
 	doc.context[:attribute_quote] = :quote
-	@current_resource.exists = true if package_exists?(@current_resource.name)
 
 	if package_exists?(@current_resource.name)
+		@current_resource.exists = true
 		package_el = matching_package(doc, @new_resource)
 		@current_resource.different = if filter_equal?(package_el, @current_resource.filter) \
 	                                && specifics_equal?(package_el, @current_resource.specifics) \
@@ -101,7 +101,6 @@ def matching_package(doc, current_resource)
 	end
 	package
 end
-
 
 def filter_equal?(doc, current_filter)
 	Chef::Log.debug("Filter ? New: #{doc.elements['filter'].nil?} && #{current_filter}")
@@ -142,7 +141,6 @@ def exclude_ranges_equal?(doc, exclude_ranges)
 	doc.elements.each('exclude-range') do |exl_el|
 		exl_el.attributes['begin'].to_s == exclude_ranges['begin'].to_s && exl_el.attributes['end'].to_s == exclude_ranges['end'].to_s
 	end
-
 end
 
 def include_urls_equal?(doc, include_urls)
@@ -294,7 +292,6 @@ def insert_filter(package_el, new_resource)
 		package_el.delete_element old_el
 	end
 end
-
 
 def insert_specific(package_el, new_resource)
 	unless new_resource.specifics.nil?
