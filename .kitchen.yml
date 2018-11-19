@@ -492,6 +492,32 @@ suites:
       inspec_tests:
         - path: test/integration/default
         - path: test/integration/collection_package
+  - name: collection_package_22_delete
+    run_list:
+    - recipe[opennms::postgres]
+    - recipe[oracle_java8::default]
+    - recipe[opennms::default]
+    - recipe[onms_lwrp_test::collection_package_delete]
+    attributes:
+      opennms:
+        version: 22.0.2-1
+    verifier:
+      inspec_tests:
+      - path: test/integration/default
+      - path: test/integration/collection_package_delete
+  - name: collection_package_22_update
+    run_list:
+    - recipe[opennms::postgres]
+    - recipe[oracle_java8::default]
+    - recipe[opennms::default]
+    - recipe[onms_lwrp_test::collection_package_update]
+    attributes:
+      opennms:
+        version: 22.0.2-1
+    verifier:
+      inspec_tests:
+      - path: test/integration/default
+      - path: test/integration/collection_package_update
   - name: collection_service_16
     run_list:
       - recipe[opennms::postgres]
