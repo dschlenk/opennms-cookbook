@@ -46,6 +46,7 @@ def load_current_resource
 	@current_resource = Chef::Resource.resource_for_node(:opennms_collection_package, node).new(@new_resource.name)
 	@current_resource.name(@new_resource.name) unless @new_resource.name.nil?
 	@current_resource.remote(@new_resource.remote) unless @new_resource.remote.nil?
+	@current_resource.remote(false) if @new_resource.remote.nil?
 	
 	@current_resource.filter(@new_resource.filter) unless @new_resource.filter.nil?
 	@current_resource.specifics(@new_resource.specifics) unless @new_resource.specifics.nil?
@@ -66,7 +67,7 @@ def load_current_resource
 	doc = REXML::Document.new(contents, respect_whitespace: :all)
 	doc.context[:attribute_quote] = :quote
 
-	if package_exists?(@current_resource.name)
+        if package_exists?(@current_resource.name, @current_resource.remote)
 		@current_resource.exists = true
 		package_el = matching_package(doc, @new_resource)
 		@current_resource.different = if filter_equal?(package_el, @current_resource.filter) \
@@ -212,11 +213,23 @@ def outage_calendars_equal?(doc, outage_calendars)
 	curr_outage_calendars == sorted_outage_calendars
 end
 
-def package_exists?(name)
+def package_exists?(name, remote)
 	Chef::Log.debug "Checking to see if this collection package exists: '#{name}'"
 	file = ::File.new("#{node['opennms']['conf']['home']}/etc/collectd-configuration.xml", 'r')
 	doc = REXML::Document.new file
-	!doc.elements["/collectd-configuration/package[@name='#{name}']"].nil?
+	pkg_el = doc.elements["/collectd-configuration/package[@name='#{name}']"]
+        if !pkg_el.nil?
+          pkg_remote = "false"
+          if !pkg_el.attributes['remote'].nil?
+            pkg_remote = pkg_el.attributes['remote'].to_s
+          end
+          true if remote == pkg_remote
+          Chef::Log.debug "found package #{name} but remote is #{pkg_remote} not #{remote}."
+          false
+        else
+          Chef::Log.debug "did not find package #{name}."
+          false
+        end
 end
 
 def create_collection_package

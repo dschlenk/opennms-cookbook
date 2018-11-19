@@ -1,0 +1,2 @@
+control 'collection_package_update_outage_calendars' do
+end
