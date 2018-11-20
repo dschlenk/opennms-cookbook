@@ -20,3 +20,4 @@ opennms_collection_package 'bar' do
   filter "IPADDR != '0.0.0.0'"
   notifies :restart, 'service[opennms]', :delayed
 end
+

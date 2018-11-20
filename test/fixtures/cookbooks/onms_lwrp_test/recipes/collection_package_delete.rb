@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 include_recipe 'onms_lwrp_test::collection_package'
+
 opennms_collection_package 'bar' do
 	filter "IPADDR != '0.0.0.0'"
 	action :delete
@@ -14,7 +15,6 @@ opennms_collection_package 'foo' do
 	include_urls ['file:/opt/opennms/etc/foo']
 	store_by_if_alias true
 	if_alias_domain 'foo.com'
-	# collectd requires a restart for changes to take effect
 	remote true
 	outage_calendars ['ignore localhost on mondays']
 	action :delete
