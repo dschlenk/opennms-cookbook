@@ -70,16 +70,16 @@ def load_current_resource
 		@current_resource.exists = true
 		package_el = matching_package(doc, @new_resource)
 		@current_resource.different = if filter_equal?(package_el, @current_resource.filter) \
-	                                                            && specifics_equal?(package_el, @current_resource.specifics) \
-	                                                            && include_ranges_equal?(package_el, @current_resource.include_ranges) \
-	                                                            && exclude_ranges_equal?(package_el, @current_resource.exclude_ranges) \
-	                                                            && include_urls_equal?(package_el, @current_resource.include_urls) \
-	                                                            && store_by_if_alias_equal?(package_el, @current_resource.store_by_if_alias) \
-	                                                            && store_by_node_id_equal?(package_el, @current_resource.store_by_node_id) \
-	                                                            && if_alias_domain_equal?(package_el, @current_resource.if_alias_domain) \
-	                                                            && stor_flag_override_equal?(package_el, @current_resource.stor_flag_override) \
-	                                                            && if_alias_comment_equal?(package_el, @current_resource.if_alias_comment) \
-	                                                            && outage_calendars_equal?(package_el, @current_resource.outage_calendars)
+	                                                              && specifics_equal?(package_el, @current_resource.specifics) \
+	                                                              && include_ranges_equal?(package_el, @current_resource.include_ranges) \
+	                                                              && exclude_ranges_equal?(package_el, @current_resource.exclude_ranges) \
+	                                                              && include_urls_equal?(package_el, @current_resource.include_urls) \
+	                                                              && store_by_if_alias_equal?(package_el, @current_resource.store_by_if_alias) \
+	                                                              && store_by_node_id_equal?(package_el, @current_resource.store_by_node_id) \
+	                                                              && if_alias_domain_equal?(package_el, @current_resource.if_alias_domain) \
+	                                                              && stor_flag_override_equal?(package_el, @current_resource.stor_flag_override) \
+	                                                              && if_alias_comment_equal?(package_el, @current_resource.if_alias_comment) \
+	                                                              && outage_calendars_equal?(package_el, @current_resource.outage_calendars)
 			                              false
 			                            else
 				                            true
@@ -104,9 +104,9 @@ def matching_package(doc, current_resource)
 end
 
 def filter_equal?(doc, new_filter)
-  Chef::Log.debug("Filter ? current: '#{doc.elements['filter'].texts.join("\n")}'; old: '#{new_filter}'")
-  current = doc.elements['filter'].texts.join("\n")
-  current == new_filter
+	Chef::Log.debug("Filter ? current: '#{doc.elements['filter'].texts.join("\n")}'; old: '#{new_filter}'")
+	current = doc.elements['filter'].texts.join("\n")
+	current == new_filter
 end
 
 def specifics_equal?(doc, specifics)
@@ -127,23 +127,23 @@ end
 def include_ranges_equal?(doc, include_ranges)
 	Chef::Log.debug("Check for no include ranges: #{doc.elements['include-range'].nil?} && #{include_ranges}")
 	
-        current = []
+	current = []
 	doc.elements.each('include-range') do |ncr_el|
-          current.push({'begin' => ncr_el.attributes['begin'].to_s, 'end' => ncr_el.attributes['end'].to_s })
+		current.push({'begin' => ncr_el.attributes['begin'].to_s, 'end' => ncr_el.attributes['end'].to_s})
 	end
-        current == include_ranges
+	current == include_ranges
 end
 
 def exclude_ranges_equal?(doc, exclude_ranges)
 	Chef::Log.debug("Check for no exclude-range: #{doc.elements['exclude-range'].nil?} && #{exclude_ranges}")
-        exclude_ranges = [] if exclude_ranges.nil?
-        current = []
+	exclude_ranges = [] if exclude_ranges.nil?
+	current = []
 	doc.elements.each('exclude-range') do |exl_el|
-          current.push({'begin' => exl_el.attributes['begin'].to_s, 'end' => exl_el.attributes['end'].to_s })
+		current.push({'begin' => exl_el.attributes['begin'].to_s, 'end' => exl_el.attributes['end'].to_s})
 	end
-        sorted_current = current.sort
-        sorted_er = exclude_ranges.sort
-        sorted_current == sorted_er
+	sorted_current = current.sort
+	sorted_er = exclude_ranges.sort
+	sorted_current == sorted_er
 end
 
 def include_urls_equal?(doc, include_urls)
@@ -162,53 +162,53 @@ def include_urls_equal?(doc, include_urls)
 end
 
 def store_by_if_alias_equal?(doc, store_by_if_alia)
-        if doc.elements['storeByIfAlias'].nil?
-	  current = false 
-        else
-          store_by_if_alias_el = true if doc.elements['storeByIfAlias'].texts.join("\n") == "true"
-        end
+	if doc.elements['storeByIfAlias'].nil?
+		current = false
+	else
+		store_by_if_alias_el = true if doc.elements['storeByIfAlias'].texts.join("\n") == "true"
+	end
 	Chef::Log.debug "storeByIfAlias ? New: #{store_by_if_alia}; Current: #{store_by_if_alias_el}"
-        store_by_if_alias_el.to_s == store_by_if_alia.to_s
+	store_by_if_alias_el.to_s == store_by_if_alia.to_s
 end
 
 def store_by_node_id_equal?(doc, store_by_node_id)
-  if doc.elements['storeByNodeID'].nil?
-    current = 'normal' 
-  else
-    current = doc.elements['storeByNodeID'].texts.join("\n")
-  end
-  Chef::Log.debug "storeByNodeID ? New: #{store_by_node_id}; Current: #{current}"
-  current.to_s == store_by_node_id.to_s
+	if doc.elements['storeByNodeID'].nil?
+		current = 'normal'
+	else
+		current = doc.elements['storeByNodeID'].texts.join("\n")
+	end
+	Chef::Log.debug "storeByNodeID ? New: #{store_by_node_id}; Current: #{current}"
+	current.to_s == store_by_node_id.to_s
 end
 
 def if_alias_domain_equal?(doc, if_alias_domain)
 	return true if doc.elements['ifAliasDomain'].nil? && (if_alias_domain.nil? || if_alias_domain.empty?)
 	
-        if_alias_domain_el = doc.elements['ifAliasDomain'].texts.join("\n")
+	if_alias_domain_el = doc.elements['ifAliasDomain'].texts.join("\n")
 	Chef::Log.debug "ifAliasDomain ? New: #{if_alias_domain}; Current: #{if_alias_domain_el}"
-        if_alias_domain_el.to_s == if_alias_domain.to_s
+	if_alias_domain_el.to_s == if_alias_domain.to_s
 end
 
 def stor_flag_override_equal?(doc, stor_flag_override)
-  if doc.elements['storFlagOverride'].nil?
-    current = false
-  else
-    current = true if doc.elements['storFlagOverride'].texts.join("\n") == "true"
-  end
-  current == stor_flag_override
+	if doc.elements['storFlagOverride'].nil?
+		current = false
+	else
+		current = true if doc.elements['storFlagOverride'].texts.join("\n") == "true"
+	end
+	current == stor_flag_override
 end
 
 def if_alias_comment_equal?(doc, if_alias_comment)
-  return true if doc.elements['ifAliasComment'].nil? && (if_alias_comment.nil? || if_alias_comment.empty?)
+	return true if doc.elements['ifAliasComment'].nil? && (if_alias_comment.nil? || if_alias_comment.empty?)
 	
-  if_alias_comment_el = doc.elements['ifAliasComment'].texts.join("\n")
-  Chef::Log.debug "ifAliasComment ? New: #{if_alias_comment}; Current: #{if_alias_comment_el}"
-  if_alias_comment_el == if_alias_comment
+	if_alias_comment_el = doc.elements['ifAliasComment'].texts.join("\n")
+	Chef::Log.debug "ifAliasComment ? New: #{if_alias_comment}; Current: #{if_alias_comment_el}"
+	if_alias_comment_el == if_alias_comment
 end
 
 def outage_calendars_equal?(doc, outage_calendars)
 	return true if doc.elements['outage-calendar'].nil? && (outage_calendars.nil? || outage_calendars.empty?)
-        outage_calendars = [] if outage_calendars.nil?
+	outage_calendars = [] if outage_calendars.nil?
 	curr_outage_calendars = []
 	doc.elements.each('outage-calendar') do |out_cal|
 		curr_outage_calendars.push out_cal.text
@@ -303,6 +303,7 @@ def insert_specific(package_el, new_resource)
 	package_el.elements.each('specific') do
 		package_el.delete_element "specific"
 	end
+	
 	unless new_resource.specifics.nil?
 		new_resource.specifics.each do |specific|
 			unless specific.nil? && specific.empty?
@@ -324,6 +325,7 @@ def insert_include_ranges(package_el, new_resource)
 	package_el.elements.each('include-range') do
 		package_el.delete_element "include-range"
 	end
+	
 	unless new_resource.include_ranges.nil?
 		new_resource.include_ranges.each do |include_range|
 			unless include_range.nil? && include_range.empty?
@@ -351,6 +353,7 @@ def insert_exclude_ranges(package_el, new_resource)
 	package_el.elements.each('exclude-range') do
 		package_el.delete_element "exclude-range"
 	end
+	
 	unless new_resource.exclude_ranges.nil?
 		new_resource.exclude_ranges.each do |exclude_range|
 			unless exclude_range.nil? && exclude_range.empty?
@@ -383,6 +386,7 @@ def insert_include_urls(package_el, new_resource)
 	package_el.elements.each('include-url') do
 		package_el.delete_element "include-url"
 	end
+	
 	unless new_resource.include_urls.nil?
 		new_resource.include_urls.each do |include_url|
 			include_url_last_el = package_el.elements['include-url[last()]']
@@ -414,11 +418,9 @@ def insert_include_urls(package_el, new_resource)
 end
 
 def insert_store_by_alias(package_el, new_resource)
-	unless package_el.elements['storeByIfAlias'].nil?
-		package_el.delete_element 'storeByIfAlias'
-	end
+	package_el.delete_element 'storeByIfAlias'
 	
-	unless new_resource.store_by_if_alias.nil?
+	if new_resource.store_by_if_alias
 		sb_ifalias_el = REXML::Element.new('storeByIfAlias')
 		sb_ifalias_el.add_text('true')
 		include_url_last_el = package_el.elements['include-url[last()]']
@@ -448,11 +450,10 @@ end
 
 
 def insert_store_by_node_id(package_el, new_resource)
-	unless package_el.elements['storeByNodeID'].nil?
-		package_el.delete_element 'storeByNodeID'
-	end
+	package_el.delete_element 'storeByNodeID'
 	
-	unless new_resource.store_by_node_id.nil?
+	
+	if new_resource.store_by_node_id != 'normal'
 		store_by_nodeid_el = REXML::Element.new('storeByNodeID')
 		store_by_nodeid_el.add_text(new_resource.store_by_node_id)
 		store_if_alias_last_el = package_el.elements['storeByIfAlias[last()]']
@@ -487,9 +488,9 @@ end
 
 
 def insert_if_alias_domain(package_el, new_resource)
-	unless package_el.elements['ifAliasDomain'].nil?
-		package_el.delete_element 'ifAliasDomain'
-	end
+	
+	package_el.delete_element 'ifAliasDomain'
+	
 	
 	unless new_resource.if_alias_domain.nil?
 		dm_ifalias_el = package_el.add_element 'ifAliasDomain'
@@ -530,9 +531,7 @@ def insert_if_alias_domain(package_el, new_resource)
 end
 
 def insert_stor_flag_override(package_el, new_resource)
-	unless package_el.elements['storFlagOverride'].nil?
-		package_el.delete_element 'storFlagOverride'
-	end
+	package_el.delete_element 'storFlagOverride'
 	
 	if new_resource.stor_flag_override
 		stor_flag_override_el = package_el.add_element('storFlagOverride')
