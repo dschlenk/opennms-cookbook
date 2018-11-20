@@ -103,12 +103,10 @@ def matching_package(doc, current_resource)
 	package
 end
 
-def filter_equal?(doc, current_filter)
-	Chef::Log.debug("Filter ? New: #{doc.elements['filter'].nil?} && #{current_filter}")
-	return true if doc.elements['filter'].nil? && (current_filter.nil? || current_filter.empty?)
-	
-	filter_el = doc.elements['filter'].to_s
-	filter_el == current_filter
+def filter_equal?(doc, new_filter)
+  Chef::Log.debug("Filter ? current: '#{doc.elements['filter'].texts.join("\n")}'; old: '#{new_filter}'")
+  current = doc.elements['filter'].texts.join("\n")
+  current == new_filter
 end
 
 def specifics_equal?(doc, specifics)
@@ -128,20 +126,24 @@ end
 
 def include_ranges_equal?(doc, include_ranges)
 	Chef::Log.debug("Check for no include ranges: #{doc.elements['include-range'].nil?} && #{include_ranges}")
-	return true if doc.elements['include-range'].nil? && (include_ranges.nil? || include_ranges.empty?)
 	
+        current = []
 	doc.elements.each('include-range') do |ncr_el|
-		ncr_el.attributes['begin'].to_s == include_ranges['begin'].to_s && ncr_el.attributes['end'].to_s == include_ranges['end'].to_s
+          current.push({'begin' => ncr_el.attributes['begin'].to_s, 'end' => ncr_el.attributes['end'].to_s })
 	end
+        current == include_ranges
 end
 
 def exclude_ranges_equal?(doc, exclude_ranges)
 	Chef::Log.debug("Check for no exclude-range: #{doc.elements['exclude-range'].nil?} && #{exclude_ranges}")
-	return true if doc.elements['exclude-range'].nil? && (exclude_ranges.nil? || exclude_ranges.empty?)
-	
+        exclude_ranges = [] if exclude_ranges.nil?
+        current = []
 	doc.elements.each('exclude-range') do |exl_el|
-		exl_el.attributes['begin'].to_s == exclude_ranges['begin'].to_s && exl_el.attributes['end'].to_s == exclude_ranges['end'].to_s
+          current.push({'begin' => exl_el.attributes['begin'].to_s, 'end' => exl_el.attributes['end'].to_s })
 	end
+        sorted_current = current.sort
+        sorted_er = exclude_ranges.sort
+        sorted_current == sorted_er
 end
 
 def include_urls_equal?(doc, include_urls)
@@ -153,55 +155,60 @@ def include_urls_equal?(doc, include_urls)
 		curr_include_urls.push urls.text
 	end
 	curr_include_urls.sort!
-	Chef::Log.debug("include-url equal? #{curr_specifics} == #{include_urls}")
+	Chef::Log.debug("include-url equal? #{curr_include_urls} == #{include_urls}")
 	sorted_include_urls = []
 	sorted_include_urls = include_urls.sort unless include_urls.nil?
 	curr_include_urls == sorted_include_urls
 end
 
 def store_by_if_alias_equal?(doc, store_by_if_alia)
-	return true if doc.elements['storeByIfAlias'].nil? && (store_by_if_alia.nil? || store_by_if_alia.empty?)
-	
-	store_by_if_alias_el = doc.elements['storeByIfAlias'].to_s
+        if doc.elements['storeByIfAlias'].nil?
+	  current = false 
+        else
+          store_by_if_alias_el = true if doc.elements['storeByIfAlias'].texts.join("\n") == "true"
+        end
 	Chef::Log.debug "storeByIfAlias ? New: #{store_by_if_alia}; Current: #{store_by_if_alias_el}"
-	store_by_if_alias_el == store_by_if_alia
+        store_by_if_alias_el.to_s == store_by_if_alia.to_s
 end
 
 def store_by_node_id_equal?(doc, store_by_node_id)
-	return true if doc.elements['storeByNodeID'].nil? && (store_by_node_id.nil? || store_by_node_id.empty?)
-	
-	store_by_node_id_el = doc.elements['storeByNodeID'].to_s
-	Chef::Log.debug "storeByNodeID ? New: #{store_by_node_id}; Current: #{store_by_node_id_el}"
-	store_by_node_id_el == store_by_node_id
+  if doc.elements['storeByNodeID'].nil?
+    current = 'normal' 
+  else
+    current = doc.elements['storeByNodeID'].texts.join("\n")
+  end
+  Chef::Log.debug "storeByNodeID ? New: #{store_by_node_id}; Current: #{current}"
+  current.to_s == store_by_node_id.to_s
 end
 
 def if_alias_domain_equal?(doc, if_alias_domain)
 	return true if doc.elements['ifAliasDomain'].nil? && (if_alias_domain.nil? || if_alias_domain.empty?)
 	
-	if_alias_domain_el = doc.elements['ifAliasDomain'].to_s
+        if_alias_domain_el = doc.elements['ifAliasDomain'].texts.join("\n")
 	Chef::Log.debug "ifAliasDomain ? New: #{if_alias_domain}; Current: #{if_alias_domain_el}"
-	if_alias_domain_el == if_alias_domain
+        if_alias_domain_el.to_s == if_alias_domain.to_s
 end
 
 def stor_flag_override_equal?(doc, stor_flag_override)
-	return true if doc.elements['storFlagOverride'].nil? && (stor_flag_override.nil? || stor_flag_override.empty?)
-	
-	stor_flag_override_el = doc.elements['storFlagOverride'].to_s
-	Chef::Log.debug "storFlagOverride ? New: #{stor_flag_override}; Current: #{stor_flag_override_el}"
-	stor_flag_override_el == stor_flag_override
+  if doc.elements['storFlagOverride'].nil?
+    current = false
+  else
+    current = true if doc.elements['storFlagOverride'].texts.join("\n") == "true"
+  end
+  current == stor_flag_override
 end
 
 def if_alias_comment_equal?(doc, if_alias_comment)
-	return true if doc.elements['ifAliasComment'].nil? && (if_alias_comment.nil? || if_alias_comment.empty?)
+  return true if doc.elements['ifAliasComment'].nil? && (if_alias_comment.nil? || if_alias_comment.empty?)
 	
-	if_alias_comment_el = doc.elements['ifAliasComment'].to_s
-	Chef::Log.debug "ifAliasComment ? New: #{if_alias_comment}; Current: #{if_alias_comment_el}"
-	if_alias_comment_el == if_alias_comment
+  if_alias_comment_el = doc.elements['ifAliasComment'].texts.join("\n")
+  Chef::Log.debug "ifAliasComment ? New: #{if_alias_comment}; Current: #{if_alias_comment_el}"
+  if_alias_comment_el == if_alias_comment
 end
 
 def outage_calendars_equal?(doc, outage_calendars)
 	return true if doc.elements['outage-calendar'].nil? && (outage_calendars.nil? || outage_calendars.empty?)
-	
+        outage_calendars = [] if outage_calendars.nil?
 	curr_outage_calendars = []
 	doc.elements.each('outage-calendar') do |out_cal|
 		curr_outage_calendars.push out_cal.text
