@@ -8,21 +8,19 @@ class CollectionPackage < Inspec.resource(1)
   '
 
   example '
-    describe collection_package(\'example1\', false) do
+    describe collection_package(\'example1\') do
       its(\'filter\') { should eq \'IPADDR != \\\'0.0.0.0\\\'\' }
       its(\'include_ranges\') { should eq [{\'begin\' => \'1.1.1.1\', \'end\' => \'254.254.254.254\'}, {\'begin\' => \'::1\', \'end\' => \'ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff\'}]}
     end
   '
 
-  def initialize(name, remote)
+  def initialize(name)
     @name = name
     doc = REXML::Document.new(inspec.file('/opt/opennms/etc/collectd-configuration.xml').content)
     p_el = doc.elements["/collectd-configuration/package[@name = '#{@name}']"]
-    @params = {}
-    @params[:remote] = false
-    @params[:remote] = true if p_el.attributes['remote'].to_s == 'true'
-    @exists = !p_el.nil? && remote == @params[:remote]
+    @exists = !p_el.nil?
     if @exists
+      @params = {}
       @params[:filter] = p_el.elements['filter'].text.to_s
       @params[:include_ranges] = []
       p_el.each_element('include-range') do |ir|
