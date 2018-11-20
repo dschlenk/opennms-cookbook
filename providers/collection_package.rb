@@ -414,11 +414,11 @@ def insert_include_urls(package_el, new_resource)
 end
 
 def insert_store_by_alias(package_el, new_resource)
-	unless package_el.elements('storeByIfAlias').nil?
+	unless package_el.elements['storeByIfAlias'].nil?
 		package_el.delete_element 'storeByIfAlias'
 	end
 	
-	unless new_resource.store_by_if_alias == true
+	unless new_resource.store_by_if_alias.nil?
 		sb_ifalias_el = REXML::Element.new('storeByIfAlias')
 		sb_ifalias_el.add_text('true')
 		include_url_last_el = package_el.elements['include-url[last()]']
@@ -448,7 +448,7 @@ end
 
 
 def insert_store_by_node_id(package_el, new_resource)
-	unless package_el.elements('storeByNodeID').nil?
+	unless package_el.elements['storeByNodeID'].nil?
 		package_el.delete_element 'storeByNodeID'
 	end
 	
@@ -487,7 +487,7 @@ end
 
 
 def insert_if_alias_domain(package_el, new_resource)
-	unless package_el.elements('ifAliasDomain').nil?
+	unless package_el.elements['ifAliasDomain'].nil?
 		package_el.delete_element 'ifAliasDomain'
 	end
 	
@@ -530,7 +530,7 @@ def insert_if_alias_domain(package_el, new_resource)
 end
 
 def insert_stor_flag_override(package_el, new_resource)
-	unless package_el.elements('storFlagOverride').nil?
+	unless package_el.elements['storFlagOverride'].nil?
 		package_el.delete_element 'storFlagOverride'
 	end
 	
@@ -578,7 +578,7 @@ def insert_stor_flag_override(package_el, new_resource)
 end
 
 def insert_if_alias_comment(package_el, new_resource)
-	unless package_el.elements('ifAliasComment').nil?
+	unless package_el.elements['ifAliasComment'].nil?
 		package_el.delete_element 'ifAliasComment'
 	end
 	
