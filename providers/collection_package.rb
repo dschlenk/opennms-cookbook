@@ -70,16 +70,16 @@ def load_current_resource
 		@current_resource.exists = true
 		package_el = matching_package(doc, @new_resource)
 		@current_resource.different = if filter_equal?(package_el, @current_resource.filter) \
-	                                                              && specifics_equal?(package_el, @current_resource.specifics) \
-	                                                              && include_ranges_equal?(package_el, @current_resource.include_ranges) \
-	                                                              && exclude_ranges_equal?(package_el, @current_resource.exclude_ranges) \
-	                                                              && include_urls_equal?(package_el, @current_resource.include_urls) \
-	                                                              && store_by_if_alias_equal?(package_el, @current_resource.store_by_if_alias) \
-	                                                              && store_by_node_id_equal?(package_el, @current_resource.store_by_node_id) \
-	                                                              && if_alias_domain_equal?(package_el, @current_resource.if_alias_domain) \
-	                                                              && stor_flag_override_equal?(package_el, @current_resource.stor_flag_override) \
-	                                                              && if_alias_comment_equal?(package_el, @current_resource.if_alias_comment) \
-	                                                              && outage_calendars_equal?(package_el, @current_resource.outage_calendars)
+	                                                                && specifics_equal?(package_el, @current_resource.specifics) \
+	                                                                && include_ranges_equal?(package_el, @current_resource.include_ranges) \
+	                                                                && exclude_ranges_equal?(package_el, @current_resource.exclude_ranges) \
+	                                                                && include_urls_equal?(package_el, @current_resource.include_urls) \
+	                                                                && store_by_if_alias_equal?(package_el, @current_resource.store_by_if_alias) \
+	                                                                && store_by_node_id_equal?(package_el, @current_resource.store_by_node_id) \
+	                                                                && if_alias_domain_equal?(package_el, @current_resource.if_alias_domain) \
+	                                                                && stor_flag_override_equal?(package_el, @current_resource.stor_flag_override) \
+	                                                                && if_alias_comment_equal?(package_el, @current_resource.if_alias_comment) \
+	                                                                && outage_calendars_equal?(package_el, @current_resource.outage_calendars)
 			                              false
 			                            else
 				                            true
@@ -640,7 +640,57 @@ def insert_outage_calendars(package_el, new_resource)
 			unless oc.nil? || oc.empty?
 				oc_el = REXML::Element.new('outage-calendar')
 				oc_el.add_text(oc)
-				package_el.insert_after(service_last_el, oc_el)
+				if service_last_el.nil?
+					if_alias_comment_last_el = package_el.elements['ifAliasComment[last()]']
+					if if_alias_comment_last_el.nil?
+						stor_flag_comment_last_el = package_el.elements['storFlagOverride[last()]']
+						if stor_flag_comment_last_el.nil?
+							if_alias_domain_last_el = package_el.elements['ifAliasDomain[last()]']
+							if if_alias_domain_last_el.nil?
+								store_by_nodeid_last_el = package_el.elements['storeByNodeID[last()]']
+								if store_by_nodeid_last_el.nil?
+									store_if_alias_last_el = package_el.elements['storeByIfAlias[last()]']
+									if store_if_alias_last_el.nil?
+										include_url_last_el = package_el.elements['include-url[last()]']
+										if include_url_last_el.nil?
+											exclude_range_last_el = package_el.elements['exclude-range[last()]']
+											if exclude_range_last_el.nil?
+												include_range_last_el = package_el.elements['include-range[last()]']
+												if include_range_last_el.nil?
+													specific_last_el = package_el.elements['specific[last()]']
+													if specific_last_el.nil?
+														filter_last_el = package_el.elements['filter[last()]']
+														package_el.insert_after(filter_last_el, oc_el)
+													else
+														package_el.insert_after(specific_last_el, oc_el)
+													end
+												else
+													package_el.insert_after(include_range_last_el, oc_el)
+												end
+											else
+												package_el.insert_after(exclude_range_last_el, oc_el)
+											end
+										else
+											package_el.insert_after(include_url_last_el, oc_el)
+										end
+									else
+										package_el.insert_after(store_if_alias_last_el, oc_el)
+									end
+								else
+									package_el.insert_after(store_by_nodeid_last_el, oc_el)
+								end
+							else
+								package_el.insert_after(if_alias_domain_last_el, oc_el)
+							end
+						else
+							package_el.insert_after(stor_flag_comment_last_el, oc_el)
+						end
+					else
+						package_el.insert_after(if_alias_comment_last_el, oc_el)
+					end
+				else
+					package_el.insert_after(service_last_el, oc_el)
+				end
 			end
 		end
 	end
