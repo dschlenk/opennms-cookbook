@@ -70,16 +70,16 @@ def load_current_resource
 		@current_resource.exists = true
 		package_el = matching_package(doc, @new_resource)
 		@current_resource.different = if filter_equal?(package_el, @current_resource.filter) \
-	                                                                && specifics_equal?(package_el, @current_resource.specifics) \
-	                                                                && include_ranges_equal?(package_el, @current_resource.include_ranges) \
-	                                                                && exclude_ranges_equal?(package_el, @current_resource.exclude_ranges) \
-	                                                                && include_urls_equal?(package_el, @current_resource.include_urls) \
-	                                                                && store_by_if_alias_equal?(package_el, @current_resource.store_by_if_alias) \
-	                                                                && store_by_node_id_equal?(package_el, @current_resource.store_by_node_id) \
-	                                                                && if_alias_domain_equal?(package_el, @current_resource.if_alias_domain) \
-	                                                                && stor_flag_override_equal?(package_el, @current_resource.stor_flag_override) \
-	                                                                && if_alias_comment_equal?(package_el, @current_resource.if_alias_comment) \
-	                                                                && outage_calendars_equal?(package_el, @current_resource.outage_calendars)
+	                                                                 && specifics_equal?(package_el, @current_resource.specifics) \
+	                                                                 && include_ranges_equal?(package_el, @current_resource.include_ranges) \
+	                                                                 && exclude_ranges_equal?(package_el, @current_resource.exclude_ranges) \
+	                                                                 && include_urls_equal?(package_el, @current_resource.include_urls) \
+	                                                                 && store_by_if_alias_equal?(package_el, @current_resource.store_by_if_alias) \
+	                                                                 && store_by_node_id_equal?(package_el, @current_resource.store_by_node_id) \
+	                                                                 && if_alias_domain_equal?(package_el, @current_resource.if_alias_domain) \
+	                                                                 && stor_flag_override_equal?(package_el, @current_resource.stor_flag_override) \
+	                                                                 && if_alias_comment_equal?(package_el, @current_resource.if_alias_comment) \
+	                                                                 && outage_calendars_equal?(package_el, @current_resource.outage_calendars)
 			                              false
 			                            else
 				                            true
