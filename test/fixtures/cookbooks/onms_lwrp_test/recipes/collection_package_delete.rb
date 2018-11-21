@@ -8,7 +8,7 @@ opennms_collection_package 'bar' do
 end
 
 opennms_collection_package 'foo' do
-	filter "(IPADDR != '0.0.0.0') & (categoryName == 'foo')"
+	filter "IPADDR != '0.0.0.0' & categoryName == 'foo'"
 	specifics ['10.0.0.1']
 	include_ranges [{ 'begin' => '10.0.1.1', 'end' => '10.0.1.254' }]
 	exclude_ranges [{ 'begin' => '10.0.2.1', 'end' => '10.0.2.254' }]

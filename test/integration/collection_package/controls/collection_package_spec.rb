@@ -2,7 +2,7 @@
 control 'collection_package' do
 	describe collection_package 'foo' do
 		its('remote'){should eq true}
-		its('filter') {should eq "(IPADDR != '0.0.0.0') & (categoryName == 'foo')"}
+		its('filter') {should eq "IPADDR != '0.0.0.0' & categoryName == 'foo'"}
 		its('specifics') {should eq ['10.0.0.1']}
 		its('include_ranges') {should eq [{'begin' => '10.0.1.1', 'end' => '10.0.1.254'}]}
 		its('exclude_ranges') {should eq [{'begin' => '10.0.2.1', 'end' => '10.0.2.254'}]}

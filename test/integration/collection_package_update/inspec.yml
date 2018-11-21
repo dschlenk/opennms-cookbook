@@ -1,10 +1,10 @@
-name: opennms_collection_package_update_filter
-title: OpenNMS collection_package_update_filter
+name: opennms_collection_package_update_excludes
+title: OpenNMS collection_package_update_excludes
 maintainer: David Schlenk
 copyright: ConvergeOne
 copyright_email: dschlenk@convergeone.com
 license: Apache 2.0
-summary: Verify OpenNMS LWRP collection_package_update_filter works.
+summary: Verify OpenNMS LWRP collection_package_update_excludes works.
 version: 1.0.0
 supports:
   - os-family: redhat
