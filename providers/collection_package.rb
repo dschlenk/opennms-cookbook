@@ -493,7 +493,7 @@ def insert_if_alias_domain(package_el, new_resource)
 	
 	
 	unless new_resource.if_alias_domain.nil?
-		dm_ifalias_el = package_el.add_element 'ifAliasDomain'
+		dm_ifalias_el = REXML::Element.new('ifAliasDomain')
 		dm_ifalias_el.add_text(new_resource.if_alias_domain)
 		store_by_nodeid_last_el = package_el.elements['storeByNodeID[last()]']
 		if store_by_nodeid_last_el.nil?
@@ -534,7 +534,7 @@ def insert_stor_flag_override(package_el, new_resource)
 	package_el.delete_element 'storFlagOverride'
 	
 	if new_resource.stor_flag_override
-		stor_flag_override_el = package_el.add_element('storFlagOverride')
+		stor_flag_override_el = REXML::Element.new('storFlagOverride')
 		stor_flag_override_el.add_text('true')
 		if_alias_domain_last_el = package_el.elements['ifAliasDomain[last()]']
 		if if_alias_domain_last_el.nil?
@@ -582,7 +582,7 @@ def insert_if_alias_comment(package_el, new_resource)
 	end
 	
 	unless new_resource.if_alias_comment.nil?
-		ifalias_comment_el = package_el.add_element 'ifAliasComment'
+		ifalias_comment_el = REXML::Element.new('ifAliasComment')
 		ifalias_comment_el.add_text(new_resource.if_alias_comment)
 		stor_flag_comment_last_el = package_el.elements['storFlagOverride[last()]']
 		if stor_flag_comment_last_el.nil?
@@ -638,7 +638,7 @@ def insert_outage_calendars(package_el, new_resource)
 		service_last_el = package_el.elements['service[last()]']
 		new_resource.outage_calendars.each do |oc|
 			unless oc.nil? || oc.empty?
-				oc_el = package_el.add_element 'outage-calendar'
+				oc_el = REXML::Element.new('outage-calendar')
 				oc_el.add_text(oc)
 				package_el.insert_after(service_last_el, oc_el)
 			end
