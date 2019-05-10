@@ -5,6 +5,6 @@ opennms_snmp_collection_group 'group-name-to-delete' do
   action :delete
 end
 
-control 'group-name-tobe-delete' do
+opennms_snmp_collection_group 'group-name-tobe-delete' do
 	action :delete
 end
