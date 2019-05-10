@@ -148,14 +148,14 @@ class Event < Inspec.resource(1)
     tticket_el = event_el.elements['tticket']
     return nil if tticket_el.nil?
     tt_state = tticket_el.attributes['state'] || 'on'
-    tt_info = tticket_el.texts.join('\n')
+    tt_info = tticket_el.texts.join("\n")
     { 'info' => tt_info, 'state' => tt_state }
   end
 
   def forwards(event_el)
     forwards = []
     event_el.elements.each('forward') do |fwd|
-      info = fwd.texts.join('\n')
+      info = fwd.texts.join("\n")
       state = fwd.attributes['state'] || 'on'
       mechanism = fwd.attributes['mechanism']
       if state.nil? && mechanism.nil?
@@ -175,7 +175,7 @@ class Event < Inspec.resource(1)
   def scripts(event_el)
     scripts = []
     event_el.elements.each('script') do |s|
-      name = s.texts.join('\n')
+      name = s.texts.join("\n")
       language = s.attributes['language']
       scripts.push 'name' => name, 'language' => language
     end

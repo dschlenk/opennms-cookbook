@@ -31,7 +31,7 @@ class Target < Inspec.resource(1)
       end
       @params[:commands] = commands
       unless t_el.elements['autoNotify'].nil?
-        @params[:auto_notify] = t_el.elements['autoNotify'].texts.join('\n')
+        @params[:auto_notify] = t_el.elements['autoNotify'].texts.join("\n")
       end
       unless t_el.attributes['interval'].nil?
         @params[:interval] = t_el.attributes['interval'].to_s

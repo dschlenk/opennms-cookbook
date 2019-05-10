@@ -95,8 +95,8 @@ def matching_package(doc, current_resource)
 end
 
 def filter_equal?(doc, new_filter)
+  Chef::Log.debug("Filter ? current: '#{doc.elements['filter'].texts.join("\n")}'; old: '#{new_filter}'")
   current = doc.elements['filter'].texts.join("\n")
-  Chef::Log.debug("Filter ? current: '#{current}'; new: '#{new_filter}'")
   current == new_filter
 end
 
@@ -376,186 +376,79 @@ def insert_include_urls(package_el, new_resource)
   end
 
   unless new_resource.include_urls.nil?
+    previous_el = package_el.elements['exclude-range[last()]']
+    previous_el = package_el.elements['include-range[last()]'] if previous_el.nil?
+    previous_el = package_el.elements['specific[last()]'] if previous_el.nil?
+    previous_el = package_el.elements['filter[last()]'] if previous_el.nil?
     new_resource.include_urls.each do |include_url|
-      include_url_last_el = package_el.elements['include-url[last()]']
       include_urls_el = REXML::Element.new('include-url')
       include_urls_el.add_text(include_url)
-      if include_url_last_el.nil?
-        exclude_range_last_el = package_el.elements['exclude-range[last()]']
-        if exclude_range_last_el.nil?
-          include_range_last_el = package_el.elements['include-range[last()]']
-          if include_range_last_el.nil?
-            specific_last_el = package_el.elements['specific[last()]']
-            if specific_last_el.nil?
-              filter_last_el = package_el.elements['filter[last()]']
-              package_el.insert_after(filter_last_el, include_urls_el)
-            else
-              package_el.insert_after(specific_last_el, include_urls_el)
-            end
-          else
-            package_el.insert_after(include_range_last_el, include_urls_el)
-          end
-        else
-          package_el.insert_after(exclude_range_last_el, include_urls_el)
-        end
-      else
-        package_el.insert_after(include_url_last_el, include_urls_el)
-      end
+      package_el.insert_after(previous_el, include_urls_el)
+      previous_el = include_urls_el
     end
   end
 end
 
 def insert_store_by_alias(package_el, new_resource)
   package_el.delete_element 'storeByIfAlias'
-
+  previous_el = package_el.elements['include-url[last()]']
+  previous_el = package_el.elements['exclude-range[last()]'] if previous_el.nil?
+  previous_el = package_el.elements['include-range[last()]'] if previous_el.nil?
+  previous_el = package_el.elements['specific[last()]'] if previous_el.nil?
+  previous_el = package_el.elements['filter[last()]'] if previous_el.nil?
   if new_resource.store_by_if_alias
     sb_ifalias_el = REXML::Element.new('storeByIfAlias')
     sb_ifalias_el.add_text('true')
-    include_url_last_el = package_el.elements['include-url[last()]']
-    if include_url_last_el.nil?
-      exclude_range_last_el = package_el.elements['exclude-range[last()]']
-      if exclude_range_last_el.nil?
-        include_range_last_el = package_el.elements['include-range[last()]']
-        if include_range_last_el.nil?
-          specific_last_el = package_el.elements['specific[last()]']
-          if specific_last_el.nil?
-            filter_last_el = package_el.elements['filter[last()]']
-            package_el.insert_after(filter_last_el, sb_ifalias_el)
-          else
-            package_el.insert_after(specific_last_el, sb_ifalias_el)
-          end
-        else
-          package_el.insert_after(include_range_last_el, sb_ifalias_el)
-        end
-      else
-        package_el.insert_after(exclude_range_last_el, sb_ifalias_el)
-      end
-    else
-      package_el.insert_after(include_url_last_el, sb_ifalias_el)
-    end
+    package_el.insert_after(previous_el, sb_ifalias_el)
   end
 end
 
 def insert_store_by_node_id(package_el, new_resource)
   package_el.delete_element 'storeByNodeID'
-
+  previous_el = package_el.elements['storeByIfAlias[last()]']
+  previous_el = package_el.elements['include-url[last()]'] if previous_el.nil?
+  previous_el = package_el.elements['exclude-range[last()]'] if previous_el.nil?
+  previous_el = package_el.elements['include-range[last()]'] if previous_el.nil?
+  previous_el = package_el.elements['specific[last()]'] if previous_el.nil?
+  previous_el = package_el.elements['filter[last()]'] if previous_el.nil?
   if new_resource.store_by_node_id != 'normal'
     store_by_nodeid_el = REXML::Element.new('storeByNodeID')
     store_by_nodeid_el.add_text(new_resource.store_by_node_id)
-    store_if_alias_last_el = package_el.elements['storeByIfAlias[last()]']
-    if store_if_alias_last_el.nil?
-      include_url_last_el = package_el.elements['include-url[last()]']
-      if include_url_last_el.nil?
-        exclude_range_last_el = package_el.elements['exclude-range[last()]']
-        if exclude_range_last_el.nil?
-          include_range_last_el = package_el.elements['include-range[last()]']
-          if include_range_last_el.nil?
-            specific_last_el = package_el.elements['specific[last()]']
-            if specific_last_el.nil?
-              filter_last_el = package_el.elements['filter[last()]']
-              package_el.insert_after(filter_last_el, store_by_nodeid_el)
-            else
-              package_el.insert_after(specific_last_el, store_by_nodeid_el)
-            end
-          else
-            package_el.insert_after(include_range_last_el, store_by_nodeid_el)
-          end
-        else
-          package_el.insert_after(exclude_range_last_el, store_by_nodeid_el)
-        end
-      else
-        package_el.insert_after(include_url_last_el, store_by_nodeid_el)
-      end
-    else
-      package_el.insert_after(store_if_alias_last_el, store_by_nodeid_el)
-    end
+    package_el.insert_after(previous_el, store_by_nodeid_el)
   end
 end
 
 def insert_if_alias_domain(package_el, new_resource)
   package_el.delete_element 'ifAliasDomain'
+  previous_el = package_el.elements['storeByNodeID[last()]']
+  previous_el = package_el.elements['storeByIfAlias[last()]'] if previous_el.nil?
+  previous_el = package_el.elements['include-url[last()]'] if previous_el.nil?
+  previous_el = package_el.elements['exclude-range[last()]'] if previous_el.nil?
+  previous_el = package_el.elements['include-range[last()]'] if previous_el.nil?
+  previous_el = package_el.elements['specific[last()]'] if previous_el.nil?
+  previous_el = package_el.elements['filter[last()]'] if previous_el.nil?
 
   unless new_resource.if_alias_domain.nil?
     dm_ifalias_el = REXML::Element.new('ifAliasDomain')
     dm_ifalias_el.add_text(new_resource.if_alias_domain)
-    store_by_nodeid_last_el = package_el.elements['storeByNodeID[last()]']
-    if store_by_nodeid_last_el.nil?
-      store_if_alias_last_el = package_el.elements['storeByIfAlias[last()]']
-      if store_if_alias_last_el.nil?
-        include_url_last_el = package_el.elements['include-url[last()]']
-        if include_url_last_el.nil?
-          exclude_range_last_el = package_el.elements['exclude-range[last()]']
-          if exclude_range_last_el.nil?
-            include_range_last_el = package_el.elements['include-range[last()]']
-            if include_range_last_el.nil?
-              specific_last_el = package_el.elements['specific[last()]']
-              if specific_last_el.nil?
-                filter_last_el = package_el.elements['filter[last()]']
-                package_el.insert_after(filter_last_el, dm_ifalias_el)
-              else
-                package_el.insert_after(specific_last_el, dm_ifalias_el)
-              end
-            else
-              package_el.insert_after(include_range_last_el, dm_ifalias_el)
-            end
-          else
-            package_el.insert_after(exclude_range_last_el, dm_ifalias_el)
-          end
-        else
-          package_el.insert_after(include_url_last_el, dm_ifalias_el)
-        end
-      else
-        package_el.insert_after(store_if_alias_last_el, dm_ifalias_el)
-      end
-    else
-      package_el.insert_after(store_by_nodeid_last_el, dm_ifalias_el)
-    end
+    package_el.insert_after(previous_el, dm_ifalias_el)
   end
 end
 
 def insert_stor_flag_override(package_el, new_resource)
   package_el.delete_element 'storFlagOverride'
-
+  previous_el = package_el.elements['ifAliasDomain[last()]']
+  previous_el = package_el.elements['storeByNodeID[last()]'] if previous_el.nil?
+  previous_el = package_el.elements['storeByIfAlias[last()]'] if previous_el.nil?
+  previous_el = package_el.elements['include-url[last()]'] if previous_el.nil?
+  previous_el = package_el.elements['exclude-range[last()]'] if previous_el.nil?
+  previous_el = package_el.elements['include-range[last()]'] if previous_el.nil?
+  previous_el = package_el.elements['specific[last()]'] if previous_el.nil?
+  previous_el = package_el.elements['filter[last()]'] if previous_el.nil?
   if new_resource.stor_flag_override
     stor_flag_override_el = REXML::Element.new('storFlagOverride')
     stor_flag_override_el.add_text('true')
-    if_alias_domain_last_el = package_el.elements['ifAliasDomain[last()]']
-    if if_alias_domain_last_el.nil?
-      store_by_nodeid_last_el = package_el.elements['storeByNodeID[last()]']
-      if store_by_nodeid_last_el.nil?
-        store_if_alias_last_el = package_el.elements['storeByIfAlias[last()]']
-        if store_if_alias_last_el.nil?
-          include_url_last_el = package_el.elements['include-url[last()]']
-          if include_url_last_el.nil?
-            exclude_range_last_el = package_el.elements['exclude-range[last()]']
-            if exclude_range_last_el.nil?
-              include_range_last_el = package_el.elements['include-range[last()]']
-              if include_range_last_el.nil?
-                specific_last_el = package_el.elements['specific[last()]']
-                if specific_last_el.nil?
-                  filter_last_el = package_el.elements['filter[last()]']
-                  package_el.insert_after(filter_last_el, stor_flag_override_el)
-                else
-                  package_el.insert_after(specific_last_el, stor_flag_override_el)
-                end
-              else
-                package_el.insert_after(include_range_last_el, stor_flag_override_el)
-              end
-            else
-              package_el.insert_after(exclude_range_last_el, stor_flag_override_el)
-            end
-          else
-            package_el.insert_after(include_url_last_el, stor_flag_override_el)
-          end
-        else
-          package_el.insert_after(store_if_alias_last_el, stor_flag_override_el)
-        end
-      else
-        package_el.insert_after(store_by_nodeid_last_el, stor_flag_override_el)
-      end
-    else
-      package_el.insert_after(if_alias_domain_last_el, stor_flag_override_el)
-    end
+    package_el.insert_after(previous_el, stor_flag_override_el)
   end
 end
 
@@ -563,52 +456,20 @@ def insert_if_alias_comment(package_el, new_resource)
   unless package_el.elements['ifAliasComment'].nil?
     package_el.delete_element 'ifAliasComment'
   end
+  previous_el = package_el.elements['storFlagOverride[last()]']
+  previous_el = package_el.elements['ifAliasDomain[last()]'] if previous_el.nil?
+  previous_el = package_el.elements['storeByNodeID[last()]'] if previous_el.nil?
+  previous_el = package_el.elements['storeByIfAlias[last()]'] if previous_el.nil?
+  previous_el = package_el.elements['include-url[last()]'] if previous_el.nil?
+  previous_el = package_el.elements['exclude-range[last()]'] if previous_el.nil?
+  previous_el = package_el.elements['include-range[last()]'] if previous_el.nil?
+  previous_el = package_el.elements['specific[last()]'] if previous_el.nil?
+  previous_el = package_el.elements['filter[last()]'] if previous_el.nil?
 
   unless new_resource.if_alias_comment.nil?
     ifalias_comment_el = REXML::Element.new('ifAliasComment')
     ifalias_comment_el.add_text(new_resource.if_alias_comment)
-    stor_flag_comment_last_el = package_el.elements['storFlagOverride[last()]']
-    if stor_flag_comment_last_el.nil?
-      if_alias_domain_last_el = package_el.elements['ifAliasDomain[last()]']
-      if if_alias_domain_last_el.nil?
-        store_by_nodeid_last_el = package_el.elements['storeByNodeID[last()]']
-        if store_by_nodeid_last_el.nil?
-          store_if_alias_last_el = package_el.elements['storeByIfAlias[last()]']
-          if store_if_alias_last_el.nil?
-            include_url_last_el = package_el.elements['include-url[last()]']
-            if include_url_last_el.nil?
-              exclude_range_last_el = package_el.elements['exclude-range[last()]']
-              if exclude_range_last_el.nil?
-                include_range_last_el = package_el.elements['include-range[last()]']
-                if include_range_last_el.nil?
-                  specific_last_el = package_el.elements['specific[last()]']
-                  if specific_last_el.nil?
-                    filter_last_el = package_el.elements['filter[last()]']
-                    package_el.insert_after(filter_last_el, ifalias_comment_el)
-                  else
-                    package_el.insert_after(specific_last_el, ifalias_comment_el)
-                  end
-                else
-                  package_el.insert_after(include_range_last_el, ifalias_comment_el)
-                end
-              else
-                package_el.insert_after(exclude_range_last_el, ifalias_comment_el)
-              end
-            else
-              package_el.insert_after(include_url_last_el, ifalias_comment_el)
-            end
-          else
-            package_el.insert_after(store_if_alias_last_el, ifalias_comment_el)
-          end
-        else
-          package_el.insert_after(store_by_nodeid_last_el, ifalias_comment_el)
-        end
-      else
-        package_el.insert_after(if_alias_domain_last_el, ifalias_comment_el)
-      end
-    else
-      package_el.insert_after(stor_flag_comment_last_el, ifalias_comment_el)
-    end
+    package_el.insert_after(previous_el, ifalias_comment_el)
   end
 end
 
@@ -618,62 +479,23 @@ def insert_outage_calendars(package_el, new_resource)
   end
 
   unless new_resource.outage_calendars.nil?
-    service_last_el = package_el.elements['service[last()]']
+    previous_el = package_el.elements['service[last()]']
+    previous_el = package_el.elements['ifAliasComment[last()]'] if previous_el.nil?
+    previous_el = package_el.elements['storFlagOverride[last()]'] if previous_el.nil?
+    previous_el = package_el.elements['ifAliasDomain[last()]'] if previous_el.nil?
+    previous_el = package_el.elements['storeByNodeID[last()]'] if previous_el.nil?
+    previous_el = package_el.elements['storeByIfAlias[last()]'] if previous_el.nil?
+    previous_el = package_el.elements['include-url[last()]'] if previous_el.nil?
+    previous_el = package_el.elements['exclude-range[last()]'] if previous_el.nil?
+    previous_el = package_el.elements['include-range[last()]'] if previous_el.nil?
+    previous_el = package_el.elements['specific[last()]'] if previous_el.nil?
+    previous_el = package_el.elements['filter[last()]'] if previous_el.nil?
     new_resource.outage_calendars.each do |oc|
       next if oc.nil? || oc.empty?
       oc_el = REXML::Element.new('outage-calendar')
       oc_el.add_text(oc)
-      if service_last_el.nil?
-        if_alias_comment_last_el = package_el.elements['ifAliasComment[last()]']
-        if if_alias_comment_last_el.nil?
-          stor_flag_comment_last_el = package_el.elements['storFlagOverride[last()]']
-          if stor_flag_comment_last_el.nil?
-            if_alias_domain_last_el = package_el.elements['ifAliasDomain[last()]']
-            if if_alias_domain_last_el.nil?
-              store_by_nodeid_last_el = package_el.elements['storeByNodeID[last()]']
-              if store_by_nodeid_last_el.nil?
-                store_if_alias_last_el = package_el.elements['storeByIfAlias[last()]']
-                if store_if_alias_last_el.nil?
-                  include_url_last_el = package_el.elements['include-url[last()]']
-                  if include_url_last_el.nil?
-                    exclude_range_last_el = package_el.elements['exclude-range[last()]']
-                    if exclude_range_last_el.nil?
-                      include_range_last_el = package_el.elements['include-range[last()]']
-                      if include_range_last_el.nil?
-                        specific_last_el = package_el.elements['specific[last()]']
-                        if specific_last_el.nil?
-                          filter_last_el = package_el.elements['filter[last()]']
-                          package_el.insert_after(filter_last_el, oc_el)
-                        else
-                          package_el.insert_after(specific_last_el, oc_el)
-                        end
-                      else
-                        package_el.insert_after(include_range_last_el, oc_el)
-                      end
-                    else
-                      package_el.insert_after(exclude_range_last_el, oc_el)
-                    end
-                  else
-                    package_el.insert_after(include_url_last_el, oc_el)
-                  end
-                else
-                  package_el.insert_after(store_if_alias_last_el, oc_el)
-                end
-              else
-                package_el.insert_after(store_by_nodeid_last_el, oc_el)
-              end
-            else
-              package_el.insert_after(if_alias_domain_last_el, oc_el)
-            end
-          else
-            package_el.insert_after(stor_flag_comment_last_el, oc_el)
-          end
-        else
-          package_el.insert_after(if_alias_comment_last_el, oc_el)
-        end
-      else
-        package_el.insert_after(service_last_el, oc_el)
-      end
+      package_el.insert_after(previous_el, oc_el)
+      previous_el = oc_el
     end
   end
 end
@@ -689,9 +511,6 @@ def update_collection_package
 
   package_el = matching_package(doc, new_resource)
   unless package_el.nil?
-    unless new_resource.remote.nil?
-      package_el.attributes['remote'] = new_resource.remote.to_s
-    end
     insert_filter(package_el, new_resource)
     insert_specific(package_el, new_resource)
     insert_include_ranges(package_el, new_resource)
