@@ -61,7 +61,7 @@ GRAPH
   postgresql (6.1.2)
     build-essential (>= 2.0.0)
     compat_resource (>= 12.16.3)
-    openssl (>= 4.0.0)
+    openssl (>= 4.0)
   seven_zip (2.0.2)
     windows (>= 1.2.2)
   snmp (0.1.0)

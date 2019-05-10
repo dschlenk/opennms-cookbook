@@ -18,6 +18,7 @@ require 'rexml/document'
 
 actions :create
 default_action :create
+actions :delete
 
 attribute :group, name_attribute: true, kind_of: String, required: true
 attribute :collection_name, kind_of: String, default: 'default', required: true
