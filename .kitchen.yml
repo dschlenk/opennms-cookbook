@@ -123,7 +123,7 @@ suites:
       - recipe[onms_lwrp_test::avail_category]
     attributes:
       opennms:
-        version: 22.0.2-1
+        version: 22.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -214,7 +214,7 @@ suites:
       - recipe[onms_lwrp_test::avail_view_section]
     attributes:
       opennms:
-        version: 22.0.2-1
+        version: 22.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -305,7 +305,7 @@ suites:
       - recipe[onms_lwrp_test::collection_graph]
     attributes:
       opennms:
-        version: 22.0.2-1
+        version: 22.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -396,7 +396,7 @@ suites:
       - recipe[onms_lwrp_test::collection_graph_file]
     attributes:
       opennms:
-        version: 22.0.2-1
+        version: 22.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -487,7 +487,7 @@ suites:
       - recipe[onms_lwrp_test::collection_package]
     attributes:
       opennms:
-        version: 22.0.2-1
+        version: 22.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -578,7 +578,7 @@ suites:
       - recipe[onms_lwrp_test::collection_service]
     attributes:
       opennms:
-        version: 22.0.2-1
+        version: 22.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -669,7 +669,7 @@ suites:
       - recipe[onms_lwrp_test::dashlet]
     attributes:
       opennms:
-        version: 22.0.2-1
+        version: 22.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -760,7 +760,7 @@ suites:
       - recipe[onms_lwrp_test::dashlet_update]
     attributes:
       opennms:
-        version: 22.0.2-1
+        version: 22.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -851,7 +851,7 @@ suites:
       - recipe[onms_lwrp_test::delete_imported_node]
     attributes:
       opennms:
-        version: 22.0.2-1
+        version: 22.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -942,7 +942,7 @@ suites:
       - recipe[onms_lwrp_test::destination_path]
     attributes:
       opennms:
-        version: 22.0.2-1
+        version: 22.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -1033,7 +1033,7 @@ suites:
       - recipe[onms_lwrp_test::disco_range]
     attributes:
       opennms:
-        version: 22.0.2-1
+        version: 22.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -1124,7 +1124,7 @@ suites:
       - recipe[onms_lwrp_test::disco_specific]
     attributes:
       opennms:
-        version: 22.0.2-1
+        version: 22.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -1215,7 +1215,7 @@ suites:
       - recipe[onms_lwrp_test::disco_url]
     attributes:
       opennms:
-        version: 22.0.2-1
+        version: 22.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -1306,7 +1306,7 @@ suites:
       - recipe[onms_lwrp_test::edit_imported_node]
     attributes:
       opennms:
-        version: 22.0.2-1
+        version: 22.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -1397,7 +1397,7 @@ suites:
       - recipe[onms_lwrp_test::event]
     attributes:
       opennms:
-        version: 22.0.2-1
+        version: 22.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -1488,7 +1488,7 @@ suites:
       - recipe[onms_lwrp_test::event_add_parameters]
     attributes:
       opennms:
-        version: 22.0.2-1
+        version: 22.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -1579,7 +1579,7 @@ suites:
       - recipe[onms_lwrp_test::event_change_parameters]
     attributes:
       opennms:
-        version: 22.0.2-1
+        version: 22.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -1670,7 +1670,7 @@ suites:
       - recipe[onms_lwrp_test::event_descr]
     attributes:
       opennms:
-        version: 22.0.2-1
+        version: 22.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -1761,7 +1761,7 @@ suites:
       - recipe[onms_lwrp_test::event_edit_alarm_data]
     attributes:
       opennms:
-        version: 22.0.2-1
+        version: 22.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -1852,7 +1852,7 @@ suites:
       - recipe[onms_lwrp_test::event_edit_autoaction]
     attributes:
       opennms:
-        version: 22.0.2-1
+        version: 22.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -1943,7 +1943,7 @@ suites:
       - recipe[onms_lwrp_test::event_edit_forward]
     attributes:
       opennms:
-        version: 22.0.2-1
+        version: 22.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -2034,7 +2034,7 @@ suites:
       - recipe[onms_lwrp_test::event_edit_mouseovertext]
     attributes:
       opennms:
-        version: 22.0.2-1
+        version: 22.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -2125,7 +2125,7 @@ suites:
       - recipe[onms_lwrp_test::event_edit_operinstruct]
     attributes:
       opennms:
-        version: 22.0.2-1
+        version: 22.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -2216,7 +2216,7 @@ suites:
       - recipe[onms_lwrp_test::event_edit_script]
     attributes:
       opennms:
-        version: 22.0.2-1
+        version: 22.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -2307,7 +2307,7 @@ suites:
       - recipe[onms_lwrp_test::event_edit_tticket]
     attributes:
       opennms:
-        version: 22.0.2-1
+        version: 22.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -2398,7 +2398,7 @@ suites:
       - recipe[onms_lwrp_test::event_edit_varbindsdecode]
     attributes:
       opennms:
-        version: 22.0.2-1
+        version: 22.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -2489,7 +2489,7 @@ suites:
       - recipe[onms_lwrp_test::event_label]
     attributes:
       opennms:
-        version: 22.0.2-1
+        version: 22.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -2580,7 +2580,7 @@ suites:
       - recipe[onms_lwrp_test::event_logmsg]
     attributes:
       opennms:
-        version: 22.0.2-1
+        version: 22.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -2671,7 +2671,7 @@ suites:
       - recipe[onms_lwrp_test::event_logmsg_dest]
     attributes:
       opennms:
-        version: 22.0.2-1
+        version: 22.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -2762,7 +2762,7 @@ suites:
       - recipe[onms_lwrp_test::event_logmsg_notify]
     attributes:
       opennms:
-        version: 22.0.2-1
+        version: 22.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -2853,7 +2853,7 @@ suites:
       - recipe[onms_lwrp_test::event_noop]
     attributes:
       opennms:
-        version: 22.0.2-1
+        version: 22.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -2944,7 +2944,7 @@ suites:
       - recipe[onms_lwrp_test::event_remove_add_alarm_data]
     attributes:
       opennms:
-        version: 22.0.2-1
+        version: 22.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -3035,7 +3035,7 @@ suites:
       - recipe[onms_lwrp_test::event_remove_add_autoaction]
     attributes:
       opennms:
-        version: 22.0.2-1
+        version: 22.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -3126,7 +3126,7 @@ suites:
       - recipe[onms_lwrp_test::event_remove_add_forward]
     attributes:
       opennms:
-        version: 22.0.2-1
+        version: 22.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -3217,7 +3217,7 @@ suites:
       - recipe[onms_lwrp_test::event_remove_add_script]
     attributes:
       opennms:
-        version: 22.0.2-1
+        version: 22.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -3308,7 +3308,7 @@ suites:
       - recipe[onms_lwrp_test::event_remove_add_tticket]
     attributes:
       opennms:
-        version: 22.0.2-1
+        version: 22.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -3399,7 +3399,7 @@ suites:
       - recipe[onms_lwrp_test::event_remove_add_varbindsdecode]
     attributes:
       opennms:
-        version: 22.0.2-1
+        version: 22.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -3490,7 +3490,7 @@ suites:
       - recipe[onms_lwrp_test::event_remove_alarm_data]
     attributes:
       opennms:
-        version: 22.0.2-1
+        version: 22.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -3581,7 +3581,7 @@ suites:
       - recipe[onms_lwrp_test::event_remove_autoaction]
     attributes:
       opennms:
-        version: 22.0.2-1
+        version: 22.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -3672,7 +3672,7 @@ suites:
       - recipe[onms_lwrp_test::event_remove_forward]
     attributes:
       opennms:
-        version: 22.0.2-1
+        version: 22.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -3763,7 +3763,7 @@ suites:
       - recipe[onms_lwrp_test::event_remove_script]
     attributes:
       opennms:
-        version: 22.0.2-1
+        version: 22.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -3854,7 +3854,7 @@ suites:
       - recipe[onms_lwrp_test::event_remove_tticket]
     attributes:
       opennms:
-        version: 22.0.2-1
+        version: 22.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -3945,7 +3945,7 @@ suites:
       - recipe[onms_lwrp_test::event_remove_varbindsdecode]
     attributes:
       opennms:
-        version: 22.0.2-1
+        version: 22.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -4036,7 +4036,7 @@ suites:
       - recipe[onms_lwrp_test::event_severity]
     attributes:
       opennms:
-        version: 22.0.2-1
+        version: 22.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -4127,7 +4127,7 @@ suites:
       - recipe[onms_lwrp_test::eventconf]
     attributes:
       opennms:
-        version: 22.0.2-1
+        version: 22.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -4218,7 +4218,7 @@ suites:
       - recipe[onms_lwrp_test::expression]
     attributes:
       opennms:
-        version: 22.0.2-1
+        version: 22.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -4309,7 +4309,7 @@ suites:
       - recipe[onms_lwrp_test::expression_change_descr]
     attributes:
       opennms:
-        version: 22.0.2-1
+        version: 22.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -4400,7 +4400,7 @@ suites:
       - recipe[onms_lwrp_test::expression_change_rearm]
     attributes:
       opennms:
-        version: 22.0.2-1
+        version: 22.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -4491,7 +4491,7 @@ suites:
       - recipe[onms_lwrp_test::expression_change_relaxed]
     attributes:
       opennms:
-        version: 22.0.2-1
+        version: 22.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -4582,7 +4582,7 @@ suites:
       - recipe[onms_lwrp_test::expression_change_trigger]
     attributes:
       opennms:
-        version: 22.0.2-1
+        version: 22.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -4673,7 +4673,7 @@ suites:
       - recipe[onms_lwrp_test::expression_change_value]
     attributes:
       opennms:
-        version: 22.0.2-1
+        version: 22.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -4764,7 +4764,7 @@ suites:
       - recipe[onms_lwrp_test::expression_delete]
     attributes:
       opennms:
-        version: 22.0.2-1
+        version: 22.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -4855,7 +4855,7 @@ suites:
       - recipe[onms_lwrp_test::foreign_source]
     attributes:
       opennms:
-        version: 22.0.2-1
+        version: 22.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -4946,7 +4946,7 @@ suites:
       - recipe[onms_lwrp_test::group]
     attributes:
       opennms:
-        version: 22.0.2-1
+        version: 22.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -5037,7 +5037,7 @@ suites:
       - recipe[onms_lwrp_test::import]
     attributes:
       opennms:
-        version: 22.0.2-1
+        version: 22.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -5128,7 +5128,7 @@ suites:
       - recipe[onms_lwrp_test::import_node]
     attributes:
       opennms:
-        version: 22.0.2-1
+        version: 22.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -5219,7 +5219,7 @@ suites:
       - recipe[onms_lwrp_test::import_node_interface]
     attributes:
       opennms:
-        version: 22.0.2-1
+        version: 22.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -5310,7 +5310,7 @@ suites:
       - recipe[onms_lwrp_test::import_node_interface_service]
     attributes:
       opennms:
-        version: 22.0.2-1
+        version: 22.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -5401,7 +5401,7 @@ suites:
       - recipe[onms_lwrp_test::jdbc_collection]
     attributes:
       opennms:
-        version: 22.0.2-1
+        version: 22.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -5492,7 +5492,7 @@ suites:
       - recipe[onms_lwrp_test::jdbc_collection_service]
     attributes:
       opennms:
-        version: 22.0.2-1
+        version: 22.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -5583,7 +5583,7 @@ suites:
       - recipe[onms_lwrp_test::jdbc_collection_service_edit]
     attributes:
       opennms:
-        version: 22.0.2-1
+        version: 22.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -5674,7 +5674,7 @@ suites:
       - recipe[onms_lwrp_test::jdbc_collection_service_noop]
     attributes:
       opennms:
-        version: 22.0.2-1
+        version: 22.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -5765,7 +5765,7 @@ suites:
       - recipe[onms_lwrp_test::jdbc_query]
     attributes:
       opennms:
-        version: 22.0.2-1
+        version: 22.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -5856,7 +5856,7 @@ suites:
       - recipe[onms_lwrp_test::jmx]
     attributes:
       opennms:
-        version: 22.0.2-1
+        version: 22.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -5947,7 +5947,7 @@ suites:
       - recipe[onms_lwrp_test::jmx_delete]
     attributes:
       opennms:
-        version: 22.0.2-1
+        version: 22.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -6038,7 +6038,7 @@ suites:
       - recipe[onms_lwrp_test::localhost]
     attributes:
       opennms:
-        version: 22.0.2-1
+        version: 22.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -6129,7 +6129,7 @@ suites:
       - recipe[onms_lwrp_test::noop_imported_node]
     attributes:
       opennms:
-        version: 22.0.2-1
+        version: 22.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -6220,7 +6220,7 @@ suites:
       - recipe[onms_lwrp_test::notifd_autoack]
     attributes:
       opennms:
-        version: 22.0.2-1
+        version: 22.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -6311,7 +6311,7 @@ suites:
       - recipe[onms_lwrp_test::notification]
     attributes:
       opennms:
-        version: 22.0.2-1
+        version: 22.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -6402,7 +6402,7 @@ suites:
       - recipe[onms_lwrp_test::notification_command]
     attributes:
       opennms:
-        version: 22.0.2-1
+        version: 22.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -6493,7 +6493,7 @@ suites:
       - recipe[onms_lwrp_test::notification_delete]
     attributes:
       opennms:
-        version: 22.0.2-1
+        version: 22.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -6584,7 +6584,7 @@ suites:
       - recipe[onms_lwrp_test::notification_edit]
     attributes:
       opennms:
-        version: 22.0.2-1
+        version: 22.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -6675,7 +6675,7 @@ suites:
       - recipe[onms_lwrp_test::policy]
     attributes:
       opennms:
-        version: 22.0.2-1
+        version: 22.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -6766,7 +6766,7 @@ suites:
       - recipe[onms_lwrp_test::poll_outage]
     attributes:
       opennms:
-        version: 22.0.2-1
+        version: 22.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -6857,7 +6857,7 @@ suites:
       - recipe[onms_lwrp_test::poller]
     attributes:
       opennms:
-        version: 22.0.2-1
+        version: 22.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -6948,7 +6948,7 @@ suites:
       - recipe[onms_lwrp_test::poller_delete]
     attributes:
       opennms:
-        version: 22.0.2-1
+        version: 22.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -7039,7 +7039,7 @@ suites:
       - recipe[onms_lwrp_test::rename_imported_node]
     attributes:
       opennms:
-        version: 22.0.2-1
+        version: 22.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -7130,7 +7130,7 @@ suites:
       - recipe[onms_lwrp_test::reparent_imported_node]
     attributes:
       opennms:
-        version: 22.0.2-1
+        version: 22.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -7221,7 +7221,7 @@ suites:
       - recipe[onms_lwrp_test::resource_type]
     attributes:
       opennms:
-        version: 22.0.2-1
+        version: 22.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -7312,7 +7312,7 @@ suites:
       - recipe[onms_lwrp_test::response_graph]
     attributes:
       opennms:
-        version: 22.0.2-1
+        version: 22.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -7403,7 +7403,7 @@ suites:
       - recipe[onms_lwrp_test::role]
     attributes:
       opennms:
-        version: 22.0.2-1
+        version: 22.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -7494,7 +7494,7 @@ suites:
       - recipe[onms_lwrp_test::send_event]
     attributes:
       opennms:
-        version: 22.0.2-1
+        version: 22.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -7585,7 +7585,7 @@ suites:
       - recipe[onms_lwrp_test::service_detector]
     attributes:
       opennms:
-        version: 22.0.2-1
+        version: 22.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -7676,7 +7676,7 @@ suites:
       - recipe[onms_lwrp_test::service_detector_delete]
     attributes:
       opennms:
-        version: 22.0.2-1
+        version: 22.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -7767,7 +7767,7 @@ suites:
       - recipe[onms_lwrp_test::service_detector_edit]
     attributes:
       opennms:
-        version: 22.0.2-1
+        version: 22.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -7858,7 +7858,7 @@ suites:
       - recipe[onms_lwrp_test::service_detector_noop]
     attributes:
       opennms:
-        version: 22.0.2-1
+        version: 22.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -7949,7 +7949,7 @@ suites:
       - recipe[onms_lwrp_test::snmp_collection]
     attributes:
       opennms:
-        version: 22.0.2-1
+        version: 22.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -8040,7 +8040,7 @@ suites:
       - recipe[onms_lwrp_test::snmp_collection_group]
     attributes:
       opennms:
-        version: 22.0.2-1
+        version: 22.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -8131,7 +8131,7 @@ suites:
       - recipe[onms_lwrp_test::snmp_collection_service]
     attributes:
       opennms:
-        version: 22.0.2-1
+        version: 22.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -8222,7 +8222,7 @@ suites:
       - recipe[onms_lwrp_test::snmp_config_definition]
     attributes:
       opennms:
-        version: 22.0.2-1
+        version: 22.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -8313,7 +8313,7 @@ suites:
       - recipe[onms_lwrp_test::snmp_config_definition_delete]
     attributes:
       opennms:
-        version: 22.0.2-1
+        version: 22.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -8404,7 +8404,7 @@ suites:
       - recipe[onms_lwrp_test::snmp_config_definition_update]
     attributes:
       opennms:
-        version: 22.0.2-1
+        version: 22.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -8495,7 +8495,7 @@ suites:
       - recipe[onms_lwrp_test::statsd]
     attributes:
       opennms:
-        version: 22.0.2-1
+        version: 22.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -8586,7 +8586,7 @@ suites:
       - recipe[onms_lwrp_test::surveillance_view]
     attributes:
       opennms:
-        version: 22.0.2-1
+        version: 22.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -8677,7 +8677,7 @@ suites:
       - recipe[onms_lwrp_test::system_def]
     attributes:
       opennms:
-        version: 22.0.2-1
+        version: 22.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -8768,7 +8768,7 @@ suites:
       - recipe[onms_lwrp_test::threshold]
     attributes:
       opennms:
-        version: 22.0.2-1
+        version: 22.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -8859,7 +8859,7 @@ suites:
       - recipe[onms_lwrp_test::threshold_change_descr]
     attributes:
       opennms:
-        version: 22.0.2-1
+        version: 22.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -8950,7 +8950,7 @@ suites:
       - recipe[onms_lwrp_test::threshold_change_dslabel]
     attributes:
       opennms:
-        version: 22.0.2-1
+        version: 22.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -9041,7 +9041,7 @@ suites:
       - recipe[onms_lwrp_test::threshold_change_rearm]
     attributes:
       opennms:
-        version: 22.0.2-1
+        version: 22.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -9132,7 +9132,7 @@ suites:
       - recipe[onms_lwrp_test::threshold_change_rearmeduei]
     attributes:
       opennms:
-        version: 22.0.2-1
+        version: 22.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -9223,7 +9223,7 @@ suites:
       - recipe[onms_lwrp_test::threshold_change_trigger]
     attributes:
       opennms:
-        version: 22.0.2-1
+        version: 22.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -9314,7 +9314,7 @@ suites:
       - recipe[onms_lwrp_test::threshold_change_triggereduei]
     attributes:
       opennms:
-        version: 22.0.2-1
+        version: 22.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -9405,7 +9405,7 @@ suites:
       - recipe[onms_lwrp_test::threshold_change_value]
     attributes:
       opennms:
-        version: 22.0.2-1
+        version: 22.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -9496,7 +9496,7 @@ suites:
       - recipe[onms_lwrp_test::threshold_common]
     attributes:
       opennms:
-        version: 22.0.2-1
+        version: 22.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -9587,7 +9587,7 @@ suites:
       - recipe[onms_lwrp_test::threshold_delete]
     attributes:
       opennms:
-        version: 22.0.2-1
+        version: 22.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -9678,7 +9678,7 @@ suites:
       - recipe[onms_lwrp_test::update_wmi_config_definition]
     attributes:
       opennms:
-        version: 22.0.2-1
+        version: 22.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -9769,7 +9769,7 @@ suites:
       - recipe[onms_lwrp_test::user]
     attributes:
       opennms:
-        version: 22.0.2-1
+        version: 22.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -9860,7 +9860,7 @@ suites:
       - recipe[onms_lwrp_test::wallboard]
     attributes:
       opennms:
-        version: 22.0.2-1
+        version: 22.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -9951,7 +9951,7 @@ suites:
       - recipe[onms_lwrp_test::webopts]
     attributes:
       opennms:
-        version: 22.0.2-1
+        version: 22.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -10042,7 +10042,7 @@ suites:
       - recipe[onms_lwrp_test::wmi_collection]
     attributes:
       opennms:
-        version: 22.0.2-1
+        version: 22.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -10133,7 +10133,7 @@ suites:
       - recipe[onms_lwrp_test::wmi_collection_service]
     attributes:
       opennms:
-        version: 22.0.2-1
+        version: 22.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -10224,7 +10224,7 @@ suites:
       - recipe[onms_lwrp_test::wmi_config_definition]
     attributes:
       opennms:
-        version: 22.0.2-1
+        version: 22.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -10315,7 +10315,7 @@ suites:
       - recipe[onms_lwrp_test::wmi_wpm]
     attributes:
       opennms:
-        version: 22.0.2-1
+        version: 22.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -10406,7 +10406,7 @@ suites:
       - recipe[onms_lwrp_test::xml_collection]
     attributes:
       opennms:
-        version: 22.0.2-1
+        version: 22.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -10497,7 +10497,7 @@ suites:
       - recipe[onms_lwrp_test::xml_collection_service]
     attributes:
       opennms:
-        version: 22.0.2-1
+        version: 22.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -10588,7 +10588,7 @@ suites:
       - recipe[onms_lwrp_test::xml_collection_service_change_interval]
     attributes:
       opennms:
-        version: 22.0.2-1
+        version: 22.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -10679,7 +10679,7 @@ suites:
       - recipe[onms_lwrp_test::xml_collection_service_change_nothing]
     attributes:
       opennms:
-        version: 22.0.2-1
+        version: 22.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -10770,7 +10770,7 @@ suites:
       - recipe[onms_lwrp_test::xml_collection_service_change_port]
     attributes:
       opennms:
-        version: 22.0.2-1
+        version: 22.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -10861,7 +10861,7 @@ suites:
       - recipe[onms_lwrp_test::xml_collection_service_change_retrycount]
     attributes:
       opennms:
-        version: 22.0.2-1
+        version: 22.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -10952,7 +10952,7 @@ suites:
       - recipe[onms_lwrp_test::xml_collection_service_change_status]
     attributes:
       opennms:
-        version: 22.0.2-1
+        version: 22.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -11043,7 +11043,7 @@ suites:
       - recipe[onms_lwrp_test::xml_collection_service_change_threshold]
     attributes:
       opennms:
-        version: 22.0.2-1
+        version: 22.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -11134,7 +11134,7 @@ suites:
       - recipe[onms_lwrp_test::xml_collection_service_change_timeout]
     attributes:
       opennms:
-        version: 22.0.2-1
+        version: 22.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -11225,7 +11225,7 @@ suites:
       - recipe[onms_lwrp_test::xml_collection_service_change_userdefined]
     attributes:
       opennms:
-        version: 22.0.2-1
+        version: 22.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -11316,7 +11316,7 @@ suites:
       - recipe[onms_lwrp_test::xml_collection_service_delete]
     attributes:
       opennms:
-        version: 22.0.2-1
+        version: 22.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -11407,7 +11407,7 @@ suites:
       - recipe[onms_lwrp_test::xml_group]
     attributes:
       opennms:
-        version: 22.0.2-1
+        version: 22.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -11498,7 +11498,7 @@ suites:
       - recipe[onms_lwrp_test::xml_group_delete]
     attributes:
       opennms:
-        version: 22.0.2-1
+        version: 22.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -11589,7 +11589,7 @@ suites:
       - recipe[onms_lwrp_test::xml_source]
     attributes:
       opennms:
-        version: 22.0.2-1
+        version: 22.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -11680,7 +11680,7 @@ suites:
       - recipe[onms_lwrp_test::xml_source_delete]
     attributes:
       opennms:
-        version: 22.0.2-1
+        version: 22.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -11771,7 +11771,7 @@ suites:
       - recipe[onms_lwrp_test::webopts]
     attributes:
       opennms:
-        version: 22.0.2-1
+        version: 22.0.4-1
         upgrade: true
     verifier:
       inspec_tests:
@@ -11862,7 +11862,7 @@ suites:
       - recipe[onms_lwrp_test::webopts]
     attributes:
       opennms:
-        version: 22.0.2-1
+        version: 22.0.4-1
         templates: true
     verifier:
       inspec_tests:
@@ -11881,7 +11881,7 @@ suites:
       - recipe[opennms_helm::default]
     attributes:
       opennms:
-        version: 22.0.2-1
+        version: 22.0.4-1
         templates: false
         telemetryd:
           managed: true
