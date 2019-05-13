@@ -97,10 +97,10 @@ def restart_collectd
 end
 
 def delete_snmp_collection_group
-	group_name = new_resource.group_name || new_resource.name
+	group_name = new_resource.collection_name || new_resource.name
 	Chef::Log.debug "Deleting snmp collection group : '#{group_name}'"
 	
-	file = ::File.new("#{node['opennms']['conf']['home']}/etc/datacollection-config.xm", 'r')
+	file = ::File.new("#{node['opennms']['conf']['home']}/etc/datacollection-config.xml", 'r')
 	contents = file.read
 	doc = REXML::Document.new(contents, respect_whitespace: :all)
 	doc.context[:attribute_quote] = :quote
@@ -110,7 +110,7 @@ def delete_snmp_collection_group
 end
 
 def snmp_collection_group_el(doc, resource, delete = false)
-	group_name = resource.group_name || resource.name
+	group_name = resource.collection_name || resource.name
 	collection_el = doc.elements["/datacollection-config/snmp-collection[@name='#{resource.collection_name}']"]
 	include_collection_el = collection_el.add_element 'include-collection', 'dataCollectionGroup' => resource.name
 	
