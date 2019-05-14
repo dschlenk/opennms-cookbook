@@ -47,7 +47,7 @@ def load_current_resource
   @current_resource.collection_name(@new_resource.collection_name)
 
   # Good enough for create / delete, but needs work if we implement support for changing existing
-  if group_exists?(@current_resource.collection_name, @current_resource.name)
+  if group_exists?(@current_resource.collection_name, @current_resource.group_name)
     @current_resource.exists = true
   end
 end
@@ -110,8 +110,8 @@ def delete_snmp_collection_group
 
   # only remove the reference to the group from the collection - the file stays put in case it is used by another collection
   # or a group in the file is used by another systemDef, etc
-  inc_collection_el = doc.elements["/datacollection-config/snmp-collection[@name='#{resource.collection_name}']/include-collection[@dataCollectionGroup = '#{group_name}']"]
-  doc.root.elements.delete(inc_collection_el)
+  del_el = doc.elements.delete("/datacollection-config/snmp-collection[@name='#{new_resource.collection_name}']/include-collection[@dataCollectionGroup = '#{group_name}']")
+  Chef::Log.debug("Deleted element: #{del_el}")
 
-  Opennms::Helpers.write_xml_file(doc, "#{node['opennms']['conf']['home']}/etc/xml-datacollection-config.xml")
+  Opennms::Helpers.write_xml_file(doc, "#{node['opennms']['conf']['home']}/etc/datacollection-config.xml")
 end
