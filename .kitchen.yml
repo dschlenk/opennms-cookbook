@@ -129,6 +129,19 @@ suites:
       inspec_tests:
         - path: test/integration/default
         - path: test/integration/avail_category
+  - name: avail_category_23
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::avail_category]
+    attributes:
+      opennms:
+        version: 23.0.4-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/avail_category
   - name: avail_view_section_16
     run_list:
       - recipe[opennms::postgres]
@@ -216,6 +229,19 @@ suites:
     attributes:
       opennms:
         version: 22.0.4-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/avail_view_section
+  - name: avail_view_section_23
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::avail_view_section]
+    attributes:
+      opennms:
+        version: 23.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -311,6 +337,19 @@ suites:
       inspec_tests:
         - path: test/integration/default
         - path: test/integration/collection_graph
+  - name: collection_graph_23
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::collection_graph]
+    attributes:
+      opennms:
+        version: 23.0.4-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/collection_graph
   - name: collection_graph_file_16
     run_list:
       - recipe[opennms::postgres]
@@ -398,6 +437,19 @@ suites:
     attributes:
       opennms:
         version: 22.0.4-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/collection_graph_file
+  - name: collection_graph_file_23
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::collection_graph_file]
+    attributes:
+      opennms:
+        version: 23.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -493,6 +545,19 @@ suites:
       inspec_tests:
         - path: test/integration/default
         - path: test/integration/collection_package
+  - name: collection_package_23
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::collection_package]
+    attributes:
+      opennms:
+        version: 23.0.4-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/collection_package
   - name: collection_service_16
     run_list:
       - recipe[opennms::postgres]
@@ -580,6 +645,19 @@ suites:
     attributes:
       opennms:
         version: 22.0.4-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/collection_service
+  - name: collection_service_23
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::collection_service]
+    attributes:
+      opennms:
+        version: 23.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -675,6 +753,19 @@ suites:
       inspec_tests:
         - path: test/integration/default
         - path: test/integration/dashlet
+  - name: dashlet_23
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::dashlet]
+    attributes:
+      opennms:
+        version: 23.0.4-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/dashlet
   - name: dashlet_update_16
     run_list:
       - recipe[opennms::postgres]
@@ -762,6 +853,19 @@ suites:
     attributes:
       opennms:
         version: 22.0.4-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/dashlet_update
+  - name: dashlet_update_23
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::dashlet_update]
+    attributes:
+      opennms:
+        version: 23.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -857,6 +961,19 @@ suites:
       inspec_tests:
         - path: test/integration/default
         - path: test/integration/delete_imported_node
+  - name: delete_imported_node_23
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::delete_imported_node]
+    attributes:
+      opennms:
+        version: 23.0.4-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/delete_imported_node
   - name: destination_path_16
     run_list:
       - recipe[opennms::postgres]
@@ -944,6 +1061,19 @@ suites:
     attributes:
       opennms:
         version: 22.0.4-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/destination_path
+  - name: destination_path_23
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::destination_path]
+    attributes:
+      opennms:
+        version: 23.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -1039,6 +1169,19 @@ suites:
       inspec_tests:
         - path: test/integration/default
         - path: test/integration/disco_range
+  - name: disco_range_23
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::disco_range]
+    attributes:
+      opennms:
+        version: 23.0.4-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/disco_range
   - name: disco_specific_16
     run_list:
       - recipe[opennms::postgres]
@@ -1126,6 +1269,19 @@ suites:
     attributes:
       opennms:
         version: 22.0.4-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/disco_specific
+  - name: disco_specific_23
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::disco_specific]
+    attributes:
+      opennms:
+        version: 23.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -1221,6 +1377,19 @@ suites:
       inspec_tests:
         - path: test/integration/default
         - path: test/integration/disco_url
+  - name: disco_url_23
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::disco_url]
+    attributes:
+      opennms:
+        version: 23.0.4-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/disco_url
   - name: edit_imported_node_16
     run_list:
       - recipe[opennms::postgres]
@@ -1308,6 +1477,19 @@ suites:
     attributes:
       opennms:
         version: 22.0.4-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/edit_imported_node
+  - name: edit_imported_node_23
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::edit_imported_node]
+    attributes:
+      opennms:
+        version: 23.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -1403,6 +1585,19 @@ suites:
       inspec_tests:
         - path: test/integration/default
         - path: test/integration/event
+  - name: event_23
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::event]
+    attributes:
+      opennms:
+        version: 23.0.4-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/event
   - name: event_add_parameters_16
     run_list:
       - recipe[opennms::postgres]
@@ -1412,6 +1607,19 @@ suites:
     attributes:
       opennms:
         version: 16.0.4-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/event_add_parameters
+  - name: event_add_parameters_23
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::event_add_parameters]
+    attributes:
+      opennms:
+        version: 23.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -1490,6 +1698,19 @@ suites:
     attributes:
       opennms:
         version: 22.0.4-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/event_add_parameters
+  - name: event_add_parameters_23
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::event_add_parameters]
+    attributes:
+      opennms:
+        version: 23.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -1585,6 +1806,19 @@ suites:
       inspec_tests:
         - path: test/integration/default
         - path: test/integration/event_change_parameters
+  - name: event_change_parameters_23
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::event_change_parameters]
+    attributes:
+      opennms:
+        version: 23.0.4-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/event_change_parameters
   - name: event_descr_16
     run_list:
       - recipe[opennms::postgres]
@@ -1672,6 +1906,19 @@ suites:
     attributes:
       opennms:
         version: 22.0.4-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/event_descr
+  - name: event_descr_23
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::event_descr]
+    attributes:
+      opennms:
+        version: 23.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -1767,6 +2014,19 @@ suites:
       inspec_tests:
         - path: test/integration/default
         - path: test/integration/event_edit_alarm_data
+  - name: event_edit_alarm_data_23
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::event_edit_alarm_data]
+    attributes:
+      opennms:
+        version: 23.0.4-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/event_edit_alarm_data
   - name: event_edit_autoaction_16
     run_list:
       - recipe[opennms::postgres]
@@ -1854,6 +2114,19 @@ suites:
     attributes:
       opennms:
         version: 22.0.4-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/event_edit_autoaction
+  - name: event_edit_autoaction_23
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::event_edit_autoaction]
+    attributes:
+      opennms:
+        version: 23.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -1949,6 +2222,19 @@ suites:
       inspec_tests:
         - path: test/integration/default
         - path: test/integration/event_edit_forward
+  - name: event_edit_forward_23
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::event_edit_forward]
+    attributes:
+      opennms:
+        version: 23.0.4-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/event_edit_forward
   - name: event_edit_mouseovertext_16
     run_list:
       - recipe[opennms::postgres]
@@ -2036,6 +2322,19 @@ suites:
     attributes:
       opennms:
         version: 22.0.4-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/event_edit_mouseovertext
+  - name: event_edit_mouseovertext_23
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::event_edit_mouseovertext]
+    attributes:
+      opennms:
+        version: 23.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -2131,6 +2430,19 @@ suites:
       inspec_tests:
         - path: test/integration/default
         - path: test/integration/event_edit_operinstruct
+  - name: event_edit_operinstruct_23
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::event_edit_operinstruct]
+    attributes:
+      opennms:
+        version: 23.0.4-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/event_edit_operinstruct
   - name: event_edit_script_16
     run_list:
       - recipe[opennms::postgres]
@@ -2218,6 +2530,19 @@ suites:
     attributes:
       opennms:
         version: 22.0.4-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/event_edit_script
+  - name: event_edit_script_23
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::event_edit_script]
+    attributes:
+      opennms:
+        version: 23.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -2313,6 +2638,19 @@ suites:
       inspec_tests:
         - path: test/integration/default
         - path: test/integration/event_edit_tticket
+  - name: event_edit_tticket_23
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::event_edit_tticket]
+    attributes:
+      opennms:
+        version: 23.0.4-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/event_edit_tticket
   - name: event_edit_varbindsdecode_16
     run_list:
       - recipe[opennms::postgres]
@@ -2400,6 +2738,19 @@ suites:
     attributes:
       opennms:
         version: 22.0.4-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/event_edit_varbindsdecode
+  - name: event_edit_varbindsdecode_23
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::event_edit_varbindsdecode]
+    attributes:
+      opennms:
+        version: 23.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -2495,6 +2846,19 @@ suites:
       inspec_tests:
         - path: test/integration/default
         - path: test/integration/event_label
+  - name: event_label_23
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::event_label]
+    attributes:
+      opennms:
+        version: 23.0.4-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/event_label
   - name: event_logmsg_16
     run_list:
       - recipe[opennms::postgres]
@@ -2582,6 +2946,19 @@ suites:
     attributes:
       opennms:
         version: 22.0.4-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/event_logmsg
+  - name: event_logmsg_23
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::event_logmsg]
+    attributes:
+      opennms:
+        version: 23.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -2677,6 +3054,19 @@ suites:
       inspec_tests:
         - path: test/integration/default
         - path: test/integration/event_logmsg_dest
+  - name: event_logmsg_dest_23
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::event_logmsg_dest]
+    attributes:
+      opennms:
+        version: 23.0.4-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/event_logmsg_dest
   - name: event_logmsg_notify_16
     run_list:
       - recipe[opennms::postgres]
@@ -2764,6 +3154,19 @@ suites:
     attributes:
       opennms:
         version: 22.0.4-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/event_logmsg_notify
+  - name: event_logmsg_notify_23
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::event_logmsg_notify]
+    attributes:
+      opennms:
+        version: 23.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -2859,6 +3262,19 @@ suites:
       inspec_tests:
         - path: test/integration/default
         - path: test/integration/event_noop
+  - name: event_noop_23
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::event_noop]
+    attributes:
+      opennms:
+        version: 23.0.4-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/event_noop
   - name: event_remove_add_alarm_data_16
     run_list:
       - recipe[opennms::postgres]
@@ -2946,6 +3362,19 @@ suites:
     attributes:
       opennms:
         version: 22.0.4-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/event_remove_add_alarm_data
+  - name: event_remove_add_alarm_data_23
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::event_remove_add_alarm_data]
+    attributes:
+      opennms:
+        version: 23.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -3041,6 +3470,19 @@ suites:
       inspec_tests:
         - path: test/integration/default
         - path: test/integration/event_remove_add_autoaction
+  - name: event_remove_add_autoaction_23
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::event_remove_add_autoaction]
+    attributes:
+      opennms:
+        version: 23.0.4-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/event_remove_add_autoaction
   - name: event_remove_add_forward_16
     run_list:
       - recipe[opennms::postgres]
@@ -3128,6 +3570,19 @@ suites:
     attributes:
       opennms:
         version: 22.0.4-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/event_remove_add_forward
+  - name: event_remove_add_forward_23
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::event_remove_add_forward]
+    attributes:
+      opennms:
+        version: 23.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -3223,6 +3678,19 @@ suites:
       inspec_tests:
         - path: test/integration/default
         - path: test/integration/event_remove_add_script
+  - name: event_remove_add_script_23
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::event_remove_add_script]
+    attributes:
+      opennms:
+        version: 23.0.4-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/event_remove_add_script
   - name: event_remove_add_tticket_16
     run_list:
       - recipe[opennms::postgres]
@@ -3310,6 +3778,19 @@ suites:
     attributes:
       opennms:
         version: 22.0.4-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/event_remove_add_tticket
+  - name: event_remove_add_tticket_23
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::event_remove_add_tticket]
+    attributes:
+      opennms:
+        version: 23.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -3405,6 +3886,19 @@ suites:
       inspec_tests:
         - path: test/integration/default
         - path: test/integration/event_remove_add_varbindsdecode
+  - name: event_remove_add_varbindsdecode_23
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::event_remove_add_varbindsdecode]
+    attributes:
+      opennms:
+        version: 23.0.4-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/event_remove_add_varbindsdecode
   - name: event_remove_alarm_data_16
     run_list:
       - recipe[opennms::postgres]
@@ -3492,6 +3986,19 @@ suites:
     attributes:
       opennms:
         version: 22.0.4-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/event_remove_alarm_data
+  - name: event_remove_alarm_data_23
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::event_remove_alarm_data]
+    attributes:
+      opennms:
+        version: 23.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -3587,6 +4094,19 @@ suites:
       inspec_tests:
         - path: test/integration/default
         - path: test/integration/event_remove_autoaction
+  - name: event_remove_autoaction_23
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::event_remove_autoaction]
+    attributes:
+      opennms:
+        version: 23.0.4-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/event_remove_autoaction
   - name: event_remove_forward_16
     run_list:
       - recipe[opennms::postgres]
@@ -3674,6 +4194,19 @@ suites:
     attributes:
       opennms:
         version: 22.0.4-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/event_remove_forward
+  - name: event_remove_forward_23
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::event_remove_forward]
+    attributes:
+      opennms:
+        version: 23.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -3769,6 +4302,19 @@ suites:
       inspec_tests:
         - path: test/integration/default
         - path: test/integration/event_remove_script
+  - name: event_remove_script_23
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::event_remove_script]
+    attributes:
+      opennms:
+        version: 23.0.4-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/event_remove_script
   - name: event_remove_tticket_16
     run_list:
       - recipe[opennms::postgres]
@@ -3856,6 +4402,19 @@ suites:
     attributes:
       opennms:
         version: 22.0.4-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/event_remove_tticket
+  - name: event_remove_tticket_23
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::event_remove_tticket]
+    attributes:
+      opennms:
+        version: 23.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -3951,6 +4510,19 @@ suites:
       inspec_tests:
         - path: test/integration/default
         - path: test/integration/event_remove_varbindsdecode
+  - name: event_remove_varbindsdecode_23
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::event_remove_varbindsdecode]
+    attributes:
+      opennms:
+        version: 23.0.4-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/event_remove_varbindsdecode
   - name: event_severity_16
     run_list:
       - recipe[opennms::postgres]
@@ -4038,6 +4610,19 @@ suites:
     attributes:
       opennms:
         version: 22.0.4-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/event_severity
+  - name: event_severity_23
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::event_severity]
+    attributes:
+      opennms:
+        version: 23.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -4133,6 +4718,19 @@ suites:
       inspec_tests:
         - path: test/integration/default
         - path: test/integration/eventconf
+  - name: eventconf_23
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::eventconf]
+    attributes:
+      opennms:
+        version: 23.0.4-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/eventconf
   - name: expression_16
     run_list:
       - recipe[opennms::postgres]
@@ -4220,6 +4818,19 @@ suites:
     attributes:
       opennms:
         version: 22.0.4-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/expression
+  - name: expression_23
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::expression]
+    attributes:
+      opennms:
+        version: 23.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -4315,6 +4926,19 @@ suites:
       inspec_tests:
         - path: test/integration/default
         - path: test/integration/expression_change_descr
+  - name: expression_change_descr_23
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::expression_change_descr]
+    attributes:
+      opennms:
+        version: 23.0.4-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/expression_change_descr
   - name: expression_change_rearm_16
     run_list:
       - recipe[opennms::postgres]
@@ -4402,6 +5026,19 @@ suites:
     attributes:
       opennms:
         version: 22.0.4-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/expression_change_rearm
+  - name: expression_change_rearm_23
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::expression_change_rearm]
+    attributes:
+      opennms:
+        version: 23.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -4497,6 +5134,19 @@ suites:
       inspec_tests:
         - path: test/integration/default
         - path: test/integration/expression_change_relaxed
+  - name: expression_change_relaxed_23
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::expression_change_relaxed]
+    attributes:
+      opennms:
+        version: 23.0.4-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/expression_change_relaxed
   - name: expression_change_trigger_16
     run_list:
       - recipe[opennms::postgres]
@@ -4584,6 +5234,19 @@ suites:
     attributes:
       opennms:
         version: 22.0.4-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/expression_change_trigger
+  - name: expression_change_trigger_23
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::expression_change_trigger]
+    attributes:
+      opennms:
+        version: 23.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -4679,6 +5342,19 @@ suites:
       inspec_tests:
         - path: test/integration/default
         - path: test/integration/expression_change_value
+  - name: expression_change_value_23
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::expression_change_value]
+    attributes:
+      opennms:
+        version: 23.0.4-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/expression_change_value
   - name: expression_delete_16
     run_list:
       - recipe[opennms::postgres]
@@ -4766,6 +5442,19 @@ suites:
     attributes:
       opennms:
         version: 22.0.4-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/expression_delete
+  - name: expression_delete_23
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::expression_delete]
+    attributes:
+      opennms:
+        version: 23.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -4861,6 +5550,19 @@ suites:
       inspec_tests:
         - path: test/integration/default
         - path: test/integration/foreign_source
+  - name: foreign_source_23
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::foreign_source]
+    attributes:
+      opennms:
+        version: 23.0.4-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/foreign_source
   - name: group_16
     run_list:
       - recipe[opennms::postgres]
@@ -4948,6 +5650,19 @@ suites:
     attributes:
       opennms:
         version: 22.0.4-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/group
+  - name: group_23
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::group]
+    attributes:
+      opennms:
+        version: 23.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -5043,6 +5758,19 @@ suites:
       inspec_tests:
         - path: test/integration/default
         - path: test/integration/import
+  - name: import_23
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::import]
+    attributes:
+      opennms:
+        version: 23.0.4-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/import
   - name: import_node_16
     run_list:
       - recipe[opennms::postgres]
@@ -5130,6 +5858,19 @@ suites:
     attributes:
       opennms:
         version: 22.0.4-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/import_node
+  - name: import_node_23
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::import_node]
+    attributes:
+      opennms:
+        version: 23.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -5225,6 +5966,19 @@ suites:
       inspec_tests:
         - path: test/integration/default
         - path: test/integration/import_node_interface
+  - name: import_node_interface_23
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::import_node_interface]
+    attributes:
+      opennms:
+        version: 23.0.4-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/import_node_interface
   - name: import_node_interface_service_16
     run_list:
       - recipe[opennms::postgres]
@@ -5316,6 +6070,19 @@ suites:
       inspec_tests:
         - path: test/integration/default
         - path: test/integration/import_node_interface_service
+  - name: import_node_interface_service_23
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::import_node_interface_service]
+    attributes:
+      opennms:
+        version: 23.0.4-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/import_node_interface_service
   - name: jdbc_collection_16
     run_list:
       - recipe[opennms::postgres]
@@ -5403,6 +6170,19 @@ suites:
     attributes:
       opennms:
         version: 22.0.4-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/jdbc_collectio
+  - name: jdbc_collection_23
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::jdbc_collection]
+    attributes:
+      opennms:
+        version: 23.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -5498,6 +6278,19 @@ suites:
       inspec_tests:
         - path: test/integration/default
         - path: test/integration/jdbc_collection_service
+  - name: jdbc_collection_service_23
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::jdbc_collection_service]
+    attributes:
+      opennms:
+        version: 23.0.4-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/jdbc_collection_service
   - name: jdbc_collection_service_edit_16
     run_list:
       - recipe[opennms::postgres]
@@ -5585,6 +6378,19 @@ suites:
     attributes:
       opennms:
         version: 22.0.4-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/jdbc_collection_service_edit
+  - name: jdbc_collection_service_edit_23
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::jdbc_collection_service_edit]
+    attributes:
+      opennms:
+        version: 23.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -5680,6 +6486,19 @@ suites:
       inspec_tests:
         - path: test/integration/default
         - path: test/integration/jdbc_collection_service_noop
+  - name: jdbc_collection_service_noop_23
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::jdbc_collection_service_noop]
+    attributes:
+      opennms:
+        version: 23.0.4-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/jdbc_collection_service_noop
   - name: jdbc_query_16
     run_list:
       - recipe[opennms::postgres]
@@ -5767,6 +6586,19 @@ suites:
     attributes:
       opennms:
         version: 22.0.4-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/jdbc_query
+  - name: jdbc_query_23
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::jdbc_query]
+    attributes:
+      opennms:
+        version: 23.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -5862,6 +6694,19 @@ suites:
       inspec_tests:
         - path: test/integration/default
         - path: test/integration/jmx
+  - name: jmx_23
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::jmx]
+    attributes:
+      opennms:
+        version: 23.0.4-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/jmx
   - name: jmx_delete_16
     run_list:
       - recipe[opennms::postgres]
@@ -5949,6 +6794,19 @@ suites:
     attributes:
       opennms:
         version: 22.0.4-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/jmx_delete
+  - name: jmx_delete_23
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::jmx_delete]
+    attributes:
+      opennms:
+        version: 23.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -6044,6 +6902,19 @@ suites:
       inspec_tests:
         - path: test/integration/default
         - path: test/integration/localhost
+  - name: localhost_23
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::localhost]
+    attributes:
+      opennms:
+        version: 23.0.4-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/localhost
   - name: noop_imported_node_16
     run_list:
       - recipe[opennms::postgres]
@@ -6131,6 +7002,19 @@ suites:
     attributes:
       opennms:
         version: 22.0.4-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/noop_imported_node
+  - name: noop_imported_node_23
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::noop_imported_node]
+    attributes:
+      opennms:
+        version: 23.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -6226,6 +7110,19 @@ suites:
       inspec_tests:
         - path: test/integration/default
         - path: test/integration/notifd_autoack
+  - name: notifd_autoack_23
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::notifd_autoack]
+    attributes:
+      opennms:
+        version: 23.0.4-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/notifd_autoack
   - name: notification_16
     run_list:
       - recipe[opennms::postgres]
@@ -6313,6 +7210,19 @@ suites:
     attributes:
       opennms:
         version: 22.0.4-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/notification
+  - name: notification_23
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::notification]
+    attributes:
+      opennms:
+        version: 23.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -6408,6 +7318,19 @@ suites:
       inspec_tests:
         - path: test/integration/default
         - path: test/integration/notification_command
+  - name: notification_command_23
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::notification_command]
+    attributes:
+      opennms:
+        version: 23.0.4-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/notification_command
   - name: notification_delete_16
     run_list:
       - recipe[opennms::postgres]
@@ -6495,6 +7418,19 @@ suites:
     attributes:
       opennms:
         version: 22.0.4-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/notification_delete
+  - name: notification_delete_23
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::notification_delete]
+    attributes:
+      opennms:
+        version: 23.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -6590,6 +7526,19 @@ suites:
       inspec_tests:
         - path: test/integration/default
         - path: test/integration/notification_edit
+  - name: notification_edit_23
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::notification_edit]
+    attributes:
+      opennms:
+        version: 23.0.4-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/notification_edit
   - name: policy_16
     run_list:
       - recipe[opennms::postgres]
@@ -6677,6 +7626,19 @@ suites:
     attributes:
       opennms:
         version: 22.0.4-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/policy
+  - name: policy_23
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::policy]
+    attributes:
+      opennms:
+        version: 23.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -6772,6 +7734,19 @@ suites:
       inspec_tests:
         - path: test/integration/default
         - path: test/integration/poll_outage
+  - name: poll_outage_23
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::poll_outage]
+    attributes:
+      opennms:
+        version: 23.0.4-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/poll_outage
   - name: poller_16
     run_list:
       - recipe[opennms::postgres]
@@ -6859,6 +7834,19 @@ suites:
     attributes:
       opennms:
         version: 22.0.4-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/poller
+  - name: poller_23
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::poller]
+    attributes:
+      opennms:
+        version: 23.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -6954,6 +7942,19 @@ suites:
       inspec_tests:
         - path: test/integration/default
         - path: test/integration/poller_delete
+  - name: poller_delete_23
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::poller_delete]
+    attributes:
+      opennms:
+        version: 23.0.4-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/poller_delete
   - name: rename_imported_node_16
     run_list:
       - recipe[opennms::postgres]
@@ -7041,6 +8042,19 @@ suites:
     attributes:
       opennms:
         version: 22.0.4-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/rename_imported_node
+  - name: rename_imported_node_23
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::rename_imported_node]
+    attributes:
+      opennms:
+        version: 23.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -7136,6 +8150,19 @@ suites:
       inspec_tests:
         - path: test/integration/default
         - path: test/integration/reparent_imported_node
+  - name: reparent_imported_node_23
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::reparent_imported_node]
+    attributes:
+      opennms:
+        version: 23.0.4-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/reparent_imported_node
   - name: resource_type_16
     run_list:
       - recipe[opennms::postgres]
@@ -7223,6 +8250,19 @@ suites:
     attributes:
       opennms:
         version: 22.0.4-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/resource_type
+  - name: resource_type_23
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::resource_type]
+    attributes:
+      opennms:
+        version: 23.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -7318,6 +8358,19 @@ suites:
       inspec_tests:
         - path: test/integration/default
         - path: test/integration/response_graph
+  - name: response_graph_23
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::response_graph]
+    attributes:
+      opennms:
+        version: 23.0.4-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/response_graph
   - name: role_16
     run_list:
       - recipe[opennms::postgres]
@@ -7405,6 +8458,19 @@ suites:
     attributes:
       opennms:
         version: 22.0.4-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/role
+  - name: role_23
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::role]
+    attributes:
+      opennms:
+        version: 23.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -7500,6 +8566,19 @@ suites:
       inspec_tests:
         - path: test/integration/default
         - path: test/integration/send_event
+  - name: send_event_23
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::send_event]
+    attributes:
+      opennms:
+        version: 23.0.4-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/send_event
   - name: service_detector_16
     run_list:
       - recipe[opennms::postgres]
@@ -7591,6 +8670,19 @@ suites:
       inspec_tests:
         - path: test/integration/default
         - path: test/integration/service_detector
+  - name: service_detector_23
+      run_list:
+        - recipe[opennms::postgres]
+        - recipe[oracle_java8::default]
+        - recipe[opennms::default]
+        - recipe[onms_lwrp_test::service_detector]
+      attributes:
+        opennms:
+          version: 23.0.4-1
+      verifier:
+        inspec_tests:
+          - path: test/integration/default
+          - path: test/integration/service_detector
   - name: service_detector_delete_16
     run_list:
       - recipe[opennms::postgres]
@@ -7678,6 +8770,19 @@ suites:
     attributes:
       opennms:
         version: 22.0.4-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/service_detector_delete
+  - name: service_detector_delete_23
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::service_detector_delete]
+    attributes:
+      opennms:
+        version: 23.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -7773,6 +8878,19 @@ suites:
       inspec_tests:
         - path: test/integration/default
         - path: test/integration/service_detector_edit
+  - name: service_detector_edit_23
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::service_detector_edit]
+    attributes:
+      opennms:
+        version: 23.0.4-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/service_detector_edit
   - name: service_detector_noop_16
     run_list:
       - recipe[opennms::postgres]
@@ -7860,6 +8978,19 @@ suites:
     attributes:
       opennms:
         version: 22.0.4-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/service_detector_noop
+  - name: service_detector_noop_23
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::service_detector_noop]
+    attributes:
+      opennms:
+        version: 23.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -7955,6 +9086,19 @@ suites:
       inspec_tests:
         - path: test/integration/default
         - path: test/integration/snmp_collection
+  - name: snmp_collection_23
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::snmp_collection]
+    attributes:
+      opennms:
+        version: 23.0.4-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/snmp_collection
   - name: snmp_collection_group_16
     run_list:
       - recipe[opennms::postgres]
@@ -8042,6 +9186,19 @@ suites:
     attributes:
       opennms:
         version: 22.0.4-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/snmp_collection_group
+  - name: snmp_collection_group_23
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::snmp_collection_group]
+    attributes:
+      opennms:
+        version: 23.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -8137,6 +9294,19 @@ suites:
       inspec_tests:
         - path: test/integration/default
         - path: test/integration/snmp_collection_service
+  - name: snmp_collection_service_23
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::snmp_collection_service]
+    attributes:
+      opennms:
+        version: 23.0.4-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/snmp_collection_service
   - name: snmp_config_definition_16
     run_list:
       - recipe[opennms::postgres]
@@ -8224,6 +9394,19 @@ suites:
     attributes:
       opennms:
         version: 22.0.4-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/snmp_config_definition
+  - name: snmp_config_definition_23
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::snmp_config_definition]
+    attributes:
+      opennms:
+        version: 23.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -8319,6 +9502,19 @@ suites:
       inspec_tests:
         - path: test/integration/default
         - path: test/integration/snmp_config_definition_delete
+  - name: snmp_config_definition_delete_23
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::snmp_config_definition_delete]
+    attributes:
+      opennms:
+        version: 23.0.4-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/snmp_config_definition_delete
   - name: snmp_config_definition_update_16
     run_list:
       - recipe[opennms::postgres]
@@ -8406,6 +9602,19 @@ suites:
     attributes:
       opennms:
         version: 22.0.4-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/snmp_config_definition_update
+  - name: snmp_config_definition_update_23
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::snmp_config_definition_update]
+    attributes:
+      opennms:
+        version: 23.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -8501,6 +9710,19 @@ suites:
       inspec_tests:
         - path: test/integration/default
         - path: test/integration/statsd
+  - name: statsd_23
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::statsd]
+    attributes:
+      opennms:
+        version: 23.0.4-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/statsd
   - name: surveillance_view_16
     run_list:
       - recipe[opennms::postgres]
@@ -8588,6 +9810,19 @@ suites:
     attributes:
       opennms:
         version: 22.0.4-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/surveillance_view
+  - name: surveillance_view_23
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::surveillance_view]
+    attributes:
+      opennms:
+        version: 23.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -8683,6 +9918,19 @@ suites:
       inspec_tests:
         - path: test/integration/default
         - path: test/integration/system_def
+  - name: system_def_23
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::system_def]
+    attributes:
+      opennms:
+        version: 23.0.4-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/system_def
   - name: threshold_16
     run_list:
       - recipe[opennms::postgres]
@@ -8770,6 +10018,19 @@ suites:
     attributes:
       opennms:
         version: 22.0.4-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/threshold
+  - name: threshold_23
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::threshold]
+    attributes:
+      opennms:
+        version: 23.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -8865,6 +10126,19 @@ suites:
       inspec_tests:
         - path: test/integration/default
         - path: test/integration/threshold_change_descr
+  - name: threshold_change_descr_23
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::threshold_change_descr]
+    attributes:
+      opennms:
+        version: 23.0.4-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/threshold_change_descr
   - name: threshold_change_dslabel_16
     run_list:
       - recipe[opennms::postgres]
@@ -8952,6 +10226,19 @@ suites:
     attributes:
       opennms:
         version: 22.0.4-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/threshold_change_dslabel
+  - name: threshold_change_dslabel_23
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::threshold_change_dslabel]
+    attributes:
+      opennms:
+        version: 23.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -9047,6 +10334,19 @@ suites:
       inspec_tests:
         - path: test/integration/default
         - path: test/integration/threshold_change_rearm
+  - name: threshold_change_rearm_23
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::threshold_change_rearm]
+    attributes:
+      opennms:
+        version: 23.0.4-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/threshold_change_rearm
   - name: threshold_change_rearmeduei_16
     run_list:
       - recipe[opennms::postgres]
@@ -9134,6 +10434,19 @@ suites:
     attributes:
       opennms:
         version: 22.0.4-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/threshold_change_rearmeduei
+  - name: threshold_change_rearmeduei_23
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::threshold_change_rearmeduei]
+    attributes:
+      opennms:
+        version: 23.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -9229,6 +10542,19 @@ suites:
       inspec_tests:
         - path: test/integration/default
         - path: test/integration/threshold_change_trigger
+  - name: threshold_change_trigger_23
+      run_list:
+        - recipe[opennms::postgres]
+        - recipe[oracle_java8::default]
+        - recipe[opennms::default]
+        - recipe[onms_lwrp_test::threshold_change_trigger]
+      attributes:
+        opennms:
+          version: 23.0.4-1
+      verifier:
+        inspec_tests:
+          - path: test/integration/default
+          - path: test/integration/threshold_change_trigger
   - name: threshold_change_triggereduei_16
     run_list:
       - recipe[opennms::postgres]
@@ -9316,6 +10642,19 @@ suites:
     attributes:
       opennms:
         version: 22.0.4-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/threshold_change_triggereduei
+  - name: threshold_change_triggereduei_23
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::threshold_change_triggereduei]
+    attributes:
+      opennms:
+        version: 23.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -9411,6 +10750,19 @@ suites:
       inspec_tests:
         - path: test/integration/default
         - path: test/integration/threshold_change_value
+  - name: threshold_change_value_23
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::threshold_change_value]
+    attributes:
+      opennms:
+        version: 23.0.4-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/threshold_change_value
   - name: threshold_common_16
     run_list:
       - recipe[opennms::postgres]
@@ -9498,6 +10850,19 @@ suites:
     attributes:
       opennms:
         version: 22.0.4-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/threshold_common
+  - name: threshold_common_23
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::threshold_common]
+    attributes:
+      opennms:
+        version: 23.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -9593,6 +10958,19 @@ suites:
       inspec_tests:
         - path: test/integration/default
         - path: test/integration/threshold_delete
+  - name: threshold_delete_23
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::threshold_delete]
+    attributes:
+      opennms:
+        version: 23.0.4-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/threshold_delete
   - name: update_wmi_config_definition_16
     run_list:
       - recipe[opennms::postgres]
@@ -9680,6 +11058,19 @@ suites:
     attributes:
       opennms:
         version: 22.0.4-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/update_wmi_config_definition
+  - name: update_wmi_config_definition_23
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::update_wmi_config_definition]
+    attributes:
+      opennms:
+        version: 23.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -9775,6 +11166,19 @@ suites:
       inspec_tests:
         - path: test/integration/default
         - path: test/integration/user
+  - name: user_23
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::user]
+    attributes:
+      opennms:
+        version: 23.0.4-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/user
   - name: wallboard_16
     run_list:
       - recipe[opennms::postgres]
@@ -9862,6 +11266,19 @@ suites:
     attributes:
       opennms:
         version: 22.0.4-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/wallboard
+  - name: wallboard_23
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::wallboard]
+    attributes:
+      opennms:
+        version: 23.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -9957,6 +11374,19 @@ suites:
       inspec_tests:
         - path: test/integration/default
         - path: test/integration/webopts
+  - name: webopts_23
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::webopts]
+    attributes:
+      opennms:
+        version: 23.0.4-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/webopts
   - name: wmi_collection_16
     run_list:
       - recipe[opennms::postgres]
@@ -10044,6 +11474,19 @@ suites:
     attributes:
       opennms:
         version: 22.0.4-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/wmi_collection
+  - name: wmi_collection_23
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::wmi_collection]
+    attributes:
+      opennms:
+        version: 23.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -10139,6 +11582,19 @@ suites:
       inspec_tests:
         - path: test/integration/default
         - path: test/integration/wmi_collection_service
+  - name: wmi_collection_service_23
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::wmi_collection_service]
+    attributes:
+      opennms:
+        version: 23.0.4-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/wmi_collection_service
   - name: wmi_config_definition_16
     run_list:
       - recipe[opennms::postgres]
@@ -10226,6 +11682,19 @@ suites:
     attributes:
       opennms:
         version: 22.0.4-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/wmi_config_definition
+  - name: wmi_config_definition_23
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::wmi_config_definition]
+    attributes:
+      opennms:
+        version: 23.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -10321,6 +11790,19 @@ suites:
       inspec_tests:
         - path: test/integration/default
         - path: test/integration/wmi_wpm
+  - name: wmi_wpm_23
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::wmi_wpm]
+    attributes:
+      opennms:
+        version: 23.0.4-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/wmi_wpm
   - name: xml_collection_16
     run_list:
       - recipe[opennms::postgres]
@@ -10408,6 +11890,19 @@ suites:
     attributes:
       opennms:
         version: 22.0.4-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/xml_collection
+  - name: xml_collection_23
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::xml_collection]
+    attributes:
+      opennms:
+        version: 23.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -10503,6 +11998,19 @@ suites:
       inspec_tests:
         - path: test/integration/default
         - path: test/integration/xml_collection_service
+  - name: xml_collection_service_23
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::xml_collection_service]
+    attributes:
+      opennms:
+        version: 23.0.4-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/xml_collection_service
   - name: xml_collection_service_change_interval_16
     run_list:
       - recipe[opennms::postgres]
@@ -10594,6 +12102,19 @@ suites:
       inspec_tests:
         - path: test/integration/default
         - path: test/integration/xml_collection_service_change_interval
+  - name: xml_collection_service_change_interval_23
+      run_list:
+        - recipe[opennms::postgres]
+        - recipe[oracle_java8::default]
+        - recipe[opennms::default]
+        - recipe[onms_lwrp_test::xml_collection_service_change_interval]
+      attributes:
+        opennms:
+          version: 23.0.4-1
+      verifier:
+        inspec_tests:
+          - path: test/integration/default
+          - path: test/integration/xml_collection_service_change_interval
   - name: xml_collection_service_change_nothing_16
     run_list:
       - recipe[opennms::postgres]
@@ -10681,6 +12202,19 @@ suites:
     attributes:
       opennms:
         version: 22.0.4-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/xml_collection_service_change_nothing
+  - name: xml_collection_service_change_nothing_23
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::xml_collection_service_change_nothing]
+    attributes:
+      opennms:
+        version: 23.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -10776,6 +12310,19 @@ suites:
       inspec_tests:
         - path: test/integration/default
         - path: test/integration/xml_collection_service_change_port
+  - name: xml_collection_service_change_port_23
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::xml_collection_service_change_port]
+    attributes:
+      opennms:
+        version: 23.0.4-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/xml_collection_service_change_port
   - name: xml_collection_service_change_retrycount_16
     run_list:
       - recipe[opennms::postgres]
@@ -10867,6 +12414,19 @@ suites:
       inspec_tests:
         - path: test/integration/default
         - path: test/integration/xml_collection_service_change_retrycount
+  - name: xml_collection_service_change_retrycount_23
+      run_list:
+        - recipe[opennms::postgres]
+        - recipe[oracle_java8::default]
+        - recipe[opennms::default]
+        - recipe[onms_lwrp_test::xml_collection_service_change_retrycount]
+      attributes:
+        opennms:
+          version: 23.0.4-1
+      verifier:
+        inspec_tests:
+          - path: test/integration/default
+          - path: test/integration/xml_collection_service_change_retrycount
   - name: xml_collection_service_change_status_16
     run_list:
       - recipe[opennms::postgres]
@@ -10954,6 +12514,19 @@ suites:
     attributes:
       opennms:
         version: 22.0.4-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/xml_collection_service_change_status
+  - name: xml_collection_service_change_status_23
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::xml_collection_service_change_status]
+    attributes:
+      opennms:
+        version: 23.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -11049,6 +12622,19 @@ suites:
       inspec_tests:
         - path: test/integration/default
         - path: test/integration/xml_collection_service_change_threshold
+  - name: xml_collection_service_change_threshold_23
+      run_list:
+        - recipe[opennms::postgres]
+        - recipe[oracle_java8::default]
+        - recipe[opennms::default]
+        - recipe[onms_lwrp_test::xml_collection_service_change_threshold]
+      attributes:
+        opennms:
+          version: 23.0.4-1
+      verifier:
+        inspec_tests:
+          - path: test/integration/default
+          - path: test/integration/xml_collection_service_change_threshold
   - name: xml_collection_service_change_timeout_16
     run_list:
       - recipe[opennms::postgres]
@@ -11136,6 +12722,19 @@ suites:
     attributes:
       opennms:
         version: 22.0.4-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/xml_collection_service_change_timeout
+  - name: xml_collection_service_change_timeout_23
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::xml_collection_service_change_timeout]
+    attributes:
+      opennms:
+        version: 23.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -11231,6 +12830,19 @@ suites:
       inspec_tests:
         - path: test/integration/default
         - path: test/integration/xml_collection_service_change_userdefined
+  - name: xml_collection_service_change_userdefined_23
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::xml_collection_service_change_userdefined]
+    attributes:
+      opennms:
+        version: 23.0.4-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/xml_collection_service_change_userdefined
   - name: xml_collection_service_delete_16
     run_list:
       - recipe[opennms::postgres]
@@ -11318,6 +12930,19 @@ suites:
     attributes:
       opennms:
         version: 22.0.4-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/xml_collection_service_delete
+  - name: xml_collection_service_delete_23
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::xml_collection_service_delete]
+    attributes:
+      opennms:
+        version: 23.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -11413,6 +13038,19 @@ suites:
       inspec_tests:
         - path: test/integration/default
         - path: test/integration/xml_group
+  - name: xml_group_23
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::xml_group]
+    attributes:
+      opennms:
+        version: 23.0.4-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/xml_group
   - name: xml_group_delete_16
     run_list:
       - recipe[opennms::postgres]
@@ -11500,6 +13138,19 @@ suites:
     attributes:
       opennms:
         version: 22.0.4-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/xml_group_delete
+  - name: xml_group_delete_23
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::xml_group_delete]
+    attributes:
+      opennms:
+        version: 23.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -11595,6 +13246,19 @@ suites:
       inspec_tests:
         - path: test/integration/default
         - path: test/integration/xml_source
+  - name: xml_source_23
+      run_list:
+        - recipe[opennms::postgres]
+        - recipe[oracle_java8::default]
+        - recipe[opennms::default]
+        - recipe[onms_lwrp_test::xml_source]
+      attributes:
+        opennms:
+          version: 23.0.4-1
+      verifier:
+        inspec_tests:
+          - path: test/integration/default
+          - path: test/integration/xml_source
   - name: xml_source_delete_16
     run_list:
       - recipe[opennms::postgres]
@@ -11682,6 +13346,19 @@ suites:
     attributes:
       opennms:
         version: 22.0.4-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/xml_source_delete
+  - name: xml_source_delete_23
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::xml_source_delete]
+    attributes:
+      opennms:
+        version: 23.0.4-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -11777,6 +13454,19 @@ suites:
     verifier:
       inspec_tests:
         - path: test/integration/default
+  - name: default_23
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::webopts]
+    attributes:
+      opennms:
+        version: 23.0.4-1
+        upgrade: true
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
   - name: templates_16
     run_list:
       - recipe[opennms::postgres]
@@ -11868,6 +13558,19 @@ suites:
     verifier:
       inspec_tests:
         - path: test/integration/default
+  - name: templates_23
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::webopts]
+    attributes:
+      opennms:
+        version: 23.0.4-1
+        templates: true
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
   - name: flows_22
     run_list:
       - recipe[opennms::postgres]
@@ -11883,6 +13586,39 @@ suites:
     attributes:
       opennms:
         version: 22.0.4-1
+        templates: false
+        telemetryd:
+          managed: true
+          jti:
+            enabled: true
+          netflow5:
+            enabled: true
+          netflow9:
+            enabled: true
+          ipfix:
+            enabled: true
+          sflow:
+            enabled: true
+          nxos:
+            enabled: true
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+  - name: flows_23
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms-elasticsearch::default]
+      - recipe[snmp::default]
+      - recipe[hsflowd::default]
+      - recipe[opennms::default]
+      - recipe[opennms::telemetryd]
+      - recipe[onms_lwrp_test::webopts]
+      - recipe[onms_lwrp_test::localhost]
+      - recipe[opennms_helm::default]
+    attributes:
+      opennms:
+        version: 23.0.4-1
         templates: false
         telemetryd:
           managed: true
