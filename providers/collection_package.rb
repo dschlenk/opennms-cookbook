@@ -83,7 +83,7 @@ def load_current_resource
                                     false
                                   else
                                     true
-      end
+                                  end
   else
     @current_resource.different = true
   end
@@ -162,9 +162,7 @@ def include_urls_equal?(doc, include_urls)
 end
 
 def store_by_if_alias_equal?(doc, store_by_if_alia)
-  if doc.elements['storeByIfAlias'].nil?
-    current = false
-  else
+  unless doc.elements['storeByIfAlias'].nil?
     store_by_if_alias_el = true if doc.elements['storeByIfAlias'].texts.join("\n") == 'true'
   end
   Chef::Log.debug "storeByIfAlias ? New: #{store_by_if_alia}; Current: #{store_by_if_alias_el}"
@@ -192,8 +190,8 @@ end
 def stor_flag_override_equal?(doc, stor_flag_override)
   if doc.elements['storFlagOverride'].nil?
     current = false
-  else
-    current = true if doc.elements['storFlagOverride'].texts.join("\n") == 'true'
+  elsif doc.elements['storFlagOverride'].texts.join("\n") == 'true'
+    current = true
   end
   current == stor_flag_override
 end
