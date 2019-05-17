@@ -39,7 +39,7 @@ echo "          xml: true"
 echo "          nsclient: true"
 echo "suites:"
 VERSIONS=(16.0.4-1 17.1.1-1 18.0.4-1 19.1.0-1 20.1.0-1 21.1.0-1 22.0.4-1 23.0.4-1)
-STABLE_VERSION=(22.0.4-1)
+STABLE_VERSION=(23.0.4-1)
 SUITES=$(ls test/fixtures/cookbooks/onms_lwrp_test/recipes/)
 SUITES+=('default')
 SUITES+=('templates')
