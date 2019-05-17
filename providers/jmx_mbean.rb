@@ -27,7 +27,6 @@ action :delete do
   end
 end
 
-
 def load_current_resource
   @current_resource = Chef::Resource.resource_for_node(:opennms_jmx_mbean, node).new(@new_resource.name)
   @current_resource.mbean_name(@new_resource.mbean_name || @new_resource.name)
