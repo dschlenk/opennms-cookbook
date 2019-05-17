@@ -8658,15 +8658,15 @@ suites:
         - path: test/integration/default
         - path: test/integration/service_detector
   - name: service_detector_23
-      run_list:
+    run_list:
         - recipe[opennms::postgres]
         - recipe[oracle_java8::default]
         - recipe[opennms::default]
         - recipe[onms_lwrp_test::service_detector]
-      attributes:
+    attributes:
         opennms:
           version: 23.0.4-1
-      verifier:
+    verifier:
         inspec_tests:
           - path: test/integration/default
           - path: test/integration/service_detector
@@ -10530,15 +10530,15 @@ suites:
         - path: test/integration/default
         - path: test/integration/threshold_change_trigger
   - name: threshold_change_trigger_23
-      run_list:
+    run_list:
         - recipe[opennms::postgres]
         - recipe[oracle_java8::default]
         - recipe[opennms::default]
         - recipe[onms_lwrp_test::threshold_change_trigger]
-      attributes:
+    attributes:
         opennms:
           version: 23.0.4-1
-      verifier:
+    verifier:
         inspec_tests:
           - path: test/integration/default
           - path: test/integration/threshold_change_trigger
@@ -12090,15 +12090,15 @@ suites:
         - path: test/integration/default
         - path: test/integration/xml_collection_service_change_interval
   - name: xml_collection_service_change_interval_23
-      run_list:
+    run_list:
         - recipe[opennms::postgres]
         - recipe[oracle_java8::default]
         - recipe[opennms::default]
         - recipe[onms_lwrp_test::xml_collection_service_change_interval]
-      attributes:
+    attributes:
         opennms:
           version: 23.0.4-1
-      verifier:
+    verifier:
         inspec_tests:
           - path: test/integration/default
           - path: test/integration/xml_collection_service_change_interval
@@ -12402,15 +12402,15 @@ suites:
         - path: test/integration/default
         - path: test/integration/xml_collection_service_change_retrycount
   - name: xml_collection_service_change_retrycount_23
-      run_list:
+    run_list:
         - recipe[opennms::postgres]
         - recipe[oracle_java8::default]
         - recipe[opennms::default]
         - recipe[onms_lwrp_test::xml_collection_service_change_retrycount]
-      attributes:
+    attributes:
         opennms:
           version: 23.0.4-1
-      verifier:
+    verifier:
         inspec_tests:
           - path: test/integration/default
           - path: test/integration/xml_collection_service_change_retrycount
@@ -12610,15 +12610,15 @@ suites:
         - path: test/integration/default
         - path: test/integration/xml_collection_service_change_threshold
   - name: xml_collection_service_change_threshold_23
-      run_list:
+    run_list:
         - recipe[opennms::postgres]
         - recipe[oracle_java8::default]
         - recipe[opennms::default]
         - recipe[onms_lwrp_test::xml_collection_service_change_threshold]
-      attributes:
+    attributes:
         opennms:
           version: 23.0.4-1
-      verifier:
+    verifier:
         inspec_tests:
           - path: test/integration/default
           - path: test/integration/xml_collection_service_change_threshold
@@ -13234,15 +13234,15 @@ suites:
         - path: test/integration/default
         - path: test/integration/xml_source
   - name: xml_source_23
-      run_list:
+    run_list:
         - recipe[opennms::postgres]
         - recipe[oracle_java8::default]
         - recipe[opennms::default]
         - recipe[onms_lwrp_test::xml_source]
-      attributes:
+    attributes:
         opennms:
           version: 23.0.4-1
-      verifier:
+    verifier:
         inspec_tests:
           - path: test/integration/default
           - path: test/integration/xml_source
