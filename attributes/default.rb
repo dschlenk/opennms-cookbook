@@ -78,7 +78,7 @@ default['opennms']['conf']['command']        = ''
 # Once upon a time there were two different recipes
 # for installation (default and notemplates) but now
 # the latter just sets this attribute to false.
-default['opennms']['templates'] = true
+default['opennms']['templates'] = false
 # default cookbook for templates
 default['opennms']['default_template_cookbook'] = 'opennms'
 default['opennms']['users']['cookbook']                    = node['opennms']['default_template_cookbook']
