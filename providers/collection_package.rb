@@ -7,7 +7,6 @@ use_inline_resources # ~FC113
 
 action :create do
   if @current_resource.exists
-    Chef::Log.info "#{@new_resource} already exists - nothing to do."
     if @current_resource.different
       converge_by("Update #{@new_resource}") do
         update_collection_package
@@ -46,7 +45,6 @@ def load_current_resource
   @current_resource = Chef::Resource.resource_for_node(:opennms_collection_package, node).new(@new_resource.name)
   @current_resource.name(@new_resource.name) unless @new_resource.name.nil?
   @current_resource.remote(@new_resource.remote) unless @new_resource.remote.nil?
-
   @current_resource.filter(@new_resource.filter) unless @new_resource.filter.nil?
   @current_resource.specifics(@new_resource.specifics) unless @new_resource.specifics.nil?
   @current_resource.include_ranges(@new_resource.include_ranges) unless @new_resource.include_ranges.nil?
@@ -86,26 +84,19 @@ def load_current_resource
                                   end
   else
     @current_resource.different = true
+    @current_resource.exists = false
   end
 end
 
 private
 
 def matching_package(doc, current_resource)
-  package = nil
-  doc.elements.each('/collectd-configuration/package') do |package_el|
-    next unless package_el.attributes['name'].to_s == current_resource.name.to_s
-    package_el.attributes['remote'] = current_resource.remote.to_s unless current_resource.remote.nil?
-
-    package = package_el
-    break
-  end
-  package
+  doc.elements["/collectd-configuration/package[@name = '#{current_resource.name}']"]
 end
 
 def filter_equal?(doc, new_filter)
-  Chef::Log.debug("Filter ? current: '#{doc.elements['filter'].texts.join("\n")}'; old: '#{new_filter}'")
   current = doc.elements['filter'].texts.join("\n")
+  Chef::Log.debug("Filter ? current: '#{current}'; new: '#{new_filter}'")
   current == new_filter
 end
 
@@ -126,6 +117,7 @@ end
 
 def include_ranges_equal?(doc, include_ranges)
   Chef::Log.debug("Check for no include ranges: #{doc.elements['include-range'].nil?} && #{include_ranges}")
+  return true if doc.elements['include-range'].nil? && (include_ranges.nil? || include_ranges.empty?)
 
   current = []
   doc.elements.each('include-range') do |ncr_el|
@@ -136,6 +128,7 @@ end
 
 def exclude_ranges_equal?(doc, exclude_ranges)
   Chef::Log.debug("Check for no exclude-range: #{doc.elements['exclude-range'].nil?} && #{exclude_ranges}")
+  return true if doc.elements['exclude-range'].nil? && (exclude_ranges.nil? || exclude_ranges.empty?)
   exclude_ranges = [] if exclude_ranges.nil?
   current = []
   doc.elements.each('exclude-range') do |exl_el|
@@ -695,8 +688,10 @@ def update_collection_package
   doc.context[:attribute_quote] = :quote
 
   package_el = matching_package(doc, new_resource)
-
   unless package_el.nil?
+    unless new_resource.remote.nil?
+      package_el.attributes['remote'] = new_resource.remote.to_s
+    end
     insert_filter(package_el, new_resource)
     insert_specific(package_el, new_resource)
     insert_include_ranges(package_el, new_resource)
