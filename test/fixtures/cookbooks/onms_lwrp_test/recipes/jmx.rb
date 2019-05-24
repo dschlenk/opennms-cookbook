@@ -13,12 +13,23 @@ opennms_jmx_collection_service 'jmx' do
   friendly_name 'jmx-friendly-name'
 end
 
-opennms_jmx_mbean 'org.apache.activemq.Queue' do
+opennms_jmx_mbean 'anQueue org.apache.activemq.Queue' do
+  mbean_name 'org.apache.activemq.Queue'
   collection_name 'jmxcollection'
-  objectname 'org.apache.activemq:BrokerName=msgbroker-a.pe.spanlink.com,Type=Queue,Destination=splk.sw'
+  objectname 'org.apache.activemq:BrokerName=broker.example.com,Type=Queue,Destination=anQueue'
   attribs(
-    'ConsumerCount' => { 'alias' => '5ConsumerCnt', 'type' => 'gauge' },
-    'InFlightCount' => { 'alias' => '5InFlightCnt', 'type' => 'gauge' }
+    'ConsumerCount' => { 'alias' => 'anQConsumerCnt', 'type' => 'gauge' },
+    'InFlightCount' => { 'alias' => 'anQFlightCnt', 'type' => 'gauge' }
+  )
+end
+
+opennms_jmx_mbean 'anotherQueue org.apache.activemq.Queue' do
+  mbean_name 'org.apache.activemq.Queue'
+  collection_name 'jmxcollection'
+  objectname 'org.apache.activemq:BrokerName=broker.example.com,Type=Queue,Destination=anotherQueue'
+  attribs(
+    'ConsumerCount' => { 'alias' => 'anoQConsumerCnt', 'type' => 'gauge' },
+    'InFlightCount' => { 'alias' => 'anoQInflightCnt', 'type' => 'gauge' }
   )
 end
 

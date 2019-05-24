@@ -36,7 +36,28 @@ Template resources for daemons that support configuration changes without a rest
 
 ### Java (Optional)
 
-While the current OpenNMS Yum repos contain a suitable JDK, you might want to check out the community java (https://github.com/socrata-cookbooks/java) cookbook. Oracle likes to change license terms on a whim and their RPM might not set up things (like alternatives priorities) to your liking, so you might want to get ahead of the curve and manage installing the JDK yourself. See `test/fixtures/cookbooks/oracle_java8` for a simple example method of installing Oracle Java via Chef.
+While the current OpenNMS Yum repos contain a suitable JDK, you might want to check out the community java (https://github.com/socrata-cookbooks/java) cookbook. Oracle likes to change license terms on a whim and their RPM might not set up things (like alternatives priorities) to your liking, so you might want to get ahead of the curve and manage installing the JDK yourself. See `test/fixtures/cookbooks/oracle_java8` for a simple example method of installing Oracle Java via Chef. Note that you'll need to host the download yourself, since the last commercial Java 8 release is now an archived version and requires a login to download. If you're using test kitchen, you'll need to override the URL in a .kitchen.local.yml file to point at your (non-public) copy of the file. An example, where I'm using VirtualBox and serving it from my local workstation using apache UserDir:
+
+```
+---
+platforms:
+  - name: centos-6.9
+    attributes:
+      java:
+        jdk:
+          '8':
+            x86_64:
+              url:  'http://10.0.2.2/~schlazor/jdk-8u201-linux-x64.tar.gz'
+              checksum: 'cb700cc0ac3ddc728a567c350881ce7e25118eaf7ca97ca9705d4580c506e370'
+  - name: centos-7
+    attributes:
+      java:
+        jdk:
+          '8':
+            x86_64:
+              url:  'http://10.0.2.2/~schlazor/jdk-8u201-linux-x64.tar.gz'
+              checksum: 'cb700cc0ac3ddc728a567c350881ce7e25118eaf7ca97ca9705d4580c506e370'
+```
 
 If you want to install Java via RPM, you have to do a bit more work. First, you need to download the appropriate RPM(s) from Oracle and make a yum repo available to your nodes. For example, on a CentOS server with Apache httpd installed you could do:
 

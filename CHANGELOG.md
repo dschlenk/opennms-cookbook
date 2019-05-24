@@ -1,5 +1,27 @@
 # OpenNMS Cookbook Changes
 
+## 22.2.0
+
+### Bug Fixes
+
+* Support for OpenNMS Horizon 22.0.4-1 (replacing 22.0.2-1). Default version.
+
+## 22.1.1
+
+### Bug Fixes
+
+* re-order repo list to fix an issue with CentOS 7
+
+## 22.1.0
+
+### New Features
+
+* Add :delete action to opennms_poller_service
+
+### Bug Fixes
+
+* Fixed some minor issues in the testing scripts
+
 ## 22.0.0
 
 ### New Features

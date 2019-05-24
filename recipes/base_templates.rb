@@ -102,7 +102,7 @@ end
 template "#{onms_home}/jetty-webapps/opennms/WEB-INF/web.xml" do
   cookbook node['opennms']['web']['cookbook']
   source "#{template_dir}web.xml.erb"
-  mode 00664
+  mode 00644
   owner 'root'
   group 'root'
   notifies :restart, 'service[opennms]'
