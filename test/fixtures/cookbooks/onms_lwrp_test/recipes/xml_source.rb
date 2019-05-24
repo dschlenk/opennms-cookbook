@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 # all options
+include_recipe 'onms_lwrp_test::xml_collection'
 opennms_xml_source 'http://{ipaddr}/get-example' do
   collection_name 'foo'
   request_method 'GET'

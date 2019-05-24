@@ -22,6 +22,12 @@ class JmxCollectionService < Inspec.resource(1)
       its(\'protocol\') { should eq \'rmi\' }
       its(\'url_path\') { should eq \'/jmxrmi\' }
       its(\'rrd_base_name\') { should eq \'java\' }
+      its(\'factory\') { should eq \'SASL\' }
+      its(\'remote_jmx\') { should eq false }
+      its(\'rmi_server_port\') { should eq 45444 }
+      its(\'url\') { should eq \'service:jmx:rmi:${ipaddr}:18980\' }
+      its(\'username\') { should eq \'bart\' }
+      its(\'password\') { should eq \'simpson\' }
     end
   '
 
@@ -42,6 +48,13 @@ class JmxCollectionService < Inspec.resource(1)
       @params[:thresholding_enabled] = true if s_el.elements["parameter[@key = 'thresholding-enabled']/@value"].to_s == 'true'
       @params[:protocol] = s_el.elements["parameter[@key = 'protocol']/@value"].to_s
       @params[:url_path] = s_el.elements["parameter[@key = 'urlPath']/@value"].to_s
+      @params[:url] = s_el.elements["parameter[@key = 'url']/@value"].to_s
+      @params[:factory] = s_el.elements["parameter[@key = 'factory']/@value"].to_s
+      @params[:remote_jmx] = false
+      @params[:remote_jmx] = true if s_el.elements["parameter[@key = 'remoteJMX']/@value"].to_s == 'true'
+      @params[:rmi_server_port] = s_el.elements["parameter[@key = 'rmiServerPort']/@value"].to_s.to_i
+      @params[:username] = s_el.elements["parameter[@key = 'username']/@value"].to_s
+      @params[:password] = s_el.elements["parameter[@key = 'password']/@value"].to_s
       @params[:rrd_base_name] = s_el.elements["parameter[@key = 'rrd-base-name']/@value"].to_s
       @params[:ds_name] = s_el.elements["parameter[@key = 'ds-name']/@value"].to_s
       @params[:friendly_name] = s_el.elements["parameter[@key = 'friendly-name']/@value"].to_s

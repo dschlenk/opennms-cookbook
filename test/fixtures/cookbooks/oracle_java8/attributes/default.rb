@@ -1,7 +1,8 @@
 # frozen_string_literal: true
 default['java']['oracle']['accept_oracle_download_terms'] = true
 default['java']['install_flavor']                         = 'oracle'
-default['java']['jdk']['8']['x86_64']['checksum']         = '97e30203f1aef324a07c94d9d078f5d19bb6c50e638e4492722debca588210bc'
-default['java']['jdk']['8']['x86_64']['url']              = 'http://download.oracle.com/otn-pub/java/jdk/8u121-b13/e9e7ea248e2c4826b92b3f075a80e441/jdk-8u121-linux-x64.tar.gz'
+default['java']['jdk']['8']['x86_64']['checksum']         = 'cb700cc0ac3ddc728a567c350881ce7e25118eaf7ca97ca9705d4580c506e370'
+# requires account because oracle so you'll need to download yourself, mirror and point this to your mirror
+default['java']['jdk']['8']['x86_64']['url']              = 'https://download.oracle.com/otn/java/jdk/8u201-b09/42970487e3af4f5aa5bca3f542482c60/jdk-8u201-linux-x64.tar.gz'
 default['java']['jdk_version']                            = 8
-default['java']['alternatives_priority'] = 18001210
+default['java']['alternatives_priority'] = 18002010

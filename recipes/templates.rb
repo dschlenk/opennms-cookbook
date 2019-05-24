@@ -117,6 +117,7 @@ template "#{onms_home}/etc/collectd-configuration.xml" do
   mode 0664
   owner 'root'
   group 'root'
+  notifies :restart, 'service[opennms]'
   variables(
     threads: node['opennms']['collectd']['threads'],
     vmware3: node['opennms']['collectd']['vmware3'],
@@ -188,6 +189,9 @@ template "#{onms_home}/etc/datacollection-config.xml" do
     pfsense: node['opennms']['datacollection']['default']['pfsense'],
     powerware: node['opennms']['datacollection']['default']['powerware'],
     postgres: node['opennms']['datacollection']['default']['postgres'],
+    ref_cpq_im: node['opennms']['datacollection']['default']['ref_cpq_im'],
+    ref_mib2_if: node['opennms']['datacollection']['default']['ref_mib2_if'],
+    ref_mib2_pe: node['opennms']['datacollection']['default']['ref_mib2_pe'],
     riverbed: node['opennms']['datacollection']['default']['riverbed'],
     savin: node['opennms']['datacollection']['default']['savin'],
     servertech: node['opennms']['datacollection']['default']['servertech'],
@@ -279,7 +283,10 @@ template "#{onms_home}/etc/enlinkd-configuration.xml" do
     bridge: node['opennms']['enlinkd']['bridge'],
     lldp: node['opennms']['enlinkd']['lldp'],
     ospf: node['opennms']['enlinkd']['ospf'],
-    isis: node['opennms']['enlinkd']['isis']
+    isis: node['opennms']['enlinkd']['isis'],
+    bridge_topo_interval: node['opennms']['enlinkd']['bridge_topo_interval'],
+    max_bft: node['opennms']['enlinkd']['max_bft'],
+    disco_bridge_threads: node['opennms']['enlinkd']['disco_bridge_threads']
   )
 end
 
@@ -433,6 +440,8 @@ template "#{onms_home}/etc/jmx-datacollection-config.xml" do
   cookbook node['opennms']['jmx_dc']['cookbook']
   source "#{template_dir}jmx-datacollection-config.xml.erb"
   mode 00644
+  mode 00664 if Opennms::Helpers.major(node['opennms']['version']) == '22.0.4-1'
+  mode 00664 if Opennms::Helpers.major(node['opennms']['version']).to_i >= 23
   owner 'root'
   group 'root'
   notifies :restart, 'service[opennms]'
@@ -586,7 +595,6 @@ template "#{onms_home}/etc/notifd-configuration.xml" do
   mode 00664
   owner 'root'
   group 'root'
-  notifies :restart, 'service[opennms]'
   variables(
     status: node['opennms']['notifd']['status'],
     match_all: node['opennms']['notifd']['match_all'],
@@ -600,7 +608,6 @@ template "#{onms_home}/etc/notificationCommands.xml" do
   mode 00664
   owner 'root'
   group 'root'
-  notifies :restart, 'service[opennms]'
   variables(
     java_pager_email: node['opennms']['notification_commands']['java_pager_email'],
     java_email: node['opennms']['notification_commands']['java_email'],
@@ -624,7 +631,6 @@ template "#{onms_home}/etc/notifications.xml" do
   mode 00664
   owner 'root'
   group 'root'
-  notifies :restart, 'service[opennms]'
   variables(
     interface_down: node['opennms']['notifications']['interface_down'],
     node_down: node['opennms']['notifications']['node_down'],
@@ -685,7 +691,6 @@ template "#{onms_home}/etc/provisiond-configuration.xml" do
   mode 0664
   owner 'root'
   group 'root'
-  notifies :restart, 'service[opennms]'
   variables(
     foreign_source_dir: node['opennms']['importer']['foreign_source_dir'],
     requisition_dir: node['opennms']['importer']['requisition_dir'],
@@ -757,7 +762,6 @@ template "#{onms_home}/etc/response-adhoc-graph.properties" do
   mode 0664
   owner 'root'
   group 'root'
-  notifies :restart, 'service[opennms]'
   variables(
     command_prefix: node['opennms']['response_adhoc_graph']['command_prefix']
   )
@@ -769,7 +773,6 @@ template "#{onms_home}/etc/response-graph.properties" do
   mode 0664
   owner 'root'
   group 'root'
-  notifies :restart, 'service[opennms]'
   variables(
     image_format: node['opennms']['response_graph']['image_format'],
     command_prefix: node['opennms']['response_graph']['command_prefix'],
@@ -854,7 +857,6 @@ template "#{onms_home}/etc/site-status-views.xml" do
   mode 0664
   owner 'root'
   group 'root'
-  notifies :restart, 'service[opennms]'
   variables(
     default_view: node['opennms']['site_status_views']['default_view']
   )
@@ -866,7 +868,6 @@ template "#{onms_home}/etc/snmp-adhoc-graph.properties" do
   mode 0664
   owner 'root'
   group 'root'
-  notifies :restart, 'service[opennms]'
   variables(
     image_format: node['opennms']['snmp_adhoc_graph']['image_format'],
     command_prefix: node['opennms']['snmp_adhoc_graph']['command_prefix']
@@ -879,7 +880,6 @@ template "#{onms_home}/etc/snmp-graph.properties" do
   mode 0664
   owner 'root'
   group 'root'
-  notifies :restart, 'service[opennms]'
   variables(
     image_format: node['opennms']['snmp_graph']['image_format'],
     command_prefix: node['opennms']['snmp_graph']['command_prefix'],
@@ -899,7 +899,6 @@ template "#{onms_home}/etc/snmp-graph.properties.d/acmepacket-graph.properties" 
   mode 0664
   owner 'root'
   group 'root'
-  notifies :restart, 'service[opennms]'
   variables(
     enabled: node['opennms']['snmp_graph']['acmepacket']['enabled']
   )
@@ -911,7 +910,6 @@ template "#{onms_home}/etc/snmp-graph.properties.d/adonis-graph.properties" do
   mode 0664
   owner 'root'
   group 'root'
-  notifies :restart, 'service[opennms]'
   variables(
     enabled: node['opennms']['snmp_graph']['adonis']['enabled']
   )
@@ -923,7 +921,6 @@ template "#{onms_home}/etc/snmp-graph.properties.d/adsl-graph.properties" do
   mode 0664
   owner 'root'
   group 'root'
-  notifies :restart, 'service[opennms]'
   variables(
     enabled: node['opennms']['snmp_graph']['adsl']['enabled']
   )
@@ -935,7 +932,6 @@ template "#{onms_home}/etc/snmp-graph.properties.d/airport-graph.properties" do
   mode 0664
   owner 'root'
   group 'root'
-  notifies :restart, 'service[opennms]'
   variables(
     enabled: node['opennms']['snmp_graph']['airport']['enabled']
   )
@@ -947,7 +943,6 @@ template "#{onms_home}/etc/snmp-graph.properties.d/aix-graph.properties" do
   mode 0664
   owner 'root'
   group 'root'
-  notifies :restart, 'service[opennms]'
   variables(
     enabled: node['opennms']['snmp_graph']['aix']['enabled']
   )
@@ -959,7 +954,6 @@ template "#{onms_home}/etc/snmp-graph.properties.d/akcp-graph.properties" do
   mode 0664
   owner 'root'
   group 'root'
-  notifies :restart, 'service[opennms]'
   variables(
     enabled: node['opennms']['snmp_graph']['akcp']['enabled']
   )
@@ -971,7 +965,6 @@ template "#{onms_home}/etc/snmp-graph.properties.d/alvarion-graph.properties" do
   mode 0664
   owner 'root'
   group 'root'
-  notifies :restart, 'service[opennms]'
   variables(
     enabled: node['opennms']['snmp_graph']['alvarion']['enabled']
   )
@@ -983,7 +976,6 @@ template "#{onms_home}/etc/snmp-graph.properties.d/apc-graph.properties" do
   mode 0664
   owner 'root'
   group 'root'
-  notifies :restart, 'service[opennms]'
   variables(
     enabled: node['opennms']['snmp_graph']['apc']['enabled']
   )
@@ -995,7 +987,6 @@ template "#{onms_home}/etc/snmp-graph.properties.d/ascend-graph.properties" do
   mode 0664
   owner 'root'
   group 'root'
-  notifies :restart, 'service[opennms]'
   variables(
     enabled: node['opennms']['snmp_graph']['ascend']['enabled']
   )
@@ -1007,7 +998,6 @@ template "#{onms_home}/etc/snmp-graph.properties.d/asterisk-graph.properties" do
   mode 0664
   owner 'root'
   group 'root'
-  notifies :restart, 'service[opennms]'
   variables(
     enabled: node['opennms']['snmp_graph']['asterisk']['enabled']
   )
@@ -1019,7 +1009,6 @@ template "#{onms_home}/etc/snmp-graph.properties.d/bgp-ietf-graph.properties" do
   mode 0664
   owner 'root'
   group 'root'
-  notifies :restart, 'service[opennms]'
   variables(
     enabled: node['opennms']['snmp_graph']['bgp_ietf']['enabled']
   )
@@ -1031,7 +1020,6 @@ template "#{onms_home}/etc/snmp-graph.properties.d/bluecoat-sgproxy-graph.proper
   mode 0664
   owner 'root'
   group 'root'
-  notifies :restart, 'service[opennms]'
   variables(
     enabled: node['opennms']['snmp_graph']['bluecoat_sgproxy']['enabled']
   )
@@ -1043,7 +1031,6 @@ template "#{onms_home}/etc/snmp-graph.properties.d/bridgewave-graph.properties" 
   mode 0664
   owner 'root'
   group 'root'
-  notifies :restart, 'service[opennms]'
   variables(
     enabled: node['opennms']['snmp_graph']['bridgewave']['enabled']
   )
@@ -1054,7 +1041,6 @@ template "#{onms_home}/etc/snmp-graph.properties.d/brocade-graph.properties" do
   mode 0664
   owner 'root'
   group 'root'
-  notifies :restart, 'service[opennms]'
   variables(
     enabled: node['opennms']['snmp_graph']['brocade']['enabled']
   )
@@ -1066,7 +1052,6 @@ template "#{onms_home}/etc/snmp-graph.properties.d/ca-empire-graph.properties" d
   mode 0664
   owner 'root'
   group 'root'
-  notifies :restart, 'service[opennms]'
   variables(
     enabled: node['opennms']['snmp_graph']['ca_empire']['enabled']
   )
@@ -1078,7 +1063,6 @@ template "#{onms_home}/etc/snmp-graph.properties.d/checkpoint-graph.properties" 
   mode 0664
   owner 'root'
   group 'root'
-  notifies :restart, 'service[opennms]'
   variables(
     enabled: node['opennms']['snmp_graph']['checkpoint']['enabled']
   )
@@ -1090,7 +1074,6 @@ template "#{onms_home}/etc/snmp-graph.properties.d/cisco-graph.properties" do
   mode 0664
   owner 'root'
   group 'root'
-  notifies :restart, 'service[opennms]'
   variables(
     enabled: node['opennms']['snmp_graph']['cisco']['enabled']
   )
@@ -1102,7 +1085,6 @@ template "#{onms_home}/etc/snmp-graph.properties.d/ciscoNexus-graph.properties" 
   mode 0664
   owner 'root'
   group 'root'
-  notifies :restart, 'service[opennms]'
   variables(
     enabled: node['opennms']['snmp_graph']['ciscoNexus']['enabled']
   )
@@ -1114,7 +1096,6 @@ template "#{onms_home}/etc/snmp-graph.properties.d/clavister-graph.properties" d
   mode 0664
   owner 'root'
   group 'root'
-  notifies :restart, 'service[opennms]'
   variables(
     enabled: node['opennms']['snmp_graph']['clavister']['enabled']
   )
@@ -1126,7 +1107,6 @@ template "#{onms_home}/etc/snmp-graph.properties.d/colubris-graph.properties" do
   mode 0664
   owner 'root'
   group 'root'
-  notifies :restart, 'service[opennms]'
   variables(
     enabled: node['opennms']['snmp_graph']['colubris']['enabled']
   )
@@ -1138,7 +1118,6 @@ template "#{onms_home}/etc/snmp-graph.properties.d/cyclades-graph.properties" do
   mode 0664
   owner 'root'
   group 'root'
-  notifies :restart, 'service[opennms]'
   variables(
     enabled: node['opennms']['snmp_graph']['cyclades']['enabled']
   )
@@ -1150,7 +1129,6 @@ template "#{onms_home}/etc/snmp-graph.properties.d/dell-openmanage-graph.propert
   mode 0664
   owner 'root'
   group 'root'
-  notifies :restart, 'service[opennms]'
   variables(
     enabled: node['opennms']['snmp_graph']['dell_openmanage']['enabled']
   )
@@ -1162,7 +1140,6 @@ template "#{onms_home}/etc/snmp-graph.properties.d/dell-rac-graph.properties" do
   mode 0664
   owner 'root'
   group 'root'
-  notifies :restart, 'service[opennms]'
   variables(
     enabled: node['opennms']['snmp_graph']['dell_rac']['enabled']
   )
@@ -1174,7 +1151,6 @@ template "#{onms_home}/etc/snmp-graph.properties.d/dns-graph.properties" do
   mode 0664
   owner 'root'
   group 'root'
-  notifies :restart, 'service[opennms]'
   variables(
     enabled: node['opennms']['snmp_graph']['dns']['enabled']
   )
@@ -1186,7 +1162,6 @@ template "#{onms_home}/etc/snmp-graph.properties.d/ejn-graph.properties" do
   mode 0664
   owner 'root'
   group 'root'
-  notifies :restart, 'service[opennms]'
   variables(
     enabled: node['opennms']['snmp_graph']['ejn']['enabled']
   )
@@ -1198,7 +1173,6 @@ template "#{onms_home}/etc/snmp-graph.properties.d/equallogic-graph.properties" 
   mode 0664
   owner 'root'
   group 'root'
-  notifies :restart, 'service[opennms]'
   variables(
     enabled: node['opennms']['snmp_graph']['equallogic']['enabled']
   )
@@ -1210,7 +1184,6 @@ template "#{onms_home}/etc/snmp-graph.properties.d/ericsson-graph.properties" do
   mode 0664
   owner 'root'
   group 'root'
-  notifies :restart, 'service[opennms]'
   variables(
     enabled: node['opennms']['snmp_graph']['ericsson']['enabled']
   )
@@ -1222,7 +1195,6 @@ template "#{onms_home}/etc/snmp-graph.properties.d/extreme-networks-graph.proper
   mode 0664
   owner 'root'
   group 'root'
-  notifies :restart, 'service[opennms]'
   variables(
     enabled: node['opennms']['snmp_graph']['extreme_networks']['enabled']
   )
@@ -1234,7 +1206,6 @@ template "#{onms_home}/etc/snmp-graph.properties.d/f5-graph.properties" do
   mode 0664
   owner 'root'
   group 'root'
-  notifies :restart, 'service[opennms]'
   variables(
     enabled: node['opennms']['snmp_graph']['f5']['enabled']
   )
@@ -1246,7 +1217,6 @@ template "#{onms_home}/etc/snmp-graph.properties.d/force10-graph.properties" do
   mode 0664
   owner 'root'
   group 'root'
-  notifies :restart, 'service[opennms]'
   variables(
     enabled: node['opennms']['snmp_graph']['force10']['enabled']
   )
@@ -1258,7 +1228,6 @@ template "#{onms_home}/etc/snmp-graph.properties.d/fortinet-graph.properties" do
   mode 0664
   owner 'root'
   group 'root'
-  notifies :restart, 'service[opennms]'
   variables(
     enabled: node['opennms']['snmp_graph']['fortinet']['enabled']
   )
@@ -1271,7 +1240,6 @@ template "#{onms_home}/etc/snmp-graph.properties.d/foundry-graph.properties" do
   mode 0664
   owner 'root'
   group 'root'
-  notifies :restart, 'service[opennms]'
   variables(
     enabled: node['opennms']['snmp_graph']['foundry']['enabled']
   )
@@ -1283,7 +1251,6 @@ template "#{onms_home}/etc/snmp-graph.properties.d/framerelay-graph.properties" 
   mode 0664
   owner 'root'
   group 'root'
-  notifies :restart, 'service[opennms]'
   variables(
     enabled: node['opennms']['snmp_graph']['framerelay']['enabled']
   )
@@ -1295,7 +1262,6 @@ template "#{onms_home}/etc/snmp-graph.properties.d/host-resources-graph.properti
   mode 0664
   owner 'root'
   group 'root'
-  notifies :restart, 'service[opennms]'
   variables(
     enabled: node['opennms']['snmp_graph']['host_resources']['enabled']
   )
@@ -1307,7 +1273,6 @@ template "#{onms_home}/etc/snmp-graph.properties.d/hp-graph.properties" do
   mode 0664
   owner 'root'
   group 'root'
-  notifies :restart, 'service[opennms]'
   variables(
     enabled: node['opennms']['snmp_graph']['hp']['enabled']
   )
@@ -1319,7 +1284,6 @@ template "#{onms_home}/etc/snmp-graph.properties.d/hpux-graph.properties" do
   mode 0664
   owner 'root'
   group 'root'
-  notifies :restart, 'service[opennms]'
   variables(
     enabled: node['opennms']['snmp_graph']['hpux']['enabled']
   )
@@ -1331,7 +1295,6 @@ template "#{onms_home}/etc/snmp-graph.properties.d/hwg-graph.properties" do
   mode 0664
   owner 'root'
   group 'root'
-  notifies :restart, 'service[opennms]'
   variables(
     enabled: node['opennms']['snmp_graph']['hwg']['enabled']
   )
@@ -1343,7 +1306,6 @@ template "#{onms_home}/etc/snmp-graph.properties.d/ipunity-graph.properties" do
   mode 0664
   owner 'root'
   group 'root'
-  notifies :restart, 'service[opennms]'
   variables(
     enabled: node['opennms']['snmp_graph']['ipunity']['enabled']
   )
@@ -1355,7 +1317,6 @@ template "#{onms_home}/etc/snmp-graph.properties.d/jboss-graph.properties" do
   mode 0664
   owner 'root'
   group 'root'
-  notifies :restart, 'service[opennms]'
   variables(
     enabled: node['opennms']['snmp_graph']['jboss']['enabled']
   )
@@ -1367,7 +1328,6 @@ template "#{onms_home}/etc/snmp-graph.properties.d/juniper-graph.properties" do
   mode 0664
   owner 'root'
   group 'root'
-  notifies :restart, 'service[opennms]'
   variables(
     enabled: node['opennms']['snmp_graph']['juniper']['enabled']
   )
@@ -1379,7 +1339,6 @@ template "#{onms_home}/etc/snmp-graph.properties.d/jvm-graph.properties" do
   mode 0664
   owner 'root'
   group 'root'
-  notifies :restart, 'service[opennms]'
   variables(
     enabled: node['opennms']['snmp_graph']['jvm']['enabled']
   )
@@ -1391,7 +1350,6 @@ template "#{onms_home}/etc/snmp-graph.properties.d/liebert-graph.properties" do
   mode 0664
   owner 'root'
   group 'root'
-  notifies :restart, 'service[opennms]'
   variables(
     enabled: node['opennms']['snmp_graph']['liebert']['enabled']
   )
@@ -1403,7 +1361,6 @@ template "#{onms_home}/etc/snmp-graph.properties.d/lmsensors-graph.properties" d
   mode 0664
   owner 'root'
   group 'root'
-  notifies :restart, 'service[opennms]'
   variables(
     enabled: node['opennms']['snmp_graph']['lmsensors']['enabled']
   )
@@ -1415,7 +1372,6 @@ template "#{onms_home}/etc/snmp-graph.properties.d/mailmarshal-graph.properties"
   mode 0664
   owner 'root'
   group 'root'
-  notifies :restart, 'service[opennms]'
   variables(
     enabled: node['opennms']['snmp_graph']['mailmarshal']['enabled']
   )
@@ -1427,7 +1383,6 @@ template "#{onms_home}/etc/snmp-graph.properties.d/mcast-graph.properties" do
   mode 0664
   owner 'root'
   group 'root'
-  notifies :restart, 'service[opennms]'
   variables(
     enabled: node['opennms']['snmp_graph']['mcast']['enabled']
   )
@@ -1439,7 +1394,6 @@ template "#{onms_home}/etc/snmp-graph.properties.d/mge-graph.properties" do
   mode 0664
   owner 'root'
   group 'root'
-  notifies :restart, 'service[opennms]'
   variables(
     enabled: node['opennms']['snmp_graph']['mge']['enabled']
   )
@@ -1451,7 +1405,6 @@ template "#{onms_home}/etc/snmp-graph.properties.d/mib2-graph.properties" do
   mode 0664
   owner 'root'
   group 'root'
-  notifies :restart, 'service[opennms]'
   variables(
     enabled: node['opennms']['snmp_graph']['mib2']['enabled']
   )
@@ -1463,7 +1416,6 @@ template "#{onms_home}/etc/snmp-graph.properties.d/microsoft-exchange-graph.prop
   mode 0664
   owner 'root'
   group 'root'
-  notifies :restart, 'service[opennms]'
   variables(
     enabled: node['opennms']['snmp_graph']['microsoft_exchange']['enabled']
   )
@@ -1475,7 +1427,6 @@ template "#{onms_home}/etc/snmp-graph.properties.d/microsoft-graph.properties" d
   mode 0664
   owner 'root'
   group 'root'
-  notifies :restart, 'service[opennms]'
   variables(
     enabled: node['opennms']['snmp_graph']['microsoft']['enabled']
   )
@@ -1487,7 +1438,6 @@ template "#{onms_home}/etc/snmp-graph.properties.d/microsoft-http-graph.properti
   mode 0664
   owner 'root'
   group 'root'
-  notifies :restart, 'service[opennms]'
   variables(
     enabled: node['opennms']['snmp_graph']['microsoft_http']['enabled']
   )
@@ -1499,7 +1449,6 @@ template "#{onms_home}/etc/snmp-graph.properties.d/microsoft-iis-graph.propertie
   mode 0664
   owner 'root'
   group 'root'
-  notifies :restart, 'service[opennms]'
   variables(
     enabled: node['opennms']['snmp_graph']['microsoft_iis']['enabled']
   )
@@ -1511,7 +1460,6 @@ template "#{onms_home}/etc/snmp-graph.properties.d/microsoft-lcs-graph.propertie
   mode 0664
   owner 'root'
   group 'root'
-  notifies :restart, 'service[opennms]'
   variables(
     enabled: node['opennms']['snmp_graph']['microsoft_lcs']['enabled']
   )
@@ -1523,7 +1471,6 @@ template "#{onms_home}/etc/snmp-graph.properties.d/microsoft-sql-graph.propertie
   mode 0664
   owner 'root'
   group 'root'
-  notifies :restart, 'service[opennms]'
   variables(
     enabled: node['opennms']['snmp_graph']['microsoft_sql']['enabled']
   )
@@ -1535,7 +1482,6 @@ template "#{onms_home}/etc/snmp-graph.properties.d/microsoft-windows-graph.prope
   mode 0664
   owner 'root'
   group 'root'
-  notifies :restart, 'service[opennms]'
   variables(
     enabled: node['opennms']['snmp_graph']['microsoft_windows']['enabled']
   )
@@ -1547,7 +1493,6 @@ template "#{onms_home}/etc/snmp-graph.properties.d/microsoft-wmi-graph.propertie
   mode 0664
   owner 'root'
   group 'root'
-  notifies :restart, 'service[opennms]'
   variables(
     enabled: node['opennms']['snmp_graph']['microsoft_wmi']['enabled']
   )
@@ -1559,7 +1504,6 @@ template "#{onms_home}/etc/snmp-graph.properties.d/mikrotik-graph.properties" do
   mode 0664
   owner 'root'
   group 'root'
-  notifies :restart, 'service[opennms]'
   variables(
     enabled: node['opennms']['snmp_graph']['mikrotik']['enabled']
   )
@@ -1571,7 +1515,6 @@ template "#{onms_home}/etc/snmp-graph.properties.d/mysql-graph.properties" do
   mode 0664
   owner 'root'
   group 'root'
-  notifies :restart, 'service[opennms]'
   variables(
     enabled: node['opennms']['snmp_graph']['mysql']['enabled']
   )
@@ -1583,7 +1526,6 @@ template "#{onms_home}/etc/snmp-graph.properties.d/netapp-graph.properties" do
   mode 0664
   owner 'root'
   group 'root'
-  notifies :restart, 'service[opennms]'
   variables(
     enabled: node['opennms']['snmp_graph']['netapp']['enabled']
   )
@@ -1595,7 +1537,6 @@ template "#{onms_home}/etc/snmp-graph.properties.d/netbotz-graph.properties" do
   mode 0664
   owner 'root'
   group 'root'
-  notifies :restart, 'service[opennms]'
   variables(
     enabled: node['opennms']['snmp_graph']['netbotz']['enabled']
   )
@@ -1607,7 +1548,6 @@ template "#{onms_home}/etc/snmp-graph.properties.d/netenforcer-graph.properties"
   mode 0664
   owner 'root'
   group 'root'
-  notifies :restart, 'service[opennms]'
   variables(
     enabled: node['opennms']['snmp_graph']['netenforcer']['enabled']
   )
@@ -1619,7 +1559,6 @@ template "#{onms_home}/etc/snmp-graph.properties.d/netscaler-graph.properties" d
   mode 0664
   owner 'root'
   group 'root'
-  notifies :restart, 'service[opennms]'
   variables(
     enabled: node['opennms']['snmp_graph']['netscaler']['enabled']
   )
@@ -1631,7 +1570,6 @@ template "#{onms_home}/etc/snmp-graph.properties.d/netsnmp-graph.properties" do
   mode 0664
   owner 'root'
   group 'root'
-  notifies :restart, 'service[opennms]'
   variables(
     enabled: node['opennms']['snmp_graph']['netsnmp']['enabled']
   )
@@ -1643,7 +1581,6 @@ template "#{onms_home}/etc/snmp-graph.properties.d/nortel-graph.properties" do
   mode 0664
   owner 'root'
   group 'root'
-  notifies :restart, 'service[opennms]'
   variables(
     enabled: node['opennms']['snmp_graph']['nortel']['enabled']
   )
@@ -1655,7 +1592,6 @@ template "#{onms_home}/etc/snmp-graph.properties.d/novell-graph.properties" do
   mode 0664
   owner 'root'
   group 'root'
-  notifies :restart, 'service[opennms]'
   variables(
     enabled: node['opennms']['snmp_graph']['novell']['enabled']
   )
@@ -1667,7 +1603,6 @@ template "#{onms_home}/etc/snmp-graph.properties.d/pfsense-graph.properties" do
   mode 0664
   owner 'root'
   group 'root'
-  notifies :restart, 'service[opennms]'
   variables(
     enabled: node['opennms']['snmp_graph']['pfsense']['enabled']
   )
@@ -1679,7 +1614,6 @@ template "#{onms_home}/etc/snmp-graph.properties.d/postgresql-graph.properties" 
   mode 0664
   owner 'root'
   group 'root'
-  notifies :restart, 'service[opennms]'
   variables(
     enabled: node['opennms']['snmp_graph']['postgresql']['enabled']
   )
@@ -1691,7 +1625,6 @@ template "#{onms_home}/etc/snmp-graph.properties.d/riverbed-steelhead-graph.prop
   mode 0664
   owner 'root'
   group 'root'
-  notifies :restart, 'service[opennms]'
   variables(
     enabled: node['opennms']['snmp_graph']['riverbed_steelhead']['enabled']
   )
@@ -1703,7 +1636,6 @@ template "#{onms_home}/etc/snmp-graph.properties.d/servertech-graph.properties" 
   mode 0664
   owner 'root'
   group 'root'
-  notifies :restart, 'service[opennms]'
   variables(
     enabled: node['opennms']['snmp_graph']['servertech']['enabled']
   )
@@ -1715,7 +1647,6 @@ template "#{onms_home}/etc/snmp-graph.properties.d/snmp-informant-graph.properti
   mode 0664
   owner 'root'
   group 'root'
-  notifies :restart, 'service[opennms]'
   variables(
     enabled: node['opennms']['snmp_graph']['snmp_informant']['enabled']
   )
@@ -1727,7 +1658,6 @@ template "#{onms_home}/etc/snmp-graph.properties.d/sofaware-embeddedngx-graph.pr
   mode 0664
   owner 'root'
   group 'root'
-  notifies :restart, 'service[opennms]'
   variables(
     enabled: node['opennms']['snmp_graph']['sofaware_embeddedngx']['enabled']
   )
@@ -1739,7 +1669,6 @@ template "#{onms_home}/etc/snmp-graph.properties.d/sun-graph.properties" do
   mode 0664
   owner 'root'
   group 'root'
-  notifies :restart, 'service[opennms]'
   variables(
     enabled: node['opennms']['snmp_graph']['sun']['enabled']
   )
@@ -1751,7 +1680,6 @@ template "#{onms_home}/etc/snmp-graph.properties.d/trango-graph.properties" do
   mode 0664
   owner 'root'
   group 'root'
-  notifies :restart, 'service[opennms]'
   variables(
     enabled: node['opennms']['snmp_graph']['trango']['enabled']
   )
@@ -1763,7 +1691,6 @@ template "#{onms_home}/etc/snmp-graph.properties.d/vmware-cim-graph-simple.prope
   mode 0664
   owner 'root'
   group 'root'
-  notifies :restart, 'service[opennms]'
   variables(
     enabled: node['opennms']['snmp_graph']['vmware_cim']['enabled']
   )
@@ -1775,7 +1702,6 @@ template "#{onms_home}/etc/snmp-graph.properties.d/vmware3-graph-simple.properti
   mode 0664
   owner 'root'
   group 'root'
-  notifies :restart, 'service[opennms]'
   variables(
     enabled: node['opennms']['snmp_graph']['vmware3']['enabled']
   )
@@ -1787,7 +1713,6 @@ template "#{onms_home}/etc/snmp-graph.properties.d/vmware4-graph-simple.properti
   mode 0664
   owner 'root'
   group 'root'
-  notifies :restart, 'service[opennms]'
   variables(
     enabled: node['opennms']['snmp_graph']['vmware4']['enabled']
   )
@@ -1799,7 +1724,6 @@ template "#{onms_home}/etc/snmp-graph.properties.d/vmware5-cpu-graph.properties"
   mode 0664
   owner 'root'
   group 'root'
-  notifies :restart, 'service[opennms]'
   variables(
     enabled: node['opennms']['snmp_graph']['vmware5']['enabled']
   )
@@ -1811,7 +1735,6 @@ template "#{onms_home}/etc/snmp-graph.properties.d/vmware5-datastore-graph.prope
   mode 0664
   owner 'root'
   group 'root'
-  notifies :restart, 'service[opennms]'
   variables(
     enabled: node['opennms']['snmp_graph']['vmware5']['enabled']
   )
@@ -1823,7 +1746,6 @@ template "#{onms_home}/etc/snmp-graph.properties.d/vmware5-disk-graph.properties
   mode 0664
   owner 'root'
   group 'root'
-  notifies :restart, 'service[opennms]'
   variables(
     enabled: node['opennms']['snmp_graph']['vmware5']['enabled']
   )
@@ -1835,7 +1757,6 @@ template "#{onms_home}/etc/snmp-graph.properties.d/vmware5-host-based-replicatio
   mode 0664
   owner 'root'
   group 'root'
-  notifies :restart, 'service[opennms]'
   variables(
     enabled: node['opennms']['snmp_graph']['vmware5']['enabled']
   )
@@ -1847,7 +1768,6 @@ template "#{onms_home}/etc/snmp-graph.properties.d/vmware5-memory-graph.properti
   mode 0664
   owner 'root'
   group 'root'
-  notifies :restart, 'service[opennms]'
   variables(
     enabled: node['opennms']['snmp_graph']['vmware5']['enabled']
   )
@@ -1859,7 +1779,6 @@ template "#{onms_home}/etc/snmp-graph.properties.d/vmware5-network-graph.propert
   mode 0664
   owner 'root'
   group 'root'
-  notifies :restart, 'service[opennms]'
   variables(
     enabled: node['opennms']['snmp_graph']['vmware5']['enabled']
   )
@@ -1871,7 +1790,6 @@ template "#{onms_home}/etc/snmp-graph.properties.d/vmware5-power-graph.propertie
   mode 0664
   owner 'root'
   group 'root'
-  notifies :restart, 'service[opennms]'
   variables(
     enabled: node['opennms']['snmp_graph']['vmware5']['enabled']
   )
@@ -1883,7 +1801,6 @@ template "#{onms_home}/etc/snmp-graph.properties.d/vmware5-storage-adapter-graph
   mode 0664
   owner 'root'
   group 'root'
-  notifies :restart, 'service[opennms]'
   variables(
     enabled: node['opennms']['snmp_graph']['vmware5']['enabled']
   )
@@ -1895,7 +1812,6 @@ template "#{onms_home}/etc/snmp-graph.properties.d/vmware5-storage-path-graph.pr
   mode 0664
   owner 'root'
   group 'root'
-  notifies :restart, 'service[opennms]'
   variables(
     enabled: node['opennms']['snmp_graph']['vmware5']['enabled']
   )
@@ -1907,7 +1823,6 @@ template "#{onms_home}/etc/snmp-graph.properties.d/vmware5-system-graph.properti
   mode 0664
   owner 'root'
   group 'root'
-  notifies :restart, 'service[opennms]'
   variables(
     enabled: node['opennms']['snmp_graph']['vmware5']['enabled']
   )
@@ -1919,7 +1834,6 @@ template "#{onms_home}/etc/snmp-graph.properties.d/vmware5-virtual-disk-graph.pr
   mode 0664
   owner 'root'
   group 'root'
-  notifies :restart, 'service[opennms]'
   variables(
     enabled: node['opennms']['snmp_graph']['vmware5']['enabled']
   )
@@ -1931,7 +1845,6 @@ template "#{onms_home}/etc/snmp-graph.properties.d/xmp-graph.properties" do
   mode 0664
   owner 'root'
   group 'root'
-  notifies :restart, 'service[opennms]'
   variables(
     enabled: node['opennms']['snmp_graph']['xmp']['enabled']
   )
@@ -1943,7 +1856,6 @@ template "#{onms_home}/etc/snmp-graph.properties.d/xups-graph.properties" do
   mode 0664
   owner 'root'
   group 'root'
-  notifies :restart, 'service[opennms]'
   variables(
     enabled: node['opennms']['snmp_graph']['xups']['enabled']
   )
@@ -1955,7 +1867,6 @@ template "#{onms_home}/etc/snmp-graph.properties.d/zeus-graph.properties" do
   mode 0664
   owner 'root'
   group 'root'
-  notifies :restart, 'service[opennms]'
   variables(
     enabled: node['opennms']['snmp_graph']['zeus']['enabled']
   )
@@ -1982,7 +1893,6 @@ template "#{onms_home}/etc/statsd-configuration.xml" do
   mode 0664
   owner 'root'
   group 'root'
-  notifies :restart, 'service[opennms]'
   variables(
     throughput: node['opennms']['statsd']['throughput'],
     response_time_reports: node['opennms']['statsd']['response_time_reports']
@@ -2009,7 +1919,6 @@ template "#{onms_home}/etc/surveillance-views.xml" do
   mode 0664
   owner 'root'
   group 'root'
-  notifies :restart, 'service[opennms]'
   variables(
     default_view: node['opennms']['surveillance_views']['default_view'],
     default: node['opennms']['surveillance_views']['default']
@@ -2041,7 +1950,6 @@ template "#{onms_home}/etc/syslogd-configuration.xml" do
   mode 0664
   owner 'root'
   group 'root'
-  notifies :restart, 'service[opennms]'
   variables(
     port: node['opennms']['syslogd']['port'],
     new_suspect: node['opennms']['syslogd']['new_suspect'],
@@ -2050,6 +1958,7 @@ template "#{onms_home}/etc/syslogd-configuration.xml" do
     matching_group_host: node['opennms']['syslogd']['matching_group_host'],
     matching_group_message: node['opennms']['syslogd']['matching_group_message'],
     discard_uei: node['opennms']['syslogd']['discard_uei'],
+    timezone: node['opennms']['syslogd']['timezone'],
     apache_httpd: node['opennms']['syslogd']['apache_httpd'],
     linux_kernel: node['opennms']['syslogd']['linux_kernel'],
     openssh: node['opennms']['syslogd']['openssh'],
@@ -2066,7 +1975,6 @@ template "#{onms_home}/etc/threshd-configuration.xml" do
   mode 0664
   owner 'root'
   group 'root'
-  notifies :restart, 'service[opennms]'
   variables(
     threads: node['opennms']['threshd']['threads'],
     mib2: node['opennms']['threshd']['mib2'],
@@ -2085,7 +1993,6 @@ template "#{onms_home}/etc/thresholds.xml" do
   mode 0664
   owner 'root'
   group 'root'
-  notifies :restart, 'service[opennms]'
   variables(
     mib2: node['opennms']['thresholds']['mib2'],
     hrstorage: node['opennms']['thresholds']['hrstorage'],
@@ -2104,7 +2011,6 @@ template "#{onms_home}/etc/translator-configuration.xml" do
   mode 0664
   owner 'root'
   group 'root'
-  notifies :restart, 'service[opennms]'
   variables(
     snmp_link_down: node['opennms']['translator']['snmp_link_down'],
     snmp_link_up: node['opennms']['translator']['snmp_link_up'],
@@ -2134,7 +2040,6 @@ template "#{onms_home}/etc/users.xml" do
   mode 0640 if mv.to_i > 19
   owner 'root'
   group 'root'
-  notifies :restart, 'service[opennms]'
   variables(
     name: node['opennms']['users']['admin']['name'],
     user_comments: node['opennms']['users']['admin']['user_comments'],
@@ -2148,7 +2053,6 @@ template "#{onms_home}/etc/vacuumd-configuration.xml" do
   mode 0664
   owner 'root'
   group 'root'
-  notifies :restart, 'service[opennms]'
   variables(
     period: node['opennms']['vacuumd']['period'],
     statement: node['opennms']['vacuumd']['statement'],
@@ -2235,4 +2139,8 @@ template "#{onms_home}/etc/xmpp-configuration.properties" do
     user: node['opennms']['xmpp']['user'],
     pass: node['opennms']['xmpp']['pass']
   )
+end
+
+if mv.to_i >= 22 && node['opennms']['telemetryd']['managed']
+  include_recipe 'opennms::telemetryd'
 end

@@ -79,18 +79,14 @@ def create_specific
     # see if there are any other discovery elements. Specifics should be first.
     before_el = doc.root.elements['/discovery-configuration/include-range[1]']
     if before_el.nil?
-      Chef::Log.warn 'no include ranges'
       before_el = doc.root.elements['/discovery-configuration/exclude-range[1]']
     end
     if before_el.nil?
-      Chef::Log.warn 'no exclude ranges'
       before_el = doc.root.elements['/discovery-configuration/include-url[1]']
     end
     if before_el.nil?
-      Chef::Log.warn 'adding at the end'
       doc.root.elements['/discovery-configuration'].add_element new_el
     else
-      Chef::Log.warn "adding before #{before_el}"
       doc.root.insert_before(before_el, new_el)
     end
   end
