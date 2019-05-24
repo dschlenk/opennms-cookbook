@@ -30,12 +30,23 @@ action :create do
   end
 end
 
+action :delete do
+  if @current_resource.exists
+    converge_by("Deleting #{@new_resource}") do
+      delete_snmp_collection_group
+    end
+  else
+    Chef::Log.info("#{@new_resource} does not exist - nothing to do.")
+  end
+end
+
 def load_current_resource
   @current_resource = Chef::Resource.resource_for_node(:opennms_snmp_collection_group, node).new(@new_resource.name)
+  @current_resource.group_name(@new_resource.group_name || @new_resource.name)
   @current_resource.collection_name(@new_resource.collection_name)
 
-  # Good enough for create but that's about it
-  if group_exists?(@current_resource.collection_name, @current_resource.name)
+  # Good enough for create / delete, but needs work if we implement support for changing existing
+  if group_exists?(@current_resource.collection_name, @current_resource.group_name)
     @current_resource.exists = true
   end
 end
@@ -50,7 +61,8 @@ def group_exists?(collection_name, name)
 end
 
 def create_snmp_collection_group
-  Chef::Log.debug "Adding snmp collection group: '#{new_resource.name}'"
+  group_name = new_resource.group_name || new_resource.name
+  Chef::Log.debug "Adding snmp collection group: '#{group_name}'"
   file = ::File.new("#{node['opennms']['conf']['home']}/etc/datacollection-config.xml")
   contents = file.read
   doc = REXML::Document.new(contents, respect_whitespace: :all)
@@ -58,7 +70,7 @@ def create_snmp_collection_group
   file.close
 
   collection_el = doc.elements["/datacollection-config/snmp-collection[@name='#{new_resource.collection_name}']"]
-  include_collection_el = collection_el.add_element 'include-collection', 'dataCollectionGroup' => new_resource.name
+  include_collection_el = collection_el.add_element 'include-collection', 'dataCollectionGroup' => group_name
   unless new_resource.system_def.nil?
     include_collection_el.add_attribute('systemDef', new_resource.system_def)
   end
@@ -67,7 +79,7 @@ def create_snmp_collection_group
     exclude_filter_el.add_text(REXML::CData.new(exclude_filter))
   end
   dcfile = new_resource.file || 'foo'
-  cookbook_file "#{dcfile}_#{new_resource.name}" do
+  cookbook_file "#{dcfile}_#{group_name}" do
     source dcfile
     path "#{node['opennms']['conf']['home']}/etc/datacollection/#{new_resource.file}"
     owner 'root'
@@ -83,4 +95,22 @@ def restart_collectd
   file "#{node['opennms']['conf']['home']}/etc/datacollection-config.xml" do
     action :touch
   end
+end
+
+def delete_snmp_collection_group
+  group_name = new_resource.group_name || new_resource.name
+  Chef::Log.debug "Deleting snmp collection group : '#{group_name}'"
+
+  file = ::File.new("#{node['opennms']['conf']['home']}/etc/datacollection-config.xml", 'r')
+  contents = file.read
+  doc = REXML::Document.new(contents, respect_whitespace: :all)
+  doc.context[:attribute_quote] = :quote
+  file.close
+
+  # only remove the reference to the group from the collection - the file stays put in case it is used by another collection
+  # or a group in the file is used by another systemDef, etc
+  del_el = doc.elements.delete("/datacollection-config/snmp-collection[@name='#{new_resource.collection_name}']/include-collection[@dataCollectionGroup = '#{group_name}']")
+  Chef::Log.debug("Deleted element: #{del_el}")
+
+  Opennms::Helpers.write_xml_file(doc, "#{node['opennms']['conf']['home']}/etc/datacollection-config.xml")
 end
