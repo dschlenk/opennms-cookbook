@@ -13,6 +13,7 @@ driver:
 
 provisioner:
   name: chef_zero
+  require_chef_omnibus: 14.2.0
   product_version: 14.2.0
   require_chef_omnibus: 14.2.0
 
@@ -493,6 +494,734 @@ suites:
       inspec_tests:
         - path: test/integration/default
         - path: test/integration/collection_package
+  - name: collection_package_delete_16
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::collection_package_delete]
+    attributes:
+      opennms:
+        version: 16.0.4-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/collection_package_delete
+  - name: collection_package_delete_17
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::collection_package_delete]
+    attributes:
+      opennms:
+        version: 17.1.1-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/collection_package_delete
+  - name: collection_package_delete_18
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::collection_package_delete]
+    attributes:
+      opennms:
+        version: 18.0.4-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/collection_package_delete
+  - name: collection_package_delete_19
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::collection_package_delete]
+    attributes:
+      opennms:
+        version: 19.1.0-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/collection_package_delete
+  - name: collection_package_delete_20
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::collection_package_delete]
+    attributes:
+      opennms:
+        version: 20.1.0-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/collection_package_delete
+  - name: collection_package_delete_21
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::collection_package_delete]
+    attributes:
+      opennms:
+        version: 21.1.0-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/collection_package_delete
+  - name: collection_package_delete_22
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::collection_package_delete]
+    attributes:
+      opennms:
+        version: 22.0.2-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/collection_package_delete
+  - name: collection_package_update_excludes_16
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::collection_package_update_excludes]
+    attributes:
+      opennms:
+        version: 16.0.4-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/collection_package_update_excludes
+  - name: collection_package_update_excludes_17
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::collection_package_update_excludes]
+    attributes:
+      opennms:
+        version: 17.1.1-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/collection_package_update_excludes
+  - name: collection_package_update_excludes_18
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::collection_package_update_excludes]
+    attributes:
+      opennms:
+        version: 18.0.4-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/collection_package_update_excludes
+  - name: collection_package_update_excludes_19
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::collection_package_update_excludes]
+    attributes:
+      opennms:
+        version: 19.1.0-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/collection_package_update_excludes
+  - name: collection_package_update_excludes_20
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::collection_package_update_excludes]
+    attributes:
+      opennms:
+        version: 20.1.0-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/collection_package_update_excludes
+  - name: collection_package_update_excludes_21
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::collection_package_update_excludes]
+    attributes:
+      opennms:
+        version: 21.1.0-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/collection_package_update_excludes
+  - name: collection_package_update_excludes_22
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::collection_package_update_excludes]
+    attributes:
+      opennms:
+        version: 22.0.2-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/collection_package_update_excludes
+  - name: collection_package_update_ifaliasdomain_16
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::collection_package_update_ifaliasdomain]
+    attributes:
+      opennms:
+        version: 16.0.4-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/collection_package_update_ifaliasdomain
+  - name: collection_package_update_ifaliasdomain_17
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::collection_package_update_ifaliasdomain]
+    attributes:
+      opennms:
+        version: 17.1.1-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/collection_package_update_ifaliasdomain
+  - name: collection_package_update_ifaliasdomain_18
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::collection_package_update_ifaliasdomain]
+    attributes:
+      opennms:
+        version: 18.0.4-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/collection_package_update_ifaliasdomain
+  - name: collection_package_update_ifaliasdomain_19
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::collection_package_update_ifaliasdomain]
+    attributes:
+      opennms:
+        version: 19.1.0-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/collection_package_update_ifaliasdomain
+  - name: collection_package_update_ifaliasdomain_20
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::collection_package_update_ifaliasdomain]
+    attributes:
+      opennms:
+        version: 20.1.0-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/collection_package_update_ifaliasdomain
+  - name: collection_package_update_ifaliasdomain_21
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::collection_package_update_ifaliasdomain]
+    attributes:
+      opennms:
+        version: 21.1.0-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/collection_package_update_ifaliasdomain
+  - name: collection_package_update_ifaliasdomain_22
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::collection_package_update_ifaliasdomain]
+    attributes:
+      opennms:
+        version: 22.0.2-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/collection_package_update_ifaliasdomain
+  - name: collection_package_update_includes_16
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::collection_package_update_includes]
+    attributes:
+      opennms:
+        version: 16.0.4-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/collection_package_update_includes
+  - name: collection_package_update_includes_17
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::collection_package_update_includes]
+    attributes:
+      opennms:
+        version: 17.1.1-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/collection_package_update_includes
+  - name: collection_package_update_includes_18
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::collection_package_update_includes]
+    attributes:
+      opennms:
+        version: 18.0.4-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/collection_package_update_includes
+  - name: collection_package_update_includes_19
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::collection_package_update_includes]
+    attributes:
+      opennms:
+        version: 19.1.0-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/collection_package_update_includes
+  - name: collection_package_update_includes_20
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::collection_package_update_includes]
+    attributes:
+      opennms:
+        version: 20.1.0-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/collection_package_update_includes
+  - name: collection_package_update_includes_21
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::collection_package_update_includes]
+    attributes:
+      opennms:
+        version: 21.1.0-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/collection_package_update_includes
+  - name: collection_package_update_includes_22
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::collection_package_update_includes]
+    attributes:
+      opennms:
+        version: 22.0.2-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/collection_package_update_includes
+  - name: collection_package_update_outage_calendars_16
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::collection_package_update_outage_calendars]
+    attributes:
+      opennms:
+        version: 16.0.4-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/collection_package_update_outage_calendars
+  - name: collection_package_update_outage_calendars_17
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::collection_package_update_outage_calendars]
+    attributes:
+      opennms:
+        version: 17.1.1-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/collection_package_update_outage_calendars
+  - name: collection_package_update_outage_calendars_18
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::collection_package_update_outage_calendars]
+    attributes:
+      opennms:
+        version: 18.0.4-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/collection_package_update_outage_calendars
+  - name: collection_package_update_outage_calendars_19
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::collection_package_update_outage_calendars]
+    attributes:
+      opennms:
+        version: 19.1.0-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/collection_package_update_outage_calendars
+  - name: collection_package_update_outage_calendars_20
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::collection_package_update_outage_calendars]
+    attributes:
+      opennms:
+        version: 20.1.0-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/collection_package_update_outage_calendars
+  - name: collection_package_update_outage_calendars_21
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::collection_package_update_outage_calendars]
+    attributes:
+      opennms:
+        version: 21.1.0-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/collection_package_update_outage_calendars
+  - name: collection_package_update_outage_calendars_22
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::collection_package_update_outage_calendars]
+    attributes:
+      opennms:
+        version: 22.0.2-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/collection_package_update_outage_calendars
+  - name: collection_package_update_sbifalias_16
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::collection_package_update_sbifalias]
+    attributes:
+      opennms:
+        version: 16.0.4-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/collection_package_update_sbifalias
+  - name: collection_package_update_sbifalias_17
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::collection_package_update_sbifalias]
+    attributes:
+      opennms:
+        version: 17.1.1-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/collection_package_update_sbifalias
+  - name: collection_package_update_sbifalias_18
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::collection_package_update_sbifalias]
+    attributes:
+      opennms:
+        version: 18.0.4-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/collection_package_update_sbifalias
+  - name: collection_package_update_sbifalias_19
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::collection_package_update_sbifalias]
+    attributes:
+      opennms:
+        version: 19.1.0-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/collection_package_update_sbifalias
+  - name: collection_package_update_sbifalias_20
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::collection_package_update_sbifalias]
+    attributes:
+      opennms:
+        version: 20.1.0-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/collection_package_update_sbifalias
+  - name: collection_package_update_sbifalias_21
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::collection_package_update_sbifalias]
+    attributes:
+      opennms:
+        version: 21.1.0-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/collection_package_update_sbifalias
+  - name: collection_package_update_sbifalias_22
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::collection_package_update_sbifalias]
+    attributes:
+      opennms:
+        version: 22.0.2-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/collection_package_update_sbifalias
+  - name: collection_package_update_specifics_16
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::collection_package_update_specifics]
+    attributes:
+      opennms:
+        version: 16.0.4-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/collection_package_update_specifics
+  - name: collection_package_update_specifics_17
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::collection_package_update_specifics]
+    attributes:
+      opennms:
+        version: 17.1.1-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/collection_package_update_specifics
+  - name: collection_package_update_specifics_18
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::collection_package_update_specifics]
+    attributes:
+      opennms:
+        version: 18.0.4-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/collection_package_update_specifics
+  - name: collection_package_update_specifics_19
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::collection_package_update_specifics]
+    attributes:
+      opennms:
+        version: 19.1.0-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/collection_package_update_specifics
+  - name: collection_package_update_specifics_20
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::collection_package_update_specifics]
+    attributes:
+      opennms:
+        version: 20.1.0-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/collection_package_update_specifics
+  - name: collection_package_update_specifics_21
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::collection_package_update_specifics]
+    attributes:
+      opennms:
+        version: 21.1.0-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/collection_package_update_specifics
+  - name: collection_package_update_specifics_22
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::collection_package_update_specifics]
+    attributes:
+      opennms:
+        version: 22.0.2-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/collection_package_update_specifics
+  - name: collection_package_update_urls_16
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::collection_package_update_urls]
+    attributes:
+      opennms:
+        version: 16.0.4-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/collection_package_update_urls
+  - name: collection_package_update_urls_17
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::collection_package_update_urls]
+    attributes:
+      opennms:
+        version: 17.1.1-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/collection_package_update_urls
+  - name: collection_package_update_urls_18
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::collection_package_update_urls]
+    attributes:
+      opennms:
+        version: 18.0.4-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/collection_package_update_urls
+  - name: collection_package_update_urls_19
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::collection_package_update_urls]
+    attributes:
+      opennms:
+        version: 19.1.0-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/collection_package_update_urls
+  - name: collection_package_update_urls_20
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::collection_package_update_urls]
+    attributes:
+      opennms:
+        version: 20.1.0-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/collection_package_update_urls
+  - name: collection_package_update_urls_21
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::collection_package_update_urls]
+    attributes:
+      opennms:
+        version: 21.1.0-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/collection_package_update_urls
+  - name: collection_package_update_urls_22
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::collection_package_update_urls]
+    attributes:
+      opennms:
+        version: 22.0.2-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/collection_package_update_urls
   - name: collection_service_16
     run_list:
       - recipe[opennms::postgres]
@@ -11992,3 +12721,94 @@ suites:
     verifier:
       inspec_tests:
         - path: test/integration/default
+  - name: collection_package_update_16
+    run_list:
+    - recipe[opennms::postgres]
+    - recipe[oracle_java8::default]
+    - recipe[opennms::default]
+    - recipe[onms_lwrp_test::collection_package_update]
+    attributes:
+      opennms:
+        version: 16.0.4-1
+    verifier:
+      inspec_tests:
+      - path: test/integration/default
+      - path: test/integration/collection_package_update
+  - name: collection_package_update_17
+    run_list:
+    - recipe[opennms::postgres]
+    - recipe[oracle_java8::default]
+    - recipe[opennms::default]
+    - recipe[onms_lwrp_test::collection_package_update]
+    attributes:
+      opennms:
+        version: 17.1.1-1
+    verifier:
+      inspec_tests:
+      - path: test/integration/default
+      - path: test/integration/collection_package_update
+  - name: collection_package_update_18
+    run_list:
+    - recipe[opennms::postgres]
+    - recipe[oracle_java8::default]
+    - recipe[opennms::default]
+    - recipe[onms_lwrp_test::collection_package_update]
+    attributes:
+      opennms:
+        version: 18.0.4-1
+    verifier:
+      inspec_tests:
+      - path: test/integration/default
+      - path: test/integration/collection_package_update
+  - name: collection_package_update_19
+    run_list:
+    - recipe[opennms::postgres]
+    - recipe[oracle_java8::default]
+    - recipe[opennms::default]
+    - recipe[onms_lwrp_test::collection_package_update]
+    attributes:
+      opennms:
+        version: 19.1.0-1
+    verifier:
+      inspec_tests:
+      - path: test/integration/default
+      - path: test/integration/collection_package_update
+  - name: collection_package_update_20
+    run_list:
+    - recipe[opennms::postgres]
+    - recipe[oracle_java8::default]
+    - recipe[opennms::default]
+    - recipe[onms_lwrp_test::collection_package_update]
+    attributes:
+      opennms:
+        version: 20.1.0-1
+    verifier:
+      inspec_tests:
+      - path: test/integration/default
+      - path: test/integration/collection_package_update
+  - name: collection_package_update_21
+    run_list:
+    - recipe[opennms::postgres]
+    - recipe[oracle_java8::default]
+    - recipe[opennms::default]
+    - recipe[onms_lwrp_test::collection_package_update]
+    attributes:
+      opennms:
+        version: 21.1.0-1
+    verifier:
+      inspec_tests:
+      - path: test/integration/default
+      - path: test/integration/collection_package_update
+  - name: collection_package_update_22
+    run_list:
+    - recipe[opennms::postgres]
+    - recipe[oracle_java8::default]
+    - recipe[opennms::default]
+    - recipe[onms_lwrp_test::collection_package_update]
+    attributes:
+      opennms:
+        version: 22.0.2-1
+    verifier:
+      inspec_tests:
+      - path: test/integration/default
+      - path: test/integration/collection_package_update
