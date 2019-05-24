@@ -10,14 +10,6 @@ action :delete do
   if @current_resource.exists
     converge_by("Deleting #{@new_resource}") do
       delete_xml_source
-      # don't do this - other sources might use the same file
-      # unless new_resource.import_groups.nil?
-      #  new_resource.import_groups.each do |file|
-      #    file "#{node['opennms']['conf']['home']}/etc/xml-datacollection/#{file}" do
-      #      action :delete
-      #    end
-      #  end
-      # end
     end
   else
     Chef::Log.info("#{@new_resource} does not exist - nothing to do.")
@@ -30,12 +22,22 @@ action :create do
     Chef::Log.info "#{@new_resource} already exists - updating import-groups files as necessary."
     unless new_resource.import_groups.nil?
       new_resource.import_groups.each do |file|
-        f = cookbook_file file do
-          path "#{node['opennms']['conf']['home']}/etc/xml-datacollection/#{file}"
-          owner 'root'
-          group 'root'
-          mode 00644
-        end
+        f = if new_resource.import_groups_source == 'cookbook_file'
+              cookbook_file file do
+                path "#{node['opennms']['conf']['home']}/etc/xml-datacollection/#{file}"
+                owner 'root'
+                group 'root'
+                mode 00644
+              end
+            else
+              remote_file file do
+                path "#{node['opennms']['conf']['home']}/etc/xml-datacollection/#{file}"
+                source "#{new_resource.import_groups_source}/#{file}"
+                owner 'root'
+                group 'root'
+                mode 00644
+              end
+            end
         converge_by("Update #{@new_resource}") if f.updated_by_last_action?
       end
     end
@@ -113,14 +115,23 @@ def create_xml_source
       gf = gf.strip
       ig_el = source_el.add_element 'import-groups'
       ig_el.add_text("xml-datacollection/#{gf}")
-      cookbook_file gf do
-        path "#{node['opennms']['conf']['home']}/etc/xml-datacollection/#{gf}"
-        owner 'root'
-        group 'root'
-        mode 00644
+      if new_resource.import_groups_source == 'cookbook_file'
+        cookbook_file gf do
+          path "#{node['opennms']['conf']['home']}/etc/xml-datacollection/#{gf}"
+          owner 'root'
+          group 'root'
+          mode 00644
+        end
+      else
+        remote_file gf do
+          path "#{node['opennms']['conf']['home']}/etc/xml-datacollection/#{gf}"
+          source "#{new_resource.import_groups_source}/#{gf}"
+          owner 'root'
+          group 'root'
+          mode 00644
+        end
       end
     end
   end
-
   Opennms::Helpers.write_xml_file(doc, "#{node['opennms']['conf']['home']}/etc/xml-datacollection-config.xml")
 end

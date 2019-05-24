@@ -10,12 +10,22 @@ action :create do
     Chef::Log.info "#{@new_resource} already exists - updating collection files as necessary."
     updated = false
     unless new_resource.file.nil?
-      f = cookbook_file new_resource.file do
-        path "#{node['opennms']['conf']['home']}/etc/datacollection/#{new_resource.file}"
-        owner 'root'
-        group 'root'
-        mode 00644
-      end
+      f = if new_resource.source == 'cookbook_file'
+            cookbook_file new_resource.file do
+              path "#{node['opennms']['conf']['home']}/etc/datacollection/#{new_resource.file}"
+              owner 'root'
+              group 'root'
+              mode 00644
+            end
+          else
+            remote_file new_resource.file do
+              path "#{node['opennms']['conf']['home']}/etc/datacollection/#{new_resource.file}"
+              source new_resource.source
+              owner 'root'
+              group 'root'
+              mode 00644
+            end
+          end
       updated = f.updated_by_last_action?
     end
     if updated
@@ -32,11 +42,12 @@ end
 
 action :delete do
   if @current_resource.exists
-    converge_by("Deleting #{@new_resource}") do
+    Chef::Log.info "#{@new_resource} does exists - deleting."
+    converge_by("Delete #{@new_resource}") do
       delete_snmp_collection_group
     end
   else
-    Chef::Log.info("#{@new_resource} does not exist - nothing to do.")
+    Chef::Log.info "#{@new_resource} does not exist - nothing to do."
   end
 end
 
@@ -78,16 +89,27 @@ def create_snmp_collection_group
     exclude_filter_el = include_collection_el.add_element 'exclude-filter'
     exclude_filter_el.add_text(REXML::CData.new(exclude_filter))
   end
-  dcfile = new_resource.file || 'foo'
-  cookbook_file "#{dcfile}_#{group_name}" do
-    source dcfile
-    path "#{node['opennms']['conf']['home']}/etc/datacollection/#{new_resource.file}"
-    owner 'root'
-    group 'root'
-    mode 00644
-    not_if { new_resource.file.nil? }
+  unless new_resource.file.nil?
+    dcfile = new_resource.file || 'foo'
+    if new_resource.source == 'cookbook_file'
+      cookbook_file "#{dcfile}_#{new_resource.name}" do
+        source dcfile
+        path "#{node['opennms']['conf']['home']}/etc/datacollection/#{new_resource.file}"
+        owner 'root'
+        group 'root'
+        mode 00644
+        not_if { new_resource.file.nil? }
+      end
+    else
+      remote_file "#{dcfile}_#{new_resource.name}" do
+        source new_resource.source
+        path "#{node['opennms']['conf']['home']}/etc/datacollection/#{new_resource.file}"
+        owner 'root'
+        group 'root'
+        mode 00644
+      end
+    end
   end
-
   Opennms::Helpers.write_xml_file(doc, "#{node['opennms']['conf']['home']}/etc/datacollection-config.xml")
 end
 
