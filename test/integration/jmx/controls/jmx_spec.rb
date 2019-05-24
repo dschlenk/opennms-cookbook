@@ -27,10 +27,14 @@ control 'jmx' do
     its('rrd_base_name') { should eq 'java' }
   end
 
-  describe jmx_mbean('org.apache.activemq.Queue', 'jmxcollection') do
+  describe jmx_mbean('org.apache.activemq.Queue', 'jmxcollection', 'org.apache.activemq:BrokerName=broker.example.com,Type=Queue,Destination=anQueue') do
     it { should exist }
-    its('objectname') { should eq 'org.apache.activemq:BrokerName=msgbroker-a.pe.spanlink.com,Type=Queue,Destination=splk.sw' }
-    its('attribs') { should eq 'ConsumerCount' => { 'alias' => '5ConsumerCnt', 'type' => 'gauge' }, 'InFlightCount' => { 'alias' => '5InFlightCnt', 'type' => 'gauge' } }
+    its('attribs') { should eq 'ConsumerCount' => { 'alias' => 'anQConsumerCnt', 'type' => 'gauge' }, 'InFlightCount' => { 'alias' => 'anQFlightCnt', 'type' => 'gauge' } }
+  end
+
+  describe jmx_mbean('org.apache.activemq.Queue', 'jmxcollection', 'org.apache.activemq:BrokerName=broker.example.com,Type=Queue,Destination=anotherQueue') do
+    it { should exist }
+    its('attribs') { should eq 'ConsumerCount' => { 'alias' => 'anoQConsumerCnt', 'type' => 'gauge' }, 'InFlightCount' => { 'alias' => 'anoQInflightCnt', 'type' => 'gauge' } }
   end
 
   describe jmx_collection_service('jmx_url', 'jmxcollection', 'jmx1') do

@@ -17,3 +17,5 @@ Style/GuardClause:
   Enabled: false
 Metrics/BlockNesting:
   Max: 4
+  Exclude:
+    - 'providers/collection_package.rb'

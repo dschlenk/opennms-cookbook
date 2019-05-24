@@ -147,6 +147,9 @@
     <logger name="org.snmp4j.transport" additivity="false" level="ERROR">
       <appender-ref ref="RoutingAppender"/>
     </logger>
+    <logger name="org.apache.kafka" additivity="false" level="INFO">
+      <appender-ref ref="RoutingAppender" />
+    </logger>
 
     <!-- Allow any message to pass through the root logger -->
     <root level="DEBUG">
@@ -185,6 +188,7 @@
         <KeyValuePair key="enlinkd"              value="<%=@log[:enlinkd]%>" />
         <KeyValuePair key="manager"              value="<%=@log[:manager]%>" />
         <KeyValuePair key="map"                  value="<%=@log[:map]%>" />
+        <KeyValuePair key="minion"               value="<%=@log[:minion]%>" />
         <KeyValuePair key="notifd"               value="<%=@log[:notifd]%>" />
         <KeyValuePair key="oss-qosd"             value="<%=@log[:oss_qosd]%>" />
         <KeyValuePair key="oss-qosdrx"           value="<%=@log[:oss_qosdrx]%>" />
