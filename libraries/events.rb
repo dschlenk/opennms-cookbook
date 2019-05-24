@@ -229,7 +229,6 @@ module Events
         tticket_el = event_el.elements['tticket']
         tt_state = tticket_el.attributes['state'] || 'on'
         tt_info = tticket_el.texts.select { |t| t && t.to_s.strip != '' }.join("\n")
-        tticket = {}
         tticket = { 'info' => tt_info, 'state' => tt_state }
         Chef::Log.debug "ttickets equal? New: #{event.tticket}, current #{tticket}"
         return true unless event.tticket == tticket

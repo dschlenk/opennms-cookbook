@@ -113,19 +113,6 @@ def create_snmp_collection_group
   Opennms::Helpers.write_xml_file(doc, "#{node['opennms']['conf']['home']}/etc/datacollection-config.xml")
 end
 
-def delete_snmp_collection_group
-  file = ::File.new("#{node['opennms']['conf']['home']}/etc/datacollection-config.xml")
-  contents = file.read
-  doc = REXML::Document.new(contents, respect_whitespace: :all)
-  doc.context[:attribute_quote] = :quote
-  file.close
-
-  collection_el = doc.elements["/datacollection-config/snmp-collection[@name='#{new_resource.collection_name}']"]
-  collection_el.delete_element("include-collection[@dataCollectionGroup = '#{new_resource.name}']")
-  Opennms::Helpers.write_xml_file(doc, "#{node['opennms']['conf']['home']}/etc/datacollection-config.xml")
-  # we don't actually delete the file since another collection might be using the same one
-end
-
 def restart_collectd
   file "#{node['opennms']['conf']['home']}/etc/datacollection-config.xml" do
     action :touch
