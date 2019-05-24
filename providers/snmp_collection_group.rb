@@ -40,7 +40,6 @@ action :delete do
   end
 end
 
-
 def load_current_resource
   @current_resource = Chef::Resource.resource_for_node(:opennms_snmp_collection_group, node).new(@new_resource.name)
   @current_resource.group_name(@new_resource.group_name || @new_resource.name)
@@ -101,7 +100,7 @@ end
 def delete_snmp_collection_group
   group_name = new_resource.group_name || new_resource.name
   Chef::Log.debug "Deleting snmp collection group : '#{group_name}'"
-  
+
   file = ::File.new("#{node['opennms']['conf']['home']}/etc/datacollection-config.xml", 'r')
   contents = file.read
   doc = REXML::Document.new(contents, respect_whitespace: :all)
