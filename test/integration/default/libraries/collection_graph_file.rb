@@ -24,10 +24,10 @@ EOL
     @graph_file = graph_file
     gf = inspec.file("/opt/opennms/etc/snmp-graph.properties.d/#{graph_file}")
     @exists = gf.exist?
-    @contents = gf.content if @exists
+    @content = gf.content if @exists
   end
 
-  attr_reader :contents
+  attr_reader :content
 
   def exist?
     @exists
