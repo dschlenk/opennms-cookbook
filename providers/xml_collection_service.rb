@@ -127,7 +127,16 @@ def create_xml_collection_service
     Chef::Log.debug 'could not find existing service_el.'
     status = new_resource.status || 'on'
     interval = new_resource.interval || 300_000
-    service_el = package_el.add_element 'service', 'name' => new_resource.service_name, 'status' => status, 'interval' => interval
+    service_el = REXML::Element.new('service')
+    service_el.attributes['name'] = new_resource.service_name
+    service_el.attributes['interval'] = interval
+    service_el.attributes['status'] = status
+    first_oc = doc.elements["/collectd-configuration/package[@name='#{new_resource.package_name}']/outage-calendar[1]"]
+    if !first_oc
+      package_el.add_element(service_el)
+    else
+      package_el.insert_before(first_oc, service_el)
+    end
   else
     Chef::Log.debug "found existing service_el: #{service_el}"
     updating = true

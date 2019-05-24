@@ -75,3 +75,8 @@ service 'opennms' do
   supports status: true, restart: true
   action [:enable]
 end
+
+execute 'reload systemd' do
+  action :nothing
+  command '/usr/bin/systemctl daemon-reload'
+end

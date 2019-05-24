@@ -113,12 +113,14 @@ def create_dashlet
   d = dashlet.add_element 'duration'
   d.text = new_resource.duration.to_s
   p = dashlet.add_element 'parameters'
-  new_resource.parameters.each do |k, v|
-    entry = p.add_element 'entry'
-    key = entry.add_element 'key'
-    key.text = k
-    value = entry.add_element 'value'
-    value.text = v
+  unless new_resource.parameters.nil?
+    new_resource.parameters.each do |k, v|
+      entry = p.add_element 'entry'
+      key = entry.add_element 'key'
+      key.text = k
+      value = entry.add_element 'value'
+      value.text = v
+    end
   end
   pri = dashlet.add_element 'priority'
   pri.text = new_resource.priority.to_s

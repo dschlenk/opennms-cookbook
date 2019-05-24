@@ -34,9 +34,33 @@ when '20'
   template_dir = 'horizon-20/'
 when '21'
   template_dir = 'horizon-21/'
+when '22'
+  template_dir = 'horizon-22/'
+end
+if Opennms::Helpers.major(node['opennms']['version']).to_i >= 22
+  node.default['opennms']['datacollection']['default']['ref_cpq_im'] = true
+  node.default['opennms']['datacollection']['default']['ref_mib2_if'] = true
+  node.default['opennms']['datacollection']['default']['ref_mib2_pe'] = true
 end
 
 Chef::Log.debug "at compile time, version is #{node['opennms']['version']} and jasper_version is #{node['opennms']['properties']['reporting']['jasper_version']}."
+
+case node['platform_family']
+when 'rhel'
+  if node['platform_version'].to_i > 6
+    template '/usr/lib/systemd/system/opennms.service' do
+      source "#{template_dir}opennms.service.erb"
+      mode 00664
+      owner 'root'
+      group 'root'
+      variables(
+        start_opts: node['opennms']['start_opts'],
+        timeout_start_sec: node['opennms']['timeout_start_sec']
+      )
+      notifies :run, 'execute[reload systemd]', :immediately
+    end
+  end
+end
 
 template "#{onms_home}/etc/opennms.conf" do
   cookbook node['opennms']['conf']['cookbook']
@@ -78,7 +102,7 @@ end
 template "#{onms_home}/jetty-webapps/opennms/WEB-INF/web.xml" do
   cookbook node['opennms']['web']['cookbook']
   source "#{template_dir}web.xml.erb"
-  mode 00664
+  mode 00644
   owner 'root'
   group 'root'
   notifies :restart, 'service[opennms]'

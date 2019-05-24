@@ -8,16 +8,26 @@ default['yum']['opennms-stable-common']['baseurl']        = 'http://yum.opennms.
 default['yum']['opennms-stable-common']['failovermethod'] = 'roundrobin'
 default['yum']['opennms-stable-rhel6']['baseurl']         = 'http://yum.opennms.org/stable/rhel6'
 default['yum']['opennms-stable-rhel6']['failovermethod']  = 'roundrobin'
+default['yum']['opennms-stable-rhel7']['baseurl']         = 'http://yum.opennms.org/stable/rhel7'
+default['yum']['opennms-stable-rhel7']['failovermethod']  = 'roundrobin'
 default['yum']['opennms-obsolete-common']['baseurl']        = 'http://yum.opennms.org/obsolete/common'
 default['yum']['opennms-obsolete-common']['failovermethod'] = 'roundrobin'
 default['yum']['opennms-obsolete-rhel6']['baseurl']         = 'http://yum.opennms.org/obsolete/rhel6'
 default['yum']['opennms-obsolete-rhel6']['failovermethod']  = 'roundrobin'
+default['yum']['opennms-obsolete-rhel7']['baseurl']         = 'http://yum.opennms.org/obsolete/rhel7'
+default['yum']['opennms-obsolete-rhel7']['failovermethod']  = 'roundrobin'
 default['yum']['opennms-snapshot-common']['baseurl']        = 'http://yum.opennms.org/snapshot/common'
 default['yum']['opennms-snapshot-common']['failovermethod'] = 'roundrobin'
 default['yum']['opennms-snapshot-rhel6']['baseurl']         = 'http://yum.opennms.org/snapshot/rhel6'
 default['yum']['opennms-snapshot-rhel6']['failovermethod']  = 'roundrobin'
+default['yum']['opennms-snapshot-rhel7']['baseurl']         = 'http://yum.opennms.org/snapshot/rhel7'
+default['yum']['opennms-snapshot-rhel7']['failovermethod']  = 'roundrobin'
 default['build-essential']['compile_time'] = true
-default['opennms']['version'] = '21.0.5-1'
+# set to -Q to mimic OOTB quick start behavior on RHEL7+ (but you should not do this if using any of the opennms resources)
+default['opennms']['start_opts'] = ''
+# set to '' if you want to re-enable OOTB behavior (but you should not do this if using any of the opennms resources)
+default['opennms']['timeout_start_sec'] = '10min'
+default['opennms']['version'] = '22.0.4-1'
 # default['opennms']['version_major'] = "%{version}"
 default['opennms']['allow_downgrade'] = false
 default['opennms']['stable'] = true
@@ -68,7 +78,7 @@ default['opennms']['conf']['command']        = ''
 # Once upon a time there were two different recipes
 # for installation (default and notemplates) but now
 # the latter just sets this attribute to false.
-default['opennms']['templates'] = true
+default['opennms']['templates'] = false
 # default cookbook for templates
 default['opennms']['default_template_cookbook'] = 'opennms'
 default['opennms']['users']['cookbook']                    = node['opennms']['default_template_cookbook']
@@ -291,8 +301,12 @@ default['opennms']['properties']['dc']['decimal_format']          = nil
 default['opennms']['properties']['dc']['reload_check_interval']   = nil
 default['opennms']['properties']['dc']['instrumentation_class']   = nil
 default['opennms']['properties']['dc']['enable_check_file_mod']   = nil
+default['opennms']['properties']['dc']['cache_timeout']           = nil
 default['opennms']['properties']['dc']['force_rescan']            = nil
 default['opennms']['properties']['dc']['instance_limiting']       = nil
+# Alarmd
+default['opennms']['properties']['alarmd']['new_if_cleared_alarm_exists'] = nil
+default['opennms']['properties']['alarmd']['legacy_alarm_state']          = nil
 # Remote
 default['opennms']['properties']['remote']['exclude_service_monitors'] = 'DHCP,NSClient,RadiusAuth,XMP'
 default['opennms']['properties']['remote']['min_config_reload_int']    = nil
@@ -345,6 +359,8 @@ default['opennms']['properties']['jetty']['key_password']           = nil
 default['opennms']['properties']['jetty']['cert_alias']             = nil
 default['opennms']['properties']['jetty']['exclude_cipher_suites']  = nil
 default['opennms']['properties']['jetty']['https_baseurl']          = nil
+default['opennms']['properties']['jetty']['datetimeformat']         = nil
+default['opennms']['properties']['jetty']['show_stacktrace']        = nil
 # JMS NB
 default['opennms']['properties']['jms_nbi']['broker_url'] = nil
 default['opennms']['properties']['jms_nbi']['activemq_username'] = nil
@@ -385,6 +401,7 @@ default['opennms']['properties']['geo']['email']          = ''
 default['opennms']['properties']['geo']['tile_url']       = nil # "http://otile1.mqcdn.com/tiles/1.0.0/osm/${z}/${x}/${y}.png"
 default['opennms']['properties']['time_series']['strategy'] = 'rrd' # newts
 default['opennms']['properties']['graph_engine'] = 'backshift' # auto, png, placeholder, backshift
+default['opennms']['properties']['graph_period'] = nil
 default['opennms']['properties']['newts']['hostname'] = 'localhost'
 default['opennms']['properties']['newts']['keyspace'] = 'newts'
 default['opennms']['properties']['newts']['port'] = 9042
@@ -401,6 +418,8 @@ default['opennms']['properties']['newts']['cache_max_entries'] = 8192
 default['opennms']['properties']['newts']['cache_redis_host'] = 'localhost'
 default['opennms']['properties']['newts']['cache_redis_port'] = 6379
 default['opennms']['properties']['newts']['nan_on_counter_wrap'] = true
+default['opennms']['properties']['newts']['cache_priming_disable'] = false
+default['opennms']['properties']['newts']['cache_priming_block_ms'] = 120000
 default['opennms']['properties']['statusbox']['elements'] = nil # defaults to 'business-services,nodes-by-alarms,nodes-by-outages' in 21
 default['opennms']['properties']['heatmap']['default_mode'] = 'alarms' # outages
 default['opennms']['properties']['heatmap']['default_heatmap'] = 'categories' # or 'foreignSources' or 'monitoredServices'
@@ -417,9 +436,12 @@ default['opennms']['properties']['grafana']['protocol'] = 'http'
 default['opennms']['properties']['grafana']['connection_timeout'] = 500
 default['opennms']['properties']['grafana']['so_timeout'] = 500
 default['opennms']['properties']['grafana']['dashboard_limit'] = 0
+default['opennms']['properties']['grafana']['base_path'] = ''
+default['opennms']['properties']['vmware']['housekeeping_interval'] = nil
 default['opennms']['properties']['alarmlist']['sound_enable'] = false
 default['opennms']['properties']['alarmlist']['sound_status'] = 'off' # newalarm, newalarmcount
 default['opennms']['properties']['alarmlist']['unackflash'] = false
+default['opennms']['properties']['rest_aliases'] = '/rest,/api/v2'
 # access point monitor
 default['opennms']['apm']['threads']           = 30
 default['opennms']['apm']['pscan_interval']    = 1_800_000
@@ -668,6 +690,9 @@ default['opennms']['datacollection']['default']['novell']           = true
 default['opennms']['datacollection']['default']['pfsense']          = true
 default['opennms']['datacollection']['default']['powerware']        = true
 default['opennms']['datacollection']['default']['postgres']         = true
+default['opennms']['datacollection']['default']['ref_cpq_im']       = false # these are true >= 22, see base_templates recipe
+default['opennms']['datacollection']['default']['ref_mib2_if']      = false
+default['opennms']['datacollection']['default']['ref_mib2_pe']      = false
 default['opennms']['datacollection']['default']['riverbed']         = true
 default['opennms']['datacollection']['default']['savin']            = true
 default['opennms']['datacollection']['default']['servertech']       = true
@@ -704,6 +729,9 @@ default['opennms']['enlinkd']['bridge'] = true
 default['opennms']['enlinkd']['lldp'] = true
 default['opennms']['enlinkd']['ospf'] = true
 default['opennms']['enlinkd']['isis'] = true
+default['opennms']['enlinkd']['bridge_topo_interval'] = 300000
+default['opennms']['enlinkd']['max_bft'] = 100
+default['opennms']['enlinkd']['disco_bridge_threads'] = 1
 
 # eventd-configuration.xml
 default['opennms']['eventd']['tcp_address']            = '127.0.0.1'
@@ -856,6 +884,7 @@ default['opennms']['jmx_dc']['jsr160']['rrd']['step'] = 300
 default['opennms']['jmx_dc']['jsr160']['rrd']['rras'] = ['RRA:AVERAGE:0.5:1:2016', 'RRA:AVERAGE:0.5:12:1488', 'RRA:AVERAGE:0.5:288:366', 'RRA:MAX:0.5:288:366', 'RRA:MIN:0.5:288:366']
 default['opennms']['jmx_dc']['jsr160']['queued']['enabled']                         = true
 default['opennms']['jmx_dc']['jsr160']['pollerd']['enabled']                        = true
+default['opennms']['jmx_dc']['jsr160']['kafka']['enabled']                          = true
 default['opennms']['jmx_dc']['jsr160']['vacuumd']['enabled']                        = true
 default['opennms']['jmx_dc']['jsr160']['collectd']['enabled']                       = true
 default['opennms']['jmx_dc']['jsr160']['capsd']['enabled']                          = true
@@ -919,6 +948,7 @@ default['opennms']['log4j2']['linkd'] = 'WARN'
 default['opennms']['log4j2']['enlinkd'] = 'WARN'
 default['opennms']['log4j2']['manager'] = 'DEBUG'
 default['opennms']['log4j2']['map'] = 'WARN'
+default['opennms']['log4j2']['minion'] = 'WARN'
 default['opennms']['log4j2']['model_importer'] = 'WARN'
 default['opennms']['log4j2']['notifd'] = 'WARN'
 default['opennms']['log4j2']['oss_qosd'] = 'WARN'
@@ -933,6 +963,7 @@ default['opennms']['log4j2']['rtc'] = 'WARN'
 default['opennms']['log4j2']['syslogd'] = 'WARN'
 default['opennms']['log4j2']['telemetryd'] = 'WARN'
 default['opennms']['log4j2']['scriptd'] = 'WARN'
+default['opennms']['log4j2']['snmp'] = 'WARN'
 default['opennms']['log4j2']['snmp_poller'] = 'WARN'
 default['opennms']['log4j2']['syslogd'] = 'WARN'
 default['opennms']['log4j2']['threshd'] = 'WARN'
@@ -1700,6 +1731,7 @@ default['opennms']['syslogd']['forwarding_regexp']      = '^.*\s(19|20)\d\d([-/.
 default['opennms']['syslogd']['matching_group_host']    = 6
 default['opennms']['syslogd']['matching_group_message'] = 8
 default['opennms']['syslogd']['discard_uei']            = 'DISCARD-MATCHING-MESSAGES'
+default['opennms']['syslogd']['timezone']               = ''
 default['opennms']['syslogd']['apache_httpd']           = true
 default['opennms']['syslogd']['linux_kernel']           = true
 default['opennms']['syslogd']['openssh']                = true
@@ -1969,3 +2001,67 @@ default['opennms']['xmpp']['pass']                = nil
 default['opennms']['web']['cookbook'] = 'opennms'
 default['opennms']['cors']['origins']     = '*'
 default['opennms']['cors']['credentials'] = true
+
+case node['platform_family']
+when 'rhel'
+  default['opennms']['repos']['branches'] = %w(obsolete snapshot stable)
+  default['opennms']['repos']['platforms'] = %w(common)
+  if node['platform_version'].to_f >= 6.0 && node['platform_version'].to_f < 7.0
+    Chef::Log.debug("i am 6 because #{node['platform_version']}")
+    default['opennms']['repos']['platforms'].push 'rhel6'
+  end
+  if node['platform_version'].to_f >= 7.0 && node['platform_version'].to_f < 8.0
+    Chef::Log.debug("i am 7 because #{node['platform_version']}")
+    default['opennms']['repos']['platforms'].push 'rhel7'
+  end
+end
+
+default['opennms']['telemetryd']['managed'] = false
+default['opennms']['telemetryd']['jti']['enabled'] = false
+default['opennms']['telemetryd']['jti']['port'] = 50000
+default['opennms']['telemetryd']['netflow5']['enabled'] = false
+default['opennms']['telemetryd']['netflow5']['port'] = 8877
+default['opennms']['telemetryd']['netflow9']['enabled'] = false
+default['opennms']['telemetryd']['netflow9']['port'] = 4729
+default['opennms']['telemetryd']['ipfix']['enabled'] = false
+default['opennms']['telemetryd']['ipfix']['port'] = 4730
+default['opennms']['telemetryd']['sflow']['enabled'] = false
+default['opennms']['telemetryd']['sflow']['port'] = 6343
+default['opennms']['telemetryd']['nxos']['enabled'] = false
+default['opennms']['telemetryd']['nxos']['port'] = 50001
+# 'protocol_name' => {
+#   'description' => 'xxx',
+#   'enabled' => true|false,
+#   'listeners' => {
+#     'listener_name' => {
+#       'class_name' => 'org.opennms.blah.blah',
+#       'parameters' => {
+#         'key' => 'value',
+#         ...
+#       }
+#      },
+#      ...
+#    },
+#    ...
+#    'adapters' => {
+#      'adapter_name' => {
+#        'class_name' => 'org.opennms.blah.blah',
+#        'parameters' => {
+#          'key' => 'value',
+#         ...
+#        }
+#      },
+#      ...
+#    },
+#    'package' => {
+#      'rrd' => {
+#        'step' => 300,
+#        'rras' => ['strings'],
+#      }
+#    }
+# },
+# ...
+default['opennms']['telemetryd']['protocols'] = {}
+default['opennms']['telemetryd']['cookbook'] = 'opennms'
+default['opennms']['es']['hosts'] = {}
+default['opennms']['manage_repos'] = true

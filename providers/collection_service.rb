@@ -38,6 +38,7 @@ def service_exists?(package_name, collection, name)
 end
 
 def create_collection_service
+  sname = new_resource.service_name || new_resource.name
   Chef::Log.debug "Adding collection package: '#{new_resource.name}'"
   # Open file
   file = ::File.new("#{node['opennms']['conf']['home']}/etc/collectd-configuration.xml")
@@ -47,7 +48,11 @@ def create_collection_service
   file.close
 
   package_el = doc.elements["/collectd-configuration/package[@name='#{new_resource.package_name}']"]
-  service_el = package_el.add_element 'service', 'name' => new_resource.service_name, 'status' => new_resource.status, 'interval' => new_resource.interval
+  first_oc = doc.elements["/collectd-configuration/package[@name='#{new_resource.package_name}']/outage-calendar[1]"]
+  service_el = REXML::Element.new('service')
+  service_el.attributes['name'] = sname
+  service_el.attributes['interval'] = new_resource.interval
+  service_el.attributes['status'] = new_resource.status
   if new_resource.user_defined
     service_el.add_attribute('user-defined', new_resource.user_defined)
   end
@@ -68,6 +73,11 @@ def create_collection_service
     new_resource.parameters.each do |k, v|
       service_el.add_element 'parameter', 'key' => k, 'value' => v
     end
+  end
+  if !first_oc
+    package_el.add_element(service_el)
+  else
+    package_el.insert_before(first_oc, service_el)
   end
   # make sure we've got a service definition at the end of the file - might already exist tho.
   unless doc.elements["/collectd-configuration/collector[@service='#{new_resource.service_name}']"]

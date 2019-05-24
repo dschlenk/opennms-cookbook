@@ -2,10 +2,11 @@
 require 'rexml/document'
 
 # this one supports updating. existance determined by service_name/package_name.
-actions :create
+actions :create, :delete
 default_action :create
 
-attribute :service_name, name_attribute: true, kind_of: String, required: true
+attribute :name, name_attribute: true, kind_of: String
+attribute :service_name, kind_of: String
 attribute :package_name, kind_of: String, default: 'example1', required: true
 attribute :interval, kind_of: Integer, default: 300_000, required: true
 attribute :user_defined, kind_of: [TrueClass, FalseClass], default: false, required: true
