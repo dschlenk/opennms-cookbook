@@ -10,6 +10,7 @@ class SnmpCollectionGroup < Inspec.resource(1)
   example '
     describe snmp_collection_group(\'MIB2\', \'mib2.xml\'[, \'default\']) do
       it { should exist }
+      its(\'file_content\') { should eq \'...\' }
     end
   '
 
@@ -26,6 +27,7 @@ class SnmpCollectionGroup < Inspec.resource(1)
       @params[:exclude_filters].push f.texts.join('')
     end
     fdoc = REXML::Document.new(inspec.file("/opt/opennms/etc/datacollection/#{file}").content)
+    @params[:file_content] = inspec.file("/opt/opennms/etc/datacollection/#{file}").content
     @exists = !fdoc.elements["/datacollection-group[@name = '#{group_name}']"].nil?
   end
 

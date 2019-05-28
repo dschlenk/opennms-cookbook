@@ -10,16 +10,12 @@ use_inline_resources # ~FC113
 action :create do
   if @current_resource.exists
     Chef::Log.info "#{@new_resource} already exists - maybe updating."
-    updated = update_collection_graph_file
-    if updated
-      converge_by("Update #{@new_resource}") do
-        touch_main_file
-      end
-    end
+    updated = create_collection_graph_file
+    converge_by("Update #{@new_resource}") if updated
   else
     Chef::Log.info "#{@new_resource} doesn't exist - creating."
     converge_by("Create #{@new_resource}") do
-      update_collection_graph_file
+      create_collection_graph_file
     end
   end
 end
@@ -54,34 +50,46 @@ end
 
 private
 
-def update_collection_graph_file
-  f = cookbook_file new_resource.file do
-    action :create
-    path "#{node['opennms']['conf']['home']}/etc/snmp-graph.properties.d/#{new_resource.file}"
-    owner 'root'
-    group 'root'
-    mode 00644
-  end
+def create_collection_graph_file
+  f = if new_resource.source == 'cookbook_file'
+        cookbook_file new_resource.file do
+          action :create
+          path "#{node['opennms']['conf']['home']}/etc/snmp-graph.properties.d/#{new_resource.file}"
+          owner 'root'
+          group 'root'
+          mode 00644
+        end
+      else
+        remote_file new_resource.file do
+          action :create
+          path "#{node['opennms']['conf']['home']}/etc/snmp-graph.properties.d/#{new_resource.file}"
+          source new_resource.source
+          owner 'root'
+          group 'root'
+          mode 00644
+        end
+      end
+  touch_main_file if f.updated_by_last_action?
   f.updated_by_last_action?
 end
 
-def create_collection_graph_file
-  cookbook_file new_resource.file do
-    action :create_if_missing
-    path "#{node['opennms']['conf']['home']}/etc/snmp-graph.properties.d/#{new_resource.file}"
-    owner 'root'
-    group 'root'
-    mode 00644
-  end
-  touch_main_file
-end
-
 def delete_collection_graph_file
-  cookbook_file "#{node['opennms']['conf']['home']}/etc/snmp-graph.properties.d/#{new_resource.file}" do
-    action :delete
-    owner 'root'
-    group 'root'
-    mode 00644
+  if new_resource.source == 'cookbook_file'
+    cookbook_file "#{node['opennms']['conf']['home']}/etc/snmp-graph.properties.d/#{new_resource.file}" do
+      action :delete
+      owner 'root'
+      group 'root'
+      mode 00644
+    end
+  else
+    remote_file new_resource.file do
+      action :delete
+      path "#{node['opennms']['conf']['home']}/etc/snmp-graph.properties.d/#{new_resource.file}"
+      source new_resource.source
+      owner 'root'
+      group 'root'
+      mode 00644
+    end
   end
   touch_main_file
 end

@@ -105,12 +105,12 @@ module Events
       return true unless event.event_label == el
     end
     unless event.descr.nil?
-      descr = event_el.elements['descr'].texts.join('\n')
+      descr = event_el.elements['descr'].texts.select { |t| t && t.to_s.strip != '' }.join("\n")
       Chef::Log.debug "Event descriptions equal? New: #{event.descr}; Current: #{descr}"
       return true unless event.descr == descr
     end
     unless event.logmsg.nil?
-      logmsg = event_el.elements['logmsg'].texts.join('\n')
+      logmsg = event_el.elements['logmsg'].texts.select { |t| t && t.to_s.strip != '' }.join("\n")
       Chef::Log.debug "Event logmsg equal? New: #{event.logmsg}; Current: #{logmsg}"
       return true unless event.logmsg == logmsg
     end
@@ -131,7 +131,7 @@ module Events
       return true unless event.severity == severity
     end
     unless event.operinstruct.nil?
-      operinstruct = event_el.elements['operinstruct'].texts.join('\n') unless event_el.elements['operinstruct'].nil?
+      operinstruct = event_el.elements['operinstruct'].texts.select { |t| t && t.to_s.strip != '' }.join("\n") unless event_el.elements['operinstruct'].nil?
       Chef::Log.debug "Event operinstruct equal? New: #{event.operinstruct}; current #{operinstruct}"
       return true unless event.operinstruct == operinstruct
     end
@@ -150,7 +150,7 @@ module Events
       else
         autoactions = []
         event_el.elements.each('autoaction') do |aa|
-          action = aa.texts.join('\n')
+          action = aa.texts.select { |t| t && t.to_s.strip != '' }.join("\n")
           state = aa.attributes['state'] || 'on'
           autoactions.push 'state' => state, 'action' => action
         end
@@ -228,7 +228,7 @@ module Events
       else
         tticket_el = event_el.elements['tticket']
         tt_state = tticket_el.attributes['state'] || 'on'
-        tt_info = tticket_el.texts.join('\n')
+        tt_info = tticket_el.texts.select { |t| t && t.to_s.strip != '' }.join("\n")
         tticket = { 'info' => tt_info, 'state' => tt_state }
         Chef::Log.debug "ttickets equal? New: #{event.tticket}, current #{tticket}"
         return true unless event.tticket == tticket
@@ -249,7 +249,7 @@ module Events
       else
         forwards = []
         event_el.elements.each('forward') do |fwd|
-          info = fwd.texts.join('\n')
+          info = fwd.texts.select { |t| t && t.to_s.strip != '' }.join("\n")
           state = fwd.attributes['state'] || 'on'
           mechanism = fwd.attributes['mechanism']
           if state.nil? && mechanism.nil?
@@ -281,7 +281,7 @@ module Events
       else
         scripts = []
         event_el.elements.each('script') do |s|
-          name = s.texts.join('\n')
+          name = s.texts.select { |t| t && t.to_s.strip != '' }.join("\n")
           language = s.attributes['language']
           scripts.push 'name' => name, 'language' => language
         end
@@ -290,7 +290,7 @@ module Events
       end
     end
     unless event.mouseovertext.nil?
-      motext = event_el.elements['mouseovertext'].texts.join('\n') unless event_el.elements['mouseovertext'].nil?
+      motext = event_el.elements['mouseovertext'].texts.select { |t| t && t.to_s.strip != '' }.join("\n") unless event_el.elements['mouseovertext'].nil?
       Chef::Log.debug "mouseovertext equal? New: #{event.mouseovertext}, current #{motext}"
       return true unless event.mouseovertext == motext
     end

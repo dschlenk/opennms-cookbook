@@ -1,0 +1,13 @@
+name: opennms_collection_package_update_ifaliasdomain
+title: OpenNMS collection_package_update_ifaliasdomain
+maintainer: David Schlenk
+copyright: ConvergeOne
+copyright_email: dschlenk@convergeone.com
+license: Apache 2.0
+summary: Verify OpenNMS LWRP collection_package_update_ifaliasdomain works.
+version: 1.0.0
+supports:
+  - os-family: redhat
+depends:
+  - name: opennms
+    path: test/integration/default
