@@ -1,9 +1,11 @@
 # frozen_string_literal: true
 require 'rexml/document'
-actions :create
+actions :create, :delete
 default_action :create
 
 attribute :filename, name_attribute: true, kind_of: String, required: true
+# default is a file in your cookbook, use a URL here to do something different
+attribute :source, kind_of: String, default: 'cookbook_file'
 # 'bottom' places it near the bottom before these files:
 # ncs-component.events.xml
 # asset-management.events.xml
