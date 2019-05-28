@@ -38,6 +38,8 @@ when '22'
   template_dir = 'horizon-22/'
 when '23'
   template_dir = 'horizon-23/'
+when '24'
+  template_dir = 'horizon-24/'
 end
 if Opennms::Helpers.major(node['opennms']['version']).to_i >= 22
   node.default['opennms']['datacollection']['default']['ref_cpq_im'] = true
