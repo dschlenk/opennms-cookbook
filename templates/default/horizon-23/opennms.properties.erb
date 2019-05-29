@@ -216,12 +216,12 @@ org.opennms.utils.propertiesCache.cacheTimeout=<%= @properties['dc']['cache_time
 org.opennms.alarmd.newIfClearedAlarmExists = <%= @properties['alarmd']['new_if_cleared_alarm_exists'] %>
 <% end -%>
 #
-# Enable this property to have the traditional dual alarm handling of alarms state
+# Enable this property to have the traditional dual alarm handling of alarms state 
 # for Alarm pairwise correlation.
 # Default: false
 #org.opennms.alarmd.legacyAlarmState = false
 #
-# Note: Setting legacyAlarmState will nullify newIfClearedAlarmExists
+# Note: Setting legacyAlarmState will nullify newIfClearedAlarmExists 
 <% unless @properties['alarmd']['legacy_alarm_state'].nil? -%>
 org.opennms.alarmd.newIfClearedAlarmExists = <%= @properties['alarmd']['legacy_alarm_state'] %>
 <% end -%>

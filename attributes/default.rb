@@ -361,7 +361,7 @@ default['opennms']['properties']['jetty']['exclude_cipher_suites']  = nil
 default['opennms']['properties']['jetty']['https_baseurl']          = nil
 default['opennms']['properties']['jetty']['datetimeformat']         = nil
 default['opennms']['properties']['jetty']['show_stacktrace']        = nil
-default['opennms']['properties']['jetty']['topology_entity_cache_duration']        = nil
+default['opennms']['properties']['jetty']['topology_entity_cache_duration'] = nil
 # JMS NB
 default['opennms']['properties']['jms_nbi']['broker_url'] = nil
 default['opennms']['properties']['jms_nbi']['activemq_username'] = nil
