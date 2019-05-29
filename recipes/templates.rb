@@ -440,8 +440,7 @@ template "#{onms_home}/etc/jmx-datacollection-config.xml" do
   cookbook node['opennms']['jmx_dc']['cookbook']
   source "#{template_dir}jmx-datacollection-config.xml.erb"
   mode 00644
-  mode 00664 if Opennms::Helpers.major(node['opennms']['version']) == '22.0.4-1'
-  mode 00664 if Opennms::Helpers.major(node['opennms']['version']).to_i >= 23
+  mode 00664 if node['opennms']['version'] == '22.0.4-1'
   owner 'root'
   group 'root'
   notifies :restart, 'service[opennms]'
