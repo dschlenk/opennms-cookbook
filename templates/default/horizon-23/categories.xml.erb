@@ -1,0 +1,124 @@
+<catinfo>
+    <header>
+        <rev>1.3</rev>
+        <created>Wednesday, February 6, 2002 10:10:00 AM EST</created>
+        <mstation>checkers</mstation>
+    </header>
+    <categorygroup>
+        <name>WebConsole</name>
+        <comment>Service Level Availability by Functional Group</comment>
+        <common>
+            <rule><![CDATA[<%=@common_rule%>]]></rule>
+        </common>
+        <categories>
+            <% if @overall[:enable] -%>
+            <category>
+                <label><![CDATA[<%=@overall[:label]%>]]></label>
+                <comment><%=@overall[:comment]%></comment>
+                <normal><%=@overall[:normal]%></normal>
+                <warning><%=@overall[:warning]%></warning>
+                <% @overall[:services].each do |service| -%>
+                <service><%=service%></service>
+                <% end -%>
+                <rule><![CDATA[<%=@overall[:rule]%>]]></rule>
+            </category>
+            <% end -%>
+            <% if @interfaces[:enable] -%>
+            <category>
+                <label><![CDATA[<%=@interfaces[:label]%>]]></label>
+                <comment><%=@interfaces[:comment]%></comment>
+                <normal><%=@interfaces[:normal]%></normal>
+                <warning><%=@interfaces[:warning]%></warning>
+                <% @interfaces[:services].each do |service| -%>
+                <service><%=service%></service>
+                <% end -%>
+                <rule><![CDATA[<%=@interfaces[:rule]%>]]></rule>
+            </category>
+            <% end -%>
+            <% if @email[:enable] -%>
+            <category>
+                <label><![CDATA[<%=@email[:label]%>]]></label>
+                <comment><%=@email[:comment]%></comment>
+                <normal><%=@email[:normal]%></normal>
+                <warning><%=@email[:warning]%></warning>
+                <% @email[:services].each do |service| -%>
+                <service><%=service%></service>
+                <% end -%>
+                <rule><![CDATA[<%=@email[:rule]%>]]></rule>
+            </category>
+            <% end -%>
+            <% if @web[:enable] -%>
+            <category>
+                <label><![CDATA[<%=@web[:label]%>]]></label>
+                <comment><%=@web[:comment]%></comment>
+                <normal><%=@web[:normal]%></normal>
+                <warning><%=@web[:warning]%></warning>
+                <% @web[:services].each do |service| -%>
+                <service><%=service%></service>
+                <% end -%>
+                <rule><![CDATA[<%=@web[:rule]%>]]></rule>
+            </category>
+            <% end -%>
+            <% if @jmx[:enable] -%>
+            <category>
+                <label><![CDATA[<%=@jmx[:label]%>]]></label>
+                <comment><%=@jmx[:comment]%></comment>
+                <normal><%=@jmx[:normal]%></normal>
+                <warning><%=@jmx[:warning]%></warning>
+                <% @jmx[:services].each do |service| -%>
+                <service><%=service%></service>
+                <% end -%>
+                <rule><![CDATA[<%=@jmx[:rule]%>]]></rule>
+            </category>
+            <% end -%>
+            <% if @dns[:enable] -%>
+            <category>
+                <label><![CDATA[<%=@dns[:label]%>]]></label>
+                <comment><%=@dns[:comment]%></comment>
+                <normal><%=@dns[:normal]%></normal>
+                <warning><%=@dns[:warning]%></warning>
+                <% @dns[:services].each do |service| -%>
+                <service><%=service%></service>
+                <% end -%>
+                <rule><![CDATA[<%=@dns[:rule]%>]]></rule>
+            </category>
+            <% end -%>
+            <% if @db[:enable] -%>
+            <category>
+                <label><![CDATA[<%=@db[:label]%>]]></label>
+                <comment><%=@db[:comment]%></comment>
+                <normal><%=@db[:normal]%></normal>
+                <warning><%=@db[:warning]%></warning>
+                <% @db[:services].each do |service| -%>
+                <service><%=service%></service>
+                <% end -%>
+                <rule><![CDATA[<%=@db[:rule]%>]]></rule>
+            </category>
+            <% end -%>
+            <% if @other[:enable] -%>
+            <category>
+                <label><![CDATA[<%=@other[:label]%>]]></label>
+                <comment><%=@other[:comment]%></comment>
+                <normal><%=@other[:normal]%></normal>
+                <warning><%=@other[:warning]%></warning>
+                <% @other[:services].each do |service| -%>
+                <service><%=service%></service>
+                <% end -%>
+                <rule><![CDATA[<%=@other[:rule]%>]]></rule>
+            </category>
+            <% end -%>
+            <% if @inet[:enable] -%>
+            <category>
+                <label><![CDATA[<%=@inet[:label]%>]]></label>
+                <comment><%=@inet[:comment]%></comment>
+                <normal><%=@inet[:normal]%></normal>
+                <warning><%=@inet[:warning]%></warning>
+                <% @inet[:services].each do |service| -%>
+                <service><%=service%></service>
+                <% end -%>
+                <rule><![CDATA[<%=@inet[:rule]%>]]></rule>
+            </category>
+            <% end -%>
+        </categories>
+    </categorygroup>
+</catinfo>

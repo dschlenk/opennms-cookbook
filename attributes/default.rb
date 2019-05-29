@@ -27,7 +27,7 @@ default['build-essential']['compile_time'] = true
 default['opennms']['start_opts'] = ''
 # set to '' if you want to re-enable OOTB behavior (but you should not do this if using any of the opennms resources)
 default['opennms']['timeout_start_sec'] = '10min'
-default['opennms']['version'] = '22.0.4-1'
+default['opennms']['version'] = '23.0.4-1'
 # default['opennms']['version_major'] = "%{version}"
 default['opennms']['allow_downgrade'] = false
 default['opennms']['stable'] = true
@@ -361,6 +361,7 @@ default['opennms']['properties']['jetty']['exclude_cipher_suites']  = nil
 default['opennms']['properties']['jetty']['https_baseurl']          = nil
 default['opennms']['properties']['jetty']['datetimeformat']         = nil
 default['opennms']['properties']['jetty']['show_stacktrace']        = nil
+default['opennms']['properties']['jetty']['topology_entity_cache_duration'] = nil
 # JMS NB
 default['opennms']['properties']['jms_nbi']['broker_url'] = nil
 default['opennms']['properties']['jms_nbi']['activemq_username'] = nil
