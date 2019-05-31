@@ -17,11 +17,9 @@
 
   <display-name>opennms</display-name>
 
-  <!-- Uncomment this to set the webapp timeout to infinite.
   <session-config>
     <session-timeout>-1</session-timeout>
   </session-config>
-  -->
 
   <!--  This is used by the Spring ContextLoaderListener <listener> below -->
   <context-param>
@@ -50,7 +48,6 @@
         classpath*:/META-INF/opennms/component-reporting.xml
         classpath*:/META-INF/opennms/component-timeformat.xml
 
-        /WEB-INF/applicationContext-remote-poller.xml
       classpath*:/META-INF/opennms/component-service.xml
       /WEB-INF/applicationContext-cxf-common.xml
 
@@ -189,12 +186,8 @@
   </filter>
 
   <filter>
-    <filter-name>cache-filter</filter-name>
-    <filter-class>org.opennms.features.poller.remote.gwt.CacheFilter</filter-class>
-  </filter>
-  <filter>
     <filter-name>proxy</filter-name>
-    <filter-class>org.opennms.container.web.ProxyFilter</filter-class>
+    <filter-class>org.opennms.container.web.bridge.proxy.ProxyFilter</filter-class>
   </filter>
 
 
@@ -326,10 +319,6 @@
     <dispatcher>FORWARD</dispatcher>
   </filter-mapping>
 
-  <filter-mapping>
-    <filter-name>cache-filter</filter-name>
-    <url-pattern>/RemotePollerMap/*</url-pattern>
-  </filter-mapping>
   <filter-mapping>
     <filter-name>proxy</filter-name>
     <url-pattern>/*</url-pattern>
@@ -850,6 +839,11 @@
         <load-on-startup>1</load-on-startup>
   </servlet>
 
+  <servlet>
+    <servlet-name>notificationStream</servlet-name>
+    <servlet-class>org.opennms.web.notification.NotificationStreamServlet</servlet-class>
+  </servlet>
+
   <!-- desktop graph servlet mapping -->
   <!-- desktop survey report servlet mapping -->
 
@@ -1123,6 +1117,10 @@
     <url-pattern>/notification/acknowledge</url-pattern>
   </servlet-mapping>
   <servlet-mapping>
+    <servlet-name>notificationStream</servlet-name>
+    <url-pattern>/notification/stream</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
     <servlet-name>dispatcher</servlet-name>
     <url-pattern>/outage/list</url-pattern>
   </servlet-mapping>
@@ -1148,21 +1146,6 @@
         <url-pattern>/graph/graph.png</url-pattern>
   </servlet-mapping>
 
-  <servlet>
-    <servlet-name>EventService</servlet-name>
-    <servlet-class>de.novanic.eventservice.service.EventServiceImpl</servlet-class>
-    <load-on-startup>1</load-on-startup>
-  </servlet>
-
-  <servlet>
-    <servlet-name>LocationStatusService</servlet-name>
-    <servlet-class>org.opennms.features.poller.remote.gwt.server.LocationStatusServiceImpl</servlet-class>
-  </servlet>
-  <servlet>
-    <servlet-name>proxy</servlet-name>
-    <servlet-class>org.apache.felix.http.proxy.ProxyServlet</servlet-class>
-    <load-on-startup>1</load-on-startup>
-  </servlet>
   <!--  RESTful Web Services -->
   <servlet>
     <servlet-name>cxfRestServlet</servlet-name>
@@ -1191,19 +1174,6 @@
     <load-on-startup>1</load-on-startup>
   </servlet>
 
-  <servlet-mapping>
-    <servlet-name>EventService</servlet-name>
-    <url-pattern>/RemotePollerMap/gwteventservice</url-pattern>
-  </servlet-mapping>
-
-  <servlet-mapping>
-    <servlet-name>LocationStatusService</servlet-name>
-    <url-pattern>/RemotePollerMap/locationStatus</url-pattern>
-  </servlet-mapping>
-  <servlet-mapping>
-    <servlet-name>proxy</servlet-name>
-    <url-pattern>/osgi/*</url-pattern>
-  </servlet-mapping>
   <!-- Servlet mappings for REST Services -->
   <servlet-mapping>
     <servlet-name>cxfRestServlet</servlet-name>

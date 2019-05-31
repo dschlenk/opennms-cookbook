@@ -243,4 +243,20 @@
       </argument>
    </command>
     <% end -%>
+    <% if @browser -%>
+   <command binary="false">
+      <name>browser</name>
+      <execute>org.opennms.netmgt.notifd.BrowserNotificationStrategy</execute>
+      <comment>Sending Notification to the Browser</comment>
+      <argument streamed="false">
+         <switch>-d</switch>
+      </argument>
+      <argument streamed="false">
+         <switch>-subject</switch>
+      </argument>
+       <argument streamed="false">
+           <switch>-tm</switch>
+       </argument>
+   </command>
+    <% end -%>
 </notification-commands>

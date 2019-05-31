@@ -660,48 +660,6 @@ org.opennms.provisiond.scheduleRescanForUpdatedNodes=<%=@properties['provisionin
 
 ###### MAPPING AND GEOCODING ######
 
-# the map implementation to use
-# current choices are: GoogleMaps, Mapquest, OpenLayers
-gwt.maptype=<%=@properties['geo']['map_type']%>
-
-# The API key to use for the remote monitor map
-gwt.apikey=<%=@properties['geo']['api_key']%>
-
-# The class options to use for geocoding.  Choices are:
-
-# (Google maps API)
-#gwt.geocoder.class=org.opennms.features.poller.remote.gwt.server.geocoding.GoogleMapsGeocoder
-
-# (Mapquest API)
-#gwt.geocoder.class=org.opennms.features.poller.remote.gwt.server.geocoding.MapquestGeocoder
-
-# (OpenStreetMaps API)
-#gwt.geocoder.class=org.opennms.features.poller.remote.gwt.server.geocoding.NominatimGeocoder
-
-# (always return OpenNMS World HQ)
-<% if @properties['geo']['geocoder_class'].nil? -%>
-gwt.geocoder.class=org.opennms.features.poller.remote.gwt.server.geocoding.NullGeocoder
-<% else -%>
-gwt.geocoder.class=<%=@properties['geo']['geocoder_class']%>
-<% end -%>
-
-# The rate at which to make requests, for geocoders that support it.
-gwt.geocoder.rate=<%=@properties['geo']['rate']%>
-
-# The referer to use when making geocoding requests, for geocoders that support it.
-# For MapQuest, the value you set here will need to be allowed in your AppKeys manager:
-#   http://developer.mapquest.com/web/info/account/app-keys
-gwt.geocoder.referer=<%=@properties['geo']['referrer']%>
-
-# The minimum quality level to require before rejecting a geocoding request.
-# This is currently only used by MapQuest. Choices are (least to most specific):
-# COUNTRY, STATE, ZIP, COUNTY, ZIP_EXTENDED, CITY, STREET, INTERSECTION, ADDRESS, POINT
-gwt.geocoder.minimumQuality=<%=@properties['geo']['min_quality']%>
-
-# The email address to report as when making geocoding requests.
-# This is currently only used by Nominatim, and MUST be set!
-gwt.geocoder.email=<%=@properties['geo']['email']%>
-
 # The tile server URL to use for OpenLayers.  This can be any mapnik-style tile server URL.
 # (Sorry, no support for multiple URLs yet.)
 
@@ -738,6 +696,21 @@ opennms.nodesWithOutages.count=<%=@properties['ui']['outage_node_count']%>
 opennms.nodesWithOutages.show=<%=@properties['ui']['show_outage_nodes']%>
 <% end -%>
 
+# This value allows you to set the number of situations to display on the front
+# page in the OpenNMS web UI. Default: 16
+#opennms.situations.count=16
+<% unless @properties['ui']['situations_count'].nil? -%>
+opennms.situations.count=<%=@properties['ui']['situations_count']%>
+<% end -%>
+
+# This value allows you to enable/disable the situations summary box on the front
+# page in the OpenNMS web UI. Default: true
+#
+#opennms.situations.show=true
+<% unless @properties['ui']['show_situations'].nil? -%>
+opennms.situations.show=<%=@properties['ui']['show_situations']%>
+<% end -%>
+
 # This value allows you to set the number of nodes with problems to display on the front
 # page in the OpenNMS web UI. Default: 16
 #opennms.nodesWithProblems.count=16
@@ -768,6 +741,12 @@ opennms.nodeStatusBar.show=<%=@properties['ui']['show_node_status_bar']%>
 org.opennms.security.disableLoginSuccessEvent=<%=@properties['ui']['disable_login_success_event']%>
 <% end -%>
 
+# This value represents the maximum number of interfaces before the availability box is
+# hidden in the node page. Default: 10
+#org.opennms.interfaceAvailabilityBox.maxInterfaceCount=10
+<% unless @properties['ui']['max_interface_count'].nil? -%>
+org.opennms.interfaceAvailabilityBox.maxInterfaceCount=<%=@properties['ui']['max_interface_count']%>
+<% end -%>
 
 ###### REMOTE POLLER ######
 

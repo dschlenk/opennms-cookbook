@@ -10,6 +10,7 @@ maintained
    <service>
       <name>OpenNMS:Name=Manager</name>
       <class-name>org.opennms.netmgt.vmmgr.Manager</class-name>
+      <invoke method="init" pass="0" at="start"/>
       <invoke method="doSystemExit" pass="1" at="stop"/>
    </service>
    <service>
@@ -85,13 +86,6 @@ maintained
       <name>OpenNMS:Name=Queued</name>
       <class-name>org.opennms.netmgt.queued.jmx.Queued</class-name>
       <invoke method="init" pass="0" at="start"/>
-      <invoke method="start" pass="1" at="start"/>
-      <invoke method="status" pass="0" at="status"/>
-      <invoke method="stop" pass="0" at="stop"/>
-   </service>
-   <service enabled="<%=@dhcpd%>">
-      <name>OpenNMS:Name=Dhcpd</name>
-      <class-name>org.opennms.netmgt.dhcpd.jmx.Dhcpd</class-name>
       <invoke method="start" pass="1" at="start"/>
       <invoke method="status" pass="0" at="status"/>
       <invoke method="stop" pass="0" at="stop"/>
