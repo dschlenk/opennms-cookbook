@@ -6,7 +6,7 @@ control 'collection_graph' do
 
   describe collection_graph_file('coffee.properties') do
     it { should exist }
-    its('contents') do
+    its('content') do
       should eq <<-EOL
 reports=coffee.temperature, \\
 coffee.potLevel
