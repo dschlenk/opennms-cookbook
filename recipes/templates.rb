@@ -1945,6 +1945,7 @@ template "#{onms_home}/etc/syslog-northbounder-configuration.xml" do
   )
 end
 
+node.default['opennms']['syslogd']['parser'] = 'org.opennms.netmgt.syslogd.RadixTreeSyslogParser' if mv.to_i >= 24
 template "#{onms_home}/etc/syslogd-configuration.xml" do
   cookbook node['opennms']['syslogd']['cookbook']
   source "#{template_dir}syslogd-configuration.xml.erb"

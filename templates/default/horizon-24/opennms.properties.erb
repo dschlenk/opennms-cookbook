@@ -216,12 +216,12 @@ org.opennms.utils.propertiesCache.cacheTimeout=<%= @properties['dc']['cache_time
 org.opennms.alarmd.newIfClearedAlarmExists = <%= @properties['alarmd']['new_if_cleared_alarm_exists'] %>
 <% end -%>
 #
-# Enable this property to have the traditional dual alarm handling of alarms state
+# Enable this property to have the traditional dual alarm handling of alarms state 
 # for Alarm pairwise correlation.
 # Default: false
 #org.opennms.alarmd.legacyAlarmState = false
 #
-# Note: Setting legacyAlarmState will nullify newIfClearedAlarmExists
+# Note: Setting legacyAlarmState will nullify newIfClearedAlarmExists 
 <% unless @properties['alarmd']['legacy_alarm_state'].nil? -%>
 org.opennms.alarmd.newIfClearedAlarmExists = <%= @properties['alarmd']['legacy_alarm_state'] %>
 <% end -%>
@@ -662,7 +662,6 @@ org.opennms.provisiond.scheduleRescanForUpdatedNodes=<%=@properties['provisionin
 
 # The tile server URL to use for OpenLayers.  This can be any mapnik-style tile server URL.
 # (Sorry, no support for multiple URLs yet.)
-
 # OpenNMS default tile server
 gwt.openlayers.url=https://tiles.opennms.org/${z}/${x}/${y}.png
 gwt.openlayers.options.attribution=Map data &copy; <a tabindex="-1" target="_blank" href="http://openstreetmap.org/copyright">OpenStreetMap</a> contributors under <a tabindex="-1" target="_blank" href="http://opendatacommons.org/licenses/odbl/">ODbL</a>, <a tabindex="-1" target="_blank" href="http://creativecommons.org/licenses/by-sa/2.0/">CC BY-SA 2.0</a>
