@@ -19,8 +19,10 @@
 elasticsearch_user 'elasticsearch'
 elasticsearch_install 'elasticsearch' do
   type 'package'
-  version '6.2.4'
+  version '7.1.1-x86_64'
 end
 elasticsearch_configure 'elasticsearch'
 elasticsearch_service 'elasticsearch'
-package 'elasticsearch-drift-plugin'
+package 'elasticsearch-drift-plugin' do
+  version '7.1.1-1'
+end
