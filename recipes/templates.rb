@@ -284,6 +284,7 @@ template "#{onms_home}/etc/enlinkd-configuration.xml" do
     lldp: node['opennms']['enlinkd']['lldp'],
     ospf: node['opennms']['enlinkd']['ospf'],
     isis: node['opennms']['enlinkd']['isis'],
+    topology_interval: node['opennms']['enlinkd']['topology_interval'],
     bridge_topo_interval: node['opennms']['enlinkd']['bridge_topo_interval'],
     max_bft: node['opennms']['enlinkd']['max_bft'],
     disco_bridge_threads: node['opennms']['enlinkd']['disco_bridge_threads']
@@ -620,7 +621,8 @@ template "#{onms_home}/etc/notificationCommands.xml" do
     call_home_phone: node['opennms']['notification_commands']['call_home_phone'],
     microblog_update: node['opennms']['notification_commands']['microblog_update'],
     microblog_reply: node['opennms']['notification_commands']['microblog_reply'],
-    microblog_dm: node['opennms']['notification_commands']['microblog_dm']
+    microblog_dm: node['opennms']['notification_commands']['microblog_dm'],
+    browser: node['opennms']['notification_commands']['browser']
   )
 end
 
@@ -1943,6 +1945,7 @@ template "#{onms_home}/etc/syslog-northbounder-configuration.xml" do
   )
 end
 
+node.default['opennms']['syslogd']['parser'] = 'org.opennms.netmgt.syslogd.RadixTreeSyslogParser' if mv.to_i >= 24
 template "#{onms_home}/etc/syslogd-configuration.xml" do
   cookbook node['opennms']['syslogd']['cookbook']
   source "#{template_dir}syslogd-configuration.xml.erb"

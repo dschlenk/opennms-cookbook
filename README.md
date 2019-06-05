@@ -4,7 +4,7 @@ Description
 ===========
 
 A Chef cookbook to manage the installation and configuration of OpenNMS Horizon.
-Current version supports releases 16, 17, 18, 19, 20, 21, 22 on CentOS 6 and 7.
+Current version supports releases 16, 17, 18, 19, 20, 21, 22, 23, 24 on CentOS 6 and 7.
 
 Versions
 ========
