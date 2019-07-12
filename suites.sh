@@ -15,6 +15,7 @@ echo ""
 echo "provisioner:"
 echo "  name: chef_zero"
 echo "  product_version: 14.2.0"
+echo "  require_chef_omnibus: 14.2.0"
 echo ""
 echo "platforms:"
 echo "  - name: centos-6.9"
@@ -38,8 +39,8 @@ echo "        plugin:"
 echo "          xml: true"
 echo "          nsclient: true"
 echo "suites:"
-VERSIONS=(16.0.4-1 17.1.1-1 18.0.4-1 19.1.0-1 20.1.0-1 21.1.0-1 22.0.4-1 23.0.4-1 24.1.0-1)
-STABLE_VERSION=(24.1.0-1)
+VERSIONS=(16.0.4-1 17.1.1-1 18.0.4-1 19.1.0-1 20.1.0-1 21.1.0-1 22.0.4-1 23.0.4-1 24.1.1-1)
+STABLE_VERSION=(24.1.1-1)
 SUITES=$(ls test/fixtures/cookbooks/onms_lwrp_test/recipes/)
 SUITES+=('default')
 SUITES+=('templates')

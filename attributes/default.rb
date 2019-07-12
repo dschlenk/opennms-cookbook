@@ -22,12 +22,18 @@ default['yum']['opennms-snapshot-rhel6']['baseurl']         = 'http://yum.opennm
 default['yum']['opennms-snapshot-rhel6']['failovermethod']  = 'roundrobin'
 default['yum']['opennms-snapshot-rhel7']['baseurl']         = 'http://yum.opennms.org/snapshot/rhel7'
 default['yum']['opennms-snapshot-rhel7']['failovermethod']  = 'roundrobin'
+default['yum']['opennms-oldstable-common']['baseurl']        = 'http://yum.opennms.org/oldstable/common'
+default['yum']['opennms-oldstable-common']['failovermethod'] = 'roundrobin'
+default['yum']['opennms-oldstable-rhel6']['baseurl']         = 'http://yum.opennms.org/oldstable/rhel6'
+default['yum']['opennms-oldstable-rhel6']['failovermethod']  = 'roundrobin'
+default['yum']['opennms-oldstable-rhel7']['baseurl']         = 'http://yum.opennms.org/oldstable/rhel7'
+default['yum']['opennms-oldstable-rhel7']['failovermethod']  = 'roundrobin'
 default['build-essential']['compile_time'] = true
 # set to -Q to mimic OOTB quick start behavior on RHEL7+ (but you should not do this if using any of the opennms resources)
 default['opennms']['start_opts'] = ''
 # set to '' if you want to re-enable OOTB behavior (but you should not do this if using any of the opennms resources)
 default['opennms']['timeout_start_sec'] = '10min'
-default['opennms']['version'] = '23.0.4-1'
+default['opennms']['version'] = '24.1.1-1'
 # default['opennms']['version_major'] = "%{version}"
 default['opennms']['allow_downgrade'] = false
 default['opennms']['stable'] = true
@@ -2010,7 +2016,7 @@ default['opennms']['cors']['credentials'] = true
 
 case node['platform_family']
 when 'rhel'
-  default['opennms']['repos']['branches'] = %w(obsolete snapshot stable)
+  default['opennms']['repos']['branches'] = %w(obsolete snapshot stable oldstable)
   default['opennms']['repos']['platforms'] = %w(common)
   if node['platform_version'].to_f >= 6.0 && node['platform_version'].to_f < 7.0
     Chef::Log.debug("i am 6 because #{node['platform_version']}")
