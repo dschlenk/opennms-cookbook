@@ -108,6 +108,14 @@ def service_changed?(current_resource)
   false
 end
 
+
+
+
+
+
+
+
+
 def update_poller_service
   service_name = new_resource.service_name || new_resource.name
   Chef::Log.debug "Updating poller service: '#{service_name}' in package '#{new_resource.package_name}'"
@@ -118,9 +126,13 @@ def update_poller_service
   file.close
 
   service_el = doc.elements["/poller-configuration/package[@name='#{new_resource.package_name}']/service[@name='#{service_name}']"]
+  monitor_el = doc.elements["/poller-configuration/monitor[@service='#{service_name}']"]
+  
   service_el.attributes['interval'] = new_resource.interval
   service_el.attributes['user-defined'] = new_resource.user_defined
   service_el.attributes['status'] = new_resource.status
+  monitor_el.attributes['class-name'] = new_resource.class_name
+  
   # clear out all parameters
   service_el.elements.delete_all 'parameter'
   # add them back with new values
@@ -137,6 +149,17 @@ def update_poller_service
   end
   Opennms::Helpers.write_xml_file(doc, "#{node['opennms']['conf']['home']}/etc/poller-configuration.xml")
 end
+
+
+
+
+
+
+
+
+
+
+
 
 def create_poller_service
   service_name = new_resource.service_name || new_resource.name
