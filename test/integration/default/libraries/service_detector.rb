@@ -30,7 +30,7 @@ class ServiceDetector < Inspec.resource(1)
     @exists = true
     puts "fs: '#{fs}'"
     if fs.empty?
-      @exists = false 
+      @exists = false
       return
     end
     doc = REXML::Document.new(fs)
