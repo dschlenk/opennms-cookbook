@@ -21,7 +21,9 @@ attribute :file, kind_of: String, default: 'eventconf.xml', required: true
 #      {'mename' => 'specific', 'mevalue' => ['1']},
 #      {'vbnumber' => '6', 'vbvalue' => ['1','2']}
 #     ]
-attribute :mask, kind_of: Array
+# As a special case, use the string '*' to indicate operating on the first event found with any mask
+# and use the string '!' to indicate no mask
+attribute :mask, kind_of: [Array, String], default: '*'
 # this is required when creating a new event, but not when updating existing
 attribute :event_label, kind_of: String
 # Never seen this in the wild but it's in the schema.
