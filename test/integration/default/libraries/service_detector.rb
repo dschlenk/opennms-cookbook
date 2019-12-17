@@ -28,6 +28,11 @@ class ServiceDetector < Inspec.resource(1)
       return
     end
     @exists = true
+    puts "fs: '#{fs}'"
+    if fs.empty?
+      @exists = false 
+      return
+    end
     doc = REXML::Document.new(fs)
     @params = {}
     @params[:class_name] = doc.elements['/detector'].attributes['class'].to_s

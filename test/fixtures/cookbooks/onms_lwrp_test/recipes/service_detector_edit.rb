@@ -25,3 +25,9 @@ opennms_service_detector 'change Router params' do
   foreign_source_name 'another-source'
   parameters 'banner' => 'heaven'
 end
+
+opennms_service_detector 'change spacey ICMP' do
+  service_name 'I C M P'
+  foreign_source_name 'another-source'
+  timeout 7000
+end

@@ -23,4 +23,10 @@ control 'service_detector' do
     its('time_out') { should eq 12_000 }
     its('parameters') { should eq 'ipMatch' => '127.0.0.1' }
   end
+
+  describe service_detector('I C M P', 'another-source') do
+    it { should exist }
+    its('time_out') { should eq 12_000 }
+    its('parameters') { should eq 'ipMatch' => '127.0.0.1' }
+  end
 end

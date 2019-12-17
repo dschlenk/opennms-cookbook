@@ -221,6 +221,7 @@ module Provision
   def remove_service_detector(new_resource, node)
     require 'rest_client'
     service_name = new_resource.service_name || new_resource.name
+    service_name = URI.escape(service_name)
     foreign_source_name = URI.escape(new_resource.foreign_source_name)
     node.run_state['foreign_sources'] = nil
     RestClient.delete "#{baseurl(node)}/foreignSources/#{foreign_source_name}/detectors/#{service_name}"
