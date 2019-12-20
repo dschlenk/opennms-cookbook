@@ -38,9 +38,75 @@ opennms_poller_service 'SNMPBar' do
   class_name 'org.opennms.netmgt.poller.monitors.SnmpMonitor'
 end
 
-# create this so we can delete it later
+# create things to edit and delete later
 opennms_poller_service 'create SNMPBar2' do
   service_name 'SNMPBar2'
   package_name 'bar'
   class_name 'org.opennms.netmgt.poller.monitors.SnmpMonitor'
+end
+
+opennms_poller_service 'create ICMPBar' do
+  service_name 'ICMPBar'
+  package_name 'bar'
+  interval 600_000
+  user_defined true
+  status 'off'
+  timeout 5000
+  parameters 'packet-size' => '65', 'retry' => '3'
+  class_name 'org.opennms.netmgt.poller.monitors.IcmpMonitor'
+end
+
+opennms_poller_service 'create ICMPBar2' do
+  service_name 'ICMPBar2'
+  package_name 'bar'
+  interval 600_000
+  user_defined true
+  status 'off'
+  timeout 5000
+  parameters 'packet-size' => '65', 'retry' => '3'
+  class_name 'org.opennms.netmgt.poller.monitors.IcmpMonitor'
+end
+
+opennms_poller_service 'create ICMPBar3' do
+  service_name 'ICMPBar3'
+  package_name 'bar'
+  interval 600_000
+  user_defined true
+  status 'off'
+  timeout 5000
+  parameters 'packet-size' => '65', 'retry' => '3'
+  class_name 'org.opennms.netmgt.poller.monitors.IcmpMonitor'
+end
+
+opennms_poller_service 'create ICMPBar4' do
+  service_name 'ICMPBar4'
+  package_name 'bar'
+  interval 600_000
+  user_defined true
+  status 'off'
+  timeout 5000
+  parameters 'packet-size' => '65', 'retry' => '3'
+  class_name 'org.opennms.netmgt.poller.monitors.IcmpMonitor'
+end
+
+opennms_poller_service 'create ICMPBar5' do
+  service_name 'ICMPBar5'
+  package_name 'bar'
+  interval 600_000
+  user_defined true
+  status 'off'
+  timeout 5000
+  parameters 'packet-size' => '65', 'retry' => '3'
+  class_name 'org.opennms.netmgt.poller.monitors.IcmpMonitor'
+end
+
+opennms_poller_service 'create ICMPBar6' do
+  service_name 'ICMPBar6'
+  package_name 'bar'
+  interval 600_000
+  user_defined true
+  status 'off'
+  timeout 5000
+  parameters 'packet-size' => '65', 'retry' => '3'
+  class_name 'org.opennms.netmgt.poller.monitors.IcmpMonitor'
 end
