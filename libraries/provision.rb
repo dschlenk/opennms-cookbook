@@ -518,7 +518,7 @@ module Provision
     begin
       events = JSON.parse(response) unless response.nil? || response.empty?
     rescue
-      Chef::Log.warn("unparseable response from events API, assuming not found")
+      Chef::Log.warn('unparseable response from events API, assuming not found')
       return false
     end
     complete = true
