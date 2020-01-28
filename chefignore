@@ -55,6 +55,7 @@ Guardfile
 Procfile
 .kitchen.local.yml
 .kitchen.local.yml*
+.kitchen.cloud*
 .kitchen/*
 
 # SCM #
