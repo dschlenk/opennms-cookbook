@@ -15,6 +15,7 @@ echo ""
 echo "provisioner:"
 echo "  name: chef_zero"
 echo "  product_version: 14.2.0"
+echo "  require_chef_omnibus: 14.2.0"
 echo ""
 echo "platforms:"
 echo "  - name: centos-6.9"
@@ -64,6 +65,7 @@ for f in ${SUITES[@]}; do
         mv ${PROF_DIR}/${recipe}_spec.rb ${PROF_DIR}/controls/
       fi
       if [ ! -f ${INSPEC_YML} ]; then
+        echo "${INSPEC_YML} didn't exist for ${recipe}, making it now" >&2
         echo "name: opennms_${recipe}" > ${INSPEC_YML}
         echo "title: OpenNMS ${recipe}" >> ${INSPEC_YML}
         echo "maintainer: David Schlenk" >> ${INSPEC_YML}
@@ -79,11 +81,13 @@ for f in ${SUITES[@]}; do
         echo "    path: test/integration/default" >> ${INSPEC_YML}
       fi
       if [ ! -f ${PROF_DIR}/controls/${recipe}_spec.rb ]; then
+        echo "adding blank spec for ${recipe}" >&2
         echo "control '${recipe}' do" > ${PROF_DIR}/controls/${recipe}_spec.rb
         echo "end" >> ${PROF_DIR}/controls/${recipe}_spec.rb
       fi
       fgrep -q "describe 'opennms::" ${PROF_DIR}/controls/${recipe}_spec.rb
       if  [ "$?" = "0" ] && [ "${recipe}" != "default" ]; then
+        echo "populating spec for ${recipe}" >&2
         echo "control '${recipe}' do" > ${PROF_DIR}/controls/${recipe}_spec.rb
         echo "end" >> ${PROF_DIR}/controls/${recipe}_spec.rb
       fi
@@ -135,6 +139,8 @@ for f in ${SUITES[@]}; do
           echo "            enabled: true"
           echo "          nxos:"
           echo "            enabled: true"
+          echo "    excludes:"
+          echo "      - centos-6.9"
         fi
       fi
       if [ "$recipe" = "default" ]; then
@@ -148,6 +154,8 @@ for f in ${SUITES[@]}; do
       if [ "$recipe" != "templates" ] && [ "$recipe" != "flows" ]; then
         echo "        - path: test/integration/${recipe}"
       fi
+    else
+      echo "already have suite for ${recipe}"
     fi
   done
 done

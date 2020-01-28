@@ -46,8 +46,8 @@ def load_current_resource
 
   if service_exists?(@current_resource.package_name, @current_resource.name)
     @current_resource.exists = true
+    @current_resource.changed = true if service_changed?(@current_resource)
   end
-  @current_resource.changed = true if service_changed?(@current_resource)
 end
 
 private
@@ -64,6 +64,8 @@ def service_changed?(current_resource)
   file = ::File.new("#{node['opennms']['conf']['home']}/etc/poller-configuration.xml", 'r')
   doc = REXML::Document.new file
   service_el = doc.elements["/poller-configuration/package[@name='#{current_resource.package_name}']/service[@name='#{current_resource.name}']"]
+  monitor_el = doc.elements["/poller-configuration/monitor[@service='#{current_resource.name}']"]
+  return true if monitor_el.attributes['class-name'].to_s != current_resource.class_name.to_s
   curr_interval = nil
   curr_interval = service_el.attributes['interval'] unless service_el.nil?
   Chef::Log.debug "curr_interval: '#{curr_interval}'; interval: '#{current_resource.interval}'"
@@ -118,21 +120,37 @@ def update_poller_service
   file.close
 
   service_el = doc.elements["/poller-configuration/package[@name='#{new_resource.package_name}']/service[@name='#{service_name}']"]
+  monitor_el = doc.elements["/poller-configuration/monitor[@service='#{service_name}']"]
+
   service_el.attributes['interval'] = new_resource.interval
   service_el.attributes['user-defined'] = new_resource.user_defined
   service_el.attributes['status'] = new_resource.status
-  # clear out all parameters
-  service_el.elements.delete_all 'parameter'
-  # add them back with new values
-  unless new_resource.timeout.nil?
-    service_el.add_element 'parameter', 'key' => 'timeout', 'value' => new_resource.timeout
-  end
-  unless new_resource.port.nil?
-    service_el.add_element 'parameter', 'key' => 'port', 'value' => new_resource.port
-  end
-  unless new_resource.parameters.nil?
+  monitor_el.attributes['class-name'] = new_resource.class_name
+
+  unless new_resource.parameters.empty?
+    # clear out all parameters
+    service_el.elements.delete_all 'parameter'
+    # add them back with new values
     new_resource.parameters.each do |key, value|
       service_el.add_element 'parameter', 'key' => key, 'value' => value
+    end
+  end
+
+  # update / recover special case parameters
+  unless new_resource.timeout.nil?
+    timeout_el = service_el.elements["parameter[@key='timeout']"]
+    if timeout_el.nil?
+      service_el.add_element 'parameter', 'key' => 'timeout', 'value' => new_resource.timeout
+    else
+      timeout_el.attributes['value'] = new_resource.timeout
+    end
+  end
+  unless new_resource.port.nil?
+    port_el = service_el.elements["parameter[@key='port']"]
+    if port_el.nil?
+      service_el.add_element 'parameter', 'key' => 'port', 'value' => new_resource.port
+    else
+      port_el.attributes['value'] = new_resource.port
     end
   end
   Opennms::Helpers.write_xml_file(doc, "#{node['opennms']['conf']['home']}/etc/poller-configuration.xml")

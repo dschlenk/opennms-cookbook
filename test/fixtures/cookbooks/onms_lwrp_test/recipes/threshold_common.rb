@@ -25,7 +25,7 @@ end
 
 # define events for triggered/rearmed
 opennms_event 'uei.opennms.org/thresholdTest/testThresholdExceeded' do
-  file 'events/chef.events.xml'
+  file 'events/chef-threshold.events.xml'
   event_label 'Chef defined event: testThresholdExceeded'
   descr '<p>A threshold defined by a chef recipe that tests thresholds has been exceeded.</p>'
   logmsg 'Chef test threshold exceeded.'
@@ -36,7 +36,7 @@ opennms_event 'uei.opennms.org/thresholdTest/testThresholdExceeded' do
 end
 
 opennms_event 'uei.opennms.org/thresholdTest/testThresholdRearmed' do
-  file 'events/chef.events.xml'
+  file 'events/chef-threshold.events.xml'
   event_label 'Chef defined event: testThresholdRearmed'
   descr '<p>A threshold defined by a chef recipe that tests thresholds has been rearmed.</p>'
   logmsg 'Chef test threshold rearmed.'

@@ -40,7 +40,7 @@ module Events
   def event_xpath(event)
     uei = event.uei || event.name
     event_xpath = "/events/event[uei/text() = '#{uei}'"
-    unless event.mask.nil?
+    if event.mask.is_a? Array
       event.mask.each do |m|
         if m.key?('mename') && m.key?('mevalue')
           event_xpath += " and mask/maskelement/mename[text() = '#{m['mename']}']"
@@ -60,6 +60,9 @@ module Events
           event_xpath += " and not(mask/varbind/vbvalue[text() = '#{lastval}']/following-sibling::*)" unless lastval.nil?
         end
       end
+      # some day if we have additional string options we'd handle them here
+    elsif event.mask == '!'
+      event_xpath += ' and not(mask)'
     end
     event_xpath += ']'
     Chef::Log.debug "event xpath is: #{event_xpath}"

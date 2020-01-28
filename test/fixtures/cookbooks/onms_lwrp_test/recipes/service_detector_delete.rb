@@ -8,3 +8,10 @@ opennms_service_detector 'delete ICMP' do
   foreign_source_name 'another-source'
   action :delete
 end
+
+opennms_service_detector 'delete spacy ICMP' do
+  service_name 'I C M P'
+  class_name 'org.opennms.netmgt.provision.detector.icmp.IcmpDetector'
+  foreign_source_name 'another-source'
+  action :delete
+end
