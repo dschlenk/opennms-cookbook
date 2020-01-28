@@ -126,7 +126,7 @@ def create_event
   end
   Chef::Log.debug "Updating #{new_resource}? #{updating}"
   # masks are immutable as they are part of identity.
-  if !updating && !new_resource.mask.nil?
+  if !updating && !new_resource.mask.nil? && new_resource.mask.is_a?(Array)
     mask_el = event_el.add_element 'mask'
     new_resource.mask.each do |mask|
       mask_container = 'maskelement'
