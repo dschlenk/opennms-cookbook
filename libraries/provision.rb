@@ -221,6 +221,7 @@ module Provision
   def remove_service_detector(new_resource, node)
     require 'rest_client'
     service_name = new_resource.service_name || new_resource.name
+    service_name = URI.escape(service_name)
     foreign_source_name = URI.escape(new_resource.foreign_source_name)
     node.run_state['foreign_sources'] = nil
     RestClient.delete "#{baseurl(node)}/foreignSources/#{foreign_source_name}/detectors/#{service_name}"
@@ -501,9 +502,25 @@ module Provision
     end
     parsed_url = Addressable::URI.parse(url).normalize.to_str
     Chef::Log.debug("sync_complete? URL: '#{parsed_url}'")
-    response = RestClient.get(parsed_url, accept: :json).to_str
+    response = RestClient.get(parsed_url, accept: :json)
     # apiv2 returns empty response (204) when nothing found
-    events = JSON.parse(response) unless response.nil? || response == ''
+    # and might return things in gzip format which annoyingly rest-client doesn't decode for you
+    return false if response.code == 204
+    if response.headers[:content_encoding] == 'gzip'
+      Chef::Log.debug('dealing with gzip content')
+      sio = StringIO.new(response.body)
+      gz = Zlib::GzipReader.new(sio)
+      response = gz.read()
+    else
+      Chef::Log.debug("not dealing with gzip content, headers are #{request.headers} and content encoding is #{request.headers[:content_encoding]}")
+      response = response.to_s
+    end
+    begin
+      events = JSON.parse(response) unless response.nil? || response.empty?
+    rescue
+      Chef::Log.warn("unparseable response from events API, assuming not found")
+      return false
+    end
     complete = true
     complete = false if !events.nil? && events.key?('totalCount') && events['totalCount'].to_i == 0
     if events.nil? || (api == 'v2' && !apiv2synced?(events, foreign_source_name))

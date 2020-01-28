@@ -31,3 +31,12 @@ opennms_service_detector 'change ICMP timeout' do
   timeout 12_000
   parameters 'ipMatch' => '127.0.0.1'
 end
+
+# something with spaces in it
+
+opennms_service_detector 'ICMP but with spaces' do
+  service_name 'I C M P'
+  foreign_source_name 'another-source'
+  timeout 12_000
+  parameters 'ipMatch' => '127.0.0.1'
+end
