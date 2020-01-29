@@ -508,9 +508,15 @@ module Provision
     return false if response.code == 204
     if response.headers[:content_encoding] == 'gzip'
       Chef::Log.debug('dealing with gzip content')
-      sio = StringIO.new(response.body)
-      gz = Zlib::GzipReader.new(sio)
-      response = gz.read()
+      begin
+        sio = StringIO.new(response.body)
+        gz = Zlib::GzipReader.new(sio)
+        response = gz.read()
+      rescue StandardError => err
+        Chef::Log.warn("response body indicated gzip but extraction failed due to #{err}")
+        Chef::Log.debug("response body that failed to extract is #{response.body}. Will attempt to read as JSON string.")
+        response = response.body
+      end
     else
       Chef::Log.debug("not dealing with gzip content, headers are #{request.headers} and content encoding is #{request.headers[:content_encoding]}")
       response = response.to_s
