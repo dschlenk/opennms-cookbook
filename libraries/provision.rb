@@ -471,7 +471,7 @@ module Provision
   def wait_for_sync(_foreign_source_name, node, wait_periods, wait_length)
     now = Time.now
     # sometimes syncs happen real quick
-    now = now - 60
+    now -= 60
     now = now.strftime '%Y-%m-%d %H:%M:%S'
     period = 0
     until sync_complete?(new_resource.foreign_source_name, now, node) || period == wait_periods
