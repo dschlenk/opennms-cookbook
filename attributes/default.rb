@@ -281,11 +281,12 @@ default['opennms']['services']['xmlrpcd']     = false
 default['opennms']['services']['asterisk_gw'] = false
 default['opennms']['services']['apm']         = false
 # opennms.properties
-default['opennms']['properties']['dc']['rrd_base_dir']        = "#{onms_home}/share/rrd"
-default['opennms']['properties']['misc']['bin_dir']           = "#{onms_home}/bin"
-default['opennms']['properties']['reporting']['template_dir'] = "#{onms_home}/etc"
-default['opennms']['properties']['reporting']['report_dir']   = "#{onms_home}/share/reports"
-default['opennms']['properties']['reporting']['report_logo']  = "#{onms_home}/webapps/images/logo.gif"
+default['opennms']['properties']['dc']['rrd_base_dir']              = "#{onms_home}/share/rrd"
+default['opennms']['properties']['misc']['bin_dir']                 = "#{onms_home}/bin"
+default['opennms']['properties']['reporting']['template_dir']       = "#{onms_home}/etc"
+default['opennms']['properties']['reporting']['report_dir']         = "#{onms_home}/share/reports"
+default['opennms']['properties']['reporting']['report_logo']        = "#{onms_home}/webapps/images/logo.gif"
+default['opennms']['properties']['reporting']['scheduler_enabled']  = true
 # ICMP
 default['opennms']['properties']['icmp']['pinger_class'] = nil # "org.opennms.netmgt.icmp.jni6.Jni6Pinger"
 default['opennms']['properties']['icmp']['require_v4']   = nil
@@ -1809,11 +1810,12 @@ default['opennms']['thresholds']['netsnmp_memory_linux']['enabled']           = 
 default['opennms']['thresholds']['netsnmp_memory_nonlinux']['enabled']        = true
 default['opennms']['thresholds']['coffee']['enabled']                         = true
 # translator-configuration.xml
-default['opennms']['translator']['snmp_link_down']     = true
-default['opennms']['translator']['snmp_link_up']       = true
-default['opennms']['translator']['hyperic']            = true
-default['opennms']['translator']['cisco_config_man']   = true
-default['opennms']['translator']['juniper_cfg_change'] = true
+default['opennms']['translator']['snmp_link_down']                = true
+default['opennms']['translator']['snmp_link_up']                  = true
+default['opennms']['translator']['hyperic']                       = true
+default['opennms']['translator']['cisco_config_man']              = true
+default['opennms']['translator']['juniper_cfg_change']            = true
+default['opennms']['translator']['telemetry_clock_skew_detected'] = true
 # trapd-configuration.xml
 default['opennms']['trapd']['port']        = 162
 default['opennms']['trapd']['new_suspect'] = false
@@ -1831,6 +1833,8 @@ default['opennms']['vacuumd']['statement']['delete_nodes']          = true
 default['opennms']['vacuumd']['statement']['delete_ip_interfaces']  = true
 default['opennms']['vacuumd']['statement']['delete_if_services']    = true
 default['opennms']['vacuumd']['statement']['delete_events']         = true
+default['opennms']['vacuumd']['statement']['delete_values_json_key']               = true
+default['opennms']['vacuumd']['statement']['delete_values_blob_key']               = true
 default['opennms']['vacuumd']['automations']['cosmic_clear']                       = true
 default['opennms']['vacuumd']['automations']['clean_up']                           = true
 default['opennms']['vacuumd']['automations']['full_clean_up']                      = true

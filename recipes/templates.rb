@@ -2018,7 +2018,8 @@ template "#{onms_home}/etc/translator-configuration.xml" do
     snmp_link_up: node['opennms']['translator']['snmp_link_up'],
     hyperic: node['opennms']['translator']['hyperic'],
     cisco_config_man: node['opennms']['translator']['cisco_config_man'],
-    juniper_cfg_change: node['opennms']['translator']['juniper_cfg_change']
+    juniper_cfg_change: node['opennms']['translator']['juniper_cfg_change'],
+    telemetry_clock_skew_detected: node['opennms']['translator']['telemetry_clock_skew_detected']
   )
 end
 

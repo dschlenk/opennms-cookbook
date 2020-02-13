@@ -309,6 +309,9 @@ org.opennms.netmgt.collectd.DefaultCollectionAgent.loadSnmpDataOnInit=<%=@proper
 opennms.report.template.dir=<%=@properties['reporting']['template_dir']%>
 opennms.report.dir=<%=@properties['reporting']['report_dir']%>
 opennms.report.logo=<%=@properties['reporting']['report_logo']%>
+
+# If set to false, scheduled reports are no longer executed/triggered
+opennms.report.scheduler.enabled=<%=@properties['reporting']['scheduler_enabled']%>
 ksc.default.graphsPerLine=<%=@properties['reporting']['ksc_graphs_per_line']%>
 
 ###### EVENTD IPC ######

@@ -39,6 +39,22 @@
     AND eventtime &lt; now() - interval '6 weeks';
   </statement>
   <% end -%>
+  
+  <% if @statement[:delete_values_json_key] -%>
+  <statement>
+    <!-- this deletes values from the JSON key value store that have expired due to TTL -->
+    DELETE from kvstore_jsonb
+    WHERE expires_at &lt; now()
+  </statement>
+  <% end -%>
+
+  <% if @statement[:delete_values_blob_key] -%>
+  <statement>
+    <!-- this deletes values from the BLOB key value store that have expired due to TTL -->
+    DELETE from kvstore_bytea
+    WHERE expires_at &lt; now()
+  </statement>
+  <% end -%>
     
   <automations>
     <% if @automations[:purge_statistics_reports] -%>
