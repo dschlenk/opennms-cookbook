@@ -99,15 +99,15 @@ module Opscode
 
       return 'mdy' if res.nil?
 
-      posM = res.index('11')
-      posD = res.index('22')
-      posY = res.index('33')
+      pos_m = res.index('11')
+      pos_d = res.index('22')
+      pos_y = res.index('33')
 
-      if posM.nil? || posD.nil? || posY.nil?
+      if pos_m.nil? || pos_d.nil? || pos_y.nil?
         return 'mdy'
-        elseif (posY < posM && posM < posD)
+        elseif (pos_y < pos_m && pos_m < pos_d)
         return 'ymd'
-        elseif (posD < posM)
+        elseif (pos_d < pos_m)
         return 'dmy'
       end
       'mdy'
@@ -120,7 +120,7 @@ module Opscode
     # Function to determine where the system stored shared timezone data.
     # Used in recipes/config_initdb.rb to detemine where it should have
     # select_default_timezone(tzdir) search.
-    def pg_TZDIR
+    def pg_tzdir
       # System time zone conversions are controlled by a timezone data file
       # identified through environment variables (TZ and TZDIR) and/or file
       # and directory naming conventions specific to the Linux distribution.
@@ -216,9 +216,9 @@ module Opscode
           tzname = path.gsub("#{tzdir}/", '')
           next unless validate_zone(tzname)
           if bestzonename.nil? ||
-             tzname.length < bestzonename.length ||
-             (tzname.length == bestzonename.length &&
-             (tzname <=> bestzonename) < 0)
+              tzname.length < bestzonename.length ||
+              (tzname.length == bestzonename.length &&
+                  (tzname <=> bestzonename) < 0)
 
             bestzonename = tzname
           end
@@ -245,9 +245,9 @@ module Opscode
         std_ofs = testtime.strftime('%:z').split(':')[0].to_i
 
         resultbuf = [
-          'Etc/GMT',
-          -std_ofs > 0 ? '+' : '',
-          (-std_ofs).to_s,
+            'Etc/GMT',
+            -std_ofs > 0 ? '+' : '',
+            (-std_ofs).to_s,
         ].join('')
       end
 
