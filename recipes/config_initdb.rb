@@ -131,7 +131,7 @@ node.default['opennms']['config']['default_text_search_config'] =
 # defaults for the postgresql.cof settings. If the timezone cannot be
 # identified, do as initdb would do: leave it unspecified so PostgreSQL
 # uses it's internal default of GMT.
-tzdirpath = pg_TZDIR # See libraries/initdb.rb
+tzdirpath = pg_tzdir # See libraries/initdb.rb
 default_timezone = select_default_timezone(tzdirpath) # See libraries/initdb.rb
 unless default_timezone.nil?
   node.default['opennms']['config']['log_timezone'] = default_timezone

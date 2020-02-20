@@ -17,29 +17,22 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-node.default['postgresql']['password']['postgres'] =  'md5c23797e9a303da48b792b4339c426700'
+node.default['postgresql']['password']['postgres'] = 'md5c23797e9a303da48b792b4339c426700'
 node.default['postgresql']['version'] = '11'
 node.default['postgresql']['config']['data_directory'] = '/var/lib/pgsql/11/data'
 
-node.default['postgresql']['config']['autovacuum'] = "on"
-node.default['postgresql']['config']['checkpoint_timeout'] = "15min"
-node.default['postgresql']['config']['shared_preload_libraries'] =  'pg_stat_statements'
-node.default['postgresql']['config']['track_activities'] = "on"
-node.default['postgresql']['config']['track_counts'] = "on"
+node.default['postgresql']['config']['autovacuum'] = 'on'
+node.default['postgresql']['config']['checkpoint_timeout'] = '15min'
+node.default['postgresql']['config']['shared_preload_libraries'] = 'pg_stat_statements'
+node.default['postgresql']['config']['track_activities'] = 'on'
+node.default['postgresql']['config']['track_counts'] = 'on'
 node.default['postgresql']['config']['vacuum_cost_delay'] = 50
 
 # 'mixed' profile fits our needs mostly - but we need a few more concurrent connections
 node.default['postgresql']['config_pgtune']['max_connections'] = 160
 # size postgresql as if it were limited to 2GB of RAM
 node.default['postgresql']['config_pgtune']['total_memory'] = '1961376kB'
-
-
-node.default['postgresql']['contrib']['extensions'] = %w(pageinspect
-                                                    pg_buffercache
-                                                    pg_freespacemap
-                                                    pgrowlocks
-                                                    pg_stat_statements
-                                                    pgstattuple)
+node.default['postgresql']['contrib']['extensions'] = %w(pageinspect pg_buffercache pg_freespacemap pgrowlocks pg_stat_statements pgstattuple)
 
 postgresql_repository 'install'
 
@@ -93,7 +86,7 @@ end
 # Using this to generate a service resource to control
 find_resource(:service, 'postgresql') do
   extend PostgresqlCookbook::Helpers
-  service_name lazy {platform_service_name}
+  service_name lazy { platform_service_name }
   supports restart: true, status: true, reload: true
   action [:enable, :start]
 end
@@ -105,7 +98,7 @@ else
 end
 
 # Install  extensions
-for extension in node['postgresql']['contrib']['extensions']
+node['postgresql']['contrib']['extensions'].each do |extension|
   postgresql_extension "postgres #{extension}" do
     database 'postgres'
     version node['postgresql']['version']
