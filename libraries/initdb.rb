@@ -103,15 +103,9 @@ module Opscode
       pos_d = res.index('22')
       pos_y = res.index('33')
 
-      if pos_m.nil? || pos_d.nil? || pos_y.nil?
-        return 'mdy'
-      end
-      if pos_y < pos_m && pos_m < pos_d
-        return 'ymd'
-      end
-      if pos_d < pos_m
-        return 'dmy'
-      end
+      return 'mdy' if pos_m.nil? || pos_d.nil? || pos_y.nil?
+      return 'ymd' if pos_y < pos_m && pos_m < pos_d
+      return 'dmy' if pos_d < pos_m
       'mdy'
     end
 
