@@ -242,7 +242,7 @@ module Opscode
         testtime = DateTime.now
         std_ofs = testtime.strftime('%:z').split(':')[0].to_i
 
-        resultbuf = ['Etc/GMT', -std_ofs > 0 ? '+' : '', (-std_ofs).to_s,].join('')
+        resultbuf = ['Etc/GMT', -std_ofs > 0 ? '+' : '', (-std_ofs).to_s].join('')
       end
 
       resultbuf
