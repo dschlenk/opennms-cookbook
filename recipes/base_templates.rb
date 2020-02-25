@@ -40,12 +40,17 @@ when '23'
   template_dir = 'horizon-23/'
 when '24'
   template_dir = 'horizon-24/'
+when '25'
+  template_dir = 'horizon-25/'
 end
+
 if Opennms::Helpers.major(node['opennms']['version']).to_i >= 22
   node.default['opennms']['datacollection']['default']['ref_cpq_im'] = true
   node.default['opennms']['datacollection']['default']['ref_mib2_if'] = true
   node.default['opennms']['datacollection']['default']['ref_mib2_pe'] = true
 end
+
+node.default['opennms']['conf']['heap_size'] = 2048 if Opennms::Helpers.major(node['opennms']['version']).to_i >= 25
 
 Chef::Log.debug "at compile time, version is #{node['opennms']['version']} and jasper_version is #{node['opennms']['properties']['reporting']['jasper_version']}."
 

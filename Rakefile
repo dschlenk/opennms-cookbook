@@ -35,7 +35,7 @@ namespace :integration do
   desc 'Run Test Kitchen with Vagrant'
   task :vagrant do
     options = {
-      versions: %w(16 17 18 19 20 21 22 23 24),
+      versions: %w(16 17 18 19 20 21 22 23 24 25),
       platforms: %w(centos-69 centos-7),
     }
     opts = OptionParser.new
