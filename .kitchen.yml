@@ -9,7 +9,7 @@ driver:
     - ["forwarded_port", {guest: 3000, host: 3000, auto_correct: false}]
     - ["forwarded_port", {guest: 9200, host: 9200, auto_correct: false}]
   customize:
-    memory: 1024
+    memory: 4096
 
 provisioner:
   name: chef_zero
@@ -18365,6 +18365,8 @@ suites:
       opennms:
         version: 25.2.0-1
         templates: true
+        #        conf:
+        #          heap_size: 1024
     verifier:
       inspec_tests:
         - path: test/integration/default

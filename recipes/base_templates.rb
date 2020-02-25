@@ -50,6 +50,8 @@ if Opennms::Helpers.major(node['opennms']['version']).to_i >= 22
   node.default['opennms']['datacollection']['default']['ref_mib2_pe'] = true
 end
 
+node.default['opennms']['conf']['heap_size'] = 2048 if Opennms::Helpers.major(node['opennms']['version']).to_i >= 25
+
 Chef::Log.debug "at compile time, version is #{node['opennms']['version']} and jasper_version is #{node['opennms']['properties']['reporting']['jasper_version']}."
 
 case node['platform_family']
@@ -67,10 +69,6 @@ when 'rhel'
       notifies :run, 'execute[reload systemd]', :immediately
     end
   end
-end
-
-if Opennms::Helpers.major(node['opennms']['version']).to_i >= 25 && node['opennms']['conf']['heap_size'].to_i  < 2048
-  node.default['opennms']['conf']['heap_size'] = 2048
 end
 
 template "#{onms_home}/etc/opennms.conf" do
