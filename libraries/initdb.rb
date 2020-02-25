@@ -103,13 +103,9 @@ module Opscode
       pos_d = res.index('22')
       pos_y = res.index('33')
 
-      if pos_m.nil? || pos_d.nil? || pos_y.nil?
-        return 'mdy'
-        elseif (pos_y < pos_m && pos_m < pos_d)
-        return 'ymd'
-        elseif (pos_d < pos_m)
-        return 'dmy'
-      end
+      return 'mdy' if pos_m.nil? || pos_d.nil? || pos_y.nil?
+      return 'ymd' if pos_y < pos_m && pos_m < pos_d
+      return 'dmy' if pos_d < pos_m
       'mdy'
     end
 
@@ -206,20 +202,16 @@ module Opscode
       else # /etc/localtime is a file, so scan for it under tzdir
         localtime_content = File.read('/etc/localtime')
 
-        Find.find(tzdir) do |path|
+        Find.find(tzdir) do |tz_path|
           # Only consider files (skip directories or symlinks)
-          next unless !::File.directory?(path) && !::File.symlink?(path)
+          next unless !::File.directory?(tz_path) && !::File.symlink?(tz_path)
           # Ignore any file named "posixrules" or "localtime"
-          next unless ::File.basename(path) != 'posixrules' && ::File.basename(path) != 'localtime'
+          next unless ::File.basename(tz_path) != 'posixrules' && ::File.basename(tz_path) != 'localtime'
           # Do consider if content exactly matches /etc/localtime.
-          next unless localtime_content == File.read(path)
-          tzname = path.gsub("#{tzdir}/", '')
+          next unless localtime_content == File.read(tz_path)
+          tzname = tz_path.gsub("#{tzdir}/", '')
           next unless validate_zone(tzname)
-          if bestzonename.nil? ||
-              tzname.length < bestzonename.length ||
-              (tzname.length == bestzonename.length &&
-                  (tzname <=> bestzonename) < 0)
-
+          if bestzonename.nil? || tzname.length < bestzonename.length || (tzname.length == bestzonename.length && (tzname <=> bestzonename) < 0)
             bestzonename = tzname
           end
         end
@@ -244,11 +236,7 @@ module Opscode
         testtime = DateTime.now
         std_ofs = testtime.strftime('%:z').split(':')[0].to_i
 
-        resultbuf = [
-            'Etc/GMT',
-            -std_ofs > 0 ? '+' : '',
-            (-std_ofs).to_s,
-        ].join('')
+        resultbuf = ['Etc/GMT', -std_ofs > 0 ? '+' : '', (-std_ofs).to_s].join('')
       end
 
       resultbuf
