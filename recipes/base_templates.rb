@@ -71,10 +71,6 @@ when 'rhel'
   end
 end
 
-if Opennms::Helpers.major(node['opennms']['version']).to_i >= 25 && node['opennms']['conf']['heap_size'].to_i  < 2048
-  node.default['opennms']['conf']['heap_size'] = 2048
-end
-
 template "#{onms_home}/etc/opennms.conf" do
   cookbook node['opennms']['conf']['cookbook']
   source "#{template_dir}opennms.conf.erb"
