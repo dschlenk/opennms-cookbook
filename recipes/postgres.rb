@@ -18,12 +18,10 @@
 # limitations under the License.
 #
 node.default['postgresql']['password']['postgres'] = 'md5c23797e9a303da48b792b4339c426700'
-if Opennms::Helpers.major(node['opennms']['version']).to_i < 25 
-  node.default['postgresql']['version'] = '9.6'
-else
-  node.default['postgresql']['version'] = '11'
-end
-psql_shortver = node['postgresql']['version'].gsub('.', '')
+node.default['postgresql']['version'] = '11'
+node.default['postgresql']['version'] = '9.6' if Opennms::Helpers.major(node['opennms']['version']).to_i < 25
+
+psql_shortver = node['postgresql']['version'].delete('.', '')
 
 node.default['postgresql']['config']['data_directory'] = "/var/lib/pgsql/#{node['postgresql']['version']}/data"
 node.default['postgresql']['config']['autovacuum'] = 'on'
