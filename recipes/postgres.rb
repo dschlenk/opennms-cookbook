@@ -19,8 +19,11 @@
 #
 node.default['postgresql']['password']['postgres'] = 'md5c23797e9a303da48b792b4339c426700'
 node.default['postgresql']['version'] = '11'
-node.default['postgresql']['config']['data_directory'] = '/var/lib/pgsql/11/data'
+node.default['postgresql']['version'] = '9.6' if Opennms::Helpers.major(node['opennms']['version']).to_i < 25
 
+psql_shortver = node['postgresql']['version'].delete('.', '')
+
+node.default['postgresql']['config']['data_directory'] = "/var/lib/pgsql/#{node['postgresql']['version']}/data"
 node.default['postgresql']['config']['autovacuum'] = 'on'
 node.default['postgresql']['config']['checkpoint_timeout'] = '15min'
 node.default['postgresql']['config']['shared_preload_libraries'] = 'pg_stat_statements'
@@ -92,7 +95,7 @@ find_resource(:service, 'postgresql') do
 end
 
 if node['platform_family'] == 'rhel'
-  package 'postgresql11-contrib'
+  package "postgresql#{psql_shortver}-contrib"
 else
   package 'postgresql-contrib'
 end
@@ -107,6 +110,6 @@ node['postgresql']['contrib']['extensions'].each do |extension|
   end
 end
 
-service 'postgresql-11' do
-  action :reload
+service "postgresql-#{psql_shortver}" do
+  action :nothing
 end
