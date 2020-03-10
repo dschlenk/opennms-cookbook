@@ -127,7 +127,14 @@ def update_poller_service
   service_el.attributes['status'] = new_resource.status
   monitor_el.attributes['class-name'] = new_resource.class_name
 
-  unless new_resource.parameters.empty?
+  # literally looking for false here, shut up rubocop
+  # rubocop:disable Style/IfUnlessModifier
+  if new_resource.parameters == false
+    service_el.elements.delete_all 'parameter'
+  end
+  # rubocop:enable Style/IfUnlessModifier
+
+  if new_resource.parameters.is_a?(Hash) && !new_resource.parameters.empty?
     # clear out all parameters
     service_el.elements.delete_all 'parameter'
     # add them back with new values
@@ -188,7 +195,7 @@ def create_poller_service
   unless new_resource.port.nil?
     service_el.add_element 'parameter', 'key' => 'port', 'value' => new_resource.port
   end
-  unless new_resource.parameters.nil?
+  if new_resource.parameters != false && new_resource.parameters.is_a?(Hash)
     new_resource.parameters.each do |key, value|
       service_el.add_element 'parameter', 'key' => key, 'value' => value
     end
