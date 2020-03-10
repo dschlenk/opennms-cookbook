@@ -19,7 +19,7 @@
 #
 node.default['postgresql']['password']['postgres'] = 'md5c23797e9a303da48b792b4339c426700'
 node.default['postgresql']['version'] = '11'
-node.default['postgresql']['version'] = '9.6' if Opennms::Helpers.major(node['opennms']['version']).to_i < 25
+node.default['postgresql']['version'] = '9.5' if Opennms::Helpers.major(node['opennms']['version']).to_i < 25
 
 psql_shortver = node['postgresql']['version'].sub('.', '')
 
