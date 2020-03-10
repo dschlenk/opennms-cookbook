@@ -102,7 +102,6 @@ template "#{onms_home}/etc/log4j2.xml" do
   mode 00664
   owner 'root'
   group 'root'
-  notifies :restart, 'service[opennms]'
   variables(
     log: node['opennms']['log4j2']
   )

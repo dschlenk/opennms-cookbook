@@ -9,7 +9,7 @@ driver:
     - ["forwarded_port", {guest: 3000, host: 3000, auto_correct: false}]
     - ["forwarded_port", {guest: 9200, host: 9200, auto_correct: false}]
   customize:
-    memory: 4096
+    memory: 1024
 
 provisioner:
   name: chef_zero
@@ -11218,6 +11218,136 @@ suites:
       inspec_tests:
         - path: test/integration/default
         - path: test/integration/poller_edit
+  - name: poller_remove_parms_16
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::poller_remove_parms]
+    attributes:
+      opennms:
+        version: 16.0.4-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/poller_remove_parms
+  - name: poller_remove_parms_17
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::poller_remove_parms]
+    attributes:
+      opennms:
+        version: 17.1.1-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/poller_remove_parms
+  - name: poller_remove_parms_18
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::poller_remove_parms]
+    attributes:
+      opennms:
+        version: 18.0.4-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/poller_remove_parms
+  - name: poller_remove_parms_19
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::poller_remove_parms]
+    attributes:
+      opennms:
+        version: 19.1.0-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/poller_remove_parms
+  - name: poller_remove_parms_20
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::poller_remove_parms]
+    attributes:
+      opennms:
+        version: 20.1.0-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/poller_remove_parms
+  - name: poller_remove_parms_21
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::poller_remove_parms]
+    attributes:
+      opennms:
+        version: 21.1.0-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/poller_remove_parms
+  - name: poller_remove_parms_22
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::poller_remove_parms]
+    attributes:
+      opennms:
+        version: 22.0.4-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/poller_remove_parms
+  - name: poller_remove_parms_23
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::poller_remove_parms]
+    attributes:
+      opennms:
+        version: 23.0.4-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/poller_remove_parms
+  - name: poller_remove_parms_24
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::poller_remove_parms]
+    attributes:
+      opennms:
+        version: 24.1.3-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/poller_remove_parms
+  - name: poller_remove_parms_25
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::poller_remove_parms]
+    attributes:
+      opennms:
+        version: 25.2.0-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/poller_remove_parms
   - name: rename_imported_node_16
     run_list:
       - recipe[opennms::postgres]
@@ -18365,8 +18495,6 @@ suites:
       opennms:
         version: 25.2.0-1
         templates: true
-        #        conf:
-        #          heap_size: 1024
     verifier:
       inspec_tests:
         - path: test/integration/default
