@@ -95,18 +95,23 @@ def service_changed?(current_resource)
   end
   curr_params = {}
   params_str = {}
-  # make a version of params that has strings for both keys and values
-  # just so we can compare without forcing certain param values to
-  # be specific types
-  current_resource.parameters.each do |k, v|
-    params_str[k.to_s] = v.to_s
-  end
   service_el.elements.each("parameter[@key != 'port' and @key != 'timeout']") do |p|
     val = p.attributes['value'].to_s # make a string outta whatever this was
     curr_params[p.attributes['key']] = val
   end
-  Chef::Log.debug "curr_params: '#{curr_params}'; params: #{params_str}"
-  return true if !current_resource.parameters.nil? && curr_params != params_str
+  if current_resource.parameters.is_a?(Hash)
+    # make a version of params that has strings for both keys and values
+    # just so we can compare without forcing certain param values to
+    # be specific types
+    current_resource.parameters.each do |k, v|
+      params_str[k.to_s] = v.to_s
+    end
+    Chef::Log.debug "curr_params: '#{curr_params}'; params: #{params_str}"
+    return true if !current_resource.parameters.nil? && curr_params != params_str
+  elsif !curr_params.empty?
+    # means we've got some parameters that aren't special, and we don't want any
+    return true
+  end
   false
 end
 
