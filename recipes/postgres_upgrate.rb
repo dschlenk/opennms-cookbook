@@ -18,7 +18,7 @@
 # limitations under the License.
 #
 
-node.default['postgresql']['upgrade']['version'] = '11'
+Opennms::Helpers.major(node['opennms']['version']).to_i > 24 ? node.default['postgresql']['upgrade']['version'] = '11' : node.default['postgresql']['upgrade']['version'] =''
 
 # Find the location of the binaries that interact with a Postgres
 # cluster of the given `version`
@@ -53,7 +53,7 @@ def old_data_dir
 end
 
 def new_data_dir
-  "/var/lib/pgsql/#{node['postgresql']['upgrade']['version']}/data"
+  node['postgresql']['upgrade']['version'].empty? ? nil : "/var/lib/pgsql/#{node['postgresql']['upgrade']['version']}/data"
 end
 
 # If this file exists, assume that the upgrade has succeeded
@@ -107,7 +107,10 @@ end
 # why-run message to describe what we're doing (or why we're not doing
 # anything)
 def upgrade_required?
-  if old_data_dir.nil?
+  if new_data_dir.nil?
+    Chef::Log.info 'A new version is not provided; nothing to upgrade'
+    false
+  elsif old_data_dir.nil?
     # This will only happen if we've never successfully completed a
     # Private Chef installation on this machine before.  In that case,
     # there is (by definition) nothing to upgrade
@@ -177,11 +180,15 @@ if upgrade_required?
         --new-options=" -c config_file=#{::File.join(ndd, 'postgresql.conf')}"
       && date > #{s_file}
     EOM
-    user    node['opennms']['collectd']['example1']['service']['postgresql']['user']
-    cwd     ndd
+    user node['opennms']['collectd']['example1']['service']['postgresql']['user']
+    cwd ndd
     creates s_file
     timeout node['opennms']['posgresql']['pg_upgrade_timeout']
     notifies :start, "service[postgresql-#{new_version}]", :immediately
   end
+
+else
+
+  include_recipe 'opennms::postgres'
 
 end
