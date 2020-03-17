@@ -17,8 +17,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+node.default['postgresql']['upgrade']['version'] =''
+node.default['postgresql']['upgrade']['version'] = '9.6' if Opennms::Helpers.major(node['opennms']['version']).to_i > 17
+node.default['postgresql']['upgrade']['version'] = '11' if Opennms::Helpers.major(node['opennms']['version']).to_i > 24
 
-Opennms::Helpers.major(node['opennms']['version']).to_i > 24 ? node.default['postgresql']['upgrade']['version'] = '11' : node.default['postgresql']['upgrade']['version'] =''
 
 # Find the location of the binaries that interact with a Postgres
 # cluster of the given `version`
