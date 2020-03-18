@@ -2082,4 +2082,4 @@ default['opennms']['telemetryd']['cookbook'] = 'opennms'
 default['opennms']['es']['hosts'] = {}
 default['opennms']['manage_repos'] = true
 
-default['opennms']['posgresql']['pg_upgrade_timeout']  = 7200
+default['opennms']['posgresql']['pg_upgrade_timeout'] = 7200

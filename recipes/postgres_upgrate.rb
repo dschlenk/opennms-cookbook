@@ -138,7 +138,6 @@ def upgrade_required?
   end
 end
 
-
 if upgrade_required?
   service 'opennms' do
     action [:stop]
