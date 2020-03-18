@@ -96,7 +96,7 @@ for f in ${SUITES[@]}; do
     if [ "$?" != "0" ]; then
       echo "  - name: ${recipe}_${v%%.*-1}"
       echo "    run_list:"
-      echo "      - recipe[opennms::postgres_upgrate]"
+      echo "      - recipe[opennms::postgres_upgrade]"
       echo "      - recipe[oracle_java8::default]"
       if [ "$recipe" == "flows" ]; then
         echo "      - recipe[opennms-elasticsearch::default]"
