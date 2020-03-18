@@ -17,7 +17,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-node.default['postgresql']['upgrade']['version'] =''
+node.default['postgresql']['upgrade']['version'] = ''
 node.default['postgresql']['upgrade']['version'] = '9.6' if Opennms::Helpers.major(node['opennms']['version']).to_i > 17
 node.default['postgresql']['upgrade']['version'] = '11' if Opennms::Helpers.major(node['opennms']['version']).to_i > 24
 
@@ -45,12 +45,9 @@ def old_data_dir
   # Cheat and use gem's version parsing and comparison operators.
   # Note we're doing a reverse sort to put the highest version at 0,
   # and we're not checking '==' because we can't have two paths of the same name.
-  ::Dir.glob(::File.join(::File.expand_path('../..', new_data_dir), '*/data'))
-      .reject { |dir| dir == new_data_dir } # ignore the new one
-      .map { |dir| [dir, version_from_data_dir(dir)] }
-      .reject { |_dir, vsn| !vsn } # filter those with no PG_VERSION
-      .sort { |a, b| Gem::Version.new(a[1]) > Gem::Version.new(b[1]) ? -1 : 1 }
-      .map(&:first) # drop the versions again
+  ::Dir.glob(::File.join(::File.expand_path('../..', new_data_dir), '*/data')).reject { |dir| dir == new_data_dir } # ignore the new one
+      .map { |dir| [dir, version_from_data_dir(dir)] }.reject { |_dir, vsn| !vsn } # filter those with no PG_VERSION
+      .sort { |a, b| Gem::Version.new(a[1]) > Gem::Version.new(b[1]) ? -1 : 1 }.map(&:first) # drop the versions again
       .first
 end
 
@@ -124,9 +121,7 @@ def upgrade_required?
     # directories); i.e., this is just another garden-variety chef run
     Chef::Log.info 'Database cluster is unchanged; nothing to upgrade'
     false
-  elsif Dir.exist?(new_data_dir) &&
-      cluster_initialized?(new_data_dir) &&
-      ::File.exist?(sentinel_file)
+  elsif Dir.exist?(new_data_dir) && cluster_initialized?(new_data_dir) && ::File.exist?(sentinel_file)
     # If the directories are different, we may need to do an upgrade,
     # but only if all the steps along the way haven't been completed
     # yet.  We'll look for a sentinel file (which we'll write out
@@ -145,7 +140,6 @@ end
 
 
 if upgrade_required?
-
   service 'opennms' do
     action [:stop]
   end
@@ -190,7 +184,5 @@ if upgrade_required?
   end
 
 else
-
   include_recipe 'opennms::postgres'
-
 end

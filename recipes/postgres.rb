@@ -22,7 +22,6 @@ node.default['postgresql']['version'] = '11'
 node.default['postgresql']['version'] = '9.6' if Opennms::Helpers.major(node['opennms']['version']).to_i < 25
 node.default['postgresql']['version'] = '9.5' if Opennms::Helpers.major(node['opennms']['version']).to_i < 18
 
-
 psql_shortver = node['postgresql']['version'].sub('.', '')
 
 node.default['postgresql']['config']['data_directory'] = "/var/lib/pgsql/#{node['postgresql']['version']}/data"
