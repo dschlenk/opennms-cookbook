@@ -786,3 +786,8 @@ The default rake task will run the style checks.
 Use `rake integration:vagrant` to run the custom resource tests. You may need to increase your open file limit for test kitchen to work since there are an awful lot of suites. By default it'll run all the suites on all the supported versions, which will probably take a day or more (and rake will for sure run out of RAM before then), or you can specify specific major versions with `-- -v 20,21`. There's also a `-r <INSTANCE_NAME>` option that lets you resume testing after fixing something that failed. 
 
 Pull requests welcome!
+
+#### libraries/postgres.rb
+
+Copyright Chef Software, Inc, https://www.chef.io/chef/
+
