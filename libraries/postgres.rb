@@ -131,6 +131,5 @@ class Chef
     def get_psql_short(version)
       version.sub('.', '')
     end
-
   end
 end
