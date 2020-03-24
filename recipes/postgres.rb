@@ -17,15 +17,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-#
 node.default['postgresql']['version'] = '11'
 node.default['postgresql']['version'] = '9.6' if Opennms::Helpers.major(node['opennms']['version']).to_i < 25
 node.default['postgresql']['version'] = '9.5' if Opennms::Helpers.major(node['opennms']['version']).to_i < 18
 
 if upgrade_required?
 
-  log "stopping opennms" do
-    notifies :stop, "service[opennms]", :immediately
+  log 'stopping opennms' do
+    notifies :stop, 'service[opennms]', :immediately
   end
 
   old_version = version_from_data_dir(old_data_dir)
