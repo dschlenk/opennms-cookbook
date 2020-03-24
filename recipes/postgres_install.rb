@@ -108,6 +108,6 @@ node['postgresql']['contrib']['extensions'].each do |extension|
   end
 end
 
-service "postgresql-#{psql_shortver}" do
+service "postgresql-#{node['postgresql']['version']}" do
   action :nothing
 end

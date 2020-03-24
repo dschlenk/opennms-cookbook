@@ -45,9 +45,8 @@ if upgrade_required?
 
   s_file = sentinel_file
 
-  new_psql_service_name = get_psql_short(new_version)
   log "stopping postgres-#{new_version}" do
-    notifies :stop, "service[postgresql-#{new_psql_service_name}]", :immediately
+    notifies :stop, "service[postgresql-#{new_version}]", :immediately
   end
 
   execute 'upgrade postgresql' do
