@@ -16,7 +16,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-#
 node.default['postgresql']['version'] = '11'
 node.default['postgresql']['version'] = '9.6' if Opennms::Helpers.major(node['opennms']['version']).to_i < 25
 node.default['postgresql']['version'] = '9.5' if Opennms::Helpers.major(node['opennms']['version']).to_i < 18
