@@ -11,8 +11,11 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-# Copyright  2012-2016, Chef Software, Inc, https://www.chef.io/chef/
-# Copyright 2015-2018, ConvergeOne
+#
+# Based on pg_upgrade resource from the private-chef cookbook included in chef-server: https://github.com/chef/chef-server
+# Copyright 2008-2019, Chef Software, Inc, https://www.chef.io/chef/
+#
+# Copyright 2014-2020, ConvergeOne
 #
 
 class Chef

@@ -763,9 +763,12 @@ See the template and default attributes source for more details on using these t
 * etc/xml-datacollection-config.xml.erb
 * etc/xmlrpcd-configuration.xml.erb
 
-License
+Copyright and License
 =======
-Apache 2.0
+Copyright 2014-2020 ConvergeOne Holding Corp.
+Some of the postgres installation and upgrade code, including `libraries/postgres.rb` is based on pg_upgrade resource in the private-chef cookbook of [chef-server](https://github.com/chef/chef-server) and is Copyright 2008-2019 Chef Software, Inc. 
+
+Released under Apache 2.0 license. See LICENSE for details.
 
 OpenNMS and OpenNMS Horizon are &#8482; and &copy; The OpenNMS Group, Inc.
 
@@ -786,8 +789,3 @@ The default rake task will run the style checks.
 Use `rake integration:vagrant` to run the custom resource tests. You may need to increase your open file limit for test kitchen to work since there are an awful lot of suites. By default it'll run all the suites on all the supported versions, which will probably take a day or more (and rake will for sure run out of RAM before then), or you can specify specific major versions with `-- -v 20,21`. There's also a `-r <INSTANCE_NAME>` option that lets you resume testing after fixing something that failed. 
 
 Pull requests welcome!
-
-#### libraries/postgres.rb
-
-Copyright Chef Software, Inc, https://www.chef.io/chef/
-
