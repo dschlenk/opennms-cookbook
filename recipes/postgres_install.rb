@@ -21,7 +21,7 @@ node.default['postgresql']['password']['postgres'] = 'md5c23797e9a303da48b792b43
 
 psql_shortver = get_psql_short(node['postgresql']['version'])
 
-node.default['postgresql']['config']['data_directory'] = "/var/lib/pgsql/#{node['postgresql']['version']}/data"
+node.override['postgresql']['config']['data_directory'] = "/var/lib/pgsql/#{node['postgresql']['version']}/data"
 node.default['postgresql']['config']['autovacuum'] = 'on'
 node.default['postgresql']['config']['checkpoint_timeout'] = '15min'
 node.default['postgresql']['config']['shared_preload_libraries'] = 'pg_stat_statements'

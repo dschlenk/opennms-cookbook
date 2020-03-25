@@ -22,14 +22,12 @@ node.default['postgresql']['version'] = '9.5' if Opennms::Helpers.major(node['op
 
 if upgrade_required?
 
-  log 'stopping opennms' do
+  log 'stopping opennms before postgresql upgrade' do
     notifies :stop, 'service[opennms]', :immediately
   end
 
   old_version = version_from_data_dir(old_data_dir)
-  Chef::Log.info "old version of pgsql is #{old_version}"
   new_version = node.default['postgresql']['version']
-  Chef::Log.info "new version of pgsql is #{new_version}"
 
   service "postgresql-#{old_version}" do
     action [:stop]
@@ -41,9 +39,7 @@ if upgrade_required?
   new_bins = binary_path_for(new_version)
 
   odd = old_data_dir
-  Chef::Log.info "old data dir is #{odd}"
   ndd = new_data_dir
-  Chef::Log.info "new data dir is #{ndd}"
 
   s_file = sentinel_file
 
@@ -69,9 +65,10 @@ if upgrade_required?
     notifies :start, "service[postgresql-#{new_version}]", :immediately
   end
 
+  log 'starting opennms after postgresql upgrade' do
+    notifies :start, 'service[opennms]', :immediately
+  end
 else
-
   Chef::Log.info 'Not upgrading PostgreSQL'
   include_recipe 'opennms::postgres_install'
-
 end
