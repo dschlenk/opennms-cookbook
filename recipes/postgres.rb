@@ -27,7 +27,9 @@ if upgrade_required?
   end
 
   old_version = version_from_data_dir(old_data_dir)
+  Chef::Log.info "old version of pgsql is #{old_version}"
   new_version = node.default['postgresql']['version']
+  Chef::Log.info "new version of pgsql is #{new_version}"
 
   service "postgresql-#{old_version}" do
     action [:stop]
@@ -39,7 +41,9 @@ if upgrade_required?
   new_bins = binary_path_for(new_version)
 
   odd = old_data_dir
+  Chef::Log.info "old data dir is #{odd}"
   ndd = new_data_dir
+  Chef::Log.info "new data dir is #{ndd}"
 
   s_file = sentinel_file
 
@@ -67,6 +71,7 @@ if upgrade_required?
 
 else
 
+  Chef::Log.info 'Not upgrading PostgreSQL'
   include_recipe 'opennms::postgres_install'
 
 end
