@@ -22,6 +22,8 @@ node.default['postgresql']['version'] = '9.5' if Opennms::Helpers.major(node['op
 
 if upgrade_required?
 
+  check_required_disk_space
+
   log 'stopping opennms before postgresql upgrade' do
     notifies :stop, 'service[opennms]', :immediately
   end
