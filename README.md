@@ -766,7 +766,7 @@ See the template and default attributes source for more details on using these t
 Copyright and License
 =======
 Copyright 2014-2020 ConvergeOne Holding Corp.
-Some of the postgres installation and upgrade code, including `libraries/postgres.rb` is based on pg_upgrade resource in the private-chef cookbook of [chef-server](https://github.com/chef/chef-server) and is Copyright 2008-2019 Chef Software, Inc. 
+Some of the postgres installation and upgrade code, including `libraries/postgres.rb, libraries/du.rb, libraries/statfs.ru` is based on pg_upgrade resource in the private-chef cookbook of [chef-server](https://github.com/chef/chef-server) and is Copyright 2008-2019 Chef Software, Inc. 
 
 Released under Apache 2.0 license. See LICENSE for details.
 
