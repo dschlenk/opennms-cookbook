@@ -95,18 +95,23 @@ def service_changed?(current_resource)
   end
   curr_params = {}
   params_str = {}
-  # make a version of params that has strings for both keys and values
-  # just so we can compare without forcing certain param values to
-  # be specific types
-  current_resource.parameters.each do |k, v|
-    params_str[k.to_s] = v.to_s
-  end
   service_el.elements.each("parameter[@key != 'port' and @key != 'timeout']") do |p|
     val = p.attributes['value'].to_s # make a string outta whatever this was
     curr_params[p.attributes['key']] = val
   end
-  Chef::Log.debug "curr_params: '#{curr_params}'; params: #{params_str}"
-  return true if !current_resource.parameters.nil? && curr_params != params_str
+  if current_resource.parameters.is_a?(Hash)
+    # make a version of params that has strings for both keys and values
+    # just so we can compare without forcing certain param values to
+    # be specific types
+    current_resource.parameters.each do |k, v|
+      params_str[k.to_s] = v.to_s
+    end
+    Chef::Log.debug "curr_params: '#{curr_params}'; params: #{params_str}"
+    return true if !current_resource.parameters.nil? && curr_params != params_str
+  elsif !curr_params.empty?
+    # means we've got some parameters that aren't special, and we don't want any
+    return true
+  end
   false
 end
 
@@ -127,7 +132,14 @@ def update_poller_service
   service_el.attributes['status'] = new_resource.status
   monitor_el.attributes['class-name'] = new_resource.class_name
 
-  unless new_resource.parameters.empty?
+  # literally looking for false here, shut up rubocop
+  # rubocop:disable Style/IfUnlessModifier
+  if new_resource.parameters == false
+    service_el.elements.delete_all 'parameter'
+  end
+  # rubocop:enable Style/IfUnlessModifier
+
+  if new_resource.parameters.is_a?(Hash) && !new_resource.parameters.empty?
     # clear out all parameters
     service_el.elements.delete_all 'parameter'
     # add them back with new values
@@ -188,7 +200,7 @@ def create_poller_service
   unless new_resource.port.nil?
     service_el.add_element 'parameter', 'key' => 'port', 'value' => new_resource.port
   end
-  unless new_resource.parameters.nil?
+  if new_resource.parameters != false && new_resource.parameters.is_a?(Hash)
     new_resource.parameters.each do |key, value|
       service_el.add_element 'parameter', 'key' => key, 'value' => value
     end

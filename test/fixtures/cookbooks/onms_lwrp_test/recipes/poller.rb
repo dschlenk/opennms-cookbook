@@ -116,3 +116,14 @@ opennms_poller_service 'create ICMPBar6' do
   parameters 'packet-size' => '65', 'retry' => '3'
   class_name 'org.opennms.netmgt.poller.monitors.IcmpMonitor'
 end
+
+opennms_poller_service 'create ICMPBar7' do
+  service_name 'ICMPBar7'
+  package_name 'bar'
+  interval 600_000
+  user_defined true
+  status 'off'
+  timeout 5000
+  parameters 'packet-size' => '65', 'retry' => '3'
+  class_name 'org.opennms.netmgt.poller.monitors.IcmpMonitor'
+end

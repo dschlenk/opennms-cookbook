@@ -469,7 +469,10 @@ module Provision
   end
 
   def wait_for_sync(_foreign_source_name, node, wait_periods, wait_length)
-    now = Time.now.strftime '%Y-%m-%d %H:%M:%S'
+    now = Time.now
+    # sometimes syncs happen real quick
+    now -= 60
+    now = now.strftime '%Y-%m-%d %H:%M:%S'
     period = 0
     until sync_complete?(new_resource.foreign_source_name, now, node) || period == wait_periods
       Chef::Log.debug "Waiting period ##{period}/#{wait_periods} for #{wait_length} seconds for requisition #{new_resource.foreign_source_name} import to finish."
@@ -508,11 +511,17 @@ module Provision
     return false if response.code == 204
     if response.headers[:content_encoding] == 'gzip'
       Chef::Log.debug('dealing with gzip content')
-      sio = StringIO.new(response.body)
-      gz = Zlib::GzipReader.new(sio)
-      response = gz.read()
+      begin
+        sio = StringIO.new(response.body)
+        gz = Zlib::GzipReader.new(sio)
+        response = gz.read()
+      rescue StandardError => err
+        Chef::Log.warn("response body indicated gzip but extraction failed due to #{err}")
+        Chef::Log.debug("response body that failed to extract is #{response.body}. Will attempt to read as JSON string.")
+        response = response.body
+      end
     else
-      Chef::Log.debug("not dealing with gzip content, headers are #{request.headers} and content encoding is #{request.headers[:content_encoding]}")
+      Chef::Log.debug("not dealing with gzip content, headers are #{response.headers} and content encoding is #{response.headers[:content_encoding]}")
       response = response.to_s
     end
     begin
