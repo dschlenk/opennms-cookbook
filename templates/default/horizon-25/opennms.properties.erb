@@ -1175,3 +1175,8 @@ opennms.alarmlist.unackflash=<%= node['opennms']['properties']['alarmlist']['una
 <% if node['opennms']['properties']['rest_aliases'] != '/rest,/api/v2' -%>
 org.opennms.features.osgi.bridge.restAliases=<%=node['opennms']['properties']['rest_aliases']%>
 <% end -%>
+
+<% unless @properties['jms_nbi']['broker_url'].nil? -%>
+# ###### Configure the ActiveMQ broker for the JMS Northbounder ######
+opennms.alarms.northbound.jms.activemq.brokerURL=<%=@properties['jms_nbi']['broker_url']%>
+<% end -%>
