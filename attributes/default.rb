@@ -938,6 +938,10 @@ default['opennms']['linkd']['vlan']['enable_hp']            = true
 default['opennms']['linkd']['vlan']['enable_cisco']         = true
 default['opennms']['linkd']['vlan']['enable_extreme']       = true
 # log4j2.xml
+default['opennms']['log4j2']['default_route']['size'] = '10MB'
+default['opennms']['log4j2']['default_route']['rollover'] = 8
+default['opennms']['log4j2']['instrumentation']['size'] = '100MB'
+default['opennms']['log4j2']['instrumentation']['rollover'] = 1
 default['opennms']['log4j2']['size'] = '100MB'
 default['opennms']['log4j2']['access_point_monitor'] = 'WARN'
 default['opennms']['log4j2']['ackd'] = 'WARN'
