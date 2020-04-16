@@ -102,7 +102,6 @@ end
 node['postgresql']['contrib']['extensions'].each do |extension|
   postgresql_extension "postgres #{extension}" do
     database 'postgres'
-    version node['postgresql']['version']
     extension extension
     notifies :reload, 'service[postgresql]'
   end
