@@ -120,3 +120,15 @@ template "#{onms_home}/jetty-webapps/opennms/WEB-INF/web.xml" do
   )
   not_if { Opennms::Helpers.major(node['opennms']['version']).to_i < 17 }
 end
+
+template "#{onms_home}/bin/opennms" do
+  cookbook node['opennms']['bin']['cookbook']
+  source "#{template_dir}opennms.erb"
+  mode 00755
+  owner 'root'
+  group 'root'
+  variables(
+    return_code: node['opennms']['bin']['return_code']
+  )
+  not_if { Opennms::Helpers.major(node['opennms']['version']).to_i < 25 }
+end
