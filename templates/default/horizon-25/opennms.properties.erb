@@ -223,7 +223,7 @@ org.opennms.alarmd.newIfClearedAlarmExists = <%= @properties['alarmd']['new_if_c
 #
 # Note: Setting legacyAlarmState will nullify newIfClearedAlarmExists 
 <% unless @properties['alarmd']['legacy_alarm_state'].nil? -%>
-org.opennms.alarmd.newIfClearedAlarmExists = <%= @properties['alarmd']['legacy_alarm_state'] %>
+org.opennms.alarmd.legacyAlarmState  = <%= @properties['alarmd']['legacy_alarm_state'] %>
 <% end -%>
 
 ###### TROUBLE TICKETING ######
