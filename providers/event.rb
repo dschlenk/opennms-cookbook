@@ -21,7 +21,7 @@ action :create do
   if !@current_resource.file_exists
     create_event_file # also adds to eventconf
   elsif !event_file_included?(@current_resource.file, node)
-    add_file_to_eventconf(@current_resource.file, 'bottom', node)
+    add_file_to_eventconf(@current_resource.file, @current_resource.position, node)
   end
   if @current_resource.exists && !@current_resource.changed
     Chef::Log.info "#{@new_resource} already exists and not changed - nothing to do."
@@ -38,7 +38,7 @@ action :create_if_missing do
   if !@current_resource.file_exists
     create_event_file # also adds to eventconf
   elsif !event_file_included?(@current_resource.file, node)
-    add_file_to_eventconf(@current_resource.file, 'bottom', node)
+    add_file_to_eventconf(@current_resource.file, @current_resource.position, node)
   end
   if @current_resource.exists
     Chef::Log.info "#{@new_resource} already exists - nothing to do."
@@ -69,6 +69,7 @@ def load_current_resource
   @current_resource.script(@new_resource.script)
   @current_resource.mouseovertext(@new_resource.mouseovertext)
   @current_resource.alarm_data(@new_resource.alarm_data)
+  @current_resource.position(@new_resource.position)
 
   if ::File.exist?("#{node['opennms']['conf']['home']}/etc/#{@current_resource.file}")
     @current_resource.file_exists = true
@@ -94,7 +95,7 @@ def create_event_file
   events_el = doc.add_element 'events'
   events_el.add_namespace('http://xmlns.opennms.org/xsd/eventconf')
   Opennms::Helpers.write_xml_file(doc, "#{node['opennms']['conf']['home']}/etc/#{new_resource.file}")
-  add_file_to_eventconf(new_resource.file, 'bottom', node)
+  add_file_to_eventconf(new_resource.file, new_resource.position, node)
 end
 
 def create_event
@@ -103,7 +104,7 @@ def create_event
   # new_resource.uei = new_resource.name if new_resource.uei.nil?
   # make sure event file is included in main eventconf
   unless event_file_included?(new_resource.file, node)
-    add_file_to_eventconf(new_resource.file, 'bottom', node)
+    add_file_to_eventconf(new_resource.file, new_resource.position, node)
   end
   Chef::Log.debug "Adding uei '#{uei}' to '#{new_resource.file}'."
 
