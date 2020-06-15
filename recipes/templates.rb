@@ -186,6 +186,7 @@ template "#{onms_home}/etc/datacollection-config.xml" do
     netsnmp: node['opennms']['datacollection']['default']['netsnmp'],
     nortel: node['opennms']['datacollection']['default']['nortel'],
     novell: node['opennms']['datacollection']['default']['novell'],
+    paloalto: node['opennms']['datacollection']['default']['paloalto'],
     pfsense: node['opennms']['datacollection']['default']['pfsense'],
     powerware: node['opennms']['datacollection']['default']['powerware'],
     postgres: node['opennms']['datacollection']['default']['postgres'],

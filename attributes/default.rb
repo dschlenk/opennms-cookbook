@@ -698,6 +698,7 @@ default['opennms']['datacollection']['default']['netscaler']        = true
 default['opennms']['datacollection']['default']['netsnmp']          = true
 default['opennms']['datacollection']['default']['nortel']           = true
 default['opennms']['datacollection']['default']['novell']           = true
+default['opennms']['datacollection']['default']['paloalto']         = true
 default['opennms']['datacollection']['default']['pfsense']          = true
 default['opennms']['datacollection']['default']['powerware']        = true
 default['opennms']['datacollection']['default']['postgres']         = true
