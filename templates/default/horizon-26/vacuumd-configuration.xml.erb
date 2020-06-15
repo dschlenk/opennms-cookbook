@@ -1,0 +1,220 @@
+<VacuumdConfiguration period="<%=@period%>" >
+  <% if @statement[:delete_snmp_interfaces] -%>
+  <statement>
+    <!-- this deletes all the snmpInterfaces that have been marked as deleted -->
+    DELETE FROM snmpInterface WHERE snmpInterface.snmpCollect = 'D';
+  </statement>
+  <% end -%>
+
+  <% if @statement[:delete_nodes] -%>
+  <statement>
+    <!-- this deletes all the nodes that have been marked as deleted - it relies on cascading deletes -->
+    DELETE FROM node WHERE node.nodeType = 'D';
+  </statement>
+  <% end -%>
+   
+  <% if @statement[:delete_ip_interfaces] -%>
+  <statement>
+    <!-- this deletes all the interfaces that have been marked as deleted - it relies on cascading deletes -->
+    DELETE FROM ipInterface WHERE ipInterface.isManaged = 'D';
+  </statement>
+  <% end -%>
+   
+  <% if @statement[:delete_if_services] -%>
+  <statement>
+    <!-- this deletes all the services that have been marked as deleted - it relies on cascading deletes -->
+    DELETE FROM ifServices WHERE ifServices.status = 'D';
+  </statement>
+  <% end -%>
+   
+  <% if @statement[:delete_events] -%>
+  <statement>
+    <!-- this deletes any events that are not associated with outages - Thanks to Chris Fedde for this -->
+    DELETE FROM events WHERE NOT EXISTS 
+      (SELECT svclosteventid FROM outages WHERE svclosteventid = events.eventid  
+    UNION 
+      SELECT svcregainedeventid FROM outages WHERE svcregainedeventid = events.eventid 
+    UNION 
+      SELECT eventid FROM notifications WHERE eventid = events.eventid) 
+    AND eventtime &lt; now() - interval '6 weeks';
+  </statement>
+  <% end -%>
+  
+  <% if @statement[:delete_values_json_key] -%>
+  <statement>
+    <!-- this deletes values from the JSON key value store that have expired due to TTL -->
+    DELETE from kvstore_jsonb
+    WHERE expires_at &lt; now()
+  </statement>
+  <% end -%>
+
+  <% if @statement[:delete_values_blob_key] -%>
+  <statement>
+    <!-- this deletes values from the BLOB key value store that have expired due to TTL -->
+    DELETE from kvstore_bytea
+    WHERE expires_at &lt; now()
+  </statement>
+  <% end -%>
+    
+  <automations>
+    <% if @automations[:purge_statistics_reports] -%>
+    <automation name="purgeStatisticsReports" active="true"
+                interval="3600000" 
+                action-name="deletePurgeableStatisticsReports" />
+    <% end -%>
+
+    <% if @automations[:clear_path_outages] -%>
+    <automation name="clearPathOutages" interval="30000" active="true"
+                trigger-name="selectPathOutagesNodes"
+                action-name="clearPathOutages" />
+    <% end -%>
+
+    <% if @automations[:clean_up_rp_status_changes] -%>
+    <automation name="cleanUpRpStatusChanges" interval="600000" active="true" 
+                action-name="cleanUpRpStatusChanges" />
+    <% end -%>
+    
+    <!-- Enable these automation for monitoring maintenance contracts -->
+    <% if !@automations[:maintenance_check] -%>
+    <!--
+    <% end -%>
+    <automation name="maintenanceCheck" interval="84600000" active="true" 
+                trigger-name="selectExpirationMaintenance" 
+                action-name="maintenanceExpirationWarning"
+                action-event="maintenanceExpirationWarning" />
+    <% if !@automations[:maintenance_check] -%>
+    -->
+    <% end -%>
+  </automations>
+  
+  <triggers>
+    <% if @triggers[:select_path_outages_nodes] -%>
+    <trigger name="selectPathOutagesNodes" operator="&gt;=" row-count="1" >
+      <statement>
+        SELECT nodeId AS _nodeid,
+               now() AS _ts,
+               lastEventTime AS _eventtime_from_node_up
+          FROM alarms
+         WHERE eventuei='uei.opennms.org/nodes/nodeUp'
+      </statement>
+    </trigger>
+    <% end -%>
+
+    <!-- Find assets that have maintenance-contract that will expire in less then 30 days -->
+    <% if !@triggers[:select_expiration_maintenance] -%>
+    <!-- 
+    <% end -%>
+    <trigger name="selectExpirationMaintenance" operator="&gt;=" row-count="1" >
+        <statement>
+        SELECT 
+          a.id, 
+          a.nodeid, 
+          a.maintcontract, 
+          CAST(a.maintcontractexpires as date),
+          '30' AS timeframe
+        FROM 
+          public.assets a
+        JOIN
+          node
+        ON
+          (a.nodeid = node.nodeid)
+        WHERE 
+          a.maintcontract IS NOT NULL  AND 
+          a.maintcontractexpires IS NOT NULL  AND 
+          a.maintcontractexpires != '' AND 
+          a.maintcontractexpires != 'n.v.' AND 
+          a.maintcontract != 'n.v.' AND 
+          a.maintcontract != '' AND 
+          CAST(a.maintcontractexpires as date) &lt; (current_date + integer '30') AND
+          CAST(a.maintcontractexpires as date) &gt; current_date AND
+          node.nodetype = 'A'
+        ORDER BY
+          CAST(a.maintcontractexpires as date) ASC;
+        </statement>
+    </trigger>
+    <% if !@triggers[:select_expiration_maintenance] -%>
+    -->
+    <% end -%>
+  </triggers>
+    
+  <actions>
+    <% if @actions[:delete_purgeable_statistics_reports] -%>
+    <action name="deletePurgeableStatisticsReports" >
+      <statement>
+        DELETE from statisticsReport
+         WHERE purgeDate &lt; now()
+      </statement>
+    </action>
+    <% end -%>
+
+    <% if @actions[:do_nothing_action] -%>
+    <!-- Does nothing while still meeting the requirements of all actions -->
+    <action name="doNothingAction" >
+      <statement>
+        UPDATE node
+           SET nodeid = -1
+         WHERE nodeid = -1
+      </statement>
+    </action>
+    <% end -%>
+
+    <% if @actions[:clean_up_rp_status_changes] -%>
+    <action name="cleanUpRpStatusChanges">
+      <statement>
+        <!-- Remove expired locations specific status changes -->
+        DELETE 
+          FROM location_specific_status_changes
+         WHERE (systemid, ifserviceid, id) 
+        NOT IN (SELECT systemid, ifserviceid, max(id) 
+                  FROM location_specific_status_changes 
+              GROUP BY systemid, ifserviceid)
+           AND statustime &lt; now() - interval '24 hours'
+      </statement>
+    </action>
+    <% end -%>
+
+    <% if @actions[:clear_path_outages] -%>
+    <action name="clearPathOutages" >
+      <statement>
+        UPDATE alarms
+           SET severity = 2, lastautomationtime = ${_ts}
+         WHERE eventuei = 'uei.opennms.org/nodes/pathOutage'
+           AND nodeid = ${_nodeid}
+           AND lasteventtime &lt;= ${_eventtime_from_node_up}
+      </statement>
+    </action>
+    <% end -%>
+
+    <!-- Monitoring maintenance contracts -->
+    <% if !@actions[:maintenance_expiration_warning] -%>
+    <!--
+    <% end -%>
+    <action name="maintenanceExpirationWarning" >
+      <statement>
+      </statement>
+    </action>
+    <% if !@actions[:maintenance_expiration_warning] -%>
+    -->
+    <% end -%>
+  </actions>
+
+  <!-- Note: action events that have tokens require the for-each-result attribute to be set to true -->
+  <action-events>
+    <!-- Monitoring maintenance contracts -->
+    <% if !@action_events[:maintenance_expiration_warning] -%>
+    <!--
+    <% end -%>
+    <action-event name="maintenanceExpirationWarning" for-each-result="true" >
+      <assignment type="field" name="uei" value="uei.opennms.org/asset/maintenance/expirationWarning" />
+      <assignment type="field" name="nodeid" value="${nodeid}" />
+      <assignment type="parameter" name="nodeId" value="${nodeid}" />
+      <assignment type="parameter" name="maintcontractexpires" value="${maintcontractexpires}" />
+      <assignment type="parameter" name="maintcontract" value="${maintcontract}" />
+      <assignment type="parameter" name="timeframe" value="${timeframe}" />
+    </action-event>
+    <% if !@action_events[:maintenance_expiration_warning] -%>
+    -->
+    <% end -%>
+  </action-events>
+  
+</VacuumdConfiguration>
