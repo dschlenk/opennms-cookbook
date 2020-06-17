@@ -453,6 +453,8 @@ default['opennms']['properties']['alarmlist']['sound_enable'] = false
 default['opennms']['properties']['alarmlist']['sound_status'] = 'off' # newalarm, newalarmcount
 default['opennms']['properties']['alarmlist']['unackflash'] = false
 default['opennms']['properties']['rest_aliases'] = '/rest,/api/v2'
+default['opennms']['properties']['maxFlowAgeSeconds'] = nil
+default['opennms']['properties']['ingressAndEgressRequired'] = false
 # access point monitor
 default['opennms']['apm']['threads']           = 30
 default['opennms']['apm']['pscan_interval']    = 1_800_000
