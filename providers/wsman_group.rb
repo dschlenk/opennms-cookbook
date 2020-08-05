@@ -48,7 +48,7 @@ end
 
 def create_wsman_group
   Chef::Log.debug "Creating wsman group : '#{new_resource.name}'"
-  file = ::File.new("#{node['opennms']['conf']['home']}/etc/wsman-datacollection-config", 'r')
+  file = ::File.new("#{node['opennms']['conf']['home']}/etc/wsman-datacollection-config.xml", 'r')
   contents = file.read
   doc = REXML::Document.new(contents, respect_whitespace: :all)
   doc.context[:attribute_quote] = :quote
@@ -62,3 +62,6 @@ def create_wsman_group
   end
   Opennms::Helpers.write_xml_file(doc, "#{node['opennms']['conf']['home']}/etc/wsman-datacollection-config.xml")
 end
+
+## TODO: only default to that file with the option to write to a specific file instead
+## TODO: need to make sure you're adding groups in the right order - attempt to find instances of its siblings before / after and then insert appropriately

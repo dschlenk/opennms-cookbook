@@ -135,9 +135,6 @@ opennms_poller_service 'WS-Man' do
   status 'off'
   timeout 5000
   port 161
-  parameters 'resource-uri' => 'http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dcim/DCIM_ComputerSystem'
-  parameters 'selector.CreationClassName' => 'DCIM_ComputerSystem'
-  parameters 'selector.Name' => 'srv:system'
-  parameters 'rule' => "#IdentifyingDescriptions matches '.*ServiceTag' and #OtherIdentifyingInfo matches 'C7BBBP1'"
+  parameters 'resource-uri' => 'http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dcim/DCIM_ComputerSystem', 'selector.CreationClassName' => 'DCIM_ComputerSystem', 'selector.Name' => 'srv:system', 'rule' => "#IdentifyingDescriptions matches '.*ServiceTag' and #OtherIdentifyingInfo matches 'C7BBBP1'"
   class_name 'org.opennms.netmgt.poller.monitors.WsManMonitor'
 end

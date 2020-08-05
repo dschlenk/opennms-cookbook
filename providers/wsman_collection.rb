@@ -44,7 +44,8 @@ def create_wsman_collection
     rra_el.add_text(rra)
   end
 
-  collection_el.add_element 'include-all-system-definitions'
+  inc_sys_def = new_resource.include_system_definition || 'include-all-system-definitions'
+  collection_el.add_element inc_sys_def
 
   unless new_resource.include_system_definition.nil?
     new_resource.include_system_definition.each do |name|
