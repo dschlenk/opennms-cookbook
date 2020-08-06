@@ -25,7 +25,7 @@ def load_current_resource
   @current_resource.filter(@new_resource.filter)
 
   if group_exists?(@current_resource.group_name)
-    @current_resource.group_exists? = true
+    @current_resource.group_exists = true
   end
 
   if resource_type_exists?(@current_resource.resource_type)
