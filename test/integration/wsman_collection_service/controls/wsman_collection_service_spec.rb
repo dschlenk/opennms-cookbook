@@ -11,7 +11,7 @@ control 'wsman_collection_service' do
     its('thresholding_enabled') { should eq true }
   end
 
-  describe wsman_collection_service('Ws-man', 'default', 'example1') do
+  describe wsman_collection_service('WS-Man', 'default', 'example1') do
     it { should exist }
     its('interval') { should eq 300_000 }
     its('user_defined') { should eq false }

@@ -19,6 +19,7 @@ end
 
 # minimal
 opennms_wsman_collection_service 'WS-Man Service' do
+  service_name 'WS-Man'
   collection 'default'
   notifies :restart, 'service[opennms]', :delayed
 end
