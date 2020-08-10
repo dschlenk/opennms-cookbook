@@ -8,10 +8,9 @@ use_inline_resources # ~FC113
 action :create do
   if @current_resource.exists
     Chef::Log.info "#{@new_resource} already exists - nothing to do."
-  else
-    converge_by("Create #{@new_resource}") do
-      create_wsman_collection
-    end
+  else converge_by("Create #{@new_resource}") do
+    create_wsman_collection
+  end
   end
 end
 
@@ -45,7 +44,9 @@ def create_wsman_collection
   end
 
   unless new_resource.include_system_definitions.nil?
+    unless new_resource.include_system_definitions == true
       collection_el.add_element 'include-system-definitions'
+    end
   end
 
   unless new_resource.include_system_definition.nil?
