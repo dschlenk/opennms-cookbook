@@ -43,6 +43,7 @@ def create_wsman_collection
     rra_el.add_text(rra)
   end
 
+  #Optional: The magic happens with the <include-all-system-definitions/> element which automatically includes all of the system definitions into the collection group.
   unless new_resource.include_system_definitions.nil?
     unless new_resource.include_system_definitions == true
       collection_el.add_element 'include-system-definitions'

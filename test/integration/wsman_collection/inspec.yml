@@ -4,7 +4,7 @@ maintainer: David Schlenk
 copyright: ConvergeOne
 copyright_email: dschlenk@convergeone.com
 license: Apache 2.0
-summary: Verify OpenNMS LWRP wmi_collection works.
+summary: Verify OpenNMS LWRP wsman_collection works.
 version: 1.0.0
 supports:
   - os-family: redhat
