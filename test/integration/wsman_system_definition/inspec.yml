@@ -1,5 +1,5 @@
-name: opennms_system_def
-title: OpenNMS system_def
+name: opennms_wsman_system_definition
+title: OpenNMS opennms_wsman_system_definition
 maintainer: David Schlenk
 copyright: ConvergeOne
 copyright_email: dschlenk@convergeone.com

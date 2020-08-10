@@ -1,13 +1,13 @@
 # frozen_string_literal: true
-control 'system_def' do
-  describe system_def('Cisco Routers') do
+control 'wsman_system_definition' do
+  describe opennms_wsman_system_definition('Dell iDRAC (All Version)') do
     it { should exist }
-    its('groups') { should include 'mib2-tcp' }
-    its('groups') { should include 'mib2-powerethernet' }
+    its('groups') { should include 'drac-system' }
+    its('groups') { should include 'drac-power-supply' }
   end
-  describe system_def('Cisco ASA5510sy') do
+  describe opennms_wsman_system_definition('Dell iDRAC 8') do
     it { should exist }
-    its('groups') { should_not include 'cisco-pix' }
-    its('groups') { should_not include 'cisco-memory' }
+    its('groups') { should_not include 'drac-system' }
+    its('groups') { should_not include 'drac-power-supply' }
   end
 end

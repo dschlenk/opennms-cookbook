@@ -1,5 +1,5 @@
-name: opennms_wmi_collection
-title: OpenNMS wmi_collection
+name: opennms_wsman_collection
+title: OpenNMS wsman_collection
 maintainer: David Schlenk
 copyright: ConvergeOne
 copyright_email: dschlenk@convergeone.com

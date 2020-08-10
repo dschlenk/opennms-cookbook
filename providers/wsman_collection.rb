@@ -44,8 +44,14 @@ def create_wsman_collection
     rra_el.add_text(rra)
   end
 
-  inc_sys_def = new_resource.include_system_definition || 'include-all-system-definitions'
-  collection_el.add_element inc_sys_def
+  # make sure we've got a service definition at the end of the file
+  unless doc.elements["/wsman-datacollection-config/include-all-system-definitions"]
+    doc.elements['/collectd-configuration'].add_element 'collector', 'service' => new_resource.service_name, 'class-name' => 'org.opennms.netmgt.collectd.WmiCollector'
+  end
+  
+  unless new_resource.include_system_definitions.nil?
+      collection_el.add_element 'include-system-definitions'
+  end
 
   unless new_resource.include_system_definition.nil?
     new_resource.include_system_definition.each do |name|
