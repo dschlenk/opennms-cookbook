@@ -20,8 +20,6 @@ class WsManGroup < Inspec.resource(1)
 
   def initialize(group_name, file_name)
     file = file_name
-    file_path = nil
-
     if file == "wsman-datacollection-config.xml" || ""
       file_path='/opt/opennms/etc/wsman-datacollection-config.xml'
     else
@@ -48,9 +46,9 @@ class WsManGroup < Inspec.resource(1)
         aobj = a.attributes['index-of'].to_s unless a.attributes['index-of'].nil?
 
         attribs[aname] = {}
-        attribs[aname]['type'] = atype
-        attribs[aname]['alias'] = aalias
-        attribs[aname]['index-of'] = aobj unless aobj.nil?
+        attribs[atype]['type'] = atype
+        attribs[aalias]['alias'] = aalias
+        attribs[aobj]['index-of'] = aobj unless aobj.nil?
       end
     end
     @params[:attribs] = attribs

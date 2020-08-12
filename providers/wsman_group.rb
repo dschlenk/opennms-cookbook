@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 include WsmanGroups
+include WsManGroup
 
 def whyrun_supported?
   true
@@ -17,7 +18,7 @@ action :create do
 end
 
 def load_current_resource
-  @current_resource = Chef::Resource.resource_for_node(:opennms_wsman_group, node).new(@new_resource.group_name)
+  @current_resource = Chef::Resource.resource_for_node(:opennms_wsman_group, node).new(@new_resource.name)
   @current_resource.file(@new_resource.file)
   @current_resource.group_name(@new_resource.group_name)
   @current_resource.resource_type(@new_resource.resource_type)
