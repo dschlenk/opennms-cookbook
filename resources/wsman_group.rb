@@ -8,12 +8,13 @@ require 'rexml/document'
 actions :create
 default_action :create
 
-attribute :name, name_attribute: true, kind_of: String, required: true
-attribute :collection_name, name_attribute: true, kind_of: String, required: true
-attribute :if_type, kind_of: String, required: true
-attribute :recheck_interval, kind_of: Integer, default: 3_600_000
+attribute :file, kind_of: String, default: 'wsman-datacollection-config.xml', required: true
+attribute :group_name, name_attribute: true, kind_of: String, required: true
 attribute :resource_type, kind_of: String, default: 'node', required: true
 attribute :resource_uri, kind_of: String, default: 'http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dcim/DCIM_ComputerSystem', required: true
+attribute :dialect, kind_of: String, required: false
+attribute :filter, kind_of: String, required: false
 attribute :attribs, kind_of: Hash, default: {}
+attribute :position, kind_of: String, equal_to: %w(top bottom), default: 'bottom'
 
-attr_accessor :exists, :collection_exists, :resource_type_exists
+attr_accessor :exists, :file_exists, :new_file, :is_group_file, :changed, :file_path

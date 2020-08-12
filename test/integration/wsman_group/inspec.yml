@@ -1,5 +1,5 @@
-name: opennms_wmi_wpm
-title: OpenNMS wmi_wpm
+name: opennms_wsman_group
+title: opennms_wsman_group
 maintainer: David Schlenk
 copyright: ConvergeOne
 copyright_email: dschlenk@convergeone.com
