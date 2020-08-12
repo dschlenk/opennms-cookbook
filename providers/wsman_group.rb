@@ -1,7 +1,5 @@
 # frozen_string_literal: true
-include WsmanGroups
 include WsManGroup
-
 def whyrun_supported?
   true
 end
@@ -18,7 +16,7 @@ action :create do
 end
 
 def load_current_resource
-  @current_resource = Chef::Resource.resource_for_node(:opennms_wsman_group, node).new(@new_resource.name)
+  @current_resource = Chef::Resource.resource_for_node(:opennms_wsman_group, node).new(@new_resource.group_name)
   @current_resource.file(@new_resource.file)
   @current_resource.group_name(@new_resource.group_name)
   @current_resource.resource_type(@new_resource.resource_type)
@@ -52,6 +50,18 @@ def load_current_resource
 end
 
 private
+
+def group_file?(file_path)
+  fn = file_path
+  groupfile = false
+  if ::File.exist?(fn)
+    file = ::File.new(fn, 'r')
+    doc = REXML::Document.new file
+    file.close
+    groupfile = !doc.elements["/wsman-datacollection-config/group"].nil?
+  end
+  groupfile
+end
 
 def create_wsman_group_file
   doc = REXML::Document.new
