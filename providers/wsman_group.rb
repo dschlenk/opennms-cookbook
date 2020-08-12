@@ -1,5 +1,5 @@
 # frozen_string_literal: true
-include WsManGroup
+
 def whyrun_supported?
   true
 end

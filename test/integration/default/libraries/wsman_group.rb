@@ -8,7 +8,7 @@ class WsManGroup < Inspec.resource(1)
   '
 
   example '
-    describe wsman_group(\'group_name\', \'file_name\') do
+    describe wsman_group(\'group_name\', \'file\') do
       it { should exist }
       its(\'resource_type\') { should eq \'resource_type\' }
       its(\'resource_uri\') { should eq \'resource_uri\' }
@@ -18,12 +18,12 @@ class WsManGroup < Inspec.resource(1)
     end
   '
 
-  def initialize(group_name, file_name)
-    file = file_name
+  def initialize(group_name, file)
+    file = file
     if file == "wsman-datacollection-config.xml" || ""
       file_path='/opt/opennms/etc/wsman-datacollection-config.xml'
     else
-      file_path="/opt/opennms/etc/wsman-datacollection.d/#{file_name}"
+      file_path="/opt/opennms/etc/wsman-datacollection.d/#{file}"
     end
     doc = REXML::Document.new(inspec.file("#{file_path}").content)
     group = doc.elements["/wsman-datacollection-config/group[@name='#{group_name}']]"]
