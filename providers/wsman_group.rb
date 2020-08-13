@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+include WsmanGroups
 
 def whyrun_supported?
   true
@@ -24,7 +25,7 @@ def load_current_resource
   @current_resource.dialect(@new_resource.dialect)
   @current_resource.filter(@new_resource.filter)
 
-  if @current_resource.file == "wsman-datacollection-config.xml" || ""
+  if @current_resource.file == "wsman-datacollection-config.xml"
     @current_resource.file_path = "#{node['opennms']['conf']['home']}/etc/wsman-datacollection-config.xml"
   else @current_resource.file_path = "#{node['opennms']['conf']['home']}/etc/wsman-datacollection.d/#{@current_resource.file}"
   @current_resource.file_exists = File.exist?("#{node['opennms']['conf']['home']}/etc/wsman-datacollection.d/#{@current_resource.file}")
@@ -79,60 +80,19 @@ end
 
 def create_wsman_group
   f = ::File.new("#{@current_resource.file_path}")
+  Chef::Log.debug "Creating wsman group : '#{new_resource.file}' #{@current_resource.file_path}"
   contents = f.read
   doc = REXML::Document.new(contents, respect_whitespace: :all)
   doc.context[:attribute_quote] = :quote
-  f.close
 
-  root_el = doc.elements["/wsman-datacollection-config/"]
-  group_el = root_el.elements[group_xpath(new_resource)]
+  root_el = doc.elements["/wsman-datacollection-config"]
+  grooup_el = root_el.add_element 'group', 'name' => new_resource.name,'resource-uri' => new_resource.resource_uri, 'dialect' => new_resource.dialect,  'filter' => new_resource.filter, 'resource-type' => new_resource.resource_type
 
-  # see if there's an existing group element
-  last_group_el = root_el.elements['group[last()]']
-  group = doc.root.elements["/wsman-datacollection-config/group[@name = '#{new_resource.group_name}']"]
-  if new_resource.position == 'bottom'
-    if !last_group_el.nil?
-      group.insert_after(last_group_el, group_el)
-    else last_group_el = root_el.elements['system-definition[first()]']
-    if !last_group_el.nil?
-      group.insert_before(last_group_el, group_el)
-    else group.add_element group_el
-    end
-    end
+  new_resource.attribs.each do |name, details|
+    attrib_el = grooup_el.add_element 'attrib', 'name' => name, 'alias' => details['alias'], 'filter' => details['filter'], 'type' => details['type'], 'type' => details['type'], 'index-of' => details['index-of']
+    attrib_el.add_attribute('maxval', details['maxval']) if details['maxval']
+    attrib_el.add_attribute('minval', details['minval']) if details['minval']
   end
+
   Opennms::Helpers.write_xml_file(doc, "#{@current_resource.file_path}")
-end
-
-def group_xpath(group)
-  group_el = REXML::Element.new('group')
-  group_el.add_attribute['name'] = group.group_name
-
-  unless group.resource_uri.nil?
-    group_el.add_attribute['resource-uri'] = group.resource_uri
-  end
-
-  unless group.dialect.nil?
-    group_el.add_attribute['dialect'] = group.dialect
-  end
-
-  unless group.filter.nil?
-    group_el.add_attribute['filter'] = group.filter
-  end
-
-  unless group.resource_type.nil?
-    group_el.add_attribute['resource-type'] = group.resource_type
-  end
-
-  unless group.attribs.nil?
-    group.attribs.each do |name, details|
-      attrib_el = REXML::Element.new('attrib')
-      attrib_el.attributes['name'] = name
-      attrib_el.attributes['alias'] = details['alias']
-      attrib_el.attributes['type'] = details['type']
-      unless details['index-of'].nil?
-        attrib_el.attributes['index-of'] = details['index-of']
-      end
-      group_el.elements[attrib_el]
-    end
-  end
 end

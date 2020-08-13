@@ -28,9 +28,9 @@ class WsManGroup < Inspec.resource(1)
     doc = REXML::Document.new(inspec.file("#{file_path}").content)
     group = doc.elements["/wsman-datacollection-config/group[@name='#{group_name}']]"]
 
-    @exists = !group.nil?
+    @group_exists = !group.nil?
     @params = {}
-    return unless @exists
+    return unless group_exists
 
     @params[:resource_type] = group.attributes['resource-type'].to_s
     @params[:resource_uri] = group.attributes['resource-uri'].to_s
@@ -55,7 +55,7 @@ class WsManGroup < Inspec.resource(1)
   end
 
   def exist?
-    @exists
+    @group_exists
   end
 
   def method_missing(param)
