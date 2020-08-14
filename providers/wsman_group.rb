@@ -84,15 +84,36 @@ def create_wsman_group
   contents = f.read
   doc = REXML::Document.new(contents, respect_whitespace: :all)
   doc.context[:attribute_quote] = :quote
+  file.close
 
-  root_el = doc.elements["/wsman-datacollection-config"]
-  grooup_el = root_el.add_element 'group', 'name' => new_resource.name,'resource-uri' => new_resource.resource_uri, 'dialect' => new_resource.dialect,  'filter' => new_resource.filter, 'resource-type' => new_resource.resource_type
-
-  new_resource.attribs.each do |name, details|
-    attrib_el = grooup_el.add_element 'attrib', 'name' => name, 'alias' => details['alias'], 'filter' => details['filter'], 'type' => details['type'], 'type' => details['type'], 'index-of' => details['index-of']
-    attrib_el.add_attribute('maxval', details['maxval']) if details['maxval']
-    attrib_el.add_attribute('minval', details['minval']) if details['minval']
+  last_group_el = doc.root.elements['/wsman-datacollection-config/group[last()]']
+  first_group_el = doc.root.elements['/wsman-datacollection-config]']
+  if new_resource.position == 'bottom'
+    if !last_group_el.nil?
+      doc.root.insert_after(last_group_el, REXML::Element.new('group'))
+      group_el = doc.root.elements['/wsman-datacollection-config/group[last()]']
+    else
+      doc.root.insert_after(first_group_el, REXML::Element.new('group'))
+      group_el = doc.root.elements['/wsman-datacollection-config/group[first()]']
+    end
+  else
+    doc.root.insert_after(first_group_el, REXML::Element.new('group'))
+    group_el = doc.root.elements['/wsman-datacollection-config/group[first()]']
   end
+  group_el.attributes['name'] = new_resource.group_name
+  group_el.attributes['resource-uri'] = new_resource.resource_uri unless new_resource.resource_uri.nil?
+  group_el.attributes['dialect'] = new_resource.dialect unless new_resource.dialect.nil?
+  group_el.attributes['filter'] = new_resource.filter unless new_resource.filter.nil?
+  group_el.attributes['resource-type'] = new_resource.resource_type unless new_resource.resource_type.nil?
 
+  unless new_resource.attribs.nil?
+    new_resource.attribs.each do |name, details|
+      attrib_el = group_el.add_element('attrib')
+      attrib_el.attributes['name'] = name unless name.nil?
+      attrib_el.attributes['alias'] = details['alias'] unless details['alias'].nil?
+      attrib_el.attributes['type'] = details['type'] unless details['type'].nil?
+      attrib_el.attributes['index-of'] = details['index-of'] unless details['index-of']
+    end
+  end
   Opennms::Helpers.write_xml_file(doc, "#{@current_resource.file_path}")
 end
