@@ -8,6 +8,7 @@ require 'rexml/document'
 actions :create
 default_action :create
 
+attribute :name, name_attribute: true, kind_of: String, required: true
 attribute :file, kind_of: String, default: 'wsman-datacollection-config.xml', required: true
 attribute :group_name, name_attribute: true, kind_of: String, required: true
 attribute :resource_type, kind_of: String, default: 'node', required: true

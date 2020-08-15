@@ -1,12 +1,12 @@
 # frozen_string_literal: true
+include_recipe 'onms_lwrp_test::collection_package'
+include_recipe 'onms_lwrp_test::wsman_collection'
 
-#add group to default file
-opennms_wsman_group 'wsman-thing' do
-  file 'wsman-datacollection-config.xml'
-  group_name 'wsman-thing'
-  position 'bottom'
-  attribs 'OtherIdentifyingInfo' => { 'alias' => 'serviceTag', 'index-of' => '#IdentifyingDescriptions matches ".*ServiceTag"', 'type' => 'string' }
-  notifies :restart, 'service[opennms]', :delayed
+opennms_resource_type 'wsman-thing' do
+  group_name 'metasyntactic'
+  label 'wsman resource'
+  resource_label '${resource}'
+  notifies :restart, 'service[opennms]'
 end
 
 opennms_wsman_group 'drac-system' do
