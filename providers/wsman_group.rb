@@ -38,18 +38,6 @@ end
 
 private
 
-def group_file?(file_path)
-  fn = file_path
-  groupfile = false
-  if ::File.exist?(fn)
-    file = ::File.new(fn, 'r')
-    doc = REXML::Document.new file
-    file.close
-    groupfile = !doc.elements["/wsman-datacollection-config/group"].nil?
-  end
-  groupfile
-end
-
 def create_wsman_group_file (groupName)
   doc = REXML::Document.new
   doc << REXML::XMLDecl.new
@@ -78,13 +66,13 @@ def create_wsman_group
   doc = REXML::Document.new(contents, respect_whitespace: :all)
   doc.context[:attribute_quote] = :quote
 
-  last_group_el = doc.root.elements['/wsman-datacollection-config/group[last()]']
-  first_group_el = doc.root.elements['/wsman-datacollection-config]']
+  last_group_el = doc.root.elements['/wsman-datacollection-config/system-definition/']
+  first_group_el = doc.root.elements['/wsman-datacollection-config/']
 
   if new_resource.position == 'bottom'
     if !last_group_el.nil?
       begin
-        doc.root.insert_after(last_group_el, REXML::Element.new('group'))
+        doc.root.insert_before(last_group_el, REXML::Element.new('group'))
         group_el = doc.root.elements['/wsman-datacollection-config/group']
       end
     else begin
@@ -107,11 +95,7 @@ def create_wsman_group
 
   unless new_resource.attribs.nil?
     new_resource.attribs.each do |name, details|
-      attrib_el = group_el.add_element('attrib')
-      attrib_el.attributes['name'] = name unless name.nil?
-      attrib_el.attributes['alias'] = details['alias'] unless details['alias'].nil?
-      attrib_el.attributes['type'] = details['type'] unless details['type'].nil?
-      attrib_el.attributes['index-of'] = details['index-of'] unless details['index-of']
+      attrib_el = group_el.add_element 'attrib', 'name' => name, 'alias' => details['alias'] , 'type' => details['type'], 'index-of' => details['index-of'] unless details['index-of'].nil?
     end
   end
   Opennms::Helpers.write_xml_file(doc, "#{@current_resource.file_path}")
@@ -120,19 +104,19 @@ end
 
 def group_file?(file, node)
   fn = "#{node['opennms']['conf']['home']}/etc/#{file}"
-  eventfile = false
+  groupfile = false
   if ::File.exist?(fn)
     file = ::File.new(fn, 'r')
     doc = REXML::Document.new file
     file.close
-    eventfile = !doc.elements['/wsman-datacollection-config'].nil?
+    groupfile = !doc.elements['/wsman-datacollection-config'].nil?
   else fn = "#{node['opennms']['conf']['home']}/etc/wsman-datacollection.d/#{file}"
   if ::File.exist?(fn)
     file = ::File.new(fn, 'r')
     doc = REXML::Document.new file
     file.close
-    eventfile = !doc.elements['/wsman-datacollection-config'].nil?
+    groupfile = !doc.elements['/wsman-datacollection-config'].nil?
   end
   end
-  eventfile
+  groupfile
 end

@@ -73,7 +73,7 @@ def load_current_resource
   if ::File.exist?("#{node['opennms']['conf']['home']}/etc/#{@current_resource.file}")
     @current_resource.file_exists = true
     if event_file?(@current_resource.file, node)
-      @current_resource.is_event_file = true
+      @current_resource.is_event_file = true3	Describe ecosystems
       if event_in_file?("#{node['opennms']['conf']['home']}/etc/#{@current_resource.file}", @current_resource)
         Chef::Log.debug("uei #{@current_resource.uei} is in file already")
         @current_resource.exists = true
