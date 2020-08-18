@@ -10,19 +10,19 @@ opennms_resource_type 'wsman-thing' do
 end
 
 opennms_wsman_group 'wsman-test-group' do
-  file 'wsman-test-group'
+  file 'wsman-datacollection.d/wsman-test-group.xml'
   group_name 'wsman-test-group'
   position 'bottom'
   resource_type 'node'
   resource_uri 'http://schemas.test.group.com/'
   attribs
-  attribs 'Info' => { 'alias' => 'serviceTag', 'index-of' => 'new Info', 'type' => 'string' }, 'IdentifyingInfo' => { 'alias' => 'serviceTag', 'index-of' => '#IdentifyingDescriptions matches ".*ServiceTag"', 'type' => 'string' }
+  attribs 'Info' => { 'alias' => 'serviceTag', 'type' => 'string' }, 'IdentifyingInfo' => { 'alias' => 'serviceTag', 'index-of' => '#IdentifyingDescriptions matches ".*ServiceTag"', 'type' => 'string' }
   notifies :restart, 'service[opennms]', :delayed
 end
 
 #existing group
 opennms_wsman_group 'drac-power-supply' do
-  file 'dell-idrac.xml'
+  file 'wsman-datacollection.d/dell-idrac.xml'
   group_name 'drac-power-supply'
   position 'top'
   resource_type 'dracPowerSupplyIndex'
