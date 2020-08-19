@@ -11,11 +11,17 @@ use_inline_resources # ~FC113
 
 action :create do
   if @current_resource.exists
-    Chef::Log.info "#{@new_resource} already exists - nothing to do."
-    updated = create_wsman_group
-    converge_by("Update #{@new_resource}") if updated
-  else Chef::Log.info "#{@new_resource} doesn't exist - creating."
-  converge_by("Create #{@new_resource}") do
+    begin
+    if @current_resource.changed
+      converge_by("Update #{@new_resource}") do
+        create_wsman_group
+      end
+    else
+      Chef::Log.info "#{@new_resource} hasn't changed - nothing to do."
+    end
+    end
+  else
+    converge_by("Create #{@new_resource}") do
     create_wsman_group
   end
   end
@@ -33,7 +39,8 @@ end
 action :delete do
   if !@current_resource.exists
     Chef::Log.info "#{@new_resource} doesn't exist - nothing to do."
-  else converge_by("Delete #{@new_resource}") do
+  else
+    converge_by("Delete #{@new_resource}") do
     delete_wsman_group
   end
   end
@@ -47,6 +54,7 @@ def load_current_resource
   @current_resource.resource_uri(@new_resource.resource_uri)
   @current_resource.dialect(@new_resource.dialect)
   @current_resource.filter(@new_resource.filter)
+  @current_resource.attribs(@new_resource.attribs)
   @current_resource.file_path = "#{node['opennms']['conf']['home']}/etc/#{new_resource.file}"
 
   if !group_file?(@new_resource.file, node)
@@ -56,20 +64,108 @@ def load_current_resource
   if group_exists?(@new_resource.group_name)
     Chef::Log.debug("group #{@current_resource.group_name} is in file already")
     @current_resource.exists = true
-  end
+    @current_resource.changed = false
 
+    file = ::File.new(@current_resource.file_path, 'r')
+    doc = REXML::Document.new file
+    file.close
+    group_el = doc.elements[group_xpath(@new_resource.group_name)]
+    if !resource_type_equal?(group_el, @new_resource.resource_type) \
+       && !resource_uri_equal?(group_el, @current_resource.resource_uri) \
+       && !dialect_equal?(group_el, @current_resource.dialect) \
+       && !dialect_filter?(group_el, @current_resource.filter)
+      @current_resource.changed = true
+    else
+      @current_resource.changed = false
+    end
+  else
+    @current_resource.exists = false
+  end
 end
 
 private
+
+def update_wsman_group()
+  Chef::Log.debug "Updating wsman group : '#{new_resource.group_name}'"
+  file = ::File.new(@current_resource.file_path, 'r')
+  doc = REXML::Document.new file
+  file.close
+
+  doc = REXML::Document.new(contents, respect_whitespace: :all)
+  doc.context[:attribute_quote] = :quote
+
+  group_el = doc.elements[group_xpath(@current_resource.group_name)]
+  Chef::Log.debug("Group? '#{group_el}'")
+end
+
+
+def resource_type_equal?(doc, resource_type)
+  if !resource_type.nil? && !resource_type.empty?
+    return true if doc.attributes['resource-type'].nil?
+  end
+
+  current = doc.attributes['resource-type'].to_s
+  current == resource_type
+end
+
+def resource_uri_equal?(doc, resource_uri)
+  if !resource_uri.nil? && !resource_uri.empty?
+    return true if doc.elements['resource-uri'].nil?
+    end
+
+    current = doc.attributes['resource-uri'].to_s
+    current == resource_uri
+end
+
+def dialect_equal?(doc, dialect)
+  if !dialect.nil? && !dialect.empty?
+    return true if doc.elements['dialect'].nil?
+  end
+
+  current = doc.attributes['dialect'].to_s
+  current == dialect
+end
+
+def filter_equal?(doc, filter)
+  if !filter.nil? && !filter.empty?
+    return true if doc.elements['filter'].nil?
+  end
+
+  current = doc.attributes['filter'].to_s
+  current == filter
+end
+
+def attribute_equal?(doc, attrib)
+  #new group and new file has no attrib yet
+  return true if doc.nil?
+
+  if !attrib.nil? && !attrib.empty?
+    return true if doc.elements['attrib'].nil?
+  end
+
+  current = []
+  attrib.each do |name, details|
+    current.push 'name' => name.to_s if name
+    current.push 'alias' => details['alias'].to_s if details['alias']
+    current.push 'type' => details['type'].to_s  if details['type']
+    current.push 'index-of' => details['index-of'].to_s if details['index-of']
+    current.push 'filter' => details['filter'].to_s if details['filter']
+  end
+
+  sorted_current = current.sort
+  sorted_er = attrib.sort
+  sorted_current == sorted_er
+end
 
 def create_wsman_group_file ()
   doc = REXML::Document.new
   doc << REXML::XMLDecl.new
   root_el = doc.add_element 'wsman-datacollection-config'
-  sys_def_el = root_el.add_element 'system-definition'
-  sys_def_el.attributes['name'] = "#{new_resource.group_name}"
-  incl_def_el = sys_def_el.add_element 'include-group'
-  incl_def_el.add_text("#{new_resource.group_name}")
+  #sys_def_el = root_el.add_element 'system-definition'
+  #sys_def_el.attributes['name'] = "#{new_resource.group_name}"
+  #incl_def_el = sys_def_el.add_element 'include-group'
+  #incl_def_el.add_text("#{new_resource.group_name}")
+  root_el.add_text("\n")
   Opennms::Helpers.write_xml_file(doc, "#{node['opennms']['conf']['home']}/etc/#{new_resource.file}")
 end
 
@@ -84,9 +180,7 @@ def group_exists?(group_name)
   if exists
     @current_resource.file_path = "#{node['opennms']['conf']['home']}/etc/wsman-datacollection-config.xml"
   end
-
   return if exists
-
 
   # let's cheat! If can't find in the wsman-datacollection-config.xml then look for the group file in wsman-datacollection.d
   groupfile = shell_out("grep -l #{group_name} #{node['opennms']['conf']['home']}/etc/wsman-datacollection.d/*.xml")
@@ -99,7 +193,8 @@ def group_exists?(group_name)
       end
       return if exists
     end
-  else # if multiple files match, only return if true since could be a regex false positive.
+  else
+    # if multiple files match, only return if true since could be a regex false positive.
     groupfile.stdout.lines.each do |file|
       exists = group_in_file?(file.chomp, group_name)
       if exists
@@ -139,49 +234,70 @@ def group_xpath(group)
 end
 
 def create_wsman_group
-  Chef::Log.debug "Creating wsman group : '#{new_resource.name}'"
-  f = ::File.new("#{@current_resource.file_path}")
-  Chef::Log.debug "file name : '#{new_resource.file}'"
-  contents = f.read
-  doc = REXML::Document.new(contents, respect_whitespace: :all)
-  doc.context[:attribute_quote] = :quote
+  if !group_exists?(new_resource.group_name)
+    Chef::Log.debug "Creating wsman group : '#{new_resource.name}'"
+    f = ::File.new("#{@current_resource.file_path}")
+    Chef::Log.debug "file name : '#{new_resource.file}'"
+    contents = f.read
+    doc = REXML::Document.new(contents, respect_whitespace: :all)
+    doc.context[:attribute_quote] = :quote
 
-  last_group_el = doc.root.elements['/wsman-datacollection-config/system-definition/']
-  first_group_el = !doc.elements['/wsman-datacollection-config/group[first()]'].nil? || doc.root.elements['/wsman-datacollection-config/']
+    last_group_el = nil
+    first_sys_def_el = nil
+    root_el = doc.root.elements['/wsman-datacollection-config']
 
-  if new_resource.position == 'bottom'
-    if !last_group_el.nil?
-      begin
-        doc.root.insert_before(last_group_el, REXML::Element.new('group'))
-        group_el = doc.root.elements['/wsman-datacollection-config/group']
+    if !doc.elements['/wsman-datacollection-config/group[last()]'].nil?
+      last_group_el = doc.root.elements['/wsman-datacollection-config/group/[last()]']
+    else if !doc.root.elements['/wsman-datacollection-config/system-definition[first()]'].nil?
+      first_sys_def_el = doc.root.elements['/wsman-datacollection-config/system-definition/[first()]']
+    end
+    end
+
+    if new_resource.position == 'bottom'
+      if !last_group_el.nil?
+        begin
+          doc.root.insert_after(last_group_el, REXML::Element.new('group'))
+        end
+      elsif first_sys_def_el.nil?
+        begin
+          doc.root.insert_before(first_sys_def_el, REXML::Element.new('group'))
+        end
+      else begin
+        doc.root.insert_after(root_el, REXML::Element.new('group'))
       end
-    else begin
-      doc.root.insert_after(first_group_el, REXML::Element.new('group'))
-      group_el = doc.root.elements['/wsman-datacollection-config/group']
+      end
     end
-    end
-  else begin
-    doc.root.insert_after(first_group_el, REXML::Element.new('group'))
+
     group_el = doc.root.elements['/wsman-datacollection-config/group']
-  end
-  end
+    group_el.attributes['name'] = new_resource.group_name
 
-  group_el.attributes['name'] = new_resource.group_name
-  group_el.attributes['resource-uri'] = new_resource.resource_uri unless new_resource.resource_uri.nil?
-  group_el.attributes['dialect'] = new_resource.dialect unless new_resource.dialect.nil?
-  group_el.attributes['filter'] = new_resource.filter unless new_resource.filter.nil?
-  group_el.attributes['resource-type'] = new_resource.resource_type unless new_resource.resource_type.nil?
+    unless new_resource.resource_type.nil?
+      group_el.attributes['resource-type'] = new_resource.resource_type
+    end
 
-  unless new_resource.attribs.nil?
-    begin
-      new_resource.attribs.each do |name, details|
-        attrib_el = group_el.add_element 'attrib', 'name' => name, 'alias' => details['alias'], 'type' => details['type']
-        attrib_el.add_attribute('index-of', details['index-of']) if details['index-of']
-        attrib_el.add_attribute('filter', details['filter']) if details['filter']
+    unless new_resource.resource_uri.nil?
+      group_el.attributes['resource-uri'] = new_resource.resource_uri
+    end
+
+    unless new_resource.dialect.nil?
+      group_el.attributes['dialect'] = new_resource.dialect
+    end
+
+    unless new_resource.filter.nil?
+      group_el.attributes['filter'] = new_resource.filter
+    end
+
+    unless new_resource.attribs.nil?
+      begin
+        new_resource.attribs.each do |name, details|
+          attrib_el = group_el.add_element 'attrib', 'name' => name, 'alias' => details['alias'], 'type' => details['type']
+          attrib_el.add_attribute('index-of', details['index-of']) if details['index-of']
+          attrib_el.add_attribute('filter', details['filter']) if details['filter']
+        end
       end
     end
+    Opennms::Helpers.write_xml_file(doc, "#{@current_resource.file_path}")
   end
-  Opennms::Helpers.write_xml_file(doc, "#{@current_resource.file_path}")
 end
 
 def group_file?(file, node)
@@ -196,4 +312,5 @@ def group_file?(file, node)
   groupfile
 end
 
-def delete_wsman_group() end
+def delete_wsman_group()
+end
