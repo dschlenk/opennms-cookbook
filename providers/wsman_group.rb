@@ -60,7 +60,7 @@ def load_current_resource
   if !group_file?(@new_resource.file, node)
     create_wsman_group_file
   end
-
+  @current_resource.exists = false
   if group_exists?(@new_resource.group_name)
     Chef::Log.debug("group #{@current_resource.group_name} is in file already")
     @current_resource.exists = true
@@ -80,7 +80,6 @@ def load_current_resource
     else
       @current_resource.changed = true
     end
-  else @current_resource.exists = false
   end
 end
 
@@ -260,7 +259,7 @@ def attrib_xpath(group, att_name)
 end
 
 def create_wsman_group
-  if !@current_resource.exists && @current_resource.changed
+  if !@current_resource.exists || @current_resource.changed
     begin
       Chef::Log.debug "Creating wsman group : '#{new_resource.name}'"
       f = ::File.new("#{@current_resource.file_path}")
