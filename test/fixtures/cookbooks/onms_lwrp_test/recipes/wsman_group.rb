@@ -11,7 +11,6 @@ end
 
 #add new group in new file
 opennms_wsman_group 'wsman-test-group' do
-  action :create
   file 'wsman-datacollection.d/wsman-test-group.xml'
   group_name 'wsman-test-group'
   position 'bottom'
@@ -22,10 +21,10 @@ opennms_wsman_group 'wsman-test-group' do
 end
 
 #existing group so not expect to add another one
-opennms_wsman_group 'drac-power-supply' do
-  action :create
+opennms_wsman_group 'drac-power' do
+  action :delete
   file 'wsman-datacollection.d/dell-idrac.xml'
-  group_name 'drac-power-supply'
+  group_name 'drac-power'
   position 'top'
   resource_type 'dracPowerSupplyIndex'
   resource_uri 'http://schemas.dmtf.org/wbem/wscim/1/*'

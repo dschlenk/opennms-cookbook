@@ -5,7 +5,7 @@ require 'rexml/document'
 # $ONMS_HOME/etc/wsman-datacollection-config.xml. The collection_name must
 # reference an existing collection defined by the wsman_collection LWRP.
 
-actions :create
+actions :create, :delete, :update
 default_action :create
 
 attribute :name, name_attribute: true, kind_of: String, required: true
@@ -18,4 +18,4 @@ attribute :filter, kind_of: String, required: false
 attribute :attribs, kind_of: Hash, default: {}
 attribute :position, kind_of: String, equal_to: %w(top bottom), default: 'bottom'
 
-attr_accessor :exists, :changed, :file_path
+attr_accessor :exists, :changed, :file_path, :include_group_file_path
