@@ -23,7 +23,7 @@ end
 
 #existing group so not expect to add another one
 opennms_wsman_group 'drac-power-supply' do
-  action :create_if_missing
+  action :create
   file 'wsman-datacollection.d/dell-idrac.xml'
   group_name 'drac-power-supply'
   position 'top'
