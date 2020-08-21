@@ -106,7 +106,7 @@ def delete_included_def()
 end
 
 def create_wsman_group
-  if !group_exists?(new_resource.group_name)
+  if !group_exists?(@current_resource.group_name)
     Chef::Log.debug "Creating wsman group : #{new_resource.group_name}"
     f = ::File.new("#{@current_resource.file_path}")
     Chef::Log.debug "file name : '#{new_resource.file}'"
@@ -114,43 +114,36 @@ def create_wsman_group
     doc = REXML::Document.new(contents, respect_whitespace: :all)
     doc.context[:attribute_quote] = :quote
 
-    last_el = nil
-    first_el = nil
-    root_el = doc.root.elements['/wsman-datacollection-config']
-
-    if !doc.elements['/wsman-datacollection-config/group[last()]'].nil?   #check for the last group
-      last_el = doc.root.elements['/wsman-datacollection-config/group/[last()]']
-    elsif !doc.root.elements['/wsman-datacollection-config/collection[last()]'].nil?  #no group then check to collection in main file wsman-datacollection-config.xml
-      last_el = doc.root.elements['/wsman-datacollection-config/collection/[last()]']
-    elsif doc.root.elements['/wsman-datacollection-config/system-definition/[first()]'].nil?  # no group and if subfolder then check first system-definition to insert before
-      first_el = doc.root.elements['/wsman-datacollection-config/system-definition/[first()]']
-    end
-
-    if !doc.elements['/wsman-datacollection-config/group[first()]'].nil?    #check for the first group
-      first_el = doc.root.elements['/wsman-datacollection-config/group/[first()]']
-    elsif !doc.root.elements['/wsman-datacollection-config/system-definition[first()]'].nil?   # no group and if subfolder then check first system-definition to insert before
-      first_el = doc.root.elements['/wsman-datacollection-config/system-definition/[first()]']
-    elsif !doc.root.elements['/wsman-datacollection-config/collection[last()]'].nil?   #no group then check to collection in main file wsman-datacollection-config.xml
-      last_el = doc.root.elements['/wsman-datacollection-config/collection/[last()]']
-    end
-
     if new_resource.position == 'top'
-      if !first_el.nil?
+      #Check for first group in the file
+      if !doc.elements['/wsman-datacollection-config/group[1]'].nil?
         group_el = REXML::Element.new 'group'
-        doc.root.insert_before(first_el, group_el)
-      elsif !last_el.nil?
+        first_group = doc.elements['/wsman-datacollection-config/group[1]']
+        doc.root.insert_before(first_group, group_el)
+      elsif !doc.root.elements['/wsman-datacollection-config/system-definition[1]'].nil?
+        first_sys_def = doc.elements['/wsman-datacollection-config/system-definition[1]']
         group_el = REXML::Element.new 'group'
-        doc.root.insert_after(last_el, group_el)
+        doc.root.insert_before(first_sys_def, group_el)
+      elsif !doc.root.elements['/wsman-datacollection-config/collection[last()]'].nil?
+        last_collection = doc.root.elements['/wsman-datacollection-config/collection/[last()]']
+        group_el = REXML::Element.new 'group'
+        doc.root.insert_after(last_collection, group_el)
       else
         group_el = doc.root.add_element 'group'
       end
-    else
-      if !last_el.nil?
+    else #add to bottom
+      if !doc.elements['/wsman-datacollection-config/group[last()]'].nil?
         group_el = REXML::Element.new 'group'
-        doc.root.insert_after(last_el, group_el)
-      elsif !first_el.nil?
+        last_group = doc.elements['/wsman-datacollection-config/group[last()]']
+        doc.root.insert_after(last_group, group_el)
+      elsif !doc.root.elements['/wsman-datacollection-config/system-definition[1]'].nil?
+        first_sys_def = doc.elements['/wsman-datacollection-config/system-definition[1]']
         group_el = REXML::Element.new 'group'
-        doc.root.insert_before(root_el, group_el)
+        doc.root.insert_before(first_sys_def, group_el)
+      elsif !doc.root.elements['/wsman-datacollection-config/collection[last()]'].nil?
+        last_collection = doc.root.elements['/wsman-datacollection-config/collection/[last()]']
+        group_el = REXML::Element.new 'group'
+        doc.root.insert_after(last_collection, group_el)
       else
         group_el = doc.root.add_element 'group'
       end

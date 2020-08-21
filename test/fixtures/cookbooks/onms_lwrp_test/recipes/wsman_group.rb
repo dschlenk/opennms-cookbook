@@ -23,7 +23,7 @@ end
 opennms_wsman_group 'wsman-test-group' do
   file 'wsman-datacollection.d/wsman-test-group.xml'
   group_name 'wsman-test-group'
-  position 'bottom'
+  position 'top'
   resource_type 'node'
   resource_uri 'http://schemas.test.group.com/'
   attribs 'Info' => { 'alias' => 'serviceTag', 'type' => 'string' }, 'IdentifyingInfo' => { 'alias' => 'serviceTag', 'index-of' => '#IdentifyingDescriptions matches ".*ServiceTag"', 'type' => 'string' }
@@ -35,7 +35,7 @@ end
 opennms_wsman_group 'drac-power' do
   file 'wsman-datacollection.d/dell-idrac.xml'
   group_name 'drac-power'
-  position 'top'
+  position 'bottom'
   resource_type 'dracPowerSupplyIndex'
   resource_uri 'http://schemas.dmtf.org/wbem/wscim/'
   dialect 'http://schemas.microsoft.com/wbem/wsman/'
@@ -59,7 +59,7 @@ end
 opennms_wsman_group 'drac-power-test' do
   file 'wsman-datacollection-config.xml'
   group_name 'drac-power-test'
-  position 'top'
+  position 'bottom'
   resource_type 'dracPowerSupplyIndex'
   resource_uri 'http://schemas.dmtf.org/wbem/wscim/1/*'
   dialect 'http://schemas.microsoft.com/wbem/wsman/1/WQL'
@@ -71,7 +71,7 @@ end
 opennms_wsman_group 'drac-power-test-bottom' do
   file 'wsman-datacollection-config.xml'
   group_name 'drac-power-test-bottom'
-  position 'bottom'
+  position 'top'
   resource_type 'dracPowerSupplyIndex'
   resource_uri 'http://schemas.dmtf.org/wbem/wscim/1/*'
   dialect 'http://schemas.microsoft.com/wbem/wsman/1/WQL'
