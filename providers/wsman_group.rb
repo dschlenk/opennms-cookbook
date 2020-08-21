@@ -11,6 +11,7 @@ use_inline_resources # ~FC113
 
 action :create do
   if !@current_resource.exists
+    Chef::Log.info "#{@new_resource} doesn't exist - create new wsman group."
     create_wsman_group
   end
 end
@@ -44,28 +45,27 @@ def load_current_resource
   if group_exists?(@new_resource.group_name)
     Chef::Log.debug("group #{@current_resource.group_name} is in file already")
     @current_resource.exists = true
-    @current_resource.changed = false
-
-    file = ::File.new(@current_resource.file_path, 'r')
-    doc = REXML::Document.new file
-    file.close
-    group_el = doc.elements[group_xpath(@new_resource.group_name)]
   end
 end
 
 private
 
 def update_wsman_group()
-  Chef::Log.debug "Updating wsman group : '#{new_resource.group_name}'"
+  #The change may have less or more attributes. it clean to delete the match group name then add new group with same name and new data
+  Chef::Log.debug "file name : '#{@current_resource.file_path}'"
   file = ::File.new(@current_resource.file_path, 'r')
   doc = REXML::Document.new file
   file.close
 
-  doc = REXML::Document.new(contents, respect_whitespace: :all)
-  doc.context[:attribute_quote] = :quote
+  if group_in_file?(@current_resource.file_path, @current_resource.group_name)
+    Chef::Log.debug "group_in_file?: 'true'"
+    del_el = doc.elements.delete("/wsman-datacollection-config/group[@name='#{new_resource.group_name}']")
+    Chef::Log.debug("Deleted element: #{del_el}")
+  end
 
-  group_el = doc.elements[group_xpath(@current_resource.group_name)]
-  Chef::Log.debug("Group? '#{group_el}'")
+  Opennms::Helpers.write_xml_file(doc, "#{@current_resource.file_path}")
+
+  create_wsman_group
 end
 
 def delete_wsman_group()
@@ -106,42 +106,57 @@ def delete_included_def()
 end
 
 def create_wsman_group
-  if !@current_resource.exists
-    begin
-      Chef::Log.debug "Creating wsman group : "#{new_resource.name}'"
-      f = ::File.new("#{@current_resource.file_path}")
-      Chef::Log.debug "file name : '#{new_resource.file}'"
-      contents = f.read
-      doc = REXML::Document.new(contents, respect_whitespace: :all)
-      doc.context[:attribute_quote] = :quote
+  if !group_exists?(new_resource.group_name)
+    Chef::Log.debug "Creating wsman group : #{new_resource.group_name}"
+    f = ::File.new("#{@current_resource.file_path}")
+    Chef::Log.debug "file name : '#{new_resource.file}'"
+    contents = f.read
+    doc = REXML::Document.new(contents, respect_whitespace: :all)
+    doc.context[:attribute_quote] = :quote
 
-      last_group_el = nil
-      first_sys_def_el = nil
-      root_el = doc.root.elements['/wsman-datacollection-config']
+    last_el = nil
+    first_el = nil
+    root_el = doc.root.elements['/wsman-datacollection-config']
 
-      if !doc.elements['/wsman-datacollection-config/group[last()]'].nil?
-        last_group_el = doc.root.elements['/wsman-datacollection-config/group/[last()]']
-      else if !doc.root.elements['/wsman-datacollection-config/system-definition[first()]'].nil?
-        first_sys_def_el = doc.root.elements['/wsman-datacollection-config/system-definition/[first()]']
+    if !doc.elements['/wsman-datacollection-config/group[last()]'].nil?   #check for the last group
+      last_el = doc.root.elements['/wsman-datacollection-config/group/[last()]']
+    elsif !doc.root.elements['/wsman-datacollection-config/collection[last()]'].nil?  #no group then check to collection in main file wsman-datacollection-config.xml
+      last_el = doc.root.elements['/wsman-datacollection-config/collection/[last()]']
+    elsif doc.root.elements['/wsman-datacollection-config/system-definition/[first()]'].nil?  # no group and if subfolder then check first system-definition to insert before
+      first_el = doc.root.elements['/wsman-datacollection-config/system-definition/[first()]']
+    end
+
+    if !doc.elements['/wsman-datacollection-config/group[first()]'].nil?    #check for the first group
+      first_el = doc.root.elements['/wsman-datacollection-config/group/[first()]']
+    elsif !doc.root.elements['/wsman-datacollection-config/system-definition[first()]'].nil?   # no group and if subfolder then check first system-definition to insert before
+      first_el = doc.root.elements['/wsman-datacollection-config/system-definition/[first()]']
+    elsif !doc.root.elements['/wsman-datacollection-config/collection[last()]'].nil?   #no group then check to collection in main file wsman-datacollection-config.xml
+      last_el = doc.root.elements['/wsman-datacollection-config/collection/[last()]']
+    end
+
+    if new_resource.position == 'top'
+      if !first_el.nil?
+        group_el = REXML::Element.new 'group'
+        doc.root.insert_before(first_el, group_el)
+      elsif !last_el.nil?
+        group_el = REXML::Element.new 'group'
+        doc.root.insert_after(last_el, group_el)
+      else
+        group_el = doc.root.add_element 'group'
       end
+    else
+      if !last_el.nil?
+        group_el = REXML::Element.new 'group'
+        doc.root.insert_after(last_el, group_el)
+      elsif !first_el.nil?
+        group_el = REXML::Element.new 'group'
+        doc.root.insert_before(root_el, group_el)
+      else
+        group_el = doc.root.add_element 'group'
       end
+    end
 
-      if new_resource.position == 'bottom'
-        if !last_group_el.nil?
-          begin
-            doc.root.insert_after(last_group_el, REXML::Element.new('group'))
-          end
-        elsif first_sys_def_el.nil?
-          begin
-            doc.root.insert_before(first_sys_def_el, REXML::Element.new('group'))
-          end
-        else begin
-          doc.root.insert_after(root_el, REXML::Element.new('group'))
-        end
-        end
-      end
-
-      group_el = doc.root.elements['/wsman-datacollection-config/group']
+    if !group_el.nil?
       group_el.attributes['name'] = new_resource.group_name
 
       unless new_resource.resource_type.nil?
@@ -169,95 +184,124 @@ def create_wsman_group
           end
         end
       end
-      Opennms::Helpers.write_xml_file(doc, "#{@current_resource.file_path}")
     end
+    Opennms::Helpers.write_xml_file(doc, "#{@current_resource.file_path}")
   end
 end
 
-def resource_type_equal?(doc, resource_type)
-  if !resource_type.nil? && !resource_type.empty?
-    return true if doc.attributes['resource-type'].nil?
-  end
-
-  current = doc.attributes['resource-type'].to_s
-  current == resource_type
-end
-
-def resource_uri_equal?(doc, resource_uri)
-  if !resource_uri.nil? && !resource_uri.empty?
-    return true if doc.elements['resource-uri'].nil?
-  end
-
-  current = doc.attributes['resource-uri'].to_s
-  current == resource_uri
-end
-
-def dialect_equal?(doc, dialect)
-  if !dialect.nil? && !dialect.empty?
-    return true if doc.elements['dialect'].nil?
-  end
-
-  current = doc.attributes['dialect'].to_s
-  current == dialect
-end
-
-def filter_equal?(doc, filter)
-  if !filter.nil? && !filter.empty?
-    return true if doc.elements['filter'].nil?
-  end
-
-  current = doc.attributes['filter'].to_s
-  current == filter
-end
-
-def attribute_equal?(attrib)
-  file = ::File.new(@current_resource.file_path, 'r')
+def group_equal?
+  Chef::Log.debug "file name : '#{@current_resource.file_path}'"
+  file = ::File.new("#{@current_resource.file_path}", 'r')
   doc = REXML::Document.new file
   file.close
 
-  if !attrib.nil? && !attrib.empty?
-    return true
-  end
+  if group_in_file?("#{@current_resource.file_path}", new_resource.group_name)
+    Chef::Log.debug "group_in_file?: #{@current_resource.file_path}"
+    group_el = doc.elements["/wsman-datacollection-config/group[@name='#{new_resource.group_name}']"]
+    return true if group_el.nil? && (new_resource.nil? || new_resource.empty?)
 
-  unless new_resource.attribs.nil?
+    if resource_type_equal?(group_el) \
+         && resource_uri_equal?(group_el) \
+         && dialect_equal?(group_el) \
+         && filters_equal?(group_el) \
+         && attribute_equal?(doc)
+      true
+    else
+      false
+     end
+  end
+end
+
+def resource_type_equal?(doc)
+  return true if doc.attributes['resource-type'].nil? && @current_resource.resource_type.nil?
+
+  Chef::Log.debug "resource_type_equal?: #{@current_resource.resource_type}"
+  doc.attributes['resource-type'].to_s == @current_resource.resource_type.to_s
+end
+
+def resource_uri_equal?(doc)
+  return true if doc.attributes['resource-uri'].nil? && @current_resource.resource_uri.nil?
+
+  Chef::Log.debug "resource-uril?: #{@current_resource.resource_uri}"
+  doc.attributes['resource-uri'].to_s == @current_resource.resource_uri.to_s
+end
+
+def dialect_equal?(doc)
+  return true if doc.attributes['dialect'].nil? && @current_resource.dialect.nil?
+
+  unless doc.attributes['dialect'].nil? && @current_resource.dialect.nil?
+    Chef::Log.debug "dialect_equal??: #{@current_resource.dialect}"
+    doc.attributes['dialect'].to_s == @current_resource.dialect.to_s
+  end
+end
+
+def filters_equal? (doc)
+  return true if doc.attributes['filter'].nil? && @current_resource.filter.nil?
+
+  unless doc.attributes['filter'].nil? && @current_resource.filter.nil?
+    Chef::Log.debug "filter_equal?: #{@current_resource.filter}"
+    doc.attributes['filter'].to_s == @current_resource.filter.to_s
+  end
+end
+
+def attribute_equal?(doc)
+  Chef::Log.debug "attribute_equal??: #{@current_resource.attribs}"
+  attribute_el = doc.elements["/wsman-datacollection-config/group[@name='#{@current_resource.group_name}/attrib']"]
+  return true if attribute_el.nil? && (@current_resource.attribs.nil? || @current_resource.attribs.empty?)
+
+  unless @current_resource.attribs.nil?
     begin
-      new_resource.attribs.each do |name, details|
-        attrib_el = doc.elements[attrib_xpath(@new_resource.group_name, name)]
-        return true if thing_changed?(attrib_el.attributes['name'].to_s, details['name'].to_s)
-        return true if thing_changed?(attrib_el.attributes['alias'].to_s, details['alias'].to_s)
-        return true if thing_changed?(attrib_el.attributes['type'].to_s, details['type'].to_s)
-        return true if thing_changed?(attrib_el.attributes['index-of'].to_s, details['index-of'].to_s)
-        return true if thing_changed?(attrib_el.attributes['filter'].to_s, details['filter'].to_s)
-        false
+      @current_resource.attribs.each do |name, details|
+        group_el = doc.elements["/wsman-datacollection-config/group[@name='#{@current_resource.group_name}']/attrib"]
+        group_el.each do |att|
+          return true if att.attribute['name'].nil? && name.nil?
+          if att.attribute['name'] == name
+            attrib_el = doc.elements["/wsman-datacollection-config/group[@name='#{@current_resource.group_name}/attrib/[@name='#{name}']"]
+            return true if attrib_el.nil? && (name.nil? || name.to_s == '')
+            if alias_equal?(attrib_el, details['alias'])  \
+            && type_equal?(attrib_el, details['type']) \
+            && filter_equal?(attrib_el, details['filter']) \
+            && index_of_equal?(attrib_el, details['index-of'])
+            end
+          end
+        end
       end
     end
   end
 end
 
-def thing_changed?(resource, current)
-  unless resource.nil?
-    Chef::Log.debug "thing_changed? #{resource} == #{current}?"
-    return true unless resource.to_s == current.to_s
-  end
-  false
+def alias_equal?(doc, current_resource)
+  return true if doc.attributes['alias'].nil? && current_resource.nil?
+  Chef::Log.debug "alias_equal?: #{current_resource.to_s}"
+  doc.attributes['alias'].to_s == current_resource.to_s
 end
 
-def things_changed?(resource, current)
-  unless resource.nil?
-    Chef::Log.debug "things_changed? #{resource} == #{current}?"
-    return true unless resource == current
+def type_equal?(doc, current_resource)
+  return true if doc.attributes['type'].nil? && current_resource.nil?
+  Chef::Log.debug "type?: #{current_resource.to_s}"
+  doc.attributes['type'].to_s == current_resource.to_s
+end
+
+def filter_equal?(doc,current_resource)
+  return true if doc.attributes['filter'].nil? && current_resource.nil?
+  Chef::Log.debug "filter?: #{current_resource.to_s}"
+  unless doc.attributes['filter'].nil? && current_resource.nil?
+    doc.attributes['filter'].to_s == current_resource.to_s
   end
-  false
+end
+
+def index_of_equal?(doc, current_resource)
+  return true if doc.attributes['index-of'].nil? && current_resource.nil?
+  Chef::Log.debug "index-of?: #{current_resource.to_s}"
+  unless doc.attributes['index-of'].nil? && current_resource.nil?
+    doc.attributes['index-of'].to_s == current_resource.to_s
+  end
 end
 
 def create_wsman_group_file ()
   doc = REXML::Document.new
   doc << REXML::XMLDecl.new
   root_el = doc.add_element 'wsman-datacollection-config'
-  #sys_def_el = root_el.add_element 'system-definition'
-  #sys_def_el.attributes['name'] = "#{new_resource.group_name}"
-  #incl_def_el = sys_def_el.add_element 'include-group'
-  #incl_def_el.add_text("#{new_resource.group_name}")
   root_el.add_text("\n")
   Opennms::Helpers.write_xml_file(doc, "#{node['opennms']['conf']['home']}/etc/#{new_resource.file}")
 end
@@ -401,12 +445,6 @@ def group_xpath(group)
 end
 
 
-def attrib_xpath(group, att_name)
-  attrib_xpath = "/wsman-datacollection-config/group[@name='#{group}']/attrib/[@name='#{att_name}']"
-  Chef::Log.debug "attrib_xpath is: #{attrib_xpath}"
-  attrib_xpath
-end
-
 def group_file?(file, node)
   fn = "#{node['opennms']['conf']['home']}/etc/#{file}"
   groupfile = false
@@ -417,40 +455,6 @@ def group_file?(file, node)
     groupfile = !doc.elements['/wsman-datacollection-config'].nil?
   end
   groupfile
-end
-
-def matching_group(doc, current_resource)
-  group = nil
-  doc.elements.each('/wsman-datacollection-config/group') do |group_el|
-    next unless group_el.attributes['name'].to_s == current_resource.group_name.to_s\
-    && group_el.attributes['resource-uri'].to_s == current_resource.resource_uri.to_s\
-    && group_el.attributes['resource-type'].to_s == current_resource.resource_type.to_s
-    group = group_el
-    break
-  end
-  group
-end
-
-def matching_attrib(doc, current_resource)
-  attr_el = nil
-  current_resource.attribs.each do |name, details|
-    next unless doc.attributes['name'].to_s == name \
-       && doc.attributes['alias'].to_s == details['alias'].to_s\
-       && doc.attributes['type'].to_s == details['type'].to_s
-    attr_el = doc
-    break
-  end
-  attr_el
-end
-
-def matching_include_group(doc, current_resource)
-  include_def_el = nil
-  doc.elements.each('/wsman-datacollection-config/system-definition/include-group') do |include_el|
-    next unless include_el.text() == current_resource.group_name.to_s
-    include_def_el = include_el
-    break
-  end
-  include_def_el
 end
 
 
