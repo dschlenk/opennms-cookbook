@@ -6,7 +6,7 @@ control 'wsman_group' do
     its('resource_label') { should eq '${resource}' }
   end
 
-  describe wsman_group('wsman-another-group') do
+  describe wsman_group('wsman-another-group', 'foo') do
     it { should exist }
     its('position') { should eq 'bottom' }
     its('group_name') { should eq 'wsman-another-group' }
@@ -15,7 +15,7 @@ control 'wsman_group' do
     its('attribs') { should eq 'Info' => { 'alias' => 'serviceTag', 'type' => 'string' }, 'IdentifyingInfo' => { 'alias' => 'serviceTag', 'index-of' => '#IdentifyingDescriptions matches ".*ServiceTag"', 'type' => 'string' } }
   end
 
-  describe wsman_group('wsman-test-group') do
+  describe wsman_group('wsman-test-group', 'foo') do
     it { should exist }
     its('group_name') { should eq 'wsman-test-group' }
     its('position') { should eq 'top' }
@@ -24,7 +24,7 @@ control 'wsman_group' do
     its('attribs') { should eq 'Info' => { 'alias' => 'serviceTag', 'type' => 'string' }, 'IdentifyingInfo' => { 'alias' => 'serviceTag', 'index-of' => '#IdentifyingDescriptions matches ".*ServiceTag"', 'type' => 'string' } }
   end
 
-  describe wsman_group('drac-power') do
+  describe wsman_group('drac-power', 'foo') do
     it { should exist }
     its('group_name') { should eq 'drac-power' }
     its('resource_type') { should eq 'dracPowerSupplyIndex' }
@@ -35,7 +35,7 @@ control 'wsman_group' do
     its('attribs') { should eq 'InstanceID' => { 'alias' => 'InstanceID',  'type' => 'String' }, 'PrimaryStatus' => { 'alias' => 'PrimaryStatus',  'type' => 'Gauge' }, 'SerialNumber' => { 'alias' => 'SerialNumber',  'type' => 'String' }, 'TotalOutputPower' => { 'alias' => 'TotalOutputPower',  'type' => 'Gauge' } }
   end
 
-  describe wsman_group('drac-power-delltest') do
+  describe wsman_group('drac-power-delltest', 'foo') do
     it { should exist }
     its('group_name') { should eq 'drac-power-delltest' }
     its('resource_type') { should eq 'dracPowerSupplyIndex' }
@@ -46,7 +46,7 @@ control 'wsman_group' do
     its('attribs') { should eq 'InstanceID' => { 'alias' => 'InstanceID',  'type' => 'String' }, 'PrimaryStatus' => { 'alias' => 'PrimaryStatus',  'type' => 'Gauge' }, 'SerialNumber' => { 'alias' => 'SerialNumber',  'type' => 'String' }, 'TotalOutputPower' => { 'alias' => 'TotalOutputPower',  'type' => 'Gauge' } }
   end
 
-  describe wsman_group('drac-power-test-bottom') do
+  describe wsman_group('drac-power-test-bottom', 'foo') do
     it { should_not exist }
   end
 end

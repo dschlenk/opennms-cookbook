@@ -8,7 +8,7 @@ class WsManGroup < Inspec.resource(1)
   '
 
   example '
-    describe wsman_group(\'wmi_test_resource\') do
+    describe wsman_group(\'wmi_test_resource\', \'foo\') do
       it { should exist }
       its(\'resource_type\') { should eq \'resource_type\' }
       its(\'resource_uri\') { should eq \'resource_uri\' }
@@ -28,11 +28,11 @@ class WsManGroup < Inspec.resource(1)
     @exists = !wsman_group?
     @params = {}
     return unless @exists
-
+    @params[:name] = group.attributes['name'].to_s
     @params[:resource_type] = group.attributes['resource-type'].to_s
     @params[:resource_uri] = group.attributes['resource-uri'].to_s
-    @params[:dialect] = group.attributes['dialect'].to_s
-    @params[:filter] = group.attributes['filter'].to_s
+    @params[:dialect] = group.attributes['dialect'].to_s unless group.attributes['dialect']
+    @params[:filter] = group.attributes['filter'].to_s unless group.attributes['filter']
 
     unless group.elements['attrib'].nil?
       attribs = {}
@@ -40,12 +40,13 @@ class WsManGroup < Inspec.resource(1)
         aname = a.attributes['name'].to_s
         atype = a.attributes['type'].to_s
         aalias = a.attributes['alias'].to_s
-        aobj = a.attributes['index-of'].to_s unless a.attributes['index-of'].nil?
-
-        attribs[aname] = {}
+        aido = a.attributes['index-of'].to_s unless a.attributes['index-of'].nil?
+        afilter = a.attributes['filter'].to_s unless a.attributes['filter'].nil?
+        attribs[aname]['name'] = aname
         attribs[atype]['type'] = atype
         attribs[aalias]['alias'] = aalias
-        attribs[aobj]['index-of'] = aobj unless aobj.nil?
+        attribs[aido]['index-of'] = aido unless aido.nil?
+        attribs[afilter]['filter'] = filter unless filter.nil?
       end
     end
     @params[:attribs] = attribs
