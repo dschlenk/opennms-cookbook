@@ -73,7 +73,7 @@ def delete_wsman_group()
   delete_group
 
   #Also delete the including group from the system-definition if find it
-  delete_included_def
+  #delete_included_def
 end
 
 def delete_group()

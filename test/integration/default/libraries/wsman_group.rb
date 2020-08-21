@@ -8,7 +8,7 @@ class WsManGroup < Inspec.resource(1)
   '
 
   example '
-    describe wsman_group(\'group_name\', \'file\') do
+    describe wsman_group(\'wmi_test_resource\') do
       it { should exist }
       its(\'resource_type\') { should eq \'resource_type\' }
       its(\'resource_uri\') { should eq \'resource_uri\' }
@@ -18,19 +18,16 @@ class WsManGroup < Inspec.resource(1)
     end
   '
 
-  def initialize(group_name, file)
-    file = file
-    if file == "wsman-datacollection-config.xml" || ""
-      file_path='/opt/opennms/etc/wsman-datacollection-config.xml'
-    else
-      file_path="/opt/opennms/etc/wsman-datacollection.d/#{file}"
+  def initialize(group_name)
+    doc = REXML::Document.new(inspec.file('/opt/opennms/etc/wsman-datacollection-config.xml').content)
+    wsman_group = doc.elements["/wsman-datacollection-config/group[@name='#{group_name}']]"]
+    if wsman_group.nil?
+      doc = REXML::Document.new(inspec.file('/opt/opennms/etc/wsman-datacollection.d/wsman-test-group.xml').content)
+      wsman_group = doc.elements["/wsman-datacollection-config/group[@name='#{group_name}']]"]
     end
-    doc = REXML::Document.new(inspec.file("#{file_path}").content)
-    group = doc.elements["/wsman-datacollection-config/group[@name='#{group_name}']]"]
-
-    @group_exists = !group.nil?
+    @exists = !wsman_group?
     @params = {}
-    return unless group_exists
+    return unless @exists
 
     @params[:resource_type] = group.attributes['resource-type'].to_s
     @params[:resource_uri] = group.attributes['resource-uri'].to_s
