@@ -9,7 +9,7 @@ actions :create, :delete
 default_action :create
 
 attribute :name, name_attribute: true, kind_of: String, required: true
-attribute :file, kind_of: String, default: 'wsman-datacollection-config.xml', required: true
+attribute :file_name, kind_of: String, default: 'wsman-datacollection-config.xml', required: true
 attribute :group_name, name_attribute: true, kind_of: String, required: true
 attribute :resource_type, kind_of: String, default: 'node', required: true
 attribute :resource_uri, kind_of: String, default: 'http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dcim/DCIM_ComputerSystem', required: true

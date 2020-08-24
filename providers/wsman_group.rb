@@ -29,15 +29,15 @@ end
 def load_current_resource
   @current_resource = Chef::Resource.resource_for_node(:opennms_wsman_group, node).new(@new_resource.name)
   @current_resource.group_name(@new_resource.group_name || @new_resource.group_name)
-  @current_resource.file(@new_resource.file)
+  @current_resource.file_name(@new_resource.file_name)
   @current_resource.resource_type(@new_resource.resource_type)
   @current_resource.resource_uri(@new_resource.resource_uri)
   @current_resource.dialect(@new_resource.dialect)
   @current_resource.filter(@new_resource.filter)
   @current_resource.attribs(@new_resource.attribs)
-  @current_resource.file_path = "#{node['opennms']['conf']['home']}/etc/#{new_resource.file}"
+  @current_resource.file_path = "#{node['opennms']['conf']['home']}/etc/#{new_resource.file_name}"
 
-  if !group_file?(@new_resource.file, node)
+  if !group_file?(@new_resource.file_name, node)
     create_wsman_group_file
   end
 
@@ -138,7 +138,7 @@ def create_wsman_group
   if !group_exists?(@current_resource.group_name)
     Chef::Log.debug "Creating wsman group : #{new_resource.group_name}"
     f = ::File.new("#{@current_resource.file_path}")
-    Chef::Log.debug "file name : '#{new_resource.file}'"
+    Chef::Log.debug "file name : '#{new_resource.file_name}'"
     contents = f.read
     doc = REXML::Document.new(contents, respect_whitespace: :all)
     doc.context[:attribute_quote] = :quote
@@ -180,14 +180,8 @@ def create_wsman_group
 
     if !group_el.nil?
       group_el.attributes['name'] = new_resource.group_name
-
-      unless new_resource.resource_type.nil?
-        group_el.attributes['resource-type'] = new_resource.resource_type
-      end
-
-      unless new_resource.resource_uri.nil?
-        group_el.attributes['resource-uri'] = new_resource.resource_uri
-      end
+      group_el.attributes['resource-type'] = new_resource.resource_type
+      group_el.attributes['resource-uri'] = new_resource.resource_uri
 
       unless new_resource.dialect.nil?
         group_el.attributes['dialect'] = new_resource.dialect
@@ -326,7 +320,7 @@ def create_wsman_group_file ()
   doc << REXML::XMLDecl.new
   root_el = doc.add_element 'wsman-datacollection-config'
   root_el.add_text("\n")
-  Opennms::Helpers.write_xml_file(doc, "#{node['opennms']['conf']['home']}/etc/#{new_resource.file}")
+  Opennms::Helpers.write_xml_file(doc, "#{node['opennms']['conf']['home']}/etc/#{new_resource.file_name}")
 end
 
 def group_exists?(group_name)

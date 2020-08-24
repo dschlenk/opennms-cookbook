@@ -1,28 +1,19 @@
 # frozen_string_literal: true
-include_recipe 'onms_lwrp_test::collection_package'
-include_recipe 'onms_lwrp_test::wsman_collection'
-
-opennms_resource_type 'wsman-thing' do
-  group_name 'metasyntactic'
-  label 'wsman resource'
-  resource_label '${resource}'
-  notifies :restart, 'service[opennms]'
-end
 
 #add new group in new file bottom
 opennms_wsman_group 'wsman-another-group' do
-  file 'wsman-datacollection.d/wsman-test-group.xml'
+  file_name 'wsman-datacollection.d/wsman-test-group.xml'
   group_name 'wsman-another-group'
   position 'bottom'
   resource_type 'node'
   resource_uri 'http://schemas.test.group.com/'
-  attribs 'Info' => { 'alias' => 'serviceTag', 'type' => 'string' }, 'IdentifyingInfo' => { 'alias' => 'serviceTag', 'index-of' => '#IdentifyingDescriptions matches ".*ServiceTag"', 'type' => 'string' }
+  attribs 'Info' => { 'alias' => 'serviceTag', 'type' => 'string' }
   notifies :restart, 'service[opennms]', :delayed
 end
 
 #add new group in new file top
 opennms_wsman_group 'wsman-test-group' do
-  file 'wsman-datacollection.d/wsman-test-group.xml'
+  file_name 'wsman-datacollection.d/wsman-test-group.xml'
   group_name 'wsman-test-group'
   position 'top'
   resource_type 'node'
@@ -33,7 +24,7 @@ end
 
 #add new group in new file bottom
 opennms_wsman_group 'drac-power' do
-  file 'wsman-datacollection.d/wsman-test-group.xml'
+  file_name 'wsman-datacollection.d/wsman-test-group.xml'
   group_name 'drac-power'
   position 'bottom'
   resource_type 'dracPowerSupplyIndex'
@@ -46,7 +37,7 @@ end
 
 #add new group in new file top
 opennms_wsman_group 'drac-power-delltest' do
-  file 'wsman-datacollection.d/wsman-test-group.xml'
+  file_name 'wsman-datacollection.d/wsman-test-group.xml'
   group_name 'drac-power-delltest'
   position 'top'
   resource_type 'dracPowerSupplyIndex'
@@ -84,7 +75,7 @@ end
 #Existing group expect do nothing
 opennms_wsman_group 'drac-system-board' do
   group_name 'drac-system-board'
-  file 'wsman-datacollection.d/dell-idrac.xml'
+  file_name 'wsman-datacollection.d/dell-idrac.xml'
   position 'top'
   resource_type 'node'
   resource_uri 'http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dcim/DCIM_NumericSensor'
