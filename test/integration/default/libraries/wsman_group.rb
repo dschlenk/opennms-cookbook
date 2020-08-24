@@ -8,7 +8,7 @@ class WsManGroup < Inspec.resource(1)
   '
 
   example '
-    describe wsman_group(\'wmi_test_resource\', \'foo\') do
+    describe wsman_group(\'wmi_test_resource\', \'file_path\') do
       it { should exist }
       its(\'resource_type\') { should eq \'resource_type\' }
       its(\'resource_uri\') { should eq \'resource_uri\' }
@@ -28,7 +28,6 @@ class WsManGroup < Inspec.resource(1)
     @exists = !wsman_group?
     @params = {}
     return unless @exists
-    @params[:name] = group.attributes['name'].to_s
     @params[:resource_type] = group.attributes['resource-type'].to_s
     @params[:resource_uri] = group.attributes['resource-uri'].to_s
     @params[:dialect] = group.attributes['dialect'].to_s unless group.attributes['dialect']

@@ -68,12 +68,35 @@ def update_wsman_group()
   create_wsman_group
 end
 
+
+def insert_included_def()
+  if !include_group_exists?(@current_resource.group_name)
+    Chef::Log.debug "No system definition included. Add system definition for group: '#{@current_resource.group_name}'"
+
+    file = ::File.new(@current_resource.file_path, 'r')
+    doc = REXML::Document.new file
+    file.close
+
+    if !doc.elements['/wsman-datacollection-config/group[last()]'].nil?
+      last_group_el = doc.elements['/wsman-datacollection-config/group[last()]']
+      system_definition_el = REXML::Element.new 'system-definition'
+      doc.root.insert_after(last_group_el, system_definition_el)
+      system_definition_el.attributes['name'] = "#{new_resource.group_name}"
+      incl_def_el = system_definition_el.add_element 'include-group'
+      incl_def_el.add_text("#{new_resource.group_name}")
+    end
+
+    Chef::Log.debug("Insert system-definition: #{system_definition_el}")
+    Opennms::Helpers.write_xml_file(doc, "#{@current_resource.file_path}")
+  end
+end
+
 def delete_wsman_group()
   #Delete group
   delete_group
 
   #Also delete the including group from the system-definition if find it
-  #delete_included_def
+  delete_included_def
 end
 
 def delete_group()
@@ -100,10 +123,16 @@ def delete_included_def()
     file.close
 
     del_el = doc.elements.delete("/wsman-datacollection-config/system-definition/include-group[text() = '#{@current_resource.group_name}']")
-    Chef::Log.debug("Deleted element: #{del_el}")
+    Chef::Log.debug("Deleted include-group: #{del_el}")
+
+    if !doc.elements["/wsman-datacollection-config/system-definition[@name = '#{@current_resource.group_name}']"].nil?
+      del_el = doc.elements.delete("/wsman-datacollection-config/system-definition[@name = '#{@current_resource.group_name}']")
+      Chef::Log.debug("Deleted system-definition: #{del_el}")
+    end
+    Opennms::Helpers.write_xml_file(doc, "#{@current_resource.include_group_file_path}")
   end
-  Opennms::Helpers.write_xml_file(doc, "#{@current_resource.include_group_file_path}")
 end
+
 
 def create_wsman_group
   if !group_exists?(@current_resource.group_name)
@@ -179,6 +208,7 @@ def create_wsman_group
       end
     end
     Opennms::Helpers.write_xml_file(doc, "#{@current_resource.file_path}")
+    insert_included_def
   end
 end
 
