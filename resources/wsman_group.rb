@@ -18,4 +18,4 @@ attribute :filter, kind_of: String, required: false
 attribute :attribs, kind_of: Hash, default: {}
 attribute :position, kind_of: String, equal_to: %w(top bottom), default: 'bottom'
 
-attr_accessor :exists, :changed, :file_path, :include_group_file_path
+attr_accessor :exists, :changed, :file_path, :include_group_file_path, :system_definition_file_path , :sys_def_exists
