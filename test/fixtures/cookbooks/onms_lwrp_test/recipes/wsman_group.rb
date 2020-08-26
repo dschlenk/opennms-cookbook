@@ -67,7 +67,7 @@ end
 
 #add new group to default file wsman-datacollection-config.xml on the top position
 opennms_wsman_group 'drac-power-test-bottom' do
-  name 'wsman-test'
+  name
   group_name 'drac-power-test-bottom'
   position 'top'
   resource_type 'dracPowerSupplyIndex'
