@@ -2,6 +2,7 @@
 
 #add new group in new file bottom
 opennms_wsman_group 'wsman-another-group' do
+  name 'wsman-test'
   file_name 'wsman-datacollection.d/wsman-test-group.xml'
   group_name 'wsman-another-group'
   position 'bottom'
@@ -13,6 +14,7 @@ end
 
 #add new group in new file top
 opennms_wsman_group 'wsman-test-group' do
+  name 'wsman-test'
   file_name 'wsman-datacollection.d/wsman-test-group.xml'
   group_name 'wsman-test-group'
   position 'top'
@@ -24,6 +26,7 @@ end
 
 #add new group in new file bottom
 opennms_wsman_group 'drac-power' do
+  name 'wsman-test'
   file_name 'wsman-datacollection.d/wsman-test-group.xml'
   group_name 'drac-power'
   position 'bottom'
@@ -37,6 +40,7 @@ end
 
 #add new group in new file top
 opennms_wsman_group 'drac-power-delltest' do
+  name 'wsman-test'
   file_name 'wsman-datacollection.d/wsman-test-group.xml'
   group_name 'drac-power-delltest'
   position 'top'
@@ -50,6 +54,7 @@ end
 
 #add new group to default file wsman-datacollection-config.xml on the bottom position
 opennms_wsman_group 'drac-power-test' do
+  name 'wsman-test'
   group_name 'drac-power-test'
   position 'bottom'
   resource_type 'dracPowerSupplyIndex'
@@ -62,6 +67,7 @@ end
 
 #add new group to default file wsman-datacollection-config.xml on the top position
 opennms_wsman_group 'drac-power-test-bottom' do
+  name 'wsman-test'
   group_name 'drac-power-test-bottom'
   position 'top'
   resource_type 'dracPowerSupplyIndex'
@@ -74,6 +80,7 @@ end
 
 #Existing group expect do nothing
 opennms_wsman_group 'drac-system-board' do
+  name 'wsman-test'
   group_name 'drac-system-board'
   file_name 'wsman-datacollection.d/dell-idrac.xml'
   position 'top'
