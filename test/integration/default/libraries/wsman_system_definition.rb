@@ -46,8 +46,7 @@ class WsmanSystemDefinition < Inspec.resource(1)
     exists = !doc.elements["/wsman-datacollection-config/system-definition[@name='#{name}']"].nil?
 
     if exists
-      @current_resource.file_path = "#{node['opennms']['conf']['home']}/etc/wsman-datacollection-config.xml"
-      system_def_file = @current_resource.file_path
+      system_def_file = "#{node['opennms']['conf']['home']}/etc/wsman-datacollection-config.xml"
       return system_def_file
     else
       Dir.foreach("#{node['opennms']['conf']['home']}/etc/wsman-datacollection.d") do |group|

@@ -47,8 +47,7 @@ control 'wsman_group' do
     its('resource_uri') { should eq 'http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dcim/DCIM_NumericSensor' }
     its('dialect') { should eq 'http://schemas.microsoft.com/wbem/wsman/1/WQL' }
     its('filter') { should eq "select CurrentReading, ElementName from DCIM_NumericSensor WHERE ElementName LIKE 'System Board %'"}
-    its('attribs') { should eq 'CurrentReading' => { 'filter' => "#ElementName == 'System Board MEM Usage'", 'alias' => 'sysBoardMemUsage',  'type' => 'Gauge' }, 'CurrentReading' => { 'filter' => "#ElementName == 'System Board IO Usage'", 'alias' => 'sysBoardMemUsage',  'type' => 'Gauge' }, 'CurrentReading' => { 'filter' => "#ElementName == 'System Board CPU Usage'", 'alias' => 'sysBoardMemUsage',  'type' => 'Gauge' }, 'CurrentReading' => { 'filter' => "#ElementName == 'System Board SYS Usage'", 'alias' => 'sysBoardMemUsage',  'type' => 'Gauge' } }
-  end
+      end
 
   describe wsman_group('drac-power-test-bottom', 'default') do
     it { should_not exist }

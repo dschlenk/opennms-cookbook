@@ -1,5 +1,5 @@
 # frozen_string_literal: true
-
+include Wsman
 def whyrun_supported?
   true
 end
@@ -7,29 +7,45 @@ end
 use_inline_resources # ~FC113
 
 action :add do
-  Chef::Application.fatal!("Missing one of these data-collection groups: #{@current_resource.groups}.") unless @current_resource.groups_exist
   if @current_resource.exists
-    Chef::Log.info "#{@new_resource} already in systemDef - nothing to do."
+    Chef::Log.info "#{@new_resource} already in system-definition - nothing to do."
   else
-    converge_by("Add #{@new_resource}") do
-      add_groups_to_system_definition
-    end
+    Chef::Log.info "#{@new_resource} doesn't exist - create new system definition."
+    add_groups_to_system_definition
   end
 end
 
 action :remove do
-  Chef::Application.fatal!("Missing one of these wsman data-collection groups: #{@current_resource.groups}.") unless @current_resource.groups_exist
   if !@current_resource.exists
-    Chef::Log.info "#{@new_resource} not present - nothing to do."
-  else
-    converge_by("Remove #{@new_resource}") do
-      remove_groups_from_system_definition
-    end
+    Chef::Log.info "#{@new_resource} doesn't exist - nothing to do."
+  else converge_by("Remove #{@new_resource}") do
+    remove_groups_from_system_definition
+  end
   end
 end
+
 def load_current_resource
   @current_resource = Chef::Resource.resource_for_node(:opennms_system_def, node).new(@new_resource.name)
   @current_resource.groups(@new_resource.groups)
+  @current_resource.file_name(@new_resource.file_name)
+  @current_resource.position(@new_resource.position)
+  @current_resource.file_path = "#{node['opennms']['conf']['home']}/etc/#{new_resource.file_name}"
+
+
+  if !file_exists?(@current_resource.file_name, "#{node['opennms']['conf']['home']}")
+    create_system_definition_file
+  end
+
+  @current_resource.exists = false
+  system_definition_file = find_system_definition("#{node['opennms']['conf']['home']}", @current_resource.name)
+
+  if !system_definition_file.nil?
+    @current_resource.exists = true
+  end
+
+  if !@current_resource.exists
+    create_system_definition(@current_resource.file_path)
+  end
 
   ge = true
   @current_resource.groups.each do |group|
@@ -50,6 +66,32 @@ end
 
 
 private
+
+def system_definition_file?(file, node)
+  fn = "#{node['opennms']['conf']['home']}/etc/#{file}"
+  groupfile = false
+  if ::File.exist?(fn)
+    file = ::File.new(fn, 'r')
+    doc = REXML::Document.new file
+    file.close
+    groupfile = !doc.elements['/wsman-datacollection-config'].nil?
+  end
+  groupfile
+end
+
+def create_system_definition_file
+
+end
+
+def create_system_definition(filename)
+  root_el = doc.add_element 'wsman-datacollection-config'
+  #sys_def_el = root_el.add_element 'system-definition'
+  #sys_def_el.attributes['name'] = "#{new_resource.group_name}"
+  #incl_def_el = sys_def_el.add_element 'include-group'
+  #incl_def_el.add_text("#{new_resource.group_name}")
+  root_el.add_text("\n")
+  Opennms::Helpers.write_xml_file(doc, "#{node['opennms']['conf']['home']}/etc/#{new_resource.file}")
+end
 
 def find_system_definition(name)
   system_def_file = nil
