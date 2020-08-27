@@ -39,8 +39,8 @@ def load_current_resource
     break
   end
   @current_resource.groups_exist = true if ge
-  system_def_file = find_system_def(@current_resource.name)
-  unless @current_resource.file_path.nil?
+  system_def_file = find_system_definition(@current_resource.name)
+  if !system_def_file.nil?
     @current_resource.system_def_exists = true
     if groups_in_system_definition?(@current_resource.name, @current_resource.file_path, @current_resource.groups)
       @current_resource.exists = true
@@ -145,7 +145,6 @@ def find_system_definition(name)
       return system_def_file
     end
   end
-  system_def_file = @current_resource.file_path
   system_def_file
   end
 end
@@ -153,9 +152,9 @@ end
 def group_exists?(group)
   Chef::Log.debug "Checking to see if group #{group} exists."
   exists = false
-  Dir.foreach("#{node['opennms']['conf']['home']}etc/wsman-datacollection.d") do |gf|
+  Dir.foreach("#{node['opennms']['conf']['home']}/etc/wsman-datacollection.d") do |gf|
     next if gf !~ /.*\.xml$/
-    file = ::File.new("#{onms_home}/etc/wsman-datacollection.d/#{gf}", 'r')
+    file = ::File.new("#{node['opennms']['conf']['home']}/etc/wsman-datacollection.d/#{gf}", 'r')
     doc = REXML::Document.new file
     file.close
     unless doc.elements["/wsman-datacollection-config/group[@name='#{group}']"].nil?

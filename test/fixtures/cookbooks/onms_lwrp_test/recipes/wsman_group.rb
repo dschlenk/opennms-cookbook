@@ -2,7 +2,7 @@
 
 #add new group in new file bottom
 opennms_wsman_group 'wsman-another-group' do
-  name 'wsman-test'
+  sysdef_name 'Dell iDRAC 8'
   file_name 'wsman-datacollection.d/wsman-test-group.xml'
   group_name 'wsman-another-group'
   position 'bottom'
@@ -14,7 +14,7 @@ end
 
 #add new group in new file top
 opennms_wsman_group 'wsman-test-group' do
-  name 'wsman-test'
+  sysdef_name 'Dell iDRAC 8'
   file_name 'wsman-datacollection.d/wsman-test-group.xml'
   group_name 'wsman-test-group'
   position 'top'
@@ -25,10 +25,10 @@ opennms_wsman_group 'wsman-test-group' do
 end
 
 #add new group in new file bottom
-opennms_wsman_group 'drac-power' do
-  name 'wsman-test'
+opennms_wsman_group 'wsman-dell-group' do
+  sysdef_name 'Dell iDRAC 8'
   file_name 'wsman-datacollection.d/wsman-test-group.xml'
-  group_name 'drac-power'
+  group_name 'wsman-dell-group'
   position 'bottom'
   resource_type 'dracPowerSupplyIndex'
   resource_uri 'http://schemas.dmtf.org/wbem/wscim/'
@@ -40,7 +40,7 @@ end
 
 #add new group in new file top
 opennms_wsman_group 'drac-power-delltest' do
-  name 'wsman-test'
+  sysdef_name 'Dell iDRAC 8'
   file_name 'wsman-datacollection.d/wsman-test-group.xml'
   group_name 'drac-power-delltest'
   position 'top'
@@ -54,8 +54,9 @@ end
 
 #add new group to default file wsman-datacollection-config.xml on the bottom position
 opennms_wsman_group 'drac-power-test' do
-  name 'wsman-test'
+  sysdef_name 'Dell iDRAC 8'
   group_name 'drac-power-test'
+  file_name 'wsman-datacollection.d/wsman-test-group.xml'
   position 'bottom'
   resource_type 'dracPowerSupplyIndex'
   resource_uri 'http://schemas.dmtf.org/wbem/wscim/1/*'
@@ -67,7 +68,7 @@ end
 
 #add new group to default file wsman-datacollection-config.xml on the top position
 opennms_wsman_group 'drac-power-test-bottom' do
-  name
+  sysdef_name 'Dell iDRAC 8'
   group_name 'drac-power-test-bottom'
   position 'top'
   resource_type 'dracPowerSupplyIndex'
@@ -80,7 +81,7 @@ end
 
 #Existing group expect do nothing
 opennms_wsman_group 'drac-system-board' do
-  name 'wsman-test'
+  sysdef_name 'Dell iDRAC 8'
   group_name 'drac-system-board'
   file_name 'wsman-datacollection.d/dell-idrac.xml'
   position 'top'
@@ -94,6 +95,7 @@ end
 
 #Delete the group
 opennms_wsman_group 'drac-power-test-bottom' do
+  sysdef_name 'Dell iDRAC 8'
   group_name 'drac-power-test-bottom'
   action :delete
 end

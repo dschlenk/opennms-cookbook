@@ -26,8 +26,8 @@ action :delete do
 end
 
 def load_current_resource
-  @current_resource = Chef::Resource.resource_for_node(:opennms_wsman_group, node).new(@new_resource.name)
-  @current_resource.name(@new_resource.name)
+  @current_resource = Chef::Resource.resource_for_node(:opennms_wsman_group, node).new(@new_resource.sysdef_name)
+  @current_resource.sysdef_name(@new_resource.sysdef_name)
   @current_resource.group_name(@new_resource.group_name)
   @current_resource.file_name(@new_resource.file_name)
   @current_resource.resource_type(@new_resource.resource_type)
@@ -47,8 +47,12 @@ def load_current_resource
     @current_resource.exists = true
   end
   @current_resource.sys_def_exists = false
-  if system_definition_exist?(@current_resource.name)
-    @current_resource.sys_def_exists = true
+  system_definition_name = @current_resource.sysdef_name
+
+  if !system_definition_name.nil?
+    if system_definition_exist?(@current_resource.sysdef_name)
+      @current_resource.sys_def_exists = true
+    end
   end
 end
 
@@ -184,9 +188,9 @@ end
 
 
 def insert_included_def()
-  Chef::Log.debug "No system definition included. Add system definition for group: '#{new_resource.name}'"
+  Chef::Log.debug "No system definition included. Add system definition for group: '#{new_resource.sysdef_name}'"
   if @current_resource.sys_def_exists
-    Chef::Log.debug "Current System Definition '#{@current_resource.name}' exist in: '#{@current_resource.system_definition_file_path}'"
+    Chef::Log.debug "Current System Definition '#{@current_resource.sysdef_name}' exist in: '#{@current_resource.system_definition_file_path}'"
     insert_system_definition_include_group("#{@current_resource.system_definition_file_path}")
   end
 end
@@ -196,10 +200,10 @@ def insert_system_definition_include_group(name)
   doc = REXML::Document.new file
   file.close
 
-  system_definition_el = doc.elements["/wsman-datacollection-config/system-definition[@name='#{new_resource.name}']"]
+  system_definition_el = doc.elements["/wsman-datacollection-config/system-definition[@name='#{new_resource.sysdef_name}']"]
 
   if !system_definition_el.nil?
-    Chef::Log.debug "Insert Include Group '#{new_resource.group_name}' to existing system definition: '#{new_resource.name}'"
+    Chef::Log.debug "Insert Include Group '#{new_resource.group_name}' to existing system definition: '#{new_resource.sysdef_name}'"
     incl_def_el = system_definition_el.add_element 'include-group'
     incl_def_el.add_text("#{new_resource.group_name}")
   end
@@ -412,7 +416,7 @@ def group_xpath(group)
 end
 
 def system_definition_xpath() #get the first system difiniton on the file if exist
-  system_definition_xpath = "/wsman-datacollection-config/system-definition[@name='#{new_resource.name}']"
+  system_definition_xpath = "/wsman-datacollection-config/system-definition[@name='#{new_resource.sysdef_name}']"
   Chef::Log.debug "system_definition_xpath  is: #{system_definition_xpath}"
   system_definition_xpath
 end

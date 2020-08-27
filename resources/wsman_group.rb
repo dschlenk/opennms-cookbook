@@ -8,7 +8,7 @@ require 'rexml/document'
 actions :create, :delete
 default_action :create
 
-attribute :name, name_attribute: true, kind_of: String, required: true
+attribute :sysdef_name, name_attribute: true, kind_of: String, required: false
 attribute :file_name, kind_of: String, default: 'wsman-datacollection-config.xml', required: true
 attribute :group_name, name_attribute: true, kind_of: String, required: true
 attribute :resource_type, kind_of: String, default: 'node', required: true
