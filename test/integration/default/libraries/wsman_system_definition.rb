@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 class WsmanSystemDefinition < Inspec.resource(1)
-  name 'system_definition'
+  name 'wsman_system_definition'
 
   desc '
-    OpenNMS WS-Man system_definition
+    OpenNMS wsman_system_definition
   '
 
   example '
