@@ -447,3 +447,24 @@ suites:
       inspec_tests:
         - path: test/integration/default
         - path: test/integration/wsman_system_definition
+  - name: wsman
+    run_list:
+      - 'recipe[opennms::postgres]'
+      - 'recipe[oracle_java8::default]'
+      - 'recipe[opennms::default]'
+      - 'recipe[onms_lwrp_test::wsman_collection]'
+      - 'recipe[onms_lwrp_test::wsman_collection_service]'
+      - 'recipe[onms_lwrp_test::wsman_group]'
+      - 'recipe[onms_lwrp_test::wsman_system_definition]'
+    atttributes:
+      opennms:
+        version: 25.2.0-1
+        verifier:
+          inspec_tests:
+            - path: test/integration/default
+            - path: test/integration/wsman_collection
+            - path: test/integration/wsman_collection_service
+            - path: test/integration/wsman_group
+            - path: test/integration/wsman_system_definition
+
+
