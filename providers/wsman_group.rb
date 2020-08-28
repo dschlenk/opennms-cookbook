@@ -2,7 +2,6 @@
 #
 include ResourceType
 include Wsman
-include Chef::Mixin::ShellOut
 
 def whyrun_supported?
   true
@@ -43,7 +42,7 @@ def load_current_resource
   end
 
   @current_resource.exists = false
-  if group_exists?(@new_resource.group_name, node)
+  if wsman_group_exists?(@new_resource.group_name, node)
     Chef::Log.debug("group #{@current_resource.group_name} is in file already")
     @current_resource.exists = true
   end
@@ -60,7 +59,7 @@ end
 private
 
 def create_wsman_group
-  if !group_exists?(@current_resource.group_name, node)
+  if !wsman_group_exists?(@current_resource.group_name, node)
     Chef::Log.debug "Creating wsman group : #{new_resource.group_name}"
     f = ::File.new("#{@current_resource.file_path}")
     Chef::Log.debug "file name : '#{new_resource.file_name}'"

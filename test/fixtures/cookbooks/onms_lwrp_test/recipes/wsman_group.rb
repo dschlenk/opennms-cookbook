@@ -2,7 +2,6 @@
 
 #add new group in new file bottom
 opennms_wsman_group 'wsman-another-group' do
-  sysdef_name 'Dell iDRAC 8'
   file_name 'wsman-datacollection.d/wsman-test-group.xml'
   group_name 'wsman-another-group'
   position 'bottom'
@@ -14,7 +13,6 @@ end
 
 #add new group in new file top
 opennms_wsman_group 'wsman-test-group' do
-  sysdef_name 'Dell iDRAC 8'
   file_name 'wsman-datacollection.d/wsman-test-group.xml'
   group_name 'wsman-test-group'
   position 'top'
@@ -26,7 +24,6 @@ end
 
 #add new group in new file bottom
 opennms_wsman_group 'wsman-dell-group' do
-  sysdef_name 'Dell iDRAC 8'
   file_name 'wsman-datacollection.d/wsman-test-group.xml'
   group_name 'wsman-dell-group'
   position 'bottom'
@@ -40,7 +37,6 @@ end
 
 #add new group in new file top
 opennms_wsman_group 'drac-power-delltest' do
-  sysdef_name 'Dell iDRAC 8'
   file_name 'wsman-datacollection.d/wsman-test-group.xml'
   group_name 'drac-power-delltest'
   position 'top'
@@ -81,7 +77,6 @@ end
 
 #Existing group expect do nothing
 opennms_wsman_group 'drac-system-board' do
-  sysdef_name 'Dell iDRAC 8'
   group_name 'drac-system-board'
   file_name 'wsman-datacollection.d/dell-idrac.xml'
   position 'top'

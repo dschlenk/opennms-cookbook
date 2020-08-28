@@ -226,7 +226,7 @@ module Wsman
     Opennms::Helpers.write_xml_file(doc, "#{node['opennms']['conf']['home']}/etc/#{@current_resource.file_name}")
   end
 
-  def group_exists?(group_name, node)
+  def wsman_group_exists?(group_name, node)
     Chef::Log.debug "Checking to see if this ws-man group exists: '#{group_name}'"
 
     #Check to see if group exist in wsman-datacollection-config.xml
