@@ -1,5 +1,5 @@
 # frozen_string_literal: true
-include ResourceType
+#
 include Wsman
 
 def whyrun_supported?
@@ -27,14 +27,14 @@ action :remove do
 end
 
 def load_current_resource
-  @current_resource = Chef::Resource.resource_for_node(:opennms_system_def, node).new(@new_resource.name)
+  @current_resource = Chef::Resource.resource_for_node(:opennms_wsman_system_definition, node).new(@new_resource.name)
   @current_resource.groups(@new_resource.groups)
-  @current_resource.file_name(@new_resource.file_name)
   @current_resource.position(@new_resource.position)
+  @current_resource.file_name(@new_resource.file_name)
   @current_resource.file_path = "#{node['opennms']['conf']['home']}/etc/#{new_resource.file_name}"
 
 
-  if !file_exists?(@new_resource.file_name, node)
+  if !file_exists?("#{@new_resource.file_name}", node)
     create_file(node)
   end
 
