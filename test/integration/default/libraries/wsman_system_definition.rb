@@ -15,6 +15,7 @@ class WsmanSystemDefinition < Inspec.resource(1)
 
   def initialize(name)
     fn = find_system_definition(name)
+    puts 'System Definition name : ' + fn
     doc = REXML::Document.new(inspec.file(fn).content)
     s_el = doc.elements["/wsman-datacollection-config/system-definition[@name='#{name}']"]
     @exists = !s_el.nil?
@@ -23,6 +24,7 @@ class WsmanSystemDefinition < Inspec.resource(1)
     unless s_el.elements['include-group'].nil?
       @params[:groups] = []
       s_el.each_element('include-group') do |g|
+        puts 'Group name : ' + "#{g}"
         @params[:groups].push g.texts.join('')
       end
     end
@@ -40,28 +42,28 @@ class WsmanSystemDefinition < Inspec.resource(1)
 
   def find_system_definition(name)
     system_def_file = nil
-    file = ::File.new("#{node['opennms']['conf']['home']}/etc/wsman-datacollection-config.xml", 'r')
-    doc = REXML::Document.new file
-
-    exists = !doc.elements["/wsman-datacollection-config/system-definition[@name='#{name}']"].nil?
-
-    if exists
-      system_def_file = "#{node['opennms']['conf']['home']}/etc/wsman-datacollection-config.xml"
-      return system_def_file
-    else
-      Dir.foreach("#{node['opennms']['conf']['home']}/etc/wsman-datacollection.d") do |group|
-        next if group !~ /.*\.xml$/
-        file = ::File.new("#{node['opennms']['conf']['home']}/etc/wsman-datacollection.d/#{group}", 'r')
-        doc = REXML::Document.new file
-        file.close
-        exists = !doc.elements["/wsman-datacollection-config/system-definition[@name='#{name}']"].nil?
-        if exists
-          @current_resource.file_path = "#{node['opennms']['conf']['home']}/etc/wsman-datacollection.d/#{group}"
-          system_def_file = @current_resource.file_path
-          return system_def_file
-        end
+    files = inspec.command('ls -1 /opt/opennms/etc/wsman-datacollection.d').stdout
+    files.each_line do |group|
+      group.chomp!
+      next if group !~ /.*\.xml$/
+      file = inspec.file("/opt/opennms/etc/wsman-datacollection.d/#{group}").content
+      doc = REXML::Document.new file
+      exists = !doc.elements["/wsman-datacollection-config/system-definition[@name='#{name}']"].nil?
+      if exists
+        system_def_file = "/opt/opennms/etc/wsman-datacollection.d/#{group}"
+        break
       end
-      system_def_file
     end
+
+    if system_def_file.nil?
+      file = ::File.new("/opt/opennms/etc/wsman-datacollection-config.xml", 'r')
+      doc = REXML::Document.new file
+
+      exists = !doc.elements["/wsman-datacollection-config/system-definition[@name='#{name}']"].nil?
+      if exists
+        system_def_file = "/opt/opennms/etc/wsman-datacollection-config.xml"
+      end
+    end
+    system_def_file
   end
 end

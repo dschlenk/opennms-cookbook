@@ -217,13 +217,13 @@ module Wsman
     groupfile
   end
 
-  def create_file(node)
+  def create_file(node, filename)
     doc = REXML::Document.new
     doc << REXML::XMLDecl.new
     root_el = doc.add_element 'wsman-datacollection-config'
     root_el.add_text("\n")
 
-    Opennms::Helpers.write_xml_file(doc, "#{node['opennms']['conf']['home']}/etc/#{@current_resource.file_name}")
+    Opennms::Helpers.write_xml_file(doc, "#{node['opennms']['conf']['home']}/etc/#{filename}")
   end
 
   def wsman_group_exists?(group_name, node)

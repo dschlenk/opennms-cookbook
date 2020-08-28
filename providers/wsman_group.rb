@@ -38,7 +38,7 @@ def load_current_resource
   @current_resource.file_path = "#{node['opennms']['conf']['home']}/etc/#{new_resource.file_name}"
 
   if !file_exists?(@new_resource.file_name, node)
-    create_file(node)
+    create_file(node, @new_resource.file_name)
   end
 
   @current_resource.exists = false
