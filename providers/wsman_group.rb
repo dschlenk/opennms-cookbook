@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 #
 include ResourceType
+include Wsman
 include Chef::Mixin::ShellOut
 
 def whyrun_supported?
@@ -37,12 +38,12 @@ def load_current_resource
   @current_resource.attribs(@new_resource.attribs)
   @current_resource.file_path = "#{node['opennms']['conf']['home']}/etc/#{new_resource.file_name}"
 
-  if !group_file?(@new_resource.file_name, node)
-    create_wsman_group_file
+  if !file_exists?(@new_resource.file_name, node)
+    create_file(node)
   end
 
   @current_resource.exists = false
-  if group_exists?(@new_resource.group_name)
+  if group_exists?(@new_resource.group_name, node)
     Chef::Log.debug("group #{@current_resource.group_name} is in file already")
     @current_resource.exists = true
   end
@@ -50,7 +51,7 @@ def load_current_resource
   system_definition_name = @current_resource.sysdef_name
 
   if !system_definition_name.nil?
-    if system_definition_exist?(@current_resource.sysdef_name)
+    if system_definition_exist?(@current_resource.sysdef_name, node)
       @current_resource.sys_def_exists = true
     end
   end
@@ -59,7 +60,7 @@ end
 private
 
 def create_wsman_group
-  if !group_exists?(@current_resource.group_name)
+  if !group_exists?(@current_resource.group_name, node)
     Chef::Log.debug "Creating wsman group : #{new_resource.group_name}"
     f = ::File.new("#{@current_resource.file_path}")
     Chef::Log.debug "file name : '#{new_resource.file_name}'"
@@ -125,19 +126,20 @@ def create_wsman_group
     end
     Opennms::Helpers.write_xml_file(doc, "#{@current_resource.file_path}")
 
-    if !include_group_exists?(new_resource.group_name)
+    if !include_group_exists?(new_resource.group_name, node)
       insert_included_def
     end
   end
 end
 
 def delete_wsman_group()
-  if group_in_file?(@current_resource.file_path, @current_resource.group_name)
+  group = find_wsman_group(node, @current_resource.group_name)
+  if !group.nil?
     Chef::Log.debug "Delete Group : '#{@current_resource.group_name}'"
-    delete_group
+    delete_group(group)
   end
 
-  if include_group_exists?(@current_resource.group_name)
+  if include_group_exists?(@current_resource.group_name, node)
     Chef::Log.debug "Delete Include Group from System Definition : '#{@current_resource.group_name}'"
     delete_included_def
   end
@@ -161,42 +163,45 @@ def update_wsman_group() #The change may have less or more attributes. it clean 
   create_wsman_group
 end
 
-def delete_group()
-  Chef::Log.debug "file name : '#{@current_resource.file_path}'"
-  file = ::File.new(@current_resource.file_path, 'r')
+def delete_group(group)
+  Chef::Log.debug "delete grooup in file : '#{group}'"
+  file = ::File.new("#{group}", 'r')
   doc = REXML::Document.new file
   file.close
 
   del_el = doc.elements.delete("/wsman-datacollection-config/group[@name='#{new_resource.group_name}']")
   Chef::Log.debug("Deleted element: #{del_el}")
 
-  Opennms::Helpers.write_xml_file(doc, "#{@current_resource.file_path}")
+  Opennms::Helpers.write_xml_file(doc, "#{group}")
 end
 
 def delete_included_def()
-  Chef::Log.debug "included_group_in_file?: '#{@current_resource.include_group_file_path}'"
+  included_group = find_include_group(node, @current_resource.group_name)
+  Chef::Log.debug "included_group_in_file?: '#{included_group}'"
 
-  file = ::File.new(@current_resource.include_group_file_path, 'r')
+  file = ::File.new("#{included_group}", 'r')
   doc = REXML::Document.new file
   file.close
 
   del_el = doc.elements.delete("/wsman-datacollection-config/system-definition/include-group[text() = '#{@current_resource.group_name}']")
   Chef::Log.debug("Deleted include-group successfully: #{del_el}")
 
-  Opennms::Helpers.write_xml_file(doc, "#{@current_resource.include_group_file_path}")
+  Opennms::Helpers.write_xml_file(doc, "#{included_group}")
 end
 
 
 def insert_included_def()
-  Chef::Log.debug "No system definition included. Add system definition for group: '#{new_resource.sysdef_name}'"
+  Chef::Log.debug "No system definition included. Add system definition for : '#{new_resource.sysdef_name}'"
   if @current_resource.sys_def_exists
-    Chef::Log.debug "Current System Definition '#{@current_resource.sysdef_name}' exist in: '#{@current_resource.system_definition_file_path}'"
-    insert_system_definition_include_group("#{@current_resource.system_definition_file_path}")
+    sys_def_file = find_system_definition(node, "#{@current_resource.sysdef_name}")
+    puts sys_def_file
+    Chef::Log.debug "Current System Definition '#{@current_resource.sysdef_name}' exist in: '#{sys_def_file}'"
+    insert_system_definition_include_group(sys_def_file)
   end
 end
 
-def insert_system_definition_include_group(name)
-  file = ::File.new("#{name}", 'r')
+def insert_system_definition_include_group(file_path)
+  file = ::File.new("#{file_path}", 'r')
   doc = REXML::Document.new file
   file.close
 
@@ -207,177 +212,10 @@ def insert_system_definition_include_group(name)
     incl_def_el = system_definition_el.add_element 'include-group'
     incl_def_el.add_text("#{new_resource.group_name}")
   end
-  Opennms::Helpers.write_xml_file(doc, "#{name}")
+  Opennms::Helpers.write_xml_file(doc, "#{file_path}")
 end
 
-def create_wsman_group_file ()
-  doc = REXML::Document.new
-  doc << REXML::XMLDecl.new
-  root_el = doc.add_element 'wsman-datacollection-config'
-  root_el.add_text("\n")
-  Opennms::Helpers.write_xml_file(doc, "#{node['opennms']['conf']['home']}/etc/#{new_resource.file_name}")
-end
 
-def group_exists?(group_name)
-  Chef::Log.debug "Checking to see if this ws-man group exists: '#{group_name}'"
-
-  #Check to see if group exist in wsman-datacollection-config.xml
-  Chef::Log.debug "Checking to see if this ws-man group exists wsman-datacollection-config.xml: '#{group_name}'"
-
-  file = ::File.new("#{node['opennms']['conf']['home']}/etc/wsman-datacollection-config.xml", 'r')
-  doc = REXML::Document.new file
-  exists = !doc.elements["/wsman-datacollection-config/group[@name='#{group_name}']"].nil?
-
-  if exists
-    @current_resource.file_path = "#{node['opennms']['conf']['home']}/etc/wsman-datacollection-config.xml"
-    return exists
-  else exists = group_exist_sub_folder?(group_name)
-  end
-  Chef::Log.debug("dir search for group name #{group_name} complete")
-  exists
-end
-
-def group_exist_sub_folder?(group_name) # let's cheat! If can't find in the wsman-datacollection-config.xml then look for the group file in wsman-datacollection.d
-  groupfile = shell_out("grep -l #{group_name} #{node['opennms']['conf']['home']}/etc/wsman-datacollection.d/*.xml")
-  if groupfile.stdout != '' && groupfile.stdout.lines.to_a.length == 1
-    begin
-      exists = group_in_file?(groupfile.stdout.chomp, group_name)
-      if exists
-        Chef::Log.debug("file name #{groupfile.stdout.chomp}")
-        @current_resource.file_path = "#{groupfile.stdout.chomp}"
-        return exists
-      end
-    end
-  else # if multiple files match, only return if true since could be a regex false positive.
-    groupfile.stdout.lines.each do |file|
-      exists = group_in_file?(file.chomp, group_name)
-      if exists
-        Chef::Log.debug("file name #{file}")
-        @current_resource.file_path = "#{file}"
-        return exists
-      end
-    end
-  end
-
-  # okay, we'll do it right now, but this is slow.
-  Chef::Log.debug("Starting dir search for group name #{group_name}")
-  Dir.foreach("#{node['opennms']['conf']['home']}/etc/wsman-datacollection.d/") do |file|
-    next if file !~ /.*\.xml$/
-    exists = group_in_file?("#{node['opennms']['conf']['home']}/etc/wsman-datacollection.d/#{file}", group_name)
-    if exists
-      @current_resource.file_path = "#{node['opennms']['conf']['home']}/etc/wsman-datacollection.d/#{file}"
-    end
-    break if exists
-  end
-end
-
-def system_definition_exist?(sys_def_name)
-  #Check to see if group exist in wsman-datacollection-config.xml
-  Chef::Log.debug "Checking to see if system definition exists wsman-datacollection-config.xml"
-
-  file = ::File.new("#{node['opennms']['conf']['home']}/etc/wsman-datacollection-config.xml", 'r')
-  doc = REXML::Document.new file
-
-  exists = !doc.elements["/wsman-datacollection-config/system-definition[@name='#{sys_def_name}']"].nil?
-
-  if exists
-    @current_resource.system_definition_file_path = "#{node['opennms']['conf']['home']}/etc/wsman-datacollection-config.xml"
-    Chef::Log.debug "System definition exists wsman-datacollection-config.xml"
-    return exists
-  else
-    exists = system_definition_exist_sub_folder?(sys_def_name)
-  end
-  Chef::Log.debug("dir search for system definition complete")
-  exists
-end
-
-def system_definition_exist_sub_folder?(sys_def_name)
-  Chef::Log.debug("Starting dir search for system definition")
-  system_definition_file = shell_out("grep -l #{sys_def_name} #{node['opennms']['conf']['home']}/etc/wsman-datacollection.d/*.xml")
-    if system_definition_file.stdout != '' && system_definition_file.stdout.lines.to_a.length == 1
-      begin
-        file = ::File.new("#{system_definition_file.stdout.chomp}", 'r')
-        doc = REXML::Document.new file
-        file.close
-
-        exists = !doc.elements["/wsman-datacollection-config/system-definition[@name='#{sys_def_name}']"].nil?
-        if exists
-          Chef::Log.debug("file name for system definition #{system_definition_file.stdout.chomp}")
-          @current_resource.system_definition_file_path = "#{system_definition_file.stdout.chomp}"
-          return exists
-        end
-      end
-
-    # okay, we'll do it right now, but this is slow.
-    Chef::Log.debug("Starting dir search for system definition name #{sys_def_name}")
-    Dir.foreach("#{node['opennms']['conf']['home']}/etc/wsman-datacollection.d/") do |name|
-      next if file !~ /.*\.xml$/
-      file = ::File.new("#{node['opennms']['conf']['home']}/etc/wsman-datacollection.d/#{name}", 'r')
-      doc = REXML::Document.new file
-      file.close
-
-      exists = !doc.elements["/wsman-datacollection-config/system-definition[@name='#{sys_def_name}']"].nil?
-      if exists
-        @current_resource.system_definition_file_path = "#{node['opennms']['conf']['home']}/etc/wsman-datacollection.d/#{name}"
-        return exists
-      end
-    end
-  end
-end
-
-def include_group_exists?(group_name)
-  Chef::Log.debug "Checking to see if this ws-man include_group_exists: '#{group_name}'"
-
-  #Check to see if group exist in wsman-datacollection-config.xml
-  Chef::Log.debug "Checking to see if this ws-man group exists wsman-datacollection-config.xml: '#{group_name}'"
-
-  file = ::File.new("#{node['opennms']['conf']['home']}/etc/wsman-datacollection-config.xml", 'r')
-  doc = REXML::Document.new file
-  exists = !doc.elements["/wsman-datacollection-config/system-definition/include-group[text() = '#{group_name}']"].nil?
-
-  if exists
-    @current_resource.include_group_file_path = "#{node['opennms']['conf']['home']}/etc/wsman-datacollection-config.xml"
-    return exists
-  else exists = include_group_exist_sub_folder?(group_name)
-  end
-  Chef::Log.debug("dir search for include group name #{group_name} complete")
-  exists
-end
-
-def include_group_exist_sub_folder?(group_name)
-# let's cheat! If can't find in the wsman-datacollection-config.xml then look for the group file in wsman-datacollection.d
-  groupfile = shell_out("grep -l #{group_name} #{node['opennms']['conf']['home']}/etc/wsman-datacollection.d/*.xml")
-  if groupfile.stdout != '' && groupfile.stdout.lines.to_a.length == 1
-    begin
-      exists = include_group_in_file?(groupfile.stdout.chomp, group_name)
-      if exists
-        Chef::Log.debug("file name #{groupfile.stdout.chomp}")
-        @current_resource.include_group_file_path = "#{groupfile.stdout.chomp}"
-        return exists
-      end
-    end
-  else # if multiple files match, only return if true since could be a regex false positive.
-    groupfile.stdout.lines.each do |file|
-      exists = group_in_file?(file.chomp, group_name)
-      if exists
-        Chef::Log.debug("file name #{file}")
-        @current_resource.include_group_file_path = "#{file}"
-        return exists
-      end
-    end
-  end
-
-  # okay, we'll do it right now, but this is slow.
-  Chef::Log.debug("Starting dir search for included group name #{group_name}")
-  Dir.foreach("#{node['opennms']['conf']['home']}/etc/wsman-datacollection.d/") do |file|
-    next if file !~ /.*\.xml$/
-    exists = include_group_in_file?("#{node['opennms']['conf']['home']}/etc/wsman-datacollection.d/#{file}", group_name)
-    if exists
-      @current_resource.include_group_file_path = "#{node['opennms']['conf']['home']}/etc/wsman-datacollection.d/#{file}"
-    end
-    break if exists
-  end
-end
 
 def system_def_in_file?(file)
   Chef::Log.debug "Group in File : '#{file}'"
@@ -421,17 +259,6 @@ def system_definition_xpath() #get the first system difiniton on the file if exi
   system_definition_xpath
 end
 
-def group_file?(file, node)
-  fn = "#{node['opennms']['conf']['home']}/etc/#{file}"
-  groupfile = false
-  if ::File.exist?(fn)
-    file = ::File.new(fn, 'r')
-    doc = REXML::Document.new file
-    file.close
-    groupfile = !doc.elements['/wsman-datacollection-config'].nil?
-  end
-  groupfile
-end
 
 #Code below are not tested yet
 def group_equal?
