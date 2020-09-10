@@ -1,4 +1,10 @@
 # frozen_string_literal: true
+opennms_resource_type 'wsman_thing' do
+  group_name 'wsman-another-group'
+  label 'wsman resource'
+  resource_label '${resource}'
+  notifies :restart, 'service[opennms]'
+end
 
 #add new group in new file bottom
 opennms_wsman_group 'wsman-another-group' do
