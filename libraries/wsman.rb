@@ -39,11 +39,11 @@ module Wsman
         end
       end
     else # if multiple files match, only return if true since could be a regex false positive.
-      search_file.stdout.lines.each do |file|
-        exists = exists?(file.chomp, element)
+      search_file.stdout.lines.each do |sfile|
+        exists = exists?(sfile.chomp, element)
         if exists
-          Chef::Log.debug("file name #{file}")
-          file = "#{file}"
+          Chef::Log.debug("file name #{sfile}")
+          file = "#{sfile}"
           return file
         end
       end

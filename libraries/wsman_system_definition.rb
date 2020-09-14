@@ -16,7 +16,7 @@ module WsmanSystemDefinition
     exists
   end
 
-  def add_wsman_system_definition(current_resource)
+  def add_wsman_system_definition(node, current_resource)
     sys_def_element = system_definition_xpath(current_resource.name)
     system_def_file = findFilePath(node, sys_def_element, "#{current_resource.name}")
     if !system_def_file.nil?
@@ -37,7 +37,7 @@ module WsmanSystemDefinition
     end
   end
 
-  def remove_wsman_system_definition(current_resource)
+  def remove_wsman_system_definition(node, current_resource)
     sys_def_element = system_definition_xpath(current_resource.name)
     system_def_file = findFilePath(node, sys_def_element, "#{current_resource.name}")
     if !system_def_file.nil?

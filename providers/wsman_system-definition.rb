@@ -72,9 +72,9 @@ end
 private
 
 def add_system_definition
-  add_wsman_system_definition(@current_resource)
+  add_wsman_system_definition(node, @current_resource)
 end
 
 def remove_system_definition
-  remove_wsman_system_definition(@current_resource)
+  remove_wsman_system_definition(node, @current_resource)
 end
