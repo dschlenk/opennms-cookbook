@@ -39,19 +39,19 @@ def load_current_resource
   @current_resource.file_path = "#{node['opennms']['conf']['home']}/etc/#{new_resource.file_name}"
 
   if !::File.exist?(@current_resource.file_path)
-    create_file(node, @new_resource.file_name)
+    create_file(node, new_resource.file_name)
   end
 
   @current_resource.exists = false
-  group_element = group_xpath(@current_resource.group_name)
-  group_file = findFilePath(node, group_element, @current_resource.group_name)
+  group_element = group_xpath(new_resource.group_name)
+  group_file = findFilePath(node, group_element, new_resource.group_name)
   if !group_file.nil?
-    Chef::Log.debug("group #{@current_resource.group_name} is in file already")
+    Chef::Log.debug("group #{new_resource.group_name} is in file already")
     @current_resource.exists = true
   end
   @current_resource.sys_def_exists = false
-    sys_def_element = system_definition_xpath(@current_resource.sysdef_name)
-    sys_def_file =findFilePath(node, sys_def_element, @current_resource.sysdef_name)
+    sys_def_element = system_definition_xpath(new_resource.sysdef_name)
+    sys_def_file =findFilePath(node, sys_def_element, new_resource.sysdef_name)
     if !sys_def_file.nil?
       @current_resource.sys_def_exists = true
     end
@@ -61,33 +61,35 @@ end
 private
 
 def create_wsman_group
-  created_wsman_group(@current_resource, node)
-
-  if (@current_resource.sys_def_exists)
-    sys_def_element ="/wsman-datacollection-config/system-definition/include-group[text() = '#{@current_resource.group_name}']"
-    included_group_file = findFilePath(node, sys_def_element, @current_resource.group_name)
-    if !included_group_file.nil?
-      insert_included_def(@current_resource.sysdef_name)
-    end
+  group_element = group_xpath(new_resource.group_name)
+  if !exists?(@current_resource.file_path, group_element)
+    created_wsman_group(new_resource, @current_resource.file_path, node)
   end
 
+  if (@current_resource.sys_def_exists)
+    sys_def_element = "/wsman-datacollection-config/system-definition/include-group[text() = '#{new_resource.group_name}']"
+    included_group_file = findFilePath(node, sys_def_element, new_resource.group_name)
+    if !included_group_file.nil?
+      insert_included_def(new_resource.sysdef_name)
+    end
+  end
 end
 
 def delete_wsman_group
-  group_element = group_xpath(@current_resource.group_name)
-  group_file = findFilePath(node, group_element, "#{@current_resource.group_name}")
+  group_element = group_xpath(new_resource.group_name)
+  group_file = findFilePath(node, group_element, "#{new_resource.group_name}")
 
   if !group_file.nil?
-    Chef::Log.debug "Delete Group : '#{@current_resource.group_name}'"
-    delete_group(group_file, "#{@current_resource.group_name}")
+    Chef::Log.debug "Delete Group : '#{new_resource.group_name}'"
+    delete_group(group_file, "#{new_resource.group_name}")
   end
 
-  include_element = included_group_xpath(@current_resource.group_name)
-  include_group_file = findFilePath(node, include_element, "#{@current_resource.group_name}")
+  include_element = included_group_xpath(new_resource.group_name)
+  include_group_file = findFilePath(node, include_element, "#{new_resource.group_name}")
   if @current_resource.sys_def_exists
     if !include_group_file.nil?
-      Chef::Log.debug "Delete Include Group from System Definition : '#{@current_resource.group_name}'"
-      delete_included_def("#{@current_resource.group_name}")
+      Chef::Log.debug "Delete Include Group from System Definition : '#{new_resource.group_name}'"
+      delete_included_def("#{new_resource.group_name}")
     end
   end
 end

@@ -36,20 +36,18 @@ def load_current_resource
   @current_resource.collection(@new_resource.collection)
   @current_resource.thresholding_enabled(@new_resource.thresholding_enabled)
 
-  if service_exists?(@current_resource.package_name,
-                     @current_resource.collection,
-                     @current_resource.service_name)
+  if service_exists?(new_resource.package_name, new_resource.collection, new_resource.service_name)
     @current_resource.exists = true
-    @current_resource.changed = true if  service_changed?(@current_resource, node)
+    @current_resource.changed = true if  service_changed?(new_resource, node)
   end
 end
 
 private
 
 def update_wsman_collection_service
-  updated_wsman_collection_service(@current_resource, node)
+  updated_wsman_collection_service(new_resource, node)
 end
 
 def create_wsman_collection_service
-  created_wsman_collection_service(@current_resource, node)
+  created_wsman_collection_service(new_resource, node)
 end

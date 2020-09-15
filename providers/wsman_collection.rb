@@ -31,5 +31,5 @@ private
 
 
 def create_wsman_collection
-  created_wsman_collection(@current_resource, node)
+  created_wsman_collection(new_resource, node)
 end

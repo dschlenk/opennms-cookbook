@@ -21,7 +21,7 @@ module Wsman
     else
       file = search_in_sub_folder(node, element, name)
     end
-    Chef::Log.debug("dir search for #{name} complete")
+    Chef::Log.debug("dir search for #{name} complete: file found #{file}")
     file
   end
 
@@ -42,8 +42,9 @@ module Wsman
       search_file.stdout.lines.each do |sfile|
         exists = exists?(sfile.chomp, element)
         if exists
-          Chef::Log.debug("file name #{sfile}")
-          file = "#{sfile}"
+          Chef::Log.debug("file name exsist:  #{sfile}")
+          file = "#{sfile.chomp}"
+          break
           return file
         end
       end
@@ -57,6 +58,7 @@ module Wsman
       exists = exists?("#{node['opennms']['conf']['home']}/etc/wsman-datacollection.d/#{filename}}", element)
       if exists
         file = "#{node['opennms']['conf']['home']}/etc/wsman-datacollection.d/#{filename}"
+        break
         return file
       end
     end

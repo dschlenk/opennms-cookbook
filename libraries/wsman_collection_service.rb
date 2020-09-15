@@ -53,38 +53,38 @@ module WsmanCollectionService
     Opennms::Helpers.write_xml_file(doc, "#{node['opennms']['conf']['home']}/etc/collectd-configuration.xml")
   end
 
-  def service_changed?(current_resource, node)
-    Chef::Log.debug "Checking to see if this wsman collection service has changed: '#{current_resource.service_name}'"
+  def service_changed?(new_resource, node)
+    Chef::Log.debug "Checking to see if this wsman collection service has changed: '#{new_resource.service_name}'"
     file = ::File.new("#{node['opennms']['conf']['home']}/etc/collectd-configuration.xml", 'r')
     doc = REXML::Document.new file
-    service_el = doc.elements["/collectd-configuration/package[@name='#{current_resource.package_name}']/service[@name='#{current_resource.service_name}' and parameter[@key='collection' and @value='#{current_resource.collection}']]"]
+    service_el = doc.elements["/collectd-configuration/package[@name='#{new_resource.package_name}']/service[@name='#{new_resource.service_name}' and parameter[@key='collection' and @value='#{new_resource.collection}']]"]
     old_interval = service_el.attributes['interval']
-    Chef::Log.debug "checking interval: #{old_interval} != #{current_resource.interval} ?"
-    return true if old_interval.to_s != current_resource.interval.to_s
+    Chef::Log.debug "checking interval: #{old_interval} != #{new_resource.interval} ?"
+    return true if old_interval.to_s != new_resource.interval.to_s
     old_user_defined = service_el.attributes['user-defined']
     Chef::Log.debug 'checking user-defined'
-    return true if old_user_defined.to_s != current_resource.user_defined.to_s
+    return true if old_user_defined.to_s != new_resource.user_defined.to_s
     old_status = service_el.attributes['status']
     Chef::Log.debug 'checking status'
-    return true if old_status.to_s != current_resource.status.to_s
+    return true if old_status.to_s != new_resource.status.to_s
     old_timeout = service_el.elements["parameter[@key='timeout']"]
     old_timeout = old_timeout.attributes['value'] unless old_timeout.nil?
     Chef::Log.debug 'checking timeout'
-    return true if old_timeout.to_s != current_resource.timeout.to_s
+    return true if old_timeout.to_s != new_resource.timeout.to_s
     old_retry_count = service_el.elements["parameter[@key='retry']"]
     unless old_retry_count.nil?
       old_retry_count = old_retry_count.attributes['value']
     end
     Chef::Log.debug 'checking retry'
-    return true if old_retry_count.to_s != current_resource.retry_count.to_s
+    return true if old_retry_count.to_s != new_resource.retry_count.to_s
     old_port = service_el.elements["parameter[@key='port']"]
     old_port = old_port.attributes['value'] unless old_port.nil?
     Chef::Log.debug 'checking port'
-    return true if old_port.to_s != current_resource.port.to_s
+    return true if old_port.to_s != new_resource.port.to_s
     old_te = service_el.elements["parameter[@key='thresholding-enabled']"]
     old_te = old_te.attributes['value'] unless old_te.nil?
     Chef::Log.debug 'checking thresholding-enabled'
-    return true if old_te.to_s != current_resource.thresholding_enabled.to_s
+    return true if old_te.to_s != new_resource.thresholding_enabled.to_s
     Chef::Log.debug 'not changed!'
     false
   end

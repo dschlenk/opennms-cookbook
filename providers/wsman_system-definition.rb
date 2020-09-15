@@ -29,6 +29,7 @@ end
 
 def load_current_resource
   @current_resource = Chef::Resource.resource_for_node(:opennms_wsman_system_definition, node).new(@new_resource.name)
+  @current_resource.name(@new_resource.name)
   @current_resource.groups(@new_resource.groups)
   @current_resource.position(@new_resource.position)
   @current_resource.file_name(@new_resource.file_name)
@@ -36,35 +37,19 @@ def load_current_resource
 
 
   if !::File.exist?(@current_resource.file_path)
-    create_file(node, @new_resource.file_name)
+    create_file(node, new_resource.file_name)
   end
 
   @current_resource.exists = false
-  system_definition_name = @current_resource.name
 
-  if !system_definition_name.nil?
-    system_definition_element = system_definition_xpath(@current_resource.name)
-    sys_def_file =  findFilePath(node, system_definition_element, @current_resource.name)
-    if !sys_def_file.nil?
-      if groups_in_system_definition?(@current_resource.name, @current_resource.file_path, @current_resource.groups)
-        @current_resource.exists = true
-      end
-    else
-      create_system_definition("#{@current_resource.file_path}", "#{@current_resource.name}")
-    end
-  end
-
-  ge = true
-
-  @current_resource.groups.each do |group|
-    group_element = group_xpath("#{group}")
-    group_file = findFilePath(node, group_element, "#{group}")
-    if group_file.nil?
-      Chef::Log.error "Missing data-collection group #{group}"
-      ge = false
+  new_resource.groups.each do |group|
+    group_element = included_group_xpath("#{group}")
+    group_file = findFilePath(node, group_element, group)
+    if !group_file.nil?
+      Chef::Log.debug "Found group in file: #{group_file}"
+      @current_resource.exists = true
       break
     end
-    @current_resource.group_exists = true if ge
   end
 end
 
@@ -72,9 +57,23 @@ end
 private
 
 def add_system_definition
-  add_wsman_system_definition(node, @current_resource)
+  sys_def_element = system_definition_xpath(new_resource.name)
+  system_def_file = findFilePath(node, sys_def_element, new_resource.name)
+  if system_def_file.nil?
+    Chef::Log.debug "Add system definition to  #{@current_resource.file_path}"
+    create_system_definition("#{@current_resource.file_path}", new_resource)
+  else
+    Chef::Log.debug "Add system definition to  #{system_def_file}"
+    add_wsman_system_definition(node, system_def_file, new_resource)
+  end
 end
 
 def remove_system_definition
-  remove_wsman_system_definition(node, @current_resource)
+  sys_def_element = system_definition_xpath(new_resource.name)
+  system_def_file = findFilePath(node, sys_def_element, new_resource.name)
+  if !system_def_file.nil?
+    remove_wsman_system_definition(system_def_file, new_resource)
+  else
+    Chef::Log.debug "No system definition. Nothing to delete"
+  end
 end

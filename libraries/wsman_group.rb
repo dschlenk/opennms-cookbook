@@ -1,18 +1,20 @@
 # frozen_string_literal: true
 
 module WsmanGroup
-  def created_wsman_group (current_resource, node)
-    group_element = group_xpath("#{current_resource.group_name}")
-    group_file = findFilePath(node, group_element, current_resource.group_name)
+  def created_wsman_group (new_resource, file_path,  node)
+    puts "#{new_resource.group_name}"
+    group_element = group_xpath("#{new_resource.group_name}")
+    group_file = findFilePath(node, group_element, new_resource.group_name)
+    puts group_file
     if group_file.nil?
-      Chef::Log.debug "Creating wsman group : #{current_resource.group_name}"
-      f = ::File.new("#{current_resource.file_path}")
-      Chef::Log.debug "file name : '#{current_resource.file_name}'"
+      Chef::Log.debug "Creating wsman group : #{new_resource.group_name}"
+      f = ::File.new("#{file_path}")
+      Chef::Log.debug "file name : '#{new_resource.file_name}'"
       contents = f.read
       doc = REXML::Document.new(contents, respect_whitespace: :all)
       doc.context[:attribute_quote] = :quote
 
-      if current_resource.position == 'top'
+      if new_resource.position == 'top'
         #Check for first group in the file
         if !doc.elements['/wsman-datacollection-config/group[1]'].nil?
           group_el = REXML::Element.new 'group'
@@ -46,21 +48,21 @@ module WsmanGroup
       end
 
       if !group_el.nil?
-        group_el.attributes['name'] = current_resource.group_name
-        group_el.attributes['resource-type'] = current_resource.resource_type
-        group_el.attributes['resource-uri'] = current_resource.resource_uri
+        group_el.attributes['name'] = new_resource.group_name
+        group_el.attributes['resource-type'] = new_resource.resource_type
+        group_el.attributes['resource-uri'] = new_resource.resource_uri
 
-        unless current_resource.dialect.nil?
-          group_el.attributes['dialect'] = current_resource.dialect
+        unless new_resource.dialect.nil?
+          group_el.attributes['dialect'] = new_resource.dialect
         end
 
-        unless current_resource.filter.nil?
-          group_el.attributes['filter'] = current_resource.filter
+        unless new_resource.filter.nil?
+          group_el.attributes['filter'] = new_resource.filter
         end
 
-        unless current_resource.attribs.nil?
+        unless new_resource.attribs.nil?
           begin
-            current_resource.attribs.each do |name, details|
+            new_resource.attribs.each do |name, details|
               attrib_el = group_el.add_element 'attrib', 'name' => name, 'alias' => details['alias'], 'type' => details['type']
               attrib_el.add_attribute('index-of', details['index-of']) if details['index-of']
               attrib_el.add_attribute('filter', details['filter']) if details['filter']
@@ -68,7 +70,7 @@ module WsmanGroup
           end
         end
       end
-      Opennms::Helpers.write_xml_file(doc, "#{current_resource.file_path}")
+      Opennms::Helpers.write_xml_file(doc, "#{file_path}")
     end
   end
 
@@ -131,22 +133,22 @@ module WsmanGroup
   end
 
   #These function have not been tested yet. It need to test and refactoring when work on the change function
-  def update_wsman_group(current_resource, node)
+  def update_wsman_group(new_resource, file_path, node)
     #The change may have less or more attributes. it clean to delete the match group name then add new group with same name and new data
-    Chef::Log.debug "file name : '#{current_resource.file_path}'"
-    file = ::File.new(current_resource.file_path, 'r')
+    Chef::Log.debug "file name : '#{file_path}'"
+    file = ::File.new(file_path, 'r')
     doc = REXML::Document.new file
     file.close
 
-    if group_in_file?(current_resource.file_path, current_resource.group_name)
+    if group_in_file?(file_path, new_resource.group_name)
       Chef::Log.debug "group_in_file?: 'true'"
-      del_el = doc.elements.delete("/wsman-datacollection-config/group[@name='#{current_resource.group_name}']")
+      del_el = doc.elements.delete("/wsman-datacollection-config/group[@name='#{new_resource.group_name}']")
       Chef::Log.debug("Deleted element: #{del_el}")
     end
 
-    Opennms::Helpers.write_xml_file(doc, "#{current_resource.file_path}")
+    Opennms::Helpers.write_xml_file(doc, "#{file_path}")
 
-    created_wsman_group(current_resource, node)
+    created_wsman_group(new_resource, file_path, node)
   end
 
   def group_in_file?(file, group)
@@ -159,73 +161,73 @@ module WsmanGroup
 
 
   #Code below are not tested yet
-  def group_equal?(current_resource)
-    Chef::Log.debug "file name : '#{current_resource.file_path}'"
-    file = ::File.new("#{current_resource.file_path}", 'r')
+  def group_equal?(new_resource, file_path)
+    Chef::Log.debug "file name : '#{file_path}'"
+    file = ::File.new("#{file_path}", 'r')
     doc = REXML::Document.new file
     file.close
 
-    if group_in_file?("#{current_resource.file_path}", current_resource.group_name)
-      Chef::Log.debug "group_in_file?: #{current_resource.file_path}"
-      group_el = doc.elements["/wsman-datacollection-config/group[@name='#{current_resource.group_name}']"]
-      return true if group_el.nil? && (current_resource.nil? || current_resource.empty?)
+    if group_in_file?("#{file_path}", new_resource.group_name)
+      Chef::Log.debug "group_in_file?: #{file_path}"
+      group_el = doc.elements["/wsman-datacollection-config/group[@name='#{new_resource.group_name}']"]
+      return true if group_el.nil? && (new_resource.nil? || new_resource.empty?)
 
-      if resource_type_equal?(group_el, current_resource) \
-           && resource_uri_equal?(group_el, current_resource) \
-           && dialect_equal?(group_el, current_resource) \
-           && filters_equal?(group_el, current_resource) \
-           && attribute_equal?(doc, current_resource)
+      if resource_type_equal?(group_el, new_resource) \
+           && resource_uri_equal?(group_el, new_resource) \
+           && dialect_equal?(group_el, new_resource) \
+           && filters_equal?(group_el, new_resource) \
+           && attribute_equal?(doc, new_resource)
         true
       else false
       end
     end
   end
 
-  def resource_type_equal?(doc, current_resource)
-    return true if doc.attributes['resource-type'].nil? && current_resource.resource_type.nil?
+  def resource_type_equal?(doc, new_resource)
+    return true if doc.attributes['resource-type'].nil? && new_resource.resource_type.nil?
 
-    Chef::Log.debug "resource_type_equal?: #{current_resource.resource_type}"
-    doc.attributes['resource-type'].to_s == current_resource.resource_type.to_s
+    Chef::Log.debug "resource_type_equal?: #{new_resource.resource_type}"
+    doc.attributes['resource-type'].to_s == new_resource.resource_type.to_s
   end
 
-  def resource_uri_equal?(doc, current_resource)
-    return true if doc.attributes['resource-uri'].nil? && current_resource.resource_uri.nil?
+  def resource_uri_equal?(doc, new_resource)
+    return true if doc.attributes['resource-uri'].nil? && new_resource.resource_uri.nil?
 
-    Chef::Log.debug "resource-uril?: #{current_resource.resource_uri}"
-    doc.attributes['resource-uri'].to_s == current_resource.resource_uri.to_s
+    Chef::Log.debug "resource-uril?: #{new_resource.resource_uri}"
+    doc.attributes['resource-uri'].to_s == new_resource.resource_uri.to_s
   end
 
-  def dialect_equal?(doc, current_resource)
-    return true if doc.attributes['dialect'].nil? && current_resource.dialect.nil?
+  def dialect_equal?(doc, new_resource)
+    return true if doc.attributes['dialect'].nil? && new_resource.dialect.nil?
 
-    unless doc.attributes['dialect'].nil? && current_resource.dialect.nil?
-      Chef::Log.debug "dialect_equal??: #{current_resource.dialect}"
-      doc.attributes['dialect'].to_s == current_resource.dialect.to_s
+    unless doc.attributes['dialect'].nil? && new_resource.dialect.nil?
+      Chef::Log.debug "dialect_equal??: #{new_resource.dialect}"
+      doc.attributes['dialect'].to_s == new_resource.dialect.to_s
     end
   end
 
-  def filters_equal? (doc, current_resource)
-    return true if doc.attributes['filter'].nil? && current_resource.filter.nil?
+  def filters_equal? (doc, new_resource)
+    return true if doc.attributes['filter'].nil? && new_resource.filter.nil?
 
-    unless doc.attributes['filter'].nil? && current_resource.filter.nil?
-      Chef::Log.debug "filter_equal?: #{current_resource.filter}"
-      doc.attributes['filter'].to_s == current_resource.filter.to_s
+    unless doc.attributes['filter'].nil? && new_resource.filter.nil?
+      Chef::Log.debug "filter_equal?: #{new_resource.filter}"
+      doc.attributes['filter'].to_s == new_resource.filter.to_s
     end
   end
 
-  def attribute_equal?(doc, current_resource)
-    Chef::Log.debug "attribute_equal??: #{current_resource.attribs}"
-    attribute_el = doc.elements["/wsman-datacollection-config/group[@name='#{current_resource.group_name}/attrib']"]
-    return true if attribute_el.nil? && (current_resource.attribs.nil? || current_resource.attribs.empty?)
+  def attribute_equal?(doc, new_resource)
+    Chef::Log.debug "attribute_equal??: #{new_resource.attribs}"
+    attribute_el = doc.elements["/wsman-datacollection-config/group[@name='#{new_resource.group_name}/attrib']"]
+    return true if attribute_el.nil? && (new_resource.attribs.nil? || new_resource.attribs.empty?)
 
-    unless current_resource.attribs.nil?
+    unless new_resource.attribs.nil?
       begin
-        current_resource.attribs.each do |name, details|
-          group_el = doc.elements["/wsman-datacollection-config/group[@name='#{current_resource.group_name}']/attrib"]
+        new_resource.attribs.each do |name, details|
+          group_el = doc.elements["/wsman-datacollection-config/group[@name='#{new_resource.group_name}']/attrib"]
           group_el.each do |att|
             return true if att.attribute['name'].nil? && name.nil?
             if att.attribute['name'] == name
-              attrib_el = doc.elements["/wsman-datacollection-config/group[@name='#{current_resource.group_name}/attrib/[@name='#{name}']"]
+              attrib_el = doc.elements["/wsman-datacollection-config/group[@name='#{new_resource.group_name}/attrib/[@name='#{name}']"]
               return true if attrib_el.nil? && (name.nil? || name.to_s == '')
               if alias_equal?(attrib_el, details['alias'])  \
               && type_equal?(attrib_el, details['type']) \
@@ -239,31 +241,31 @@ module WsmanGroup
     end
   end
 
-  def alias_equal?(doc, current_resource)
-    return true if doc.attributes['alias'].nil? && current_resource.nil?
-    Chef::Log.debug "alias_equal?: #{current_resource.to_s}"
-    doc.attributes['alias'].to_s == current_resource.to_s
+  def alias_equal?(doc, new_resource)
+    return true if doc.attributes['alias'].nil? && new_resource.nil?
+    Chef::Log.debug "alias_equal?: #{new_resource.to_s}"
+    doc.attributes['alias'].to_s == new_resource.to_s
   end
 
-  def type_equal?(doc, current_resource)
-    return true if doc.attributes['type'].nil? && current_resource.nil?
-    Chef::Log.debug "type?: #{current_resource.to_s}"
-    doc.attributes['type'].to_s == current_resource.to_s
+  def type_equal?(doc, new_resource)
+    return true if doc.attributes['type'].nil? && new_resource.nil?
+    Chef::Log.debug "type?: #{new_resource.to_s}"
+    doc.attributes['type'].to_s == new_resource.to_s
   end
 
-  def filter_equal?(doc, current_resource)
-    return true if doc.attributes['filter'].nil? && current_resource.nil?
-    Chef::Log.debug "filter?: #{current_resource.to_s}"
-    unless doc.attributes['filter'].nil? && current_resource.nil?
-      doc.attributes['filter'].to_s == current_resource.to_s
+  def filter_equal?(doc, new_resource)
+    return true if doc.attributes['filter'].nil? && new_resource.nil?
+    Chef::Log.debug "filter?: #{new_resource.to_s}"
+    unless doc.attributes['filter'].nil? && new_resource.nil?
+      doc.attributes['filter'].to_s == new_resource.to_s
     end
   end
 
-  def index_of_equal?(doc, current_resource)
-    return true if doc.attributes['index-of'].nil? && current_resource.nil?
-    Chef::Log.debug "index-of?: #{current_resource.to_s}"
-    unless doc.attributes['index-of'].nil? && current_resource.nil?
-      doc.attributes['index-of'].to_s == current_resource.to_s
+  def index_of_equal?(doc, new_resource)
+    return true if doc.attributes['index-of'].nil? && new_resource.nil?
+    Chef::Log.debug "index-of?: #{new_resource.to_s}"
+    unless doc.attributes['index-of'].nil? && new_resource.nil?
+      doc.attributes['index-of'].to_s == new_resource.to_s
     end
   end
 end

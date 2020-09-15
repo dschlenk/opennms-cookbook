@@ -16,49 +16,51 @@ module WsmanSystemDefinition
     exists
   end
 
-  def add_wsman_system_definition(node, current_resource)
-    sys_def_element = system_definition_xpath(current_resource.name)
-    system_def_file = findFilePath(node, sys_def_element, "#{current_resource.name}")
-    if !system_def_file.nil?
-      Chef::Log.debug "System definition exists in file: '#{system_def_file}'"
+  def add_wsman_system_definition(node, file_path, new_resource)
+    f = ::File.new("#{file_path}")
+    Chef::Log.debug "file name : '#{file_path}'"
+    contents = f.read
+    doc = REXML::Document.new(contents, respect_whitespace: :all)
+    doc.context[:attribute_quote] = :quote
 
-      f = ::File.new("#{system_def_file}")
+    Chef::Log.debug "Group '#{new_resource.groups}' are about to add to the system"
+    system_definition_el = doc.root.elements["/wsman-datacollection-config/system-definition[@name='#{new_resource.name}']"]
+    if !system_definition_el.nil?
+      addSystemDefinition(doc, system_definition_el, new_resource)
+      Opennms::Helpers.write_xml_file(doc, "#{file_path}")
+    end
+  end
+
+  def remove_wsman_system_definition( file_name, new_resource)
+    if groups_in_system_definition?(new_resource.name, file_name, new_resource.groups)
+      f = ::File.new("#{file_name}")
+      Chef::Log.debug "Delete group in file: '#{file_name}'"
       contents = f.read
       doc = REXML::Document.new(contents, respect_whitespace: :all)
       doc.context[:attribute_quote] = :quote
 
-      current_resource.groups.each do |group|
-        next unless doc.elements["/wsman-datacollection-config/system-definition[@name='#{current_resource.name}']/include-group[text() = '#{group}']"].nil?
-        system_definition_el = doc.elements["/wsman-datacollection-config/system-definition[@name='#{current_resource.name}']"]
-        ig_el = system_definition_el.add_element 'include-group'
-        ig_el.add_text group
-      end
-      Opennms::Helpers.write_xml_file(doc, "#{system_def_file}")
-    end
-  end
-
-  def remove_wsman_system_definition(node, current_resource)
-    sys_def_element = system_definition_xpath(current_resource.name)
-    system_def_file = findFilePath(node, sys_def_element, "#{current_resource.name}")
-    if !system_def_file.nil?
-      file = ::File.new("#{system_def_file}", 'r')
-      doc = REXML::Document.new file
-      file.close
-      groups = new_resource.groups
-
-      groups.each do |group|
-        unless doc.elements["/wsman-datacollection-config/system-definition[@name='#{current_resource.name}']/include-group[text() = '#{group}']"].nil?
-          doc.delete_element "/wsman-datacollection-config/system-definition[@name='#{current_resource.name}']/include-group[text() = '#{group}']"
+      new_resource.groups.each do |group|
+        if !doc.elements["/wsman-datacollection-config/system-definition[@name='#{new_resource.name}']/include-group[text() = '#{group}']"].nil?
+          Chef::Log.debug "Delete group #{group} from file : '#{file_name}'"
+          doc.delete_element "/wsman-datacollection-config/system-definition[@name='#{new_resource.name}']/include-group[text() = '#{group}']"
         end
       end
-      Opennms::Helpers.write_xml_file(doc, "#{system_def_file}")
+      #If empty system definition then remove system definition
+      if doc.elements["/wsman-datacollection-config/system-definition[@name='#{new_resource.name}']/include-group[1]"].nil?
+        Chef::Log.debug "Empty system definition detele system definition name #{new_resource.name} from file '#{file_name}'"
+        doc.delete_element "/wsman-datacollection-config/system-definition[@name='#{new_resource.name}']"
+      end
+      Opennms::Helpers.write_xml_file(doc, "#{file_name}")
     end
   end
 
-  def create_system_definition(filename, name)
-    file = ::File.new("#{filename}", 'r')
-    doc = REXML::Document.new file
-    file.close
+  def create_system_definition(filename, new_resource)
+    f = ::File.new("#{filename}")
+    Chef::Log.debug "file name : '#{filename}'"
+    contents = f.read
+    doc = REXML::Document.new(contents, respect_whitespace: :all)
+    doc.context[:attribute_quote] = :quote
+
 
     if new_resource.position == 'top'
       #Check for first group in the file
@@ -77,8 +79,7 @@ module WsmanSystemDefinition
       else
         sys_def_el = doc.root.add_element 'system-definition'
       end
-    else
-      #add to bottom
+    else #add to bottom
       if !doc.root.elements['/wsman-datacollection-config/system-definition[last()]'].nil?
         sys_def_el = REXML::Element.new 'system-definition'
         last_sys_def_el = doc.elements['/wsman-datacollection-config/system-definition[last()]']
@@ -96,8 +97,28 @@ module WsmanSystemDefinition
       end
     end
 
-    sys_def_el.attributes['name'] = "#{name}"
-    sys_def_el.add_text("\n")
+    sys_def_el.attributes['name'] = "#{new_resource.name}"
+    unless new_resource.groups.nil?
+      addSystemDefinition(doc, sys_def_el, new_resource)
+    end
+
     Opennms::Helpers.write_xml_file(doc, "#{filename}")
+  end
+
+  def addSystemDefinition(doc, system_definition, new_resource)
+    new_resource.groups.each do |group|
+      Chef::Log.debug "Group '#{group}' is about to add to the system"
+      next unless doc.elements["/wsman-datacollection-config/system-definition[@name='#{new_resource.name}']/include-group[text() = '#{group}']"].nil?
+        #Check to see if group exist? If exist then add group to system definition. If not exist then return error
+        group_element = group_xpath(group)
+        included_group_file = findFilePath(node, group_element, group)
+        if !included_group_file.nil?
+          Chef::Log.debug "Group '#{group}' is added to the system"
+          system_definition_el = system_definition.add_element 'include-group'
+          system_definition_el.add_text group
+        else
+          Chef::Log.debug "Group '#{group}' is not exist in the system. Please ad group first"
+        end
+    end
   end
 end
