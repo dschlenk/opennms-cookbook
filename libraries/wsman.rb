@@ -49,19 +49,6 @@ module Wsman
         end
       end
     end
-
-    # okay, we'll do it right now, but this is slow.
-    Chef::Log.debug("Starting dir search for #{name}")
-    Dir.foreach("#{node['opennms']['conf']['home']}/etc/wsman-datacollection.d/") do |filename|
-      next if file !~ /.*\.xml$/
-
-      exists = exists?("#{node['opennms']['conf']['home']}/etc/wsman-datacollection.d/#{filename}}", element)
-      if exists
-        file = "#{node['opennms']['conf']['home']}/etc/wsman-datacollection.d/#{filename}"
-        break
-        return file
-      end
-    end
     file
   end
 
