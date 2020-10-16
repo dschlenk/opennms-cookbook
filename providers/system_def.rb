@@ -19,7 +19,6 @@ action :add do
 end
 
 action :remove do
-  Chef::Application.fatal!("Missing one of these data-collection groups: #{@current_resource.groups}.") unless @current_resource.groups_exist
   if !@current_resource.exists
     Chef::Log.info "#{@new_resource} not present - nothing to do."
   else
