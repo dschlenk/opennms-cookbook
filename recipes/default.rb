@@ -36,6 +36,10 @@ hostsfile_entry node['ipaddress'] do
   action [:create_if_missing, :append]
 end
 
+if node['opennms']['version'] == '26.2.2-1' || node['opennms']['version'].to_i > 26
+  node.default['opennms']['users']['admin']['pwhash'] = 'gU2wmSW7k9v1xg4/MrAsaI+VyddBAhJJt4zPX5SGG0BK+qiASGnJsqM8JOug/aEL'
+  node.default['opennms']['users']['salted'] = true
+end
 include_recipe 'opennms::packages'
 include_recipe 'opennms::send_events'
 include_recipe 'opennms::upgrade' if node['opennms']['upgrade']
@@ -64,7 +68,6 @@ unless node['opennms']['secure_admin_password'].nil?
   node.default['opennms']['users']['admin']['password'] = node['opennms']['secure_admin_password']
   node.default['opennms']['users']['admin']['pwhash'] = Digest::MD5.hexdigest(node['opennms']['secure_admin_password']).upcase
 end
-Chef::Log.debug("secure_admin? #{node['opennms']['secure_admin']}; pwhash? #{node['opennms']['users']['admin']['pwhash']}; password? #{node['opennms']['users']['admin']['password']}")
 if (node['opennms']['secure_admin'] && node['opennms']['secure_admin_password'].nil?) || (!node['opennms']['secure_admin'] && node['opennms']['users']['admin']['password'] != 'admin')
   include_recipe 'opennms::adminpw'
 end
