@@ -42,6 +42,8 @@ when '24'
   template_dir = 'horizon-24/'
 when '25'
   template_dir = 'horizon-25/'
+when '26'
+  template_dir = 'horizon-26/'
 end
 
 if Opennms::Helpers.major(node['opennms']['version']).to_i >= 22
@@ -131,4 +133,7 @@ template "#{onms_home}/bin/opennms" do
     return_code: node['opennms']['bin']['return_code']
   )
   not_if { Opennms::Helpers.major(node['opennms']['version']).to_i < 25 }
+  not_if { Opennms::Helpers.major(node['opennms']['version']).to_i > 26 }
+  not_if { node['opennms']['version'] == '26.2.1-1' }
+  not_if { node['opennms']['version'] == '26.2.2-1' }
 end
