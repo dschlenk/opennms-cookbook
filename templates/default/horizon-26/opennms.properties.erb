@@ -305,6 +305,12 @@ org.opennms.dao.ipinterface.findByServiceType=<%=@properties['misc']['find_by_se
 org.opennms.netmgt.collectd.DefaultCollectionAgent.loadSnmpDataOnInit=<%=@properties['misc']['load_snmp_data_on_init']%>
 <% end -%>
 
+# Set this to false to disallow creating/storing old-style MD5-hashed passwords
+# org.opennms.users.allowUnsalted=true
+<% unless @properties['misc']['allow_unsalted'].nil? -%>
+org.opennms.users.allowUnsalted=<%=@properties['misc']['allow_unsalted']%>
+<% end -%>
+
 ###### REPORTING ######
 opennms.report.template.dir=<%=@properties['reporting']['template_dir']%>
 opennms.report.dir=<%=@properties['reporting']['report_dir']%>
@@ -1191,4 +1197,5 @@ org.opennms.features.telemetry.maxFlowAgeSeconds=<%=node['opennms']['properties'
 <% if node['opennms']['properties']['ingressAndEgressRequired'] -%>
 org.opennms.features.telemetry.ingressAndEgressRequired=<%=node['opennms']['properties']['ingressAndEgressRequired']%>
 <% end -%>
+
 

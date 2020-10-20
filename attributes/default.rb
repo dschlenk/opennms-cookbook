@@ -269,6 +269,7 @@ default['opennms']['users']['admin']['user_comments'] = 'Default administrator, 
 # changed for you.
 default['opennms']['users']['admin']['password']      = 'admin'
 default['opennms']['users']['admin']['pwhash']        = '21232F297A57A5A743894A0E4A801FC3'
+default['opennms']['users']['salted']                 = false
 
 # non-default daemons
 default['opennms']['services']['dhcpd']       = false
@@ -332,6 +333,7 @@ default['opennms']['properties']['misc']['headless']                       = tru
 default['opennms']['properties']['misc']['find_by_service_type_query']     = nil
 default['opennms']['properties']['misc']['load_snmp_data_on_init']         = nil
 default['opennms']['properties']['misc']['allow_html_fields']              = nil
+default['opennms']['properties']['misc']['allow_unsalted']                 = nil
 # Reporting
 default['opennms']['properties']['reporting']['jasper_version'] = '6.3.0'
 default['opennms']['properties']['reporting']['ksc_graphs_per_line'] = 1
@@ -346,6 +348,7 @@ default['opennms']['properties']['rancid']['only_rancid_adapter']  = nil
 default['opennms']['properties']['rtc']['baseurl']   = 'http://localhost:8980/opennms/rtc/post'
 default['opennms']['properties']['rtc']['username']  = 'rtc'
 default['opennms']['properties']['rtc']['password']  = 'rtc'
+default['opennms']['properties']['rtc']['pwhash']  = 'sHMy+HycWKGJC/uUMF0IGlXUXP1KhcqD0GEchFlvYTw40jT9r+zMxOb3F+phWNzX'
 # MAP IPC
 default['opennms']['properties']['map']['baseurl']   = 'http://localhost:8980/opennms/map/post'
 default['opennms']['properties']['map']['username']  = 'map'

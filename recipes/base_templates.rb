@@ -133,4 +133,7 @@ template "#{onms_home}/bin/opennms" do
     return_code: node['opennms']['bin']['return_code']
   )
   not_if { Opennms::Helpers.major(node['opennms']['version']).to_i < 25 }
+  not_if { Opennms::Helpers.major(node['opennms']['version']).to_i > 26 }
+  not_if { node['opennms']['version'] == '26.2.1-1' }
+  not_if { node['opennms']['version'] == '26.2.2-1' }
 end

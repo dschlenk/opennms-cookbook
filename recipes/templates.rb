@@ -2043,11 +2043,21 @@ template "#{onms_home}/etc/users.xml" do
   mode 0640 if mv.to_i > 19
   owner 'root'
   group 'root'
-  variables(
-    name: node['opennms']['users']['admin']['name'],
-    user_comments: node['opennms']['users']['admin']['user_comments'],
-    password: node['opennms']['users']['admin']['pwhash']
-  )
+  if node['opennms']['version'] == '26.2.2-1' || node['opennms']['version'].to_i > 26
+    variables(
+      name: node['opennms']['users']['admin']['name'],
+      user_comments: node['opennms']['users']['admin']['user_comments'],
+      password: node['opennms']['users']['admin']['pwhash'],
+      rtc_pwhash: node['opennms']['properties']['rtc']['pwhash'],
+      salted: node['opennms']['users']['salted']
+    )
+  else
+    variables(
+      name: node['opennms']['users']['admin']['name'],
+      user_comments: node['opennms']['users']['admin']['user_comments'],
+      password: node['opennms']['users']['admin']['pwhash']
+    )
+  end
 end
 
 template "#{onms_home}/etc/vacuumd-configuration.xml" do
