@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+include_recipe 'onms_lwrp::wsman_collection_service'
 opennms_resource_type 'wsman_thing' do
   group_name 'wsman-another-group'
   label 'wsman resource'

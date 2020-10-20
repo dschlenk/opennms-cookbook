@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+include_recipe 'onms_lwrp_test::wsman_group'
 opennms_wsman_system_definition 'wsman-test' do
   name 'wsman-test'
   file_name 'wsman-datacollection.d/wsman-test-group.xml'

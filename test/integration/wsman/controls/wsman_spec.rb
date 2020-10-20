@@ -1,4 +1,42 @@
 # frozen_string_literal: true
+control 'wsman_collection' do
+  describe wsman_collection('foo') do
+    its('rrd_step') { should eq 600 }
+    its('rras') { should eq ['RRA:AVERAGE:0.5:2:4032', 'RRA:AVERAGE:0.5:24:2976', 'RRA:AVERAGE:0.5:576:732', 'RRA:MAX:0.5:576:732', 'RRA:MIN:0.5:576:732'] }
+    its('include_system_definitions') { should eq nil } # we add empty <include_system_definitions/>
+  end
+
+  # minimal
+  describe wsman_collection('bar') do
+    it { should exist }
+    its('rrd_step') { should eq 300 }
+    its('rras') { should eq ['RRA:AVERAGE:0.5:1:2016', 'RRA:AVERAGE:0.5:12:1488', 'RRA:AVERAGE:0.5:288:366', 'RRA:MAX:0.5:288:366', 'RRA:MIN:0.5:288:366'] }
+  end
+end
+
+control 'wsman_collection_service' do
+  describe wsman_collection_service('WS-ManFoo', 'foo', 'foo') do
+    it { should exist }
+    its('interval') { should eq 400_000 }
+    its('user_defined') { should eq true }
+    its('status') { should eq 'off' }
+    its('collection_timeout') { should eq 5000 }
+    its('retry_count') { should eq 10 }
+    its('port') { should eq 4445 }
+    its('thresholding_enabled') { should eq true }
+  end
+
+  describe wsman_collection_service('WS-Man', 'default', 'example1') do
+    it { should exist }
+    its('interval') { should eq 300_000 }
+    its('user_defined') { should eq false }
+    its('status') { should eq 'on' }
+    its('collection_timeout') { should eq 3000 }
+    its('retry_count') { should eq 1 }
+    its('thresholding_enabled') { should eq false }
+  end
+end
+
 control 'wsman_group' do
   describe wsman_group('wsman-another-group', 'wsman-datacollection.d/wsman-test-group.xml') do
     it { should exist }
@@ -54,4 +92,16 @@ control 'wsman_group' do
   end
 end
 
-
+control 'wsman_system_definition' do
+  describe wsman_system_definition('wsman-test') do
+    it { should exist }
+    its('groups') { should include 'wsman-test-group' }
+    its('groups') { should include 'wsman-another-group' }
+    its('groups') { should include 'wsman-dell-group' }
+    its('groups') { should include 'drac-power-delltest' }
+  end
+  describe wsman_system_definition('wsman-test') do
+    it { should exist }
+    its('groups') { should_not include 'drac-power-test' }
+  end
+end
