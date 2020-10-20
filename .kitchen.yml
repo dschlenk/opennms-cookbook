@@ -18038,7 +18038,20 @@ suites:
       - recipe[onms_lwrp_test::wsman]
     attributes:
       opennms:
-        version: 25.2.0-1
+        version: 25.2.1-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/wsman
+  - name: wsman_26
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::wsman]
+    attributes:
+      opennms:
+        version: 26.2.2-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -18168,7 +18181,20 @@ suites:
       - recipe[onms_lwrp_test::wsman_collection]
     attributes:
       opennms:
-        version: 25.2.0-1
+        version: 25.2.1-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/wsman_collection
+  - name: wsman_collection_26
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::wsman_collection]
+    attributes:
+      opennms:
+        version: 26.2.2-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -18298,7 +18324,20 @@ suites:
       - recipe[onms_lwrp_test::wsman_collection_service]
     attributes:
       opennms:
-        version: 25.2.0-1
+        version: 25.2.1-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/wsman_collection_service
+  - name: wsman_collection_service_26
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::wsman_collection_service]
+    attributes:
+      opennms:
+        version: 26.2.2-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -18428,7 +18467,20 @@ suites:
       - recipe[onms_lwrp_test::wsman_group]
     attributes:
       opennms:
-        version: 25.2.0-1
+        version: 25.2.1-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/wsman_group
+  - name: wsman_group_26
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::wsman_group]
+    attributes:
+      opennms:
+        version: 26.2.2-1
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -18558,7 +18610,20 @@ suites:
       - recipe[onms_lwrp_test::wsman_system_definition]
     attributes:
       opennms:
-        version: 25.2.0-1
+        version: 25.2.1-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/wsman_system_definition
+  - name: wsman_system_definition_26
+    run_list:
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::wsman_system_definition]
+    attributes:
+      opennms:
+        version: 26.2.2-1
     verifier:
       inspec_tests:
         - path: test/integration/default
