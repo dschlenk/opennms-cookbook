@@ -137,3 +137,14 @@ template "#{onms_home}/bin/opennms" do
   not_if { node['opennms']['version'] == '26.2.1-1' }
   not_if { node['opennms']['version'] == '26.2.2-1' }
 end
+
+cookbook_file "patch #{onms_home}/bin/opennms" do
+  path "#{onms_home}/bin/opennms"
+  cookbook node['opennms']['bin']['cookbook']
+  source "opennms-26-dot-two-dot-some"
+  mode 00755
+  owner 'root'
+  group 'root'
+  only_if { node['opennms']['version'] == '26.2.1-1' }
+  only_if { node['opennms']['version'] == '26.2.2-1' }
+end
