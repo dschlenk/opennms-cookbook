@@ -145,6 +145,5 @@ cookbook_file "patch #{onms_home}/bin/opennms" do
   mode 00755
   owner 'root'
   group 'root'
-  only_if { node['opennms']['version'] == '26.2.1-1' }
-  only_if { node['opennms']['version'] == '26.2.2-1' }
+  only_if { node['opennms']['version'] == '26.2.1-1' || node['opennms']['version'] == '26.2.2-1' }
 end
