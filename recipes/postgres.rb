@@ -20,7 +20,7 @@ node.default['postgresql']['version'] = '11'
 node.default['postgresql']['version'] = '9.6' if Opennms::Helpers.major(node['opennms']['version']).to_i < 25
 node.default['postgresql']['version'] = '9.5' if Opennms::Helpers.major(node['opennms']['version']).to_i < 18
 
-if upgrade_required?
+if node['opennms']['postgresql']['attempt_upgrade'] && upgrade_required?
 
   check_required_disk_space
 
@@ -69,7 +69,10 @@ if upgrade_required?
 
   log 'starting opennms after postgresql upgrade' do
     notifies :start, 'service[opennms]', :immediately
+    only_if { node['opennms']['postgresql']['start_after_upgrade'] }
   end
+elsif upgrade_required?
+  raise "PostgreSQL upgrade required, but node['opennms']['postgresql']['attempt_upgrade'] is '#{node['opennms']['postgresql']['attempt_upgrade']}'. Upgrade PostgreSQL manually or adjust node attributes."
 else
   Chef::Log.info 'Not upgrading PostgreSQL'
   include_recipe 'opennms::postgres_install'

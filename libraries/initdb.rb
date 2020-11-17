@@ -163,11 +163,7 @@ module Opscode
       # LOG:  time zone "right/US/Eastern" appears to use leap seconds
       # DETAIL:  PostgreSQL does not support leap seconds.
 
-      if tzname.index('right/') == 0
-        false
-      else
-        true
-      end
+      !(tzname.index('right/') == 0)
     end
 
     # Function to support select_default_timezone(tzdir), which is

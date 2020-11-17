@@ -18,7 +18,7 @@
 # limitations under the License.
 #
 
-include_recipe 'build-essential::default'
+include_recipe 'build-essential::default' # ~FC122
 %w(java_properties rest-client addressable).each do |g|
   chef_gem g do
     compile_time true

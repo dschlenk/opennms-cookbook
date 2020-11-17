@@ -141,7 +141,7 @@ end
 cookbook_file "patch #{onms_home}/bin/opennms" do
   path "#{onms_home}/bin/opennms"
   cookbook node['opennms']['bin']['cookbook']
-  source "opennms-26-dot-two-dot-some"
+  source 'opennms-26-dot-two-dot-some'
   mode 00755
   owner 'root'
   group 'root'

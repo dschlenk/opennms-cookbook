@@ -20718,6 +20718,8 @@ suites:
       opennms:
         version: 16.0.4-1
         upgrade: true
+        postgresql:
+          attempt_upgrade: true
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -20731,6 +20733,8 @@ suites:
       opennms:
         version: 17.1.1-1
         upgrade: true
+        postgresql:
+          attempt_upgrade: true
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -20744,6 +20748,8 @@ suites:
       opennms:
         version: 18.0.4-1
         upgrade: true
+        postgresql:
+          attempt_upgrade: true
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -20757,6 +20763,8 @@ suites:
       opennms:
         version: 19.1.0-1
         upgrade: true
+        postgresql:
+          attempt_upgrade: true
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -20770,6 +20778,8 @@ suites:
       opennms:
         version: 20.1.0-1
         upgrade: true
+        postgresql:
+          attempt_upgrade: true
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -20783,6 +20793,8 @@ suites:
       opennms:
         version: 21.1.0-1
         upgrade: true
+        postgresql:
+          attempt_upgrade: true
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -20796,6 +20808,8 @@ suites:
       opennms:
         version: 22.0.4-1
         upgrade: true
+        postgresql:
+          attempt_upgrade: true
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -20809,6 +20823,8 @@ suites:
       opennms:
         version: 23.0.4-1
         upgrade: true
+        postgresql:
+          attempt_upgrade: true
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -20822,6 +20838,8 @@ suites:
       opennms:
         version: 24.1.3-1
         upgrade: true
+        postgresql:
+          attempt_upgrade: true
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -20835,6 +20853,8 @@ suites:
       opennms:
         version: 25.2.1-1
         upgrade: true
+        postgresql:
+          attempt_upgrade: true
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -20848,6 +20868,8 @@ suites:
       opennms:
         version: 26.2.2-1
         upgrade: true
+        postgresql:
+          attempt_upgrade: true
     verifier:
       inspec_tests:
         - path: test/integration/default
