@@ -145,6 +145,8 @@ for f in ${SUITES[@]}; do
       fi
       if [ "$recipe" = "default" ]; then
         echo "        upgrade: true"
+        echo "        postgresql:"
+        echo "          attempt_upgrade: true"
       fi
       echo "    verifier:"
       echo "      inspec_tests:"

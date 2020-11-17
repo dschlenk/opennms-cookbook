@@ -20,7 +20,6 @@
 
 class Chef
   class Recipe
-
     def old_data_dir
       # Something to play with - just discover the first initialized data dir
       # that isn't the new data dir.
@@ -31,10 +30,10 @@ class Chef
       # Note we're doing a reverse sort to put the highest version at 0,
       # and we're not checking '==' because we can't have two paths of the same name. # filter those with no PG_VERSION
       ::Dir.glob(::File.join(::File.expand_path('../..', new_data_dir), '*/data'))
-          .reject { |dir| dir == new_data_dir } # ignore the new one
-          .map { |dir| [dir, version_from_data_dir(dir)] }
-          .reject { |_dir, vsn| !vsn }.sort { |a, b| Gem::Version.new(a[1]) > Gem::Version.new(b[1]) ? -1 : 1 }
-          .map(&:first).first # drop the versions again
+           .reject { |dir| dir == new_data_dir } # ignore the new one
+           .map { |dir| [dir, version_from_data_dir(dir)] }
+           .reject { |_dir, vsn| !vsn }.sort { |a, b| Gem::Version.new(a[1]) > Gem::Version.new(b[1]) ? -1 : 1 }
+           .map(&:first).first # drop the versions again
     end
 
     def new_data_dir

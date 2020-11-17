@@ -348,7 +348,7 @@ default['opennms']['properties']['rancid']['only_rancid_adapter']  = nil
 default['opennms']['properties']['rtc']['baseurl']   = 'http://localhost:8980/opennms/rtc/post'
 default['opennms']['properties']['rtc']['username']  = 'rtc'
 default['opennms']['properties']['rtc']['password']  = 'rtc'
-default['opennms']['properties']['rtc']['pwhash']  = 'sHMy+HycWKGJC/uUMF0IGlXUXP1KhcqD0GEchFlvYTw40jT9r+zMxOb3F+phWNzX'
+default['opennms']['properties']['rtc']['pwhash']    = 'sHMy+HycWKGJC/uUMF0IGlXUXP1KhcqD0GEchFlvYTw40jT9r+zMxOb3F+phWNzX'
 # MAP IPC
 default['opennms']['properties']['map']['baseurl']   = 'http://localhost:8980/opennms/map/post'
 default['opennms']['properties']['map']['username']  = 'map'
@@ -2093,6 +2093,8 @@ default['opennms']['es']['hosts'] = {}
 default['opennms']['manage_repos'] = true
 
 default['opennms']['posgresql']['pg_upgrade_timeout'] = 7200
+default['opennms']['postgresql']['attempt_upgrade'] = false
+default['opennms']['postgresql']['start_after_upgrade'] = false
 
 default['opennms']['bin']['cookbook'] = 'opennms'
 default['opennms']['bin']['return_code'] = false
