@@ -26,52 +26,28 @@ class WsManGroup < Inspec.resource(1)
     @params = {}
 
     if @exists
-      puts 'Group Name : ' + group.attributes["name"].to_s
-      @params[:group_name] = group.attributes["name"].to_s
-      puts 'Resource Type : ' + group.attributes["resource-type"].to_s
-      @params[:resource_type] = group.attributes["resource-type"].to_s
-      puts 'Resource URL : ' + group.attributes["resource-uri"].to_s
-      @params[:resource_uri] = group.attributes["resource-uri"].to_s
+      @params[:group_name] = group.attributes['name'].to_s
+      @params[:resource_type] = group.attributes['resource-type'].to_s
+      @params[:resource_uri] = group.attributes['resource-uri'].to_s
 
-      unless group.attributes["dialect"].nil?
-        puts 'dialect : ' + group.attributes["dialect"].to_s
-        @params[:dialect] = group.attributes["dialect"].to_s
+      unless group.attributes['dialect'].nil?
+        @params[:dialect] = group.attributes['dialect'].to_s
       end
-      unless group.attributes["filter"].nil?
-        puts 'filter : ' + group.attributes["filter"].to_s
-        @params[:filter] = group.attributes["filter"].to_s
+      unless group.attributes['filter'].nil?
+        @params[:filter] = group.attributes['filter'].to_s
       end
       unless group.elements['attrib'].nil?
-        attribs = {}
+        attribs = []
         group.each_element('attrib') do |a|
-          aname = a.attributes['name'].to_s
-          puts 'attributes name : ' + aname
-          atype = a.attributes['type'].to_s
-          puts 'attributes type : ' + atype
-          aalias = a.attributes['alias'].to_s
-          puts 'attributes alias : ' + aalias
+          na = {}
 
-          unless a.attributes['index-of'].nil?
-            aido = a.attributes['index-of'].to_s
-            puts 'attributes index-of : ' + aido
-          end
+          na['name'] = a.attributes['name'].to_s
+          na['type'] = a.attributes['type'].to_s
+          na['alias'] = a.attributes['alias'].to_s
+          na['index-of'] = a.attributes['index-of'] unless a.attributes['index-of'].nil?
+          na['filter'] = a.attributes['filter'].to_s unless a.attributes['filter'].nil?
 
-          unless a.attributes['filter'].nil?
-            afilter = a.attributes['filter'].to_s
-            puts 'attributes index-of : ' + afilter
-          end
-
-          attribs[aname] = {}
-          attribs[aname]['type'] = atype
-          attribs[aname]['alias'] = aalias
-
-          unless aido.nil?
-            attribs[aname]['index-of'] = aido
-          end
-
-          unless afilter.nil?
-            attribs[aname]['filter'] = afilter
-          end
+          attribs.push na
         end
       end
       @params[:attribs] = attribs

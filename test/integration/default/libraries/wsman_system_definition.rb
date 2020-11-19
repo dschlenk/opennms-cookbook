@@ -24,7 +24,7 @@ class WsmanSystemDefinition < Inspec.resource(1)
     unless s_el.elements['include-group'].nil?
       @params[:groups] = []
       s_el.each_element('include-group') do |g|
-        puts 'Group name : ' + "#{g}"
+        puts 'Group name : ' + g.to_s
         @params[:groups].push g.texts.join('')
       end
     end
@@ -56,12 +56,12 @@ class WsmanSystemDefinition < Inspec.resource(1)
     end
 
     if system_def_file.nil?
-      file = ::File.new("/opt/opennms/etc/wsman-datacollection-config.xml", 'r')
+      file = ::File.new('/opt/opennms/etc/wsman-datacollection-config.xml', 'r')
       doc = REXML::Document.new file
 
       exists = !doc.elements["/wsman-datacollection-config/system-definition[@name='#{name}']"].nil?
       if exists
-        system_def_file = "/opt/opennms/etc/wsman-datacollection-config.xml"
+        system_def_file = '/opt/opennms/etc/wsman-datacollection-config.xml'
       end
     end
     system_def_file

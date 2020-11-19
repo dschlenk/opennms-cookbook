@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 module WsmanCollection
-
   def wsman_service_exists?(name, node)
     Chef::Log.debug "Checking to see if this wsman collection exists: '#{name}'"
     file = ::File.new("#{node['opennms']['conf']['home']}/etc/wsman-datacollection-config.xml", 'r')
@@ -9,7 +8,7 @@ module WsmanCollection
     !doc.elements["/wsman-datacollection-config/collection[@name='#{name}']"].nil?
   end
 
-  def created_wsman_collection (new_resource, node)
+  def created_wsman_collection(new_resource, node)
     Chef::Log.debug "Creating wsman collection : '#{new_resource.name}'"
     file = ::File.new("#{node['opennms']['conf']['home']}/etc/wsman-datacollection-config.xml", 'r')
     contents = file.read
@@ -22,7 +21,7 @@ module WsmanCollection
       rra_el.add_text(rra)
     end
 
-    #Optional: The magic happens with the <include-all-system-definitions/> element which automatically includes all of the system definitions into the collection group.
+    # Optional: The magic happens with the <include-all-system-definitions/> element which automatically includes all of the system definitions into the collection group.
     unless new_resource.include_system_definitions.nil?
       unless new_resource.include_system_definitions == true
         collection_el.add_element 'include-system-definitions'

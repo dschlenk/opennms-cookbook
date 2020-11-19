@@ -28,8 +28,6 @@ end
 
 private
 
-
-
 def create_wsman_collection
   created_wsman_collection(new_resource, node)
 end

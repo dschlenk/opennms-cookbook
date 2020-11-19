@@ -3,16 +3,14 @@ require 'rexml/document'
 include Chef::Mixin::ShellOut
 
 module Wsman
-  def findFilePath(node, element, name)
+  def find_file_path(node, element, name)
     file = nil
 
-    #Check to see if group exist in wsman-datacollection-config.xml
+    # Check to see if group exist in wsman-datacollection-config.xml
     Chef::Log.debug "Checking to see if #{name} exists wsman-datacollection-config.xml"
 
     fn = "#{node['opennms']['conf']['home']}/etc/wsman-datacollection-config.xml"
-    if ::File.exist?(fn)
-      exists = exists?(fn, element)
-    end
+    exists = exists?(fn, element) if ::File.exist?(fn)
 
     if exists
       file = "#{node['opennms']['conf']['home']}/etc/wsman-datacollection-config.xml"
@@ -31,33 +29,31 @@ module Wsman
     search_file = shell_out("grep -l '#{name}' #{node['opennms']['conf']['home']}/etc/wsman-datacollection.d/*.xml")
     if search_file.stdout != '' && search_file.stdout.lines.to_a.length == 1
       begin
-        exists = exists?("#{search_file.stdout.chomp}", element)
+        exists = exists?(search_file.stdout.chomp, element)
         if exists
           Chef::Log.debug("file name for system definition #{search_file.stdout.chomp}")
-          file = "#{search_file.stdout.chomp}"
+          file = search_file.stdout.chomp
           return file
         end
       end
     else # if multiple files match, only return if true since could be a regex false positive.
       search_file.stdout.lines.each do |sfile|
         exists = exists?(sfile.chomp, element)
-        if exists
-          Chef::Log.debug("file name exsist:  #{sfile}")
-          file = "#{sfile.chomp}"
-          break
-          return file
-        end
+        next unless exists
+        Chef::Log.debug("file name exsist:  #{sfile}")
+        file = sfile.chomp
+        break
       end
     end
     file
   end
 
   def exists?(filename, element)
-    file = ::File.new("#{filename}", 'r')
+    file = ::File.new(filename, 'r')
     doc = REXML::Document.new file
     file.close
 
-    exists = !doc.elements["#{element}"].nil?
+    exists = !doc.elements[element].nil?
     exists
   end
 
@@ -83,8 +79,8 @@ module Wsman
   end
 
   def config_file_xpath
-    config_file_xpath = "/wsman-datacollection-config"
-    Chef::Log.debug "config_file_xpath is wsman-datacollection-config"
+    config_file_xpath = '/wsman-datacollection-config'
+    Chef::Log.debug 'config_file_xpath is wsman-datacollection-config'
     config_file_xpath
   end
 
