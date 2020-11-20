@@ -223,7 +223,7 @@ org.opennms.alarmd.newIfClearedAlarmExists = <%= @properties['alarmd']['new_if_c
 #
 # Note: Setting legacyAlarmState will nullify newIfClearedAlarmExists 
 <% unless @properties['alarmd']['legacy_alarm_state'].nil? -%>
-org.opennms.alarmd.newIfClearedAlarmExists = <%= @properties['alarmd']['legacy_alarm_state'] %>
+org.opennms.alarmd.legacyAlarmState  = <%= @properties['alarmd']['legacy_alarm_state'] %>
 <% end -%>
 
 ###### TROUBLE TICKETING ######
@@ -1174,4 +1174,9 @@ opennms.alarmlist.unackflash=<%= node['opennms']['properties']['alarmlist']['una
 # org.opennms.features.osgi.bridge.restAliases=/rest,/api/v2
 <% if node['opennms']['properties']['rest_aliases'] != '/rest,/api/v2' -%>
 org.opennms.features.osgi.bridge.restAliases=<%=node['opennms']['properties']['rest_aliases']%>
+<% end -%>
+
+<% unless @properties['jms_nbi']['broker_url'].nil? -%>
+# ###### Configure the ActiveMQ broker for the JMS Northbounder ######
+opennms.alarms.northbound.jms.activemq.brokerURL=<%=@properties['jms_nbi']['broker_url']%>
 <% end -%>

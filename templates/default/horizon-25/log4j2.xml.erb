@@ -43,11 +43,11 @@
               <pattern>%d %-5p [%t] %c{1.}: %m%n</pattern>
             </PatternLayout>
 
-            <!-- Rotate logs at 100MB-->
-            <SizeBasedTriggeringPolicy size="100MB" />
+            <!-- Rotate logs at <%=@log['default_route']['size']%>-->
+            <SizeBasedTriggeringPolicy size="<%=@log['default_route']['size']%>" />
 
-            <!-- Rotate through 4 logs -->
-            <DefaultRolloverStrategy max="4" fileIndex="min" />
+            <!-- Rotate through <%=@log['default_route']['rollover']%> logs -->
+            <DefaultRolloverStrategy max="<%=@log['default_route']['rollover']%>" fileIndex="min" />
           </RollingFile>
         </Route>
           <!--
@@ -63,11 +63,11 @@
               <pattern>%d %-5p [%t] %m%n</pattern>
             </PatternLayout>
 
-            <!-- Rotate logs at 100MB-->
-            <SizeBasedTriggeringPolicy size="<%=@log[:size]%>" />
+            <!-- Rotate logs at <%=@log['instrumentation']['size']%>-->
+            <SizeBasedTriggeringPolicy size="<%=@log['instrumentation']['size']%>" />
 
-            <!-- Rotate through 4 logs -->
-            <DefaultRolloverStrategy max="4" fileIndex="min" />
+            <!-- Rotate through <%=@log['instrumentation']['rollover']%> logs -->
+            <DefaultRolloverStrategy max="<%=@log['instrumentation']['rollover']%>" fileIndex="min" />
           </RollingFile>
         </Route>
       </Routes>

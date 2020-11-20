@@ -132,11 +132,7 @@ class Event < Inspec.resource(1)
       event_el.elements.each('parameter') do |parm|
         p = { 'name' => parm.attributes['name'], 'value' => parm.attributes['value'] }
         unless parm.attributes['expand'].nil?
-          p['expand'] = if parm.attributes['expand'] == 'true'
-                          true
-                        else
-                          false
-                        end
+          p['expand'] = parm.attributes['expand'] == 'true'
         end
         parameters.push p
       end
@@ -200,11 +196,7 @@ class Event < Inspec.resource(1)
     update_fields = []
     ad_el.elements.each('update-field') do |uf|
       fn = uf.attributes['field-name']
-      uor = if uf.attributes['update-on-reduction'] == 'false'
-              false
-            else
-              true
-            end
+      uor = !(uf.attributes['update-on-reduction'] == 'false')
       if uor.nil?
         update_fields.push 'field_name' => fn
       else
