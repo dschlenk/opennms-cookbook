@@ -206,11 +206,7 @@ module Events
         event_el.elements.each('parameter') do |parm|
           p = { 'name' => parm.attributes['name'], 'value' => parm.attributes['value'] }
           next if Opennms::Helpers.major(node['opennms']['version']).to_i <= 17 || parm.attributes['expand'].nil?
-          p['expand'] = if parm.attributes['expand'] == 'true'
-                          true
-                        else
-                          false
-                        end
+          p['expand'] = parm.attributes['expand'] == 'true'
         end
         Chef::Log.debug "parameters equal? New: #{event.parameters}, current #{parameters}"
         return true unless event.parameters == parameters
@@ -325,11 +321,7 @@ module Events
         update_fields = []
         ad_el.elements.each('update-field') do |uf|
           fn = uf.attributes['field-name']
-          uor = if uf.attributes['update-on-reduction'] == 'false'
-                  false
-                else
-                  true
-                end
+          uor = !(uf.attributes['update-on-reduction'] == 'false')
           if uor.nil?
             update_fields.push 'field_name' => fn
           else

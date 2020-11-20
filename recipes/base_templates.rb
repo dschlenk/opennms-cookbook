@@ -42,6 +42,8 @@ when '24'
   template_dir = 'horizon-24/'
 when '25'
   template_dir = 'horizon-25/'
+when '26'
+  template_dir = 'horizon-26/'
 end
 
 if Opennms::Helpers.major(node['opennms']['version']).to_i >= 22
@@ -119,4 +121,29 @@ template "#{onms_home}/jetty-webapps/opennms/WEB-INF/web.xml" do
     credentials: node['opennms']['cors']['credentials']
   )
   not_if { Opennms::Helpers.major(node['opennms']['version']).to_i < 17 }
+end
+
+template "#{onms_home}/bin/opennms" do
+  cookbook node['opennms']['bin']['cookbook']
+  source "#{template_dir}opennms.erb"
+  mode 00755
+  owner 'root'
+  group 'root'
+  variables(
+    return_code: node['opennms']['bin']['return_code']
+  )
+  not_if { Opennms::Helpers.major(node['opennms']['version']).to_i < 25 }
+  not_if { Opennms::Helpers.major(node['opennms']['version']).to_i > 26 }
+  not_if { node['opennms']['version'] == '26.2.1-1' }
+  not_if { node['opennms']['version'] == '26.2.2-1' }
+end
+
+cookbook_file "patch #{onms_home}/bin/opennms" do
+  path "#{onms_home}/bin/opennms"
+  cookbook node['opennms']['bin']['cookbook']
+  source 'opennms-26-dot-two-dot-some'
+  mode 00755
+  owner 'root'
+  group 'root'
+  only_if { node['opennms']['version'] == '26.2.1-1' || node['opennms']['version'] == '26.2.2-1' }
 end
