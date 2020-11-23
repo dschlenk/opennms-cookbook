@@ -197,6 +197,8 @@ GEM
       hashie (~> 3.4)
       inspec (>= 0.34.0, < 3.0.0)
       test-kitchen (~> 1.6)
+    kitchen-vagrant (1.7.2)
+      test-kitchen (>= 1.4, < 3)
     libyajl2 (1.2.0)
     little-plugger (1.1.4)
     logging (2.2.2)
@@ -448,10 +450,11 @@ DEPENDENCIES
   inspec (~> 1.51)
   java_properties
   kitchen-inspec (~> 0.23)
+  kitchen-vagrant (~> 1.6)
   rake
   rest-client
   stove (~> 6)
   test-kitchen (~> 1.20)
 
 BUNDLED WITH
-   1.16.1
+   1.16.6
