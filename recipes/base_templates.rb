@@ -97,7 +97,11 @@ template "#{onms_home}/etc/opennms.properties" do
     properties: node['opennms']['properties']
   )
 end
-
+if Opennms::Helpers.major(node['opennms']['version']).to_i >= 25
+  node.default['opennms']['log4j2']['default_route']['size'] = '100MB'
+  node.default['opennms']['log4j2']['default_route']['rollover'] = 4
+  node.default['opennms']['log4j2']['instrumentation']['rollover'] = 4
+end
 template "#{onms_home}/etc/log4j2.xml" do
   cookbook node['opennms']['log4j2']['cookbook']
   source "#{template_dir}log4j2.xml.erb"
