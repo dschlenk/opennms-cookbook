@@ -15,12 +15,10 @@ opennms_import_node 'nothing nodeC' do
   building 'Big'
   categories %w(Servers Dev)
   assets 'vendorPhone' => '311'
-  sync_import true
 end
 
 opennms_import_node 'nothing for different reasons nodeC' do
   foreign_source_name 'dry-source'
   foreign_id node_c_foreign_id
-  sync_import true
   action :create_if_missing
 end

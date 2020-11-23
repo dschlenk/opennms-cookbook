@@ -20,6 +20,7 @@ opennms_import_node 'nodeB' do
   building 'HQ'
   categories %w(Servers Test)
   assets 'vendorPhone' => '411', 'serialNumber' => 'SN12838931'
+  sync_import false
 end
 
 node_c_foreign_id = 'nodeC'
@@ -34,7 +35,11 @@ opennms_import_node 'nodeC' do
   building 'Barn'
   categories %w(Servers Test)
   assets 'vendorPhone' => '511', 'serialNumber' => 'SN12838932'
-  sync_import true
+  sync_import false
   sync_wait_periods 30
   sync_wait_secs 10
+end
+
+log 'sync dry-source after adding two nodes' do
+  notifies :sync, 'opennms_import[dry-source]', :immediately
 end
