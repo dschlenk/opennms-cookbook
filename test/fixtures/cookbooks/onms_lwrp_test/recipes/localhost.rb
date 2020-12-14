@@ -20,7 +20,8 @@ end
     foreign_source_name 'localhost'
     foreign_id iface_node_foreign_id
     managed true
-    snmp_primary 'P'
+    snmp_primary 'P' if ip == '127.0.0.1'
+    snmp_primary 'S' if ip != '127.0.0.1'
     sync_import false
   end
   # all options
