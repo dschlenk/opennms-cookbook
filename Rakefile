@@ -94,10 +94,12 @@ namespace :integration do
           old_instance = instance
         end
         # to improve the odds it actually destroys properly, rename it back to original
-        puts "Done with #{ver} on #{plat}. Moving #{old_instance.name}.yml to #{first_instance.name}.yml before destroying."
-        File.rename(".kitchen/#{old_instance.name}.yml", ".kitchen/#{first_instance.name}.yml")
-        first_instance.destroy
-        # try to prevent OOM
+        if File.exist?(".kitchen/#{old_instance.name}.yml")
+          puts "Done with #{ver} on #{plat}. Moving #{old_instance.name}.yml to #{first_instance.name}.yml before destroying."
+          File.rename(".kitchen/#{old_instance.name}.yml", ".kitchen/#{first_instance.name}.yml")
+          first_instance.destroy
+        end
+          # try to prevent OOM
         GC.start
       end
     end
