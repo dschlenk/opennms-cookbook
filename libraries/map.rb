@@ -7,7 +7,7 @@ module Map
   def map_exists?(_map, node)
     require 'rest_client'
     begin
-      response = RestClient.get "#{baseurl(node)}/maps", accept: :json
+      response = RestClient.get "#{baseurl(node)}/maps", { accept: :json, 'Accept-Encoding' => 'identity' }
       count = JSON.parse(response)['@count']
       if count > 0
         maps = JSON.parse(response)['map']

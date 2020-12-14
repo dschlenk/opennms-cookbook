@@ -301,27 +301,35 @@ module Provision
     require 'rest_client'
     foreign_source_name = URI.escape(current_resource.foreign_source_name)
     foreign_id = URI.escape(current_resource.foreign_id)
-    n = JSON.parse(RestClient.get("#{baseurl(node)}/requisitions/#{foreign_source_name}/nodes/#{foreign_id}", accept: :json).to_s)
-    Chef::Log.debug("checking for changes in #{new_resource.foreign_id}.")
-    Chef::Log.debug("n is #{n}")
-    return true if thing_changed?(current_resource.node_label, n['node-label'])
-    return true if thing_changed?(current_resource.parent_foreign_source, n['parent-foreign-source'])
-    return true if thing_changed?(current_resource.parent_foreign_id, n['parent-foreign-id'])
-    return true if thing_changed?(current_resource.parent_node_label, n['parent-node-label'])
-    return true if thing_changed?(current_resource.city, n['city'])
-    return true if thing_changed?(current_resource.building, n['building'])
-    # TODO: support categories/assets return true if things_changed?(current_resource.categories, n[
-    curr_cats = []
-    n['category'].each do |cat|
-      Chef::Log.debug "current category membership includes #{cat['name']}"
-      curr_cats.push cat['name']
+    (1..3).each do |r|
+      begin
+        Chef::Log.debug("url for existing, try #{r}: '#{baseurl(node)}/requisitions/#{foreign_source_name}/nodes/#{foreign_id}'") #, { accept: :json, 'Accept-Encoding' => 'identity' }).to_s)
+        n = JSON.parse(RestClient.get("#{baseurl(node)}/requisitions/#{foreign_source_name}/nodes/#{foreign_id}", { accept: :json, 'Accept-Encoding' => 'identity' }).to_s)
+        Chef::Log.debug("checking for changes in #{new_resource.foreign_id}.")
+        Chef::Log.debug("n is #{n}")
+        return true if thing_changed?(current_resource.node_label, n['node-label'])
+        return true if thing_changed?(current_resource.parent_foreign_source, n['parent-foreign-source'])
+        return true if thing_changed?(current_resource.parent_foreign_id, n['parent-foreign-id'])
+        return true if thing_changed?(current_resource.parent_node_label, n['parent-node-label'])
+        return true if thing_changed?(current_resource.city, n['city'])
+        return true if thing_changed?(current_resource.building, n['building'])
+        # TODO: support categories/assets return true if things_changed?(current_resource.categories, n[
+        curr_cats = []
+        n['category'].each do |cat|
+          Chef::Log.debug "current category membership includes #{cat['name']}"
+          curr_cats.push cat['name']
+        end
+        return true if things_changed?(current_resource.categories, curr_cats)
+        curr_assets = {}
+        n['asset'].each do |asset|
+          curr_assets[asset['name']] = asset['value']
+        end
+        return true if things_changed?(current_resource.assets, curr_assets)
+      rescue StandardError => err
+        Chef::Log.debug("failed to get node from requisition because '#{err}', will wait a bit for provisiond to catch up")
+        sleep(15)
+      end
     end
-    return true if things_changed?(current_resource.categories, curr_cats)
-    curr_assets = {}
-    n['asset'].each do |asset|
-      curr_assets[asset['name']] = asset['value']
-    end
-    return true if things_changed?(current_resource.assets, curr_assets)
     false
   end
 
@@ -335,7 +343,7 @@ module Provision
     foreign_source_name = URI.escape(new_resource.foreign_source_name)
     foreign_id = URI.escape(new_resource.foreign_id)
 
-    n = REXML::Document.new(RestClient.get("#{baseurl(node)}/requisitions/#{foreign_source_name}/nodes/#{foreign_id}").to_s)
+    n = REXML::Document.new(RestClient.get("#{baseurl(node)}/requisitions/#{foreign_source_name}/nodes/#{foreign_id}", { 'Accept-Encoding' => 'identity' }).to_s)
     # you can't update a node label using the implied node label from the name of the resource
     node_el = n.elements['node']
     if !new_resource.node_label.nil? && new_resource.node_label != node_el.attributes['node-label']
@@ -505,7 +513,7 @@ module Provision
     end
     parsed_url = Addressable::URI.parse(url).normalize.to_str
     Chef::Log.debug("sync_complete? URL: '#{parsed_url}'")
-    response = RestClient.get(parsed_url, accept: :json)
+    response = RestClient.get(parsed_url, { accept: :json, 'Accept-Encoding' => 'identity' })
     # apiv2 returns empty response (204) when nothing found
     # and might return things in gzip format which annoyingly rest-client doesn't decode for you
     return false if response.code == 204
@@ -582,7 +590,7 @@ module Provision
     begin
       node.run_state['default_foreign_source'] ||=
         JSON.parse(RestClient.get("#{baseurl(node)}/foreignSources/default",
-                                  accept: :json).to_str)
+                                  { accept: :json, 'Accept-Encoding' => 'identity' }).to_str)
       node.run_state['default_foreign_source']
     rescue
       Chef::Log.warn 'Cannot retrieve default foreign source via OpenNMS ReST API.'
@@ -595,10 +603,10 @@ module Provision
       node.run_state['foreign_sources'] ||=
         if Opennms::Helpers.major(node['opennms']['version']).to_i > 16
           JSON.parse(RestClient.get("#{baseurl(node)}/foreignSources",
-                                  accept: :json).to_str)['foreignSources']
+                                  { accept: :json, 'Accept-Encoding' => 'identity' }).to_str)['foreignSources']
         else
           JSON.parse(RestClient.get("#{baseurl(node)}/foreignSources",
-                                  accept: :json).to_str)
+                                  { accept: :json, 'Accept-Encoding' => 'identity' }).to_str)
         end
       node.run_state['foreign_sources']
     rescue
@@ -609,13 +617,29 @@ module Provision
 
   def imports(node)
     require 'rest_client'
-    begin
-      node.run_state['imports'] ||=
-        JSON.parse(RestClient.get("#{baseurl(node)}/requisitions",
-                                      accept: :json).to_str)
-    rescue
-      Chef::Log.error 'Cannot retrieve requisitions via OpenNMS ReST API.'
-      return false
+    last_err = nil
+    ret = nil
+    (1..3).each do |r|
+      begin
+        node.run_state['imports'] ||=
+          JSON.parse(RestClient.get("#{baseurl(node)}/requisitions",
+                                        { accept: :json, 'Accept-Encoding' => 'identity' }).to_str)
+        Chef::Log.debug("imports is #{node.run_state['imports']}.")
+        ret = node.run_state['imports']
+        if ret.nil?
+          Chef::Log.debug('imports was nil somehow, sleeping and trying again')
+          sleep(15)
+          next
+        else
+          return ret
+        end
+      rescue StandardError => err
+        Chef::Log.debug "Cannot retrieve requisitions via OpenNMS ReST API due to #{err}."
+        last_err = err
+        sleep(15)
+      end
     end
+    Chef::Log.error 'Could not retrieve requisitions via OpenNMS ReST API.'
+    return false
   end
 end
