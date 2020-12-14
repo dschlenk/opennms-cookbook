@@ -14,7 +14,8 @@ DEPENDENCIES
   postgresql (~> 7.1.4)
   snmp
     path: test/fixtures/cookbooks/snmp
-  yum-centos
+  yum-centos-ct
+    path: test/fixtures/cookbooks/yum-centos-ct
   yum-epel
 
 GRAPH
@@ -60,5 +61,5 @@ GRAPH
   snmp (0.1.0)
   windows (4.0.1)
   yum (5.1.0)
-  yum-centos (3.0.0)
+  yum-centos-ct (0.1.0)
   yum-epel (3.1.0)

@@ -74,6 +74,22 @@ end
 
 include_recipe 'opennms::templates' if node['opennms']['templates']
 
+if node['platform_family'] == 'rhel' && node['platform_version'].to_i > 6
+  directory '/etc/systemd/system/opennms.service.d' do
+    owner 'root'
+    group 'root'
+    mode 00755
+  end
+
+  file '/etc/systemd/system/opennms.service.d/timeout.conf' do
+    owner 'root'
+    group 'root'
+    mode 00644
+    content "[Service]\nTimeoutSec=900"
+    notifies :run, 'execute[reload systemd]', :immediately
+  end
+end
+
 service 'opennms' do
   supports status: true, restart: true
   action [:enable]

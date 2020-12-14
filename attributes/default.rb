@@ -28,6 +28,18 @@ default['yum']['opennms-oldstable-rhel6']['baseurl']         = 'http://yum.openn
 default['yum']['opennms-oldstable-rhel6']['failovermethod']  = 'roundrobin'
 default['yum']['opennms-oldstable-rhel7']['baseurl']         = 'http://yum.opennms.org/oldstable/rhel7'
 default['yum']['opennms-oldstable-rhel7']['failovermethod']  = 'roundrobin'
+# 6 is eol but I guess folks might still need it
+case node['platform_family']
+when 'rhel'
+  if node['platform_version'].to_f >= 6.0 && node['platform_version'].to_f < 7.0
+    default['yum']['base']['baseurl'] = 'https://archive.kernel.org/centos-vault/6.9/os/$basearch/'
+    default['yum']['extras']['baseurl'] = 'https://archive.kernel.org/centos-vault/6.9/extras/$basearch/'
+    default['yum']['updates']['baseurl'] = 'https://archive.kernel.org/centos-vault/6.9/updates/$basearch/'
+    default['yum']['base']['mirrorlist'] = nil
+    default['yum']['extras']['mirrorlist'] = nil
+    default['yum']['updates']['mirrorlist'] = nil
+  end
+end
 default['build-essential']['compile_time'] = true
 # set to -Q to mimic OOTB quick start behavior on RHEL7+ (but you should not do this if using any of the opennms resources)
 default['opennms']['start_opts'] = ''
