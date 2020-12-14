@@ -182,6 +182,7 @@ def create_poller_service
   first_downtime_el = doc.elements["/poller-configuration/package[@name='#{new_resource.package_name}']/downtime[1]"]
   first_oc = doc.elements["/poller-configuration/package[@name='#{new_resource.package_name}']/outage-calendar[1]"]
   Chef::Log.debug("first_oc: #{first_oc}")
+  Chef::Log.debug("first_downtime_el: #{first_downtime_el}")
   service_el = REXML::Element.new('service')
   service_el.attributes['name'] = service_name
   service_el.attributes['interval'] = new_resource.interval
