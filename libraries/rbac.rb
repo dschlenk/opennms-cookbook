@@ -36,7 +36,7 @@ module Opennms
       begin
         retries ||= 0
         sleep(10) if retries > 0
-        response = RestClient.get "#{baseurl(node)}/users/#{user}", { accept: :json, 'Accept-Encoding' => 'identity' }
+        response = RestClient.get "#{baseurl(node)}/users/#{user}", accept: :json, 'Accept-Encoding' => 'identity'
         return JSON.parse(response.to_s)
       rescue => e
         Chef::Log.warn "Unable to retrieve current admin user using supplied password: #{e}"
@@ -45,7 +45,7 @@ module Opennms
           iretries ||= 0
           sleep(10) if iretries > 0
           Chef::Log.debug 'falling back to default password'
-          response = RestClient.get "#{baseurl(node, 'admin')}/users/#{user}", { accept: :json, 'Accept-Encoding' => 'identity' }
+          response = RestClient.get "#{baseurl(node, 'admin')}/users/#{user}", accept: :json, 'Accept-Encoding' => 'identity'
           return JSON.parse(response.to_s)
         rescue => e
           Chef::Log.warn "Unable to retrieve current admin user using supplied or default password: #{e}"
@@ -57,7 +57,7 @@ module Opennms
     def user_exists?(user, node)
       require 'rest_client'
       begin
-        response = RestClient.get "#{baseurl(node)}/users/#{user}", { accept: :json, 'Accept-Encoding' => 'identity' }
+        response = RestClient.get "#{baseurl(node)}/users/#{user}", accept: :json, 'Accept-Encoding' => 'identity'
         return true if response.code == 200
       rescue
         return false

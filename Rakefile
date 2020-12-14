@@ -99,7 +99,7 @@ namespace :integration do
           File.rename(".kitchen/#{old_instance.name}.yml", ".kitchen/#{first_instance.name}.yml")
           first_instance.destroy
         end
-          # try to prevent OOM
+        # try to prevent OOM
         GC.start
       end
     end

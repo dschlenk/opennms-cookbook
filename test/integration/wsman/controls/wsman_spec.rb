@@ -76,7 +76,7 @@ control 'wsman_group' do
     its('resource_uri') { should eq 'http://schemas.dmtf.org/wbem/wscim/1/*' }
     its('dialect') { should eq 'http://schemas.microsoft.com/wbem/wsman/1/WQL' }
     its('filter') { should eq "select InputVoltage,InstanceID,PrimaryStatus,SerialNumber,TotalOutputPower from DCIM_PowerSupplyView where DetailedState != 'Absent'" }
-    its('attribs') { should eq [{ 'name' => 'InputVoltage', 'alias' => 'inputVoltage', 'type' => 'Gauge' }, { 'name' => 'InstanceID', 'alias' => 'InstanceID', 'type' => 'String' }, { 'name' => 'PrimaryStatus', 'alias' => 'PrimaryStatus', 'type' => 'Gauge' }, { 'name' => 'SerialNumber','alias' => 'SerialNumber', 'type' => 'String' }, { 'name' => 'TotalOutputPower', 'alias' => 'TotalOutputPower', 'type' => 'Gauge' }] }
+    its('attribs') { should eq [{ 'name' => 'InputVoltage', 'alias' => 'inputVoltage', 'type' => 'Gauge' }, { 'name' => 'InstanceID', 'alias' => 'InstanceID', 'type' => 'String' }, { 'name' => 'PrimaryStatus', 'alias' => 'PrimaryStatus', 'type' => 'Gauge' }, { 'name' => 'SerialNumber', 'alias' => 'SerialNumber', 'type' => 'String' }, { 'name' => 'TotalOutputPower', 'alias' => 'TotalOutputPower', 'type' => 'Gauge' }] }
   end
 
   describe wsman_group('drac-system-board', 'wsman-datacollection.d/dell-idrac.xml') do

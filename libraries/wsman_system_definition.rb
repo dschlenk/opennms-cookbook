@@ -99,9 +99,7 @@ module WsmanSystemDefinition
     end
 
     sys_def_el.attributes['name'] = new_resource.name
-    unless new_resource.groups.nil?
-      add_sysdef(doc, sys_def_el, new_resource)
-    end
+    add_sysdef(doc, sys_def_el, new_resource) unless new_resource.groups.nil?
 
     Opennms::Helpers.write_xml_file(doc, filename)
   end
