@@ -186,6 +186,7 @@ template "#{onms_home}/etc/datacollection-config.xml" do
     netsnmp: node['opennms']['datacollection']['default']['netsnmp'],
     nortel: node['opennms']['datacollection']['default']['nortel'],
     novell: node['opennms']['datacollection']['default']['novell'],
+    paloalto: node['opennms']['datacollection']['default']['paloalto'],
     pfsense: node['opennms']['datacollection']['default']['pfsense'],
     powerware: node['opennms']['datacollection']['default']['powerware'],
     postgres: node['opennms']['datacollection']['default']['postgres'],
@@ -284,6 +285,7 @@ template "#{onms_home}/etc/enlinkd-configuration.xml" do
     lldp: node['opennms']['enlinkd']['lldp'],
     ospf: node['opennms']['enlinkd']['ospf'],
     isis: node['opennms']['enlinkd']['isis'],
+    topology_interval: node['opennms']['enlinkd']['topology_interval'],
     bridge_topo_interval: node['opennms']['enlinkd']['bridge_topo_interval'],
     max_bft: node['opennms']['enlinkd']['max_bft'],
     disco_bridge_threads: node['opennms']['enlinkd']['disco_bridge_threads']
@@ -440,8 +442,7 @@ template "#{onms_home}/etc/jmx-datacollection-config.xml" do
   cookbook node['opennms']['jmx_dc']['cookbook']
   source "#{template_dir}jmx-datacollection-config.xml.erb"
   mode 00644
-  mode 00664 if Opennms::Helpers.major(node['opennms']['version']) == '22.0.4-1'
-  mode 00664 if Opennms::Helpers.major(node['opennms']['version']).to_i >= 23
+  mode 00664 if node['opennms']['version'] == '22.0.4-1'
   owner 'root'
   group 'root'
   notifies :restart, 'service[opennms]'
@@ -621,7 +622,8 @@ template "#{onms_home}/etc/notificationCommands.xml" do
     call_home_phone: node['opennms']['notification_commands']['call_home_phone'],
     microblog_update: node['opennms']['notification_commands']['microblog_update'],
     microblog_reply: node['opennms']['notification_commands']['microblog_reply'],
-    microblog_dm: node['opennms']['notification_commands']['microblog_dm']
+    microblog_dm: node['opennms']['notification_commands']['microblog_dm'],
+    browser: node['opennms']['notification_commands']['browser']
   )
 end
 
@@ -1944,6 +1946,7 @@ template "#{onms_home}/etc/syslog-northbounder-configuration.xml" do
   )
 end
 
+node.default['opennms']['syslogd']['parser'] = 'org.opennms.netmgt.syslogd.RadixTreeSyslogParser' if mv.to_i >= 24
 template "#{onms_home}/etc/syslogd-configuration.xml" do
   cookbook node['opennms']['syslogd']['cookbook']
   source "#{template_dir}syslogd-configuration.xml.erb"
@@ -2016,7 +2019,8 @@ template "#{onms_home}/etc/translator-configuration.xml" do
     snmp_link_up: node['opennms']['translator']['snmp_link_up'],
     hyperic: node['opennms']['translator']['hyperic'],
     cisco_config_man: node['opennms']['translator']['cisco_config_man'],
-    juniper_cfg_change: node['opennms']['translator']['juniper_cfg_change']
+    juniper_cfg_change: node['opennms']['translator']['juniper_cfg_change'],
+    telemetry_clock_skew_detected: node['opennms']['translator']['telemetry_clock_skew_detected']
   )
 end
 
@@ -2040,11 +2044,21 @@ template "#{onms_home}/etc/users.xml" do
   mode 0640 if mv.to_i > 19
   owner 'root'
   group 'root'
-  variables(
-    name: node['opennms']['users']['admin']['name'],
-    user_comments: node['opennms']['users']['admin']['user_comments'],
-    password: node['opennms']['users']['admin']['pwhash']
-  )
+  if node['opennms']['version'] == '26.2.2-1' || node['opennms']['version'].to_i > 26
+    variables(
+      name: node['opennms']['users']['admin']['name'],
+      user_comments: node['opennms']['users']['admin']['user_comments'],
+      password: node['opennms']['users']['admin']['pwhash'],
+      rtc_pwhash: node['opennms']['properties']['rtc']['pwhash'],
+      salted: node['opennms']['users']['salted']
+    )
+  else
+    variables(
+      name: node['opennms']['users']['admin']['name'],
+      user_comments: node['opennms']['users']['admin']['user_comments'],
+      password: node['opennms']['users']['admin']['pwhash']
+    )
+  end
 end
 
 template "#{onms_home}/etc/vacuumd-configuration.xml" do

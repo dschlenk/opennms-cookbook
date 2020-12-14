@@ -9,6 +9,10 @@ require 'rexml/document'
 # of cookbook_file names) or xml_groups (hash object representing XML
 #  xml-group elements) attributes.
 #
+# If you'd like to load the import_groups files from a remote location
+# rather than embedded in the cookbook, set the import_groups_source
+# parameter to the base URL that each file in import_groups can be found.
+#
 # Equivalence/identity determined by all attributes except request_content
 
 actions :create, :delete
@@ -28,6 +32,7 @@ attribute :request_headers, kind_of: Hash
 attribute :request_content, kind_of: String
 # an array of String filenames (that contain xml-groups/xml-group[0..*]/xml-object[0..*])
 attribute :import_groups, kind_of: Array, default: []
+attribute :import_groups_source, kind_of: String, default: 'cookbook_file'
 # or xml_groups, which is an array of hashes like
 # { 'name' => { 'resource_type' => 'anResourceType', 'resource_xpath' => '/the/resource/xpath',
 #   'key_xpath' => '@key', {'object_name' => {'type'=> 'string|gauge|etc', 'xpath' => 'more[@xpath='objectname']'}, ... } }, ... }

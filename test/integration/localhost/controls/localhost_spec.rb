@@ -13,7 +13,8 @@ control 'localhost' do
     describe import_node_interface(iface, 'localhost', '1') do
       it { should exist }
       its('managed') { should eq true }
-      its('snmp_primary') { should eq 'P' }
+      its('snmp_primary') { should eq 'P' } if iface == '127.0.0.1'
+      its('snmp_primary') { should eq 'S' } if iface != '127.0.0.1'
     end
     %w(SNMP ICMP).each do |svc|
       describe import_node_interface_service(svc, iface, 'localhost', '1') do

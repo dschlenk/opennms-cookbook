@@ -18,7 +18,7 @@
 # limitations under the License.
 #
 
-include_recipe 'build-essential::default'
+include_recipe 'build-essential::default' # ~FC122
 %w(java_properties rest-client addressable).each do |g|
   chef_gem g do
     compile_time true
@@ -36,6 +36,10 @@ hostsfile_entry node['ipaddress'] do
   action [:create_if_missing, :append]
 end
 
+if node['opennms']['version'] == '26.2.2-1' || node['opennms']['version'].to_i > 26
+  node.default['opennms']['users']['admin']['pwhash'] = 'gU2wmSW7k9v1xg4/MrAsaI+VyddBAhJJt4zPX5SGG0BK+qiASGnJsqM8JOug/aEL'
+  node.default['opennms']['users']['salted'] = true
+end
 include_recipe 'opennms::packages'
 include_recipe 'opennms::send_events'
 include_recipe 'opennms::upgrade' if node['opennms']['upgrade']
@@ -64,12 +68,27 @@ unless node['opennms']['secure_admin_password'].nil?
   node.default['opennms']['users']['admin']['password'] = node['opennms']['secure_admin_password']
   node.default['opennms']['users']['admin']['pwhash'] = Digest::MD5.hexdigest(node['opennms']['secure_admin_password']).upcase
 end
-Chef::Log.debug("secure_admin? #{node['opennms']['secure_admin']}; pwhash? #{node['opennms']['users']['admin']['pwhash']}; password? #{node['opennms']['users']['admin']['password']}")
 if (node['opennms']['secure_admin'] && node['opennms']['secure_admin_password'].nil?) || (!node['opennms']['secure_admin'] && node['opennms']['users']['admin']['password'] != 'admin')
   include_recipe 'opennms::adminpw'
 end
 
 include_recipe 'opennms::templates' if node['opennms']['templates']
+
+if node['platform_family'] == 'rhel' && node['platform_version'].to_i > 6
+  directory '/etc/systemd/system/opennms.service.d' do
+    owner 'root'
+    group 'root'
+    mode 00755
+  end
+
+  file '/etc/systemd/system/opennms.service.d/timeout.conf' do
+    owner 'root'
+    group 'root'
+    mode 00644
+    content "[Service]\nTimeoutSec=900"
+    notifies :run, 'execute[reload systemd]', :immediately
+  end
+end
 
 service 'opennms' do
   supports status: true, restart: true

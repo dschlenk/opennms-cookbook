@@ -45,6 +45,12 @@ opennms_poller_service 'create SNMPBar2' do
   class_name 'org.opennms.netmgt.poller.monitors.SnmpMonitor'
 end
 
+opennms_poller_service "create 'SNMPBar 2'" do
+  service_name 'SNMPBar 2'
+  package_name 'bar'
+  class_name 'org.opennms.netmgt.poller.monitors.SnmpMonitor'
+end
+
 opennms_poller_service 'create ICMPBar' do
   service_name 'ICMPBar'
   package_name 'bar'

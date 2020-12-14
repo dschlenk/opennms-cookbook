@@ -24,7 +24,7 @@ class JdbcCollection < Inspec.resource(1)
       @params[:rrd_step] = c_el.elements['rrd'].attributes['step'].to_i
       @params[:rras] = []
       c_el.each_element('rrd/rra') do |rra|
-        @params[:rras].push rra.texts.join('\n') # lord I hope no one has ever split one of these on multiple lines
+        @params[:rras].push rra.texts.join('')
       end
     end
   end

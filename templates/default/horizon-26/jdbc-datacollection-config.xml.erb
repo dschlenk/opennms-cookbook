@@ -1,0 +1,394 @@
+<jdbc-datacollection-config xmlns="http://xmlns.opennms.org/xsd/config/jdbc-datacollection" rrdRepository="<%=@rrd_repository%>">
+<% if @enable_default -%>
+   <jdbc-collection name="default">
+      <rrd step="<%=@default[:rrd][:step]%>">
+                  <% @default[:rrd][:rras].each do |rra| -%>
+         <rra><%=rra%></rra>
+                  <% end -%>
+      </rrd>
+      <queries>
+        <% if @default[:event_count][:enabled] -%>
+         <query name="opennmsQuery" recheckInterval="0" ifType="ignore">
+            <statement>
+               <queryString>SELECT COUNT(eventid) as EventCount
+FROM events
+WHERE eventtime
+BETWEEN (CURRENT_TIMESTAMP - INTERVAL '<%=@default[:event_count][:interval]%>')
+AND CURRENT_TIMESTAMP;</queryString>
+            </statement>
+            <columns>
+               <column name="eventCount" data-source-name="EventCount" type="gauge" alias="OnmsEventCount"/>
+            </columns>
+         </query>
+        <% end -%>
+        <% if @default[:node_count][:enabled] -%>
+         <query name="opennmsNodeQuery" recheckInterval="0" ifType="ignore">
+            <statement>
+               <queryString>SELECT COUNT(*) as NodeCount FROM node WHERE nodetype != 'D';</queryString>
+            </statement>
+            <columns>
+               <column name="nodeCount" data-source-name="NodeCount" type="gauge" alias="OnmsNodeCount"/>
+            </columns>
+         </query>
+        <% end -%>
+      </queries>
+   </jdbc-collection>
+<% end -%>
+<% if @enable_mysql_stats -%>
+   <jdbc-collection name="MySQL-Global-Stats-51">
+      <rrd step="<%=@mysql[:rrd][:step]%>">
+            <% @mysql[:rrd][:rras].each do |rra| -%>
+         <rra><%=rra%></rra>
+            <% end -%>
+      </rrd>
+      <queries>
+            <% if @mysql[:uptime] -%>
+         <query name="Q_MyUptime" recheckInterval="0" ifType="ignore">
+            <statement>
+               <queryString>SELECT VARIABLE_VALUE AS Uptime FROM GLOBAL_STATUS WHERE VARIABLE_NAME = 'UPTIME'</queryString>
+            </statement>
+            <columns>
+               <column name="Uptime" data-source-name="Uptime" type="gauge" alias="MyUptime"/>
+            </columns>
+         </query>
+            <% end -%>
+            <% if @mysql[:bytes_rx] -%>
+         <query name="Q_MyBytesReceived" recheckInterval="0" ifType="ignore">
+            <statement>
+               <queryString>SELECT VARIABLE_VALUE AS Bytes_received FROM GLOBAL_STATUS WHERE VARIABLE_NAME = 'BYTES_RECEIVED'</queryString>
+            </statement>
+            <columns>
+               <column name="Bytes_received" data-source-name="Bytes_received" type="counter" alias="MyBytesReceived"/>
+            </columns>
+         </query>
+            <% end -%>
+            <% if @mysql[:bytes_tx] -%>
+         <query name="Q_MyBytesSent" recheckInterval="0" ifType="ignore">
+            <statement>
+               <queryString>SELECT VARIABLE_VALUE AS Bytes_sent FROM GLOBAL_STATUS WHERE VARIABLE_NAME = 'BYTES_SENT'</queryString>
+            </statement>
+            <columns>
+               <column name="Bytes_sent" data-source-name="Bytes_sent" type="counter" alias="MyBytesSent"/>
+            </columns>
+         </query>
+            <% end -%>
+            <% if @mysql[:delete] -%>
+         <query name="Q_Com_delete" recheckInterval="0" ifType="ignore">
+            <statement>
+               <queryString>SELECT VARIABLE_VALUE AS Com_delete FROM GLOBAL_STATUS WHERE VARIABLE_NAME = 'COM_DELETE'</queryString>
+            </statement>
+            <columns>
+               <column name="Com_delete" data-source-name="Com_delete" type="counter" alias="MyComDelete"/>
+            </columns>
+         </query>
+            <% end -%>
+            <% if @mysql[:delete_multi] -%>
+         <query name="Q_Com_delete_multi" recheckInterval="0" ifType="ignore">
+            <statement>
+               <queryString>SELECT VARIABLE_VALUE AS Com_delete_multi FROM GLOBAL_STATUS WHERE VARIABLE_NAME = 'COM_DELETE_MULTI'</queryString>
+            </statement>
+            <columns>
+               <column name="Com_delete_multi" data-source-name="Com_delete_multi" type="counter" alias="MyComDeleteMulti"/>
+            </columns>
+         </query>
+            <% end -%>
+            <% if @mysql[:insert] -%>
+         <query name="Q_Com_insert" recheckInterval="0" ifType="ignore">
+            <statement>
+               <queryString>SELECT VARIABLE_VALUE AS Com_insert FROM GLOBAL_STATUS WHERE VARIABLE_NAME = 'COM_INSERT'</queryString>
+            </statement>
+            <columns>
+               <column name="Com_insert" data-source-name="Com_insert" type="counter" alias="MyComInsert"/>
+            </columns>
+         </query>
+            <% end -%>
+            <% if @mysql[:insert_select] -%>
+         <query name="Q_Com_insert_select" recheckInterval="0" ifType="ignore">
+            <statement>
+               <queryString>SELECT VARIABLE_VALUE AS Com_insert_select FROM GLOBAL_STATUS WHERE VARIABLE_NAME = 'COM_INSERT_SELECT'</queryString>
+            </statement>
+            <columns>
+               <column name="Com_insert_select" data-source-name="Com_insert_select" type="counter" alias="MyComInsertSelect"/>
+            </columns>
+         </query>
+            <% end -%>
+            <% if @mysql[:select] -%>
+         <query name="Q_Com_select" recheckInterval="0" ifType="ignore">
+            <statement>
+               <queryString>SELECT VARIABLE_VALUE AS Com_select FROM GLOBAL_STATUS WHERE VARIABLE_NAME = 'COM_SELECT'</queryString>
+            </statement>
+            <columns>
+               <column name="Com_select" data-source-name="Com_select" type="counter" alias="MyComSelect"/>
+            </columns>
+         </query>
+            <% end -%>
+            <% if @mysql[:stmt_execute] -%>
+         <query name="Q_Com_stmt_execute" recheckInterval="0" ifType="ignore">
+            <statement>
+               <queryString>SELECT VARIABLE_VALUE AS Com_stmt_execute FROM GLOBAL_STATUS WHERE VARIABLE_NAME = 'COM_STMT_EXECUTE'</queryString>
+            </statement>
+            <columns>
+               <column name="Com_stmt_execute" data-source-name="Com_stmt_execute" type="counter" alias="MyComStmtExecute"/>
+            </columns>
+         </query>
+            <% end -%>
+            <% if @mysql[:update] -%>
+         <query name="Q_Com_update" recheckInterval="0" ifType="ignore">
+            <statement>
+               <queryString>SELECT VARIABLE_VALUE AS Com_update FROM GLOBAL_STATUS WHERE VARIABLE_NAME = 'COM_UPDATE'</queryString>
+            </statement>
+            <columns>
+               <column name="Com_update" data-source-name="Com_update" type="counter" alias="MyComUpdate"/>
+            </columns>
+         </query>
+            <% end -%>
+            <% if @mysql[:update_multi] -%>
+         <query name="Q_Com_update_multi" recheckInterval="0" ifType="ignore">
+            <statement>
+               <queryString>SELECT VARIABLE_VALUE AS Com_update_multi FROM GLOBAL_STATUS WHERE VARIABLE_NAME = 'COM_UPDATE_MULTI'</queryString>
+            </statement>
+            <columns>
+               <column name="Com_update_multi" data-source-name="Com_update_multi" type="counter" alias="MyComUpdateMulti"/>
+            </columns>
+         </query>
+            <% end -%>
+            <% if @mysql[:tmp_disk_tables] -%>
+         <query name="Q_Created_tmp_disk_tables" recheckInterval="0" ifType="ignore">
+            <statement>
+               <queryString>SELECT VARIABLE_VALUE AS Created_tmp_disk_tables FROM GLOBAL_STATUS WHERE VARIABLE_NAME = 'CREATED_TMP_DISK_TABLES'</queryString>
+            </statement>
+            <columns>
+               <column name="Created_tmp_disk_tables" data-source-name="Created_tmp_disk_tables" type="counter" alias="MyCreatTmpDiskTbl"/>
+            </columns>
+         </query>
+            <% end -%>
+            <% if @mysql[:tmp_tables] -%>
+         <query name="Q_Created_tmp_tables" recheckInterval="0" ifType="ignore">
+            <statement>
+               <queryString>SELECT VARIABLE_VALUE AS Created_tmp_tables FROM GLOBAL_STATUS WHERE VARIABLE_NAME = 'CREATED_TMP_TABLES'</queryString>
+            </statement>
+            <columns>
+               <column name="Created_tmp_tables" data-source-name="Created_tmp_tables" type="counter" alias="MyCreatTmpTables"/>
+            </columns>
+         </query>
+            <% end -%>
+            <% if @mysql[:key_buffer_size] -%>
+         <query name="Q_key_buffer_size" recheckInterval="0" ifType="ignore">
+            <statement>
+               <queryString>SELECT VARIABLE_VALUE AS key_buffer_size FROM GLOBAL_VARIABLES WHERE VARIABLE_NAME ='KEY_BUFFER_SIZE'</queryString>
+            </statement>
+            <columns>
+               <column name="key_buffer_size" data-source-name="key_buffer_size" type="gauge" alias="MyKeyBufferSize"/>
+            </columns>
+         </query>
+            <% end -%>
+            <% if @mysql[:cache_block_size] -%>
+         <query name="Q_key_cache_block_size" recheckInterval="0" ifType="ignore">
+            <statement>
+               <queryString>SELECT VARIABLE_VALUE AS key_cache_block_size FROM GLOBAL_VARIABLES WHERE VARIABLE_NAME ='KEY_CACHE_BLOCK_SIZE'</queryString>
+            </statement>
+            <columns>
+               <column name="key_cache_block_size" data-source-name="key_cache_block_size" type="gauge" alias="MyKeyCacheBlkSize"/>
+            </columns>
+         </query>
+            <% end -%>
+            <% if @mysql[:key_blocks_unused] -%>
+         <query name="Q_Key_blocks_unused" recheckInterval="0" ifType="ignore">
+            <statement>
+               <queryString>SELECT VARIABLE_VALUE AS Key_blocks_unused FROM GLOBAL_STATUS WHERE VARIABLE_NAME = 'KEY_BLOCKS_UNUSED'</queryString>
+            </statement>
+            <columns>
+               <column name="Key_blocks_unused" data-source-name="Key_blocks_unused" type="gauge" alias="MyKeyBlkUnused"/>
+            </columns>
+         </query>
+            <% end -%>
+            <% if @mysql[:key_read_requests] -%>
+         <query name="Q_Key_read_requests" recheckInterval="0" ifType="ignore">
+            <statement>
+               <queryString>SELECT VARIABLE_VALUE AS Key_read_requests FROM GLOBAL_STATUS WHERE VARIABLE_NAME = 'KEY_READ_REQUESTS'</queryString>
+            </statement>
+            <columns>
+               <column name="Key_read_requests" data-source-name="Key_read_requests" type="counter" alias="MyKeyReadReqs"/>
+            </columns>
+         </query>
+            <% end -%>
+            <% if @mysql[:key_reads] -%>
+         <query name="Q_Key_reads" recheckInterval="0" ifType="ignore">
+            <statement>
+               <queryString>SELECT VARIABLE_VALUE AS Key_reads FROM GLOBAL_STATUS WHERE VARIABLE_NAME = 'KEY_READS'</queryString>
+            </statement>
+            <columns>
+               <column name="Key_reads" data-source-name="Key_reads" type="counter" alias="MyKeyReads"/>
+            </columns>
+         </query>
+            <% end -%>
+            <% if @mysql[:key_write_requests] -%>
+         <query name="Q_Key_write_requests" recheckInterval="0" ifType="ignore">
+            <statement>
+               <queryString>SELECT VARIABLE_VALUE AS Key_write_requests FROM GLOBAL_STATUS WHERE VARIABLE_NAME = 'KEY_WRITE_REQUESTS'</queryString>
+            </statement>
+            <columns>
+               <column name="Key_write_requests" data-source-name="Key_write_requests" type="counter" alias="MyKeyWriteReqs"/>
+            </columns>
+         </query>
+            <% end -%>
+            <% if @mysql[:key_writes] -%>
+         <query name="Q_Key_writes" recheckInterval="0" ifType="ignore">
+            <statement>
+               <queryString>SELECT VARIABLE_VALUE AS Key_writes FROM GLOBAL_STATUS WHERE VARIABLE_NAME = 'KEY_WRITES'</queryString>
+            </statement>
+            <columns>
+               <column name="Key_writes" data-source-name="Key_writes" type="counter" alias="MyKeyWrites"/>
+            </columns>
+         </query>
+            <% end -%>
+            <% if @mysql[:open_files] -%>
+         <query name="Q_Open_files" recheckInterval="0" ifType="ignore">
+            <statement>
+               <queryString>SELECT VARIABLE_VALUE AS Open_files FROM GLOBAL_STATUS WHERE VARIABLE_NAME = 'OPEN_FILES'</queryString>
+            </statement>
+            <columns>
+               <column name="Open_files" data-source-name="Open_files" type="gauge" alias="MyOpenFiles"/>
+            </columns>
+         </query>
+            <% end -%>
+            <% if @mysql[:open_tables] -%>
+         <query name="Q_Open_tables" recheckInterval="0" ifType="ignore">
+            <statement>
+               <queryString>SELECT VARIABLE_VALUE AS Open_tables FROM GLOBAL_STATUS WHERE VARIABLE_NAME = 'OPEN_TABLES'</queryString>
+            </statement>
+            <columns>
+               <column name="Open_tables" data-source-name="Open_tables" type="gauge" alias="MyOpenTables"/>
+            </columns>
+         </query>
+            <% end -%>
+            <% if @mysql[:table_open_cache] -%>
+         <query name="Q_table_open_cache" recheckInterval="0" ifType="ignore">
+            <statement>
+               <queryString>SELECT VARIABLE_VALUE AS table_open_cache FROM GLOBAL_VARIABLES WHERE VARIABLE_NAME ='TABLE_OPEN_CACHE'</queryString>
+            </statement>
+            <columns>
+               <column name="table_open_cache" data-source-name="table_open_cache" type="gauge" alias="MyTableOpenCache"/>
+            </columns>
+         </query>
+            <% end -%>
+            <% if @mysql[:questions] -%>
+         <query name="Q_Questions" recheckInterval="0" ifType="ignore">
+            <statement>
+               <queryString>SELECT VARIABLE_VALUE AS Questions FROM GLOBAL_STATUS WHERE VARIABLE_NAME = 'QUESTIONS'</queryString>
+            </statement>
+            <columns>
+               <column name="Questions" data-source-name="Questions" type="counter" alias="MyQuestions"/>
+            </columns>
+         </query>
+            <% end -%>
+            <% if @mysql[:slow_queries] -%>
+         <query name="Q_Slow_queries" recheckInterval="0" ifType="ignore">
+            <statement>
+               <queryString>SELECT VARIABLE_VALUE AS Slow_queries FROM GLOBAL_STATUS WHERE VARIABLE_NAME = 'SLOW_QUERIES'</queryString>
+            </statement>
+            <columns>
+               <column name="Slow_queries" data-source-name="Slow_queries" type="counter" alias="MySlowQueries"/>
+            </columns>
+         </query>
+            <% end -%>
+            <% if @mysql[:connections] -%>
+         <query name="Q_Connections" recheckInterval="0" ifType="ignore">
+            <statement>
+               <queryString>SELECT VARIABLE_VALUE AS Connections FROM GLOBAL_STATUS WHERE VARIABLE_NAME = 'CONNECTIONS'</queryString>
+            </statement>
+            <columns>
+               <column name="Connections" data-source-name="Connections" type="counter" alias="MyConnections"/>
+            </columns>
+         </query>
+            <% end -%>
+            <% if @mysql[:threads_created] -%>
+         <query name="Q_Threads_created" recheckInterval="0" ifType="ignore">
+            <statement>
+               <queryString>SELECT VARIABLE_VALUE Threads_created FROM GLOBAL_STATUS WHERE VARIABLE_NAME = 'THREADS_CREATED'</queryString>
+            </statement>
+            <columns>
+               <column name="Threads_created" data-source-name="Threads_created" type="counter" alias="MyThreadsCreatd"/>
+            </columns>
+         </query>
+            <% end -%>
+            <% if @mysql[:threads_cached] -%>
+         <query name="Q_Threads_cached" recheckInterval="0" ifType="ignore">
+            <statement>
+               <queryString>SELECT VARIABLE_VALUE AS Threads_cached FROM GLOBAL_STATUS WHERE VARIABLE_NAME = 'THREADS_CACHED'</queryString>
+            </statement>
+            <columns>
+               <column name="Threads_cached" data-source-name="Threads_cached" type="gauge" alias="MyThreadsCachd"/>
+            </columns>
+         </query>
+            <% end -%>
+            <% if @mysql[:threads_connected] -%>
+         <query name="Q_Threads_connected" recheckInterval="0" ifType="ignore">
+            <statement>
+               <queryString>SELECT VARIABLE_VALUE AS Threads_connected FROM GLOBAL_STATUS WHERE VARIABLE_NAME = 'THREADS_CONNECTED'</queryString>
+            </statement>
+            <columns>
+               <column name="Threads_connected" data-source-name="Threads_connected" type="gauge" alias="MyThreadsCnnctd"/>
+            </columns>
+         </query>
+            <% end -%>
+            <% if @mysql[:threads_running] -%>
+         <query name="Q_Threads_running" recheckInterval="0" ifType="ignore">
+            <statement>
+               <queryString>SELECT VARIABLE_VALUE AS Threads_running FROM GLOBAL_STATUS WHERE VARIABLE_NAME = 'THREADS_RUNNING'</queryString>
+            </statement>
+            <columns>
+               <column name="Threads_running" data-source-name="Threads_running" type="gauge" alias="MyThreadsRunng"/>
+            </columns>
+         </query>
+            <% end -%>
+      </queries>
+   </jdbc-collection>
+<% end -%>
+<% if @enable_pgsql_stats -%>
+   <jdbc-collection name="PostgreSQL">
+      <rrd step="<%=@pgsql[:rrd][:step]%>">
+            <% @pgsql[:rrd][:rras].each do |rra| -%>
+         <rra><%=rra%></rra>
+            <% end -%>
+      </rrd>
+      <queries>
+            <% if @pgsql[:tablespace_size] -%>
+         <query name="pg_tablespace_size" recheckInterval="0" ifType="all" resourceType="pgTableSpace" instance-column="spcname">
+            <statement>
+               <queryString>
+                    SELECT spcname, pg_tablespace_size(pg_tablespace.spcname) AS ts_size
+                    FROM pg_tablespace
+                    </queryString>
+            </statement>
+            <columns>
+               <column name="spcname" data-source-name="spcname" type="string" alias="spcname"/>
+               <column name="ts_size" data-source-name="ts_size" type="gauge" alias="ts_size"/>
+            </columns>
+         </query>
+            <% end -%>
+            <% if @pgsql[:stat_database] -%>
+         <query name="pg_stat_database" recheckInterval="0" ifType="all" resourceType="pgDatabase" instance-column="datname">
+            <statement>
+               <queryString>
+                    SELECT datname, numbackends, xact_commit, xact_rollback, blks_read, blks_hit,
+                           pg_database_size(pg_stat_database.datname) AS db_size
+                    FROM pg_stat_database
+                    WHERE datname NOT IN ('template0', 'template1')
+                    </queryString>
+            </statement>
+            <columns>
+               <column name="datname" data-source-name="datname" type="string" alias="datname"/>
+               <column name="numbackends" data-source-name="numbackends" type="gauge" alias="numbackends"/>
+               <column name="xact_commit" data-source-name="xact_commit" type="counter" alias="xact_commit"/>
+               <column name="xact_rollback" data-source-name="xact_rollback" type="counter" alias="xact_rollback"/>
+               <column name="blks_read" data-source-name="blks_read" type="counter" alias="blks_read"/>
+               <column name="blks_hit" data-source-name="blks_hit" type="counter" alias="blks_hit"/>
+               <column name="db_size" data-source-name="db_size" type="gauge" alias="db_size"/>
+            </columns>
+         </query>
+            <% end -%>
+      </queries>
+   </jdbc-collection>
+<% end -%>
+</jdbc-datacollection-config>

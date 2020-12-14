@@ -22,12 +22,30 @@ default['yum']['opennms-snapshot-rhel6']['baseurl']         = 'http://yum.opennm
 default['yum']['opennms-snapshot-rhel6']['failovermethod']  = 'roundrobin'
 default['yum']['opennms-snapshot-rhel7']['baseurl']         = 'http://yum.opennms.org/snapshot/rhel7'
 default['yum']['opennms-snapshot-rhel7']['failovermethod']  = 'roundrobin'
+default['yum']['opennms-oldstable-common']['baseurl']        = 'http://yum.opennms.org/oldstable/common'
+default['yum']['opennms-oldstable-common']['failovermethod'] = 'roundrobin'
+default['yum']['opennms-oldstable-rhel6']['baseurl']         = 'http://yum.opennms.org/oldstable/rhel6'
+default['yum']['opennms-oldstable-rhel6']['failovermethod']  = 'roundrobin'
+default['yum']['opennms-oldstable-rhel7']['baseurl']         = 'http://yum.opennms.org/oldstable/rhel7'
+default['yum']['opennms-oldstable-rhel7']['failovermethod']  = 'roundrobin'
+# 6 is eol but I guess folks might still need it
+case node['platform_family']
+when 'rhel'
+  if node['platform_version'].to_f >= 6.0 && node['platform_version'].to_f < 7.0
+    default['yum']['base']['baseurl'] = 'https://archive.kernel.org/centos-vault/6.9/os/$basearch/'
+    default['yum']['extras']['baseurl'] = 'https://archive.kernel.org/centos-vault/6.9/extras/$basearch/'
+    default['yum']['updates']['baseurl'] = 'https://archive.kernel.org/centos-vault/6.9/updates/$basearch/'
+    default['yum']['base']['mirrorlist'] = nil
+    default['yum']['extras']['mirrorlist'] = nil
+    default['yum']['updates']['mirrorlist'] = nil
+  end
+end
 default['build-essential']['compile_time'] = true
 # set to -Q to mimic OOTB quick start behavior on RHEL7+ (but you should not do this if using any of the opennms resources)
 default['opennms']['start_opts'] = ''
 # set to '' if you want to re-enable OOTB behavior (but you should not do this if using any of the opennms resources)
 default['opennms']['timeout_start_sec'] = '10min'
-default['opennms']['version'] = '22.0.4-1'
+default['opennms']['version'] = '26.2.2-1'
 # default['opennms']['version_major'] = "%{version}"
 default['opennms']['allow_downgrade'] = false
 default['opennms']['stable'] = true
@@ -78,7 +96,7 @@ default['opennms']['conf']['command']        = ''
 # Once upon a time there were two different recipes
 # for installation (default and notemplates) but now
 # the latter just sets this attribute to false.
-default['opennms']['templates'] = true
+default['opennms']['templates'] = false
 # default cookbook for templates
 default['opennms']['default_template_cookbook'] = 'opennms'
 default['opennms']['users']['cookbook']                    = node['opennms']['default_template_cookbook']
@@ -263,6 +281,7 @@ default['opennms']['users']['admin']['user_comments'] = 'Default administrator, 
 # changed for you.
 default['opennms']['users']['admin']['password']      = 'admin'
 default['opennms']['users']['admin']['pwhash']        = '21232F297A57A5A743894A0E4A801FC3'
+default['opennms']['users']['salted']                 = false
 
 # non-default daemons
 default['opennms']['services']['dhcpd']       = false
@@ -275,11 +294,12 @@ default['opennms']['services']['xmlrpcd']     = false
 default['opennms']['services']['asterisk_gw'] = false
 default['opennms']['services']['apm']         = false
 # opennms.properties
-default['opennms']['properties']['dc']['rrd_base_dir']        = "#{onms_home}/share/rrd"
-default['opennms']['properties']['misc']['bin_dir']           = "#{onms_home}/bin"
-default['opennms']['properties']['reporting']['template_dir'] = "#{onms_home}/etc"
-default['opennms']['properties']['reporting']['report_dir']   = "#{onms_home}/share/reports"
-default['opennms']['properties']['reporting']['report_logo']  = "#{onms_home}/webapps/images/logo.gif"
+default['opennms']['properties']['dc']['rrd_base_dir']              = "#{onms_home}/share/rrd"
+default['opennms']['properties']['misc']['bin_dir']                 = "#{onms_home}/bin"
+default['opennms']['properties']['reporting']['template_dir']       = "#{onms_home}/etc"
+default['opennms']['properties']['reporting']['report_dir']         = "#{onms_home}/share/reports"
+default['opennms']['properties']['reporting']['report_logo']        = "#{onms_home}/webapps/images/logo.gif"
+default['opennms']['properties']['reporting']['scheduler_enabled']  = true
 # ICMP
 default['opennms']['properties']['icmp']['pinger_class'] = nil # "org.opennms.netmgt.icmp.jni6.Jni6Pinger"
 default['opennms']['properties']['icmp']['require_v4']   = nil
@@ -325,6 +345,7 @@ default['opennms']['properties']['misc']['headless']                       = tru
 default['opennms']['properties']['misc']['find_by_service_type_query']     = nil
 default['opennms']['properties']['misc']['load_snmp_data_on_init']         = nil
 default['opennms']['properties']['misc']['allow_html_fields']              = nil
+default['opennms']['properties']['misc']['allow_unsalted']                 = nil
 # Reporting
 default['opennms']['properties']['reporting']['jasper_version'] = '6.3.0'
 default['opennms']['properties']['reporting']['ksc_graphs_per_line'] = 1
@@ -339,6 +360,7 @@ default['opennms']['properties']['rancid']['only_rancid_adapter']  = nil
 default['opennms']['properties']['rtc']['baseurl']   = 'http://localhost:8980/opennms/rtc/post'
 default['opennms']['properties']['rtc']['username']  = 'rtc'
 default['opennms']['properties']['rtc']['password']  = 'rtc'
+default['opennms']['properties']['rtc']['pwhash']    = 'sHMy+HycWKGJC/uUMF0IGlXUXP1KhcqD0GEchFlvYTw40jT9r+zMxOb3F+phWNzX'
 # MAP IPC
 default['opennms']['properties']['map']['baseurl']   = 'http://localhost:8980/opennms/map/post'
 default['opennms']['properties']['map']['username']  = 'map'
@@ -361,6 +383,7 @@ default['opennms']['properties']['jetty']['exclude_cipher_suites']  = nil
 default['opennms']['properties']['jetty']['https_baseurl']          = nil
 default['opennms']['properties']['jetty']['datetimeformat']         = nil
 default['opennms']['properties']['jetty']['show_stacktrace']        = nil
+default['opennms']['properties']['jetty']['topology_entity_cache_duration'] = nil
 # JMS NB
 default['opennms']['properties']['jms_nbi']['broker_url'] = nil
 default['opennms']['properties']['jms_nbi']['activemq_username'] = nil
@@ -371,10 +394,13 @@ default['opennms']['properties']['ui']['ack']                         = false
 default['opennms']['properties']['ui']['show_count']                  = false
 default['opennms']['properties']['ui']['show_outage_nodes']           = nil
 default['opennms']['properties']['ui']['show_problem_nodes']          = nil
+default['opennms']['properties']['ui']['show_situations']             = nil
 default['opennms']['properties']['ui']['outage_node_count']           = nil
 default['opennms']['properties']['ui']['problem_node_count']          = nil
+default['opennms']['properties']['ui']['situations_count']            = nil
 default['opennms']['properties']['ui']['show_node_status_bar']        = nil
 default['opennms']['properties']['ui']['disable_login_success_event'] = nil
+default['opennms']['properties']['ui']['max_interface_count']         = nil
 default['opennms']['properties']['ui']['center_url']                  = nil
 # Asterisk AGI
 default['opennms']['properties']['asterisk']['listen_address'] = nil
@@ -442,6 +468,8 @@ default['opennms']['properties']['alarmlist']['sound_enable'] = false
 default['opennms']['properties']['alarmlist']['sound_status'] = 'off' # newalarm, newalarmcount
 default['opennms']['properties']['alarmlist']['unackflash'] = false
 default['opennms']['properties']['rest_aliases'] = '/rest,/api/v2'
+default['opennms']['properties']['maxFlowAgeSeconds'] = nil
+default['opennms']['properties']['ingressAndEgressRequired'] = false
 # access point monitor
 default['opennms']['apm']['threads']           = 30
 default['opennms']['apm']['pscan_interval']    = 1_800_000
@@ -687,6 +715,7 @@ default['opennms']['datacollection']['default']['netscaler']        = true
 default['opennms']['datacollection']['default']['netsnmp']          = true
 default['opennms']['datacollection']['default']['nortel']           = true
 default['opennms']['datacollection']['default']['novell']           = true
+default['opennms']['datacollection']['default']['paloalto']         = true
 default['opennms']['datacollection']['default']['pfsense']          = true
 default['opennms']['datacollection']['default']['powerware']        = true
 default['opennms']['datacollection']['default']['postgres']         = true
@@ -729,6 +758,7 @@ default['opennms']['enlinkd']['bridge'] = true
 default['opennms']['enlinkd']['lldp'] = true
 default['opennms']['enlinkd']['ospf'] = true
 default['opennms']['enlinkd']['isis'] = true
+default['opennms']['enlinkd']['topology_interval'] = 30000
 default['opennms']['enlinkd']['bridge_topo_interval'] = 300000
 default['opennms']['enlinkd']['max_bft'] = 100
 default['opennms']['enlinkd']['disco_bridge_threads'] = 1
@@ -926,6 +956,10 @@ default['opennms']['linkd']['vlan']['enable_hp']            = true
 default['opennms']['linkd']['vlan']['enable_cisco']         = true
 default['opennms']['linkd']['vlan']['enable_extreme']       = true
 # log4j2.xml
+default['opennms']['log4j2']['default_route']['size'] = '10MB'
+default['opennms']['log4j2']['default_route']['rollover'] = 8
+default['opennms']['log4j2']['instrumentation']['size'] = '100MB'
+default['opennms']['log4j2']['instrumentation']['rollover'] = 1
 default['opennms']['log4j2']['size'] = '100MB'
 default['opennms']['log4j2']['access_point_monitor'] = 'WARN'
 default['opennms']['log4j2']['ackd'] = 'WARN'
@@ -1133,6 +1167,7 @@ default['opennms']['notification_commands']['call_home_phone']    = true
 default['opennms']['notification_commands']['microblog_update']   = true
 default['opennms']['notification_commands']['microblog_reply']    = true
 default['opennms']['notification_commands']['microblog_dm']       = true
+default['opennms']['notification_commands']['browser']            = true
 # notifications.xml
 default['opennms']['notifications']['interface_down']['enabled']          = true
 default['opennms']['notifications']['interface_down']['status']           = 'on'
@@ -1797,11 +1832,12 @@ default['opennms']['thresholds']['netsnmp_memory_linux']['enabled']           = 
 default['opennms']['thresholds']['netsnmp_memory_nonlinux']['enabled']        = true
 default['opennms']['thresholds']['coffee']['enabled']                         = true
 # translator-configuration.xml
-default['opennms']['translator']['snmp_link_down']     = true
-default['opennms']['translator']['snmp_link_up']       = true
-default['opennms']['translator']['hyperic']            = true
-default['opennms']['translator']['cisco_config_man']   = true
-default['opennms']['translator']['juniper_cfg_change'] = true
+default['opennms']['translator']['snmp_link_down']                = true
+default['opennms']['translator']['snmp_link_up']                  = true
+default['opennms']['translator']['hyperic']                       = true
+default['opennms']['translator']['cisco_config_man']              = true
+default['opennms']['translator']['juniper_cfg_change']            = true
+default['opennms']['translator']['telemetry_clock_skew_detected'] = true
 # trapd-configuration.xml
 default['opennms']['trapd']['port']        = 162
 default['opennms']['trapd']['new_suspect'] = false
@@ -1819,6 +1855,8 @@ default['opennms']['vacuumd']['statement']['delete_nodes']          = true
 default['opennms']['vacuumd']['statement']['delete_ip_interfaces']  = true
 default['opennms']['vacuumd']['statement']['delete_if_services']    = true
 default['opennms']['vacuumd']['statement']['delete_events']         = true
+default['opennms']['vacuumd']['statement']['delete_values_json_key']               = true
+default['opennms']['vacuumd']['statement']['delete_values_blob_key']               = true
 default['opennms']['vacuumd']['automations']['cosmic_clear']                       = true
 default['opennms']['vacuumd']['automations']['clean_up']                           = true
 default['opennms']['vacuumd']['automations']['full_clean_up']                      = true
@@ -2004,7 +2042,7 @@ default['opennms']['cors']['credentials'] = true
 
 case node['platform_family']
 when 'rhel'
-  default['opennms']['repos']['branches'] = %w(obsolete snapshot stable)
+  default['opennms']['repos']['branches'] = %w(obsolete snapshot stable oldstable)
   default['opennms']['repos']['platforms'] = %w(common)
   if node['platform_version'].to_f >= 6.0 && node['platform_version'].to_f < 7.0
     Chef::Log.debug("i am 6 because #{node['platform_version']}")
@@ -2065,3 +2103,10 @@ default['opennms']['telemetryd']['protocols'] = {}
 default['opennms']['telemetryd']['cookbook'] = 'opennms'
 default['opennms']['es']['hosts'] = {}
 default['opennms']['manage_repos'] = true
+
+default['opennms']['posgresql']['pg_upgrade_timeout'] = 7200
+default['opennms']['postgresql']['attempt_upgrade'] = false
+default['opennms']['postgresql']['start_after_upgrade'] = false
+
+default['opennms']['bin']['cookbook'] = 'opennms'
+default['opennms']['bin']['return_code'] = false

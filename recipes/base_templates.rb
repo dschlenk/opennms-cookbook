@@ -36,12 +36,23 @@ when '21'
   template_dir = 'horizon-21/'
 when '22'
   template_dir = 'horizon-22/'
+when '23'
+  template_dir = 'horizon-23/'
+when '24'
+  template_dir = 'horizon-24/'
+when '25'
+  template_dir = 'horizon-25/'
+when '26'
+  template_dir = 'horizon-26/'
 end
+
 if Opennms::Helpers.major(node['opennms']['version']).to_i >= 22
   node.default['opennms']['datacollection']['default']['ref_cpq_im'] = true
   node.default['opennms']['datacollection']['default']['ref_mib2_if'] = true
   node.default['opennms']['datacollection']['default']['ref_mib2_pe'] = true
 end
+
+node.default['opennms']['conf']['heap_size'] = 2048 if Opennms::Helpers.major(node['opennms']['version']).to_i >= 25
 
 Chef::Log.debug "at compile time, version is #{node['opennms']['version']} and jasper_version is #{node['opennms']['properties']['reporting']['jasper_version']}."
 
@@ -86,7 +97,11 @@ template "#{onms_home}/etc/opennms.properties" do
     properties: node['opennms']['properties']
   )
 end
-
+if Opennms::Helpers.major(node['opennms']['version']).to_i >= 25
+  node.default['opennms']['log4j2']['default_route']['size'] = '100MB'
+  node.default['opennms']['log4j2']['default_route']['rollover'] = 4
+  node.default['opennms']['log4j2']['instrumentation']['rollover'] = 4
+end
 template "#{onms_home}/etc/log4j2.xml" do
   cookbook node['opennms']['log4j2']['cookbook']
   source "#{template_dir}log4j2.xml.erb"
@@ -110,4 +125,29 @@ template "#{onms_home}/jetty-webapps/opennms/WEB-INF/web.xml" do
     credentials: node['opennms']['cors']['credentials']
   )
   not_if { Opennms::Helpers.major(node['opennms']['version']).to_i < 17 }
+end
+
+template "#{onms_home}/bin/opennms" do
+  cookbook node['opennms']['bin']['cookbook']
+  source "#{template_dir}opennms.erb"
+  mode 00755
+  owner 'root'
+  group 'root'
+  variables(
+    return_code: node['opennms']['bin']['return_code']
+  )
+  not_if { Opennms::Helpers.major(node['opennms']['version']).to_i < 25 }
+  not_if { Opennms::Helpers.major(node['opennms']['version']).to_i > 26 }
+  not_if { node['opennms']['version'] == '26.2.1-1' }
+  not_if { node['opennms']['version'] == '26.2.2-1' }
+end
+
+cookbook_file "patch #{onms_home}/bin/opennms" do
+  path "#{onms_home}/bin/opennms"
+  cookbook node['opennms']['bin']['cookbook']
+  source 'opennms-26-dot-two-dot-some'
+  mode 00755
+  owner 'root'
+  group 'root'
+  only_if { node['opennms']['version'] == '26.2.1-1' || node['opennms']['version'] == '26.2.2-1' }
 end
