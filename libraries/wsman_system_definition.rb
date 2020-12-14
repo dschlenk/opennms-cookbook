@@ -26,7 +26,7 @@ module WsmanSystemDefinition
     Chef::Log.debug "Group '#{new_resource.groups}' are about to add to the system"
     system_definition_el = doc.root.elements["/wsman-datacollection-config/system-definition[@name='#{new_resource.name}']"]
     unless system_definition_el.nil?
-      add_system_definition(doc, system_definition_el, new_resource)
+      add_sysdef(doc, system_definition_el, new_resource)
       Opennms::Helpers.write_xml_file(doc, file_path)
     end
   end
@@ -100,13 +100,13 @@ module WsmanSystemDefinition
 
     sys_def_el.attributes['name'] = new_resource.name
     unless new_resource.groups.nil?
-      add_system_definition(doc, sys_def_el, new_resource)
+      add_sysdef(doc, sys_def_el, new_resource)
     end
 
     Opennms::Helpers.write_xml_file(doc, filename)
   end
 
-  def add_system_definition(doc, system_definition, new_resource)
+  def add_sysdef(doc, system_definition, new_resource)
     new_resource.groups.each do |group|
       Chef::Log.debug "Group '#{group}' is about to add to the system"
       next unless doc.elements["/wsman-datacollection-config/system-definition[@name='#{new_resource.name}']/include-group[text() = '#{group}']"].nil?
