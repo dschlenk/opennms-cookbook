@@ -97,9 +97,14 @@ for f in ${SUITES[@]}; do
       echo "      - recipe[yum-centos-ct::default]"
       echo "      - recipe[opennms::postgres]"
       echo "      - recipe[oracle_java8::default]"
+      if [ "$recipe" = "plugins" ]; then
+        echo "      - recipe[onms_lwrp_test::${recipe}]"
+      fi
       echo "      - recipe[opennms::default]"
       if [ "$recipe" != "default" ] && [ "$recipe" != "templates" ]; then
-        echo "      - recipe[onms_lwrp_test::${recipe}]"
+        if [ "$recipe" != "plugins" ]; then
+          echo "      - recipe[onms_lwrp_test::${recipe}]"
+        fi
       else
         echo "      - recipe[onms_lwrp_test::webopts]"
       fi

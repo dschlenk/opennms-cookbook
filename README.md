@@ -4,7 +4,7 @@ Description
 ===========
 
 A Chef cookbook to manage the installation and configuration of OpenNMS Horizon.
-Current version supports releases 16, 17, 18, 19, 20, 21, 22, 23, 24, 25 on CentOS 6 and 7.
+Current version supports releases 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26 on CentOS 6 and 7.
 
 Versions
 ========
@@ -132,7 +132,7 @@ we want anyway, so we just remove the old file.
  
 ### Recipes
 
-* `opennms::default` Installs and configures OpenNMS with the standard configuration modified with any node attribute values changed from their defaults.
+* `opennms::default` Installs and configures OpenNMS with the standard configuration modified with any node attribute values changed from their defaults. Set `node['opennms']['plugin']['addl']` to an array of strings representing the names of the packages of the plugins you'd like installed.
 * `opennms::notemplates` Everything default does except minimal templates are used - etc/opennms.conf, etc/opennms.properties and etc/log4j2.xml. Use this recipe if you intend to use any of the custom resources in this cookbook.
 * `opennms::rrdtool` Installs rrdtool and configures OpenNMS to use it rather than JRobin for metrics storage.
 * `opennms::postgres` Installs postgresql 9.3 in a somewhat tuned manner (from PGDG). You can use a newer version by changing node attributes in your role/environment/wrapper.

@@ -66,6 +66,13 @@ default['opennms']['upgrade_dirs'] = [
 # whether or not to include the plugin packages
 default['opennms']['plugin']['xml'] = false
 default['opennms']['plugin']['nsclient'] = false
+# populate this with the names of additional packages you want installed.
+# examples:
+# * opennms-plugin-northbounder-jms
+# * opennms-plugin-provisioning-snmp-asset
+# * opennms-plugin-provisioning-snmp-hardware-inventory
+# * opennms-plugin-provisioning-wsman-asset
+default['opennms']['plugin']['addl'] = []
 default['opennms']['addl_handlers'] = []
 # change to true to generate a random password
 default['opennms']['secure_admin'] = false
