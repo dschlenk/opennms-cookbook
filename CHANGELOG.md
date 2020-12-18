@@ -1,8 +1,64 @@
 # OpenNMS Cookbook Changes
 
-## 22.2.0
+## 26.1.0
+
+* Allow installation of plugin packages via node attributes
+
+## 26.0.0
+
+### New Features
+
+* Use OpenNMS Horizon 26.2.2-1 as the default version.
+* Support OpenNMS Horizon 23, 24, 25, 26
+
+## 22.3.3
 
 ### Bug Fixes
+
+* remove unnecessary check for datacollection group before removing a system def
+
+## 22.3.2
+
+### Bug Fixes
+
+* join multiline strings together properly in events
+
+## 22.3.1
+
+### Bug Fixes
+
+* fix bug introduced in poller param modification
+
+## 22.3.0
+
+### New Features
+
+* add ability to remove params from poller services
+
+## 22.2.3
+
+### Bug Fixes
+
+* quit restarting unnecessarily when logging config changes
+
+## 22.2.2
+
+### Bug Fixes
+
+* more attempts to deal with bogus gzip handling in rest calls
+
+## 22.2.1
+
+### Bug Fixes
+
+* correctly use mask existence in identity of events 
+* attempt to deal with bogus gzip handling in rest calls
+* fix bug in editing of poller services
+* misc test improvements
+
+## 22.2.0
+
+### New Features
 
 * Support for OpenNMS Horizon 22.0.4-1 (replacing 22.0.2-1). Default version.
 
