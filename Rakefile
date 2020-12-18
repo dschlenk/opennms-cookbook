@@ -43,6 +43,7 @@ namespace :integration do
     opts.on('-r', '--resume ARG', String) { |resume| options[:resume] = resume }
     opts.on('-v', '--versions ARG', Array) { |versions| options[:versions] = versions }
     opts.on('-p', '--platforms ARG', Array) { |platforms| options[:platforms] = platforms }
+    opts.on('-s', '--suites ARG', Array) { |suites| options[:suites] = suites }
     opts.on('-h', '--help') { puts opts }
     args = opts.order!(ARGV) {}
     opts.parse!(args)
@@ -60,6 +61,10 @@ namespace :integration do
         old_instance = nil
         first_instance = nil
         Kitchen::Config.new.instances.each do |instance|
+          unless options[:suites].nil?
+            md = /^(\w+((?:-\w+)?)*)-(\d+)-(\w+-\d+)$/.match(instance.name)
+            next unless options[:suites].include?(md[1])
+          end
           next unless instance.name =~ /-#{ver}-#{plat}/
           if skipping
             if instance.name == options[:resume]

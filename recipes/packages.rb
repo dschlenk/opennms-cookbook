@@ -32,6 +32,12 @@ if node['opennms']['plugin']['nsclient']
   onms_versions.push node['opennms']['version']
 end
 
+node['opennms']['plugin']['addl'].each do |plugin|
+  Chef::Log.warn "adding plugin #{plugin}"
+  onms_packages.push plugin
+  onms_versions.push node['opennms']['version']
+end
+
 ruby_block 'stop opennms before upgrade' do
   block do
     Opennms::Upgrade.stop_opennms(node)
