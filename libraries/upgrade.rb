@@ -24,6 +24,8 @@ module Opennms
           clean_dir(conf_dir, 'rpmnew')
           clean_dir(conf_dir, 'rpmsave')
         end
+        # users.xml is special - we can't just rebuild it, since you do so via rest and we'd lose track of admin auth
+        restore("#{node['opennms']['conf']['home']}/etc/users.xml")
         unless ::File.exist?("#{onms_home}/etc/java.conf")
           shell_out!("#{onms_home}/bin/runjava -s", returns: [0])
         end
@@ -85,6 +87,12 @@ module Opennms
             end
           end
         end
+      end
+    end
+
+    def self.restore(target)
+      if ::File.exist?("#{target}.bak")
+        FileUtils.mv("#{target}.bak", target)
       end
     end
   end
