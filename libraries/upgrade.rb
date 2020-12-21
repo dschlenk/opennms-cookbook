@@ -24,6 +24,84 @@ module Opennms
           clean_dir(conf_dir, 'rpmnew')
           clean_dir(conf_dir, 'rpmsave')
         end
+        # users.xml is special - we can't just rebuild it, since you do so via rest and we'd lose track of admin auth
+        restore("#{node['opennms']['conf']['home']}/etc/users.xml")
+        # also, if upgrading from 18 or lower to something higher, need to move the rtc user into this file
+        # and make sure admin has the right role
+        major_version = Opennms::Helpers.major(node['opennms']['version']).to_i
+        if major_version >= 19
+          uf = ::File.new("#{node['opennms']['conf']['home']}/etc/users.xml", 'r')
+          udoc = REXML::Document.new uf
+          uf.close
+
+          u_rtc = udoc.elements["/userinfo/users/user/user-id[text() = 'rtc']"]
+          if u_rtc.nil?
+            Chef::Log.debug 'adding rtc user since we must have been upgrading from < 18 to something >= 18'
+            users_el = udoc.elements['/userinfo/users']
+            if !users_el.nil?
+              rtc_el = users_el.add_element 'user'
+              rtc_uid_el = rtc_el.add_element 'user-id'
+              rtc_uid_el.add_text 'rtc'
+              rtc_fn_el = rtc_el.add_element 'full-name'
+              rtc_fn_el.add_text 'RTC'
+              rtc_uc_el = rtc_el.add_element 'user-comments'
+              rtc_uc_el.add_text 'RTC user, do not delete'
+              rtc_pw_el = rtc_el.add_element 'password'
+              if major_version >= 26
+                Chef::Log.debug 'adding salted rtc password since 26+'
+                rtc_pw_el.attributes['salt'] = 'true'
+                rtc_pw_el.add_text 'sHMy+HycWKGJC/uUMF0IGlXUXP1KhcqD0GEchFlvYTw40jT9r+zMxOb3F+phWNzX'
+              else
+                Chef::Log.debug 'adding uppercase MD5 rtc password since < 26'
+                rtc_pw_el.add_text '68154466F81BFB532CD70F8C71426356'
+              end
+            else
+              Chef::Log.warn 'You do not have a users element in users.xml, which is pretty bad!?!'
+            end
+          end
+          u_admin = udoc.elements["/userinfo/users/user[user-id[text() = 'admin']]"]
+          if !u_admin.nil?
+            u_admin.elements["role[text() = 'ROLE_ADMIN']"]
+            Chef::Log.debug 'admin user missing ROLE_ADMIN role, adding'
+            admin_role_el = REXML::Element.new('role')
+            admin_role_el.add_text 'ROLE_ADMIN'
+            if u_admin.elements['role'].nil?
+              Chef::Log.debug 'admin has no role element at all, adding it'
+              sib_el = u_admin.elements['duty-schedule']
+              sib_el = u_admin.elements['contact'] if sib_el.nil?
+              sib_el = u_admin.elements['password'] if sib_el.nil?
+              u_admin.insert_after(sib_el, admin_role_el)
+            else
+              Chef::Log.debug 'admin has other roles, adding after last role'
+              u_admin.insert_after(u_admin.elements['role[last()]'], admin_role_el)
+            end
+          else
+            Chef::Log.debug 'somehow you do not have an admin user, adding one'
+            users_el = udoc.elements['/userinfo/users']
+            if !users_el.nil?
+              admin_el = users_el.add_element 'user'
+              admin_uid_el = admin_el.add_element 'user-id'
+              admin_uid_el.add_text 'admin'
+              admin_fn_el = admin_el.add_element 'full-name'
+              admin_fn_el.add_text 'Administrator'
+              admin_uc_el = admin_el.add_element 'user-comments'
+              admin_uc_el.add_text 'Default administrator, do not delete'
+              admin_pw_el = admin_el.add_element 'password'
+              if major_version >= 26
+                Chef::Log.debug 'adding salted admin password since 26+'
+                admin_pw_el.attributes['salt'] = 'true'
+                admin_pw_el.add_text 'gU2wmSW7k9v1xg4/MrAsaI+VyddBAhJJt4zPX5SGG0BK+qiASGnJsqM8JOug/aEL'
+              else
+                Chef::Log.debug 'adding uppercase MD5 admin password since < 26'
+                admin_pw_el.add_text '21232F297A57A5A743894A0E4A801FC3'
+              end
+            else
+              Chef::Log.warn 'You do not have a users element in users.xml, which is pretty bad!?!'
+            end
+          end
+          Opennms::Helpers.write_xml_file(udoc, "#{node['opennms']['conf']['home']}/etc/users.xml")
+        end
+
         unless ::File.exist?("#{onms_home}/etc/java.conf")
           shell_out!("#{onms_home}/bin/runjava -s", returns: [0])
         end
@@ -86,6 +164,10 @@ module Opennms
           end
         end
       end
+    end
+
+    def self.restore(target)
+      FileUtils.mv("#{target}.bak", target) if ::File.exist?("#{target}.bak")
     end
   end
 end
