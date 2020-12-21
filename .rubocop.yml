@@ -16,7 +16,7 @@ Style/FormatString:
 Style/GuardClause:
   Enabled: false
 Metrics/BlockNesting:
-  Max: 4
+  Max: 5
 Layout/TrailingWhitespace:
   Exclude:
     - 'test/integration/collection_graph_file/controls/collection_graph_file_spec.rb'
