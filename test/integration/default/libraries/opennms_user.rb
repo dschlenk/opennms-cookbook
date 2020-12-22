@@ -37,6 +37,18 @@ class OpennmsUser < Inspec.resource(1)
     @params[:password] = u_el.elements['password'].texts.join('') unless u_el.elements['password'].nil?
     @params[:password_salt] = false
     @params[:password_salt] = true unless u_el.elements['passwordSalt'].nil? || !(u_el.elements['passwordSalt'].texts.join('') == 'true')
+    roles = []
+    u_el.elements.each('role') do |r_el|
+      puts "r_el is #{r_el}"
+      roles.push r_el.texts[0].to_s
+    end
+    puts "roles will be #{roles}"
+    @params[:roles] = roles
+    ds = []
+    u_el.elements.each('duty-schedule') do |ds_el|
+      ds.push ds_el.texts[0].to_s
+    end
+    @params[:duty_schedules] = ds
   end
 
   def exist?

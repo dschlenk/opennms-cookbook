@@ -154,7 +154,7 @@ The list of implemented custom resources is as follows:
 
 #### Users, Groups and Roles
 
-* `opennms_user`: add a user. Uses the REST API.
+* `opennms_user`: add a user. Uses the REST API. Supports changes, but requires all parameters to be included, not just identity + things you want to change.
 * `opennms_group`: add a group and populate it with users. You can even set the default SVG map and duty schedules.
 * `opennms_role`: add a role.
 * `opennms_role_schedule`: Add schedules to a role.

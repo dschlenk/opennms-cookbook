@@ -65,6 +65,40 @@ module Opennms
       false
     end
 
+    def user_changed?(new_user, node)
+      require 'rest-client'
+      begin
+        response = RestClient.get "#{baseurl(node)}/users/#{new_user.name}", accept: :json, 'Accept-Encoding' => 'identity'
+        curr_user = JSON.parse(response.to_s)
+        Chef::Log.debug("#{new_user.full_name} == #{curr_user['full-name']}?")
+        return true if new_user.full_name != curr_user['full-name'].to_s
+        Chef::Log.debug("#{new_user.user_comments} == #{curr_user['user-comments']}?")
+        return true if new_user.user_comments != curr_user['user-comments'].to_s
+        Chef::Log.debug("#{new_user.password} == #{curr_user['password']}?")
+        return true if new_user.password != curr_user['password'].to_s
+        Chef::Log.debug("#{new_user.password_salt} == #{(curr_user['password']['salt'].to_s.downcase == true)}?")
+        return true if new_user.password_salt != (curr_user['password']['salt'].to_s.downcase == true)
+        major_version = Opennms::Helpers.major(node['opennms']['version']).to_i
+        if major_version >= 19
+          curr_roles = []
+          curr_user['role'].each do |r_el|
+            curr_roles.push r_el.to_s
+          end
+          Chef::Log.debug("#{new_user.roles} == #{curr_roles}?")
+          return true if new_user.roles != curr_roles
+        end
+        curr_ds = []
+        curr_user['duty-schedule'].each do |ds_el|
+          curr_ds.push ds_el.to_s
+        end
+        Chef::Log.debug("#{new_user.duty_schedules} == #{curr_ds}?")
+        return true if new_user.duty_schedules != curr_ds
+      rescue => e
+        Chef::Log.warn "Unable to get current users from OpenNMS REST API becaue #{e}. Assuming this user, #{new_user.name}, has not changed."
+      end
+      false
+    end
+
     def self.change_admin_password(old_pw, new_pw_hash, node)
       require 'rest_client'
       cu = REXML::Document.new
@@ -105,14 +139,29 @@ module Opennms
         pws_el = user_el.add_element 'passwordSalt'
         pws_el.add_text 'true'
       end
+      major_version = Opennms::Helpers.major(node['opennms']['version']).to_i
+      if major_version >= 19 && !new_resource.roles.nil?
+        new_resource.roles.each do |r|
+          r_el = user_el.add_element 'role'
+          r_el.add_text r
+        end
+      end
       unless new_resource.duty_schedules.nil?
         new_resource.duty_schedules.each do |ds|
           ds_el = user_el.add_element 'duty-schedule'
           ds_el.add_text ds
         end
       end
-      RestClient.post "#{baseurl(node)}/users", cu.to_s, content_type: :xml
-      FileUtils.touch "#{node['opennms']['conf']['home']}/etc/users.xml"
+      begin
+        tries ||= 6
+        RestClient.post "#{baseurl(node)}/users", cu.to_s, content_type: :xml
+        FileUtils.touch "#{node['opennms']['conf']['home']}/etc/users.xml"
+      rescue => e
+        Chef::Log.debug("Retrying user add/update for #{new_resource.name}.")
+        sleep(30)
+        retry if (tries -= 1) > 0
+        raise e
+      end
     end
 
     # could use REST for this, but we're doing file based for creates as the REST API is very limited so let's be consistent
