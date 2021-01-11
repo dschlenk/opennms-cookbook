@@ -40,6 +40,7 @@ postgresql_repository 'install'
 postgresql_server_install 'package' do
   password node['postgresql']['password']['postgres']
   version node['postgresql']['version']
+  setup_repo node['opennms']['postgresql']['setup_repo']
   action [:install, :create]
 end
 
@@ -81,6 +82,7 @@ postgresql_server_conf 'PostgreSQL Config' do
   version node['postgresql']['version']
   data_directory node['postgresql']['config']['data_directory']
   additional_config additional_config
+  stats_temp_directory node['postgresql']['config']['stats_temp_directory']
   notifies :reload, 'service[postgresql]'
 end
 
