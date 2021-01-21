@@ -2114,6 +2114,7 @@ default['opennms']['manage_repos'] = true
 default['opennms']['posgresql']['pg_upgrade_timeout'] = 7200
 default['opennms']['postgresql']['attempt_upgrade'] = false
 default['opennms']['postgresql']['start_after_upgrade'] = false
+default['opennms']['postgresql']['setup_repo'] = true
 
 default['opennms']['bin']['cookbook'] = 'opennms'
 default['opennms']['bin']['return_code'] = false
