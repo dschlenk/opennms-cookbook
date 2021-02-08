@@ -63,7 +63,7 @@ onms_packages.each do |pkg|
           skip = true
         end
         next if skip
-        notifies :makecache, "yum_repository[opennms-#{branch}-#{platform}]", :immediately
+        notifies :makecache, "yum_repository[opennms-#{branch}-#{platform}]", :immediately if node['opennms']['manage_repos']
       end
     end
   end
