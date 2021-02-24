@@ -1,5 +1,26 @@
 # OpenNMS Cookbook Changes
 
+## 26.3.3
+
+* actually don't manage postres repos when told not to
+
+## 26.3.2
+
+* fix bug introduced as side effect of making postgresl repo mgmt optional
+
+## 26.3.1
+
+* Fix location of postgres stats directory
+* Make management of postgres repos optional
+
+## 26.3.0
+
+* support changes and manage roles in user LWRP
+
+## 26.2.0
+
+* Properly handle upgrades of users.xml when jumping from very old to current
+
 ## 26.1.0
 
 * Allow installation of plugin packages via node attributes

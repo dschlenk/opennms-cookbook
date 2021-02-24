@@ -28,7 +28,7 @@ Requirements
 Usage
 =====
 
-Running the default recipe will install OpenNMS 22.0.2-1 (or a custom version using the attribute `node[:opennms][:version]`) on CentOS 6 or 7 from the official repo with the default configuration. It will also execute `'$ONMS_HOME/bin/runjava -s` if `$ONMS_HOME/etc/java.conf` is not present and `$ONMS_HOME/bin/install -dis` if `$ONMS_HOME/etc/configured` is not present.
+Running the default recipe will install OpenNMS 26.2.2-1 (or a custom version using the attribute `node[:opennms][:version]`) on CentOS 6 or 7 from the official repo with the default configuration. It will also execute `'$ONMS_HOME/bin/runjava -s` if `$ONMS_HOME/etc/java.conf` is not present and `$ONMS_HOME/bin/install -dis` if `$ONMS_HOME/etc/configured` is not present.
 
 There are two primary ways to use this cookbook: as an application cookbook or library cookbook. If you simply want to tweak a few settings to the default OpenNMS configuration, you can use the `default` recipe of this cookbook directly and modify node attributes to suit your needs. There are also a plethora of custom resources that you can use to do more in depth customizations. If you go that route I recommend setting `node['opennms']['templates']` to false (or add `recipe[opennnms::notemplates]` to your run list) and then using the custom resources (and maybe a few of the templates in this cookbook) to define your run list. If your node's run list contains both the template and a resource that manages the same file you'll end up with a lot of churn during the chef client run, which is a waste of time and will probably cause unnecessary restarts of the application.
 
@@ -135,7 +135,7 @@ we want anyway, so we just remove the old file.
 * `opennms::default` Installs and configures OpenNMS with the standard configuration modified with any node attribute values changed from their defaults. Set `node['opennms']['plugin']['addl']` to an array of strings representing the names of the packages of the plugins you'd like installed.
 * `opennms::notemplates` Everything default does except minimal templates are used - etc/opennms.conf, etc/opennms.properties and etc/log4j2.xml. Use this recipe if you intend to use any of the custom resources in this cookbook.
 * `opennms::rrdtool` Installs rrdtool and configures OpenNMS to use it rather than JRobin for metrics storage.
-* `opennms::postgres` Installs postgresql 9.3 in a somewhat tuned manner (from PGDG). You can use a newer version by changing node attributes in your role/environment/wrapper.
+* `opennms::postgres` Installs postgresql in a somewhat tuned manner (from PGDG). See `postres_install` recipe to figure out how the version is selected and override with node attributes if desired.
 * `opennms::repositories` Adds the public OpenNMS yum repositories to your system.
 
 A few other recipes exist that aren't listed here. They are included by others when needed and are unlikely to be interesting for individual use.

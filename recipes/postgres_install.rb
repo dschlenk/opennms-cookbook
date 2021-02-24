@@ -35,7 +35,7 @@ node.default['postgresql']['config_pgtune']['max_connections'] = 160
 node.default['postgresql']['config_pgtune']['total_memory'] = '1961376kB'
 node.default['postgresql']['contrib']['extensions'] = %w(pageinspect pg_buffercache pg_freespacemap pgrowlocks pg_stat_statements pgstattuple)
 
-postgresql_repository 'install'
+postgresql_repository 'install' if node['opennms']['postgresql']['setup_repo']
 
 postgresql_server_install 'package' do
   password node['postgresql']['password']['postgres']
