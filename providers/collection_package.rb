@@ -155,6 +155,7 @@ def include_urls_equal?(doc, include_urls)
 end
 
 def store_by_if_alias_equal?(doc, store_by_if_alia)
+  store_by_if_alias_el = false
   unless doc.elements['storeByIfAlias'].nil?
     store_by_if_alias_el = true if doc.elements['storeByIfAlias'].texts.join("\n") == 'true'
   end

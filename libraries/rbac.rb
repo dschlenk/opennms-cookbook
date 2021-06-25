@@ -71,11 +71,11 @@ module Opennms
         response = RestClient.get "#{baseurl(node)}/users/#{new_user.name}", accept: :json, 'Accept-Encoding' => 'identity'
         curr_user = JSON.parse(response.to_s)
         Chef::Log.debug("#{new_user.full_name} == #{curr_user['full-name']}?")
-        return true if new_user.full_name != curr_user['full-name'].to_s
+        return true if new_user.full_name.to_s != curr_user['full-name'].to_s
         Chef::Log.debug("#{new_user.user_comments} == #{curr_user['user-comments']}?")
-        return true if new_user.user_comments != curr_user['user-comments'].to_s
+        return true if new_user.user_comments.to_s != curr_user['user-comments'].to_s
         Chef::Log.debug("#{new_user.password} == #{curr_user['password']}?")
-        return true if new_user.password != curr_user['password'].to_s
+        return true if new_user.password.to_s != curr_user['password'].to_s
         Chef::Log.debug("#{new_user.password_salt} == #{(curr_user['password']['salt'].to_s.downcase == true)}?")
         return true if new_user.password_salt != (curr_user['password']['salt'].to_s.downcase == true)
         major_version = Opennms::Helpers.major(node['opennms']['version']).to_i
