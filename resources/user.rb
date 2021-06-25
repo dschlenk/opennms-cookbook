@@ -12,6 +12,6 @@ attribute :password, kind_of: String
 attribute :password_salt, kind_of: [TrueClass, FalseClass], default: false, required: false
 attribute :roles, kind_of: Array, default: ['ROLE_USER']
 # Array of strings
-attribute :duty_schedules, kind_of: Array
+attribute :duty_schedules, kind_of: Array, default: []
 
 attr_accessor :exists, :changed
