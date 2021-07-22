@@ -44,6 +44,8 @@ when '25'
   template_dir = 'horizon-25/'
 when '26'
   template_dir = 'horizon-26/'
+when '27'
+  template_dir = 'horizon-27/'
 end
 
 if Opennms::Helpers.major(node['opennms']['version']).to_i >= 22
@@ -136,10 +138,10 @@ template "#{onms_home}/bin/opennms" do
   variables(
     return_code: node['opennms']['bin']['return_code']
   )
-  not_if { Opennms::Helpers.major(node['opennms']['version']).to_i < 25 }
-  not_if { Opennms::Helpers.major(node['opennms']['version']).to_i > 26 }
+  not_if { Opennms::Helpers.major(node['opennms']['version']).to_i < 26 }
+  not_if { Opennms::Helpers.major(node['opennms']['version']).to_i > 27 }
   not_if { node['opennms']['version'] == '26.2.1-1' }
-  not_if { node['opennms']['version'] == '26.2.2-1' }
+  not_if { node['opennms']['version'] == '27.2.0-1' }
 end
 
 cookbook_file "patch #{onms_home}/bin/opennms" do
@@ -151,3 +153,4 @@ cookbook_file "patch #{onms_home}/bin/opennms" do
   group 'root'
   only_if { node['opennms']['version'] == '26.2.1-1' || node['opennms']['version'] == '26.2.2-1' }
 end
+
