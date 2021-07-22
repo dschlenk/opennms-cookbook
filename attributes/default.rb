@@ -45,12 +45,17 @@ default['build-essential']['compile_time'] = true
 default['opennms']['start_opts'] = ''
 # set to '' if you want to re-enable OOTB behavior (but you should not do this if using any of the opennms resources)
 default['opennms']['timeout_start_sec'] = '10min'
-default['opennms']['version'] = '26.2.2-1'
+default['opennms']['version'] = '28.0.2-1'
+default['java']['version'] = '11'
 # default['opennms']['version_major'] = "%{version}"
 default['opennms']['allow_downgrade'] = false
 default['opennms']['stable'] = true
 # whether or not to attempt to automatically upgrade opennms
 default['opennms']['upgrade'] = false
+# version 28 and up need upgrade java version to javajdk-11
+if node['opennms']['version'].to_i > 27
+  default['opennms']['upgrade'] = true
+end
 default['opennms']['upgrade_dirs'] = [
   'etc',
   'etc/datacollection',
@@ -719,6 +724,7 @@ default['opennms']['datacollection']['default']['netapp']           = true
 default['opennms']['datacollection']['default']['netbotz']          = true
 default['opennms']['datacollection']['default']['netenforcer']      = true
 default['opennms']['datacollection']['default']['netscaler']        = true
+default['opennms']['datacollection']['default']['netscalserver']    = true
 default['opennms']['datacollection']['default']['netsnmp']          = true
 default['opennms']['datacollection']['default']['nortel']           = true
 default['opennms']['datacollection']['default']['novell']           = true
@@ -995,6 +1001,8 @@ default['opennms']['log4j2']['notifd'] = 'WARN'
 default['opennms']['log4j2']['oss_qosd'] = 'WARN'
 default['opennms']['log4j2']['oss_qosdrx'] = 'WARN'
 default['opennms']['log4j2']['passive'] = 'WARN'
+default['opennms']['log4j2']['passive'] = 'WARN'
+default['opennms']['log4j2']['perspective_pollerd'] = 'WARN'
 default['opennms']['log4j2']['poller'] = 'WARN'
 default['opennms']['log4j2']['provisiond'] = 'WARN'
 default['opennms']['log4j2']['queued'] = 'WARN'
@@ -1878,7 +1886,10 @@ default['opennms']['vacuumd']['automations']['create_critical_ticket']          
 default['opennms']['vacuumd']['automations']['update_tickets']                     = true
 default['opennms']['vacuumd']['automations']['close_cleared_alarm_tickets']        = true
 default['opennms']['vacuumd']['automations']['clear_alarms_for_closed_tickets']    = true
-default['opennms']['vacuumd']['automations']['clean_up_rp_status_changes']         = true
+default['opennms']['vacuumd']['automations']['clean_up_rp_status_changes'] = true
+if node['opennms']['version'].to_i == 27
+  default['opennms']['vacuumd']['automations']['clean_up_rp_status_changes'] = false # change for version 27
+end
 default['opennms']['vacuumd']['automations']['maintenance_check']                  = false
 default['opennms']['vacuumd']['automations']['access_points_table']                = false
 default['opennms']['vacuumd']['triggers']['select_closed_ticket_state_for_problem_alarms'] = true
@@ -1910,7 +1921,10 @@ default['opennms']['vacuumd']['actions']['clear_problems']                      
 default['opennms']['vacuumd']['actions']['clear_closed_ticket_alarms']           = true
 default['opennms']['vacuumd']['actions']['delete_purgeable_statistics_reports']  = true
 default['opennms']['vacuumd']['actions']['do_nothing_action']                    = true
-default['opennms']['vacuumd']['actions']['clean_up_rp_status_changes']           = true
+default['opennms']['vacuumd']['actions']['clean_up_rp_status_changes'] = true
+if node['opennms']['version'].to_i == 28
+  default['opennms']['vacuumd']['actions']['clean_up_rp_status_changes'] = false # change for version 28
+end
 default['opennms']['vacuumd']['actions']['maintenance_expiration_warning']       = false
 default['opennms']['vacuumd']['actions']['access_points_table']                  = false
 default['opennms']['vacuumd']['actions']['clear_path_outages']                   = true

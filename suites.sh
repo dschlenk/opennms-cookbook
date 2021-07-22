@@ -6,11 +6,11 @@ echo ""
 echo "driver:"
 echo "  name: vagrant"
 echo "  network:"
-echo "    - [\"forwarded_port\", {guest: 8980, host: 8980, auto_correct: true}]"
+echo "    - [\"forwarded_port\", {guest: 8980, host: 8980, auto_correct: false}]"
 echo "    - [\"forwarded_port\", {guest: 3000, host: 3000, auto_correct: false}]"
 echo "    - [\"forwarded_port\", {guest: 9200, host: 9200, auto_correct: false}]"
 echo "  customize:"
-echo "    memory: 1024"
+echo "    memory: 2048"
 echo ""
 echo "provisioner:"
 echo "  name: chef_zero"
@@ -39,8 +39,8 @@ echo "        plugin:"
 echo "          xml: true"
 echo "          nsclient: true"
 echo "suites:"
-VERSIONS=(16.0.4-1 17.1.1-1 18.0.4-1 19.1.0-1 20.1.0-1 21.1.0-1 22.0.4-1 23.0.4-1 24.1.3-1 25.2.1-1 26.2.2-1)
-STABLE_VERSION=(26.2.2-1)
+VERSIONS=(16.0.4-1 17.1.1-1 18.0.4-1 19.1.0-1 20.1.0-1 21.1.0-1 22.0.4-1 23.0.4-1 24.1.3-1 25.2.1-1 26.2.2-1 27.2.0-1 28.0.2-1)
+STABLE_VERSION=(28.0.2-1)
 SUITES=$(ls test/fixtures/cookbooks/onms_lwrp_test/recipes/)
 SUITES+=('default')
 SUITES+=('templates')
@@ -89,14 +89,19 @@ for f in ${SUITES[@]}; do
     $(fgrep -q "  - name: ${recipe}_${v%%.*-1}" .kitchen.yml)
     if [ "$?" != "0" ]; then
       if [[ $recipe == wsman* ]] && [[ ${v%%.*-1} == 16 ]]; then
-        echo "skipping wsman suite for recipe $recipe version $v" > /dev/stderr
+        #echo "skipping wsman suite for recipe $recipe version $v" > /dev/stderr
         continue
       fi
       echo "  - name: ${recipe}_${v%%.*-1}"
       echo "    run_list:"
       echo "      - recipe[yum-centos-ct::default]"
       echo "      - recipe[opennms::postgres]"
-      echo "      - recipe[oracle_java8::default]"
+      if [[ ${v%%.*-1} > 27 ]]; then
+        echo "      - recipe[openjdk_java11::default]"
+      fi
+      if [[ ${v%%.*-1} < 28 ]]; then
+         echo "      - recipe[oracle_java8::default]"
+      fi
       if [ "$recipe" = "plugins" ]; then
         echo "      - recipe[onms_lwrp_test::${recipe}]"
       fi
@@ -122,6 +127,9 @@ for f in ${SUITES[@]}; do
         echo "        upgrade: true"
         echo "        postgresql:"
         echo "          attempt_upgrade: true"
+      fi
+      if [[ ${v%%.*-1} > 27 ]]; then
+        echo "    excludes: centos-6.9"
       fi
       echo "    verifier:"
       echo "      inspec_tests:"
