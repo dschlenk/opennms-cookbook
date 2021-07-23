@@ -143,6 +143,9 @@
     <% if @netscaler -%>
       <include-collection dataCollectionGroup="Netscaler"/>
     <% end -%>
+     <% if @netscalserver -%>
+       <include-collection dataCollectionGroup="Netscaler vServer"/>
+     <% end -%>
     <% if @netapp -%>
       <include-collection dataCollectionGroup="Network Appliance"/>
     <% end -%>

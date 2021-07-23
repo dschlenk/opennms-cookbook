@@ -183,6 +183,7 @@ template "#{onms_home}/etc/datacollection-config.xml" do
     netbotz: node['opennms']['datacollection']['default']['netbotz'],
     netenforcer: node['opennms']['datacollection']['default']['netenforcer'],
     netscaler: node['opennms']['datacollection']['default']['netscaler'],
+    netscalserver: node['opennms']['datacollection']['default']['netscalserver'],
     netsnmp: node['opennms']['datacollection']['default']['netsnmp'],
     nortel: node['opennms']['datacollection']['default']['nortel'],
     novell: node['opennms']['datacollection']['default']['novell'],
