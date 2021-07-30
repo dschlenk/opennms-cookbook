@@ -21,8 +21,7 @@ include_recipe 'opennms::repositories' if node['opennms']['manage_repos']
 onms_packages = ['opennms-core', 'opennms-webapp-jetty', 'opennms-docs']
 
 #version 28.0.1-1 remove the opennms-docs
-case Opennms::Helpers.major(node['opennms']['version'])
-when '28'
+if node['opennms']['version'] >= 28
   onms_packages = ['opennms-core', 'opennms-webapp-jetty']
 end
 
