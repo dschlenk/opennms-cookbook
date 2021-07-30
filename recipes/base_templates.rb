@@ -46,7 +46,10 @@ when '26'
   template_dir = 'horizon-26/'
 when '27'
   template_dir = 'horizon-27/'
+when '28'
+  template_dir = 'horizon-28/'
 end
+
 
 if Opennms::Helpers.major(node['opennms']['version']).to_i >= 22
   node.default['opennms']['datacollection']['default']['ref_cpq_im'] = true
@@ -139,9 +142,9 @@ template "#{onms_home}/bin/opennms" do
     return_code: node['opennms']['bin']['return_code']
   )
   not_if { Opennms::Helpers.major(node['opennms']['version']).to_i < 26 }
-  not_if { Opennms::Helpers.major(node['opennms']['version']).to_i > 27 }
+  not_if { Opennms::Helpers.major(node['opennms']['version']).to_i > 28 }
   not_if { node['opennms']['version'] == '26.2.1-1' }
-  not_if { node['opennms']['version'] == '27.2.0-1' }
+  not_if { node['opennms']['version'] == '28.0.1-1' }
 end
 
 cookbook_file "patch #{onms_home}/bin/opennms" do
