@@ -40,7 +40,7 @@ echo "          xml: true"
 echo "          nsclient: true"
 echo "suites:"
 VERSIONS=(16.0.4-1 17.1.1-1 18.0.4-1 19.1.0-1 20.1.0-1 21.1.0-1 22.0.4-1 23.0.4-1 24.1.3-1 25.2.1-1 26.2.2-1 27.2.0-1 28.0.1-1)
-STABLE_VERSION=(27.2.0-1)
+STABLE_VERSION=(28.0.1-1)
 SUITES=$(ls test/fixtures/cookbooks/onms_lwrp_test/recipes/)
 SUITES+=('default')
 SUITES+=('templates')
@@ -96,7 +96,12 @@ for f in ${SUITES[@]}; do
       echo "    run_list:"
       echo "      - recipe[yum-centos-ct::default]"
       echo "      - recipe[opennms::postgres]"
-      echo "      - recipe[oracle_java8::default]"
+      if [[ ${v%%.*-1} > 26 ]]; then
+        echo "      - recipe[openjdk_java11::default]"
+      fi
+      if [[ ${v%%.*-1} < 27 ]]; then
+         echo "      - recipe[oracle_java8::default]"
+      fi
       if [ "$recipe" = "plugins" ]; then
         echo "      - recipe[onms_lwrp_test::${recipe}]"
       fi
