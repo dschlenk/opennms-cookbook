@@ -8,6 +8,7 @@ group :integration do
   cookbook 'yum-epel'
   cookbook 'onms_lwrp_test', path: 'test/fixtures/cookbooks/onms_lwrp_test'
   cookbook 'oracle_java8', path: 'test/fixtures/cookbooks/oracle_java8'
+  cookbook 'openjdk_java11', path: 'test/fixtures/cookbooks/openjdk_java11'
   cookbook 'opennms-elasticsearch', path: 'test/fixtures/cookbooks/opennms-elasticsearch'
   cookbook 'opennms_helm'
   cookbook 'snmp', path: 'test/fixtures/cookbooks/snmp'
