@@ -1,5 +1,3 @@
 # frozen_string_literal: true
-apt_update
-
-# make sure we have java installed
-openjdk_pkg_install node['java']['jdk_version']
+sudo yum update
+sudo yum install java-11-openjdk-devel
