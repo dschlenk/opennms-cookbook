@@ -1,0 +1,21 @@
+version: 2.1
+jobs:
+  prep:
+    docker:
+      - image: cimg/ruby:2.4.3
+    steps:
+      - checkout
+      - run: bundle install
+  test:
+    docker:
+      - image: cimg/ruby:2.4.3
+    steps:
+      - checkout
+      - run: bundle exec rake
+workflows:
+  build_and_test:
+    jobs:
+      - prep
+      - test:
+          requires:
+            - prep
