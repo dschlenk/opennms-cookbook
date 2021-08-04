@@ -2,7 +2,7 @@ version: 2.1
 jobs:
   prep:
     docker:
-      - image: cimg/ruby:2.4.3
+      - image: cimg/ruby:2.4
     steps:
       - checkout
       - run: bundle install
