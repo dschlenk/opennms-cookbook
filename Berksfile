@@ -2,6 +2,7 @@
 source 'https://supermarket.chef.io'
 
 metadata
+
 group :integration do
   cookbook 'postgresql', '~> 7.1.5'
   cookbook 'yum-centos-ct', path: 'test/fixtures/cookbooks/yum-centos-ct'

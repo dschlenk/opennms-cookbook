@@ -14,8 +14,8 @@ echo "    memory: 2048"
 echo ""
 echo "provisioner:"
 echo "  name: chef_zero"
-echo "  product_version: 15.3"
-echo "  require_chef_omnibus: 15.3"
+echo "  product_version: 14.13.11"
+echo "  require_chef_omnibus: 14.13.11"
 echo ""
 echo "platforms:"
 echo "  - name: centos-6.9"
@@ -89,17 +89,17 @@ for f in ${SUITES[@]}; do
     $(fgrep -q "  - name: ${recipe}_${v%%.*-1}" .kitchen.yml)
     if [ "$?" != "0" ]; then
       if [[ $recipe == wsman* ]] && [[ ${v%%.*-1} == 16 ]]; then
-        echo "skipping wsman suite for recipe $recipe version $v" > /dev/stderr
+        #echo "skipping wsman suite for recipe $recipe version $v" > /dev/stderr
         continue
       fi
       echo "  - name: ${recipe}_${v%%.*-1}"
       echo "    run_list:"
       echo "      - recipe[yum-centos-ct::default]"
       echo "      - recipe[opennms::postgres]"
-      if [[ ${v%%.*-1} > 26 ]]; then
+      if [[ ${v%%.*-1} > 27 ]]; then
         echo "      - recipe[openjdk_java11::default]"
       fi
-      if [[ ${v%%.*-1} < 27 ]]; then
+      if [[ ${v%%.*-1} < 28 ]]; then
          echo "      - recipe[oracle_java8::default]"
       fi
       if [ "$recipe" = "plugins" ]; then
