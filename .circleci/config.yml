@@ -5,13 +5,13 @@ jobs:
       - image: cimg/ruby:2.4
     steps:
       - checkout
+      - run: gem install bundler:1.16.6
       - run: bundle install
   test:
     docker:
       - image: cimg/ruby:2.4.3
     steps:
       - checkout
-      - run: gem install bundler:1.16.6
       - run: bundle exec rake
 workflows:
   build_and_test:
