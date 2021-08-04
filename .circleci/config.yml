@@ -1,0 +1,14 @@
+version: 2.1
+jobs:
+  build:
+    docker:
+      - image: cimg/ruby:2.4
+    steps:
+      - checkout
+      - run: gem install bundler:1.16.6
+      - run: bundle install
+      - run: bundle exec rake
+workflows:
+  build_and_test:
+    jobs:
+      - build
