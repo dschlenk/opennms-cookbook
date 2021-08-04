@@ -14,4 +14,4 @@ depends          'hostsfile'
 depends          'build-essential'
 depends          'postgresql'
 depends          'openssl'
-chef_version '>= 12.7' if respond_to?(:chef_version)
+chef_version '>= 15.3' if respond_to?(:chef_version)
