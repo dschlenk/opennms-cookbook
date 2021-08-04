@@ -9,7 +9,7 @@ jobs:
       - run: bundle install
   test:
     docker:
-      - image: cimg/ruby:2.4.3
+      - image: cimg/ruby:2.4
     steps:
       - checkout
       - run: bundle exec rake
