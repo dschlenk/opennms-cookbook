@@ -60,7 +60,6 @@ GRAPH
   oracle_java8 (0.1.0)
     java (>= 0.0.0)
   postgresql (7.1.9)
-  seven_zip (4.2.1)
   snmp (0.1.0)
   yum (6.1.1)
   yum-centos-ct (0.1.0)
