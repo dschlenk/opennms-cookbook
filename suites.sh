@@ -129,7 +129,7 @@ for f in ${SUITES[@]}; do
         echo "          attempt_upgrade: true"
       fi
       if [[ ${v%%.*-1} > 27 ]]; then
-        echo "        excludes: centos-6.9"
+        echo "    excludes: centos-6.9"
       fi
       echo "    verifier:"
       echo "      inspec_tests:"
