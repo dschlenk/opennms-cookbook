@@ -3,6 +3,8 @@ DEPENDENCIES
     path: test/fixtures/cookbooks/hsflowd
   onms_lwrp_test
     path: test/fixtures/cookbooks/onms_lwrp_test
+  openjdk_java11
+    path: test/fixtures/cookbooks/openjdk_java11
   opennms
     path: .
     metadata: true
@@ -33,17 +35,17 @@ GRAPH
     ark (>= 0.0.0)
     chef-sugar (>= 0.0.0)
     yum (>= 0.0.0)
-  homebrew (4.3.0)
   hostsfile (3.0.1)
   hsflowd (0.1.0)
-  java (1.50.0)
-    apt (>= 0.0.0)
-    homebrew (>= 0.0.0)
-    windows (>= 0.0.0)
+  java (9.0.0)
+    line (>= 0.0.0)
+  line (4.0.1)
   mingw (2.0.2)
     seven_zip (>= 0.0.0)
   onms_lwrp_test (0.1.0)
     opennms (>= 0.0.0)
+  openjdk_java11 (0.1.0)
+    java (>= 0.0.0)
   opennms (26.3.4)
     build-essential (>= 0.0.0)
     hostsfile (>= 0.0.0)
