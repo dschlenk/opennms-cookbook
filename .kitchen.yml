@@ -222,6 +222,7 @@ suites:
     attributes:
       opennms:
         version: 28.0.1-1
+        excludes: centos-6.9
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -410,6 +411,7 @@ suites:
     attributes:
       opennms:
         version: 28.0.1-1
+        excludes: centos-6.9
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -598,6 +600,7 @@ suites:
     attributes:
       opennms:
         version: 28.0.1-1
+        excludes: centos-6.9
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -786,6 +789,7 @@ suites:
     attributes:
       opennms:
         version: 28.0.1-1
+        excludes: centos-6.9
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -974,6 +978,7 @@ suites:
     attributes:
       opennms:
         version: 28.0.1-1
+        excludes: centos-6.9
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -1162,6 +1167,7 @@ suites:
     attributes:
       opennms:
         version: 28.0.1-1
+        excludes: centos-6.9
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -1350,6 +1356,7 @@ suites:
     attributes:
       opennms:
         version: 28.0.1-1
+        excludes: centos-6.9
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -1538,6 +1545,7 @@ suites:
     attributes:
       opennms:
         version: 28.0.1-1
+        excludes: centos-6.9
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -1726,6 +1734,7 @@ suites:
     attributes:
       opennms:
         version: 28.0.1-1
+        excludes: centos-6.9
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -1914,6 +1923,7 @@ suites:
     attributes:
       opennms:
         version: 28.0.1-1
+        excludes: centos-6.9
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -2102,6 +2112,7 @@ suites:
     attributes:
       opennms:
         version: 28.0.1-1
+        excludes: centos-6.9
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -2290,6 +2301,7 @@ suites:
     attributes:
       opennms:
         version: 28.0.1-1
+        excludes: centos-6.9
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -2478,6 +2490,7 @@ suites:
     attributes:
       opennms:
         version: 28.0.1-1
+        excludes: centos-6.9
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -2666,6 +2679,7 @@ suites:
     attributes:
       opennms:
         version: 28.0.1-1
+        excludes: centos-6.9
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -2854,6 +2868,7 @@ suites:
     attributes:
       opennms:
         version: 28.0.1-1
+        excludes: centos-6.9
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -3042,6 +3057,7 @@ suites:
     attributes:
       opennms:
         version: 28.0.1-1
+        excludes: centos-6.9
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -3230,6 +3246,7 @@ suites:
     attributes:
       opennms:
         version: 28.0.1-1
+        excludes: centos-6.9
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -3418,6 +3435,7 @@ suites:
     attributes:
       opennms:
         version: 28.0.1-1
+        excludes: centos-6.9
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -3606,6 +3624,7 @@ suites:
     attributes:
       opennms:
         version: 28.0.1-1
+        excludes: centos-6.9
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -3794,6 +3813,7 @@ suites:
     attributes:
       opennms:
         version: 28.0.1-1
+        excludes: centos-6.9
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -3982,6 +4002,7 @@ suites:
     attributes:
       opennms:
         version: 28.0.1-1
+        excludes: centos-6.9
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -4170,6 +4191,7 @@ suites:
     attributes:
       opennms:
         version: 28.0.1-1
+        excludes: centos-6.9
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -4358,6 +4380,7 @@ suites:
     attributes:
       opennms:
         version: 28.0.1-1
+        excludes: centos-6.9
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -4546,6 +4569,7 @@ suites:
     attributes:
       opennms:
         version: 28.0.1-1
+        excludes: centos-6.9
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -4734,6 +4758,7 @@ suites:
     attributes:
       opennms:
         version: 28.0.1-1
+        excludes: centos-6.9
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -4922,6 +4947,7 @@ suites:
     attributes:
       opennms:
         version: 28.0.1-1
+        excludes: centos-6.9
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -5110,6 +5136,7 @@ suites:
     attributes:
       opennms:
         version: 28.0.1-1
+        excludes: centos-6.9
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -5298,6 +5325,7 @@ suites:
     attributes:
       opennms:
         version: 28.0.1-1
+        excludes: centos-6.9
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -5486,6 +5514,7 @@ suites:
     attributes:
       opennms:
         version: 28.0.1-1
+        excludes: centos-6.9
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -5674,6 +5703,7 @@ suites:
     attributes:
       opennms:
         version: 28.0.1-1
+        excludes: centos-6.9
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -5862,6 +5892,7 @@ suites:
     attributes:
       opennms:
         version: 28.0.1-1
+        excludes: centos-6.9
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -6050,6 +6081,7 @@ suites:
     attributes:
       opennms:
         version: 28.0.1-1
+        excludes: centos-6.9
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -6238,6 +6270,7 @@ suites:
     attributes:
       opennms:
         version: 28.0.1-1
+        excludes: centos-6.9
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -6426,6 +6459,7 @@ suites:
     attributes:
       opennms:
         version: 28.0.1-1
+        excludes: centos-6.9
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -6614,6 +6648,7 @@ suites:
     attributes:
       opennms:
         version: 28.0.1-1
+        excludes: centos-6.9
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -6802,6 +6837,7 @@ suites:
     attributes:
       opennms:
         version: 28.0.1-1
+        excludes: centos-6.9
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -6990,6 +7026,7 @@ suites:
     attributes:
       opennms:
         version: 28.0.1-1
+        excludes: centos-6.9
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -7178,6 +7215,7 @@ suites:
     attributes:
       opennms:
         version: 28.0.1-1
+        excludes: centos-6.9
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -7366,6 +7404,7 @@ suites:
     attributes:
       opennms:
         version: 28.0.1-1
+        excludes: centos-6.9
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -7554,6 +7593,7 @@ suites:
     attributes:
       opennms:
         version: 28.0.1-1
+        excludes: centos-6.9
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -7742,6 +7782,7 @@ suites:
     attributes:
       opennms:
         version: 28.0.1-1
+        excludes: centos-6.9
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -7930,6 +7971,7 @@ suites:
     attributes:
       opennms:
         version: 28.0.1-1
+        excludes: centos-6.9
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -8118,6 +8160,7 @@ suites:
     attributes:
       opennms:
         version: 28.0.1-1
+        excludes: centos-6.9
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -8306,6 +8349,7 @@ suites:
     attributes:
       opennms:
         version: 28.0.1-1
+        excludes: centos-6.9
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -8494,6 +8538,7 @@ suites:
     attributes:
       opennms:
         version: 28.0.1-1
+        excludes: centos-6.9
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -8682,6 +8727,7 @@ suites:
     attributes:
       opennms:
         version: 28.0.1-1
+        excludes: centos-6.9
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -8870,6 +8916,7 @@ suites:
     attributes:
       opennms:
         version: 28.0.1-1
+        excludes: centos-6.9
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -9058,6 +9105,7 @@ suites:
     attributes:
       opennms:
         version: 28.0.1-1
+        excludes: centos-6.9
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -9246,6 +9294,7 @@ suites:
     attributes:
       opennms:
         version: 28.0.1-1
+        excludes: centos-6.9
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -9434,6 +9483,7 @@ suites:
     attributes:
       opennms:
         version: 28.0.1-1
+        excludes: centos-6.9
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -9622,6 +9672,7 @@ suites:
     attributes:
       opennms:
         version: 28.0.1-1
+        excludes: centos-6.9
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -9810,6 +9861,7 @@ suites:
     attributes:
       opennms:
         version: 28.0.1-1
+        excludes: centos-6.9
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -9998,6 +10050,7 @@ suites:
     attributes:
       opennms:
         version: 28.0.1-1
+        excludes: centos-6.9
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -10186,6 +10239,7 @@ suites:
     attributes:
       opennms:
         version: 28.0.1-1
+        excludes: centos-6.9
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -10374,6 +10428,7 @@ suites:
     attributes:
       opennms:
         version: 28.0.1-1
+        excludes: centos-6.9
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -10562,6 +10617,7 @@ suites:
     attributes:
       opennms:
         version: 28.0.1-1
+        excludes: centos-6.9
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -10750,6 +10806,7 @@ suites:
     attributes:
       opennms:
         version: 28.0.1-1
+        excludes: centos-6.9
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -10938,6 +10995,7 @@ suites:
     attributes:
       opennms:
         version: 28.0.1-1
+        excludes: centos-6.9
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -11126,6 +11184,7 @@ suites:
     attributes:
       opennms:
         version: 28.0.1-1
+        excludes: centos-6.9
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -11314,6 +11373,7 @@ suites:
     attributes:
       opennms:
         version: 28.0.1-1
+        excludes: centos-6.9
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -11502,6 +11562,7 @@ suites:
     attributes:
       opennms:
         version: 28.0.1-1
+        excludes: centos-6.9
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -11690,6 +11751,7 @@ suites:
     attributes:
       opennms:
         version: 28.0.1-1
+        excludes: centos-6.9
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -11878,6 +11940,7 @@ suites:
     attributes:
       opennms:
         version: 28.0.1-1
+        excludes: centos-6.9
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -12066,6 +12129,7 @@ suites:
     attributes:
       opennms:
         version: 28.0.1-1
+        excludes: centos-6.9
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -12254,6 +12318,7 @@ suites:
     attributes:
       opennms:
         version: 28.0.1-1
+        excludes: centos-6.9
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -12442,6 +12507,7 @@ suites:
     attributes:
       opennms:
         version: 28.0.1-1
+        excludes: centos-6.9
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -12630,6 +12696,7 @@ suites:
     attributes:
       opennms:
         version: 28.0.1-1
+        excludes: centos-6.9
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -12818,6 +12885,7 @@ suites:
     attributes:
       opennms:
         version: 28.0.1-1
+        excludes: centos-6.9
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -13006,6 +13074,7 @@ suites:
     attributes:
       opennms:
         version: 28.0.1-1
+        excludes: centos-6.9
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -13194,6 +13263,7 @@ suites:
     attributes:
       opennms:
         version: 28.0.1-1
+        excludes: centos-6.9
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -13382,6 +13452,7 @@ suites:
     attributes:
       opennms:
         version: 28.0.1-1
+        excludes: centos-6.9
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -13570,6 +13641,7 @@ suites:
     attributes:
       opennms:
         version: 28.0.1-1
+        excludes: centos-6.9
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -13758,6 +13830,7 @@ suites:
     attributes:
       opennms:
         version: 28.0.1-1
+        excludes: centos-6.9
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -13946,6 +14019,7 @@ suites:
     attributes:
       opennms:
         version: 28.0.1-1
+        excludes: centos-6.9
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -14134,6 +14208,7 @@ suites:
     attributes:
       opennms:
         version: 28.0.1-1
+        excludes: centos-6.9
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -14322,6 +14397,7 @@ suites:
     attributes:
       opennms:
         version: 28.0.1-1
+        excludes: centos-6.9
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -14510,6 +14586,7 @@ suites:
     attributes:
       opennms:
         version: 28.0.1-1
+        excludes: centos-6.9
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -14698,6 +14775,7 @@ suites:
     attributes:
       opennms:
         version: 28.0.1-1
+        excludes: centos-6.9
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -14886,6 +14964,7 @@ suites:
     attributes:
       opennms:
         version: 28.0.1-1
+        excludes: centos-6.9
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -15074,6 +15153,7 @@ suites:
     attributes:
       opennms:
         version: 28.0.1-1
+        excludes: centos-6.9
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -15262,6 +15342,7 @@ suites:
     attributes:
       opennms:
         version: 28.0.1-1
+        excludes: centos-6.9
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -15450,6 +15531,7 @@ suites:
     attributes:
       opennms:
         version: 28.0.1-1
+        excludes: centos-6.9
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -15638,6 +15720,7 @@ suites:
     attributes:
       opennms:
         version: 28.0.1-1
+        excludes: centos-6.9
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -15826,6 +15909,7 @@ suites:
     attributes:
       opennms:
         version: 28.0.1-1
+        excludes: centos-6.9
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -16014,6 +16098,7 @@ suites:
     attributes:
       opennms:
         version: 28.0.1-1
+        excludes: centos-6.9
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -16202,6 +16287,7 @@ suites:
     attributes:
       opennms:
         version: 28.0.1-1
+        excludes: centos-6.9
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -16390,6 +16476,7 @@ suites:
     attributes:
       opennms:
         version: 28.0.1-1
+        excludes: centos-6.9
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -16578,6 +16665,7 @@ suites:
     attributes:
       opennms:
         version: 28.0.1-1
+        excludes: centos-6.9
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -16766,6 +16854,7 @@ suites:
     attributes:
       opennms:
         version: 28.0.1-1
+        excludes: centos-6.9
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -16954,6 +17043,7 @@ suites:
     attributes:
       opennms:
         version: 28.0.1-1
+        excludes: centos-6.9
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -17142,6 +17232,7 @@ suites:
     attributes:
       opennms:
         version: 28.0.1-1
+        excludes: centos-6.9
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -17330,6 +17421,7 @@ suites:
     attributes:
       opennms:
         version: 28.0.1-1
+        excludes: centos-6.9
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -17518,6 +17610,7 @@ suites:
     attributes:
       opennms:
         version: 28.0.1-1
+        excludes: centos-6.9
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -17706,6 +17799,7 @@ suites:
     attributes:
       opennms:
         version: 28.0.1-1
+        excludes: centos-6.9
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -17894,6 +17988,7 @@ suites:
     attributes:
       opennms:
         version: 28.0.1-1
+        excludes: centos-6.9
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -18082,6 +18177,7 @@ suites:
     attributes:
       opennms:
         version: 28.0.1-1
+        excludes: centos-6.9
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -18270,6 +18366,7 @@ suites:
     attributes:
       opennms:
         version: 28.0.1-1
+        excludes: centos-6.9
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -18458,6 +18555,7 @@ suites:
     attributes:
       opennms:
         version: 28.0.1-1
+        excludes: centos-6.9
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -18646,6 +18744,7 @@ suites:
     attributes:
       opennms:
         version: 28.0.1-1
+        excludes: centos-6.9
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -18834,6 +18933,7 @@ suites:
     attributes:
       opennms:
         version: 28.0.1-1
+        excludes: centos-6.9
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -19022,6 +19122,7 @@ suites:
     attributes:
       opennms:
         version: 28.0.1-1
+        excludes: centos-6.9
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -19210,6 +19311,7 @@ suites:
     attributes:
       opennms:
         version: 28.0.1-1
+        excludes: centos-6.9
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -19398,6 +19500,7 @@ suites:
     attributes:
       opennms:
         version: 28.0.1-1
+        excludes: centos-6.9
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -19586,6 +19689,7 @@ suites:
     attributes:
       opennms:
         version: 28.0.1-1
+        excludes: centos-6.9
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -19774,6 +19878,7 @@ suites:
     attributes:
       opennms:
         version: 28.0.1-1
+        excludes: centos-6.9
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -19962,6 +20067,7 @@ suites:
     attributes:
       opennms:
         version: 28.0.1-1
+        excludes: centos-6.9
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -20150,6 +20256,7 @@ suites:
     attributes:
       opennms:
         version: 28.0.1-1
+        excludes: centos-6.9
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -20338,6 +20445,7 @@ suites:
     attributes:
       opennms:
         version: 28.0.1-1
+        excludes: centos-6.9
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -20526,6 +20634,7 @@ suites:
     attributes:
       opennms:
         version: 28.0.1-1
+        excludes: centos-6.9
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -20714,6 +20823,7 @@ suites:
     attributes:
       opennms:
         version: 28.0.1-1
+        excludes: centos-6.9
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -20902,6 +21012,7 @@ suites:
     attributes:
       opennms:
         version: 28.0.1-1
+        excludes: centos-6.9
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -21090,6 +21201,7 @@ suites:
     attributes:
       opennms:
         version: 28.0.1-1
+        excludes: centos-6.9
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -21278,6 +21390,7 @@ suites:
     attributes:
       opennms:
         version: 28.0.1-1
+        excludes: centos-6.9
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -21466,6 +21579,7 @@ suites:
     attributes:
       opennms:
         version: 28.0.1-1
+        excludes: centos-6.9
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -21654,6 +21768,7 @@ suites:
     attributes:
       opennms:
         version: 28.0.1-1
+        excludes: centos-6.9
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -21842,6 +21957,7 @@ suites:
     attributes:
       opennms:
         version: 28.0.1-1
+        excludes: centos-6.9
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -22030,6 +22146,7 @@ suites:
     attributes:
       opennms:
         version: 28.0.1-1
+        excludes: centos-6.9
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -22218,6 +22335,7 @@ suites:
     attributes:
       opennms:
         version: 28.0.1-1
+        excludes: centos-6.9
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -22406,6 +22524,7 @@ suites:
     attributes:
       opennms:
         version: 28.0.1-1
+        excludes: centos-6.9
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -22594,6 +22713,7 @@ suites:
     attributes:
       opennms:
         version: 28.0.1-1
+        excludes: centos-6.9
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -22782,6 +22902,7 @@ suites:
     attributes:
       opennms:
         version: 28.0.1-1
+        excludes: centos-6.9
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -22970,6 +23091,7 @@ suites:
     attributes:
       opennms:
         version: 28.0.1-1
+        excludes: centos-6.9
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -23158,6 +23280,7 @@ suites:
     attributes:
       opennms:
         version: 28.0.1-1
+        excludes: centos-6.9
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -23346,6 +23469,7 @@ suites:
     attributes:
       opennms:
         version: 28.0.1-1
+        excludes: centos-6.9
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -23534,6 +23658,7 @@ suites:
     attributes:
       opennms:
         version: 28.0.1-1
+        excludes: centos-6.9
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -23722,6 +23847,7 @@ suites:
     attributes:
       opennms:
         version: 28.0.1-1
+        excludes: centos-6.9
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -23910,6 +24036,7 @@ suites:
     attributes:
       opennms:
         version: 28.0.1-1
+        excludes: centos-6.9
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -24082,6 +24209,7 @@ suites:
     attributes:
       opennms:
         version: 28.0.1-1
+        excludes: centos-6.9
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -24254,6 +24382,7 @@ suites:
     attributes:
       opennms:
         version: 28.0.1-1
+        excludes: centos-6.9
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -24426,6 +24555,7 @@ suites:
     attributes:
       opennms:
         version: 28.0.1-1
+        excludes: centos-6.9
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -24598,6 +24728,7 @@ suites:
     attributes:
       opennms:
         version: 28.0.1-1
+        excludes: centos-6.9
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -24770,6 +24901,7 @@ suites:
     attributes:
       opennms:
         version: 28.0.1-1
+        excludes: centos-6.9
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -24958,6 +25090,7 @@ suites:
     attributes:
       opennms:
         version: 28.0.1-1
+        excludes: centos-6.9
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -25146,6 +25279,7 @@ suites:
     attributes:
       opennms:
         version: 28.0.1-1
+        excludes: centos-6.9
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -25334,6 +25468,7 @@ suites:
     attributes:
       opennms:
         version: 28.0.1-1
+        excludes: centos-6.9
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -25522,6 +25657,7 @@ suites:
     attributes:
       opennms:
         version: 28.0.1-1
+        excludes: centos-6.9
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -25710,6 +25846,7 @@ suites:
     attributes:
       opennms:
         version: 28.0.1-1
+        excludes: centos-6.9
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -25898,6 +26035,7 @@ suites:
     attributes:
       opennms:
         version: 28.0.1-1
+        excludes: centos-6.9
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -26086,6 +26224,7 @@ suites:
     attributes:
       opennms:
         version: 28.0.1-1
+        excludes: centos-6.9
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -26274,6 +26413,7 @@ suites:
     attributes:
       opennms:
         version: 28.0.1-1
+        excludes: centos-6.9
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -26462,6 +26602,7 @@ suites:
     attributes:
       opennms:
         version: 28.0.1-1
+        excludes: centos-6.9
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -26650,6 +26791,7 @@ suites:
     attributes:
       opennms:
         version: 28.0.1-1
+        excludes: centos-6.9
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -26838,6 +26980,7 @@ suites:
     attributes:
       opennms:
         version: 28.0.1-1
+        excludes: centos-6.9
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -27026,6 +27169,7 @@ suites:
     attributes:
       opennms:
         version: 28.0.1-1
+        excludes: centos-6.9
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -27214,6 +27358,7 @@ suites:
     attributes:
       opennms:
         version: 28.0.1-1
+        excludes: centos-6.9
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -27402,6 +27547,7 @@ suites:
     attributes:
       opennms:
         version: 28.0.1-1
+        excludes: centos-6.9
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -27590,6 +27736,7 @@ suites:
     attributes:
       opennms:
         version: 28.0.1-1
+        excludes: centos-6.9
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -27805,6 +27952,7 @@ suites:
         upgrade: true
         postgresql:
           attempt_upgrade: true
+        excludes: centos-6.9
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -27993,6 +28141,7 @@ suites:
       opennms:
         version: 28.0.1-1
         templates: true
+        excludes: centos-6.9
     verifier:
       inspec_tests:
         - path: test/integration/default
