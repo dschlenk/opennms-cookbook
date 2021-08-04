@@ -3,8 +3,7 @@ name 'openjdk_java11'
 license 'Apache 2.0'
 version '0.1.0'
 
-depends 'java'
-chef_version      '>= 15.3'
+depends 'java', '= 8.4.0'
 
 source_url  'https://github.com/sous-chefs/java'
 issues_url  'https://github.com/sous-chefs/java/issues'
