@@ -3,33 +3,25 @@
 require 'kitchen'
 require 'cookstyle'
 require 'rubocop/rake_task'
-require 'foodcritic'
 require 'optparse'
 
 # # Style tests. cookstyle (rubocop) and Foodcritic
 namespace :style do
-  desc 'Run Ruby style checks'
-  RuboCop::RakeTask.new(:ruby)
-  RuboCop::RakeTask.new(:rubycorrect) do |task|
+  desc 'Run Chef and ruby style checks'
+  RuboCop::RakeTask.new(:cookstyle)
+  RuboCop::RakeTask.new(:correct) do |task|
     task.options = ['-a']
   end
-  RuboCop::RakeTask.new(:rubyconfig) do |task|
+  RuboCop::RakeTask.new(:config) do |task|
     task.options = ['--auto-gen-config']
   end
-  RuboCop::RakeTask.new(:rubycorrectconfig) do |task|
+  RuboCop::RakeTask.new(:correctconfig) do |task|
     task.options = ['--auto-gen-config', '-a']
-  end
-  desc 'Run Chef style checks'
-  FoodCritic::Rake::LintTask.new(:chef) do |t|
-    t.options = {
-      fail_tags: ['any'],
-      progress: true,
-    }
   end
 end
 
 desc 'Run all style checks'
-task style: ['style:chef', 'style:ruby']
+task style: ['style:cookstyle']
 
 namespace :integration do
   desc 'Run Test Kitchen with Vagrant'
