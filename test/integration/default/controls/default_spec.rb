@@ -3,12 +3,9 @@ describe 'opennms::default' do
   it 'installs opennms' do
     expect(package('opennms-core')).to be_installed
     expect(package('opennms-webapp-jetty')).to be_installed
-    if node['opennms']['version'].to_i >= 28
-      skip (package('opennms-docs')).to be_installed
-    else
+    if node['opennms']['version'].to_i < 28
       expect(package('opennms-docs')).to be_installed
     end
-
   end
 end
 describe service('opennms') do
