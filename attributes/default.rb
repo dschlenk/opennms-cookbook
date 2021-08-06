@@ -1881,7 +1881,10 @@ default['opennms']['vacuumd']['automations']['create_critical_ticket']          
 default['opennms']['vacuumd']['automations']['update_tickets']                     = true
 default['opennms']['vacuumd']['automations']['close_cleared_alarm_tickets']        = true
 default['opennms']['vacuumd']['automations']['clear_alarms_for_closed_tickets']    = true
-default['opennms']['vacuumd']['automations']['clean_up_rp_status_changes']         = false # change for version 27
+default['opennms']['vacuumd']['automations']['clean_up_rp_status_changes']         = true
+if node['opennms']['version'].to_i == 27 then
+  default['opennms']['vacuumd']['automations']['clean_up_rp_status_changes']       = false # change for version 27
+end
 default['opennms']['vacuumd']['automations']['maintenance_check']                  = false
 default['opennms']['vacuumd']['automations']['access_points_table']                = false
 default['opennms']['vacuumd']['triggers']['select_closed_ticket_state_for_problem_alarms'] = true
@@ -1914,6 +1917,9 @@ default['opennms']['vacuumd']['actions']['clear_closed_ticket_alarms']          
 default['opennms']['vacuumd']['actions']['delete_purgeable_statistics_reports']  = true
 default['opennms']['vacuumd']['actions']['do_nothing_action']                    = true
 default['opennms']['vacuumd']['actions']['clean_up_rp_status_changes']           = true
+if node['opennms']['version'].to_i == 28 then
+  default['opennms']['vacuumd']['actions']['clean_up_rp_status_changes']        = false # change for version 28
+end
 default['opennms']['vacuumd']['actions']['maintenance_expiration_warning']       = false
 default['opennms']['vacuumd']['actions']['access_points_table']                  = false
 default['opennms']['vacuumd']['actions']['clear_path_outages']                   = true
