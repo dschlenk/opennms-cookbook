@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 describe 'opennms::default' do
   it 'installs opennms' do
+    let(:node) { json('/tmp/kitchen/dna.json').params }
     expect(package('opennms-core')).to be_installed
     expect(package('opennms-webapp-jetty')).to be_installed
     if (node['opennms']['version'].to_i < 28) then
