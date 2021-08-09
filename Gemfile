@@ -3,7 +3,7 @@ source 'https://rubygems.org'
 
 gem 'java_properties'
 gem 'rest-client'
-gem 'rake'
+gem 'rake', '= 12.3.3'
 gem 'kitchen-inspec', '~> 0.23'
 gem 'cookstyle', '~> 2.1'
 gem 'foodcritic', '~> 12.3'
