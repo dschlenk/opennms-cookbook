@@ -35,10 +35,10 @@ GEM
     celluloid-io (0.16.2)
       celluloid (>= 0.16.0)
       nio4r (>= 1.1.0)
-    chef (14.15.6)
+    chef (13.12.14)
       addressable
       bundler (>= 1.10)
-      chef-config (= 14.15.6)
+      chef-config (= 13.12.14)
       chef-zero (>= 13.0, < 15.0)
       diff-lcs (~> 1.2, >= 1.2.4)
       erubis (~> 2.7)
@@ -65,10 +65,10 @@ GEM
       specinfra (~> 2.10)
       syslog-logger (~> 1.6)
       uuidtools (~> 2.1.5)
-    chef (14.15.6-universal-mingw32)
+    chef (13.12.14-universal-mingw32)
       addressable
       bundler (>= 1.10)
-      chef-config (= 14.15.6)
+      chef-config (= 13.12.14)
       chef-zero (>= 13.0, < 15.0)
       diff-lcs (~> 1.2, >= 1.2.4)
       erubis (~> 2.7)
@@ -110,7 +110,7 @@ GEM
     chef-api (0.8.0)
       logify (~> 0.1)
       mime-types
-    chef-config (14.15.6)
+    chef-config (13.12.14)
       addressable
       fuzzyurl
       mixlib-config (>= 2.2.12, < 4.0)
