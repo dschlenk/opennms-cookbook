@@ -50,7 +50,6 @@ when '28'
   template_dir = 'horizon-28/'
 end
 
-
 if Opennms::Helpers.major(node['opennms']['version']).to_i >= 22
   node.default['opennms']['datacollection']['default']['ref_cpq_im'] = true
   node.default['opennms']['datacollection']['default']['ref_mib2_if'] = true
@@ -156,4 +155,3 @@ cookbook_file "patch #{onms_home}/bin/opennms" do
   group 'root'
   only_if { node['opennms']['version'] == '26.2.1-1' || node['opennms']['version'] == '26.2.2-1' }
 end
-

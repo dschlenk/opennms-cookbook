@@ -8,4 +8,3 @@ depends 'java', '= 8.4.0'
 depends 'seven_zip', '= 3.2.0'
 depends 'line', '= 2.9.3'
 
-

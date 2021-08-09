@@ -19,6 +19,6 @@ end
 cookbook_file 'jetty-25.xml' do
   path '/opt/opennms/etc/jetty.xml'
   notifies :restart, 'service[opennms]'
-  only_if {mv >= 20 && mv <= 25 }
+  only_if { mv >= 20 && mv <= 25 }
 end
 # see default attributes file for other configuration changes made to the web server
