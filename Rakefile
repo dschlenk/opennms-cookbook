@@ -9,9 +9,6 @@ require 'optparse'
 # # Style tests. cookstyle (rubocop) and Foodcritic
 namespace :style do
   desc 'Run Ruby style checks'
-  RuboCop::RakeTask.new(:rubocop_debug) do |t|
-    t.options = ['-d']
-  end
   RuboCop::RakeTask.new(:ruby)
   RuboCop::RakeTask.new(:rubycorrect) do |task|
     task.options = ['-a']
