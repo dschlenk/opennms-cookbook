@@ -5,11 +5,9 @@ verifier:
 driver:
   name: vagrant
   network:
-    - ["forwarded_port", {guest: 8000, host: 9000, auto_correct: true}]
-    - ["forwarded_port", {guest: 3200, host: 3200, auto_correct: true}]
-    - ["forwarded_port", {guest: 9300, host: 9300, auto_correct: true}]
-  usable_port_range:
-    - [8000..8999]
+    - ["forwarded_port", {guest: 8980, host: 8980, auto_correct: true}]
+    - ["forwarded_port", {guest: 3000, host: 3000, auto_correct: true}]
+    - ["forwarded_port", {guest: 9200, host: 9200, auto_correct: true}]
   customize:
     memory: 2048
 
