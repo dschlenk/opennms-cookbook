@@ -10,7 +10,6 @@ driver:
     - ["forwarded_port", {guest: 9200, host: 9200, auto_correct: true}]
   customize:
     memory: 2048
-
 provisioner:
   name: chef_zero
   product_version: 14.13.11
