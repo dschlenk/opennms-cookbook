@@ -295,21 +295,6 @@ suites:
       inspec_tests:
         - path: test/integration/default
         - path: test/integration/dashlet_update
-  - name: delete_imported_node_28
-    run_list:
-      - recipe[yum-centos-ct::default]
-      - recipe[opennms::postgres]
-      - recipe[openjdk_java11::default]
-      - recipe[opennms::default]
-      - recipe[onms_lwrp_test::delete_imported_node]
-    attributes:
-      opennms:
-        version: 28.0.1-1
-    excludes: centos-6.9
-    verifier:
-      inspec_tests:
-        - path: test/integration/default
-        - path: test/integration/delete_imported_node
   - name: destination_path_28
     run_list:
       - recipe[yum-centos-ct::default]
