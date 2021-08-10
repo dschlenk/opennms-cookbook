@@ -40,21 +40,6 @@ platforms:
           xml: true
           nsclient: true
 suites:
-  - name: disco_specific_28
-    run_list:
-      - recipe[yum-centos-ct::default]
-      - recipe[opennms::postgres]
-      - recipe[openjdk_java11::default]
-      - recipe[opennms::default]
-      - recipe[onms_lwrp_test::disco_specific]
-    attributes:
-      opennms:
-        version: 28.0.1-1
-    excludes: centos-6.9
-    verifier:
-      inspec_tests:
-        - path: test/integration/default
-        - path: test/integration/disco_specific
   - name: disco_url_28
     run_list:
       - recipe[yum-centos-ct::default]
