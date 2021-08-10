@@ -6,8 +6,8 @@ driver:
   name: vagrant
   network:
     - ["forwarded_port", {guest: 8000, host: 9000, auto_correct: true}]
-    - ["forwarded_port", {guest: 3000, host: 3000, auto_correct: true}]
-    - ["forwarded_port", {guest: 9200, host: 9200, auto_correct: true}]
+    - ["forwarded_port", {guest: 3200, host: 3200, auto_correct: true}]
+    - ["forwarded_port", {guest: 9300, host: 9300, auto_correct: true}]
   usable_port_range:
     - [8000..8999]
   customize:
@@ -40,6 +40,21 @@ platforms:
           xml: true
           nsclient: true
 suites:
+  - name: disco_specific_28
+    run_list:
+      - recipe[yum-centos-ct::default]
+      - recipe[opennms::postgres]
+      - recipe[openjdk_java11::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::disco_specific]
+    attributes:
+      opennms:
+        version: 28.0.1-1
+    excludes: centos-6.9
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/disco_specific
   - name: disco_url_28
     run_list:
       - recipe[yum-centos-ct::default]
