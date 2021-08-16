@@ -45,7 +45,7 @@ default['build-essential']['compile_time'] = true
 default['opennms']['start_opts'] = ''
 # set to '' if you want to re-enable OOTB behavior (but you should not do this if using any of the opennms resources)
 default['opennms']['timeout_start_sec'] = '10min'
-default['opennms']['version'] = '28.0.1-1'
+default['opennms']['version'] = '28.0.2-1'
 # default['opennms']['version_major'] = "%{version}"
 default['opennms']['allow_downgrade'] = false
 default['opennms']['stable'] = true
