@@ -969,7 +969,7 @@
     <url-pattern>/admin/deleteNodes</url-pattern>
   </servlet-mapping>
   <servlet-mapping>
-    <servlet-name>deleteIntrface</servlet-name>
+    <servlet-name>deleteInterface</servlet-name>
     <url-pattern>/admin/deleteInterface</url-pattern>
   </servlet-mapping>
   <servlet-mapping>
@@ -1202,32 +1202,32 @@
   <error-page>
     <exception-type>java.lang.SecurityException</exception-type>
     <location>/errors/sealingviolation.jsp</location>
-  </error-page>
-  <error-page>
-    <exception-type>org.opennms.web.controller.statisticsReports.StatisticsReportIdNotFoundException</exception-type>
-    <location>/errors/statisticsreportidnotfound.jsp</location>
-  </error-page>
-  <error-page>
-    <exception-type>org.opennms.netmgt.events.api.EventProxyException</exception-type>
-    <location>/errors/eventproxyexception.jsp</location>
-  </error-page>
-  <error-page>
-    <exception-type>org.opennms.web.admin.nodeManagement.NoManagedInterfacesException</exception-type>
-    <location>/errors/nomanagedinterfaces.jsp</location>
-  </error-page>
-  <error-page>
-    <error-code>500</error-code>
-    <location>/errors/unknownexception.jsp</location>
-  </error-page>
-  <error-page>
-    <error-code>404</error-code>
-    <location>/errors/pagenotfound.jsp</location>
-  </error-page>
+</error-page>
+<error-page>
+<exception-type>org.opennms.web.controller.statisticsReports.StatisticsReportIdNotFoundException</exception-type>
+<location>/errors/statisticsreportidnotfound.jsp</location>
+</error-page>
+<error-page>
+<exception-type>org.opennms.netmgt.events.api.EventProxyException</exception-type>
+<location>/errors/eventproxyexception.jsp</location>
+</error-page>
+<error-page>
+<exception-type>org.opennms.web.admin.nodeManagement.NoManagedInterfacesException</exception-type>
+<location>/errors/nomanagedinterfaces.jsp</location>
+</error-page>
+<error-page>
+<error-code>500</error-code>
+<location>/errors/unknownexception.jsp</location>
+</error-page>
+<error-page>
+<error-code>404</error-code>
+<location>/errors/pagenotfound.jsp</location>
+</error-page>
 
   <!-- the welcome-file elements need to point at a file that exists or
        a non-wildcard url-pattern in a servlet-mapping element. -->
-  <welcome-file-list>
-    <welcome-file>frontPage.jsp</welcome-file>
-  </welcome-file-list>
+<welcome-file-list>
+<welcome-file>frontPage.jsp</welcome-file>
+</welcome-file-list>
 
-</web-app>
+  </web-app>
