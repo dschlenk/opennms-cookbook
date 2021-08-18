@@ -3,40 +3,32 @@
 require 'kitchen'
 require 'cookstyle'
 require 'rubocop/rake_task'
-require 'foodcritic'
 require 'optparse'
 
 # # Style tests. cookstyle (rubocop) and Foodcritic
 namespace :style do
-  desc 'Run Ruby style checks'
-  RuboCop::RakeTask.new(:ruby)
-  RuboCop::RakeTask.new(:rubycorrect) do |task|
+  desc 'Run Chef and ruby style checks'
+  RuboCop::RakeTask.new(:cookstyle)
+  RuboCop::RakeTask.new(:correct) do |task|
     task.options = ['-a']
   end
-  RuboCop::RakeTask.new(:rubyconfig) do |task|
+  RuboCop::RakeTask.new(:config) do |task|
     task.options = ['--auto-gen-config']
   end
-  RuboCop::RakeTask.new(:rubycorrectconfig) do |task|
+  RuboCop::RakeTask.new(:correctconfig) do |task|
     task.options = ['--auto-gen-config', '-a']
-  end
-  desc 'Run Chef style checks'
-  FoodCritic::Rake::LintTask.new(:chef) do |t|
-    t.options = {
-      fail_tags: ['any'],
-      progress: true,
-    }
   end
 end
 
 desc 'Run all style checks'
-task style: ['style:chef', 'style:ruby']
+task style: ['style:cookstyle']
 
 namespace :integration do
   desc 'Run Test Kitchen with Vagrant'
   task :vagrant do
     options = {
-      versions: %w(27),
-      platforms: %w(centos-6.9),
+      versions: %w(16 17 18 19 20 21 22 23 24 25 26 27 28),
+      platforms: %w(centos-69 centos-7),
     }
     opts = OptionParser.new
     opts.banner = 'Usage: rake integration:vagrant [options]'
@@ -99,7 +91,7 @@ namespace :integration do
           old_instance = instance
         end
         # to improve the odds it actually destroys properly, rename it back to original
-        if File.exist?(".kitchen/#{old_instance.name}.yml")
+        if !old_instance.nil? && File.exist?(".kitchen/#{old_instance.name}.yml")
           puts "Done with #{ver} on #{plat}. Moving #{old_instance.name}.yml to #{first_instance.name}.yml before destroying."
           File.rename(".kitchen/#{old_instance.name}.yml", ".kitchen/#{first_instance.name}.yml")
           first_instance.destroy
