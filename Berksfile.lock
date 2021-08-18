@@ -66,6 +66,6 @@ GRAPH
     windows (>= 0.0.0)
   snmp (0.1.0)
   windows (7.0.2)
-  yum (6.1.1)
+  yum (7.0.0)
   yum-centos-ct (0.1.0)
   yum-epel (4.1.3)

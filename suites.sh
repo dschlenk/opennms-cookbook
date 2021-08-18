@@ -6,7 +6,7 @@ echo ""
 echo "driver:"
 echo "  name: vagrant"
 echo "  network:"
-echo "    - [\"forwarded_port\", {guest: 8980, host: 8980, auto_correct: true}]"
+echo "    - [\"forwarded_port\", {guest: 8980, host: 8980, auto_correct: false}]"
 echo "    - [\"forwarded_port\", {guest: 3000, host: 3000, auto_correct: false}]"
 echo "    - [\"forwarded_port\", {guest: 9200, host: 9200, auto_correct: false}]"
 echo "  customize:"
@@ -39,8 +39,8 @@ echo "        plugin:"
 echo "          xml: true"
 echo "          nsclient: true"
 echo "suites:"
-VERSIONS=(16.0.4-1 17.1.1-1 18.0.4-1 19.1.0-1 20.1.0-1 21.1.0-1 22.0.4-1 23.0.4-1 24.1.3-1 25.2.1-1 26.2.2-1 27.2.0-1 28.0.1-1)
-STABLE_VERSION=(28.0.1-1)
+VERSIONS=(16.0.4-1 17.1.1-1 18.0.4-1 19.1.0-1 20.1.0-1 21.1.0-1 22.0.4-1 23.0.4-1 24.1.3-1 25.2.1-1 26.2.2-1 27.2.0-1 28.0.2-1)
+STABLE_VERSION=(28.0.2-1)
 SUITES=$(ls test/fixtures/cookbooks/onms_lwrp_test/recipes/)
 SUITES+=('default')
 SUITES+=('templates')
