@@ -91,7 +91,7 @@ namespace :integration do
           old_instance = instance
         end
         # to improve the odds it actually destroys properly, rename it back to original
-        if File.exist?(".kitchen/#{old_instance.name}.yml")
+        if !old_instance.nil? && File.exist?(".kitchen/#{old_instance.name}.yml")
           puts "Done with #{ver} on #{plat}. Moving #{old_instance.name}.yml to #{first_instance.name}.yml before destroying."
           File.rename(".kitchen/#{old_instance.name}.yml", ".kitchen/#{first_instance.name}.yml")
           first_instance.destroy
