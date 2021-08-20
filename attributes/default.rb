@@ -45,12 +45,17 @@ default['build-essential']['compile_time'] = true
 default['opennms']['start_opts'] = ''
 # set to '' if you want to re-enable OOTB behavior (but you should not do this if using any of the opennms resources)
 default['opennms']['timeout_start_sec'] = '10min'
-default['opennms']['version'] = '27.2.0-1'
+default['opennms']['version'] = '28.0.2-1'
+default['java']['version'] = '11'
 # default['opennms']['version_major'] = "%{version}"
 default['opennms']['allow_downgrade'] = false
 default['opennms']['stable'] = true
 # whether or not to attempt to automatically upgrade opennms
 default['opennms']['upgrade'] = false
+# version 28 and up need upgrade java version to javajdk-11
+if node['opennms']['version'].to_i > 27
+  default['opennms']['upgrade'] = true
+end
 default['opennms']['upgrade_dirs'] = [
   'etc',
   'etc/datacollection',

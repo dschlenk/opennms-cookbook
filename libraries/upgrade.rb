@@ -8,6 +8,7 @@ module Opennms
       upgraded = false
       onms_home = node['opennms']['conf']['home']
       onms_home ||= '/opt/opennms'
+      major_version = Opennms::Helpers.major(node['opennms']['version']).to_i
 
       node['opennms']['upgrade_dirs'].each do |d|
         conf_dir = "#{onms_home}/#{d}"
@@ -28,7 +29,6 @@ module Opennms
         restore("#{node['opennms']['conf']['home']}/etc/users.xml")
         # also, if upgrading from 18 or lower to something higher, need to move the rtc user into this file
         # and make sure admin has the right role
-        major_version = Opennms::Helpers.major(node['opennms']['version']).to_i
         if major_version >= 19
           uf = ::File.new("#{node['opennms']['conf']['home']}/etc/users.xml", 'r')
           udoc = REXML::Document.new uf
@@ -102,10 +102,18 @@ module Opennms
           Opennms::Helpers.write_xml_file(udoc, "#{node['opennms']['conf']['home']}/etc/users.xml")
         end
 
-        unless ::File.exist?("#{onms_home}/etc/java.conf")
+        # Java upgrade for version >= 28. We need to update the java.conf
+        Chef::Log.info 'If version >= 28. We need to update java version to javajdk-11'
+        if major_version > 27
+          # Need to give the Read write permission to java.conf file first
+          File.chmod(0770,"#{onms_home}/etc/java.conf")
           shell_out!("#{onms_home}/bin/runjava -s", returns: [0])
+        else
+          unless ::File.exist?("#{onms_home}/etc/java.conf")
+            shell_out!("#{onms_home}/bin/runjava -s", returns: [0])
+          end
         end
-
+        
         unless ::File.exist?("#{onms_home}/etc/configured")
           shell_out!("#{onms_home}/bin/install -dis", returns: [0])
         end
