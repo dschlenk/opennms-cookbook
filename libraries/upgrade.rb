@@ -106,18 +106,18 @@ module Opennms
         Chef::Log.info 'If version >= 28. We need to update java version to javajdk-11'
         if major_version > 27
           # Need to give the Read write permission to java.conf file first
-          File.chmod(0770,"#{onms_home}/etc/java.conf")
+          File.chmod(0770, "#{onms_home}/etc/java.conf")
           shell_out!("#{onms_home}/bin/runjava -s", returns: [0])
         else
           unless ::File.exist?("#{onms_home}/etc/java.conf")
             shell_out!("#{onms_home}/bin/runjava -s", returns: [0])
           end
         end
-        
+
         unless ::File.exist?("#{onms_home}/etc/configured")
           shell_out!("#{onms_home}/bin/install -dis", returns: [0])
         end
-
+        
         # stop current service until we have important things reconverged
         shell_out("#{onms_home}/bin/opennms stop", returns: [0])
         Chef::Log.info 'All *.rpmnew and *.rpmsave files moved into place.'
