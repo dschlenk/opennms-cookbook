@@ -120,7 +120,7 @@ opennms_event 'uei.opennms.org/anUeiForANewThingInANewFile' do
   notifies :run, 'opennms_send_event[restart_Eventd]'
 end
 
-#Test position top and eventconf_position top
+# Test position top and eventconf_position top
 opennms_event 'uei.opennms.org/anUeiForANewThingInANewFileWithPositionTop' do
   file 'events/chef3.events.xml'
   position 'top'
