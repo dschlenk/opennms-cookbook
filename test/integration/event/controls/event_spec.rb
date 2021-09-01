@@ -101,7 +101,7 @@ control 'event' do
     its('logmsg_dest') { should eq 'logndisplay' }
     its('logmsg_notify') { should be true }
     its('severity') { should eq 'Minor' }
-    its('alarm_data') { should eq('reduction_key' => '%uei%:%dpname%:%nodeid%:%interface%:%parm[ds]%:%parm[threshold]%:%parm[trigger]%:%parm[rearm]%:%parm[label]%',  'alarm_type' => 1, 'auto_clean' => false) }
+    its('alarm_data') { should eq('reduction_key' => '%uei%:%dpname%:%nodeid%:%interface%:%parm[ds]%:%parm[threshold]%:%parm[trigger]%:%parm[rearm]%:%parm[label]%', 'alarm_type' => 1, 'auto_clean' => false) }
   end
 
   describe eventconf('chef3.events.xml') do
@@ -110,3 +110,4 @@ control 'event' do
     its('position') { should be <= 3 }
   end
 end
+
