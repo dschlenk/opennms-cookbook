@@ -106,8 +106,7 @@ control 'event' do
 
   describe eventconf('chef3.events.xml') do
     it { should exist }
-    # 20+ is position 3
+    # 20+ is position
     its('position') { should be <= 3 }
   end
 end
-
