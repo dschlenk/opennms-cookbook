@@ -94,8 +94,8 @@ def create_event_file
   doc = REXML::Document.new
   doc << REXML::XMLDecl.new
   event_el = doc.add_element 'events'
-  event_el.add_namespace('http://xmlns.opennms.org/xsd/eventconf')
   event_el.add_element 'event'
+  event_el = doc.root.elements['/events/event']
   createOrUpdateEvent(updating, event_el)
   Opennms::Helpers.write_xml_file(doc, "#{node['opennms']['conf']['home']}/etc/#{new_resource.file}")
   add_file_to_eventconf(new_resource.file, new_resource.eventconf_position, node)
