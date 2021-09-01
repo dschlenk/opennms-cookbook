@@ -96,7 +96,7 @@ def create_event_file
   event_el = doc.add_element 'events'
   event_el.add_element 'event'
   event_el = doc.root.elements['/events/event']
-  createOrUpdateEvent(updating, event_el)
+  create_or_update_event(updating, event_el)
   Opennms::Helpers.write_xml_file(doc, "#{node['opennms']['conf']['home']}/etc/#{new_resource.file}")
   add_file_to_eventconf(new_resource.file, new_resource.eventconf_position, node)
   @current_resource.exists = true
@@ -127,12 +127,12 @@ def create_event
     updating = true
   end
 
-  createOrUpdateEvent(updating, event_el)
+  create_or_update_event(updating, event_el)
   Chef::Log.debug("Converged event_el for #{new_resource}: #{event_el}")
   Opennms::Helpers.write_xml_file(doc, "#{node['opennms']['conf']['home']}/etc/#{new_resource.file}")
 end
 
-def createOrUpdateEvent (updating, event_el)
+def create_or_update_event(updating, event_el)
   Chef::Log.debug "Updating #{new_resource}? #{updating}"
 
   uei = new_resource.uei || new_resource.name
