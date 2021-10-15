@@ -69,11 +69,6 @@
                 action-name="clearPathOutages" />
     <% end -%>
 
-    <% if @automations[:clean_up_rp_status_changes] -%>
-    <automation name="cleanUpRpStatusChanges" interval="600000" active="true" 
-                action-name="cleanUpRpStatusChanges" />
-    <% end -%>
-    
     <!-- Enable these automation for monitoring maintenance contracts -->
     <% if !@automations[:maintenance_check] -%>
     <!--
@@ -154,21 +149,6 @@
         UPDATE node
            SET nodeid = -1
          WHERE nodeid = -1
-      </statement>
-    </action>
-    <% end -%>
-
-    <% if @actions[:clean_up_rp_status_changes] -%>
-    <action name="cleanUpRpStatusChanges">
-      <statement>
-        <!-- Remove expired locations specific status changes -->
-        DELETE 
-          FROM location_specific_status_changes
-         WHERE (systemid, ifserviceid, id) 
-        NOT IN (SELECT systemid, ifserviceid, max(id) 
-                  FROM location_specific_status_changes 
-              GROUP BY systemid, ifserviceid)
-           AND statustime &lt; now() - interval '24 hours'
       </statement>
     </action>
     <% end -%>
