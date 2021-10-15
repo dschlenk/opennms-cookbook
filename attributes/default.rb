@@ -1913,7 +1913,7 @@ default['opennms']['vacuumd']['actions']['clear_problems']                      
 default['opennms']['vacuumd']['actions']['clear_closed_ticket_alarms']           = true
 default['opennms']['vacuumd']['actions']['delete_purgeable_statistics_reports']  = true
 default['opennms']['vacuumd']['actions']['do_nothing_action']                    = true
-default['opennms']['vacuumd']['actions']['clean_up_rp_status_changes'] = true
+default['opennms']['vacuumd']['actions']['clean_up_rp_status_changes']           = true
 default['opennms']['vacuumd']['actions']['maintenance_expiration_warning']       = false
 default['opennms']['vacuumd']['actions']['access_points_table']                  = false
 default['opennms']['vacuumd']['actions']['clear_path_outages']                   = true
