@@ -52,10 +52,6 @@ default['opennms']['allow_downgrade'] = false
 default['opennms']['stable'] = true
 # whether or not to attempt to automatically upgrade opennms
 default['opennms']['upgrade'] = false
-# version 28 and up need upgrade java version to javajdk-11
-if node['opennms']['version'].to_i > 27
-  default['opennms']['upgrade'] = true
-end
 default['opennms']['upgrade_dirs'] = [
   'etc',
   'etc/datacollection',

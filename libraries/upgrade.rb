@@ -134,7 +134,6 @@ module Opennms
         unless ::File.exist?("#{onms_home}/etc/configured")
           shell_out!("#{onms_home}/bin/install -dis", returns: [0])
         end
-        
         # stop current service until we have important things reconverged
         shell_out("#{onms_home}/bin/opennms stop", returns: [0])
         Chef::Log.info 'All *.rpmnew and *.rpmsave files moved into place.'
