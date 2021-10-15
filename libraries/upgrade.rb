@@ -34,7 +34,7 @@ module Opennms
           udoc = REXML::Document.new uf
           uf.close
 
-          u_rtc = udoc.elements["/userinfo/users/user/user-id[text() = 'rtc']"]
+          u_rtc = udoc.elements["/userinfo/users/user[user-id[text() = 'rtc']]"]
           if u_rtc.nil?
             Chef::Log.debug 'adding rtc user since we must have been upgrading from < 18 to something >= 18'
             users_el = udoc.elements['/userinfo/users']
@@ -55,25 +55,42 @@ module Opennms
                 Chef::Log.debug 'adding uppercase MD5 rtc password since < 26'
                 rtc_pw_el.add_text '68154466F81BFB532CD70F8C71426356'
               end
+              rtc_r_el = rtc_el.add_element 'role'
+              rtc_r_el.add_text 'ROLE_RTC'
             else
               Chef::Log.warn 'You do not have a users element in users.xml, which is pretty bad!?!'
+            end
+          elsif u_rtc.elements["role[text() = 'ROLE_RTC']"].nil?
+            Chef::Log.debug 'rtc user missing ROLE_RTC role, adding'
+            rtc_role_el = REXML::Element.new('role')
+            rtc_role_el.add_text 'ROLE_RTC'
+            if u_rtc.elements['role'].nil?
+              Chef::Log.debug 'rtc has no role element at all, adding it'
+              sib_el = u_rtc.elements['duty-schedule']
+              sib_el = u_rtc.elements['contact'] if sib_el.nil?
+              sib_el = u_rtc.elements['password'] if sib_el.nil?
+              u_rtc.insert_after(sib_el, rtc_role_el)
+            else
+              Chef::Log.debug 'rtc has other roles, adding after last role'
+              u_rtc.insert_after(u_rtc.elements['role[last()]'], rtc_role_el)
             end
           end
           u_admin = udoc.elements["/userinfo/users/user[user-id[text() = 'admin']]"]
           if !u_admin.nil?
-            u_admin.elements["role[text() = 'ROLE_ADMIN']"]
-            Chef::Log.debug 'admin user missing ROLE_ADMIN role, adding'
-            admin_role_el = REXML::Element.new('role')
-            admin_role_el.add_text 'ROLE_ADMIN'
-            if u_admin.elements['role'].nil?
-              Chef::Log.debug 'admin has no role element at all, adding it'
-              sib_el = u_admin.elements['duty-schedule']
-              sib_el = u_admin.elements['contact'] if sib_el.nil?
-              sib_el = u_admin.elements['password'] if sib_el.nil?
-              u_admin.insert_after(sib_el, admin_role_el)
-            else
-              Chef::Log.debug 'admin has other roles, adding after last role'
-              u_admin.insert_after(u_admin.elements['role[last()]'], admin_role_el)
+            if u_admin.elements["role[text() = 'ROLE_ADMIN']"].nil?
+              Chef::Log.debug 'admin user missing ROLE_ADMIN role, adding'
+              admin_role_el = REXML::Element.new('role')
+              admin_role_el.add_text 'ROLE_ADMIN'
+              if u_admin.elements['role'].nil?
+                Chef::Log.debug 'admin has no role element at all, adding it'
+                sib_el = u_admin.elements['duty-schedule']
+                sib_el = u_admin.elements['contact'] if sib_el.nil?
+                sib_el = u_admin.elements['password'] if sib_el.nil?
+                u_admin.insert_after(sib_el, admin_role_el)
+              else
+                Chef::Log.debug 'admin has other roles, adding after last role'
+                u_admin.insert_after(u_admin.elements['role[last()]'], admin_role_el)
+              end
             end
           else
             Chef::Log.debug 'somehow you do not have an admin user, adding one'
