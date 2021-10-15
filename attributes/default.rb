@@ -997,7 +997,6 @@ default['opennms']['log4j2']['notifd'] = 'WARN'
 default['opennms']['log4j2']['oss_qosd'] = 'WARN'
 default['opennms']['log4j2']['oss_qosdrx'] = 'WARN'
 default['opennms']['log4j2']['passive'] = 'WARN'
-default['opennms']['log4j2']['passive'] = 'WARN'
 default['opennms']['log4j2']['perspective_pollerd'] = 'WARN'
 default['opennms']['log4j2']['poller'] = 'WARN'
 default['opennms']['log4j2']['provisiond'] = 'WARN'
@@ -1882,7 +1881,7 @@ default['opennms']['vacuumd']['automations']['create_critical_ticket']          
 default['opennms']['vacuumd']['automations']['update_tickets']                     = true
 default['opennms']['vacuumd']['automations']['close_cleared_alarm_tickets']        = true
 default['opennms']['vacuumd']['automations']['clear_alarms_for_closed_tickets']    = true
-default['opennms']['vacuumd']['automations']['clean_up_rp_status_changes'] = true
+default['opennms']['vacuumd']['automations']['clean_up_rp_status_changes']         = true
 default['opennms']['vacuumd']['automations']['maintenance_check']                  = false
 default['opennms']['vacuumd']['automations']['access_points_table']                = false
 default['opennms']['vacuumd']['triggers']['select_closed_ticket_state_for_problem_alarms'] = true
