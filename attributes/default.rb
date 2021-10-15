@@ -478,11 +478,6 @@ default['opennms']['properties']['alarmlist']['unackflash'] = false
 default['opennms']['properties']['rest_aliases'] = '/rest,/api/v2'
 default['opennms']['properties']['maxFlowAgeSeconds'] = nil
 default['opennms']['properties']['ingressAndEgressRequired'] = false
-# access point monitor
-default['opennms']['apm']['threads']           = 30
-default['opennms']['apm']['pscan_interval']    = 1_800_000
-default['opennms']['apm']['aruba_enabled']     = true
-default['opennms']['apm']['moto_enabled']      = true
 # database reports - availability
 default['opennms']['db_reports']['avail']['cal']['logo']                    = "#{onms_home}/etc/reports/logo.gif"
 default['opennms']['db_reports']['avail']['classic']['logo']                = "#{onms_home}/etc/reports/logo.gif"
