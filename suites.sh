@@ -89,7 +89,6 @@ for f in ${SUITES[@]}; do
     $(fgrep -q "  - name: ${recipe}_${v%%.*-1}" .kitchen.yml)
     if [ "$?" != "0" ]; then
       if [[ $recipe == wsman* ]] && [[ ${v%%.*-1} == 16 ]]; then
-        #echo "skipping wsman suite for recipe $recipe version $v" > /dev/stderr
         continue
       fi
       echo "  - name: ${recipe}_${v%%.*-1}"
