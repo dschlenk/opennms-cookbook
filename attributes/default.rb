@@ -478,6 +478,7 @@ default['opennms']['properties']['alarmlist']['unackflash'] = false
 default['opennms']['properties']['rest_aliases'] = '/rest,/api/v2'
 default['opennms']['properties']['maxFlowAgeSeconds'] = nil
 default['opennms']['properties']['ingressAndEgressRequired'] = false
+default['opennms']['properties']['search_info'] = nil
 # database reports - availability
 default['opennms']['db_reports']['avail']['cal']['logo']                    = "#{onms_home}/etc/reports/logo.gif"
 default['opennms']['db_reports']['avail']['classic']['logo']                = "#{onms_home}/etc/reports/logo.gif"

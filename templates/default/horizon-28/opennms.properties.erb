@@ -757,45 +757,6 @@ org.opennms.security.disableLoginSuccessEvent=<%=@properties['ui']['disable_logi
 org.opennms.interfaceAvailabilityBox.maxInterfaceCount=<%=@properties['ui']['max_interface_count']%>
 <% end -%>
 
-###### REMOTE POLLER ######
-
-#### SERVER SETTINGS ####
-
-# This setting is the minimum amount of time between reloads of a remote poller configuration
-# in milliseconds because of global changes.  This value should never be set
-# less the 300000 (5 minutes) except to set it to zero which means never only reload the
-# configuration if the location monitors status has been set to CONFIG_CHANGED.
-#opennms.pollerBackend.minimumConfigurationReloadInterval=300000
-<% unless @properties['remote']['min_config_reload_int'].nil? -%>
-opennms.pollerBackend.minimumConfigurationReloadInterval=<%=@properties['remote']['min_config_reload_int']%> 
-<% end -%>
-#
-# This is the amount of time in milliseconds after which a remote poller is considered
-# disconnected if it has not communicated with this OpenNMS system.
-#opennms.pollerBackend.disconnectedTimeout=600000
-<% unless @properties['remote']['pb_disconnect_timeout'].nil? -%>
-opennms.pollerBackend.disconnectedTimeout=<%=@properties['remote']['pb_disconnect_timeout']%>
-<% end -%>
-#
-# Specify the RMI ports when using the legacy RMI IPC interface
-#opennms.poller.server.serverPort=1199
-<% unless @properties['remote']['pb_server_port'].nil? -%>
-opennms.poller.server.serverPort=<%=@properties['remote']['pb_server_port']%>
-<% end -%>
-#opennms.poller.server.registryPort=1099
-<% unless @properties['remote']['pb_registry_port'].nil? -%>
-opennms.poller.server.registryPort=<%=@properties['remote']['pb_registry_port']%>
-<% end -%>
-
-#### REMOTE SETTINGS ####
-
-# All settings on the remote pollers are controlled via command-line options. Look at these
-# wiki pages for more details.
-#
-# http://www.opennms.org/wiki/Remote_Polling
-# http://www.opennms.org/wiki/Remote_Poller_Design_Overview
-
-
 ###### JasperReports Properties ######
 # Defines the Version of the Jasperreports library
 org.opennms.jasperReportsVersion=<%=@properties['reporting']['jasper_version'] % {version: node['opennms']['version']}%>
@@ -814,6 +775,7 @@ net.sf.jasperreports.chart.pie.ignore.duplicated.key=true
 <% unless @properties['ui']['center_url'].nil? -%>
 org.opennms.web.console.centerUrl=<%=@properties['ui']['center_url']%>
 <% end -%>
+
 
 ###### DASHBOARD LANDING PAGE ######
 # This setting controls whether users will be redirected to the dashboard page after
@@ -1189,4 +1151,14 @@ org.opennms.features.telemetry.maxFlowAgeSeconds=<%=node['opennms']['properties'
 org.opennms.features.telemetry.ingressAndEgressRequired=<%=node['opennms']['properties']['ingressAndEgressRequired']%>
 <% end -%>
 
-
+# By default the central search shows only the found nodes and the corresponding matched field. This property
+# allows you to add an additional line where you can use any meta-data DSL expression.
+#
+# This example will display the node's sys-contact and the associated department:
+# org.opennms.netmgt.search.info=${node:sys-contact} (Department: ${asset:department})
+#
+# By default this property is not used and empty.
+# org.opennms.netmgt.search.info=
+<% if node['opennms']['properties']['search_info'] -%>
+org.opennms.netmgt.search.info=<%=node['opennms']['properties']['search_info'] %>
+<% end -%>
