@@ -1720,6 +1720,8 @@ default['opennms']['snmp_graph']['zeus']['enabled']      = true
 # snmp-interface-poller-configuration.xml
 default['opennms']['snmp_iface_poller']['threads']                               = 30
 default['opennms']['snmp_iface_poller']['service']                               = 'SNMP'
+default['opennms']['snmp_iface_poller']['upvalues']                               = 1
+default['opennms']['snmp_iface_poller']['downvalues']                               = 2
 # array of service names
 default['opennms']['snmp_iface_poller']['node_outage']                           = %w(ICMP SNMP)
 default['opennms']['snmp_iface_poller']['example1']['filter']                    = "IPADDR != '0.0.0.0'"

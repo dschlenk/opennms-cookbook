@@ -1886,7 +1886,9 @@ template "#{onms_home}/etc/snmp-interface-poller-configuration.xml" do
     threads: node['opennms']['snmp_iface_poller']['threads'],
     service: node['opennms']['snmp_iface_poller']['service'],
     node_outage: node['opennms']['snmp_iface_poller']['node_outage'],
-    example1: node['opennms']['snmp_iface_poller']['example1']
+    example1: node['opennms']['snmp_iface_poller']['example1'],
+    upvalues: node['opennms']['snmp_iface_poller']['upvalues'],
+    downvalues: node['opennms']['snmp_iface_poller']['downvalues']
   )
 end
 
