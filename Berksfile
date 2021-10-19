@@ -14,4 +14,5 @@ group :integration do
   cookbook 'opennms_helm'
   cookbook 'snmp', path: 'test/fixtures/cookbooks/snmp'
   cookbook 'hsflowd', path: 'test/fixtures/cookbooks/hsflowd'
+  cookbook 'lecert', path: 'test/fixtures/cookbooks/lecert'
 end

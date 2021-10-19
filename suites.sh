@@ -11,6 +11,7 @@ echo "    - [\"forwarded_port\", {guest: 3000, host: 3000, auto_correct: false}]
 echo "    - [\"forwarded_port\", {guest: 9200, host: 9200, auto_correct: false}]"
 echo "  customize:"
 echo "    memory: 2048"
+echo "  box_download_insecure: true" # because lets encrypt
 echo ""
 echo "provisioner:"
 echo "  name: chef_zero"
@@ -93,6 +94,7 @@ for f in ${SUITES[@]}; do
       fi
       echo "  - name: ${recipe}_${v%%.*-1}"
       echo "    run_list:"
+      echo "      - recipe[lecert::default]"
       echo "      - recipe[yum-centos-ct::default]"
       echo "      - recipe[opennms::postgres]"
       if [[ ${v%%.*-1} > 27 ]]; then
