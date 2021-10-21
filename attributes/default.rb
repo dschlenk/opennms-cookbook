@@ -45,7 +45,7 @@ default['build-essential']['compile_time'] = true
 default['opennms']['start_opts'] = ''
 # set to '' if you want to re-enable OOTB behavior (but you should not do this if using any of the opennms resources)
 default['opennms']['timeout_start_sec'] = '10min'
-default['opennms']['version'] = '28.0.2-1'
+default['opennms']['version'] = '28.1.1-1'
 default['java']['version'] = '11'
 # default['opennms']['version_major'] = "%{version}"
 default['opennms']['allow_downgrade'] = false
@@ -346,6 +346,8 @@ default['opennms']['properties']['ticket']['servicelayer']  = 'org.opennms.netmg
 default['opennms']['properties']['ticket']['plugin']        = 'org.opennms.netmgt.ticketd.NullTicketerPlugin'
 default['opennms']['properties']['ticket']['enabled']       = nil
 default['opennms']['properties']['ticket']['link_template'] = nil
+default['opennms']['properties']['ticket']['skip_create_when_cleared'] = false
+default['opennms']['properties']['ticket']['skip_close_when_not_cleared'] = false
 # Misc
 default['opennms']['properties']['misc']['layout_applications_vertically'] = false
 default['opennms']['properties']['misc']['webapp_logs_dir']                = '${install.logs.dir}'
@@ -416,6 +418,8 @@ default['opennms']['properties']['asterisk']['listen_port']    = nil
 default['opennms']['properties']['asterisk']['max_pool_size']  = nil
 # Provisioning
 default['opennms']['properties']['provisioning']['dns_server']                = '127.0.0.1'
+default['opennms']['properties']['provisioning']['dns_level']                 = nil
+default['opennms']['properties']['provisioning']['reverse_dns_level']         = nil
 default['opennms']['properties']['provisioning']['max_concurrent_xtn']        = nil
 default['opennms']['properties']['provisioning']['enable_discovery']          = nil
 default['opennms']['properties']['provisioning']['enable_deletions']          = nil

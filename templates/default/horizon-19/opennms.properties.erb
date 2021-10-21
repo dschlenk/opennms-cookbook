@@ -253,9 +253,15 @@ opennms.alarmTroubleTicketLinkTemplate = <%=@properties['ticket']['link_template
 
 # Enable this flag to ignore 'uei.opennms.org/troubleTicket/create' events against alarms with a severity of 'Cleared'
 #opennms.ticketer.skipCreateWhenCleared = true
+<% unless @properties['ticket']['skip_create_when_cleared'] -%>
+opennms.ticketer.skipCreateWhenCleared = false
+<% end -%>
 
 # Enable this flag to ignore 'uei.opennms.org/troubleTicket/close' events against alarms with a severity other than 'Cleared'
 #opennms.ticketer.skipCloseWhenNotCleared = true
+<% unless @properties['ticket']['skip_close_when_not_cleared'] -%>
+opennms.ticketer.skipCloseWhenNotCleared = false
+<% end -%>
 
 ###### MISCELLANEOUS ######
 
@@ -517,9 +523,26 @@ org.opennms.netmgt.collectd.SnmpCollector.limitCollectionToInstances=<%=@propert
 org.opennms.web.aclsEnabled=<%=@properties['ui']['acls']%>
 <% end -%>
 
+####### DNS and REVERS DNS ADAPTERS #########################
 # IP address of the DNS server that the DnsProvisioningAdapter
 # should send dynamic DNS updates to
 importer.adapter.dns.server=<%=@properties['provisioning']['dns_server']%>
+# dns level to use, by default the dns adapter 
+# uses the nodelabel in the form hostname.domainname 
+# the latest dot in the nodelabel is used to separate
+# hostname from domain name
+# set the following property to define 
+# the default level dns domain default is 0
+#
+# importer.adapter.dns.level=3
+<% if @properties['provisioning']['dns_level'] -%>
+importer.adapter.dns.level = <%=@properties['provisioning']['dns_level']%>
+<% end -%>
+# identical property for reverse dns domains
+# importer.adapter.dns.reverse.leveli=3
+<% if @properties['provisioning']['reverse_dns_level'] -%>
+importer.adapter.dns.reverse.level = <%=@properties['provisioning']['reverse_dns_level']%>
+<% end -%>
 
 
 
@@ -553,17 +576,6 @@ smslib.serial.polling=<%=@properties['sms']['polling']%>
 #org.opennms.provisiond.enableDiscovery=true
 <% unless @properties['provisioning']['enable_discovery'].nil? -%>
 org.opennms.provisiond.enableDiscovery=<%=@properties['provisioning']['enable_discovery']%>
-<% end -%>
-
-# Prior to 1.10 it was possible to delete entities that have been provisioned as
-# part of a provisioning group.  In 1.10 we have disabled this so that in order to
-# delete these entities you have to go back to the provisioning group and delete them
-# from there.  To reenable this deletion you can set this to true.
-# NOTE: if you do this then the object will be recreated when the provisioning group is
-# next imported/synchronized
-org.opennms.provisiond.enableDeletionOfRequisitionedEntities=true
-<% unless @properties['provisioning']['enable_deletions'].nil? -%>
-org.opennms.provisiond.enableDeletionOfRequisitionedEntities=<%=@properties['provisioning']['enable_deletions']%>
 <% end -%>
 
 # This property is used to control the rescan scheduling existing nodes in
@@ -793,6 +805,7 @@ excludeServiceMonitorsFromRemotePoller=<%=@properties['remote']['exclude_service
 #   rrd (default)
 #   newts
 #   evaluate (for sizing purposes only)
+#   tcp (export metrics using protobuf messages over TCP)
 #org.opennms.timeseries.strategy=rrd
 <% if node['opennms']['properties']['time_series']['strategy'] != 'rrd' -%>
 org.opennms.timeseries.strategy=<%=node['opennms']['properties']['time_series']['strategy']%>

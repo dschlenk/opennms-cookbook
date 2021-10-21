@@ -17,30 +17,19 @@ echo "provisioner:"
 echo "  name: chef_zero"
 echo "  product_version: 14.13.11"
 echo "  require_chef_omnibus: 14.13.11"
-echo ""
-echo "platforms:"
-echo "  - name: centos-6.9"
-echo "    attributes:"
-echo "      opennms:"
-echo "        templates: false"
-echo "        conf:"
-echo "          start_timeout: 50"
-echo "        stable: true"
-echo "        plugin:"
-echo "          xml: true"
-echo "          nsclient: true"
-echo "  - name: centos-7"
-echo "    attributes:"
-echo "      opennms:"
-echo "        templates: false"
-echo "        conf:"
-echo "          start_timeout: 50"
-echo "        stable: true"
-echo "        plugin:"
-echo "          xml: true"
-echo "          nsclient: true"
+echo "  attributes:"
+echo "    opennms:"
+echo "      upgrade: true"
+echo "      templates: false"
+echo "      conf:"
+echo "        start_timeout: 50"
+echo "      stable: true"
+echo "      plugin:"
+echo "        nsclient: true"
+echo "      postgresql:"
+echo "        attempt_upgrade: true"
 echo "suites:"
-VERSIONS=(16.0.4-1 17.1.1-1 18.0.4-1 19.1.0-1 20.1.0-1 21.1.0-1 22.0.4-1 23.0.4-1 24.1.3-1 25.2.1-1 26.2.2-1 27.2.0-1 28.0.2-1)
+VERSIONS=(16.0.4-1 17.1.1-1 18.0.4-1 19.1.0-1 20.1.0-1 21.1.0-1 22.0.4-1 23.0.4-1 24.1.3-1 25.2.1-1 26.2.2-1 27.2.0-1 28.1.1-1)
 STABLE_VERSION=(28.0.2-1)
 SUITES=$(ls test/fixtures/cookbooks/onms_lwrp_test/recipes/)
 SUITES+=('default')
@@ -123,14 +112,6 @@ for f in ${SUITES[@]}; do
       fi
       if [ "$recipe" == "templates" ]; then
         echo "        templates: true"
-      fi
-      if [ "$recipe" = "default" ]; then
-        echo "        upgrade: true"
-        echo "        postgresql:"
-        echo "          attempt_upgrade: true"
-      fi
-      if [[ ${v%%.*-1} > 27 ]]; then
-        echo "    excludes: centos-6.9"
       fi
       echo "    verifier:"
       echo "      inspec_tests:"

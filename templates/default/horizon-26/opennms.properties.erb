@@ -1199,3 +1199,7 @@ org.opennms.features.telemetry.ingressAndEgressRequired=<%=node['opennms']['prop
 <% end -%>
 
 
+<% unless @properties['jms_nbi']['broker_url'].nil? -%>
+# ###### Configure the ActiveMQ broker for the JMS Northbounder ######
+opennms.alarms.northbound.jms.activemq.brokerURL=<%=@properties['jms_nbi']['broker_url']%>
+<% end -%>

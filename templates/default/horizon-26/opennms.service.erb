@@ -2,16 +2,17 @@
 Description=OpenNMS server
 Wants=postgresql.service
 Requires=network.target network-online.target
-After=postgresql.service network.target network-online.target
+After=postgresql.service postgresql-10.service postgresql-11.service postgresql-12.service network.target network-online.target
 
 [Service]
 User=root
+Environment="OPENNMS_HOME=/opt/opennms"
 
 Type=forking
 PIDFile=/opt/opennms/logs/opennms.pid
 
-ExecStart=/opt/opennms/bin/opennms <%=@start_opts%> start
-ExecStop=/opt/opennms/bin/opennms stop
+ExecStart=/etc/init.d/opennms -s <%=@start_opts%> start
+ExecStop=/etc/init.d/opennms stop
 TimeoutStartSec=<%=@timeout_start_sec%>
 
 [Install]

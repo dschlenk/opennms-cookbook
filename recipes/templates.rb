@@ -106,11 +106,6 @@ template "#{onms_home}/etc/chart-configuration.xml" do
   )
 end
 
-if mv.to_i == 20
-  node.default['opennms']['collectd']['vmware3']['filter'] = "(IPADDR != '0.0.0.0') & (categoryName == 'VMware3')"
-  node.default['opennms']['collectd']['vmware4']['filter'] = "(IPADDR != '0.0.0.0') & (categoryName == 'VMware4')"
-  node.default['opennms']['collectd']['vmware5']['filter'] = "(IPADDR != '0.0.0.0') & (categoryName == 'VMware5')"
-end
 template "#{onms_home}/etc/collectd-configuration.xml" do
   cookbook node['opennms']['collectd']['cookbook']
   source "#{template_dir}collectd-configuration.xml.erb"
@@ -443,7 +438,6 @@ template "#{onms_home}/etc/jmx-datacollection-config.xml" do
   cookbook node['opennms']['jmx_dc']['cookbook']
   source "#{template_dir}jmx-datacollection-config.xml.erb"
   mode 00644
-  mode 00664 if node['opennms']['version'] == '22.0.4-1'
   owner 'root'
   group 'root'
   notifies :restart, 'service[opennms]'
