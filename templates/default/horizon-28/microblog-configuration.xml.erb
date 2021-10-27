@@ -1,0 +1,63 @@
+<?xml version="1.0"?>
+<!-- 
+  This file contains profiles for posting to and reading notices from
+  one or more microblog services such as Identica, StatusNet, or Twitter.
+  
+  Currently these profiles are used only by the MicroblogNotificationStrategy
+  and its ~Reply~ and ~DM~ derived classes.  These strategies will first try
+  to use a profile whose name is "notifd", falling back to the default profile
+  if one does not exist.
+  
+  Future uses for the profiles in this configuration file include an
+  AckReader for Ackd and perhaps a MicroblogTransportMonitor for Pollerd.
+ -->
+<microblog-configuration default-microblog-profile-name="<%=@default_profile[:name]%>">
+        <% if @default_profile[:name] != "identica" && @default_profile[:name] != "twitter" -%>
+	<microblog-profile
+                name="<%=@default_profile[:name]%>"
+		service-url="<%=@default_profile[:service_url]%>"
+		authen-username="<%=@default_profile[:authen_username]%>"
+		authen-password="<%=@default_profile[:authen_password]%>"
+	/>
+        <% end -%>
+        <% if @default_profile[:name] != "identica" -%>
+	<microblog-profile
+		name="identica"
+		service-url="https://identi.ca/api/"
+		authen-username="yourusername"
+		authen-password="yourpassword"
+	/>
+        <% else -%>
+	<microblog-profile
+		name="identica"
+		service-url="https://identi.ca/api/"
+		authen-username="<%=@default_profile[:authen_username]%>"
+		authen-password="<%=@default_profile[:authen_password]%>"
+	/>
+        <% end -%>
+	<!--
+		Twitter no longer supports username/password for application posting.
+		Instead, you should use OAuth authentication.  To configure OpenNMS
+		for OAuth, run $OPENNMS_HOME/bin/microblog-auth and follow the prompts.
+		It will update this configuration file for you.
+	-->
+        <% if @default_profile[:name] != "twitter" -%>
+	<microblog-profile
+		name="twitter"
+		service-url="https://twitter.com/"
+		oauth-consumer-key=""
+		oauth-consumer-secret=""
+		oauth-access-token=""
+		oauth-access-token-secret=""
+	/>
+        <% else -%>
+	<microblog-profile
+		name="twitter"
+		service-url="https://twitter.com/"
+		oauth-consumer-key="<%=@default_profile[:oauth_ckey]%>"
+		oauth-consumer-secret="<%=@default_profile[:oauth_csecret]%>"
+		oauth-access-token="<%=@default_profile[:oauth_atoken]%>"
+		oauth-access-token-secret="<%=@default_profile[:oauth_atoken_secret]%>"
+	/>
+        <% end -%>
+</microblog-configuration>

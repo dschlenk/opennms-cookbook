@@ -28,6 +28,10 @@ ive.connections
 #reports=juniper.bufferPoolUtil, \
 #juniper.cpu, \
 #juniper.temp, \
+#juniper.jnxOpTableCPU, \
+#juniper.jnxOpTableLoad, \
+#juniper.jnxOpTableBuff, \
+#juniper.jnxOpTableTemp, \
 #juniperj.mem, \
 #juniperj.uptime, \
 #juniperj.fwddUtil, \
@@ -36,6 +40,8 @@ ive.connections
 #erx.subscribers, \
 #erx.systemmodule, \
 #erx.temp, \
+#srx.spuFlowMonitor, \
+#srx.spuCPUMonitor, \
 #ive.connections
 <% end -%>
 
@@ -126,8 +132,8 @@ report.juniper.jnxOpTableTemp.command=--title="Juniper Temperature on {jnxOpDesc
  AREA:tempavg#fcaf3e \
  LINE1:tempavg#f57900:"Temperature " \
  GPRINT:tempavg:AVERAGE:" Avg  \\: %8.2lf %s" \
- GPRINT:tempmin:MIN:" Min  \\: %8.2lf %s" \
- GPRINT:tempmax:MAX:" Max  \\: %8.2lf %s\\n"
+ GPRINT:tempavg:MIN:" Min  \\: %8.2lf %s" \
+ GPRINT:tempavg:MAX:" Max  \\: %8.2lf %s\\n"
 
 report.juniper.bufferPoolUtil.name=Buffer Utilization (Juniper)
 report.juniper.bufferPoolUtil.columns=juniperBufferFeb,juniperBufferFpc0
@@ -195,6 +201,7 @@ report.srx.spuFlowMonitor.propertiesValues=juniSPUMonNodeDescr
 report.srx.spuFlowMonitor.command=--title="Sessions used on node {juniSPUMonNodeDescr}" \
  --vertical-label="Sessions" \
  DEF:currentSessions={rrd1}:juniSPUMonCurrFlow:AVERAGE \
+ DEF:maxSessions={rrd2}:juniSPUMonMaxFlow:AVERAGE \
  CDEF:percentSessions=currentSessions,maxSessions,/,100,* \
  LINE2:currentSessions#0000ff:"Sessions" \
  COMMENT:"\\n" \
@@ -288,9 +295,9 @@ report.erx.temp.command=--title="Temperature" \
  --vertical-label="Celsius" \
  DEF:juniSTValue={rrd1}:juniSTValue:AVERAGE \
  LINE2:juniSTValue#000000:"Temperature" \
- GPRINT:juniSTValue:AVERAGE:"Avg  \\: %3.0f%s" \
- GPRINT:juniSTValue:MIN:"Min  \\: %3.0lf%s" \
- GPRINT:juniSTValue:MAX:"Max  \\: %3.0lf%s\\n"
+ GPRINT:juniSTValue:AVERAGE:"Avg  \\: %3.0lf %s" \
+ GPRINT:juniSTValue:MIN:"Min  \\: %3.0lf %s" \
+ GPRINT:juniSTValue:MAX:"Max  \\: %3.0lf %s\\n"
 
 #####
 ##### Juniper J-Router reports
@@ -310,14 +317,14 @@ report.juniperj.mem.command=--title="Memory Usage (Juniper)" \
  AREA:um#0000ff:"Used Memory" \
  GPRINT:um:AVERAGE:" Avg  \\: %8.0lf" \
  GPRINT:um:MIN:"Min  \\: %8.0lf" \
- GPRINT:um:MAX:"Max  \\: %8.0f\\n" \
+ GPRINT:um:MAX:"Max  \\: %8.0lf\\n" \
  STACK:fm#00ff00:"Total Memory" \
  GPRINT:val1:AVERAGE:"Avg  \\: %8.0lf" \
  GPRINT:val1:MIN:"Min  \\: %8.0lf" \
  GPRINT:val1:MAX:"Max  \\: %8.0lf\\n"
 
 report.juniperj.uptime.name=fwdd Uptime (Juniper J-Series)
-report.juniperj.uptime.columns=junFwddUptime 
+report.juniperj.uptime.columns=junFwddUptime
 report.juniperj.uptime.type=nodeSnmp
 report.juniperj.uptime.command=--title="fwdd Uptime" \
  --vertical-label="Days" \

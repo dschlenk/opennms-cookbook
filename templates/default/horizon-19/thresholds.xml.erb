@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<thresholding-config xmlns="http://xmlns.opennms.org/xsd/config/thresholding-config">
+<thresholding-config xmlns="http://xmlns.opennms.org/xsd/config/thresholding">
         <% if @mib2[:enabled] -%>
     <group name="mib2" rrdRepository="<%=@mib2[:rrd_repository]%>">
         <threshold
