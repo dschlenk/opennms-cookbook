@@ -45,7 +45,8 @@ default['build-essential']['compile_time'] = true
 default['opennms']['start_opts'] = ''
 # set to '' if you want to re-enable OOTB behavior (but you should not do this if using any of the opennms resources)
 default['opennms']['timeout_start_sec'] = '10min'
-default['opennms']['version'] = '26.2.2-1'
+default['opennms']['version'] = '28.1.1-1'
+default['java']['version'] = '11'
 # default['opennms']['version_major'] = "%{version}"
 default['opennms']['allow_downgrade'] = false
 default['opennms']['stable'] = true
@@ -345,6 +346,8 @@ default['opennms']['properties']['ticket']['servicelayer']  = 'org.opennms.netmg
 default['opennms']['properties']['ticket']['plugin']        = 'org.opennms.netmgt.ticketd.NullTicketerPlugin'
 default['opennms']['properties']['ticket']['enabled']       = nil
 default['opennms']['properties']['ticket']['link_template'] = nil
+default['opennms']['properties']['ticket']['skip_create_when_cleared'] = false
+default['opennms']['properties']['ticket']['skip_close_when_not_cleared'] = false
 # Misc
 default['opennms']['properties']['misc']['layout_applications_vertically'] = false
 default['opennms']['properties']['misc']['webapp_logs_dir']                = '${install.logs.dir}'
@@ -415,6 +418,8 @@ default['opennms']['properties']['asterisk']['listen_port']    = nil
 default['opennms']['properties']['asterisk']['max_pool_size']  = nil
 # Provisioning
 default['opennms']['properties']['provisioning']['dns_server']                = '127.0.0.1'
+default['opennms']['properties']['provisioning']['dns_level']                 = nil
+default['opennms']['properties']['provisioning']['reverse_dns_level']         = nil
 default['opennms']['properties']['provisioning']['max_concurrent_xtn']        = nil
 default['opennms']['properties']['provisioning']['enable_discovery']          = nil
 default['opennms']['properties']['provisioning']['enable_deletions']          = nil
@@ -477,11 +482,7 @@ default['opennms']['properties']['alarmlist']['unackflash'] = false
 default['opennms']['properties']['rest_aliases'] = '/rest,/api/v2'
 default['opennms']['properties']['maxFlowAgeSeconds'] = nil
 default['opennms']['properties']['ingressAndEgressRequired'] = false
-# access point monitor
-default['opennms']['apm']['threads']           = 30
-default['opennms']['apm']['pscan_interval']    = 1_800_000
-default['opennms']['apm']['aruba_enabled']     = true
-default['opennms']['apm']['moto_enabled']      = true
+default['opennms']['properties']['search_info'] = nil
 # database reports - availability
 default['opennms']['db_reports']['avail']['cal']['logo']                    = "#{onms_home}/etc/reports/logo.gif"
 default['opennms']['db_reports']['avail']['classic']['logo']                = "#{onms_home}/etc/reports/logo.gif"
@@ -719,6 +720,7 @@ default['opennms']['datacollection']['default']['netapp']           = true
 default['opennms']['datacollection']['default']['netbotz']          = true
 default['opennms']['datacollection']['default']['netenforcer']      = true
 default['opennms']['datacollection']['default']['netscaler']        = true
+default['opennms']['datacollection']['default']['netscalserver']    = true
 default['opennms']['datacollection']['default']['netsnmp']          = true
 default['opennms']['datacollection']['default']['nortel']           = true
 default['opennms']['datacollection']['default']['novell']           = true
@@ -995,6 +997,7 @@ default['opennms']['log4j2']['notifd'] = 'WARN'
 default['opennms']['log4j2']['oss_qosd'] = 'WARN'
 default['opennms']['log4j2']['oss_qosdrx'] = 'WARN'
 default['opennms']['log4j2']['passive'] = 'WARN'
+default['opennms']['log4j2']['perspective_pollerd'] = 'WARN'
 default['opennms']['log4j2']['poller'] = 'WARN'
 default['opennms']['log4j2']['provisiond'] = 'WARN'
 default['opennms']['log4j2']['queued'] = 'WARN'
@@ -1722,6 +1725,8 @@ default['opennms']['snmp_graph']['zeus']['enabled']      = true
 # snmp-interface-poller-configuration.xml
 default['opennms']['snmp_iface_poller']['threads']                               = 30
 default['opennms']['snmp_iface_poller']['service']                               = 'SNMP'
+default['opennms']['snmp_iface_poller']['upvalues']                               = 1
+default['opennms']['snmp_iface_poller']['downvalues']                               = 2
 # array of service names
 default['opennms']['snmp_iface_poller']['node_outage']                           = %w(ICMP SNMP)
 default['opennms']['snmp_iface_poller']['example1']['filter']                    = "IPADDR != '0.0.0.0'"

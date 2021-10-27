@@ -40,6 +40,10 @@ if node['opennms']['version'] == '26.2.2-1' || node['opennms']['version'].to_i >
   node.default['opennms']['users']['admin']['pwhash'] = 'gU2wmSW7k9v1xg4/MrAsaI+VyddBAhJJt4zPX5SGG0BK+qiASGnJsqM8JOug/aEL'
   node.default['opennms']['users']['salted'] = true
 end
+if node['opennms']['version'].to_i > 18
+  node.default['opennms']['properties']['ticket']['skip_create_when_cleared'] = true
+  node.default['opennms']['properties']['ticket']['skip_close_when_not_cleared'] = true
+end
 include_recipe 'opennms::packages'
 include_recipe 'opennms::send_events'
 include_recipe 'opennms::upgrade' if node['opennms']['upgrade']

@@ -988,6 +988,12 @@ org.opennms.statusbox.elements=<%=node['opennms']['properties']['statusbox']['el
 org.opennms.grafanaBox.show=true
 <% end -%>
 #
+# And also the port of the grafana server
+#org.opennms.grafanaBox.port=3000
+<% if node['opennms']['properties']['grafana']['show'] -%>
+org.opennms.grafanaBox.port=<%=node['opennms']['properties']['grafana']['port']%>
+<% end -%>
+#
 # If the box is enabled you also need to specify hostname of the grafana server
 #org.opennms.grafanaBox.hostname=localhost
 <% if node['opennms']['properties']['grafana']['show'] -%>
