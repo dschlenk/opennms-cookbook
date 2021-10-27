@@ -98,6 +98,6 @@ attribute :mouseovertext, kind_of: String
 attribute :alarm_data, kind_of: [Hash, FalseClass]
 # control where in a file the event is added. Does not guarantee that the event will remain the first or last element in the file - once it exists in the file this attribute is ignored for purposes of whether or not the resource needs to be updated.
 attribute :position, kind_of: String, equal_to: %w(top bottom), default: 'bottom'
-# control where in the evenconf.xml will add the new.evens.xml to the evenconf.xml. Does not guarantee that the events.xml will remain the first or last element in the evenconf.xml file - once it exists in the file and also when it get call within the .rb file
+# if a new eventconf file is created as a result of this resource executing, this property controls the relative position that the reference to the new file is added to the main eventconf file
 attribute :eventconf_position, kind_of: String, equal_to: %w(top bottom), default: 'bottom'
 attr_accessor :exists, :file_exists, :is_event_file, :changed
