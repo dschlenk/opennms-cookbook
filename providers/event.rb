@@ -90,7 +90,6 @@ end
 private
 
 def create_event_file
-  updating = false
   doc = REXML::Document.new
   doc << REXML::XMLDecl.new
   events_el = doc.add_element 'events'
@@ -114,7 +113,7 @@ def create_event
   event_el = doc.root.elements[event_xpath(new_resource)]
   Chef::Log.debug("Current event_el for #{new_resource}: #{event_el}")
   if event_el.nil?
-    if new_resource.position == 'top' && !doc.root.elements["/events/event"].nil?
+    if new_resource.position == 'top' && !doc.root.elements['/events/event'].nil?
       doc.root.insert_before('/events/event', REXML::Element.new('event'))
       event_el = doc.root.elements['/events/event']
     else
