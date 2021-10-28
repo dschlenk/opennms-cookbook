@@ -7,6 +7,7 @@ opennms_event 'uei.opennms.org/cheftest/thresholdExceeded' do
   logmsg_dest 'logndisplay'
   logmsg_notify true
   severity 'Minor'
+  position 'top'
   alarm_data 'reduction_key' => '%uei%:%dpname%:%nodeid%:%interface%:%parm[ds]%:%parm[threshold]%:%parm[trigger]%:%parm[rearm]%:%parm[label]%', 'alarm_type' => 1, 'auto_clean' => false
   # tell Eventd to reload config
   notifies :run, 'opennms_send_event[restart_Eventd]'
@@ -132,5 +133,64 @@ opennms_event 'uei.opennms.org/anUeiForANewThingInANewFileWithPositionTop' do
   logmsg_notify true
   severity 'Minor'
   alarm_data 'reduction_key' => '%uei%:%dpname%:%nodeid%:%interface%:%parm[ds]%:%parm[threshold]%:%parm[trigger]%:%parm[rearm]%:%parm[label]%', 'alarm_type' => 1, 'auto_clean' => false
+  notifies :run, 'opennms_send_event[restart_Eventd]'
+end
+
+# Test position top and eventconf_position bottom
+# this one should be index 1 (starting at 0)
+opennms_event 'uei.opennms.org/fillerForANewThingInANewFile1' do
+  file 'events/chef4.events.xml'
+  event_label 'Chef defined event: thresholdExceeded'
+  descr '<p>A threshold defined by a chef recipe has been exceeded.</p>'
+  logmsg 'A threshold has been exceeded.'
+  logmsg_dest 'logndisplay'
+  logmsg_notify true
+  severity 'Minor'
+  alarm_data 'reduction_key' => '%uei%:%dpname%:%nodeid%:%interface%:%parm[ds]%:%parm[threshold]%:%parm[trigger]%:%parm[rearm]%:%parm[label]%', 'alarm_type' => 1, 'auto_clean' => false
+  eventconf_position 'top'
+  notifies :run, 'opennms_send_event[restart_Eventd]'
+end
+
+# this one should be index 2 (starting at 0)
+opennms_event 'uei.opennms.org/fillerForANewThingInANewFile2' do
+  file 'events/chef4.events.xml'
+  event_label 'Chef defined event: thresholdExceeded'
+  descr '<p>A threshold defined by a chef recipe has been exceeded.</p>'
+  logmsg 'A threshold has been exceeded.'
+  logmsg_dest 'logndisplay'
+  logmsg_notify true
+  severity 'Minor'
+  alarm_data 'reduction_key' => '%uei%:%dpname%:%nodeid%:%interface%:%parm[ds]%:%parm[threshold]%:%parm[trigger]%:%parm[rearm]%:%parm[label]%', 'alarm_type' => 1, 'auto_clean' => false
+  eventconf_position 'top'
+  notifies :run, 'opennms_send_event[restart_Eventd]'
+end
+
+# this one should be index 0 (starting at 0)
+opennms_event 'uei.opennms.org/eventTopFileTop' do
+  file 'events/chef4.events.xml'
+  event_label 'Chef defined event: thresholdExceeded'
+  descr '<p>A threshold defined by a chef recipe has been exceeded.</p>'
+  logmsg 'A threshold has been exceeded.'
+  logmsg_dest 'logndisplay'
+  logmsg_notify true
+  severity 'Minor'
+  alarm_data 'reduction_key' => '%uei%:%dpname%:%nodeid%:%interface%:%parm[ds]%:%parm[threshold]%:%parm[trigger]%:%parm[rearm]%:%parm[label]%', 'alarm_type' => 1, 'auto_clean' => false
+  position 'top'
+  eventconf_position 'top'
+  notifies :run, 'opennms_send_event[restart_Eventd]'
+end
+
+# this one should be index 3 (starting at 0)
+opennms_event 'uei.opennms.org/eventBottomFileTop' do
+  file 'events/chef4.events.xml'
+  event_label 'Chef defined event: thresholdExceeded'
+  descr '<p>A threshold defined by a chef recipe has been exceeded.</p>'
+  logmsg 'A threshold has been exceeded.'
+  logmsg_dest 'logndisplay'
+  logmsg_notify true
+  severity 'Minor'
+  alarm_data 'reduction_key' => '%uei%:%dpname%:%nodeid%:%interface%:%parm[ds]%:%parm[threshold]%:%parm[trigger]%:%parm[rearm]%:%parm[label]%', 'alarm_type' => 1, 'auto_clean' => false
+  position 'bottom'
+  eventconf_position 'top'
   notifies :run, 'opennms_send_event[restart_Eventd]'
 end
