@@ -21,7 +21,7 @@ action :create do
   if !@current_resource.file_exists
     create_event_file # also adds to eventconf
   elsif !event_file_included?(@current_resource.file, node)
-    add_file_to_eventconf(@current_resource.file, @current_resource.position, node)
+    add_file_to_eventconf(@new_resource.file, @new_resource.eventconf_position, node)
   end
   if @current_resource.exists && !@current_resource.changed
     Chef::Log.info "#{@new_resource} already exists and not changed - nothing to do."
@@ -38,7 +38,7 @@ action :create_if_missing do
   if !@current_resource.file_exists
     create_event_file # also adds to eventconf
   elsif !event_file_included?(@current_resource.file, node)
-    add_file_to_eventconf(@current_resource.file, @current_resource.position, node)
+    add_file_to_eventconf(@new_resource.file, @new_resource.eventconf_position, node)
   end
   if @current_resource.exists
     Chef::Log.info "#{@new_resource} already exists - nothing to do."
@@ -95,28 +95,25 @@ def create_event_file
   events_el = doc.add_element 'events'
   events_el.add_namespace('http://xmlns.opennms.org/xsd/eventconf')
   Opennms::Helpers.write_xml_file(doc, "#{node['opennms']['conf']['home']}/etc/#{new_resource.file}")
-  add_file_to_eventconf(new_resource.file, new_resource.position, node)
+  add_file_to_eventconf(new_resource.file, new_resource.eventconf_position, node)
 end
 
 def create_event
-  uei = new_resource.uei || new_resource.name
-  new_resource.uei = uei
-  # new_resource.uei = new_resource.name if new_resource.uei.nil?
   # make sure event file is included in main eventconf
   unless event_file_included?(new_resource.file, node)
-    add_file_to_eventconf(new_resource.file, new_resource.position, node)
+    add_file_to_eventconf(new_resource.file, new_resource.eventconf_position, node)
   end
-  Chef::Log.debug "Adding uei '#{uei}' to '#{new_resource.file}'."
 
   file = ::File.new("#{node['opennms']['conf']['home']}/etc/#{new_resource.file}", 'r')
   doc = REXML::Document.new file
   file.close
   doc.context[:attribute_quote] = :quote
   updating = false
+
   event_el = doc.root.elements[event_xpath(new_resource)]
   Chef::Log.debug("Current event_el for #{new_resource}: #{event_el}")
   if event_el.nil?
-    if new_resource.position == 'top'
+    if new_resource.position == 'top' && !doc.root.elements['/events/event'].nil?
       doc.root.insert_before('/events/event', REXML::Element.new('event'))
       event_el = doc.root.elements['/events/event']
     else
@@ -125,7 +122,19 @@ def create_event
   else
     updating = true
   end
+
+  create_or_update_event(updating, event_el)
+  Chef::Log.debug("Converged event_el for #{new_resource}: #{event_el}")
+  Opennms::Helpers.write_xml_file(doc, "#{node['opennms']['conf']['home']}/etc/#{new_resource.file}")
+end
+
+def create_or_update_event(updating, event_el)
   Chef::Log.debug "Updating #{new_resource}? #{updating}"
+
+  uei = new_resource.uei || new_resource.name
+  new_resource.uei = uei
+  Chef::Log.debug "Adding uei '#{uei}' to '#{new_resource.file}'."
+
   # masks are immutable as they are part of identity.
   if !updating && !new_resource.mask.nil? && new_resource.mask.is_a?(Array)
     mask_el = event_el.add_element 'mask'
@@ -282,8 +291,6 @@ def create_event
       end
     end
   end
-  Chef::Log.debug("Converged event_el for #{new_resource}: #{event_el}")
-  Opennms::Helpers.write_xml_file(doc, "#{node['opennms']['conf']['home']}/etc/#{new_resource.file}")
 end
 
 def delete_event
