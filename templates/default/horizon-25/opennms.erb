@@ -627,6 +627,7 @@ doStatus(){
 	else
 		PARM_PID=()
 	fi
+
 	APP_VM_PARMS=("${CONTROLLER_OPTIONS[@]}")
 	APP_PARMS_BEFORE=("${PARM_PID[@]}" -u "$JMX_URL" "${PARM_VERBOSE[@]}" status)
 	runCmd "${JAVA_CMD[@]}" "${APP_VM_PARMS[@]}" -jar "$BOOTSTRAP" "${APP_PARMS_CONTROLLER[@]}" "${APP_PARMS_BEFORE[@]}" "$@" "${APP_PARMS_AFTER[@]}"

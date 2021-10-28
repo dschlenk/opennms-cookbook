@@ -9,9 +9,9 @@ issues_url       'https://github.com/dschlenk/opennms-cookbook/issues'
 source_url       'https://github.com/dschlenk/opennms-cookbook'
 supports         'centos', '>= 6.0'
 supports         'redhat', '>= 6.0'
-version          '26.3.5'
+version          '28.0.0'
 depends          'hostsfile'
 depends          'build-essential'
 depends          'postgresql'
 depends          'openssl'
-chef_version '>= 12.5' if respond_to?(:chef_version)
+chef_version '>= 12.7' if respond_to?(:chef_version)
