@@ -20,13 +20,14 @@
 include_recipe 'opennms::repositories' if node['opennms']['manage_repos']
 onms_packages = ['opennms-core', 'opennms-webapp-jetty', 'opennms-docs']
 
-# version 28.0.1-1 remove the opennms-docs
-if node['opennms']['version'].to_i >= 28
-  onms_packages = ['opennms-core', 'opennms-webapp-jetty']
-end
-
 onms_versions = [node['opennms']['version'], node['opennms']['version'],
                  node['opennms']['version']]
+
+# version 28.0.1-1 remove opennms-docs
+if node['opennms']['version'].to_i >= 28
+  onms_packages = ['opennms-core', 'opennms-webapp-jetty']
+  onms_versions = [node['opennms']['version'], node['opennms']['version']]
+end
 
 if node['opennms']['plugin']['xml'] && Opennms::Helpers.major(node['opennms']['version']).to_i <= 18
   onms_packages.push 'opennms-plugin-protocol-xml'
