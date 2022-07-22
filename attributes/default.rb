@@ -2123,3 +2123,10 @@ default['opennms']['postgresql']['setup_repo'] = true
 
 default['opennms']['bin']['cookbook'] = 'opennms'
 default['opennms']['bin']['return_code'] = false
+
+#Kafka
+default['opennms']['karaf']['addl_features'] = []
+default['opennms']['kafka']['producer'] = {'eventTopic' => 'events', 'alarmTopic' => 'alarms', 'alarmFeedbackTopic' => 'alarmFeedback', 'nodeTopic' => 'nodes', 'topologyVertexTopic' => 'vertices',
+                                           'topologyEdgeTopic' => 'edges', 'metricTopic' => 'metrics', 'eventFilter' => '', 'alarmFilter' => '', 'forward.metrics' => false,
+                                           'nodeRefreshTimeoutMs' => 300000, 'alarmSyncIntervalMs' => 300000, 'suppressIncrementalAlarms' => true, 'kafkaSendQueueCapacity' => 1000,
+                                           'startAlarmSyncWithCleanState' => false}
