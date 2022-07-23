@@ -152,7 +152,7 @@ featuresBoot = ( \
                opennms-endpoints-grafana, \
                opennms-reporting, \
                <% node['opennms']['karaf']['addl_features'].each do |v| -%>
-               <%=v%>
+               <%=v%>, \
                <% end -%>
                opennms-karaf-health
 
