@@ -33,6 +33,15 @@ template "#{node['opennms']['conf']['home']}/etc/org.opennms.features.kafka.prod
   notifies :restart, 'service[opennms]', :delayed
 end
 
+template "#{node['opennms']['conf']['home']}/etc/org.opennms.features.kafka.producer.client.cfg" do
+  source "#{template_dir}org.opennms.features.kafka.producer.client.cfg.erb"
+  owner 'root'
+  group 'root'
+  mode 00664
+  only_if { mv.to_i >= 26}
+  notifies :restart, 'service[opennms]', :delayed
+end
+
 template "#{node['opennms']['conf']['home']}/etc/org.apache.karaf.features.cfg" do
   source "#{template_dir}org.apache.karaf.features.cfg.erb"
   owner 'root'
