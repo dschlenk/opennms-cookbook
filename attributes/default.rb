@@ -2130,4 +2130,4 @@ default['opennms']['kafka']['producer'] = {'eventTopic' => 'events', 'alarmTopic
                                            'topologyEdgeTopic' => 'edges', 'metricTopic' => 'metrics', 'eventFilter' => '', 'alarmFilter' => '', 'forward.metrics' => false,
                                            'nodeRefreshTimeoutMs' => 300000, 'alarmSyncIntervalMs' => 300000, 'suppressIncrementalAlarms' => true, 'kafkaSendQueueCapacity' => 1000,
                                            'startAlarmSyncWithCleanState' => false}
-default['opennms']['kafka']['producer']['client'] = {'bootstrap.servers' => '127.0.0.1:9092'}
+default['opennms']['kafka']['producer_client'] = {'bootstrap.servers' => '127.0.0.1:9092'}

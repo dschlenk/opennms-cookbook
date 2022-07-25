@@ -29,7 +29,7 @@ template "#{node['opennms']['conf']['home']}/etc/org.opennms.features.kafka.prod
   owner 'root'
   group 'root'
   mode 00664
-  only_if { mv.to_i >= 26}
+  only_if { mv.to_i == 26}
   notifies :restart, 'service[opennms]', :delayed
 end
 
@@ -38,7 +38,7 @@ template "#{node['opennms']['conf']['home']}/etc/org.opennms.features.kafka.prod
   owner 'root'
   group 'root'
   mode 00664
-  only_if { mv.to_i >= 26}
+  only_if { mv.to_i == 26}
   notifies :restart, 'service[opennms]', :delayed
 end
 
@@ -47,6 +47,6 @@ template "#{node['opennms']['conf']['home']}/etc/org.apache.karaf.features.cfg" 
   owner 'root'
   group 'root'
   mode 00664
-  only_if { mv.to_i >= 26}
+  only_if { mv.to_i == 26}
   notifies :restart, 'service[opennms]', :delayed
 end
