@@ -29644,9 +29644,12 @@ suites:
       - recipe[oracle_java8::default]
       - recipe[opennms::default]
       - recipe[onms_lwrp_test::webopts]
+      - recipe[opennms::kafka_producer]
     attributes:
       opennms:
         version: 26.2.2-1
+        karaf:
+          addl_features: ['opennms-kafka-producer' ]
     verifier:
       inspec_tests:
         - path: test/integration/default
