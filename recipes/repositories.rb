@@ -18,16 +18,18 @@
 # limitations under the License.
 #
 
-cookbook_file '/etc/yum.repos.d/OPENNMS-GPG-KEY' do
-  source 'OPENNMS-GPG-KEY'
-  mode 00644
-  owner 'root'
-  group 'root'
-end
+node['opennms']['yum_gpg_keys'].each do |key, descr|
+  cookbook_file "/etc/yum.repos.d/#{key}" do
+    source key
+    mode 00644
+    owner 'root'
+    group 'root'
+  end
 
-bash 'import OpenNMS GPG key' do
-  code 'rpm --import /etc/yum.repos.d/OPENNMS-GPG-KEY'
-  not_if 'rpm -qai "*gpg*" | grep -q OpenNMS'
+  bash "import OpenNMS GPG key #{key}" do
+    code "rpm --import /etc/yum.repos.d/#{key}"
+    not_if "rpm -qai \"*gpg*\" | grep -q \"#{descr}\""
+  end
 end
 
 def yum_attr(branch, platform, attr)

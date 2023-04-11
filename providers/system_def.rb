@@ -35,7 +35,7 @@ def load_current_resource
   ge = true
   @current_resource.groups.each do |group|
     next if group_exists?(node['opennms']['conf']['home'], group)
-    Chef::Log.error "Missing data-collection group #{group}"
+    Chef::Log.debug "data-collection group #{group} not present"
     ge = false
     break
   end

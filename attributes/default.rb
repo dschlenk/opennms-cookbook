@@ -28,6 +28,10 @@ default['yum']['opennms-oldstable-rhel6']['baseurl']         = 'http://yum.openn
 default['yum']['opennms-oldstable-rhel6']['failovermethod']  = 'roundrobin'
 default['yum']['opennms-oldstable-rhel7']['baseurl']         = 'http://yum.opennms.org/oldstable/rhel7'
 default['yum']['opennms-oldstable-rhel7']['failovermethod']  = 'roundrobin'
+default['opennms']['yum_gpg_keys'] = {
+  'OPENNMS-GPG-KEY-2012' => 'OpenNMS Signing Key 2012',
+  'OPENNMS-GPG-KEY-2023' => 'OpenNMS Signing Key 2023',
+}
 # 6 is eol but I guess folks might still need it
 case node['platform_family']
 when 'rhel'
