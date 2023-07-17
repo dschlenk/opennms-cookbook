@@ -35,8 +35,6 @@ node.default['postgresql']['config_pgtune']['max_connections'] = 160
 node.default['postgresql']['config_pgtune']['total_memory'] = '1961376kB'
 node.default['postgresql']['contrib']['extensions'] = %w(pageinspect pg_buffercache pg_freespacemap pgrowlocks pg_stat_statements pgstattuple)
 
-Chef::Log.warn("psql ver at compile time is #{psql_shortver}")
-log "psql ver at execution time is #{psql_shortver}"
 if node['opennms']['postgresql']['setup_repo']
   postgresql_repository 'install' do
     version psql_shortver
