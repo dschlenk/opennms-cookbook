@@ -2918,6 +2918,177 @@ suites:
       inspec_tests:
         - path: test/integration/default
         - path: test/integration/delete_imported_node
+  - name: delete_threshd_package_16
+    run_list:
+      - recipe[lecert::default]
+      - recipe[yum-centos-ct::default]
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::delete_threshd_package]
+    attributes:
+      opennms:
+        version: 16.0.4-1
+        plugin:
+          xml: true
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/delete_threshd_package
+  - name: delete_threshd_package_17
+    run_list:
+      - recipe[lecert::default]
+      - recipe[yum-centos-ct::default]
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::delete_threshd_package]
+    attributes:
+      opennms:
+        version: 17.1.1-1
+        plugin:
+          xml: true
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/delete_threshd_package
+  - name: delete_threshd_package_18
+    run_list:
+      - recipe[lecert::default]
+      - recipe[yum-centos-ct::default]
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::delete_threshd_package]
+    attributes:
+      opennms:
+        version: 18.0.4-1
+        plugin:
+          xml: true
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/delete_threshd_package
+  - name: delete_threshd_package_19
+    run_list:
+      - recipe[lecert::default]
+      - recipe[yum-centos-ct::default]
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::delete_threshd_package]
+    attributes:
+      opennms:
+        version: 19.1.0-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/delete_threshd_package
+  - name: delete_threshd_package_20
+    run_list:
+      - recipe[lecert::default]
+      - recipe[yum-centos-ct::default]
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::delete_threshd_package]
+    attributes:
+      opennms:
+        version: 20.1.0-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/delete_threshd_package
+  - name: delete_threshd_package_21
+    run_list:
+      - recipe[lecert::default]
+      - recipe[yum-centos-ct::default]
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::delete_threshd_package]
+    attributes:
+      opennms:
+        version: 21.1.0-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/delete_threshd_package
+  - name: delete_threshd_package_22
+    run_list:
+      - recipe[lecert::default]
+      - recipe[yum-centos-ct::default]
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::delete_threshd_package]
+    attributes:
+      opennms:
+        version: 22.0.4-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/delete_threshd_package
+  - name: delete_threshd_package_23
+    run_list:
+      - recipe[lecert::default]
+      - recipe[yum-centos-ct::default]
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::delete_threshd_package]
+    attributes:
+      opennms:
+        version: 23.0.4-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/delete_threshd_package
+  - name: delete_threshd_package_24
+    run_list:
+      - recipe[lecert::default]
+      - recipe[yum-centos-ct::default]
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::delete_threshd_package]
+    attributes:
+      opennms:
+        version: 24.1.3-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/delete_threshd_package
+  - name: delete_threshd_package_25
+    run_list:
+      - recipe[lecert::default]
+      - recipe[yum-centos-ct::default]
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::delete_threshd_package]
+    attributes:
+      opennms:
+        version: 25.2.1-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/delete_threshd_package
+  - name: delete_threshd_package_26
+    run_list:
+      - recipe[lecert::default]
+      - recipe[yum-centos-ct::default]
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::delete_threshd_package]
+    attributes:
+      opennms:
+        version: 26.2.2-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/delete_threshd_package
   - name: destination_path_16
     run_list:
       - recipe[yum-centos-ct::default]
@@ -3718,6 +3889,861 @@ suites:
       inspec_tests:
         - path: test/integration/default
         - path: test/integration/edit_imported_node
+  - name: edit_threshd_package_filter_16
+    run_list:
+      - recipe[lecert::default]
+      - recipe[yum-centos-ct::default]
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::edit_threshd_package_filter]
+    attributes:
+      opennms:
+        version: 16.0.4-1
+        plugin:
+          xml: true
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/edit_threshd_package_filter
+  - name: edit_threshd_package_filter_17
+    run_list:
+      - recipe[lecert::default]
+      - recipe[yum-centos-ct::default]
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::edit_threshd_package_filter]
+    attributes:
+      opennms:
+        version: 17.1.1-1
+        plugin:
+          xml: true
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/edit_threshd_package_filter
+  - name: edit_threshd_package_filter_18
+    run_list:
+      - recipe[lecert::default]
+      - recipe[yum-centos-ct::default]
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::edit_threshd_package_filter]
+    attributes:
+      opennms:
+        version: 18.0.4-1
+        plugin:
+          xml: true
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/edit_threshd_package_filter
+  - name: edit_threshd_package_filter_19
+    run_list:
+      - recipe[lecert::default]
+      - recipe[yum-centos-ct::default]
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::edit_threshd_package_filter]
+    attributes:
+      opennms:
+        version: 19.1.0-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/edit_threshd_package_filter
+  - name: edit_threshd_package_filter_20
+    run_list:
+      - recipe[lecert::default]
+      - recipe[yum-centos-ct::default]
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::edit_threshd_package_filter]
+    attributes:
+      opennms:
+        version: 20.1.0-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/edit_threshd_package_filter
+  - name: edit_threshd_package_filter_21
+    run_list:
+      - recipe[lecert::default]
+      - recipe[yum-centos-ct::default]
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::edit_threshd_package_filter]
+    attributes:
+      opennms:
+        version: 21.1.0-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/edit_threshd_package_filter
+  - name: edit_threshd_package_filter_22
+    run_list:
+      - recipe[lecert::default]
+      - recipe[yum-centos-ct::default]
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::edit_threshd_package_filter]
+    attributes:
+      opennms:
+        version: 22.0.4-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/edit_threshd_package_filter
+  - name: edit_threshd_package_filter_23
+    run_list:
+      - recipe[lecert::default]
+      - recipe[yum-centos-ct::default]
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::edit_threshd_package_filter]
+    attributes:
+      opennms:
+        version: 23.0.4-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/edit_threshd_package_filter
+  - name: edit_threshd_package_filter_24
+    run_list:
+      - recipe[lecert::default]
+      - recipe[yum-centos-ct::default]
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::edit_threshd_package_filter]
+    attributes:
+      opennms:
+        version: 24.1.3-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/edit_threshd_package_filter
+  - name: edit_threshd_package_filter_25
+    run_list:
+      - recipe[lecert::default]
+      - recipe[yum-centos-ct::default]
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::edit_threshd_package_filter]
+    attributes:
+      opennms:
+        version: 25.2.1-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/edit_threshd_package_filter
+  - name: edit_threshd_package_filter_26
+    run_list:
+      - recipe[lecert::default]
+      - recipe[yum-centos-ct::default]
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::edit_threshd_package_filter]
+    attributes:
+      opennms:
+        version: 26.2.2-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/edit_threshd_package_filter
+  - name: edit_threshd_package_ranges_16
+    run_list:
+      - recipe[lecert::default]
+      - recipe[yum-centos-ct::default]
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::edit_threshd_package_ranges]
+    attributes:
+      opennms:
+        version: 16.0.4-1
+        plugin:
+          xml: true
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/edit_threshd_package_ranges
+  - name: edit_threshd_package_ranges_17
+    run_list:
+      - recipe[lecert::default]
+      - recipe[yum-centos-ct::default]
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::edit_threshd_package_ranges]
+    attributes:
+      opennms:
+        version: 17.1.1-1
+        plugin:
+          xml: true
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/edit_threshd_package_ranges
+  - name: edit_threshd_package_ranges_18
+    run_list:
+      - recipe[lecert::default]
+      - recipe[yum-centos-ct::default]
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::edit_threshd_package_ranges]
+    attributes:
+      opennms:
+        version: 18.0.4-1
+        plugin:
+          xml: true
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/edit_threshd_package_ranges
+  - name: edit_threshd_package_ranges_19
+    run_list:
+      - recipe[lecert::default]
+      - recipe[yum-centos-ct::default]
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::edit_threshd_package_ranges]
+    attributes:
+      opennms:
+        version: 19.1.0-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/edit_threshd_package_ranges
+  - name: edit_threshd_package_ranges_20
+    run_list:
+      - recipe[lecert::default]
+      - recipe[yum-centos-ct::default]
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::edit_threshd_package_ranges]
+    attributes:
+      opennms:
+        version: 20.1.0-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/edit_threshd_package_ranges
+  - name: edit_threshd_package_ranges_21
+    run_list:
+      - recipe[lecert::default]
+      - recipe[yum-centos-ct::default]
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::edit_threshd_package_ranges]
+    attributes:
+      opennms:
+        version: 21.1.0-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/edit_threshd_package_ranges
+  - name: edit_threshd_package_ranges_22
+    run_list:
+      - recipe[lecert::default]
+      - recipe[yum-centos-ct::default]
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::edit_threshd_package_ranges]
+    attributes:
+      opennms:
+        version: 22.0.4-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/edit_threshd_package_ranges
+  - name: edit_threshd_package_ranges_23
+    run_list:
+      - recipe[lecert::default]
+      - recipe[yum-centos-ct::default]
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::edit_threshd_package_ranges]
+    attributes:
+      opennms:
+        version: 23.0.4-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/edit_threshd_package_ranges
+  - name: edit_threshd_package_ranges_24
+    run_list:
+      - recipe[lecert::default]
+      - recipe[yum-centos-ct::default]
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::edit_threshd_package_ranges]
+    attributes:
+      opennms:
+        version: 24.1.3-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/edit_threshd_package_ranges
+  - name: edit_threshd_package_ranges_25
+    run_list:
+      - recipe[lecert::default]
+      - recipe[yum-centos-ct::default]
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::edit_threshd_package_ranges]
+    attributes:
+      opennms:
+        version: 25.2.1-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/edit_threshd_package_ranges
+  - name: edit_threshd_package_ranges_26
+    run_list:
+      - recipe[lecert::default]
+      - recipe[yum-centos-ct::default]
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::edit_threshd_package_ranges]
+    attributes:
+      opennms:
+        version: 26.2.2-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/edit_threshd_package_ranges
+  - name: edit_threshd_package_services_16
+    run_list:
+      - recipe[lecert::default]
+      - recipe[yum-centos-ct::default]
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::edit_threshd_package_services]
+    attributes:
+      opennms:
+        version: 16.0.4-1
+        plugin:
+          xml: true
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/edit_threshd_package_services
+  - name: edit_threshd_package_services_17
+    run_list:
+      - recipe[lecert::default]
+      - recipe[yum-centos-ct::default]
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::edit_threshd_package_services]
+    attributes:
+      opennms:
+        version: 17.1.1-1
+        plugin:
+          xml: true
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/edit_threshd_package_services
+  - name: edit_threshd_package_services_18
+    run_list:
+      - recipe[lecert::default]
+      - recipe[yum-centos-ct::default]
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::edit_threshd_package_services]
+    attributes:
+      opennms:
+        version: 18.0.4-1
+        plugin:
+          xml: true
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/edit_threshd_package_services
+  - name: edit_threshd_package_services_19
+    run_list:
+      - recipe[lecert::default]
+      - recipe[yum-centos-ct::default]
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::edit_threshd_package_services]
+    attributes:
+      opennms:
+        version: 19.1.0-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/edit_threshd_package_services
+  - name: edit_threshd_package_services_20
+    run_list:
+      - recipe[lecert::default]
+      - recipe[yum-centos-ct::default]
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::edit_threshd_package_services]
+    attributes:
+      opennms:
+        version: 20.1.0-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/edit_threshd_package_services
+  - name: edit_threshd_package_services_21
+    run_list:
+      - recipe[lecert::default]
+      - recipe[yum-centos-ct::default]
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::edit_threshd_package_services]
+    attributes:
+      opennms:
+        version: 21.1.0-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/edit_threshd_package_services
+  - name: edit_threshd_package_services_22
+    run_list:
+      - recipe[lecert::default]
+      - recipe[yum-centos-ct::default]
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::edit_threshd_package_services]
+    attributes:
+      opennms:
+        version: 22.0.4-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/edit_threshd_package_services
+  - name: edit_threshd_package_services_23
+    run_list:
+      - recipe[lecert::default]
+      - recipe[yum-centos-ct::default]
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::edit_threshd_package_services]
+    attributes:
+      opennms:
+        version: 23.0.4-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/edit_threshd_package_services
+  - name: edit_threshd_package_services_24
+    run_list:
+      - recipe[lecert::default]
+      - recipe[yum-centos-ct::default]
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::edit_threshd_package_services]
+    attributes:
+      opennms:
+        version: 24.1.3-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/edit_threshd_package_services
+  - name: edit_threshd_package_services_25
+    run_list:
+      - recipe[lecert::default]
+      - recipe[yum-centos-ct::default]
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::edit_threshd_package_services]
+    attributes:
+      opennms:
+        version: 25.2.1-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/edit_threshd_package_services
+  - name: edit_threshd_package_services_26
+    run_list:
+      - recipe[lecert::default]
+      - recipe[yum-centos-ct::default]
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::edit_threshd_package_services]
+    attributes:
+      opennms:
+        version: 26.2.2-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/edit_threshd_package_services
+  - name: edit_threshd_package_specifics_16
+    run_list:
+      - recipe[lecert::default]
+      - recipe[yum-centos-ct::default]
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::edit_threshd_package_specifics]
+    attributes:
+      opennms:
+        version: 16.0.4-1
+        plugin:
+          xml: true
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/edit_threshd_package_specifics
+  - name: edit_threshd_package_specifics_17
+    run_list:
+      - recipe[lecert::default]
+      - recipe[yum-centos-ct::default]
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::edit_threshd_package_specifics]
+    attributes:
+      opennms:
+        version: 17.1.1-1
+        plugin:
+          xml: true
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/edit_threshd_package_specifics
+  - name: edit_threshd_package_specifics_18
+    run_list:
+      - recipe[lecert::default]
+      - recipe[yum-centos-ct::default]
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::edit_threshd_package_specifics]
+    attributes:
+      opennms:
+        version: 18.0.4-1
+        plugin:
+          xml: true
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/edit_threshd_package_specifics
+  - name: edit_threshd_package_specifics_19
+    run_list:
+      - recipe[lecert::default]
+      - recipe[yum-centos-ct::default]
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::edit_threshd_package_specifics]
+    attributes:
+      opennms:
+        version: 19.1.0-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/edit_threshd_package_specifics
+  - name: edit_threshd_package_specifics_20
+    run_list:
+      - recipe[lecert::default]
+      - recipe[yum-centos-ct::default]
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::edit_threshd_package_specifics]
+    attributes:
+      opennms:
+        version: 20.1.0-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/edit_threshd_package_specifics
+  - name: edit_threshd_package_specifics_21
+    run_list:
+      - recipe[lecert::default]
+      - recipe[yum-centos-ct::default]
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::edit_threshd_package_specifics]
+    attributes:
+      opennms:
+        version: 21.1.0-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/edit_threshd_package_specifics
+  - name: edit_threshd_package_specifics_22
+    run_list:
+      - recipe[lecert::default]
+      - recipe[yum-centos-ct::default]
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::edit_threshd_package_specifics]
+    attributes:
+      opennms:
+        version: 22.0.4-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/edit_threshd_package_specifics
+  - name: edit_threshd_package_specifics_23
+    run_list:
+      - recipe[lecert::default]
+      - recipe[yum-centos-ct::default]
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::edit_threshd_package_specifics]
+    attributes:
+      opennms:
+        version: 23.0.4-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/edit_threshd_package_specifics
+  - name: edit_threshd_package_specifics_24
+    run_list:
+      - recipe[lecert::default]
+      - recipe[yum-centos-ct::default]
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::edit_threshd_package_specifics]
+    attributes:
+      opennms:
+        version: 24.1.3-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/edit_threshd_package_specifics
+  - name: edit_threshd_package_specifics_25
+    run_list:
+      - recipe[lecert::default]
+      - recipe[yum-centos-ct::default]
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::edit_threshd_package_specifics]
+    attributes:
+      opennms:
+        version: 25.2.1-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/edit_threshd_package_specifics
+  - name: edit_threshd_package_specifics_26
+    run_list:
+      - recipe[lecert::default]
+      - recipe[yum-centos-ct::default]
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::edit_threshd_package_specifics]
+    attributes:
+      opennms:
+        version: 26.2.2-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/edit_threshd_package_specifics
+  - name: edit_threshd_package_urls_16
+    run_list:
+      - recipe[lecert::default]
+      - recipe[yum-centos-ct::default]
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::edit_threshd_package_urls]
+    attributes:
+      opennms:
+        version: 16.0.4-1
+        plugin:
+          xml: true
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/edit_threshd_package_urls
+  - name: edit_threshd_package_urls_17
+    run_list:
+      - recipe[lecert::default]
+      - recipe[yum-centos-ct::default]
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::edit_threshd_package_urls]
+    attributes:
+      opennms:
+        version: 17.1.1-1
+        plugin:
+          xml: true
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/edit_threshd_package_urls
+  - name: edit_threshd_package_urls_18
+    run_list:
+      - recipe[lecert::default]
+      - recipe[yum-centos-ct::default]
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::edit_threshd_package_urls]
+    attributes:
+      opennms:
+        version: 18.0.4-1
+        plugin:
+          xml: true
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/edit_threshd_package_urls
+  - name: edit_threshd_package_urls_19
+    run_list:
+      - recipe[lecert::default]
+      - recipe[yum-centos-ct::default]
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::edit_threshd_package_urls]
+    attributes:
+      opennms:
+        version: 19.1.0-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/edit_threshd_package_urls
+  - name: edit_threshd_package_urls_20
+    run_list:
+      - recipe[lecert::default]
+      - recipe[yum-centos-ct::default]
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::edit_threshd_package_urls]
+    attributes:
+      opennms:
+        version: 20.1.0-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/edit_threshd_package_urls
+  - name: edit_threshd_package_urls_21
+    run_list:
+      - recipe[lecert::default]
+      - recipe[yum-centos-ct::default]
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::edit_threshd_package_urls]
+    attributes:
+      opennms:
+        version: 21.1.0-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/edit_threshd_package_urls
+  - name: edit_threshd_package_urls_22
+    run_list:
+      - recipe[lecert::default]
+      - recipe[yum-centos-ct::default]
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::edit_threshd_package_urls]
+    attributes:
+      opennms:
+        version: 22.0.4-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/edit_threshd_package_urls
+  - name: edit_threshd_package_urls_23
+    run_list:
+      - recipe[lecert::default]
+      - recipe[yum-centos-ct::default]
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::edit_threshd_package_urls]
+    attributes:
+      opennms:
+        version: 23.0.4-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/edit_threshd_package_urls
+  - name: edit_threshd_package_urls_24
+    run_list:
+      - recipe[lecert::default]
+      - recipe[yum-centos-ct::default]
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::edit_threshd_package_urls]
+    attributes:
+      opennms:
+        version: 24.1.3-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/edit_threshd_package_urls
+  - name: edit_threshd_package_urls_25
+    run_list:
+      - recipe[lecert::default]
+      - recipe[yum-centos-ct::default]
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::edit_threshd_package_urls]
+    attributes:
+      opennms:
+        version: 25.2.1-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/edit_threshd_package_urls
+  - name: edit_threshd_package_urls_26
+    run_list:
+      - recipe[lecert::default]
+      - recipe[yum-centos-ct::default]
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::edit_threshd_package_urls]
+    attributes:
+      opennms:
+        version: 26.2.2-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/edit_threshd_package_urls
   - name: event_16
     run_list:
       - recipe[yum-centos-ct::default]
@@ -17318,6 +18344,177 @@ suites:
       inspec_tests:
         - path: test/integration/default
         - path: test/integration/system_def
+  - name: threshd_package_16
+    run_list:
+      - recipe[lecert::default]
+      - recipe[yum-centos-ct::default]
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::threshd_package]
+    attributes:
+      opennms:
+        version: 16.0.4-1
+        plugin:
+          xml: true
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/threshd_package
+  - name: threshd_package_17
+    run_list:
+      - recipe[lecert::default]
+      - recipe[yum-centos-ct::default]
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::threshd_package]
+    attributes:
+      opennms:
+        version: 17.1.1-1
+        plugin:
+          xml: true
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/threshd_package
+  - name: threshd_package_18
+    run_list:
+      - recipe[lecert::default]
+      - recipe[yum-centos-ct::default]
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::threshd_package]
+    attributes:
+      opennms:
+        version: 18.0.4-1
+        plugin:
+          xml: true
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/threshd_package
+  - name: threshd_package_19
+    run_list:
+      - recipe[lecert::default]
+      - recipe[yum-centos-ct::default]
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::threshd_package]
+    attributes:
+      opennms:
+        version: 19.1.0-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/threshd_package
+  - name: threshd_package_20
+    run_list:
+      - recipe[lecert::default]
+      - recipe[yum-centos-ct::default]
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::threshd_package]
+    attributes:
+      opennms:
+        version: 20.1.0-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/threshd_package
+  - name: threshd_package_21
+    run_list:
+      - recipe[lecert::default]
+      - recipe[yum-centos-ct::default]
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::threshd_package]
+    attributes:
+      opennms:
+        version: 21.1.0-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/threshd_package
+  - name: threshd_package_22
+    run_list:
+      - recipe[lecert::default]
+      - recipe[yum-centos-ct::default]
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::threshd_package]
+    attributes:
+      opennms:
+        version: 22.0.4-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/threshd_package
+  - name: threshd_package_23
+    run_list:
+      - recipe[lecert::default]
+      - recipe[yum-centos-ct::default]
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::threshd_package]
+    attributes:
+      opennms:
+        version: 23.0.4-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/threshd_package
+  - name: threshd_package_24
+    run_list:
+      - recipe[lecert::default]
+      - recipe[yum-centos-ct::default]
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::threshd_package]
+    attributes:
+      opennms:
+        version: 24.1.3-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/threshd_package
+  - name: threshd_package_25
+    run_list:
+      - recipe[lecert::default]
+      - recipe[yum-centos-ct::default]
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::threshd_package]
+    attributes:
+      opennms:
+        version: 25.2.1-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/threshd_package
+  - name: threshd_package_26
+    run_list:
+      - recipe[lecert::default]
+      - recipe[yum-centos-ct::default]
+      - recipe[opennms::postgres]
+      - recipe[oracle_java8::default]
+      - recipe[opennms::default]
+      - recipe[onms_lwrp_test::threshd_package]
+    attributes:
+      opennms:
+        version: 26.2.2-1
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/threshd_package
   - name: threshold_16
     run_list:
       - recipe[yum-centos-ct::default]

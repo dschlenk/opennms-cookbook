@@ -1,10 +1,12 @@
 # frozen_string_literal: true
 require 'rexml/document'
 
-actions :create
+actions :create, :create_if_missing, :delete
 default_action :create
 
-attribute :package_name, kind_of: String, required: true, name_attribute: true
+attribute :name, kind_of: String, required: true, name_attribute: true
+# identity is defined exclusively by package_name
+attribute :package_name, kind_of: String
 attribute :filter, kind_of: String, default: "IPADDR != '0.0.0.0'", required: true
 attribute :specifics, kind_of: Array
 # arrays of hashes each containing begin and end keys
@@ -17,4 +19,4 @@ attribute :services, kind_of: Array
 # array of strings referencing an outage calendar name TODO validate exists
 attribute :outage_calendars, kind_of: Array
 
-attr_accessor :exists
+attr_accessor :exists, :changed

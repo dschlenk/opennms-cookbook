@@ -2,6 +2,42 @@
 require 'rexml/document'
 
 module Threshold
+  def package_exists?(name, node)
+    Chef::Log.debug "Checking to see if this threshd package exists: '#{name}'"
+    file = ::File.new("#{node['opennms']['conf']['home']}/etc/threshd-configuration.xml", 'r')
+    doc = REXML::Document.new file
+    !doc.elements["/threshd-configuration/package[@name='#{name}']"].nil?
+  end
+
+  def package_changed?(resource, node)
+    Chef::Log.debug "Checking to see if this threshd package changed: '#{resource.name}'"
+    file = ::File.new("#{node['opennms']['conf']['home']}/etc/threshd-configuration.xml", 'r')
+    doc = REXML::Document.new file
+    pel = doc.elements["/threshd-configuration/package[@name='#{resource.name}']"]
+
+    return true unless Opennms::Helpers.text_equal?(pel, 'filter', resource.filter)
+    return true unless Opennms::Helpers.text_array_equal?(pel, 'specific', resource.specifics || [])
+    return true unless Opennms::Helpers.range_hash_array_equal?(pel, 'include-range', resource.include_ranges || [])
+    return true unless Opennms::Helpers.range_hash_array_equal?(pel, 'exclude-range', resource.exclude_ranges || [])
+    return true unless Opennms::Helpers.text_array_equal?(pel, 'include-url', resource.include_urls || [])
+    curr_services = []
+    pel.elements.each('service') do |sel|
+      sparams = []
+      sel.elements.each('parameter') do |p|
+        sparams.push 'key' => p['key'].to_s, 'value' => p['value'].to_s
+      end
+      s = { 'name' => sel.attributes['name'].to_s, 'interval' => sel.attributes['interval'].to_s }
+      s['status'] = sel.attributes['status'].to_s unless sel.attributes['status'].nil?
+      s['user-defined'] = sel.attributes['user-defined'].to_s unless sel.attributes['user-defined'].nil?
+      s['parameters'] = sparams
+      curr_services.push s
+    end
+    Chef::Log.debug("services equal? '#{curr_services}' == '#{resource.services}'")
+    return true unless curr_services == (resource.services || [])
+    return true unless Opennms::Helpers.text_array_equal?(pel, 'outage-calendar', resource.outage_calendars || [])
+    false
+  end
+
   def group_exists?(name, node)
     Chef::Log.debug "Checking to see if this threshold group exists: '#{name}'"
     file = ::File.new("#{node['opennms']['conf']['home']}/etc/thresholds.xml", 'r')
