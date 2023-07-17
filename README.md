@@ -4,7 +4,7 @@ Description
 ===========
 
 A Chef cookbook to manage the installation and configuration of OpenNMS Horizon.
-Current version supports releases 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26 on CentOS 6 and 7.
+Current version supports releases 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28 on CentOS 7.
 
 Versions
 ========
@@ -15,20 +15,20 @@ Requirements
 ============
 
 * Chef 12.5.1 or later
-* CentOS 6 or 7
+* CentOS 7
 * Either use Berkshelf to satisfy dependencies or manually acquire the following cookbooks: 
   * hostsfile
   * build-essential
   * postgresql
   * openssl
 
-* In OpenNMS 17+ you will need a newer PostgreSQL than CentOS 6.x provides. Also, using Chef to install PostgreSQL makes tuning a lot easier. While you're free to install PostgreSQL in whatever manner pleases you, there is a `postgres` recipe that installs 9.3 from pgdg and does some basic tuning.
-  * You might also be interested in [the six-fixups branch of my fork of the public postgresql cookbook](https://github.com/dschlenk/postgresql/tree/six-fixups). It's based on v6.1.1 and fixes Chef 13+ deprecation errors and a couple minor bugs. The Berksfile in this cookbook is pinned to this version until I can complete testing with the v7 release of that cookbook.
+* While you're free to install PostgreSQL in whatever manner pleases you, there is a `postgres` recipe that installs an appropriate version from pgdg and does some basic tuning.
+* Java
 
 Usage
 =====
 
-Running the default recipe will install OpenNMS 26.2.2-1 (or a custom version using the attribute `node[:opennms][:version]`) on CentOS 6 or 7 from the official repo with the default configuration. It will also execute `'$ONMS_HOME/bin/runjava -s` if `$ONMS_HOME/etc/java.conf` is not present and `$ONMS_HOME/bin/install -dis` if `$ONMS_HOME/etc/configured` is not present.
+Running the default recipe will install OpenNMS 28.1.1-1 (or a custom version using the attribute `node[:opennms][:version]`) on 7 from the official repo with the default configuration. It will also execute `'$ONMS_HOME/bin/runjava -s` if `$ONMS_HOME/etc/java.conf` is not present and `$ONMS_HOME/bin/install -dis` if `$ONMS_HOME/etc/configured` is not present.
 
 There are two primary ways to use this cookbook: as an application cookbook or library cookbook. If you simply want to tweak a few settings to the default OpenNMS configuration, you can use the `default` recipe of this cookbook directly and modify node attributes to suit your needs. There are also a plethora of custom resources that you can use to do more in depth customizations. If you go that route I recommend setting `node['opennms']['templates']` to false (or add `recipe[opennnms::notemplates]` to your run list) and then using the custom resources (and maybe a few of the templates in this cookbook) to define your run list. If your node's run list contains both the template and a resource that manages the same file you'll end up with a lot of churn during the chef client run, which is a waste of time and will probably cause unnecessary restarts of the application.
 
@@ -36,76 +36,7 @@ Template resources for daemons that support configuration changes without a rest
 
 ### Java (Optional)
 
-While the current OpenNMS Yum repos contain a suitable JDK, you might want to check out the community java (https://github.com/socrata-cookbooks/java) cookbook. Oracle likes to change license terms on a whim and their RPM might not set up things (like alternatives priorities) to your liking, so you might want to get ahead of the curve and manage installing the JDK yourself. See `test/fixtures/cookbooks/oracle_java8` for a simple example method of installing Oracle Java via Chef. Note that you'll need to host the download yourself, since the last commercial Java 8 release is now an archived version and requires a login to download. If you're using test kitchen, you'll need to override the URL in a .kitchen.local.yml file to point at your (non-public) copy of the file. An example, where I'm using VirtualBox and serving it from my local workstation using apache UserDir:
-
-```
----
-platforms:
-  - name: centos-6.9
-    attributes:
-      java:
-        jdk:
-          '8':
-            x86_64:
-              url:  'http://10.0.2.2/~schlazor/jdk-8u201-linux-x64.tar.gz'
-              checksum: 'cb700cc0ac3ddc728a567c350881ce7e25118eaf7ca97ca9705d4580c506e370'
-  - name: centos-7
-    attributes:
-      java:
-        jdk:
-          '8':
-            x86_64:
-              url:  'http://10.0.2.2/~schlazor/jdk-8u201-linux-x64.tar.gz'
-              checksum: 'cb700cc0ac3ddc728a567c350881ce7e25118eaf7ca97ca9705d4580c506e370'
-```
-
-If you want to install Java via RPM, you have to do a bit more work. First, you need to download the appropriate RPM(s) from Oracle and make a yum repo available to your nodes. For example, on a CentOS server with Apache httpd installed you could do:
-
-```
-# mkdir /var/www/html/oracle-java
-# mv jdk*.rpm /var/www/html/oracle-java/
-# createrepo /var/www/html/oracle-java
-# chown -R apache:apache /var/www/html/oracle-java
-```
-
-Next, acquire the java cookbook in the link above by either cloning the repo and uploading to your Chef server or using Berkshelf or another cookbook management tool that can talk to git repos. 
-
-Set the following attributes (in a role, environement, or in a wrapper cookbook - up to you):
-
-```
-node['java']['oracle']['accept_oracle_download_terms'] = true
-node['java']['install_flavor'] = 'oracle_rpm'
-node['java']['oracle_rpm']['type'] = 'jdk'
-node['java']['oracle_rpm']['package_name'] = 'jdk1.8.0_40' # match the current JDK version you've downloaded and set up a yum repo for
-node['java']['alternatives_priority'] = 180040
-node['java']['jdk_version'] = 8
-node['java']['set_etc_environment'] = true
-node['java']['oracle']['jce']['enabled'] = true
-```
-
-Add a `yum_repository` resource to a recipe in your node or role's run list, like so:
-
-```
-yum_repository 'oracle-java' do
-  description 'mirror of oracle java RPM packages'
-  baseurl 'URL_TO_YOUR_YUM_REPO'
-  gpgcheck false
-  action :create
-end
-```
-
-Then add the 'java::default' recipe to your run list.
-
-### Recommended Tweaks
-
-There are also a couple OpenNMS attributes you'll probably want to override at a minimum: 
-
-### opennms.conf
-
-```
-node[:opennms][:conf][:heap_size] = 1024
-node[:opennms][:conf][:addl_mgr_opts] = '-XX:+UseConcMarkSweepGC -XX:MaxMetaspaceSize=512m'
-```
+You'll need to install Java. Take a look at the fixture cookbooks in `test/fixtures/cookbooks` for examples.
 
 ### Upgrades
 
@@ -245,7 +176,7 @@ See `opennms::example_statsd` for example usage of these custom resources.
 
 See examples for all of these custom resources are in a single recipe, `example_threshold`.
 
-* `opennms_threshd_package`: Create a new package in threshd-configuration.xml.
+* `opennms_threshd_package`: Create a new package in threshd-configuration.xml. Supports updating and deleting.
 * `opennms_threshold_group`: Create a new threshold group in thresholds.xml.
 * `opennms_threshold`: Create a new threshold in the specified group in thresholds.xml. Supports updating and deleting.
 * `opennms_expression`: Create a new expression threshold in the specified group in thresholds.xml. Supports updating and deleting.

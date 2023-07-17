@@ -1,5 +1,9 @@
 # OpenNMS Cookbook Changes
 
+## 28.1.0
+
+* add support for updating and deleteing threshd packages
+
 ## 26.3.3
 
 * actually don't manage postres repos when told not to
