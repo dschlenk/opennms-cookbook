@@ -1,6 +1,8 @@
 DEPENDENCIES
   hsflowd
     path: test/fixtures/cookbooks/hsflowd
+  lecert
+    path: test/fixtures/cookbooks/lecert
   onms_lwrp_test
     path: test/fixtures/cookbooks/onms_lwrp_test
   opennms
@@ -11,6 +13,8 @@ DEPENDENCIES
   opennms_helm
   oracle_java8
     path: test/fixtures/cookbooks/oracle_java8
+  pgfix
+    path: test/fixtures/cookbooks/pgfix
   postgresql
     git: https://github.com/dschlenk/postgresql.git
     revision: 9815f30ac6fe4bdf688ddb799101b2e24038860d
@@ -18,6 +22,8 @@ DEPENDENCIES
   snmp
     path: test/fixtures/cookbooks/snmp
   yum-centos
+  yum-centos-ct
+    path: test/fixtures/cookbooks/yum-centos-ct
   yum-epel
 
 GRAPH
@@ -43,11 +49,12 @@ GRAPH
     apt (>= 0.0.0)
     homebrew (>= 0.0.0)
     windows (>= 0.0.0)
+  lecert (0.1.0)
   mingw (2.0.2)
     seven_zip (>= 0.0.0)
   onms_lwrp_test (0.1.0)
     opennms (>= 0.0.0)
-  opennms (22.3.2)
+  opennms (22.3.3)
     build-essential (>= 0.0.0)
     hostsfile (>= 0.0.0)
     openssl (>= 0.0.0)
@@ -58,6 +65,7 @@ GRAPH
   openssl (8.1.2)
   oracle_java8 (0.1.0)
     java (>= 0.0.0)
+  pgfix (0.1.0)
   postgresql (6.1.2)
     build-essential (>= 2.0.0)
     compat_resource (>= 12.16.3)
@@ -68,4 +76,5 @@ GRAPH
   windows (4.0.1)
   yum (5.1.0)
   yum-centos (3.0.0)
+  yum-centos-ct (0.1.0)
   yum-epel (3.1.0)

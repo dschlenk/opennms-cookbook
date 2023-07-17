@@ -3,39 +3,31 @@
 require 'kitchen'
 require 'cookstyle'
 require 'rubocop/rake_task'
-require 'foodcritic'
 require 'optparse'
 
 # # Style tests. cookstyle (rubocop) and Foodcritic
 namespace :style do
-  desc 'Run Ruby style checks'
-  RuboCop::RakeTask.new(:ruby)
-  RuboCop::RakeTask.new(:rubycorrect) do |task|
+  desc 'Run Chef and ruby style checks'
+  RuboCop::RakeTask.new(:cookstyle)
+  RuboCop::RakeTask.new(:correct) do |task|
     task.options = ['-a']
   end
-  RuboCop::RakeTask.new(:rubyconfig) do |task|
+  RuboCop::RakeTask.new(:config) do |task|
     task.options = ['--auto-gen-config']
   end
-  RuboCop::RakeTask.new(:rubycorrectconfig) do |task|
+  RuboCop::RakeTask.new(:correctconfig) do |task|
     task.options = ['--auto-gen-config', '-a']
-  end
-  desc 'Run Chef style checks'
-  FoodCritic::Rake::LintTask.new(:chef) do |t|
-    t.options = {
-      fail_tags: ['any'],
-      progress: true,
-    }
   end
 end
 
 desc 'Run all style checks'
-task style: ['style:chef', 'style:ruby']
+task style: ['style:cookstyle']
 
 namespace :integration do
   desc 'Run Test Kitchen with Vagrant'
   task :vagrant do
     options = {
-      versions: %w(16 17 18 19 20 21 22),
+      versions: %w(16 17 18 19 20 21 22 23 24 25 26),
       platforms: %w(centos-69 centos-7),
     }
     opts = OptionParser.new
@@ -43,6 +35,7 @@ namespace :integration do
     opts.on('-r', '--resume ARG', String) { |resume| options[:resume] = resume }
     opts.on('-v', '--versions ARG', Array) { |versions| options[:versions] = versions }
     opts.on('-p', '--platforms ARG', Array) { |platforms| options[:platforms] = platforms }
+    opts.on('-s', '--suites ARG', Array) { |suites| options[:suites] = suites }
     opts.on('-h', '--help') { puts opts }
     args = opts.order!(ARGV) {}
     opts.parse!(args)
@@ -60,6 +53,10 @@ namespace :integration do
         old_instance = nil
         first_instance = nil
         Kitchen::Config.new.instances.each do |instance|
+          unless options[:suites].nil?
+            md = /^(\w+((?:-\w+)?)*)-(\d+)-(\w+-\d+)$/.match(instance.name)
+            next unless options[:suites].include?(md[1])
+          end
           next unless instance.name =~ /-#{ver}-#{plat}/
           if skipping
             if instance.name == options[:resume]
@@ -94,9 +91,11 @@ namespace :integration do
           old_instance = instance
         end
         # to improve the odds it actually destroys properly, rename it back to original
-        puts "Done with #{ver} on #{plat}. Moving #{old_instance.name}.yml to #{first_instance.name}.yml before destroying."
-        File.rename(".kitchen/#{old_instance.name}.yml", ".kitchen/#{first_instance.name}.yml")
-        first_instance.destroy
+        if File.exist?(".kitchen/#{old_instance.name}.yml")
+          puts "Done with #{ver} on #{plat}. Moving #{old_instance.name}.yml to #{first_instance.name}.yml before destroying."
+          File.rename(".kitchen/#{old_instance.name}.yml", ".kitchen/#{first_instance.name}.yml")
+          first_instance.destroy
+        end
         # try to prevent OOM
         GC.start
       end
