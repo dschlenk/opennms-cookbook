@@ -54,7 +54,7 @@ GRAPH
     seven_zip (>= 0.0.0)
   onms_lwrp_test (0.1.0)
     opennms (>= 0.0.0)
-  opennms (22.3.3)
+  opennms (22.4.0)
     build-essential (>= 0.0.0)
     hostsfile (>= 0.0.0)
     openssl (>= 0.0.0)
