@@ -26,7 +26,7 @@ module Threshold
       sel.elements.each('parameter') do |p|
         sparams.push 'key' => p['key'].to_s, 'value' => p['value'].to_s
       end
-      s = { 'name' => sel.attributes['name'].to_s, 'interval' => sel.attributes['interval'].to_s }
+      s = { 'name' => sel.attributes['name'].to_s, 'interval' => sel.attributes['interval'].to_i }
       s['status'] = sel.attributes['status'].to_s unless sel.attributes['status'].nil?
       s['user-defined'] = sel.attributes['user-defined'].to_s unless sel.attributes['user-defined'].nil?
       s['parameters'] = sparams
