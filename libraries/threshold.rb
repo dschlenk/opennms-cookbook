@@ -22,9 +22,9 @@ module Threshold
     return true unless Opennms::Helpers.text_array_equal?(pel, 'include-url', resource.include_urls || [])
     curr_services = []
     pel.elements.each('service') do |sel|
-      sparams = []
+      sparams = {}
       sel.elements.each('parameter') do |p|
-        sparams.push 'key' => p['key'].to_s, 'value' => p['value'].to_s
+        sparams[p['key'].to_s] = p['value'].to_s
       end
       s = { 'name' => sel.attributes['name'].to_s, 'interval' => sel.attributes['interval'].to_i }
       s['status'] = sel.attributes['status'].to_s unless sel.attributes['status'].nil?
