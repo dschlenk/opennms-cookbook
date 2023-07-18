@@ -29,7 +29,7 @@ module Threshold
       s = { 'name' => sel.attributes['name'].to_s, 'interval' => sel.attributes['interval'].to_i }
       s['status'] = sel.attributes['status'].to_s unless sel.attributes['status'].nil?
       s['user-defined'] = sel.attributes['user-defined'].to_s unless sel.attributes['user-defined'].nil?
-      s['parameters'] = sparams
+      s['params'] = sparams
       curr_services.push s
     end
     Chef::Log.debug("services equal? '#{curr_services}' == '#{resource.services}'")
