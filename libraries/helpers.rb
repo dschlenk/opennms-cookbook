@@ -1,7 +1,16 @@
 # frozen_string_literal: false
 require 'rexml/document'
+require 'chef-vault'
 module Opennms
   module Helpers
+    def self.snake_to_camel_lower(str)
+      str.split('_').inject([]){ |buffer, e| buffer.push(buffer.empty? ? e : e.capitalize) }.join
+    end
+
+    def self.snake_to_kebab(str)
+      str.split('_').join('-')
+    end
+
     def self.major(version)
       m = version.match(/(\d+)\..*/)
       return m.captures[0] unless m.nil?

@@ -1,57 +1,36 @@
-# frozen_string_literal: true
 onms_home = '/opt/opennms'
 # change default yum_timeout to 1200 because opennms packages are slow sometimes.
 default['yum_timeout'] = 1200
+default['opennms']['username'] = 'opennms'
+default['opennms']['groupname'] = 'opennms'
 # yum repo stuff
 default['yum']['opennms']['key_url']                      = 'http://yum.opennms.org/OPENNMS-GPG-KEY'
 default['yum']['opennms-stable-common']['baseurl']        = 'http://yum.opennms.org/stable/common'
 default['yum']['opennms-stable-common']['failovermethod'] = 'roundrobin'
-default['yum']['opennms-stable-rhel6']['baseurl']         = 'http://yum.opennms.org/stable/rhel6'
-default['yum']['opennms-stable-rhel6']['failovermethod']  = 'roundrobin'
-default['yum']['opennms-stable-rhel7']['baseurl']         = 'http://yum.opennms.org/stable/rhel7'
-default['yum']['opennms-stable-rhel7']['failovermethod']  = 'roundrobin'
+default['yum']['opennms-stable-rhel9']['baseurl']         = 'http://yum.opennms.org/stable/rhel9'
+default['yum']['opennms-stable-rhel9']['failovermethod']  = 'roundrobin'
 default['yum']['opennms-obsolete-common']['baseurl']        = 'http://yum.opennms.org/obsolete/common'
 default['yum']['opennms-obsolete-common']['failovermethod'] = 'roundrobin'
-default['yum']['opennms-obsolete-rhel6']['baseurl']         = 'http://yum.opennms.org/obsolete/rhel6'
-default['yum']['opennms-obsolete-rhel6']['failovermethod']  = 'roundrobin'
-default['yum']['opennms-obsolete-rhel7']['baseurl']         = 'http://yum.opennms.org/obsolete/rhel7'
-default['yum']['opennms-obsolete-rhel7']['failovermethod']  = 'roundrobin'
+default['yum']['opennms-obsolete-rhel9']['baseurl']         = 'http://yum.opennms.org/obsolete/rhel9'
+default['yum']['opennms-obsolete-rhel9']['failovermethod']  = 'roundrobin'
 default['yum']['opennms-snapshot-common']['baseurl']        = 'http://yum.opennms.org/snapshot/common'
 default['yum']['opennms-snapshot-common']['failovermethod'] = 'roundrobin'
-default['yum']['opennms-snapshot-rhel6']['baseurl']         = 'http://yum.opennms.org/snapshot/rhel6'
-default['yum']['opennms-snapshot-rhel6']['failovermethod']  = 'roundrobin'
-default['yum']['opennms-snapshot-rhel7']['baseurl']         = 'http://yum.opennms.org/snapshot/rhel7'
-default['yum']['opennms-snapshot-rhel7']['failovermethod']  = 'roundrobin'
+default['yum']['opennms-snapshot-rhel9']['baseurl']         = 'http://yum.opennms.org/snapshot/rhel9'
+default['yum']['opennms-snapshot-rhel9']['failovermethod']  = 'roundrobin'
 default['yum']['opennms-oldstable-common']['baseurl']        = 'http://yum.opennms.org/oldstable/common'
 default['yum']['opennms-oldstable-common']['failovermethod'] = 'roundrobin'
-default['yum']['opennms-oldstable-rhel6']['baseurl']         = 'http://yum.opennms.org/oldstable/rhel6'
-default['yum']['opennms-oldstable-rhel6']['failovermethod']  = 'roundrobin'
-default['yum']['opennms-oldstable-rhel7']['baseurl']         = 'http://yum.opennms.org/oldstable/rhel7'
-default['yum']['opennms-oldstable-rhel7']['failovermethod']  = 'roundrobin'
-default['opennms']['yum_gpg_keys'] = {
-  'OPENNMS-GPG-KEY-2012' => 'OpenNMS Signing Key 2012',
-  'OPENNMS-GPG-KEY-2023' => 'OpenNMS Signing Key 2023',
-}
-# 6 is eol but I guess folks might still need it
-case node['platform_family']
-when 'rhel'
-  if node['platform_version'].to_f >= 6.0 && node['platform_version'].to_f < 7.0
-    default['yum']['base']['baseurl'] = 'https://archive.kernel.org/centos-vault/6.9/os/$basearch/'
-    default['yum']['extras']['baseurl'] = 'https://archive.kernel.org/centos-vault/6.9/extras/$basearch/'
-    default['yum']['updates']['baseurl'] = 'https://archive.kernel.org/centos-vault/6.9/updates/$basearch/'
-    default['yum']['base']['mirrorlist'] = nil
-    default['yum']['extras']['mirrorlist'] = nil
-    default['yum']['updates']['mirrorlist'] = nil
-  end
-end
-default['build-essential']['compile_time'] = true
+default['yum']['opennms-oldstable-rhel9']['baseurl']         = 'http://yum.opennms.org/oldstable/rhel9'
+default['yum']['opennms-oldstable-rhel9']['failovermethod']  = 'roundrobin'
+default['opennms']['yum_gpg_keys'] = [
+  'https://yum.opennms.org/OPENNMS-GPG-KEY',
+]
 # set to -Q to mimic OOTB quick start behavior on RHEL7+ (but you should not do this if using any of the opennms resources)
 default['opennms']['start_opts'] = ''
 # set to '' if you want to re-enable OOTB behavior (but you should not do this if using any of the opennms resources)
 default['opennms']['timeout_start_sec'] = '10min'
-default['opennms']['version'] = '28.1.1-1'
-default['java']['version'] = '11'
-# default['opennms']['version_major'] = "%{version}"
+default['opennms']['version'] = '33.0.8-1'
+default['java']['version'] = '17'
+default['opennms']['jre_path'] = nil
 default['opennms']['allow_downgrade'] = false
 default['opennms']['stable'] = true
 # whether or not to attempt to automatically upgrade opennms
@@ -68,9 +47,6 @@ default['opennms']['upgrade_dirs'] = [
   'jetty-webapps/opennms/WEB-INF/jsp/ncs',
   'jetty-webapps/opennms-remoting/WEB-INF',
 ]
-# whether or not to include the plugin packages
-default['opennms']['plugin']['xml'] = false
-default['opennms']['plugin']['nsclient'] = false
 # populate this with the names of additional packages you want installed.
 # examples:
 # * opennms-plugin-northbounder-jms
@@ -81,27 +57,16 @@ default['opennms']['plugin']['addl'] = []
 default['opennms']['addl_handlers'] = []
 # change to true to generate a random password
 default['opennms']['secure_admin'] = false
-# opennms.conf
 default['opennms']['conf']['home']           = onms_home
-
-default['opennms']['conf']['pidfile']        = "#{onms_home}/logs/opennms.pid"
-default['opennms']['conf']['logdir']         = "#{onms_home}/logs"
-default['opennms']['conf']['initdir']        = "#{onms_home}/bin"
-default['opennms']['conf']['redirect']       = '$LOG_DIRECTORY/output.log'
-default['opennms']['conf']['start_timeout']  = 35
-default['opennms']['conf']['status_wait']    = 5
-default['opennms']['conf']['heap_size']      = 512
-default['opennms']['conf']['addl_mgr_opts']  = ''
-default['opennms']['conf']['addl_classpath'] = ''
-default['opennms']['conf']['use_incgc']      = ''
-default['opennms']['conf']['hotspot']        = ''
-default['opennms']['conf']['verbose_gc']     = ''
-default['opennms']['conf']['runjava_opts']   = ''
-default['opennms']['conf']['invoke_url']     = 'http://127.0.0.1:8181/invoke?objectname=OpenNMS:Name=Manager'
-default['opennms']['conf']['runas']          = 'root'
-default['opennms']['conf']['max_file_descr'] = '20480'
-default['opennms']['conf']['max_stack_sgmt'] = '8192'
-default['opennms']['conf']['command']        = ''
+# opennms.conf
+default['opennms']['conf']['env'] = {
+  # required because we need opennms to fully start before resources will work
+  'START_TIMEOUT' => 20,
+  # see $OPENNMS_HOME/etc/examples/opennms.conf for more options, like:
+  # 'JAVA_HEAP_SIZE' => 4096,
+  # 'MAXIMUM_FILE_DESCRIPTORS' => 204800,
+  # 'ADDITIONAL_MANAGER_OPTIONS' => '${ADDITIONAL_MANAGER_OPTIONS} -XX:+UseStringDeduplication',
+}
 # TEMPLATES
 
 # whether or not to use all templates or just base.
@@ -288,12 +253,13 @@ default['opennms']['xml']['rrd_repository']                                   = 
 # users.xml
 default['opennms']['users']['admin']['name']          = 'Administrator'
 default['opennms']['users']['admin']['user_comments'] = 'Default administrator, do not delete'
-# if you want to change the admin password to something specific you
-# only need to change the password attribute - the hash will then get
-# changed for you.
-default['opennms']['users']['admin']['password']      = 'admin'
-default['opennms']['users']['admin']['pwhash']        = '21232F297A57A5A743894A0E4A801FC3'
-default['opennms']['users']['salted']                 = false
+# if you want to change the admin password to something specific, you must provide the node with a vault item that contains JSON like:
+# {
+#     "password": "thePassword"
+# }
+default['opennms']['users']['admin']['vault'] = Chef::Config[:node_name]
+# must contain a value named `password`.
+default['opennms']['users']['admin']['vault_item'] = 'opennms_admin_password'
 
 # non-default daemons
 default['opennms']['services']['dhcpd']       = false
@@ -306,6 +272,13 @@ default['opennms']['services']['xmlrpcd']     = false
 default['opennms']['services']['asterisk_gw'] = false
 default['opennms']['services']['apm']         = false
 # opennms.properties
+default['opennms']['properties']['files'] = {
+#  Use to define properties overrides in `$OPENNMS_HOME/etc/opennms.properties.d`.
+#  For example, to override property `org.opennms.features.scv.jceks.key` in a file named `$OPENNMS_HOME/etc/opennms.properties.d/scv.properties`, do:
+#  'scv' => {
+#    'org.opennms.features.scv.jceks.key' => 'pw'
+#  }
+}
 default['opennms']['properties']['dc']['rrd_base_dir']              = "#{onms_home}/share/rrd"
 default['opennms']['properties']['misc']['bin_dir']                 = "#{onms_home}/bin"
 default['opennms']['properties']['reporting']['template_dir']       = "#{onms_home}/etc"
@@ -350,8 +323,8 @@ default['opennms']['properties']['ticket']['servicelayer']  = 'org.opennms.netmg
 default['opennms']['properties']['ticket']['plugin']        = 'org.opennms.netmgt.ticketd.NullTicketerPlugin'
 default['opennms']['properties']['ticket']['enabled']       = nil
 default['opennms']['properties']['ticket']['link_template'] = nil
-default['opennms']['properties']['ticket']['skip_create_when_cleared'] = false
-default['opennms']['properties']['ticket']['skip_close_when_not_cleared'] = false
+default['opennms']['properties']['ticket']['skip_create_when_cleared'] = true
+default['opennms']['properties']['ticket']['skip_close_when_not_cleared'] = true
 # Misc
 default['opennms']['properties']['misc']['layout_applications_vertically'] = false
 default['opennms']['properties']['misc']['webapp_logs_dir']                = '${install.logs.dir}'
@@ -526,7 +499,7 @@ default['opennms']['categories']['web']['label']    = 'Web Servers'
 default['opennms']['categories']['web']['comment']  = 'This category includes all managed interfaces which are running an HTTP (Web) server on port 80 or other common ports.'
 default['opennms']['categories']['web']['normal']   = 99.99
 default['opennms']['categories']['web']['warning']  = 97
-default['opennms']['categories']['web']['services'] = ['HTTP', 'HTTPS', 'HTTP-8000', 'HTTP-8080']
+default['opennms']['categories']['web']['services'] = %w(HTTP HTTPS HTTP-8000 HTTP-8080)
 default['opennms']['categories']['web']['rule']     = 'isHTTP | isHTTPS | isHTTP-8000 | isHTTP-8080'
 default['opennms']['categories']['jmx']['enable']   = true
 default['opennms']['categories']['jmx']['label']    = 'JMX Servers'
@@ -969,10 +942,10 @@ default['opennms']['linkd']['vlan']['enable_hp']            = true
 default['opennms']['linkd']['vlan']['enable_cisco']         = true
 default['opennms']['linkd']['vlan']['enable_extreme']       = true
 # log4j2.xml
-default['opennms']['log4j2']['default_route']['size'] = '10MB'
-default['opennms']['log4j2']['default_route']['rollover'] = 8
+default['opennms']['log4j2']['default_route']['size'] = '100MB'
+default['opennms']['log4j2']['default_route']['rollover'] = 4
 default['opennms']['log4j2']['instrumentation']['size'] = '100MB'
-default['opennms']['log4j2']['instrumentation']['rollover'] = 1
+default['opennms']['log4j2']['instrumentation']['rollover'] = 4
 default['opennms']['log4j2']['size'] = '100MB'
 default['opennms']['log4j2']['access_point_monitor'] = 'WARN'
 default['opennms']['log4j2']['ackd'] = 'WARN'
@@ -1729,8 +1702,8 @@ default['opennms']['snmp_graph']['zeus']['enabled']      = true
 # snmp-interface-poller-configuration.xml
 default['opennms']['snmp_iface_poller']['threads']                               = 30
 default['opennms']['snmp_iface_poller']['service']                               = 'SNMP'
-default['opennms']['snmp_iface_poller']['upvalues']                               = 1
-default['opennms']['snmp_iface_poller']['downvalues']                               = 2
+default['opennms']['snmp_iface_poller']['upvalues'] = 1
+default['opennms']['snmp_iface_poller']['downvalues'] = 2
 # array of service names
 default['opennms']['snmp_iface_poller']['node_outage']                           = %w(ICMP SNMP)
 default['opennms']['snmp_iface_poller']['example1']['filter']                    = "IPADDR != '0.0.0.0'"
@@ -1777,7 +1750,7 @@ default['opennms']['syslog_north']['uei']['node_up']   = false
 # syslogd-configuration.xml
 default['opennms']['syslogd']['port']                   = 10_514
 default['opennms']['syslogd']['new_suspect']            = false
-default['opennms']['syslogd']['parser']                 = 'org.opennms.netmgt.syslogd.CustomSyslogParser'
+default['opennms']['syslogd']['parser']                 = 'org.opennms.netmgt.syslogd.RadixTreeSyslogParser'
 default['opennms']['syslogd']['forwarding_regexp']      = '^.*\s(19|20)\d\d([-/.])(0[1-9]|1[012])\2(0[1-9]|[12][0-9]|3[01])(\s+)(\S+)(\s)(\S.+)'
 default['opennms']['syslogd']['matching_group_host']    = 6
 default['opennms']['syslogd']['matching_group_message'] = 8
@@ -2056,19 +2029,8 @@ default['opennms']['web']['cookbook'] = 'opennms'
 default['opennms']['cors']['origins']     = '*'
 default['opennms']['cors']['credentials'] = true
 
-case node['platform_family']
-when 'rhel'
-  default['opennms']['repos']['branches'] = %w(obsolete snapshot stable oldstable)
-  default['opennms']['repos']['platforms'] = %w(common)
-  if node['platform_version'].to_f >= 6.0 && node['platform_version'].to_f < 7.0
-    Chef::Log.debug("i am 6 because #{node['platform_version']}")
-    default['opennms']['repos']['platforms'].push 'rhel6'
-  end
-  if node['platform_version'].to_f >= 7.0 && node['platform_version'].to_f < 8.0
-    Chef::Log.debug("i am 7 because #{node['platform_version']}")
-    default['opennms']['repos']['platforms'].push 'rhel7'
-  end
-end
+default['opennms']['repos']['branches'] = %w(obsolete snapshot stable oldstable)
+default['opennms']['repos']['platforms'] = %w(common rhel9)
 
 default['opennms']['telemetryd']['managed'] = false
 default['opennms']['telemetryd']['jti']['enabled'] = false
@@ -2120,10 +2082,57 @@ default['opennms']['telemetryd']['cookbook'] = 'opennms'
 default['opennms']['es']['hosts'] = {}
 default['opennms']['manage_repos'] = true
 
-default['opennms']['posgresql']['pg_upgrade_timeout'] = 7200
-default['opennms']['postgresql']['attempt_upgrade'] = false
-default['opennms']['postgresql']['start_after_upgrade'] = false
 default['opennms']['postgresql']['setup_repo'] = true
+default['opennms']['postgresql']['version'] = '15'
+# must contain objects named 'postgres' and 'opennms' each with string values named 'password'
+default['opennms']['postgresql']['user_vault'] = Chef::Config['node_name']
+default['opennms']['postgresql']['user_vault_item'] = 'postgres_users'
 
 default['opennms']['bin']['cookbook'] = 'opennms'
 default['opennms']['bin']['return_code'] = false
+default['opennms']['rrdtool']['enabled'] = false
+
+# values for opennms-datasources.xml
+default['opennms']['datasources_cookbook'] = 'opennms'
+default['opennms']['datasources']['connection_pool'] = {
+  'idle_timeout' => 600,
+  'login_timeout' => 3,
+  'min_pool' => 25,
+  'max_pool' => 50,
+  'max_size' => 50,
+}
+default['opennms']['datasources']['opennms'] = {
+  'database_name' => 'opennms',
+  'class_name' => 'org.postgresql.Driver',
+  'url' => 'jdbc:postgresql://localhost:5432/opennms',
+  'user_name' => '${scv:postgres:username|opennms}',
+  'password' => '${scv:postgres:password|opennms}',
+}
+default['opennms']['datasources']['opennms-admin'] = {
+  'database_name' => 'template1',
+  'class_name' => 'org.postgresql.Driver',
+  'url' => 'jdbc:postgresql://localhost:5432/template1',
+  'user_name' => '${scv:postgres-admin:username|postgres}',
+  'password' => '${scv:postgres-admin:password|}',
+  'connection_pool' => {
+    'idle_timeout' => 600,
+    'min_pool' => 0,
+    'max_pool' => 10,
+    'max_size' => 50,
+  }
+}
+default['opennms']['datasources']['opennms-monitor'] = {
+  'database_name' => 'postgres',
+  'class_name' => 'org.postgresql.Driver',
+  'url' => 'jdbc:postgresql://localhost:5432/postgres',
+  'user_name' => '${scv:postgres-admin:username|postgres}',
+  'password' => '${scv:postgres-admin:password|}',
+  'connection_pool' => {
+    'idle_timeout' => 600,
+    'min_pool' => 0,
+    'max_pool' => 10,
+    'max_size' => 50,
+  }
+}
+default['opennms']['scv']['vault'] = Chef::Config['node_name']
+default['opennms']['scv']['item'] = 'scv'

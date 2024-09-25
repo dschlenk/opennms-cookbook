@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-include Opennms::Rbac
 def whyrun_supported?
   true
 end
@@ -41,14 +39,14 @@ def load_current_resource
   @current_resource.roles(@new_resource.roles)
   @current_resource.duty_schedules(@new_resource.duty_schedules)
 
-  if user_exists?(@current_resource.name, node)
+  if rbac.user_exists?(@current_resource.name)
     @current_resource.exists = true
-    @current_resource.changed = true if user_changed?(@current_resource, node)
+    @current_resource.changed = true if rbac.user_changed?(@current_resource)
   end
 end
 
 private
 
 def create_user
-  add_user(new_resource, node)
+  add_user(new_resource)
 end

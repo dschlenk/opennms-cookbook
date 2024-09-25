@@ -1,9 +1,8 @@
-# frozen_string_literal: true
 #
-# Cookbook Name:: opennms
+# Cookbook:: opennms
 # Recipe:: templates
 #
-# Copyright 2015, Spanlink Communications, Inc
+# Copyright:: 2015-2024, ConvergeOne Holding Corp.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -20,21 +19,10 @@
 onms_home = node['opennms']['conf']['home']
 onms_home ||= '/opt/opennms'
 
-# don't make wrappers that change templates support multiple versions
-mv = Opennms::Helpers.major(node['opennms']['version'])
-template_dir = if node['opennms']['conf']['cookbook'] == 'opennms'
-                 "horizon-#{mv % { version: node['opennms']['version'] }}/"
-               else
-                 ''
-               end
-if mv.to_i >= 20
-  node.default['opennms']['threshd']['hrstorage']['filter'] = "IPADDR != '0.0.0.0' &amp; (nodeSysOID LIKE '.1.3.6.1.4.1.311.%' | nodeSysOID LIKE '.1.3.6.1.4.1.2.3.1.2.1.1.3.%' | nodeSysOID LIKE '.1.3.6.1.4.1.8072.%')"
-end
-
 template "#{onms_home}/etc/availability-reports.xml" do
   cookbook node['opennms']['db_reports']['avail']['cookbook']
-  source "#{template_dir}availability-reports.xml.erb"
-  mode 0664
+  source 'availability-reports.xml.erb'
+  mode '664'
   owner 'root'
   group 'root'
   variables(
@@ -50,12 +38,13 @@ template "#{onms_home}/etc/availability-reports.xml" do
     classic_minutes: node['opennms']['db_reports']['avail']['classic']['endDate']['minutes'],
     onms_home: onms_home
   )
+  action node['opennms']['templates'] ? :create : :nothing
 end
 
 template "#{onms_home}/etc/service-configuration.xml" do
   cookbook node['opennms']['services']['cookbook']
-  source "#{template_dir}service-configuration.xml.erb"
-  mode 00664
+  source 'service-configuration.xml.erb'
+  mode '664'
   owner 'root'
   group 'root'
   notifies :restart, 'service[opennms]'
@@ -69,12 +58,13 @@ template "#{onms_home}/etc/service-configuration.xml" do
     asterisk_gw: node['opennms']['services']['asterisk_gw'],
     apm: node['opennms']['services']['apm']
   )
+  action node['opennms']['templates'] ? :create : :nothing
 end
 
 template "#{onms_home}/etc/categories.xml" do
   cookbook node['opennms']['categories']['cookbook']
-  source "#{template_dir}categories.xml.erb"
-  mode 0664
+  source 'categories.xml.erb'
+  mode '664'
   owner 'root'
   group 'root'
   notifies :restart, 'service[opennms]'
@@ -90,12 +80,13 @@ template "#{onms_home}/etc/categories.xml" do
     other: node['opennms']['categories']['other'],
     inet: node['opennms']['categories']['inet']
   )
+  action node['opennms']['templates'] ? :create : :nothing
 end
 
 template "#{onms_home}/etc/chart-configuration.xml" do
   cookbook node['opennms']['chart']['cookbook']
-  source "#{template_dir}chart-configuration.xml.erb"
-  mode 0664
+  source 'chart-configuration.xml.erb'
+  mode '664'
   owner 'root'
   group 'root'
   notifies :restart, 'service[opennms]'
@@ -104,12 +95,13 @@ template "#{onms_home}/etc/chart-configuration.xml" do
     outages_enable: node['opennms']['chart']['outages_enable'],
     inventory_enable: node['opennms']['chart']['inventory_enable']
   )
+  action node['opennms']['templates'] ? :create : :nothing
 end
 
 template "#{onms_home}/etc/collectd-configuration.xml" do
   cookbook node['opennms']['collectd']['cookbook']
-  source "#{template_dir}collectd-configuration.xml.erb"
-  mode 0664
+  source 'collectd-configuration.xml.erb'
+  mode '664'
   owner 'root'
   group 'root'
   notifies :restart, 'service[opennms]'
@@ -121,12 +113,13 @@ template "#{onms_home}/etc/collectd-configuration.xml" do
     vmware6: node['opennms']['collectd']['vmware6'],
     example1: node['opennms']['collectd']['example1']
   )
+  action node['opennms']['templates'] ? :create : :nothing
 end
 
 template "#{onms_home}/etc/datacollection-config.xml" do
   cookbook node['opennms']['datacollection']['cookbook']
-  source "#{template_dir}datacollection-config.xml.erb"
-  mode 0664
+  source 'datacollection-config.xml.erb'
+  mode '664'
   owner 'root'
   group 'root'
   notifies :restart, 'service[opennms]'
@@ -205,12 +198,13 @@ template "#{onms_home}/etc/datacollection-config.xml" do
     vmwarecim: node['opennms']['datacollection']['default']['vmwarecim'],
     ejn: node['opennms']['datacollection']['ejn']
   )
+  action node['opennms']['templates'] ? :create : :nothing
 end
 
 template "#{onms_home}/etc/xml-datacollection-config.xml" do
   cookbook node['opennms']['xml']['cookbook']
-  source "#{template_dir}xml-datacollection-config.xml.erb"
-  mode 00664
+  source 'xml-datacollection-config.xml.erb'
+  mode '664'
   owner 'root'
   group 'root'
   notifies :restart, 'service[opennms]'
@@ -221,12 +215,13 @@ template "#{onms_home}/etc/xml-datacollection-config.xml" do
     threegpp_sample: node['opennms']['xml']['threegpp_sample']
   )
   only_if { node['opennms']['plugin']['xml'] }
+  action node['opennms']['templates'] ? :create : :nothing
 end
 
 template "#{onms_home}/etc/nsclient-datacollection-config.xml" do
   cookbook node['opennms']['nsclient_datacollection']['cookbook']
-  source "#{template_dir}nsclient-datacollection-config.xml.erb"
-  mode 00664
+  source 'nsclient-datacollection-config.xml.erb'
+  mode '664'
   owner 'root'
   group 'root'
   notifies :restart, 'service[opennms]'
@@ -245,12 +240,13 @@ template "#{onms_home}/etc/nsclient-datacollection-config.xml" do
     mailmarshal: node['opennms']['nsclient_datacollection']['default']['mailmarshal']
   )
   only_if { node['opennms']['plugin']['nsclient'] }
+  action node['opennms']['templates'] ? :create : :nothing
 end
 
 template "#{onms_home}/etc/discovery-configuration.xml" do
   cookbook node['opennms']['discovery']['cookbook']
-  source "#{template_dir}discovery-configuration.xml.erb"
-  mode 0664
+  source 'discovery-configuration.xml.erb'
+  mode '664'
   owner 'root'
   group 'root'
   notifies :restart, 'service[opennms]'
@@ -263,12 +259,13 @@ template "#{onms_home}/etc/discovery-configuration.xml" do
     timeout: node['opennms']['discovery']['timeout'],
     foreign_source: node['opennms']['discovery']['foreign_source']
   )
+  action node['opennms']['templates'] ? :create : :nothing
 end
 
 template "#{onms_home}/etc/enlinkd-configuration.xml" do
   cookbook node['opennms']['enlinkd']['cookbook']
-  source "#{template_dir}enlinkd-configuration.xml.erb"
-  mode 0664
+  source 'enlinkd-configuration.xml.erb'
+  mode '664'
   owner 'root'
   group 'root'
   notifies :restart, 'service[opennms]'
@@ -286,12 +283,13 @@ template "#{onms_home}/etc/enlinkd-configuration.xml" do
     max_bft: node['opennms']['enlinkd']['max_bft'],
     disco_bridge_threads: node['opennms']['enlinkd']['disco_bridge_threads']
   )
+  action node['opennms']['templates'] ? :create : :nothing
 end
 
 template "#{onms_home}/etc/eventd-configuration.xml" do
   cookbook node['opennms']['eventd']['cookbook']
-  source "#{template_dir}eventd-configuration.xml.erb"
-  mode 00664
+  source 'eventd-configuration.xml.erb'
+  mode '664'
   owner 'root'
   group 'root'
   notifies :restart, 'service[opennms]'
@@ -305,12 +303,13 @@ template "#{onms_home}/etc/eventd-configuration.xml" do
     sock_so_timeout_req: node['opennms']['eventd']['sock_so_timeout_req'],
     socket_so_timeout_period: node['opennms']['eventd']['socket_so_timeout_period']
   )
+  action node['opennms']['templates'] ? :create : :nothing
 end
 
 template "#{onms_home}/etc/javamail-configuration.properties" do
   cookbook node['opennms']['javamail_props']['cookbook']
-  source "#{template_dir}javamail-configuration.properties.erb"
-  mode 00664
+  source 'javamail-configuration.properties.erb'
+  mode '664'
   owner 'root'
   group 'root'
   variables(
@@ -330,12 +329,13 @@ template "#{onms_home}/etc/javamail-configuration.properties" do
     message_content_type: node['opennms']['javamail_props']['message_content_type'],
     charset: node['opennms']['javamail_props']['charset']
   )
+  action node['opennms']['templates'] ? :create : :nothing
 end
 
 template "#{onms_home}/etc/javamail-configuration.xml" do
   cookbook node['opennms']['javamail_config']['cookbook']
-  source "#{template_dir}javamail-configuration.xml.erb"
-  mode 00664
+  source 'javamail-configuration.xml.erb'
+  mode '664'
   owner 'root'
   group 'root'
   notifies :restart, 'service[opennms]'
@@ -375,12 +375,13 @@ template "#{onms_home}/etc/javamail-configuration.xml" do
     ds_user: node['opennms']['javamail_config']['default_send']['user'],
     ds_password: node['opennms']['javamail_config']['default_send']['password']
   )
+  action node['opennms']['templates'] ? :create : :nothing
 end
 
 template "#{onms_home}/etc/jcifs.properties" do
   cookbook node['opennms']['jcifs']['cookbook']
-  source "#{template_dir}jcifs.properties.erb"
-  mode 00664
+  source 'jcifs.properties.erb'
+  mode '664'
   owner 'root'
   group 'root'
   notifies :restart, 'service[opennms]'
@@ -395,12 +396,13 @@ template "#{onms_home}/etc/jcifs.properties" do
     password: node['opennms']['jcifs']['password'],
     client_laddr: node['opennms']['jcifs']['client_laddr']
   )
+  action node['opennms']['templates'] ? :create : :nothing
 end
 
 template "#{onms_home}/etc/jdbc-datacollection-config.xml" do
   cookbook node['opennms']['jdbc_dc']['cookbook']
-  source "#{template_dir}jdbc-datacollection-config.xml.erb"
-  mode 00664
+  source 'jdbc-datacollection-config.xml.erb'
+  mode '664'
   owner 'root'
   group 'root'
   notifies :restart, 'service[opennms]'
@@ -413,10 +415,11 @@ template "#{onms_home}/etc/jdbc-datacollection-config.xml" do
     enable_pgsql_stats: node['opennms']['jdbc_dc']['enable_pgsql_stats'],
     pgsql: node['opennms']['jdbc_dc']['pgsql']
   )
+  action node['opennms']['templates'] ? :create : :nothing
 end
 
 template "#{onms_home}/etc/jms-northbounder-configuration.xml" do
-  source "#{template_dir}jms-northbounder-configuration.xml.erb"
+  source 'jms-northbounder-configuration.xml.erb'
   cookbook node['opennms']['jms_nbi']['cookbook']
   owner 'root'
   group 'root'
@@ -432,12 +435,13 @@ template "#{onms_home}/etc/jms-northbounder-configuration.xml" do
   )
   notifies :restart, 'service[opennms]'
   not_if { Opennms::Helpers.major(node['opennms']['version']).to_i == 16 }
+  action node['opennms']['templates'] ? :create : :nothing
 end
 
 template "#{onms_home}/etc/jmx-datacollection-config.xml" do
   cookbook node['opennms']['jmx_dc']['cookbook']
-  source "#{template_dir}jmx-datacollection-config.xml.erb"
-  mode 00644
+  source 'jmx-datacollection-config.xml.erb'
+  mode '644'
   owner 'root'
   group 'root'
   notifies :restart, 'service[opennms]'
@@ -448,134 +452,26 @@ template "#{onms_home}/etc/jmx-datacollection-config.xml" do
     enable_opennms: node['opennms']['jmx_dc']['enable_opennms'],
     jsr160: node['opennms']['jmx_dc']['jsr160']
   )
-end
-
-template "#{onms_home}/etc/linkd-configuration.xml" do
-  cookbook node['opennms']['linkd']['cookbook']
-  source "#{template_dir}linkd-configuration.xml.erb"
-  mode 00664
-  owner 'root'
-  group 'root'
-  notifies :restart, 'service[opennms]'
-  variables(
-    threads: node['opennms']['linkd']['threads'],
-    initial_sleep_time: node['opennms']['linkd']['initial_sleep_time'],
-    snmp_poll_interval: node['opennms']['linkd']['snmp_poll_interval'],
-    discovery_link_interval: node['opennms']['linkd']['discovery_link_interval'],
-    package: node['opennms']['linkd']['package'],
-    filter: node['opennms']['linkd']['filter'],
-    range_begin: node['opennms']['linkd']['range_begin'],
-    range_end: node['opennms']['linkd']['range_end'],
-    netscreen: node['opennms']['linkd']['iproutes']['enable_netscreen'],
-    samsung: node['opennms']['linkd']['iproutes']['enable_samsung'],
-    iproute_cisco: node['opennms']['linkd']['iproutes']['enable_cisco'],
-    darwin: node['opennms']['linkd']['iproutes']['enable_darwin'],
-    vlan_3com: node['opennms']['linkd']['vlan']['enable_3com'],
-    vlan_3com3870: node['opennms']['linkd']['vlan']['enable_3com3870'],
-    vlan_nortel: node['opennms']['linkd']['vlan']['enable_nortel'],
-    vlan_intel: node['opennms']['linkd']['vlan']['enable_intel'],
-    vlan_hp: node['opennms']['linkd']['vlan']['enable_hp'],
-    vlan_cisco: node['opennms']['linkd']['vlan']['enable_cisco'],
-    vlan_extreme: node['opennms']['linkd']['vlan']['enable_extreme']
-  )
-  only_if { Opennms::Helpers.major(node['opennms']['version']).to_i == 16 }
-end
-
-template "#{onms_home}/etc/magic-users.properties" do
-  cookbook node['opennms']['magic_users']['cookbook']
-  source "#{template_dir}magic-users.properties.erb"
-  mode 00664
-  owner 'root'
-  group 'root'
-  notifies :restart, 'service[opennms]'
-  variables(
-    rtc_username: node['opennms']['properties']['rtc']['username'],
-    rtc_password: node['opennms']['properties']['rtc']['password'],
-    admin_users: node['opennms']['magic_users']['admin_users'],
-    ro_users: node['opennms']['magic_users']['ro_users'],
-    dashboard_users: node['opennms']['magic_users']['dashboard_users'],
-    provision_users: node['opennms']['magic_users']['provision_users'],
-    remoting_users: node['opennms']['magic_users']['remoting_users'],
-    rest_users: node['opennms']['magic_users']['rest_users']
-  )
-  not_if { Opennms::Helpers.major(node['opennms']['version']).to_i >= 19 }
-end
-
-template "#{onms_home}/etc/map.properties" do
-  cookbook node['opennms']['map']['cookbook']
-  source "#{template_dir}map.properties.erb"
-  mode 00664
-  owner 'root'
-  group 'root'
-  notifies :restart, 'service[opennms]'
-  variables(
-    critical: node['opennms']['map']['severity']['critical'],
-    major: node['opennms']['map']['severity']['major'],
-    minor: node['opennms']['map']['severity']['minor'],
-    warning: node['opennms']['map']['severity']['warning'],
-    normal: node['opennms']['map']['severity']['normal'],
-    cleared: node['opennms']['map']['severity']['cleared'],
-    indeterminate: node['opennms']['map']['severity']['indeterminate'],
-    default: node['opennms']['map']['severity']['default'],
-    ethernet_text: node['opennms']['map']['link']['ethernet']['text'],
-    fastethernet_text: node['opennms']['map']['link']['fastethernet']['text'],
-    fastethernet2_text: node['opennms']['map']['link']['fastethernet2']['text'],
-    gigaethernet_text: node['opennms']['map']['link']['gigaethernet']['text'],
-    gigaethernet2_text: node['opennms']['map']['link']['gigaethernet2']['text'],
-    serial_text: node['opennms']['map']['link']['serial']['text'],
-    framerelay_text: node['opennms']['map']['link']['framerelay']['text'],
-    ieee80211_text: node['opennms']['map']['link']['ieee80211']['text'],
-    unknown_text: node['opennms']['map']['link']['unknown']['text'],
-    dwo_text: node['opennms']['map']['link']['dwo']['text'],
-    summary_text: node['opennms']['map']['link']['summary']['text'],
-    link_default: node['opennms']['map']['link']['default'],
-    multilink: node['opennms']['map']['multilink'],
-    linkstatus: node['opennms']['map']['linkstatus'],
-    status: node['opennms']['map']['status'],
-    avail: node['opennms']['map']['avail'],
-    icon: node['opennms']['map']['icon'],
-    cmenu: node['opennms']['map']['cmenu'],
-    severity: node['opennms']['map']['severity'],
-    enable: node['opennms']['map']['enable']
-  )
-  only_if { Opennms::Helpers.major(node['opennms']['version']).to_i == 16 }
+  action node['opennms']['templates'] ? :create : :nothing
 end
 
 template "#{onms_home}/etc/microblog-configuration.xml" do
   cookbook node['opennms']['microblog']['cookbook']
-  source "#{template_dir}microblog-configuration.xml.erb"
-  mode 00664
+  source 'microblog-configuration.xml.erb'
+  mode '664'
   owner 'root'
   group 'root'
   notifies :restart, 'service[opennms]'
   variables(
     default_profile: node['opennms']['microblog']['default_profile']
   )
-end
-
-template "#{onms_home}/etc/model-importer.properties" do
-  cookbook node['opennms']['importer']['cookbook']
-  source "#{template_dir}model-importer.properties.erb"
-  mode 00664
-  owner 'root'
-  group 'root'
-  notifies :restart, 'service[opennms]'
-  variables(
-    import_url: node['opennms']['importer']['import_url'],
-    schedule: node['opennms']['importer']['schedule'],
-    threads: node['opennms']['importer']['threads'],
-    scan_threads: node['opennms']['importer']['scan_threads'],
-    write_threads: node['opennms']['importer']['write_threads'],
-    requisition_dir: node['opennms']['importer']['requisition_dir'],
-    foreign_source_dir: node['opennms']['importer']['foreign_source_dir']
-  )
-  not_if { Opennms::Helpers.major(node['opennms']['version']).to_i >= 18 }
+  action node['opennms']['templates'] ? :create : :nothing
 end
 
 template "#{onms_home}/etc/modemConfig.properties" do
   cookbook node['opennms']['modem']['cookbook']
-  source "#{template_dir}modemConfig.properties.erb"
-  mode 00664
+  source 'modemConfig.properties.erb'
+  mode '664'
   owner 'root'
   group 'root'
   notifies :restart, 'service[opennms]'
@@ -583,12 +479,13 @@ template "#{onms_home}/etc/modemConfig.properties" do
     modem: node['opennms']['modem']['model'],
     custom_modem: node['opennms']['custom_modem']
   )
+  action node['opennms']['templates'] ? :create : :nothing
 end
 
 template "#{onms_home}/etc/notifd-configuration.xml" do
   cookbook node['opennms']['notifd']['cookbook']
-  source "#{template_dir}notifd-configuration.xml.erb"
-  mode 00664
+  source 'notifd-configuration.xml.erb'
+  mode '664'
   owner 'root'
   group 'root'
   variables(
@@ -596,12 +493,13 @@ template "#{onms_home}/etc/notifd-configuration.xml" do
     match_all: node['opennms']['notifd']['match_all'],
     auto_ack: node['opennms']['notifd']['auto_ack']
   )
+  action node['opennms']['templates'] ? :create : :nothing
 end
 
 template "#{onms_home}/etc/notificationCommands.xml" do
   cookbook node['opennms']['notification_commands']['cookbook']
-  source "#{template_dir}notificationCommands.xml.erb"
-  mode 00664
+  source 'notificationCommands.xml.erb'
+  mode '664'
   owner 'root'
   group 'root'
   variables(
@@ -620,12 +518,13 @@ template "#{onms_home}/etc/notificationCommands.xml" do
     microblog_dm: node['opennms']['notification_commands']['microblog_dm'],
     browser: node['opennms']['notification_commands']['browser']
   )
+  action node['opennms']['templates'] ? :create : :nothing
 end
 
 template "#{onms_home}/etc/notifications.xml" do
   cookbook node['opennms']['notifications']['cookbook']
-  source "#{template_dir}notifications.xml.erb"
-  mode 00664
+  source 'notifications.xml.erb'
+  mode '664'
   owner 'root'
   group 'root'
   variables(
@@ -639,12 +538,13 @@ template "#{onms_home}/etc/notifications.xml" do
     low_threshold_rearmed: node['opennms']['notifications']['low_threshold_rearmed'],
     high_threshold_rearmed: node['opennms']['notifications']['high_threshold_rearmed']
   )
+  action node['opennms']['templates'] ? :create : :nothing
 end
 
 template "#{onms_home}/etc/poller-configuration.xml" do
   cookbook node['opennms']['poller']['cookbook']
-  source "#{template_dir}poller-configuration.xml.erb"
-  mode 0664
+  source 'poller-configuration.xml.erb'
+  mode '664'
   owner 'root'
   group 'root'
   notifies :restart, 'service[opennms]'
@@ -680,12 +580,13 @@ template "#{onms_home}/etc/poller-configuration.xml" do
     strafer: node['opennms']['poller']['strafer'],
     strafeping: node['opennms']['poller']['strafer']['strafeping']
   )
+  action node['opennms']['templates'] ? :create : :nothing
 end
 
 template "#{onms_home}/etc/provisiond-configuration.xml" do
   cookbook node['opennms']['importer']['cookbook']
-  source "#{template_dir}provisiond-configuration.xml.erb"
-  mode 0664
+  source 'provisiond-configuration.xml.erb'
+  mode '664'
   owner 'root'
   group 'root'
   variables(
@@ -696,12 +597,13 @@ template "#{onms_home}/etc/provisiond-configuration.xml" do
     rescan_threads: node['opennms']['importer']['rescan_threads'],
     write_threads: node['opennms']['importer']['write_threads']
   )
+  action node['opennms']['templates'] ? :create : :nothing
 end
 
 template "#{onms_home}/etc/remedy.properties" do
   cookbook node['opennms']['remedy']['cookbook']
-  source "#{template_dir}remedy.properties.erb"
-  mode 0664
+  source 'remedy.properties.erb'
+  mode '664'
   owner 'root'
   group 'root'
   notifies :restart, 'service[opennms]'
@@ -738,12 +640,13 @@ template "#{onms_home}/etc/remedy.properties" do
     reason_resolved: node['opennms']['remedy']['reason_resolved'],
     reason_cancelled: node['opennms']['remedy']['reason_cancelled']
   )
+  action node['opennms']['templates'] ? :create : :nothing
 end
 
 template "#{onms_home}/etc/reportd-configuration.xml" do
   cookbook node['opennms']['reportd']['cookbook']
-  source "#{template_dir}reportd-configuration.xml.erb"
-  mode 0664
+  source 'reportd-configuration.xml.erb'
+  mode '664'
   owner 'root'
   group 'root'
   notifies :restart, 'service[opennms]'
@@ -751,23 +654,25 @@ template "#{onms_home}/etc/reportd-configuration.xml" do
     storage_location: node['opennms']['reportd']['storage_location'],
     persist_reports: node['opennms']['reportd']['persist_reports']
   )
+  action node['opennms']['templates'] ? :create : :nothing
 end
 
 template "#{onms_home}/etc/response-adhoc-graph.properties" do
   cookbook node['opennms']['response_adhoc_graph']['cookbook']
-  source "#{template_dir}response-adhoc-graph.properties.erb"
-  mode 0664
+  source 'response-adhoc-graph.properties.erb'
+  mode '664'
   owner 'root'
   group 'root'
   variables(
     command_prefix: node['opennms']['response_adhoc_graph']['command_prefix']
   )
+  action node['opennms']['templates'] ? :create : :nothing
 end
 
 template "#{onms_home}/etc/response-graph.properties" do
   cookbook node['opennms']['response_graph']['cookbook']
-  source "#{template_dir}response-graph.properties.erb"
-  mode 0664
+  source 'response-graph.properties.erb'
+  mode '664'
   owner 'root'
   group 'root'
   variables(
@@ -808,12 +713,13 @@ template "#{onms_home}/etc/response-graph.properties" do
     memcached_struct: node['opennms']['response_graph']['memcached_struct'],
     ciscoping_time: node['opennms']['response_graph']['ciscoping_time']
   )
+  action node['opennms']['templates'] ? :create : :nothing
 end
 
 template "#{onms_home}/etc/rrd-configuration.properties" do
   cookbook node['opennms']['rrd']['cookbook']
-  source "#{template_dir}rrd-configuration.properties.erb"
-  mode 0664
+  source 'rrd-configuration.properties.erb'
+  mode '664'
   owner 'root'
   group 'root'
   notifies :restart, 'service[opennms]'
@@ -827,12 +733,13 @@ template "#{onms_home}/etc/rrd-configuration.properties" do
     usetcp: node['opennms']['rrd']['usetcp'],
     tcp: node['opennms']['rrd']['tcp']
   )
+  action node['opennms']['templates'] ? :create : :nothing
 end
 
 template "#{onms_home}/etc/rtc-configuration.xml" do
   cookbook node['opennms']['rtc']['cookbook']
-  source "#{template_dir}rtc-configuration.xml.erb"
-  mode 0664
+  source 'rtc-configuration.xml.erb'
+  mode '664'
   owner 'root'
   group 'root'
   notifies :restart, 'service[opennms]'
@@ -846,35 +753,38 @@ template "#{onms_home}/etc/rtc-configuration.xml" do
     user_refresh_interval: node['opennms']['rtc']['user_refresh_interval'],
     errors_before_url_unsubscribe: node['opennms']['rtc']['errors_before_url_unsubscribe']
   )
+  action node['opennms']['templates'] ? :create : :nothing
 end
 
 template "#{onms_home}/etc/site-status-views.xml" do
   cookbook node['opennms']['site_status_views']['cookbook']
-  source "#{template_dir}site-status-views.xml.erb"
-  mode 0664
+  source 'site-status-views.xml.erb'
+  mode '664'
   owner 'root'
   group 'root'
   variables(
     default_view: node['opennms']['site_status_views']['default_view']
   )
+  action node['opennms']['templates'] ? :create : :nothing
 end
 
 template "#{onms_home}/etc/snmp-adhoc-graph.properties" do
   cookbook node['opennms']['snmp_adhoc_graph']['cookbook']
-  source "#{template_dir}snmp-adhoc-graph.properties.erb"
-  mode 0664
+  source 'snmp-adhoc-graph.properties.erb'
+  mode '664'
   owner 'root'
   group 'root'
   variables(
     image_format: node['opennms']['snmp_adhoc_graph']['image_format'],
     command_prefix: node['opennms']['snmp_adhoc_graph']['command_prefix']
   )
+  action node['opennms']['templates'] ? :create : :nothing
 end
 
 template "#{onms_home}/etc/snmp-graph.properties" do
   cookbook node['opennms']['snmp_graph']['cookbook']
-  source "#{template_dir}snmp-graph.properties.erb"
-  mode 0664
+  source 'snmp-graph.properties.erb'
+  mode '664'
   owner 'root'
   group 'root'
   variables(
@@ -888,991 +798,1068 @@ template "#{onms_home}/etc/snmp-graph.properties" do
     onms_queued_updates: node['opennms']['snmp_graph']['onms_queued_updates'],
     onms_queued_pending: node['opennms']['snmp_graph']['onms_queued_pending']
   )
+  action node['opennms']['templates'] ? :create : :nothing
 end
 
 template "#{onms_home}/etc/snmp-graph.properties.d/acmepacket-graph.properties" do
   cookbook node['opennms']['snmp_graph']['acmepacket']['cookbook']
-  source "#{template_dir}snmp-graph.properties.d/acmepacket-graph.properties.erb"
-  mode 0664
+  source 'snmp-graph.properties.d/acmepacket-graph.properties.erb'
+  mode '664'
   owner 'root'
   group 'root'
   variables(
     enabled: node['opennms']['snmp_graph']['acmepacket']['enabled']
   )
+  action node['opennms']['templates'] ? :create : :nothing
 end
 
 template "#{onms_home}/etc/snmp-graph.properties.d/adonis-graph.properties" do
   cookbook node['opennms']['snmp_graph']['adonis']['cookbook']
-  source "#{template_dir}snmp-graph.properties.d/adonis-graph.properties.erb"
-  mode 0664
+  source 'snmp-graph.properties.d/adonis-graph.properties.erb'
+  mode '664'
   owner 'root'
   group 'root'
   variables(
     enabled: node['opennms']['snmp_graph']['adonis']['enabled']
   )
+  action node['opennms']['templates'] ? :create : :nothing
 end
 
 template "#{onms_home}/etc/snmp-graph.properties.d/adsl-graph.properties" do
   cookbook node['opennms']['snmp_graph']['adsl']['cookbook']
-  source "#{template_dir}snmp-graph.properties.d/adsl-graph.properties.erb"
-  mode 0664
+  source 'snmp-graph.properties.d/adsl-graph.properties.erb'
+  mode '664'
   owner 'root'
   group 'root'
   variables(
     enabled: node['opennms']['snmp_graph']['adsl']['enabled']
   )
+  action node['opennms']['templates'] ? :create : :nothing
 end
 
 template "#{onms_home}/etc/snmp-graph.properties.d/airport-graph.properties" do
   cookbook node['opennms']['snmp_graph']['airport']['cookbook']
-  source "#{template_dir}snmp-graph.properties.d/airport-graph.properties.erb"
-  mode 0664
+  source 'snmp-graph.properties.d/airport-graph.properties.erb'
+  mode '664'
   owner 'root'
   group 'root'
   variables(
     enabled: node['opennms']['snmp_graph']['airport']['enabled']
   )
+  action node['opennms']['templates'] ? :create : :nothing
 end
 
 template "#{onms_home}/etc/snmp-graph.properties.d/aix-graph.properties" do
   cookbook node['opennms']['snmp_graph']['aix']['cookbook']
-  source "#{template_dir}snmp-graph.properties.d/aix-graph.properties.erb"
-  mode 0664
+  source 'snmp-graph.properties.d/aix-graph.properties.erb'
+  mode '664'
   owner 'root'
   group 'root'
   variables(
     enabled: node['opennms']['snmp_graph']['aix']['enabled']
   )
+  action node['opennms']['templates'] ? :create : :nothing
 end
 
 template "#{onms_home}/etc/snmp-graph.properties.d/akcp-graph.properties" do
   cookbook node['opennms']['snmp_graph']['akcp']['cookbook']
-  source "#{template_dir}snmp-graph.properties.d/akcp-graph.properties.erb"
-  mode 0664
+  source 'snmp-graph.properties.d/akcp-graph.properties.erb'
+  mode '664'
   owner 'root'
   group 'root'
   variables(
     enabled: node['opennms']['snmp_graph']['akcp']['enabled']
   )
+  action node['opennms']['templates'] ? :create : :nothing
 end
 
 template "#{onms_home}/etc/snmp-graph.properties.d/alvarion-graph.properties" do
   cookbook node['opennms']['snmp_graph']['alvarion']['cookbook']
-  source "#{template_dir}snmp-graph.properties.d/alvarion-graph.properties.erb"
-  mode 0664
+  source 'snmp-graph.properties.d/alvarion-graph.properties.erb'
+  mode '664'
   owner 'root'
   group 'root'
   variables(
     enabled: node['opennms']['snmp_graph']['alvarion']['enabled']
   )
+  action node['opennms']['templates'] ? :create : :nothing
 end
 
 template "#{onms_home}/etc/snmp-graph.properties.d/apc-graph.properties" do
   cookbook node['opennms']['snmp_graph']['apc']['cookbook']
-  source "#{template_dir}snmp-graph.properties.d/apc-graph.properties.erb"
-  mode 0664
+  source 'snmp-graph.properties.d/apc-graph.properties.erb'
+  mode '664'
   owner 'root'
   group 'root'
   variables(
     enabled: node['opennms']['snmp_graph']['apc']['enabled']
   )
+  action node['opennms']['templates'] ? :create : :nothing
 end
 
 template "#{onms_home}/etc/snmp-graph.properties.d/ascend-graph.properties" do
   cookbook node['opennms']['snmp_graph']['ascend']['cookbook']
-  source "#{template_dir}snmp-graph.properties.d/ascend-graph.properties.erb"
-  mode 0664
+  source 'snmp-graph.properties.d/ascend-graph.properties.erb'
+  mode '664'
   owner 'root'
   group 'root'
   variables(
     enabled: node['opennms']['snmp_graph']['ascend']['enabled']
   )
+  action node['opennms']['templates'] ? :create : :nothing
 end
 
 template "#{onms_home}/etc/snmp-graph.properties.d/asterisk-graph.properties" do
   cookbook node['opennms']['snmp_graph']['asterisk']['cookbook']
-  source "#{template_dir}snmp-graph.properties.d/asterisk-graph.properties.erb"
-  mode 0664
+  source 'snmp-graph.properties.d/asterisk-graph.properties.erb'
+  mode '664'
   owner 'root'
   group 'root'
   variables(
     enabled: node['opennms']['snmp_graph']['asterisk']['enabled']
   )
+  action node['opennms']['templates'] ? :create : :nothing
 end
 
 template "#{onms_home}/etc/snmp-graph.properties.d/bgp-ietf-graph.properties" do
   cookbook node['opennms']['snmp_graph']['bgp_ietf']['cookbook']
-  source "#{template_dir}snmp-graph.properties.d/bgp-ietf-graph.properties.erb"
-  mode 0664
+  source 'snmp-graph.properties.d/bgp-ietf-graph.properties.erb'
+  mode '664'
   owner 'root'
   group 'root'
   variables(
     enabled: node['opennms']['snmp_graph']['bgp_ietf']['enabled']
   )
+  action node['opennms']['templates'] ? :create : :nothing
 end
 
 template "#{onms_home}/etc/snmp-graph.properties.d/bluecoat-sgproxy-graph.properties" do
   cookbook node['opennms']['snmp_graph']['bluecoat_sgproxy']['cookbook']
-  source "#{template_dir}snmp-graph.properties.d/bluecoat-sgproxy-graph.properties.erb"
-  mode 0664
+  source 'snmp-graph.properties.d/bluecoat-sgproxy-graph.properties.erb'
+  mode '664'
   owner 'root'
   group 'root'
   variables(
     enabled: node['opennms']['snmp_graph']['bluecoat_sgproxy']['enabled']
   )
+  action node['opennms']['templates'] ? :create : :nothing
 end
 
 template "#{onms_home}/etc/snmp-graph.properties.d/bridgewave-graph.properties" do
   cookbook node['opennms']['snmp_graph']['bridgewave']['cookbook']
-  source "#{template_dir}snmp-graph.properties.d/bridgewave-graph.properties.erb"
-  mode 0664
+  source 'snmp-graph.properties.d/bridgewave-graph.properties.erb'
+  mode '664'
   owner 'root'
   group 'root'
   variables(
     enabled: node['opennms']['snmp_graph']['bridgewave']['enabled']
   )
+  action node['opennms']['templates'] ? :create : :nothing
 end
 template "#{onms_home}/etc/snmp-graph.properties.d/brocade-graph.properties" do
   cookbook node['opennms']['snmp_graph']['brocade']['cookbook']
-  source "#{template_dir}snmp-graph.properties.d/brocade-graph.properties.erb"
-  mode 0664
+  source 'snmp-graph.properties.d/brocade-graph.properties.erb'
+  mode '664'
   owner 'root'
   group 'root'
   variables(
     enabled: node['opennms']['snmp_graph']['brocade']['enabled']
   )
+  action node['opennms']['templates'] ? :create : :nothing
 end
 
 template "#{onms_home}/etc/snmp-graph.properties.d/ca-empire-graph.properties" do
   cookbook node['opennms']['snmp_graph']['ca_empire']['cookbook']
-  source "#{template_dir}snmp-graph.properties.d/ca-empire-graph.properties.erb"
-  mode 0664
+  source 'snmp-graph.properties.d/ca-empire-graph.properties.erb'
+  mode '664'
   owner 'root'
   group 'root'
   variables(
     enabled: node['opennms']['snmp_graph']['ca_empire']['enabled']
   )
+  action node['opennms']['templates'] ? :create : :nothing
 end
 
 template "#{onms_home}/etc/snmp-graph.properties.d/checkpoint-graph.properties" do
   cookbook node['opennms']['snmp_graph']['checkpoint']['cookbook']
-  source "#{template_dir}snmp-graph.properties.d/checkpoint-graph.properties.erb"
-  mode 0664
+  source 'snmp-graph.properties.d/checkpoint-graph.properties.erb'
+  mode '664'
   owner 'root'
   group 'root'
   variables(
     enabled: node['opennms']['snmp_graph']['checkpoint']['enabled']
   )
+  action node['opennms']['templates'] ? :create : :nothing
 end
 
 template "#{onms_home}/etc/snmp-graph.properties.d/cisco-graph.properties" do
   cookbook node['opennms']['snmp_graph']['cisco']['cookbook']
-  source "#{template_dir}snmp-graph.properties.d/cisco-graph.properties.erb"
-  mode 0664
+  source 'snmp-graph.properties.d/cisco-graph.properties.erb'
+  mode '664'
   owner 'root'
   group 'root'
   variables(
     enabled: node['opennms']['snmp_graph']['cisco']['enabled']
   )
+  action node['opennms']['templates'] ? :create : :nothing
 end
 
 template "#{onms_home}/etc/snmp-graph.properties.d/ciscoNexus-graph.properties" do
   cookbook node['opennms']['snmp_graph']['ciscoNexus']['cookbook']
-  source "#{template_dir}snmp-graph.properties.d/ciscoNexus-graph.properties.erb"
-  mode 0664
+  source 'snmp-graph.properties.d/ciscoNexus-graph.properties.erb'
+  mode '664'
   owner 'root'
   group 'root'
   variables(
     enabled: node['opennms']['snmp_graph']['ciscoNexus']['enabled']
   )
+  action node['opennms']['templates'] ? :create : :nothing
 end
 
 template "#{onms_home}/etc/snmp-graph.properties.d/clavister-graph.properties" do
   cookbook node['opennms']['snmp_graph']['clavister']['cookbook']
-  source "#{template_dir}snmp-graph.properties.d/clavister-graph.properties.erb"
-  mode 0664
+  source 'snmp-graph.properties.d/clavister-graph.properties.erb'
+  mode '664'
   owner 'root'
   group 'root'
   variables(
     enabled: node['opennms']['snmp_graph']['clavister']['enabled']
   )
+  action node['opennms']['templates'] ? :create : :nothing
 end
 
 template "#{onms_home}/etc/snmp-graph.properties.d/colubris-graph.properties" do
   cookbook node['opennms']['snmp_graph']['colubris']['cookbook']
-  source "#{template_dir}snmp-graph.properties.d/colubris-graph.properties.erb"
-  mode 0664
+  source 'snmp-graph.properties.d/colubris-graph.properties.erb'
+  mode '664'
   owner 'root'
   group 'root'
   variables(
     enabled: node['opennms']['snmp_graph']['colubris']['enabled']
   )
+  action node['opennms']['templates'] ? :create : :nothing
 end
 
 template "#{onms_home}/etc/snmp-graph.properties.d/cyclades-graph.properties" do
   cookbook node['opennms']['snmp_graph']['cyclades']['cookbook']
-  source "#{template_dir}snmp-graph.properties.d/cyclades-graph.properties.erb"
-  mode 0664
+  source 'snmp-graph.properties.d/cyclades-graph.properties.erb'
+  mode '664'
   owner 'root'
   group 'root'
   variables(
     enabled: node['opennms']['snmp_graph']['cyclades']['enabled']
   )
+  action node['opennms']['templates'] ? :create : :nothing
 end
 
 template "#{onms_home}/etc/snmp-graph.properties.d/dell-openmanage-graph.properties" do
   cookbook node['opennms']['snmp_graph']['dell_openmanage']['cookbook']
-  source "#{template_dir}snmp-graph.properties.d/dell-openmanage-graph.properties.erb"
-  mode 0664
+  source 'snmp-graph.properties.d/dell-openmanage-graph.properties.erb'
+  mode '664'
   owner 'root'
   group 'root'
   variables(
     enabled: node['opennms']['snmp_graph']['dell_openmanage']['enabled']
   )
+  action node['opennms']['templates'] ? :create : :nothing
 end
 
 template "#{onms_home}/etc/snmp-graph.properties.d/dell-rac-graph.properties" do
   cookbook node['opennms']['snmp_graph']['dell_rac']['cookbook']
-  source "#{template_dir}snmp-graph.properties.d/dell-rac-graph.properties.erb"
-  mode 0664
+  source 'snmp-graph.properties.d/dell-rac-graph.properties.erb'
+  mode '664'
   owner 'root'
   group 'root'
   variables(
     enabled: node['opennms']['snmp_graph']['dell_rac']['enabled']
   )
+  action node['opennms']['templates'] ? :create : :nothing
 end
 
 template "#{onms_home}/etc/snmp-graph.properties.d/dns-graph.properties" do
   cookbook node['opennms']['snmp_graph']['dns']['cookbook']
-  source "#{template_dir}snmp-graph.properties.d/dns-graph.properties.erb"
-  mode 0664
+  source 'snmp-graph.properties.d/dns-graph.properties.erb'
+  mode '664'
   owner 'root'
   group 'root'
   variables(
     enabled: node['opennms']['snmp_graph']['dns']['enabled']
   )
+  action node['opennms']['templates'] ? :create : :nothing
 end
 
 template "#{onms_home}/etc/snmp-graph.properties.d/ejn-graph.properties" do
   cookbook node['opennms']['snmp_graph']['ejn']['cookbook']
-  source "#{template_dir}snmp-graph.properties.d/ejn-graph.properties.erb"
-  mode 0664
+  source 'snmp-graph.properties.d/ejn-graph.properties.erb'
+  mode '664'
   owner 'root'
   group 'root'
   variables(
     enabled: node['opennms']['snmp_graph']['ejn']['enabled']
   )
+  action node['opennms']['templates'] ? :create : :nothing
 end
 
 template "#{onms_home}/etc/snmp-graph.properties.d/equallogic-graph.properties" do
   cookbook node['opennms']['snmp_graph']['equallogic']['cookbook']
-  source "#{template_dir}snmp-graph.properties.d/equallogic-graph.properties.erb"
-  mode 0664
+  source 'snmp-graph.properties.d/equallogic-graph.properties.erb'
+  mode '664'
   owner 'root'
   group 'root'
   variables(
     enabled: node['opennms']['snmp_graph']['equallogic']['enabled']
   )
+  action node['opennms']['templates'] ? :create : :nothing
 end
 
 template "#{onms_home}/etc/snmp-graph.properties.d/ericsson-graph.properties" do
   cookbook node['opennms']['snmp_graph']['ericsson']['cookbook']
-  source "#{template_dir}snmp-graph.properties.d/ericsson-graph.properties.erb"
-  mode 0664
+  source 'snmp-graph.properties.d/ericsson-graph.properties.erb'
+  mode '664'
   owner 'root'
   group 'root'
   variables(
     enabled: node['opennms']['snmp_graph']['ericsson']['enabled']
   )
+  action node['opennms']['templates'] ? :create : :nothing
 end
 
 template "#{onms_home}/etc/snmp-graph.properties.d/extreme-networks-graph.properties" do
   cookbook node['opennms']['snmp_graph']['extreme_networks']['cookbook']
-  source "#{template_dir}snmp-graph.properties.d/extreme-networks-graph.properties.erb"
-  mode 0664
+  source 'snmp-graph.properties.d/extreme-networks-graph.properties.erb'
+  mode '664'
   owner 'root'
   group 'root'
   variables(
     enabled: node['opennms']['snmp_graph']['extreme_networks']['enabled']
   )
+  action node['opennms']['templates'] ? :create : :nothing
 end
 
 template "#{onms_home}/etc/snmp-graph.properties.d/f5-graph.properties" do
   cookbook node['opennms']['snmp_graph']['f5']['cookbook']
-  source "#{template_dir}snmp-graph.properties.d/f5-graph.properties.erb"
-  mode 0664
+  source 'snmp-graph.properties.d/f5-graph.properties.erb'
+  mode '664'
   owner 'root'
   group 'root'
   variables(
     enabled: node['opennms']['snmp_graph']['f5']['enabled']
   )
+  action node['opennms']['templates'] ? :create : :nothing
 end
 
 template "#{onms_home}/etc/snmp-graph.properties.d/force10-graph.properties" do
   cookbook node['opennms']['snmp_graph']['force10']['cookbook']
-  source "#{template_dir}snmp-graph.properties.d/force10-graph.properties.erb"
-  mode 0664
+  source 'snmp-graph.properties.d/force10-graph.properties.erb'
+  mode '664'
   owner 'root'
   group 'root'
   variables(
     enabled: node['opennms']['snmp_graph']['force10']['enabled']
   )
-end
-
-template "#{onms_home}/etc/snmp-graph.properties.d/fortinet-graph.properties" do
-  cookbook node['opennms']['snmp_graph']['fortinet']['cookbook']
-  source "#{template_dir}snmp-graph.properties.d/fortinet-graph.properties.erb"
-  mode 0664
-  owner 'root'
-  group 'root'
-  variables(
-    enabled: node['opennms']['snmp_graph']['fortinet']['enabled']
-  )
-  only_if { Opennms::Helpers.major(node['opennms']['version']).to_i == 16 }
+  action node['opennms']['templates'] ? :create : :nothing
 end
 
 template "#{onms_home}/etc/snmp-graph.properties.d/foundry-graph.properties" do
   cookbook node['opennms']['snmp_graph']['foundry']['cookbook']
-  source "#{template_dir}snmp-graph.properties.d/foundry-graph.properties.erb"
-  mode 0664
+  source 'snmp-graph.properties.d/foundry-graph.properties.erb'
+  mode '664'
   owner 'root'
   group 'root'
   variables(
     enabled: node['opennms']['snmp_graph']['foundry']['enabled']
   )
+  action node['opennms']['templates'] ? :create : :nothing
 end
 
 template "#{onms_home}/etc/snmp-graph.properties.d/framerelay-graph.properties" do
   cookbook node['opennms']['snmp_graph']['framerelay']['cookbook']
-  source "#{template_dir}snmp-graph.properties.d/framerelay-graph.properties.erb"
-  mode 0664
+  source 'snmp-graph.properties.d/framerelay-graph.properties.erb'
+  mode '664'
   owner 'root'
   group 'root'
   variables(
     enabled: node['opennms']['snmp_graph']['framerelay']['enabled']
   )
+  action node['opennms']['templates'] ? :create : :nothing
 end
 
 template "#{onms_home}/etc/snmp-graph.properties.d/host-resources-graph.properties" do
   cookbook node['opennms']['snmp_graph']['host_resources']['cookbook']
-  source "#{template_dir}snmp-graph.properties.d/host-resources-graph.properties.erb"
-  mode 0664
+  source 'snmp-graph.properties.d/host-resources-graph.properties.erb'
+  mode '664'
   owner 'root'
   group 'root'
   variables(
     enabled: node['opennms']['snmp_graph']['host_resources']['enabled']
   )
+  action node['opennms']['templates'] ? :create : :nothing
 end
 
 template "#{onms_home}/etc/snmp-graph.properties.d/hp-graph.properties" do
   cookbook node['opennms']['snmp_graph']['hp']['cookbook']
-  source "#{template_dir}snmp-graph.properties.d/hp-graph.properties.erb"
-  mode 0664
+  source 'snmp-graph.properties.d/hp-graph.properties.erb'
+  mode '664'
   owner 'root'
   group 'root'
   variables(
     enabled: node['opennms']['snmp_graph']['hp']['enabled']
   )
+  action node['opennms']['templates'] ? :create : :nothing
 end
 
 template "#{onms_home}/etc/snmp-graph.properties.d/hpux-graph.properties" do
   cookbook node['opennms']['snmp_graph']['hpux']['cookbook']
-  source "#{template_dir}snmp-graph.properties.d/hpux-graph.properties.erb"
-  mode 0664
+  source 'snmp-graph.properties.d/hpux-graph.properties.erb'
+  mode '664'
   owner 'root'
   group 'root'
   variables(
     enabled: node['opennms']['snmp_graph']['hpux']['enabled']
   )
+  action node['opennms']['templates'] ? :create : :nothing
 end
 
 template "#{onms_home}/etc/snmp-graph.properties.d/hwg-graph.properties" do
   cookbook node['opennms']['snmp_graph']['hwg']['cookbook']
-  source "#{template_dir}snmp-graph.properties.d/hwg-graph.properties.erb"
-  mode 0664
+  source 'snmp-graph.properties.d/hwg-graph.properties.erb'
+  mode '664'
   owner 'root'
   group 'root'
   variables(
     enabled: node['opennms']['snmp_graph']['hwg']['enabled']
   )
+  action node['opennms']['templates'] ? :create : :nothing
 end
 
 template "#{onms_home}/etc/snmp-graph.properties.d/ipunity-graph.properties" do
   cookbook node['opennms']['snmp_graph']['ipunity']['cookbook']
-  source "#{template_dir}snmp-graph.properties.d/ipunity-graph.properties.erb"
-  mode 0664
+  source 'snmp-graph.properties.d/ipunity-graph.properties.erb'
+  mode '664'
   owner 'root'
   group 'root'
   variables(
     enabled: node['opennms']['snmp_graph']['ipunity']['enabled']
   )
+  action node['opennms']['templates'] ? :create : :nothing
 end
 
 template "#{onms_home}/etc/snmp-graph.properties.d/jboss-graph.properties" do
   cookbook node['opennms']['snmp_graph']['jboss']['cookbook']
-  source "#{template_dir}snmp-graph.properties.d/jboss-graph.properties.erb"
-  mode 0664
+  source 'snmp-graph.properties.d/jboss-graph.properties.erb'
+  mode '664'
   owner 'root'
   group 'root'
   variables(
     enabled: node['opennms']['snmp_graph']['jboss']['enabled']
   )
+  action node['opennms']['templates'] ? :create : :nothing
 end
 
 template "#{onms_home}/etc/snmp-graph.properties.d/juniper-graph.properties" do
   cookbook node['opennms']['snmp_graph']['juniper']['cookbook']
-  source "#{template_dir}snmp-graph.properties.d/juniper-graph.properties.erb"
-  mode 0664
+  source 'snmp-graph.properties.d/juniper-graph.properties.erb'
+  mode '664'
   owner 'root'
   group 'root'
   variables(
     enabled: node['opennms']['snmp_graph']['juniper']['enabled']
   )
+  action node['opennms']['templates'] ? :create : :nothing
 end
 
 template "#{onms_home}/etc/snmp-graph.properties.d/jvm-graph.properties" do
   cookbook node['opennms']['snmp_graph']['jvm']['cookbook']
-  source "#{template_dir}snmp-graph.properties.d/jvm-graph.properties.erb"
-  mode 0664
+  source 'snmp-graph.properties.d/jvm-graph.properties.erb'
+  mode '664'
   owner 'root'
   group 'root'
   variables(
     enabled: node['opennms']['snmp_graph']['jvm']['enabled']
   )
+  action node['opennms']['templates'] ? :create : :nothing
 end
 
 template "#{onms_home}/etc/snmp-graph.properties.d/liebert-graph.properties" do
   cookbook node['opennms']['snmp_graph']['liebert']['cookbook']
-  source "#{template_dir}snmp-graph.properties.d/liebert-graph.properties.erb"
-  mode 0664
+  source 'snmp-graph.properties.d/liebert-graph.properties.erb'
+  mode '664'
   owner 'root'
   group 'root'
   variables(
     enabled: node['opennms']['snmp_graph']['liebert']['enabled']
   )
+  action node['opennms']['templates'] ? :create : :nothing
 end
 
 template "#{onms_home}/etc/snmp-graph.properties.d/lmsensors-graph.properties" do
   cookbook node['opennms']['snmp_graph']['lmsensors']['cookbook']
-  source "#{template_dir}snmp-graph.properties.d/lmsensors-graph.properties.erb"
-  mode 0664
+  source 'snmp-graph.properties.d/lmsensors-graph.properties.erb'
+  mode '664'
   owner 'root'
   group 'root'
   variables(
     enabled: node['opennms']['snmp_graph']['lmsensors']['enabled']
   )
+  action node['opennms']['templates'] ? :create : :nothing
 end
 
 template "#{onms_home}/etc/snmp-graph.properties.d/mailmarshal-graph.properties" do
   cookbook node['opennms']['snmp_graph']['mailmarshal']['cookbook']
-  source "#{template_dir}snmp-graph.properties.d/mailmarshal-graph.properties.erb"
-  mode 0664
+  source 'snmp-graph.properties.d/mailmarshal-graph.properties.erb'
+  mode '664'
   owner 'root'
   group 'root'
   variables(
     enabled: node['opennms']['snmp_graph']['mailmarshal']['enabled']
   )
+  action node['opennms']['templates'] ? :create : :nothing
 end
 
 template "#{onms_home}/etc/snmp-graph.properties.d/mcast-graph.properties" do
   cookbook node['opennms']['snmp_graph']['mcast']['cookbook']
-  source "#{template_dir}snmp-graph.properties.d/mcast-graph.properties.erb"
-  mode 0664
+  source 'snmp-graph.properties.d/mcast-graph.properties.erb'
+  mode '664'
   owner 'root'
   group 'root'
   variables(
     enabled: node['opennms']['snmp_graph']['mcast']['enabled']
   )
+  action node['opennms']['templates'] ? :create : :nothing
 end
 
 template "#{onms_home}/etc/snmp-graph.properties.d/mge-graph.properties" do
   cookbook node['opennms']['snmp_graph']['mge']['cookbook']
-  source "#{template_dir}snmp-graph.properties.d/mge-graph.properties.erb"
-  mode 0664
+  source 'snmp-graph.properties.d/mge-graph.properties.erb'
+  mode '664'
   owner 'root'
   group 'root'
   variables(
     enabled: node['opennms']['snmp_graph']['mge']['enabled']
   )
+  action node['opennms']['templates'] ? :create : :nothing
 end
 
 template "#{onms_home}/etc/snmp-graph.properties.d/mib2-graph.properties" do
   cookbook node['opennms']['snmp_graph']['mib2']['cookbook']
-  source "#{template_dir}snmp-graph.properties.d/mib2-graph.properties.erb"
-  mode 0664
+  source 'snmp-graph.properties.d/mib2-graph.properties.erb'
+  mode '664'
   owner 'root'
   group 'root'
   variables(
     enabled: node['opennms']['snmp_graph']['mib2']['enabled']
   )
+  action node['opennms']['templates'] ? :create : :nothing
 end
 
 template "#{onms_home}/etc/snmp-graph.properties.d/microsoft-exchange-graph.properties" do
   cookbook node['opennms']['snmp_graph']['microsoft_exchange']['cookbook']
-  source "#{template_dir}snmp-graph.properties.d/microsoft-exchange-graph.properties.erb"
-  mode 0664
+  source 'snmp-graph.properties.d/microsoft-exchange-graph.properties.erb'
+  mode '664'
   owner 'root'
   group 'root'
   variables(
     enabled: node['opennms']['snmp_graph']['microsoft_exchange']['enabled']
   )
+  action node['opennms']['templates'] ? :create : :nothing
 end
 
 template "#{onms_home}/etc/snmp-graph.properties.d/microsoft-graph.properties" do
   cookbook node['opennms']['snmp_graph']['microsoft']['cookbook']
-  source "#{template_dir}snmp-graph.properties.d/microsoft-graph.properties.erb"
-  mode 0664
+  source 'snmp-graph.properties.d/microsoft-graph.properties.erb'
+  mode '664'
   owner 'root'
   group 'root'
   variables(
     enabled: node['opennms']['snmp_graph']['microsoft']['enabled']
   )
+  action node['opennms']['templates'] ? :create : :nothing
 end
 
 template "#{onms_home}/etc/snmp-graph.properties.d/microsoft-http-graph.properties" do
   cookbook node['opennms']['snmp_graph']['microsoft_http']['cookbook']
-  source "#{template_dir}snmp-graph.properties.d/microsoft-http-graph.properties.erb"
-  mode 0664
+  source 'snmp-graph.properties.d/microsoft-http-graph.properties.erb'
+  mode '664'
   owner 'root'
   group 'root'
   variables(
     enabled: node['opennms']['snmp_graph']['microsoft_http']['enabled']
   )
+  action node['opennms']['templates'] ? :create : :nothing
 end
 
 template "#{onms_home}/etc/snmp-graph.properties.d/microsoft-iis-graph.properties" do
   cookbook node['opennms']['snmp_graph']['microsoft_iis']['cookbook']
-  source "#{template_dir}snmp-graph.properties.d/microsoft-iis-graph.properties.erb"
-  mode 0664
+  source 'snmp-graph.properties.d/microsoft-iis-graph.properties.erb'
+  mode '664'
   owner 'root'
   group 'root'
   variables(
     enabled: node['opennms']['snmp_graph']['microsoft_iis']['enabled']
   )
+  action node['opennms']['templates'] ? :create : :nothing
 end
 
 template "#{onms_home}/etc/snmp-graph.properties.d/microsoft-lcs-graph.properties" do
   cookbook node['opennms']['snmp_graph']['microsoft_lcs']['cookbook']
-  source "#{template_dir}snmp-graph.properties.d/microsoft-lcs-graph.properties.erb"
-  mode 0664
+  source 'snmp-graph.properties.d/microsoft-lcs-graph.properties.erb'
+  mode '664'
   owner 'root'
   group 'root'
   variables(
     enabled: node['opennms']['snmp_graph']['microsoft_lcs']['enabled']
   )
+  action node['opennms']['templates'] ? :create : :nothing
 end
 
 template "#{onms_home}/etc/snmp-graph.properties.d/microsoft-sql-graph.properties" do
   cookbook node['opennms']['snmp_graph']['microsoft_sql']['cookbook']
-  source "#{template_dir}snmp-graph.properties.d/microsoft-sql-graph.properties.erb"
-  mode 0664
+  source 'snmp-graph.properties.d/microsoft-sql-graph.properties.erb'
+  mode '664'
   owner 'root'
   group 'root'
   variables(
     enabled: node['opennms']['snmp_graph']['microsoft_sql']['enabled']
   )
+  action node['opennms']['templates'] ? :create : :nothing
 end
 
 template "#{onms_home}/etc/snmp-graph.properties.d/microsoft-windows-graph.properties" do
   cookbook node['opennms']['snmp_graph']['microsoft_windows']['cookbook']
-  source "#{template_dir}snmp-graph.properties.d/microsoft-windows-graph.properties.erb"
-  mode 0664
+  source 'snmp-graph.properties.d/microsoft-windows-graph.properties.erb'
+  mode '664'
   owner 'root'
   group 'root'
   variables(
     enabled: node['opennms']['snmp_graph']['microsoft_windows']['enabled']
   )
+  action node['opennms']['templates'] ? :create : :nothing
 end
 
 template "#{onms_home}/etc/snmp-graph.properties.d/microsoft-wmi-graph.properties" do
   cookbook node['opennms']['snmp_graph']['microsoft_wmi']['cookbook']
-  source "#{template_dir}snmp-graph.properties.d/microsoft-wmi-graph.properties.erb"
-  mode 0664
+  source 'snmp-graph.properties.d/microsoft-wmi-graph.properties.erb'
+  mode '664'
   owner 'root'
   group 'root'
   variables(
     enabled: node['opennms']['snmp_graph']['microsoft_wmi']['enabled']
   )
+  action node['opennms']['templates'] ? :create : :nothing
 end
 
 template "#{onms_home}/etc/snmp-graph.properties.d/mikrotik-graph.properties" do
   cookbook node['opennms']['snmp_graph']['mikrotik']['cookbook']
-  source "#{template_dir}snmp-graph.properties.d/mikrotik-graph.properties.erb"
-  mode 0664
+  source 'snmp-graph.properties.d/mikrotik-graph.properties.erb'
+  mode '664'
   owner 'root'
   group 'root'
   variables(
     enabled: node['opennms']['snmp_graph']['mikrotik']['enabled']
   )
+  action node['opennms']['templates'] ? :create : :nothing
 end
 
 template "#{onms_home}/etc/snmp-graph.properties.d/mysql-graph.properties" do
   cookbook node['opennms']['snmp_graph']['mysql']['cookbook']
-  source "#{template_dir}snmp-graph.properties.d/mysql-graph.properties.erb"
-  mode 0664
+  source 'snmp-graph.properties.d/mysql-graph.properties.erb'
+  mode '664'
   owner 'root'
   group 'root'
   variables(
     enabled: node['opennms']['snmp_graph']['mysql']['enabled']
   )
+  action node['opennms']['templates'] ? :create : :nothing
 end
 
 template "#{onms_home}/etc/snmp-graph.properties.d/netapp-graph.properties" do
   cookbook node['opennms']['snmp_graph']['netapp']['cookbook']
-  source "#{template_dir}snmp-graph.properties.d/netapp-graph.properties.erb"
-  mode 0664
+  source 'snmp-graph.properties.d/netapp-graph.properties.erb'
+  mode '664'
   owner 'root'
   group 'root'
   variables(
     enabled: node['opennms']['snmp_graph']['netapp']['enabled']
   )
+  action node['opennms']['templates'] ? :create : :nothing
 end
 
 template "#{onms_home}/etc/snmp-graph.properties.d/netbotz-graph.properties" do
   cookbook node['opennms']['snmp_graph']['netbotz']['cookbook']
-  source "#{template_dir}snmp-graph.properties.d/netbotz-graph.properties.erb"
-  mode 0664
+  source 'snmp-graph.properties.d/netbotz-graph.properties.erb'
+  mode '664'
   owner 'root'
   group 'root'
   variables(
     enabled: node['opennms']['snmp_graph']['netbotz']['enabled']
   )
+  action node['opennms']['templates'] ? :create : :nothing
 end
 
 template "#{onms_home}/etc/snmp-graph.properties.d/netenforcer-graph.properties" do
   cookbook node['opennms']['snmp_graph']['netenforcer']['cookbook']
-  source "#{template_dir}snmp-graph.properties.d/netenforcer-graph.properties.erb"
-  mode 0664
+  source 'snmp-graph.properties.d/netenforcer-graph.properties.erb'
+  mode '664'
   owner 'root'
   group 'root'
   variables(
     enabled: node['opennms']['snmp_graph']['netenforcer']['enabled']
   )
+  action node['opennms']['templates'] ? :create : :nothing
 end
 
 template "#{onms_home}/etc/snmp-graph.properties.d/netscaler-graph.properties" do
   cookbook node['opennms']['snmp_graph']['netscaler']['cookbook']
-  source "#{template_dir}snmp-graph.properties.d/netscaler-graph.properties.erb"
-  mode 0664
+  source 'snmp-graph.properties.d/netscaler-graph.properties.erb'
+  mode '664'
   owner 'root'
   group 'root'
   variables(
     enabled: node['opennms']['snmp_graph']['netscaler']['enabled']
   )
+  action node['opennms']['templates'] ? :create : :nothing
 end
 
 template "#{onms_home}/etc/snmp-graph.properties.d/netsnmp-graph.properties" do
   cookbook node['opennms']['snmp_graph']['netsnmp']['cookbook']
-  source "#{template_dir}snmp-graph.properties.d/netsnmp-graph.properties.erb"
-  mode 0664
+  source 'snmp-graph.properties.d/netsnmp-graph.properties.erb'
+  mode '664'
   owner 'root'
   group 'root'
   variables(
     enabled: node['opennms']['snmp_graph']['netsnmp']['enabled']
   )
+  action node['opennms']['templates'] ? :create : :nothing
 end
 
 template "#{onms_home}/etc/snmp-graph.properties.d/nortel-graph.properties" do
   cookbook node['opennms']['snmp_graph']['nortel']['cookbook']
-  source "#{template_dir}snmp-graph.properties.d/nortel-graph.properties.erb"
-  mode 0664
+  source 'snmp-graph.properties.d/nortel-graph.properties.erb'
+  mode '664'
   owner 'root'
   group 'root'
   variables(
     enabled: node['opennms']['snmp_graph']['nortel']['enabled']
   )
+  action node['opennms']['templates'] ? :create : :nothing
 end
 
 template "#{onms_home}/etc/snmp-graph.properties.d/novell-graph.properties" do
   cookbook node['opennms']['snmp_graph']['novell']['cookbook']
-  source "#{template_dir}snmp-graph.properties.d/novell-graph.properties.erb"
-  mode 0664
+  source 'snmp-graph.properties.d/novell-graph.properties.erb'
+  mode '664'
   owner 'root'
   group 'root'
   variables(
     enabled: node['opennms']['snmp_graph']['novell']['enabled']
   )
+  action node['opennms']['templates'] ? :create : :nothing
 end
 
 template "#{onms_home}/etc/snmp-graph.properties.d/pfsense-graph.properties" do
   cookbook node['opennms']['snmp_graph']['pfsense']['cookbook']
-  source "#{template_dir}snmp-graph.properties.d/pfsense-graph.properties.erb"
-  mode 0664
+  source 'snmp-graph.properties.d/pfsense-graph.properties.erb'
+  mode '664'
   owner 'root'
   group 'root'
   variables(
     enabled: node['opennms']['snmp_graph']['pfsense']['enabled']
   )
+  action node['opennms']['templates'] ? :create : :nothing
 end
 
 template "#{onms_home}/etc/snmp-graph.properties.d/postgresql-graph.properties" do
   cookbook node['opennms']['snmp_graph']['postgresql']['cookbook']
-  source "#{template_dir}snmp-graph.properties.d/postgresql-graph.properties.erb"
-  mode 0664
+  source 'snmp-graph.properties.d/postgresql-graph.properties.erb'
+  mode '664'
   owner 'root'
   group 'root'
   variables(
     enabled: node['opennms']['snmp_graph']['postgresql']['enabled']
   )
+  action node['opennms']['templates'] ? :create : :nothing
 end
 
 template "#{onms_home}/etc/snmp-graph.properties.d/riverbed-steelhead-graph.properties" do
   cookbook node['opennms']['snmp_graph']['riverbed_steelhead']['cookbook']
-  source "#{template_dir}snmp-graph.properties.d/riverbed-steelhead-graph.properties.erb"
-  mode 0664
+  source 'snmp-graph.properties.d/riverbed-steelhead-graph.properties.erb'
+  mode '664'
   owner 'root'
   group 'root'
   variables(
     enabled: node['opennms']['snmp_graph']['riverbed_steelhead']['enabled']
   )
+  action node['opennms']['templates'] ? :create : :nothing
 end
 
 template "#{onms_home}/etc/snmp-graph.properties.d/servertech-graph.properties" do
   cookbook node['opennms']['snmp_graph']['servertech']['cookbook']
-  source "#{template_dir}snmp-graph.properties.d/servertech-graph.properties.erb"
-  mode 0664
+  source 'snmp-graph.properties.d/servertech-graph.properties.erb'
+  mode '664'
   owner 'root'
   group 'root'
   variables(
     enabled: node['opennms']['snmp_graph']['servertech']['enabled']
   )
+  action node['opennms']['templates'] ? :create : :nothing
 end
 
 template "#{onms_home}/etc/snmp-graph.properties.d/snmp-informant-graph.properties" do
   cookbook node['opennms']['snmp_graph']['snmp_informant']['cookbook']
-  source "#{template_dir}snmp-graph.properties.d/snmp-informant-graph.properties.erb"
-  mode 0664
+  source 'snmp-graph.properties.d/snmp-informant-graph.properties.erb'
+  mode '664'
   owner 'root'
   group 'root'
   variables(
     enabled: node['opennms']['snmp_graph']['snmp_informant']['enabled']
   )
+  action node['opennms']['templates'] ? :create : :nothing
 end
 
 template "#{onms_home}/etc/snmp-graph.properties.d/sofaware-embeddedngx-graph.properties" do
   cookbook node['opennms']['snmp_graph']['sofaware_embeddedngx']['cookbook']
-  source "#{template_dir}snmp-graph.properties.d/sofaware-embeddedngx-graph.properties.erb"
-  mode 0664
+  source 'snmp-graph.properties.d/sofaware-embeddedngx-graph.properties.erb'
+  mode '664'
   owner 'root'
   group 'root'
   variables(
     enabled: node['opennms']['snmp_graph']['sofaware_embeddedngx']['enabled']
   )
+  action node['opennms']['templates'] ? :create : :nothing
 end
 
 template "#{onms_home}/etc/snmp-graph.properties.d/sun-graph.properties" do
   cookbook node['opennms']['snmp_graph']['sun']['cookbook']
-  source "#{template_dir}snmp-graph.properties.d/sun-graph.properties.erb"
-  mode 0664
+  source 'snmp-graph.properties.d/sun-graph.properties.erb'
+  mode '664'
   owner 'root'
   group 'root'
   variables(
     enabled: node['opennms']['snmp_graph']['sun']['enabled']
   )
+  action node['opennms']['templates'] ? :create : :nothing
 end
 
 template "#{onms_home}/etc/snmp-graph.properties.d/trango-graph.properties" do
   cookbook node['opennms']['snmp_graph']['trango']['cookbook']
-  source "#{template_dir}snmp-graph.properties.d/trango-graph.properties.erb"
-  mode 0664
+  source 'snmp-graph.properties.d/trango-graph.properties.erb'
+  mode '664'
   owner 'root'
   group 'root'
   variables(
     enabled: node['opennms']['snmp_graph']['trango']['enabled']
   )
+  action node['opennms']['templates'] ? :create : :nothing
 end
 
 template "#{onms_home}/etc/snmp-graph.properties.d/vmware-cim-graph-simple.properties" do
   cookbook node['opennms']['snmp_graph']['vmware_cim']['cookbook']
-  source "#{template_dir}snmp-graph.properties.d/vmware-cim-graph-simple.properties.erb"
-  mode 0664
+  source 'snmp-graph.properties.d/vmware-cim-graph-simple.properties.erb'
+  mode '664'
   owner 'root'
   group 'root'
   variables(
     enabled: node['opennms']['snmp_graph']['vmware_cim']['enabled']
   )
+  action node['opennms']['templates'] ? :create : :nothing
 end
 
 template "#{onms_home}/etc/snmp-graph.properties.d/vmware3-graph-simple.properties" do
   cookbook node['opennms']['snmp_graph']['vmware3']['cookbook']
-  source "#{template_dir}snmp-graph.properties.d/vmware3-graph-simple.properties.erb"
-  mode 0664
+  source 'snmp-graph.properties.d/vmware3-graph-simple.properties.erb'
+  mode '664'
   owner 'root'
   group 'root'
   variables(
     enabled: node['opennms']['snmp_graph']['vmware3']['enabled']
   )
+  action node['opennms']['templates'] ? :create : :nothing
 end
 
 template "#{onms_home}/etc/snmp-graph.properties.d/vmware4-graph-simple.properties" do
   cookbook node['opennms']['snmp_graph']['vmware4']['cookbook']
-  source "#{template_dir}snmp-graph.properties.d/vmware4-graph-simple.properties.erb"
-  mode 0664
+  source 'snmp-graph.properties.d/vmware4-graph-simple.properties.erb'
+  mode '664'
   owner 'root'
   group 'root'
   variables(
     enabled: node['opennms']['snmp_graph']['vmware4']['enabled']
   )
+  action node['opennms']['templates'] ? :create : :nothing
 end
 
 template "#{onms_home}/etc/snmp-graph.properties.d/vmware5-cpu-graph.properties" do
   cookbook node['opennms']['snmp_graph']['vmware5']['cookbook']
-  source "#{template_dir}snmp-graph.properties.d/vmware5-cpu-graph.properties.erb"
-  mode 0664
+  source 'snmp-graph.properties.d/vmware5-cpu-graph.properties.erb'
+  mode '664'
   owner 'root'
   group 'root'
   variables(
     enabled: node['opennms']['snmp_graph']['vmware5']['enabled']
   )
+  action node['opennms']['templates'] ? :create : :nothing
 end
 
 template "#{onms_home}/etc/snmp-graph.properties.d/vmware5-datastore-graph.properties" do
   cookbook node['opennms']['snmp_graph']['vmware5']['cookbook']
-  source "#{template_dir}snmp-graph.properties.d/vmware5-datastore-graph.properties.erb"
-  mode 0664
+  source 'snmp-graph.properties.d/vmware5-datastore-graph.properties.erb'
+  mode '664'
   owner 'root'
   group 'root'
   variables(
     enabled: node['opennms']['snmp_graph']['vmware5']['enabled']
   )
+  action node['opennms']['templates'] ? :create : :nothing
 end
 
 template "#{onms_home}/etc/snmp-graph.properties.d/vmware5-disk-graph.properties" do
   cookbook node['opennms']['snmp_graph']['vmware5']['cookbook']
-  source "#{template_dir}snmp-graph.properties.d/vmware5-disk-graph.properties.erb"
-  mode 0664
+  source 'snmp-graph.properties.d/vmware5-disk-graph.properties.erb'
+  mode '664'
   owner 'root'
   group 'root'
   variables(
     enabled: node['opennms']['snmp_graph']['vmware5']['enabled']
   )
+  action node['opennms']['templates'] ? :create : :nothing
 end
 
 template "#{onms_home}/etc/snmp-graph.properties.d/vmware5-host-based-replication-graph.properties" do
   cookbook node['opennms']['snmp_graph']['vmware5']['cookbook']
-  source "#{template_dir}snmp-graph.properties.d/vmware5-host-based-replication-graph.properties.erb"
-  mode 0664
+  source 'snmp-graph.properties.d/vmware5-host-based-replication-graph.properties.erb'
+  mode '664'
   owner 'root'
   group 'root'
   variables(
     enabled: node['opennms']['snmp_graph']['vmware5']['enabled']
   )
+  action node['opennms']['templates'] ? :create : :nothing
 end
 
 template "#{onms_home}/etc/snmp-graph.properties.d/vmware5-memory-graph.properties" do
   cookbook node['opennms']['snmp_graph']['vmware5']['cookbook']
-  source "#{template_dir}snmp-graph.properties.d/vmware5-memory-graph.properties.erb"
-  mode 0664
+  source 'snmp-graph.properties.d/vmware5-memory-graph.properties.erb'
+  mode '664'
   owner 'root'
   group 'root'
   variables(
     enabled: node['opennms']['snmp_graph']['vmware5']['enabled']
   )
+  action node['opennms']['templates'] ? :create : :nothing
 end
 
 template "#{onms_home}/etc/snmp-graph.properties.d/vmware5-network-graph.properties" do
   cookbook node['opennms']['snmp_graph']['vmware5']['cookbook']
-  source "#{template_dir}snmp-graph.properties.d/vmware5-network-graph.properties.erb"
-  mode 0664
+  source 'snmp-graph.properties.d/vmware5-network-graph.properties.erb'
+  mode '664'
   owner 'root'
   group 'root'
   variables(
     enabled: node['opennms']['snmp_graph']['vmware5']['enabled']
   )
+  action node['opennms']['templates'] ? :create : :nothing
 end
 
 template "#{onms_home}/etc/snmp-graph.properties.d/vmware5-power-graph.properties" do
   cookbook node['opennms']['snmp_graph']['vmware5']['cookbook']
-  source "#{template_dir}snmp-graph.properties.d/vmware5-power-graph.properties.erb"
-  mode 0664
+  source 'snmp-graph.properties.d/vmware5-power-graph.properties.erb'
+  mode '664'
   owner 'root'
   group 'root'
   variables(
     enabled: node['opennms']['snmp_graph']['vmware5']['enabled']
   )
+  action node['opennms']['templates'] ? :create : :nothing
 end
 
 template "#{onms_home}/etc/snmp-graph.properties.d/vmware5-storage-adapter-graph.properties" do
   cookbook node['opennms']['snmp_graph']['vmware5']['cookbook']
-  source "#{template_dir}snmp-graph.properties.d/vmware5-storage-adapter-graph.properties.erb"
-  mode 0664
+  source 'snmp-graph.properties.d/vmware5-storage-adapter-graph.properties.erb'
+  mode '664'
   owner 'root'
   group 'root'
   variables(
     enabled: node['opennms']['snmp_graph']['vmware5']['enabled']
   )
+  action node['opennms']['templates'] ? :create : :nothing
 end
 
 template "#{onms_home}/etc/snmp-graph.properties.d/vmware5-storage-path-graph.properties" do
   cookbook node['opennms']['snmp_graph']['vmware5']['cookbook']
-  source "#{template_dir}snmp-graph.properties.d/vmware5-storage-path-graph.properties.erb"
-  mode 0664
+  source 'snmp-graph.properties.d/vmware5-storage-path-graph.properties.erb'
+  mode '664'
   owner 'root'
   group 'root'
   variables(
     enabled: node['opennms']['snmp_graph']['vmware5']['enabled']
   )
+  action node['opennms']['templates'] ? :create : :nothing
 end
 
 template "#{onms_home}/etc/snmp-graph.properties.d/vmware5-system-graph.properties" do
   cookbook node['opennms']['snmp_graph']['vmware5']['cookbook']
-  source "#{template_dir}snmp-graph.properties.d/vmware5-system-graph.properties.erb"
-  mode 0664
+  source 'snmp-graph.properties.d/vmware5-system-graph.properties.erb'
+  mode '664'
   owner 'root'
   group 'root'
   variables(
     enabled: node['opennms']['snmp_graph']['vmware5']['enabled']
   )
+  action node['opennms']['templates'] ? :create : :nothing
 end
 
 template "#{onms_home}/etc/snmp-graph.properties.d/vmware5-virtual-disk-graph.properties" do
   cookbook node['opennms']['snmp_graph']['vmware5']['cookbook']
-  source "#{template_dir}snmp-graph.properties.d/vmware5-virtual-disk-graph.properties.erb"
-  mode 0664
+  source 'snmp-graph.properties.d/vmware5-virtual-disk-graph.properties.erb'
+  mode '664'
   owner 'root'
   group 'root'
   variables(
     enabled: node['opennms']['snmp_graph']['vmware5']['enabled']
   )
+  action node['opennms']['templates'] ? :create : :nothing
 end
 
 template "#{onms_home}/etc/snmp-graph.properties.d/xmp-graph.properties" do
   cookbook node['opennms']['snmp_graph']['xmp']['cookbook']
-  source "#{template_dir}snmp-graph.properties.d/xmp-graph.properties.erb"
-  mode 0664
+  source 'snmp-graph.properties.d/xmp-graph.properties.erb'
+  mode '664'
   owner 'root'
   group 'root'
   variables(
     enabled: node['opennms']['snmp_graph']['xmp']['enabled']
   )
+  action node['opennms']['templates'] ? :create : :nothing
 end
 
 template "#{onms_home}/etc/snmp-graph.properties.d/xups-graph.properties" do
   cookbook node['opennms']['snmp_graph']['xups']['cookbook']
-  source "#{template_dir}snmp-graph.properties.d/xups-graph.properties.erb"
-  mode 0664
+  source 'snmp-graph.properties.d/xups-graph.properties.erb'
+  mode '664'
   owner 'root'
   group 'root'
   variables(
     enabled: node['opennms']['snmp_graph']['xups']['enabled']
   )
+  action node['opennms']['templates'] ? :create : :nothing
 end
 
 template "#{onms_home}/etc/snmp-graph.properties.d/zeus-graph.properties" do
   cookbook node['opennms']['snmp_graph']['zeus']['cookbook']
-  source "#{template_dir}snmp-graph.properties.d/zeus-graph.properties.erb"
-  mode 0664
+  source 'snmp-graph.properties.d/zeus-graph.properties.erb'
+  mode '664'
   owner 'root'
   group 'root'
   variables(
     enabled: node['opennms']['snmp_graph']['zeus']['enabled']
   )
+  action node['opennms']['templates'] ? :create : :nothing
 end
 
 template "#{onms_home}/etc/snmp-interface-poller-configuration.xml" do
   cookbook node['opennms']['snmp_iface_poller']['cookbook']
-  source "#{template_dir}snmp-interface-poller-configuration.xml.erb"
-  mode 0664
+  source 'snmp-interface-poller-configuration.xml.erb'
+  mode '664'
   owner 'root'
   group 'root'
   notifies :restart, 'service[opennms]'
@@ -1884,24 +1871,26 @@ template "#{onms_home}/etc/snmp-interface-poller-configuration.xml" do
     upvalues: node['opennms']['snmp_iface_poller']['upvalues'],
     downvalues: node['opennms']['snmp_iface_poller']['downvalues']
   )
+  action node['opennms']['templates'] ? :create : :nothing
 end
 
 template "#{onms_home}/etc/statsd-configuration.xml" do
   cookbook node['opennms']['statsd']['cookbook']
-  source "#{template_dir}statsd-configuration.xml.erb"
-  mode 0664
+  source 'statsd-configuration.xml.erb'
+  mode '664'
   owner 'root'
   group 'root'
   variables(
     throughput: node['opennms']['statsd']['throughput'],
     response_time_reports: node['opennms']['statsd']['response_time_reports']
   )
+  action node['opennms']['templates'] ? :create : :nothing
 end
 
 template "#{onms_home}/etc/support.properties" do
   cookbook node['opennms']['support']['cookbook']
-  source "#{template_dir}support.properties.erb"
-  mode 0664
+  source 'support.properties.erb'
+  mode '664'
   owner 'root'
   group 'root'
   notifies :restart, 'service[opennms]'
@@ -1910,24 +1899,26 @@ template "#{onms_home}/etc/support.properties" do
     timeout: node['opennms']['support']['timeout'],
     retry: node['opennms']['support']['retry']
   )
+  action node['opennms']['templates'] ? :create : :nothing
 end
 
 template "#{onms_home}/etc/surveillance-views.xml" do
   cookbook node['opennms']['surveillance_views']['cookbook']
-  source "#{template_dir}surveillance-views.xml.erb"
-  mode 0664
+  source 'surveillance-views.xml.erb'
+  mode '664'
   owner 'root'
   group 'root'
   variables(
     default_view: node['opennms']['surveillance_views']['default_view'],
     default: node['opennms']['surveillance_views']['default']
   )
+  action node['opennms']['templates'] ? :create : :nothing
 end
 
 template "#{onms_home}/etc/syslog-northbounder-configuration.xml" do
   cookbook node['opennms']['syslog_north']['cookbook']
-  source "#{template_dir}syslog-northbounder-configuration.xml.erb"
-  mode 0664
+  source 'syslog-northbounder-configuration.xml.erb'
+  mode '664'
   owner 'root'
   group 'root'
   notifies :restart, 'service[opennms]'
@@ -1941,13 +1932,13 @@ template "#{onms_home}/etc/syslog-northbounder-configuration.xml" do
     destination: node['opennms']['syslog_north']['destination'],
     uei: node['opennms']['syslog_north']['uei']
   )
+  action node['opennms']['templates'] ? :create : :nothing
 end
 
-node.default['opennms']['syslogd']['parser'] = 'org.opennms.netmgt.syslogd.RadixTreeSyslogParser' if mv.to_i >= 24
 template "#{onms_home}/etc/syslogd-configuration.xml" do
   cookbook node['opennms']['syslogd']['cookbook']
-  source "#{template_dir}syslogd-configuration.xml.erb"
-  mode 0664
+  source 'syslogd-configuration.xml.erb'
+  mode '664'
   owner 'root'
   group 'root'
   variables(
@@ -1967,12 +1958,13 @@ template "#{onms_home}/etc/syslogd-configuration.xml" do
     sudo: node['opennms']['syslogd']['sudo'],
     files: node['opennms']['syslogd']['files']
   )
+  action node['opennms']['templates'] ? :create : :nothing
 end
 
 template "#{onms_home}/etc/threshd-configuration.xml" do
   cookbook node['opennms']['threshd']['cookbook']
-  source "#{template_dir}threshd-configuration.xml.erb"
-  mode 0664
+  source 'threshd-configuration.xml.erb'
+  mode '664'
   owner 'root'
   group 'root'
   variables(
@@ -1985,12 +1977,13 @@ template "#{onms_home}/etc/threshd-configuration.xml" do
     netsnmp_memory_linux: node['opennms']['threshd']['netsnmp_memory_linux'],
     netsnmp_memory_nonlinux: node['opennms']['threshd']['netsnmp_memory_nonlinux']
   )
+  action node['opennms']['templates'] ? :create : :nothing
 end
 
 template "#{onms_home}/etc/thresholds.xml" do
   cookbook node['opennms']['thresholds']['cookbook']
-  source "#{template_dir}thresholds.xml.erb"
-  mode 0664
+  source 'thresholds.xml.erb'
+  mode '664'
   owner 'root'
   group 'root'
   variables(
@@ -2003,12 +1996,13 @@ template "#{onms_home}/etc/thresholds.xml" do
     netsnmp_memory_nonlinux: node['opennms']['thresholds']['netsnmp_memory_nonlinux'],
     coffee: node['opennms']['thresholds']['coffee']
   )
+  action node['opennms']['templates'] ? :create : :nothing
 end
 
 template "#{onms_home}/etc/translator-configuration.xml" do
   cookbook node['opennms']['translator']['cookbook']
-  source "#{template_dir}translator-configuration.xml.erb"
-  mode 0664
+  source 'translator-configuration.xml.erb'
+  mode '664'
   owner 'root'
   group 'root'
   variables(
@@ -2019,12 +2013,13 @@ template "#{onms_home}/etc/translator-configuration.xml" do
     juniper_cfg_change: node['opennms']['translator']['juniper_cfg_change'],
     telemetry_clock_skew_detected: node['opennms']['translator']['telemetry_clock_skew_detected']
   )
+  action node['opennms']['templates'] ? :create : :nothing
 end
 
 template "#{onms_home}/etc/trapd-configuration.xml" do
   cookbook node['opennms']['trapd']['cookbook']
-  source "#{template_dir}trapd-configuration.xml.erb"
-  mode 0664
+  source 'trapd-configuration.xml.erb'
+  mode '664'
   owner 'root'
   group 'root'
   notifies :restart, 'service[opennms]'
@@ -2032,36 +2027,29 @@ template "#{onms_home}/etc/trapd-configuration.xml" do
     port: node['opennms']['trapd']['port'],
     new_suspect: node['opennms']['trapd']['new_suspect']
   )
+  action node['opennms']['templates'] ? :create : :nothing
 end
 
 template "#{onms_home}/etc/users.xml" do
   cookbook node['opennms']['users']['cookbook']
-  source "#{template_dir}users.xml.erb"
-  mode 0664 if mv.to_i <= 19
-  mode 0640 if mv.to_i > 19
+  source 'users.xml.erb'
+  mode '640'
   owner 'root'
   group 'root'
-  if node['opennms']['version'] == '26.2.2-1' || node['opennms']['version'].to_i > 26
-    variables(
-      name: node['opennms']['users']['admin']['name'],
-      user_comments: node['opennms']['users']['admin']['user_comments'],
-      password: node['opennms']['users']['admin']['pwhash'],
-      rtc_pwhash: node['opennms']['properties']['rtc']['pwhash'],
-      salted: node['opennms']['users']['salted']
-    )
-  else
-    variables(
-      name: node['opennms']['users']['admin']['name'],
-      user_comments: node['opennms']['users']['admin']['user_comments'],
-      password: node['opennms']['users']['admin']['pwhash']
-    )
-  end
+  variables(
+    name: node['opennms']['users']['admin']['name'],
+    user_comments: node['opennms']['users']['admin']['user_comments'],
+    password: node['opennms']['users']['admin']['pwhash'],
+    rtc_pwhash: node['opennms']['properties']['rtc']['pwhash'],
+    salted: node['opennms']['users']['salted']
+  )
+  action node['opennms']['templates'] ? :create : :nothing
 end
 
 template "#{onms_home}/etc/vacuumd-configuration.xml" do
   cookbook node['opennms']['vacuumd']['cookbook']
-  source "#{template_dir}vacuumd-configuration.xml.erb"
-  mode 0664
+  source 'vacuumd-configuration.xml.erb'
+  mode '664'
   owner 'root'
   group 'root'
   variables(
@@ -2073,24 +2061,26 @@ template "#{onms_home}/etc/vacuumd-configuration.xml" do
     auto_events: node['opennms']['vacuumd']['auto_events'],
     action_events: node['opennms']['vacuumd']['action_events']
   )
+  action node['opennms']['templates'] ? :create : :nothing
 end
 
 template "#{onms_home}/etc/viewsdisplay.xml" do
   cookbook node['opennms']['web_console_view']['cookbook']
-  source "#{template_dir}viewsdisplay.xml.erb"
-  mode 0664
+  source 'viewsdisplay.xml.erb'
+  mode '664'
   owner 'root'
   group 'root'
   notifies :restart, 'service[opennms]'
   variables(
     web_console_view: node['opennms']['web_console_view']
   )
+  action node['opennms']['templates'] ? :create : :nothing
 end
 
 template "#{onms_home}/etc/vmware-cim-datacollection-config.xml" do
   cookbook node['opennms']['vmware_cim']['cookbook']
-  source "#{template_dir}vmware-cim-datacollection-config.xml.erb"
-  mode 0664
+  source 'vmware-cim-datacollection-config.xml.erb'
+  mode '664'
   owner 'root'
   group 'root'
   notifies :restart, 'service[opennms]'
@@ -2098,12 +2088,13 @@ template "#{onms_home}/etc/vmware-cim-datacollection-config.xml" do
     rrd_repository: node['opennms']['vmware_cim']['rrd_repository'],
     default_esx_hostsystem: node['opennms']['vmware_cim']['default_esx_hostsystem']
   )
+  action node['opennms']['templates'] ? :create : :nothing
 end
 
 template "#{onms_home}/etc/vmware-datacollection-config.xml" do
   cookbook node['opennms']['vmware']['cookbook']
-  source "#{template_dir}vmware-datacollection-config.xml.erb"
-  mode 0664
+  source 'vmware-datacollection-config.xml.erb'
+  mode '664'
   owner 'root'
   group 'root'
   notifies :restart, 'service[opennms]'
@@ -2116,12 +2107,13 @@ template "#{onms_home}/etc/vmware-datacollection-config.xml" do
     default_hostsystem5: node['opennms']['vmware']['default_hostsystem5'],
     default_vm5: node['opennms']['vmware']['default_vm5']
   )
+  action node['opennms']['templates'] ? :create : :nothing
 end
 
 template "#{onms_home}/etc/wmi-datacollection-config.xml" do
   cookbook node['opennms']['wmi']['cookbook']
-  source "#{template_dir}wmi-datacollection-config.xml.erb"
-  mode 0664
+  source 'wmi-datacollection-config.xml.erb'
+  mode '664'
   owner 'root'
   group 'root'
   notifies :restart, 'service[opennms]'
@@ -2129,12 +2121,13 @@ template "#{onms_home}/etc/wmi-datacollection-config.xml" do
     rrd_repository: node['opennms']['wmi']['rrd_repository'],
     default: node['opennms']['wmi']['default']
   )
+  action node['opennms']['templates'] ? :create : :nothing
 end
 
 template "#{onms_home}/etc/xmpp-configuration.properties" do
   cookbook node['opennms']['xmpp']['cookbook']
-  source "#{template_dir}xmpp-configuration.properties.erb"
-  mode 0664
+  source 'xmpp-configuration.properties.erb'
+  mode '664'
   owner 'root'
   group 'root'
   notifies :restart, 'service[opennms]'
@@ -2150,8 +2143,9 @@ template "#{onms_home}/etc/xmpp-configuration.properties" do
     user: node['opennms']['xmpp']['user'],
     pass: node['opennms']['xmpp']['pass']
   )
+  action node['opennms']['templates'] ? :create : :nothing
 end
 
-if mv.to_i >= 22 && node['opennms']['telemetryd']['managed']
+if node['opennms']['telemetryd']['managed']
   include_recipe 'opennms::telemetryd'
 end

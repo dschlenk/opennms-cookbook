@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-include Opennms::Rbac
 def whyrun_supported?
   true
 end
@@ -27,13 +26,13 @@ def load_current_resource
   @current_resource.times(@new_resource.times)
 
   # nest things that depend on each other and could cause convergence to fail
-  if role_exists?(@current_resource.role_name, node)
+  if rbac.role_exists?(@current_resource.role_name)
     @current_resource.role_exists = true
-    if user_in_group?(group_for_role(@current_resource.role_name, node), @current_resource.username, node)
+    if rbac.user_in_group?(rbac.group_for_role(@current_resource.role_name), @current_resource.username)
       @current_resource.user_in_group = true
       if times_valid?(@current_resource.times)
         @current_resource.times_valid = true
-        if schedule_exists?(@current_resource.role_name, @current_resource.username, @current_resource.type, node)
+        if rbac.schedule_exists?(@current_resource.role_name, @current_resource.username, @current_resource.type)
           @current_resource.exists = true
         end
       end
@@ -72,5 +71,5 @@ def times_valid?(times)
 end
 
 def create_role_schedule
-  add_schedule_to_role(new_resource, node)
+  add_schedule_to_role(new_resource)
 end

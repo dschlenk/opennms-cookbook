@@ -1,0 +1,50 @@
+---
+driver:
+  name: dokken
+  privileged: true
+  chef_image: cincproject/cinc
+  chef_version: 18
+
+transport:
+  name: dokken
+
+provisioner:
+  name: dokken
+  project_name: cinc
+  download_url: https://omnitruck.cinc.sh/install.sh
+  chef_binary: /opt/cinc/bin/cinc-client
+  chef_license: accept-no-persist # until https://github.com/test-kitchen/test-kitchen/pull/1984
+  attributes:
+    opennms:
+      conf:
+        env:
+          START_TIMEOUT: 50
+      plugin:
+        addl: 
+          - opennms-plugin-protocol-nsclient
+          - opennms-plugin-provisioning-snmp-hardware-inventory
+          - opennms-plugin-provisioning-snmp-asset
+          - opennms-plugin-northbounder-jms
+      postgresql:
+        user_vault: creds
+      rrdtool:
+        enable: true
+      stable: true
+      scv:
+        vault: creds
+      upgrade: true
+      users:
+        admin:
+          vault: creds
+
+verifier:
+  name: inspec
+
+platforms:
+  - name: oraclelinux-9
+    driver:
+      image: dokken/oraclelinux-9
+      pid_one_command: /usr/lib/systemd/systemd
+
+suites:
+  - name: opennms-horizon

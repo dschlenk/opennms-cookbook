@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-include Opennms::Rbac
 def whyrun_supported?
   true
 end
@@ -23,11 +21,11 @@ def load_current_resource
   @current_resource.membership_group(@new_resource.membership_group)
   @current_resource.supervisor(@new_resource.supervisor)
 
-  @current_resource.exists = true if role_exists?(@current_resource.name, node)
-  if group_exists?(@current_resource.membership_group, node)
+  @current_resource.exists = true if rbac.role_exists?(@current_resource.name)
+  if rbac.group_exists?(@current_resource.membership_group)
     @current_resource.group_exists = true
   end
-  if user_exists?(@current_resource.supervisor, node)
+  if rbac.user_exists?(@current_resource.supervisor)
     @current_resource.supervisor_exists = true
   end
 end
@@ -35,5 +33,5 @@ end
 private
 
 def create_role
-  add_role(new_resource, node)
+  add_role(new_resource)
 end

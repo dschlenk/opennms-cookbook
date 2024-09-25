@@ -1,9 +1,8 @@
-# frozen_string_literal: true
 #
-# Cookbook Name:: opennms
+# Cookbook:: opennms
 # Recipe:: templates
 #
-# Copyright 2015, Spanlink Communications, Inc
+# Copyright:: 2015-2024, ConvergeOne Holding Corp
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -19,138 +18,58 @@
 onms_home = node['opennms']['conf']['home']
 onms_home ||= '/opt/opennms'
 
-# don't make wrappers that change templates support multiple versions
-case Opennms::Helpers.major(node['opennms']['version'])
-when '16'
-  template_dir = 'horizon-16/'
-  node.default['opennms']['properties']['reporting']['jasper_version'] = '5.6.1'
-when '17'
-  template_dir = 'horizon-17/'
-when '18'
-  template_dir = 'horizon-18/'
-when '19'
-  template_dir = 'horizon-19/'
-when '20'
-  template_dir = 'horizon-20/'
-when '21'
-  template_dir = 'horizon-21/'
-when '22'
-  template_dir = 'horizon-22/'
-when '23'
-  template_dir = 'horizon-23/'
-when '24'
-  template_dir = 'horizon-24/'
-when '25'
-  template_dir = 'horizon-25/'
-when '26'
-  template_dir = 'horizon-26/'
-when '27'
-  template_dir = 'horizon-27/'
-when '28'
-  template_dir = 'horizon-28/'
-end
+node.default['opennms']['datacollection']['default']['ref_cpq_im'] = true
+node.default['opennms']['datacollection']['default']['ref_mib2_if'] = true
+node.default['opennms']['datacollection']['default']['ref_mib2_pe'] = true
 
-if Opennms::Helpers.major(node['opennms']['version']).to_i >= 22
-  node.default['opennms']['datacollection']['default']['ref_cpq_im'] = true
-  node.default['opennms']['datacollection']['default']['ref_mib2_if'] = true
-  node.default['opennms']['datacollection']['default']['ref_mib2_pe'] = true
-end
+pw = opennms_scv_password
 
-node.default['opennms']['conf']['heap_size'] = 2048 if Opennms::Helpers.major(node['opennms']['version']).to_i >= 25
-
-Chef::Log.debug "at compile time, version is #{node['opennms']['version']} and jasper_version is #{node['opennms']['properties']['reporting']['jasper_version']}."
-
-case node['platform_family']
-when 'rhel'
-  if node['platform_version'].to_i > 6
-    template '/usr/lib/systemd/system/opennms.service' do
-      source "#{template_dir}opennms.service.erb"
-      mode 00664
-      owner 'root'
-      group 'root'
-      variables(
-        start_opts: node['opennms']['start_opts'],
-        timeout_start_sec: node['opennms']['timeout_start_sec']
-      )
-      notifies :run, 'execute[reload systemd]', :immediately
-    end
-  end
+# this has to go in both `opennms.conf` the properties file because the installer includes this file but not `opennms.properties.*`.
+unless pw.nil?
+  node.default['opennms']['conf']['env']['ADDITIONAL_MANAGER_OPTIONS'] = "${ADDITIONAL_MANAGER_OPTIONS} -Dorg.opennms.features.scv.jceks.key=#{pw}"
+  node.default['opennms']['properties']['files']['scv'] = { 'org.opennms.features.scv.jceks.key' => pw }
 end
 
 template "#{onms_home}/etc/opennms.conf" do
   cookbook node['opennms']['conf']['cookbook']
-  source "#{template_dir}opennms.conf.erb"
-  mode 00664
-  owner 'root'
-  group 'root'
+  source 'opennms.conf.erb'
+  mode '664'
+  owner node['opennms']['username']
+  group node['opennms']['groupname']
   notifies :restart, 'service[opennms]'
   variables(
-    conf: node['opennms']['conf']
+    env: node['opennms']['conf']['env']
   )
 end
 
-template "#{onms_home}/etc/opennms.properties" do
-  cookbook node['opennms']['properties']['cookbook']
-  source "#{template_dir}opennms.properties.erb"
-  mode 0664
-  owner 'root'
-  group 'root'
-  notifies :restart, 'service[opennms]'
-  variables(
-    conf: node['opennms']['conf'],
-    properties: node['opennms']['properties']
-  )
-end
-if Opennms::Helpers.major(node['opennms']['version']).to_i >= 25
-  node.default['opennms']['log4j2']['default_route']['size'] = '100MB'
-  node.default['opennms']['log4j2']['default_route']['rollover'] = 4
-  node.default['opennms']['log4j2']['instrumentation']['rollover'] = 4
-end
-template "#{onms_home}/etc/log4j2.xml" do
-  cookbook node['opennms']['log4j2']['cookbook']
-  source "#{template_dir}log4j2.xml.erb"
-  mode 00664
-  owner 'root'
-  group 'root'
-  variables(
-    log: node['opennms']['log4j2']
-  )
+node['opennms']['properties']['files'].each do |file, properties|
+  file "#{onms_home}/etc/opennms.properties.d/#{file}.properties" do
+    owner node['opennms']['username']
+    group node['opennms']['groupname']
+    mode '0600'
+    content properties.map { |k, v| "#{k}=#{v}" }.join("\n")
+  end
 end
 
-template "#{onms_home}/jetty-webapps/opennms/WEB-INF/web.xml" do
-  cookbook node['opennms']['web']['cookbook']
-  source "#{template_dir}web.xml.erb"
-  mode 00644
-  owner 'root'
-  group 'root'
-  notifies :restart, 'service[opennms]'
-  variables(
-    origins: node['opennms']['cors']['origins'],
-    credentials: node['opennms']['cors']['credentials']
-  )
-  not_if { Opennms::Helpers.major(node['opennms']['version']).to_i < 17 }
+opennms_secret 'opennms postgresql user' do
+  secret_alias 'postgres'
+  username node['opennms']['username']
+  password chef_vault_item(node['opennms']['postgresql']['user_vault'], node['opennms']['postgresql']['user_vault_item'])['opennms']['password']
 end
 
-template "#{onms_home}/bin/opennms" do
-  cookbook node['opennms']['bin']['cookbook']
-  source "#{template_dir}opennms.erb"
-  mode 00755
-  owner 'root'
-  group 'root'
-  variables(
-    return_code: node['opennms']['bin']['return_code']
-  )
-  not_if { Opennms::Helpers.major(node['opennms']['version']).to_i < 24 }
-  not_if { Opennms::Helpers.major(node['opennms']['version']).to_i > 26 }
-  not_if { node['opennms']['version'] == '26.2.2-1' }
+opennms_secret 'postgres postgresql user' do
+  secret_alias 'postgres-admin'
+  username 'postgres'
+  password chef_vault_item(node['opennms']['postgresql']['user_vault'], node['opennms']['postgresql']['user_vault_item'])['postgres']['password']
 end
 
-cookbook_file "patch #{onms_home}/bin/opennms" do
-  path "#{onms_home}/bin/opennms"
-  cookbook node['opennms']['bin']['cookbook']
-  source 'opennms-26-dot-two-dot-some'
-  mode 00755
-  owner 'root'
-  group 'root'
-  only_if { node['opennms']['version'] == '26.2.1-1' || node['opennms']['version'] == '26.2.2-1' }
+template "#{onms_home}/etc/opennms-datasources.xml" do
+  cookbook node['opennms']['datasources_cookbook']
+  source 'opennms-datasources.xml.erb'
+  mode '664'
+  owner node['opennms']['username']
+  group node['opennms']['groupname']
+  variables(
+    datasources: node['opennms']['datasources']
+  )
 end

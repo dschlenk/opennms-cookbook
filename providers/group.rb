@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-include Opennms::Rbac
 include Map
 def whyrun_supported?
   true
@@ -25,7 +23,7 @@ def load_current_resource
   @current_resource.users(@new_resource.users) unless @new_resource.users.nil?
 
   @current_resource.users_exist = true if users_exist?(@current_resource.users)
-  if map_exists?(@current_resource.default_svg_map, node) || @current_resource.default_svg_map.nil?
+  if rbac.map_exists?(@current_resource.default_svg_map) || @current_resource.default_svg_map.nil?
     @current_resource.map_exists = true
   end
   @current_resource.exists = true if group_exists?(@current_resource.name, node)
@@ -36,7 +34,7 @@ private
 def users_exist?(users)
   unless users.nil?
     users.each do |user|
-      return false unless user_exists?(user, node)
+      return false unless rbac.user_exists?(user)
     end
   end
   true
@@ -44,5 +42,5 @@ end
 
 def create_group
   Chef::Log.info "Adding group #{new_resource.name}."
-  add_group(new_resource, node)
+  add_group(new_resource)
 end

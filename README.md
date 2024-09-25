@@ -1,84 +1,147 @@
-[![Build Status](https://travis-ci.org/dschlenk/opennms-cookbook.svg?branch=master)](https://travis-ci.org/dschlenk/opennms-cookbook)
-
-Description
-===========
+# Description
 
 A Chef cookbook to manage the installation and configuration of OpenNMS Horizon.
-Current version supports releases 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28 on CentOS 7.
+Current version supports Horizon release 33 on EL (redhat, rocky, oracle, etc) 9.
 
-Versions
-========
+# Versions
 
-Starting with OpenNMS Horizon 16, the MSB of the version of the cookbook matches the latest MSB of the version of OpenNMS Horizon it supports. Support for older versions will be noted. The version of OpenNMS Horizon is selected via node attribute, defaulting to the latest supported release. The balance of the version follows semantic versioning - minor version bumps for backwards-compatible new features, third level bumps for bugfix only releases.
+Starting with OpenNMS Horizon 16, the MSB of the version of the cookbook matches the latest MSB of the version of OpenNMS Horizon it supports.
+Starting with cookbook version 33.0.0 and OpenNMS Horizon 33.x.x, each cookbook version only officially supports the major Horizon release for which it is named.
+The version of OpenNMS Horizon is selected via node attribute, defaulting to the latest release at the time the cookbook was released.
+The balance of the version follows semantic versioning - minor version bumps for backwards-compatible new features, third level bumps for bugfix only releases.
 
-Requirements
-============
+# Requirements
 
-* Chef 12.5.1 or later
-* CentOS 7
-* Either use Berkshelf to satisfy dependencies or manually acquire the following cookbooks: 
-  * hostsfile
-  * build-essential
-  * postgresql
-  * openssl
+* Chef or Cinc version 18.5.0 or later
+* EL 9
+* the public `postgresql` cookbook maintained by `sous-chefs`
+* a compatible java runtime
+* A Chef vault item that contains `postgres` credentials for the PostgreSQL server that will be used by OpenNMS Horizon
 
-* While you're free to install PostgreSQL in whatever manner pleases you, there is a `postgres` recipe that installs an appropriate version from pgdg and does some basic tuning.
-* Java
+# Usage
 
-Usage
-=====
+Running the `default` recipe will install OpenNMS Horizon from the official repo with a mostly default configuration.
+It will also execute `'$ONMS_HOME/bin/runjava -s` if `$ONMS_HOME/etc/java.conf` is not present and `$ONMS_HOME/bin/install -dis` if `$ONMS_HOME/etc/configured` is not present.
 
-Running the default recipe will install OpenNMS 28.1.1-1 (or a custom version using the attribute `node[:opennms][:version]`) on 7 from the official repo with the default configuration. It will also execute `'$ONMS_HOME/bin/runjava -s` if `$ONMS_HOME/etc/java.conf` is not present and `$ONMS_HOME/bin/install -dis` if `$ONMS_HOME/etc/configured` is not present.
+There are also a plethora of custom resources that you can use to do more in depth configuration management.
 
-There are two primary ways to use this cookbook: as an application cookbook or library cookbook. If you simply want to tweak a few settings to the default OpenNMS configuration, you can use the `default` recipe of this cookbook directly and modify node attributes to suit your needs. There are also a plethora of custom resources that you can use to do more in depth customizations. If you go that route I recommend setting `node['opennms']['templates']` to false (or add `recipe[opennnms::notemplates]` to your run list) and then using the custom resources (and maybe a few of the templates in this cookbook) to define your run list. If your node's run list contains both the template and a resource that manages the same file you'll end up with a lot of churn during the chef client run, which is a waste of time and will probably cause unnecessary restarts of the application.
+## Required Dependencies
 
-Template resources for daemons that support configuration changes without a restart will automatically send the proper event to activate changes. Add appropriate `notifies` when you use custom resources from this cookbook for similar functionality. The test cookbook in `test/fixtures/cookbooks/onms_lwrp_test` has a recipe that demonstrates this for each custom resource.
+The following dependencies must be satisfied for the `default` recipe to successfully converge.
 
-### Java (Optional)
+### Java
 
-You'll need to install Java. Take a look at the fixture cookbooks in `test/fixtures/cookbooks` for examples.
+You'll need to install a compatible Java runtime. Take a look at the fixture cookbook `openjdk17` in `test/fixtures/cookbooks` for an example.
+Set `node['opennms']['jre_path']` to the home directory of a specific runtime if you cannot rely on the algorithm used by the `run_java -s` command to find the correct runtime.
+
+### Postgres
+
+An OpenNMS Horizon instance needs a PostgreSQL server to function. 
+You must provide the node with a Chef vault named `node['opennms']['postgresql']['user_vault']` (defaults to `Chef::Config['node_name']`) that contains an item named `node['opennms']['postgresql']['user_vault_item']` (defaults to `postgres_users`) with objects named `postgres` and `opennms`, each with string values named `password`, like this:
+
+```
+{
+  "id": "postgres_users",
+  "postgres": {
+    "password": "foo12345"
+  },
+  "opennms": {
+    "password": "bar67890"
+  }
+}
+```
+
+The `postgres` role on the server should exist and have the password set before the `default` recipe runs, but the `opennms` role should not yet exist.
+
+The easiest way to satisfy this dependency is to use the `postgres` recipe in this cookbook.
+It can be added to the run list prior to the `default` recipe.
+Installation, configuration, and initialization of PostgreSQL 15 will occur via the PGDG repositories and the `postgres` password contained in the vault item described above will be applied to the `postgres` role.
+
+## Useful Features
+
+Many of the following features are essential to the long term success of using this cookbook to manage your OpenNMS instance.
+
+### Admin Password
+
+You should absolutely not use the default admin password.
+Store an item named `node['opennms']['users']['admin']['vault_item']` (default `opennms_admin_password`) in a vault named `node['opennms']['users']['admin']['vault']` (default `Chef::Config['node_name']`) with a value named `password`, and the cookbook will change it for you.
+
+Once changed, you can also change it again later by adding a new value to that vault item named `new_password`.
+Once the password is changed, the vault item is automatically updated to reflect the new state.
+
+### Secure Credential Vault Password
+
+Another thing you should not do is use the default secure credential vault password.
+To set a custom one, simply populate a vault item named 'scv' with a value named `password` in a vault named `node['opennms']['scv']['vault']` (default `Chef::Config['node_name']`).
+You can use a different item name by changing `node['opennms']['scv']['item']`.
+
+Just like when doing this manually, there's no way to change the password after credentials are stored.
+This means that you need to have this configured before you perform the initial installation, or delete the `scv.jce` file from `$OPENNMS_HOME/etc` to start fresh with a new SCV.
+
+Note: If everything needed in the SCV is added via the custom resource `opennms_secret` provided by this cookbook, you could delete file `/opt/opennms/etc/scv.jce` and re-run Chef after changing the password in the appropriate vault item, although some temporary issues may occur during the time between when the SCV gets recreated and the secrets get added back to the SCV. The safest approach would be to:
+
+1. Stop `opennms`
+2. Change the password in the vault item
+3. Run chef with a temporary run list that includes `opennms::base_templates` and your `opennms_secret` resources
+4. Start `opennms`
 
 ### Upgrades
 
-Starting with version 2.0.0 there is support for handling upgrades
-automatically. It is disabled by default. To enable, set
-`node['opennms']['upgrade']` to true. If this sounds like something you want
-to do, review the `upgrade` recipe and library. It roughly translates to:
+Starting with version 2.0.0 there is support for handling upgrades automatically.
+It is disabled by default. To enable, set `node['opennms']['upgrade']` to `true`.
+If this sounds like something you want to do, review the `upgrade` helper library.
+It roughly translates to:
 
-* New RPM is installed.
-* Are there any files named `*.rpmnew` in `$ONMS_HOME`? If so, overwrite the existing files with them.
-* Are there any files named `*.rpmsave` in `$ONMS_HOME`? If so, remove them.
+1. New RPMs are installed.
+2. Are there any files named `*.rpmnew` in `$ONMS_HOME`? If so, overwrite the existing files with them.
+3. Are there any files named `*.rpmsave` in `$ONMS_HOME`? If so, remove them.
 
-`rpmsave` files happen when there's a config file that you have changed that
-was replaced with the new version because not replacing it would prevent
-OpenNMS from working properly. But since we're using Chef, we don't care about
-the old version as any changes we made to it previously will be redone with the
-appropriate custom resources and templates later in the converge. Since OpenNMS won't
-start with these files in place we just remove them.
-
-Similarly, `rpmnew` files are created when a newer version of a file exists, but 
-it doesn't contain breaking changes. Just like `rpmsave` files, OpenNMS won't 
-start with these files present, and the rest of the converge will make the changes
-we want anyway, so we just remove the old file.
+`rpmnew` files are created when a newer version of a file exists, but it doesn't contain breaking changes.
+OpenNMS won't start with these files present, and the rest of the converge will make the changes we want anyway, so we just remove the old file by replacing it with the new file.
  
-### Recipes
+`rpmsave` files happen when there's a config file that you have changed that was replaced with the new version, because not replacing it would prevent OpenNMS from working properly.
+But since we're using Chef, we don't care about the old version as any changes we made to it previously will be redone with the appropriate custom resources and templates later in the converge.
+Since OpenNMS won't start with these files in place we just remove them.
 
-* `opennms::default` Installs and configures OpenNMS with the standard configuration modified with any node attribute values changed from their defaults. Set `node['opennms']['plugin']['addl']` to an array of strings representing the names of the packages of the plugins you'd like installed.
-* `opennms::notemplates` Everything default does except minimal templates are used - etc/opennms.conf, etc/opennms.properties and etc/log4j2.xml. Use this recipe if you intend to use any of the custom resources in this cookbook.
+### Environment Variables and System Properties
+
+You can add environment variables in `opennms.conf` by populating `node['opennms']['conf']['env']`. By default, we do so to set `START_TIMEOUT` to 20, like so:
+
+```
+default['opennms']['conf']['env'] = {
+  'START_TIMEOUT' => 20,
+}
+```
+
+Similarly, you can override Java system properties by populating `node['opennms']['properties']['files']`.
+For instance, if you provide the vault item required to change the SCV password, the following object is added to this attribute:
+
+```
+'scv' => {
+  'org.opennms.features.scv.jceks.key' => '<the password>'
+}
+```
+
+This results in file `$OPENNMS_HOME/etc/opennms.properties.d/scv.properties` created with the contents `org.opennms.features.scv.jceks.key=the password`.
+
+### RRDTool
+
+To enable installation and configuration of RRDTool in place of the default time series engine JRobin, set `node['opennms']['rrdtool']['enabled']` to `true` or include the `rrdtool` recipe after the `default` recipe in your node's run list.
+
+### Other Recipes
+
+The recipes you may wish to include in your node list directly are:
+
+* `opennms::default` Installs and configures OpenNMS Horizon with the standard configuration modified with any node attribute values changed from their defaults. 
+  * Set `node['opennms']['plugin']['addl']` to an array of strings representing the names of the packages of the plugins you'd like installed.
 * `opennms::rrdtool` Installs rrdtool and configures OpenNMS to use it rather than JRobin for metrics storage.
 * `opennms::postgres` Installs postgresql in a somewhat tuned manner (from PGDG). See `postres_install` recipe to figure out how the version is selected and override with node attributes if desired.
-* `opennms::repositories` Adds the public OpenNMS yum repositories to your system.
 
 A few other recipes exist that aren't listed here. They are included by others when needed and are unlikely to be interesting for individual use.
 
-#### Deprecated
+# Custom Resources
 
-The following recipes are deprecated. The preferred method to install these packages is by setting `node[:opennms][:plugin][:nsclient]` and/or `node[:opennms][:plugin][:xml]` to true. As of 19.0.0, the XML plugin has been merged into the core package and therefore setting that attribute to true has no effect. All these recipes do now is set those attributes at the default level. 
-* `opennms::nsclient` installs the optional nsclient data collection plugin and uses the template for etc/nsclient-datacollection-config.xml. 
-* `opennms::xml` installs the optional xml data collection plugin and uses the template for etc/xml-datacollection-config.xml. 
-
-### Custom Resources
-
+TODO: UPDATE EVERYTHING AFTER THIS
 As a general rule these custom resources support a single action: `create` and many of them behave more like `create_if_missing` does in other cookbooks. In other words, updating is generally not supported. Exceptions are noted. This behavior will change in future releases (generally whenever I encounter a use case for update of that resource IRL).
 
 The list of implemented custom resources is as follows:
@@ -197,14 +260,19 @@ Most configuration files are templated and can be overridden with environment, r
 
 Each template can also be overridden in a wrapper cookbook by manipulating the appropriate node attribute. For example, if you've got a pretty heavily customized collectd-configuration.xml file and you don't want to move to the custom resource/library cookbook workflow, turn your custom version into a template (append `.erb` to the filename and optionally add some templating logic to it) and add it to `templates/default` in your wrapper cookbook. Then set `default[:opennms][:collectd][:cookbook]` to the name of your wrapper cookbook. You could also copy all of the templates from this cookbook to your wrapper, edit them all as desired and set `default[:opennms][:default_template_cookbook]` to your wrapper cookbook's name.
 
-If you want to skip some of the templates you can get the resource for each out of the resource collection and then set the action to :nothing. Example:
+If you want to skip some of the templates you can use `edit_resource` to set the action to :nothing. Example:
 
 ```
-begin
-  sct = resources('template[/opt/opennms/etc/service-configuration.xml')
-  sct.action(:nothing)
-rescue
-  Chef::Log.warn("Unable to find service-configuration.xml template in the resource collection!")
+edit_resource(:template, '/opt/opennms/etc/service-configuration.xml') do {
+  action :nothing
+end
+```
+
+A similar technique can be done to selectively enable a specific template, even when you are running with non-base templates disabled:
+
+```
+edit_resource(:template, '/opt/opennms/etc/service-configuration.xml') do {
+  action :create
 end
 ```
 
@@ -249,6 +317,7 @@ Default categories can be modified by doing things like
      }
    }
 ```
+
 That'll leave the defaults for everything except overwrite the list of services in the `web` category.
 The names of the categories are: 'overall', 'interfaces', 'email', 'web', 'jmx', 'dns', 'db', 'other', 'inet'.
 The defaults are nil, which leaves the defaults as is. Override with false to disable.
@@ -274,11 +343,13 @@ Use the `node['opennms']['collectd']['threads']` attribute to change the number 
      }
    }
 ```
+
 That leaves most of the example1 package as default. Set a package's `enabled` attribute to false if you want to completely remove that package. You can also do that for specific services in that package. See the template for more options.
 
 #### etc/datacollection-config.xml
 
 You can override some settings like:
+
 ```
    {
      "opennms": {
@@ -289,7 +360,9 @@ You can override some settings like:
        }
    }
 ```
+
 Or maybe you don't have any Dell gear:
+
 ```
    {
      "opennms": {
@@ -307,6 +380,7 @@ You can also remove one of the default snmp-collections, or change the step and 
 #### etc/discovery-configuration.xml
 
 Attributes are available in `node['opennms']['discovery']` to change global settings:
+
 * threads (`threads`)
 * packets-per-second (`pps`)
 * initial-sleep-time (`init_sleep_ms`)
@@ -317,6 +391,7 @@ Attributes are available in `node['opennms']['discovery']` to change global sett
 #### etc/eventd-configuration.xml
 
 Attributes are available in `node['opennms']['eventd']` to change global settings:
+
 * TCPAddress (`tcp_address`)
 * TCPPort (`tcp_port`)
 * UDPAddress (`udp_address`)
@@ -328,6 +403,7 @@ Attributes are available in `node['opennms']['eventd']` to change global setting
 #### etc/events-archiver-configuration.xml
 
 Attributes are available in `node['opennms']['events_archiver']` to change global settings:
+
 * archiveAge (`age`)
 * separator (`separator`)
 
@@ -335,6 +411,7 @@ Attributes are available in `node['opennms']['events_archiver']` to change globa
 
 This file controls how OpenNMS sends email. This is not where you configure the mail monitor.
 Attributes available in `node['opennms']['javamail_props']`. They follow the config file but with ruby style because the kids hate camel case I guess.
+
 * org.opennms.core.utils.fromAddress (`from_address`) 
 * org.opennms.core.utils.mailHost (`mail_host`)
 * ...and so on.
@@ -400,17 +477,20 @@ Similar to other datacollection-config.xml files, you can change the RRD reposit
 #### etc/linkd-configuration.xml & etc/enlinkd-configuration.xml
 
 Attributes available in `node['opennms']['linkd']` that allow you change global settings like:
+
 * threads
 * initial_sleep_time
 * snmp_poll_interval
 * discovery_link_interval
 
 You can also turn off various kinds of detection, like for `iproutes`, set any of these to false to remove them from the file:
+
 * netscreen
 * cisco
 * darwin
 
 Finally there's the package element at the end of the file that you can configure with these attributes:
+
 ```
 default['opennms']['linkd']['package']                      = "example1"
 default['opennms']['linkd']['filter']                       = "IPADDR != '0.0.0.0'"
@@ -421,6 +501,7 @@ default['opennms']['linkd']['range_end']                    = "254.254.254.254"
 #### etc/log4j2.xml
 
 This one is a little different. If you want to turn up logging for collectd, for instance, you'd set these override attributes:
+
 ```
 default['opennms']['log4j2']['collectd'] = 'DEBUG'
 ```
@@ -428,6 +509,7 @@ default['opennms']['log4j2']['collectd'] = 'DEBUG'
 #### magic-users.properties
 
 The rtc username and password are populated from the values set in `node['opennms']['properties']['rtc']['username']` and `node['opennms']['properties']['rtc']['password']`. TODO: Generate passwords during install! Other attributes available for configuration are:
+
 ```
 default['opennms']['magic_users']['admin_users']     = "admin"
 default['opennms']['magic_users']['ro_users']        = ""
@@ -450,6 +532,7 @@ Is ignorance about your broken network in fact bliss?  Shut off notifd by settin
 #### etc/notificationCommands.xml
 
 Turn off one of the default notification commands by setting one of the attributes in `node['opennms']['notification_commands']` to false:
+
 * java_pager_email
 * java_email
 * xmpp_message
@@ -465,6 +548,7 @@ Turn off one of the default notification commands by setting one of the attribut
 #### etc/notifications.xml
 
 These attributes:
+
 * enabled
 * status
 * rule
@@ -487,6 +571,7 @@ can be overridden to alter any of these default notifications:
 in `node['opennms']['notifications']`.
 
 #### etc/response-graph.properties
+
 Change the image format from the default `png` to `gif` or `jpg` (if using jrobin or you like broken images) with `node['response_graph']['image_format']`. Font sizes can also be changed with `node['response_graph']['default_font_size']` and `node['response_graph']['title_font_size']` (defaults are 7 and 10 respectively). Setting these attributes to false removes them from the file:
 
 * icmp
@@ -524,6 +609,7 @@ If you changed the count of pings in the strafer polling package to a value high
 #### etc/rrd-configuration.properties
 
 Tobi enthusiasts will want to set some attributes in `node['opennms']['rrd']` to switch from jrobin to rrdtool:
+
 ```
 {
   "opennms":
@@ -553,6 +639,7 @@ default['opennms']['rrd']['tcp']['port'] = 9100     # Hope that's a JetDirect co
 #### etc/site-status-views.xml
 
 Do you actually populate the building column in assets or site field in provisioning reqs? Change the default site status view name and/or it's definition with these attributes: `node['opennms']['site_status_views']['default_view']['name']` and `node['opennms']['site_status_views']['default_view']['rows']` where `rows` is an array of single element hashes (to maintain order) like:
+
 ```
 [
   {
@@ -696,8 +783,8 @@ See the template and default attributes source for more details on using these t
 
 Copyright and License
 =======
-Copyright 2014-2020 ConvergeOne Holding Corp.
-Some of the postgres installation and upgrade code, including `libraries/postgres.rb, libraries/du.rb, libraries/statfs.ru` is based on pg_upgrade resource in the private-chef cookbook of [chef-server](https://github.com/chef/chef-server) and is Copyright 2008-2019 Chef Software, Inc. 
+
+Copyright 2014-2024 ConvergeOne Holding Corp.
 
 Released under Apache 2.0 license. See LICENSE for details.
 
@@ -705,7 +792,7 @@ OpenNMS and OpenNMS Horizon are &#8482; and &copy; The OpenNMS Group, Inc.
 
 Author
 ======
-David Schlenk (<dschlenk@convergeone.com>)
+David Schlenk (<dschlenk@onec1.com>)
 
 Development
 ===========
@@ -716,7 +803,5 @@ So far, tests consist of:
 * InSpec tests for all the custom resources.
 
 The default rake task will run the style checks. 
-
-Use `rake integration:vagrant` to run the custom resource tests. You may need to increase your open file limit for test kitchen to work since there are an awful lot of suites. By default it'll run all the suites on all the supported versions, which will probably take a day or more (and rake will for sure run out of RAM before then), or you can specify specific major versions with `-- -v 20,21`. There's also a `-r <INSTANCE_NAME>` option that lets you resume testing after fixing something that failed. 
 
 Pull requests welcome!

@@ -1,9 +1,8 @@
-# frozen_string_literal: true
 #
-# Cookbook Name:: opennms-cookbook
+# Cookbook:: opennms-cookbook
 # Recipe:: rrdtool
 #
-# Copyright (c) 2016 ConvergeOne
+# Copyright:: (c) 2016-2024 ConvergeOne Holding Corp
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -22,17 +21,17 @@
   package p
 end
 
-node.default['opennms']['properties']['dc']['store_by_group'] = true
+node.default['opennms']['properties']['files']['store_by_group'] = { 'org.opennms.rrd.storeByGroup' => true }
 node.default['opennms']['rrd']['strategy_class'] = 'org.opennms.netmgt.rrd.rrdtool.MultithreadedJniRrdStrategy'
 node.default['opennms']['rrd']['interface_jar'] = '/usr/share/java/jrrd2.jar'
 node.default['opennms']['rrd']['jrrd'] = '/usr/lib64/libjrrd2.so'
 
 template "#{node['opennms']['conf']['home']}/etc/rrd-configuration.properties" do
-  source "horizon-#{Opennms::Helpers.major(node['opennms']['version'])}/rrd-configuration.properties.erb"
+  source 'rrd-configuration.properties.erb'
   cookbook 'opennms'
-  mode 0664
-  owner 'root'
-  group 'root'
+  mode '664'
+  owner node['opennms']['username']
+  group node['opennms']['groupname']
   notifies :restart, 'service[opennms]'
   variables(
     strategy_class: node['opennms']['rrd']['strategy_class'],
@@ -44,6 +43,4 @@ template "#{node['opennms']['conf']['home']}/etc/rrd-configuration.properties" d
     usetcp: node['opennms']['rrd']['usetcp'],
     tcp: node['opennms']['rrd']['tcp']
   )
-  # this template already included full template recipe
-  not_if node['opennms']['templates']
 end

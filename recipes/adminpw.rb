@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 #
-# Cookbook Name:: opennms-cookbook
+# Cookbook:: opennms
 # Recipe:: adminpw
 #
-# Copyright 2016, ConvergeOne
+# Copyright:: 2016-2024, ConvergeOne Holding Corp
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,17 +18,28 @@
 # limitations under the License.
 #
 
-require 'digest'
-
-log 'start OpenNMS' do
-  notifies :start, 'service[opennms]', :immediately
-end
-
-Chef::Recipe.send(:include, OpenSSLCookbook::RandomPassword)
-adminpw = random_password
-
-ruby_block 'maybe change admin password' do
+ruby_block 'set admin password' do
   block do
-    Opennms::Rbac.admin_password(adminpw, node)
+    adminpw = admin_secret_from_vault('password')
+    if adminpw != 'admin' && default_admin_password?
+      resources(:service => 'opennms').run_action(:start)
+      set_admin_password(adminpw)
+    end
+  end
+end
+# maybe change the admin password
+ruby_block 'change admin password' do
+  block do
+    adminpw = admin_secret_from_vault('password')
+    new_adminpw = admin_secret_from_vault('new_password')
+    unless new_adminpw.nil?
+      change_admin_password(adminpw, new_adminpw)
+      declare_resource(:chef_vault_secret, node['opennms']['admin']['vault_item']) do
+        data_bag node['opennms']['admin']['vault']
+        raw_data(
+          'password' => new_adminpw
+        )
+      end
+    end
   end
 end
