@@ -16,6 +16,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# until https://issues.redhat.com/browse/RHEL-59715
 cookbook_file "#{Chef::Config['file_cache_path']}/openldap-2.6.6-4.el9.x86_64.rpm" do
   source 'openldap-2.6.6-4.el9.x86_64.rpm'
   notifies :upgrade, 'dnf_package[openldap]', :immediately

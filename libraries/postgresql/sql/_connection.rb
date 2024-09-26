@@ -4,17 +4,7 @@ module PostgreSQL
       module Connection
         private
 
-#        def pg_gem_build_options
-#          case node['platform_family']
-#          when 'rhel', 'fedora', 'amazon'
-#            "-- --with-pg-include=#{postgresql_devel_path('include')} --with-pg-lib=#{postgresql_devel_path('lib')} --with-pg-config=#{postgresql_devel_path('bin')}/pg_config"
-#          when 'debian'
-#            "-- --with-pg-include=#{postgresql_devel_path} --with-pg-lib=#{postgresql_devel_path}"
-#          else
-#            raise "Unsupported platform family #{node['platform_family']}"
-#          end
-#        end
-#
+        # until https://github.com/sous-chefs/postgresql/pull/775
         def install_pg_gem
           return if gem_installed?('pg')
 
