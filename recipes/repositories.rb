@@ -26,7 +26,7 @@ platforms = node['opennms']['repos']['platforms']
 branches.each do |branch|
   platforms.each do |platform|
     skip = false
-    Chef::Log.warn "branch is '#{branch}' and stable is #{node['opennms']['stable']}"
+    Chef::Log.debug "branch is '#{branch}' and stable is #{node['opennms']['stable']}"
     if (branch == 'stable' && !node['opennms']['stable']) ||
        ((branch == 'snapshot' || branch == 'obsolete' || branch == 'oldstable') && node['opennms']['stable'])
       skip = true

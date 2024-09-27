@@ -26,7 +26,7 @@ include_recipe 'opennms::repositories' if node['opennms']['manage_repos']
 onms_packages = %w(opennms-core opennms-webapp-jetty)
 onms_versions = [node['opennms']['version'], node['opennms']['version']]
 node['opennms']['plugin']['addl'].each do |plugin|
-  Chef::Log.debug "adding plugin #{plugin}"
+  Chef::Log.warn "adding plugin #{plugin}"
   onms_packages.push plugin
   onms_versions.push node['opennms']['version']
 end

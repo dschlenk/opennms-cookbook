@@ -1,4 +1,3 @@
-# frozen_string_literal: true
 describe package('opennms-core') do
   it { should be_installed }
   its('version') { should eq '33.0.8-1' }

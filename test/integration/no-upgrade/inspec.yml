@@ -1,5 +1,5 @@
-name: upgrade
-title: OpenNMS upgrade
+name: no-upgrade
+title: OpenNMS no-upgrade
 maintainer: David Schlenk
 copyright: ConvergeOne
 copyright_email: dschlenk@convergeone.com

@@ -60,10 +60,11 @@ suites:
         upgrade: false
   - name: default
   - name: plugins
-    opennms:
-      plugin:
-        addl: 
-          - opennms-plugin-protocol-nsclient
-          - opennms-plugin-provisioning-snmp-hardware-inventory
-          - opennms-plugin-provisioning-snmp-asset
-          - opennms-plugin-northbounder-jms
+    attributes:
+      opennms:
+        plugin:
+          addl: 
+            - opennms-plugin-protocol-nsclient
+            - opennms-plugin-provisioning-snmp-hardware-inventory
+            - opennms-plugin-provisioning-snmp-asset
+            - opennms-plugin-northbounder-jms
