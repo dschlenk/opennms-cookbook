@@ -16,17 +16,17 @@ provisioner:
   name: chef_zero
   product_version: 14.13.11
   require_chef_omnibus: 14.13.11
-  attributes:
-    opennms:
-      upgrade: true
-      templates: false
-      conf:
-        start_timeout: 50
-      stable: true
-      plugin:
-        nsclient: true
-      postgresql:
-        attempt_upgrade: true
+#  attributes:
+#    opennms:
+#      upgrade: true
+#      templates: false
+#      conf:
+#        start_timeout: 50
+#      stable: true
+#      plugin:
+#        nsclient: true
+#      postgresql:
+#        attempt_upgrade: true
 suites:
   - name: avail_category_16
     run_list:

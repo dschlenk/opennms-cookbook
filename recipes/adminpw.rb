@@ -32,7 +32,7 @@ ruby_block 'change admin password' do
   block do
     adminpw = admin_secret_from_vault('password')
     new_adminpw = admin_secret_from_vault('new_password')
-    unless new_adminpw.nil?
+    unless new_adminpw == 'admin'
       change_admin_password(adminpw, new_adminpw)
       declare_resource(:chef_vault_secret, node['opennms']['admin']['vault_item']) do
         data_bag node['opennms']['admin']['vault']

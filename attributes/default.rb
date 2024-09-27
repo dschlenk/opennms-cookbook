@@ -2031,6 +2031,9 @@ default['opennms']['cors']['credentials'] = true
 
 default['opennms']['repos']['branches'] = %w(obsolete snapshot stable oldstable)
 default['opennms']['repos']['platforms'] = %w(common rhel9)
+# add a specific version vault repo like this:
+# node['opennms']['repos']['vault'] = ['32.0.6'] 
+default['opennms']['repos']['vault'] = []
 
 default['opennms']['telemetryd']['managed'] = false
 default['opennms']['telemetryd']['jti']['enabled'] = false

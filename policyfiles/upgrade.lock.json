@@ -1,0 +1,195 @@
+{
+  "revision_id": "7b93e031e3a86c6abf3791b115d40fed3873d81456a3621f1f027de8f2aab97e",
+  "name": "opennms-upgrade",
+  "run_list": [
+    "recipe[opennms::postgres]",
+    "recipe[openjdk17::default]",
+    "recipe[opennms-upgrade::default]",
+    "recipe[opennms::default]"
+  ],
+  "included_policy_locks": [
+
+  ],
+  "cookbook_locks": {
+    "java": {
+      "version": "12.0.6",
+      "identifier": "562bcc23a38889f59c664b56b582b7c391b9613e",
+      "dotted_decimal_identifier": "24255003768359049.69133332458681730.202050591351102",
+      "cache_key": "java-12.0.6-supermarket.chef.io",
+      "origin": "https://supermarket.chef.io:443/api/v1/cookbooks/java/versions/12.0.6/download",
+      "source_options": {
+        "artifactserver": "https://supermarket.chef.io:443/api/v1/cookbooks/java/versions/12.0.6/download",
+        "version": "12.0.6"
+      }
+    },
+    "line": {
+      "version": "4.5.19",
+      "identifier": "f96a4a16a4808b2205c7dc1219d73aa63232df8a",
+      "dotted_decimal_identifier": "70204135640957067.9576505156966871.64485481176970",
+      "cache_key": "line-4.5.19-supermarket.chef.io",
+      "origin": "https://supermarket.chef.io:443/api/v1/cookbooks/line/versions/4.5.19/download",
+      "source_options": {
+        "artifactserver": "https://supermarket.chef.io:443/api/v1/cookbooks/line/versions/4.5.19/download",
+        "version": "4.5.19"
+      }
+    },
+    "openjdk17": {
+      "version": "0.1.0",
+      "identifier": "e1e3de5f8d53f58886046015aa7f766357d52a2d",
+      "dotted_decimal_identifier": "63582413985240053.38427950182673023.130169047427629",
+      "source": "../test/fixtures/cookbooks/openjdk17",
+      "cache_key": null,
+      "scm_info": {
+        "scm": "git",
+        "remote": "git@github.com:dschlenk/opennms-cookbook",
+        "revision": "b9530462c7b40e917ee286556c73bff5d46c54fe",
+        "working_tree_clean": false,
+        "published": false,
+        "synchronized_remote_branches": [
+
+        ]
+      },
+      "source_options": {
+        "path": "../test/fixtures/cookbooks/openjdk17"
+      }
+    },
+    "opennms": {
+      "version": "33.0.0",
+      "identifier": "d28aea8ea7c0c464985dbb6846c3ae9352ee1b75",
+      "dotted_decimal_identifier": "59262485129576644.28315026014619331.191947774761845",
+      "source": "..",
+      "cache_key": null,
+      "scm_info": {
+        "scm": "git",
+        "remote": "git@github.com:dschlenk/opennms-cookbook",
+        "revision": "b9530462c7b40e917ee286556c73bff5d46c54fe",
+        "working_tree_clean": false,
+        "published": false,
+        "synchronized_remote_branches": [
+
+        ]
+      },
+      "source_options": {
+        "path": ".."
+      }
+    },
+    "opennms-upgrade": {
+      "version": "0.1.0",
+      "identifier": "7f97d9e5cc9ea654712244408b08374befc6cb9c",
+      "dotted_decimal_identifier": "35914284161343142.23768290031602440.60799284857756",
+      "source": "../test/fixtures/cookbooks/upgrade",
+      "cache_key": null,
+      "scm_info": {
+        "scm": "git",
+        "remote": "git@github.com:dschlenk/opennms-cookbook",
+        "revision": "b9530462c7b40e917ee286556c73bff5d46c54fe",
+        "working_tree_clean": false,
+        "published": false,
+        "synchronized_remote_branches": [
+
+        ]
+      },
+      "source_options": {
+        "path": "../test/fixtures/cookbooks/upgrade"
+      }
+    },
+    "postgresql": {
+      "version": "11.10.3",
+      "identifier": "1ef42098c852e22e98bb37f2e2f68ee415c61252",
+      "dotted_decimal_identifier": "8712670140715746.13115778793661174.157110268990034",
+      "cache_key": "postgresql-11.10.3-supermarket.chef.io",
+      "origin": "https://supermarket.chef.io:443/api/v1/cookbooks/postgresql/versions/11.10.3/download",
+      "source_options": {
+        "artifactserver": "https://supermarket.chef.io:443/api/v1/cookbooks/postgresql/versions/11.10.3/download",
+        "version": "11.10.3"
+      }
+    },
+    "yum": {
+      "version": "7.4.18",
+      "identifier": "fcd4689007979241fbb317f747a729f96ee75d82",
+      "dotted_decimal_identifier": "71165239689189266.18572620105992103.46151284252034",
+      "cache_key": "yum-7.4.18-supermarket.chef.io",
+      "origin": "https://supermarket.chef.io:443/api/v1/cookbooks/yum/versions/7.4.18/download",
+      "source_options": {
+        "artifactserver": "https://supermarket.chef.io:443/api/v1/cookbooks/yum/versions/7.4.18/download",
+        "version": "7.4.18"
+      }
+    }
+  },
+  "default_attributes": {
+
+  },
+  "override_attributes": {
+
+  },
+  "solution_dependencies": {
+    "Policyfile": [
+      [
+        "java",
+        "= 12.0.6"
+      ],
+      [
+        "line",
+        "= 4.5.19"
+      ],
+      [
+        "openjdk17",
+        ">= 0.0.0"
+      ],
+      [
+        "opennms",
+        ">= 0.0.0"
+      ],
+      [
+        "opennms-upgrade",
+        ">= 0.0.0"
+      ],
+      [
+        "postgresql",
+        "= 11.10.3"
+      ],
+      [
+        "yum",
+        "= 7.4.18"
+      ]
+    ],
+    "dependencies": {
+      "java (12.0.6)": [
+        [
+          "line",
+          ">= 0.0.0"
+        ]
+      ],
+      "line (4.5.19)": [
+
+      ],
+      "openjdk17 (0.1.0)": [
+        [
+          "java",
+          ">= 0.0.0"
+        ]
+      ],
+      "opennms (33.0.0)": [
+        [
+          "postgresql",
+          ">= 0.0.0"
+        ]
+      ],
+      "opennms-upgrade (0.1.0)": [
+        [
+          "opennms",
+          ">= 0.0.0"
+        ]
+      ],
+      "postgresql (11.10.3)": [
+        [
+          "yum",
+          ">= 7.2.0"
+        ]
+      ],
+      "yum (7.4.18)": [
+
+      ]
+    }
+  }
+}

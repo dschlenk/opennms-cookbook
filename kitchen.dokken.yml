@@ -14,28 +14,14 @@ provisioner:
   download_url: https://omnitruck.cinc.sh/install.sh
   chef_binary: /opt/cinc/bin/cinc-client
   chef_license: accept-no-persist # until https://github.com/test-kitchen/test-kitchen/pull/1984
+    # log_level: debug
   attributes:
     opennms:
       conf:
         env:
           START_TIMEOUT: 50
-      plugin:
-        addl: 
-          - opennms-plugin-protocol-nsclient
-          - opennms-plugin-provisioning-snmp-hardware-inventory
-          - opennms-plugin-provisioning-snmp-asset
-          - opennms-plugin-northbounder-jms
       postgresql:
         user_vault: creds
-      rrdtool:
-        enable: true
-      stable: true
-      scv:
-        vault: creds
-      upgrade: true
-      users:
-        admin:
-          vault: creds
 
 verifier:
   name: inspec
@@ -47,4 +33,37 @@ platforms:
       pid_one_command: /usr/lib/systemd/systemd
 
 suites:
-  - name: opennms-horizon
+  - name: recommended
+    attributes:
+      opennms:
+        rrdtool:
+          enable: true
+        scv:
+          vault: creds
+        upgrade: true
+        users:
+          admin:
+            vault: creds
+  - name: upgrade
+    provisioner:
+      policyfile: policyfiles/upgrade.rb
+      multiple_converge: 2
+    attributes:
+      opennms:
+        upgrade: true
+  - name: no-upgrade
+    provisioner:
+      policyfile: policyfiles/upgrade.rb
+      multiple_converge: 2
+    attributes:
+      opennms:
+        upgrade: false
+  - name: default
+  - name: plugins
+    opennms:
+      plugin:
+        addl: 
+          - opennms-plugin-protocol-nsclient
+          - opennms-plugin-provisioning-snmp-hardware-inventory
+          - opennms-plugin-provisioning-snmp-asset
+          - opennms-plugin-northbounder-jms

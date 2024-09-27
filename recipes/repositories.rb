@@ -26,12 +26,12 @@ platforms = node['opennms']['repos']['platforms']
 branches.each do |branch|
   platforms.each do |platform|
     skip = false
-    Chef::Log.debug "branch is '#{branch}' and stable is #{node['opennms']['stable']}"
+    Chef::Log.warn "branch is '#{branch}' and stable is #{node['opennms']['stable']}"
     if (branch == 'stable' && !node['opennms']['stable']) ||
        ((branch == 'snapshot' || branch == 'obsolete' || branch == 'oldstable') && node['opennms']['stable'])
       skip = true
     end
-    next if skip
+    # next if skip
     bu = yum_attr(branch, platform, 'baseurl')
     ml = yum_attr(branch, platform, 'url')
     fom = yum_attr(branch, platform, 'failovermethod')
@@ -44,10 +44,19 @@ branches.each do |branch|
       mirrorlist ml unless ml.nil? || ml == ''
       gpgkey node['opennms']['yum_gpg_keys']
       failovermethod fom unless fom.nil? || fom == ''
-      enabled false if repo_enabled == false
+      enabled false if repo_enabled == false || skip
       includepkgs inc_pkgs unless inc_pkgs.nil? || inc_pkgs == ''
       exclude ex unless ex.nil? || ex == ''
       action :create
     end
+  end
+end
+
+node['opennms']['repos']['vault'].each do |k|
+  yum_repository "opennms-vault-#{k}" do
+    description "Vault for OpenNMS #{k} RPMs"
+    baseurl "https://vault.opennms.com/horizon/#{k}/rpm"
+    gpgkey node['opennms']['yum_gpg_keys']
+    enabled true
   end
 end
