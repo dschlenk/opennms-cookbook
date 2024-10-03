@@ -26,7 +26,6 @@ platforms = node['opennms']['repos']['platforms']
 branches.each do |branch|
   platforms.each do |platform|
     skip = false
-    Chef::Log.debug "branch is '#{branch}' and stable is #{node['opennms']['stable']}"
     if (branch == 'stable' && !node['opennms']['stable']) ||
        ((branch == 'snapshot' || branch == 'obsolete' || branch == 'oldstable') && node['opennms']['stable'])
       skip = true
@@ -45,8 +44,10 @@ branches.each do |branch|
       gpgkey node['opennms']['yum_gpg_keys']
       failovermethod fom unless fom.nil? || fom == ''
       enabled false if repo_enabled == false || skip
+      make_cache false if repo_enabled == false || skip
       includepkgs inc_pkgs unless inc_pkgs.nil? || inc_pkgs == ''
       exclude ex unless ex.nil? || ex == ''
+      only_if { node['opennms']['manage_repos'] }
       action :create
     end
   end

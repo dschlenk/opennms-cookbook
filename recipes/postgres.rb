@@ -62,6 +62,34 @@ end
     address h
     auth_method 'scram-sha-256'
   end
+  postgresql_access "remove host replication trust access from #{h}" do
+    type 'host'
+    database 'replication'
+    user 'all'
+    address h
+    auth_method 'trust'
+    action :delete
+  end
+end
+postgresql_access "remove local all trust" do
+  type 'local'
+  database 'all'
+  user 'all'
+  auth_method 'trust'
+  action :delete
+end
+postgresql_access "remove local replication trust" do
+  type 'local'
+  database 'replication'
+  user 'all'
+  auth_method 'trust'
+  action :delete
+end
+postgresql_access "add local scram" do
+  type 'local'
+  database 'all'
+  user 'all'
+  auth_method 'scram-sha-256'
 end
 
 postgresql_service 'postgresql' do
@@ -69,6 +97,7 @@ postgresql_service 'postgresql' do
 end
 
 postgresql_user 'postgres' do
+  ignore_failure true # this fails after the password gets set initially
   unencrypted_password chef_vault_item(node['opennms']['postgresql']['user_vault'], node['opennms']['postgresql']['user_vault_item'])['postgres']['password']
   action :set_password
 end

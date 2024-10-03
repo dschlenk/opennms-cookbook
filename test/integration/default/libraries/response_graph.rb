@@ -1,5 +1,5 @@
 # frozen_string_literal: true
-require 'java_properties'
+require 'java-properties'
 require 'tempfile'
 class ResponseGraph < Inspec.resource(1)
   name 'response_graph'

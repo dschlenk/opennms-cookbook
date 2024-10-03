@@ -28,7 +28,7 @@ module Graph
   end
 
   def check_file_for_graph(file, name)
-    require 'java_properties'
+    require 'java-properties'
     props = JavaProperties::Properties.new(file)
     found = false
     values = props[:reports].split(/,\s*/) unless props[:reports].nil?

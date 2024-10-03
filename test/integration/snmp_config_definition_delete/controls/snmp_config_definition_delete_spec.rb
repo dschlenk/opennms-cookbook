@@ -1,4 +1,3 @@
-# frozen_string_literal: true
 control 'snmp_config_definition_delete' do
   v1v2c_typical = {
     'read_community' => 'public',

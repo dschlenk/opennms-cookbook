@@ -21,7 +21,7 @@ if !node['opennms']['upgrade'] && upgrade.upgrade?
   return
 end
 
-include_recipe 'opennms::repositories' if node['opennms']['manage_repos']
+include_recipe 'opennms::repositories'
 
 onms_packages = %w(opennms-core opennms-webapp-jetty)
 onms_versions = [node['opennms']['version'], node['opennms']['version']]
@@ -33,37 +33,14 @@ end
 
 ruby_block 'stop opennms before upgrade' do
   block do
-    resources(:service => 'opennms').run_action(:stop)
+    resources(service: 'opennms').run_action(:stop)
   end
   only_if { node['opennms']['upgrade'] && upgrade.upgrade? }
 end
 
-#onms_packages.each do |pkg|
-#  pv = "#{pkg}-#{node['opennms']['version']}"
-#  # remove any version locks that don't match current version
-#  execute "remove old versionlocks for #{pkg}" do
-#    command "yum versionlock delete 0:#{pkg}*"
-#    ignore_failure true
-#    not_if "yum versionlock list | grep -q #{pkg}-0:#{node['opennms']['version']}"
-#    node['opennms']['repos']['branches'].each do |branch|
-#      node['opennms']['repos']['platforms'].each do |_platform|
-#        skip = false
-#        Chef::Log.debug "branch is '#{branch}' and stable is #{node['opennms']['stable']}"
-#        if (branch == 'stable' && !node['opennms']['stable']) ||
-#           (branch == 'snapshot' && node['opennms']['stable'])
-#          skip = true
-#        end
-#        next if skip
-#      end
-#    end
-#  end
-#  execute "add yum versionlock for #{pkg}" do
-#    command "yum versionlock add #{pv}"
-#    not_if "yum versionlock list #{pv} | grep -q #{pkg}-0:#{node['opennms']['version']}"
-#  end
-#end
+# the former is needed for dnf_package action `:lock` and the latter for `$OPENNMS_HOME/bin/send-event.pl
+dnf_package %w(python3-dnf-plugin-versionlock perl-Sys-Hostname)
 
-dnf_package 'python3-dnf-plugin-versionlock'
 dnf_package onms_packages do
   action :unlock
   only_if { node['opennms']['upgrade'] && upgrade.upgrade? }
@@ -80,11 +57,4 @@ ruby_block 'do post-upgrade cleanup' do
     upgrade.upgrade
   end
   only_if { node['opennms']['upgrade'] && upgrade.upgraded? }
-end
-
-ruby_block 'start opennms after upgrade' do
-  block do
-    resources(:service => 'opennms').run_action(:start)
-  end
-  only_if { node['opennms']['upgrade'] }
 end

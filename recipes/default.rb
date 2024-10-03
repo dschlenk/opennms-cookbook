@@ -63,8 +63,8 @@ file '/etc/systemd/system/opennms.service.d/timeout.conf' do
 end
 
 # configure base templates before we get started
-include_recipe 'opennms::base_templates'
 include_recipe 'opennms::rrdtool' if node['opennms']['rrdtool']['enabled']
+include_recipe 'opennms::base_templates'
 execute 'install' do
   cwd onms_home
   user node['opennms']['username']
@@ -72,15 +72,15 @@ execute 'install' do
   command "#{onms_home}/bin/install -dis"
 end
 
-include_recipe 'opennms::adminpw'
-
 service 'opennms' do
   timeout start_timeout
   supports status: true, restart: true
-  action [:enable]
+  action [:enable, :start]
 end
 
 execute 'reload systemd' do
   action :nothing
   command '/usr/bin/systemctl daemon-reload'
 end
+
+include_recipe 'opennms::adminpw'

@@ -7,18 +7,17 @@ module Opennms::Rbac
   @admin_password = nil
 
   def admin_secret_from_vault(secret)
-    adminpw = 'admin'
+    adminpw = 'admin' if secret == 'password' # default
     begin
       adminpw = chef_vault_item(node['opennms']['users']['admin']['vault'], node['opennms']['users']['admin']['vault_item'])[secret]
     rescue => e
       Chef::Log.warn("Unable to retrieve admin password from vault #{node['opennms']['users']['admin']['vault']} item #{node['opennms']['users']['admin']['vault_item']} due to #{e.message}. The default password will continue to be used. This is not recommended!")
     end
-    @admin_password = adminpw
     adminpw
   end
 
   def default_admin_password?
-    Chef::Log.debug 'Checking to see if the admin user has the default password'
+    Chef::Log.warn 'Checking to see if the admin user has the default password'
     if ::File.exist?("#{node['opennms']['conf']['home']}/etc/users.xml")
       file = ::File.new("#{node['opennms']['conf']['home']}/etc/users.xml", 'r')
       doc = REXML::Document.new file
@@ -26,6 +25,7 @@ module Opennms::Rbac
       doc.each_element("/userinfo/users/user[user-id/text()[contains(., 'admin')]]") do |el|
         # find the user with user-id that is exactly 'admin'
         next unless el.elements['user-id'].texts.join('').strip == 'admin'
+        Chef::Log.warn('true') if el.elements['password'].texts.join('').strip == 'gU2wmSW7k9v1xg4/MrAsaI+VyddBAhJJt4zPX5SGG0BK+qiASGnJsqM8JOug/aEL'
         return el.elements['password'].texts.join('').strip == 'gU2wmSW7k9v1xg4/MrAsaI+VyddBAhJJt4zPX5SGG0BK+qiASGnJsqM8JOug/aEL'
       end
       # I guess if there's no admin user they aren't using the default password
@@ -79,6 +79,7 @@ module Opennms::Rbac
   end
 
   def change_admin_password(old_pw, new_pw)
+    Chef::Log.warn("Changing admin password to #{new_pw} with #{old_pw}")
     RestClient.put "#{baseurl(old_pw)}/users/admin?hashPassword=true", { 'password': new_pw }
     @admin_password = new_pw
     FileUtils.touch "#{node['opennms']['conf']['home']}/etc/users.xml"

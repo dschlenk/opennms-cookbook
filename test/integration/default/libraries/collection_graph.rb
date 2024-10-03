@@ -1,5 +1,5 @@
 # frozen_string_literal: true
-require 'java_properties'
+require 'java-properties'
 require 'tempfile'
 class CollectionGraph < Inspec.resource(1)
   name 'collection_graph'

@@ -134,14 +134,43 @@ The recipes you may wish to include in your node list directly are:
 
 * `opennms::default` Installs and configures OpenNMS Horizon with the standard configuration modified with any node attribute values changed from their defaults. 
   * Set `node['opennms']['plugin']['addl']` to an array of strings representing the names of the packages of the plugins you'd like installed.
-* `opennms::rrdtool` Installs rrdtool and configures OpenNMS to use it rather than JRobin for metrics storage.
+* `opennms::rrdtool` Installs rrdtool and configures OpenNMS to use it instead of JRobin for performance metric storage.
 * `opennms::postgres` Installs postgresql in a somewhat tuned manner (from PGDG). See `postres_install` recipe to figure out how the version is selected and override with node attributes if desired.
 
 A few other recipes exist that aren't listed here. They are included by others when needed and are unlikely to be interesting for individual use.
 
 # Custom Resources
 
-TODO: UPDATE EVERYTHING AFTER THIS
+## SNMP Config
+
+* [opennms\_snmp\_config](documentation/snmp_config.md)
+* [opennms\_snmp\_config\_definition](documentation/snmp_config_definition.md)
+* [opennms\_snmp\_config\_profile](documentation/snmp_config_profile.md)
+
+## Events, Alarms, and Notifications
+
+* [opennms\_eventconf](documentation/eventconf.md)
+* [opennms\_event](documentation/event.md)
+
+## Service Assurance
+
+## Performance Management and Thresholding
+
+## User and Group Management
+
+## Provisioning and Discovery
+
+## Presentation
+
+## Administration
+
+* [opennms\_secret](documentation/secret.md)
+
+TODO: update and move the rest of these to individual files
+
+## opennms_snmp_config_definition
+
+
 As a general rule these custom resources support a single action: `create` and many of them behave more like `create_if_missing` does in other cookbooks. In other words, updating is generally not supported. Exceptions are noted. This behavior will change in future releases (generally whenever I encounter a use case for update of that resource IRL).
 
 The list of implemented custom resources is as follows:
@@ -166,7 +195,7 @@ These custom resources use the OpenNMS REST interface. As such, OpenNMS has to b
 * `opennms_foreign_source`: create a new foreign source optionally defining a scan interval (defaults to '1d').
 * `opennms_service_detector`: add a service detector to a foreign source. Supports updating and deleting.
 * `opennms_policy`: add a policy to a foreign source.
-* `opennms_import`: Defines a requisition for a foreign source. This and all import* custom resources include an option to synchronize the requisition - sync_import.
+* `opennms_import`: Defines a requisition for a foreign source. This and all import\* custom resources include an option to synchronize the requisition - sync\_import.
 * `opennms_import_node`: Add a node to a requisition including categories (array of strings) and assets (key/value hash pairs).
 * `opennms_import_node_interface`: Add an interface to a node in a requisition.
 * `opennms_import_node_interface_service`: Add a service to an interface on a node in a requisition.

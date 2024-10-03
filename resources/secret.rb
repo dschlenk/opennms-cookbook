@@ -3,7 +3,7 @@ unified_mode true
 property :secret_alias, String, required: true
 property :username, String, sensitive: true, required: true
 property :password, String, sensitive: true, required: true
-property :extra_properties, Hash, default: {}
+property :extra_properties, Hash, sensitive: true, default: {}
 
 action :create do
   pw = opennms_scv_password

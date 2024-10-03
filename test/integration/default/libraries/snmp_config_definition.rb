@@ -1,4 +1,3 @@
-# frozen_string_literal: true
 class SnmpConfigDefinition < Inspec.resource(1)
   name 'snmp_config_definition'
 
@@ -21,7 +20,7 @@ class SnmpConfigDefinition < Inspec.resource(1)
     }
     opennms_snmp_config_definition(v1v2c_all) do
       it { should exist }
-      its(\'ranges\') { should eq \'10.0.0.1\' => \'10.0.0.254\', \'172.17.16.1\' => \'172.17.16.254\' }
+      its(\'ranges\') { should eq [\'10.0.0.1\' => \'10.0.0.254\', \'172.17.16.1\' => \'172.17.16.254\'] }
       its(\'specifics\') { should eq [\'192.168.0.1\', \'192.168.1.2\', \'192.168.2.3\'] }
       its(\'ip_matches\') { should eq [\'172.17.21.*\', \'172.17.20.*\'] }
     end
@@ -50,7 +49,9 @@ class SnmpConfigDefinition < Inspec.resource(1)
       && def_el.attributes['context-name'].to_s == config['context_name'].to_s\
       && def_el.attributes['privacy-passphrase'].to_s == config['privacy_passphrase'].to_s\
       && def_el.attributes['privacy-protocol'].to_s == config['privacy_protocol'].to_s\
-      && def_el.attributes['enterprise-id'].to_s == config['enterprise_id'].to_s
+      && def_el.attributes['enterprise-id'].to_s == config['enterprise_id'].to_s\
+      && def_el.attributes['location'].to_s == config['location'].to_s\
+      && def_el.attributes['profile-label'].to_s == config['profile_label'].to_s
       d = def_el
       break
     end
@@ -58,9 +59,9 @@ class SnmpConfigDefinition < Inspec.resource(1)
     return unless @exists
     @params = {}
     unless d.elements['range'].nil?
-      @params[:ranges] = {}
+      @params[:ranges] = []
       d.each_element('range') do |r|
-        @params[:ranges][r.attributes['begin'].to_s] = r.attributes['end'].to_s
+        @params[:ranges].push(r.attributes['begin'].to_s => r.attributes['end'].to_s)
       end
     end
     unless d.elements['specific'].nil?

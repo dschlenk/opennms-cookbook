@@ -29,7 +29,7 @@ node.default['opennms']['rrd']['jrrd'] = '/usr/lib64/libjrrd2.so'
 template "#{node['opennms']['conf']['home']}/etc/rrd-configuration.properties" do
   source 'rrd-configuration.properties.erb'
   cookbook 'opennms'
-  mode '664'
+  mode '0664'
   owner node['opennms']['username']
   group node['opennms']['groupname']
   notifies :restart, 'service[opennms]'

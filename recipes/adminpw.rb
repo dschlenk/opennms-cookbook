@@ -22,7 +22,7 @@ ruby_block 'set admin password' do
   block do
     adminpw = admin_secret_from_vault('password')
     if adminpw != 'admin' && default_admin_password?
-      resources(:service => 'opennms').run_action(:start)
+      resources(service: 'opennms').run_action(:start)
       set_admin_password(adminpw)
     end
   end
@@ -32,14 +32,16 @@ ruby_block 'change admin password' do
   block do
     adminpw = admin_secret_from_vault('password')
     new_adminpw = admin_secret_from_vault('new_password')
-    unless new_adminpw == 'admin'
+    if new_adminpw
       change_admin_password(adminpw, new_adminpw)
-      declare_resource(:chef_vault_secret, node['opennms']['admin']['vault_item']) do
+      declare_resource(:chef_vault_secret, node['opennms']['users']['admin']['vault_item']) do
         data_bag node['opennms']['admin']['vault']
         raw_data(
           'password' => new_adminpw
         )
       end
+    else
+      Chef::Log.warn('No new admin password')
     end
   end
 end

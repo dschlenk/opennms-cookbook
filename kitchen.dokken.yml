@@ -19,7 +19,7 @@ provisioner:
     opennms:
       conf:
         env:
-          START_TIMEOUT: 50
+          START_TIMEOUT: 60
       postgresql:
         user_vault: creds
 
@@ -34,10 +34,14 @@ platforms:
 
 suites:
   - name: recommended
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/recommended
     attributes:
       opennms:
         rrdtool:
-          enable: true
+          enabled: true
         scv:
           vault: creds
         upgrade: true
@@ -48,13 +52,20 @@ suites:
     provisioner:
       policyfile: policyfiles/upgrade.rb
       multiple_converge: 2
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/upgrade
     attributes:
       opennms:
         upgrade: true
-  - name: no-upgrade
+  - name: no_upgrade
     provisioner:
       policyfile: policyfiles/upgrade.rb
       multiple_converge: 2
+    verifier:
+      inspec_tests:
+        - path: test/integration/no_upgrade
     attributes:
       opennms:
         upgrade: false
@@ -68,3 +79,45 @@ suites:
             - opennms-plugin-provisioning-snmp-hardware-inventory
             - opennms-plugin-provisioning-snmp-asset
             - opennms-plugin-northbounder-jms
+  - name: snmp_config_definition
+    provisioner:
+      policyfile: policyfiles/snmp_config_definition.rb
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/snmp_config_definition
+  - name: snmp_config_definition_update
+    provisioner:
+      policyfile: policyfiles/snmp_config_definition_update.rb
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/snmp_config_definition_update
+  - name: snmp_config_definition_delete
+    provisioner:
+      policyfile: policyfiles/snmp_config_definition_delete.rb
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/snmp_config_definition_delete
+  - name: snmp_config_profile
+    provisioner:
+      policyfile: policyfiles/snmp_config_profile.rb
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/snmp_config_profile
+  - name: snmp_config_profile_update
+    provisioner:
+      policyfile: policyfiles/snmp_config_profile_update.rb
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/snmp_config_profile_update
+  - name: snmp_config_profile_delete
+    provisioner:
+      policyfile: policyfiles/snmp_config_profile_delete.rb
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/snmp_config_profile_delete
