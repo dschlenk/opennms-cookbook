@@ -121,3 +121,10 @@ suites:
       inspec_tests:
         - path: test/integration/default
         - path: test/integration/snmp_config_profile_delete
+  - name: eventconf
+    provisioner:
+      policyfile: policyfiles/eventconf.rb
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/eventconf

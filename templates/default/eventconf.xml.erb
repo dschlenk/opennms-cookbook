@@ -1,0 +1,26 @@
+<events xmlns="http://xmlns.opennms.org/xsd/eventconf">
+   <global>
+      <security>
+<% @secure_fields.each do |sf| -%>
+         <doNotOverride><%= sf %></doNotOverride>
+<% end -%>
+      </security>
+   </global>
+   <!-- Custom event configs go here -->
+<% @eventconf.event_files.select{ |ec,v| v[:position] == 'override' }.each do |k,_v| -%>
+   <event-file>events/<%= k.encode(:xml => :text) %></event-file>
+<% end -%>
+<% @opennms_event_files.each do |e| -%>
+   <event-file>events/<%= e.encode(:xml => :text) %></event-file>
+<% end -%>
+<% @eventconf.event_files.select{ |ec,v| v[:position] == 'top' }.each do |k,_v| -%>
+   <event-file>events/<%= k.encode(:xml => :text) %></event-file>
+<% end -%>
+<% @vendor_event_files.each do |e| -%>
+   <event-file>events/<%= e.encode(:xml => :text) %></event-file>
+<% end -%>
+<% @eventconf.event_files.select{ |ec,v| v[:position] == 'bottom' }.each do |k,_v| -%>
+   <event-file>events/<%= k.encode(:xml => :text) %></event-file>
+<% end -%>
+   <event-file>events/<%= @catch_all_event_file.encode(:xml => :text) %></event-file>
+</events>

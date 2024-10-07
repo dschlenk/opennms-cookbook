@@ -1,9 +1,8 @@
-# frozen_string_literal: true
 control 'eventconf' do
   describe eventconf('bogus-events.xml') do
     it { should exist }
     # 20+ is position 3
-    its('position') { should be <= 4 }
+    its('position') { should be == 2 }
     becontent = <<-EOL
 <events xmlns="http://xmlns.opennms.org/xsd/eventconf">
   <event>
@@ -24,7 +23,7 @@ EOL
 
   describe eventconf('tripp-lite.events.xml') do
     it { should exist }
-    its('position') { should be <= 3 }
+    its('position') { should be <= 27 }
     tlcontent = <<-EOL
 <events xmlns="http://xmlns.opennms.org/xsd/eventconf">
     <!-- Start of auto generated data from MIB: TRIPPUPS-MIB -->
@@ -247,4 +246,24 @@ EOL
   describe eventconf('apache.httpd.syslog.events.xml') do
     it { should_not exist }
   end
+
+  describe eventconf('bogus-events3.xml') do
+    it { should exist }
+    its('position') { should eq 26 }
+  end
+
+  describe file('/opt/opennms/etc/events/bogus-events3.xml') do
+    its('mode') { should cmp '0777' }
+  end
+
+  describe eventconf('NOTIFICATION-TEST-MIB.events.xml') do
+    it { should exist }
+    its('content') { should match /<severity>Major<\/severity>/ }
+  end
+
+  describe eventconf('printer.events.xml') do
+    it { should exist }
+    its('content'){ should match /<severity>Minor<\/severity>/ }
+  end
+
 end

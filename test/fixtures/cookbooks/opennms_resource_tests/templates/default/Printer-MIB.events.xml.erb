@@ -1,0 +1,1755 @@
+<events xmlns="http://xmlns.opennms.org/xsd/eventconf">
+   <event>
+      <mask>
+         <maskelement>
+            <mename>id</mename>
+            <mevalue>.1.3.6.1.2.1.43.18.2</mevalue>
+         </maskelement>
+         <maskelement>
+            <mename>generic</mename>
+            <mevalue>6</mevalue>
+         </maskelement>
+         <maskelement>
+            <mename>specific</mename>
+            <mevalue>1</mevalue>
+         </maskelement>
+      </mask>
+      <uei>uei.opennms.org/traps/Printer-MIB/printerV2Alert</uei>
+      <event-label>Printer-MIB defined trap event: printerV2Alert</event-label>
+      <descr>
+&lt;p>This trap is sent whenever a critical event is added to the&#xd;
+&#xd;
+        prtAlertTable.&#xd;
+&#xd;
+        NOTE: The prtAlertIndex object was redundantly included in the&#xd;
+        bindings of the 'printerV2Alert' notification in RFC 1759, even&#xd;
+        though the value exists in the instance qualifier of all the&#xd;
+        other bindings.  This object has been retained to provide&#xd;
+        compatiblity with existing RFC 1759 implementaions.&lt;/p>&lt;table>
+	&lt;tr>&lt;td>&lt;b>
+
+	prtAlertIndex&lt;/b>&lt;/td>&lt;td>
+	%parm[#1]%;&lt;/td>&lt;td>&lt;p>&lt;/p>&lt;/td>&lt;/tr>
+	&lt;tr>&lt;td>&lt;b>
+
+	prtAlertSeverityLevel&lt;/b>&lt;/td>&lt;td>
+	%parm[#2]%;&lt;/td>&lt;td>&lt;p>
+		other(1)
+		critical(3)
+		warning(4)
+		warningBinaryChangeEvent(5)
+	&lt;/p>&lt;/td>&lt;/tr>
+	&lt;tr>&lt;td>&lt;b>
+
+	prtAlertGroup&lt;/b>&lt;/td>&lt;td>
+	%parm[#3]%;&lt;/td>&lt;td>&lt;p>
+		other(1)
+		unknown(2)
+		hostResourcesMIBStorageTable(3)
+		hostResourcesMIBDeviceTable(4)
+		generalPrinter(5)
+		cover(6)
+		localization(7)
+		input(8)
+		output(9)
+		marker(10)
+		markerSupplies(11)
+		markerColorant(12)
+		mediaPath(13)
+		channel(14)
+		interpreter(15)
+		consoleDisplayBuffer(16)
+		consoleLights(17)
+		alert(18)
+		finDevice(30)
+		finSupply(31)
+		finSupplyMediaInput(32)
+		finAttribute(33)
+		scanDevice(50)
+		scanner(51)
+		scanMediaPath(52)
+		faxDevice(60)
+		faxModem(61)
+		outputChannel(70)
+	&lt;/p>&lt;/td>&lt;/tr>
+	&lt;tr>&lt;td>&lt;b>
+
+	prtAlertGroupIndex&lt;/b>&lt;/td>&lt;td>
+	%parm[#4]%;&lt;/td>&lt;td>&lt;p>&lt;/p>&lt;/td>&lt;/tr>
+	&lt;tr>&lt;td>&lt;b>
+
+	prtAlertLocation&lt;/b>&lt;/td>&lt;td>
+	%parm[#5]%;&lt;/td>&lt;td>&lt;p>&lt;/p>&lt;/td>&lt;/tr>
+	&lt;tr>&lt;td>&lt;b>
+
+	prtAlertCode&lt;/b>&lt;/td>&lt;td>
+	%parm[#6]%;&lt;/td>&lt;td>&lt;p>
+		other(1)
+		unknown(2)
+		coverOpen(3)
+		coverClosed(4)
+		interlockOpen(5)
+		interlockClosed(6)
+		configurationChange(7)
+		jam(8)
+		subunitMissing(9)
+		subunitLifeAlmostOver(10)
+		subunitLifeOver(11)
+		subunitAlmostEmpty(12)
+		subunitEmpty(13)
+		subunitAlmostFull(14)
+		subunitFull(15)
+		subunitNearLimit(16)
+		subunitAtLimit(17)
+		subunitOpened(18)
+		subunitClosed(19)
+		subunitTurnedOn(20)
+		subunitTurnedOff(21)
+		subunitOffline(22)
+		subunitPowerSaver(23)
+		subunitWarmingUp(24)
+		subunitAdded(25)
+		subunitRemoved(26)
+		subunitResourceAdded(27)
+		subunitResourceRemoved(28)
+		subunitRecoverableFailure(29)
+		subunitUnrecoverableFailure(30)
+		subunitRecoverableStorageError(31)
+		subunitUnrecoverableStorageError(32)
+		subunitMotorFailure(33)
+		subunitMemoryExhausted(34)
+		subunitUnderTemperature(35)
+		subunitOverTemperature(36)
+		subunitTimingFailure(37)
+		subunitThermistorFailure(38)
+		doorOpen(501)
+		doorClosed(502)
+		powerUp(503)
+		powerDown(504)
+		printerNMSReset(505)
+		printerManualReset(506)
+		printerReadyToPrint(507)
+		inputMediaTrayMissing(801)
+		inputMediaSizeChange(802)
+		inputMediaWeightChange(803)
+		inputMediaTypeChange(804)
+		inputMediaColorChange(805)
+		inputMediaFormPartsChange(806)
+		inputMediaSupplyLow(807)
+		inputMediaSupplyEmpty(808)
+		inputMediaChangeRequest(809)
+		inputManualInputRequest(810)
+		inputTrayPositionFailure(811)
+		inputTrayElevationFailure(812)
+		inputCannotFeedSizeSelected(813)
+		inputMediaTrayFeedError(814)
+		inputMediaTrayJam(815)
+		inputMediaTrayFailure(816)
+		inputMediaTrayPickRollerLifeWarn(817)
+		inputMediaTrayPickRollerLifeOver(818)
+		inputMediaTrayPickRollerFailure(819)
+		inputMediaTrayPickRollerMissing(820)
+		outputMediaTrayMissing(901)
+		outputMediaTrayAlmostFull(902)
+		outputMediaTrayFull(903)
+		outputMailboxSelectFailure(904)
+		outputMediaTrayFeedError(905)
+		outputMediaTrayJam(906)
+		outputMediaTrayFailure(907)
+		markerFuserUnderTemperature(1001)
+		markerFuserOverTemperature(1002)
+		markerFuserTimingFailure(1003)
+		markerFuserThermistorFailure(1004)
+		markerAdjustingPrintQuality(1005)
+		markerAdded(1006)
+		markerAtLimit(1007)
+		markerCarrierFailure(1008)
+		markerClosed(1009)
+		markerLifeAlmostOver(1010)
+		markerLifeOver(1011)
+		markerMemoryExhausted(1012)
+		markerMissing(1013)
+		markerMotorFailure(1014)
+		markerNearLimit(1015)
+		markerOffline(1016)
+		markerOpened(1017)
+		markerOverTemperature(1018)
+		markerPowerSaver(1019)
+		markerRecoverableFailure(1020)
+		markerRemoved(1021)
+		markerResourceAdded(1022)
+		markerResourceRemoved(1023)
+		markerThermistorFailure(1024)
+		markerTimingFailure(1025)
+		markerTurnedOff(1026)
+		markerTurnedOn(1027)
+		markerUnderTemperature(1028)
+		markerUnrecoverableFailure(1029)
+		markerWarmingUp(1030)
+		markerTonerEmpty(1101)
+		markerInkEmpty(1102)
+		markerPrintRibbonEmpty(1103)
+		markerTonerAlmostEmpty(1104)
+		markerInkAlmostEmpty(1105)
+		markerPrintRibbonAlmostEmpty(1106)
+		markerWasteTonerReceptacleAlmostFull(1107)
+		markerWasteInkReceptacleAlmostFull(1108)
+		markerWasteTonerReceptacleFull(1109)
+		markerWasteInkReceptacleFull(1110)
+		markerOpcLifeAlmostOver(1111)
+		markerOpcLifeOver(1112)
+		markerDeveloperAlmostEmpty(1113)
+		markerDeveloperEmpty(1114)
+		markerTonerCartridgeMissing(1115)
+		markerCleanerMissing(1116)
+		markerDeveloperMissing(1117)
+		markerFuserMissing(1118)
+		markerInkMissing(1119)
+		markerOpcMissing(1120)
+		markerPrintRibbonMissing(1121)
+		markerSupplyAlmostEmpty(1122)
+		markerSupplyEmpty(1123)
+		markerSupplyMissing(1124)
+		markerWasteAlmostFull(1125)
+		markerWasteFull(1126)
+		markerWasteMissing(1127)
+		markerWasteInkReceptacleMissing(1128)
+		markerWasteTonerReceptacleMissing(1129)
+		markerTonerMissing(1130)
+		markerSupplyFailure(1131)
+		mediaPathMediaTrayMissing(1301)
+		mediaPathMediaTrayAlmostFull(1302)
+		mediaPathMediaTrayFull(1303)
+		mediaPathCannotDuplexMediaSelected(1304)
+		mediaPathFailure(1305)
+		mediaPathJam(1306)
+		mediaPathInputRequest(1310)
+		mediaPathInputFeedError(1311)
+		mediaPathInputJam(1312)
+		mediaPathOutputFeedError(1321)
+		mediaPathOutputJam(1322)
+		mediaPathOutputFull(1323)
+		mediaPathPickRollerLifeWarn(1331)
+		mediaPathPickRollerLifeOver(1332)
+		mediaPathPickRollerFailure(1333)
+		mediaPathPickRollerMissing(1334)
+		interpreterMemoryIncrease(1501)
+		interpreterMemoryDecrease(1502)
+		interpreterCartridgeAdded(1503)
+		interpreterCartridgeDeleted(1504)
+		interpreterResourceAdded(1505)
+		interpreterResourceDeleted(1506)
+		interpreterResourceUnavailable(1507)
+		interpreterComplexPageEncountered(1509)
+		alertRemovalOfBinaryChangeEntry(1801)
+		scannerLightLifeAlmostOver(5101)
+		scannerLightLifeOver(5102)
+		scannerLightFailure(5103)
+		scannerLightMissing(5104)
+		scannerSensorLifeAlmostOver(5111)
+		scannerSensorLifeOver(5112)
+		scannerSensorFailure(5113)
+		scannerSensorMissing(5114)
+		scanMediaPathTrayMissing(5201)
+		scanMediaPathTrayAlmostFull(5202)
+		scanMediaPathTrayFull(5203)
+		scanMediaPathFailure(5205)
+		scanMediaPathJam(5206)
+		scanMediaPathInputRequest(5210)
+		scanMediaPathInputFeedError(5211)
+		scanMediaPathInputJam(5212)
+		scanMediaPathOutputFeedError(5221)
+		scanMediaPathOutputJam(5222)
+		scanMediaPathOutputFull(5223)
+		scanMediaPathPickRollerLifeWarn(5231)
+		scanMediaPathPickRollerLifeOver(5232)
+		scanMediaPathPickRollerFailure(5233)
+		scanMediaPathPickRollerMissing(5234)
+		faxModemMissing(6101)
+		faxModemLifeAlmostOver(6102)
+		faxModemLifeOver(6103)
+		faxModemTurnedOn(6104)
+		faxModemTurnedOff(6105)
+		faxModemInactivityTimeout(6110)
+		faxModemProtocolAlert(6111)
+		faxModemEquipmentFailure(6112)
+		faxModemNoDialTone(6113)
+		faxModemLineBusy(6114)
+		faxModemNoAnswer(6115)
+		faxModemVoiceDetected(6116)
+		faxModemCarrierLost(6117)
+		faxModemTrainingFailure(6118)
+		staplerCoverOpen(30203)
+		staplerCoverClosed(30204)
+		staplerInterlockOpen(30205)
+		staplerInterlockClosed(30206)
+		staplerConfigurationChange(30207)
+		staplerJam(30208)
+		staplerMissing(30209)
+		staplerLifeAlmostOver(30210)
+		staplerLifeOver(30211)
+		staplerAlmostEmpty(30212)
+		staplerEmpty(30213)
+		staplerAlmostFull(30214)
+		staplerFull(30215)
+		staplerNearLimit(30216)
+		staplerAtLimit(30217)
+		staplerOpened(30218)
+		staplerClosed(30219)
+		staplerTurnedOn(30220)
+		staplerTurnedOff(30221)
+		staplerOffline(30222)
+		staplerPowerSaver(30223)
+		staplerWarmingUp(30224)
+		staplerAdded(30225)
+		staplerRemoved(30226)
+		staplerResourceAdded(30227)
+		staplerResourceRemoved(30228)
+		staplerRecoverableFailure(30229)
+		staplerUnrecoverableFailure(30230)
+		staplerRecoverableStorageError(30231)
+		staplerUnrecoverableStorageError(30232)
+		staplerMotorFailure(30233)
+		staplerMemoryExhausted(30234)
+		staplerUnderTemperature(30235)
+		staplerOverTemperature(30236)
+		staplerTimingFailure(30237)
+		staplerThermistorFailure(30238)
+		stitcherCoverOpen(30303)
+		stitcherCoverClosed(30304)
+		stitcherInterlockOpen(30305)
+		stitcherInterlockClosed(30306)
+		stitcherConfigurationChange(30307)
+		stitcherJam(30308)
+		stitcherMissing(30309)
+		stitcherLifeAlmostOver(30310)
+		stitcherLifeOver(30311)
+		stitcherAlmostEmpty(30312)
+		stitcherEmpty(30313)
+		stitcherAlmostFull(30314)
+		stitcherFull(30315)
+		stitcherNearLimit(30316)
+		stitcherAtLimit(30317)
+		stitcherOpened(30318)
+		stitcherClosed(30319)
+		stitcherTurnedOn(30320)
+		stitcherTurnedOff(30321)
+		stitcherOffline(30322)
+		stitcherPowerSaver(30323)
+		stitcherWarmingUp(30324)
+		stitcherAdded(30325)
+		stitcherRemoved(30326)
+		stitcherResourceAdded(30327)
+		stitcherResourceRemoved(30328)
+		stitcherRecoverableFailure(30329)
+		stitcherUnrecoverableFailure(30330)
+		stitcherRecoverableStorageError(30331)
+		stitcherUnrecoverableStorageError(30332)
+		stitcherMotorFailure(30333)
+		stitcherMemoryExhausted(30334)
+		stitcherUnderTemperature(30335)
+		stitcherOverTemperature(30336)
+		stitcherTimingFailure(30337)
+		stitcherThermistorFailure(30338)
+		folderCoverOpen(30403)
+		folderCoverClosed(30404)
+		folderInterlockOpen(30405)
+		folderInterlockClosed(30406)
+		folderConfigurationChange(30407)
+		folderJam(30408)
+		folderMissing(30409)
+		folderLifeAlmostOver(30410)
+		folderLifeOver(30411)
+		folderAlmostEmpty(30412)
+		folderEmpty(30413)
+		folderAlmostFull(30414)
+		folderFull(30415)
+		folderNearLimit(30416)
+		folderAtLimit(30417)
+		folderOpened(30418)
+		folderClosed(30419)
+		folderTurnedOn(30420)
+		folderTurnedOff(30421)
+		folderOffline(30422)
+		folderPowerSaver(30423)
+		folderWarmingUp(30424)
+		folderAdded(30425)
+		folderRemoved(30426)
+		folderResourceAdded(30427)
+		folderResourceRemoved(30428)
+		folderRecoverableFailure(30429)
+		folderUnrecoverableFailure(30430)
+		folderRecoverableStorageError(30431)
+		folderUnrecoverableStorageError(30432)
+		folderMotorFailure(30433)
+		folderMemoryExhausted(30434)
+		folderUnderTemperature(30435)
+		folderOverTemperature(30436)
+		folderTimingFailure(30437)
+		folderThermistorFailure(30438)
+		binderCoverOpen(30503)
+		binderCoverClosed(30504)
+		binderInterlockOpen(30505)
+		binderInterlockClosed(30506)
+		binderConfigurationChange(30507)
+		binderJam(30508)
+		binderMissing(30509)
+		binderLifeAlmostOver(30510)
+		binderLifeOver(30511)
+		binderAlmostEmpty(30512)
+		binderEmpty(30513)
+		binderAlmostFull(30514)
+		binderFull(30515)
+		binderNearLimit(30516)
+		binderAtLimit(30517)
+		binderOpened(30518)
+		binderClosed(30519)
+		binderTurnedOn(30520)
+		binderTurnedOff(30521)
+		binderOffline(30522)
+		binderPowerSaver(30523)
+		binderWarmingUp(30524)
+		binderAdded(30525)
+		binderRemoved(30526)
+		binderResourceAdded(30527)
+		binderResourceRemoved(30528)
+		binderRecoverableFailure(30529)
+		binderUnrecoverableFailure(30530)
+		binderRecoverableStorageError(30531)
+		binderUnrecoverableStorageError(30532)
+		binderMotorFailure(30533)
+		binderMemoryExhausted(30534)
+		binderUnderTemperature(30535)
+		binderOverTemperature(30536)
+		binderTimingFailure(30537)
+		binderThermistorFailure(30538)
+		trimmerCoverOpen(30603)
+		trimmerCoverClosed(30604)
+		trimmerInterlockOpen(30605)
+		trimmerInterlockClosed(30606)
+		trimmerConfigurationChange(30607)
+		trimmerJam(30608)
+		trimmerMissing(30609)
+		trimmerLifeAlmostOver(30610)
+		trimmerLifeOver(30611)
+		trimmerAlmostEmpty(30612)
+		trimmerEmpty(30613)
+		trimmerAlmostFull(30614)
+		trimmerFull(30615)
+		trimmerNearLimit(30616)
+		trimmerAtLimit(30617)
+		trimmerOpened(30618)
+		trimmerClosed(30619)
+		trimmerTurnedOn(30620)
+		trimmerTurnedOff(30621)
+		trimmerOffline(30622)
+		trimmerPowerSaver(30623)
+		trimmerWarmingUp(30624)
+		trimmerAdded(30625)
+		trimmerRemoved(30626)
+		trimmerResourceAdded(30627)
+		trimmerResourceRemoved(30628)
+		trimmerRecoverableFailure(30629)
+		trimmerUnrecoverableFailure(30630)
+		trimmerRecoverableStorageError(30631)
+		trimmerUnrecoverableStorageError(30632)
+		trimmerMotorFailure(30633)
+		trimmerMemoryExhausted(30634)
+		trimmerUnderTemperature(30635)
+		trimmerOverTemperature(30636)
+		trimmerTimingFailure(30637)
+		trimmerThermistorFailure(30638)
+		dieCutterCoverOpen(30703)
+		dieCutterCoverClosed(30704)
+		dieCutterInterlockOpen(30705)
+		dieCutterInterlockClosed(30706)
+		dieCutterConfigurationChange(30707)
+		dieCutterJam(30708)
+		dieCutterMissing(30709)
+		dieCutterLifeAlmostOver(30710)
+		dieCutterLifeOver(30711)
+		dieCutterAlmostEmpty(30712)
+		dieCutterEmpty(30713)
+		dieCutterAlmostFull(30714)
+		dieCutterFull(30715)
+		dieCutterNearLimit(30716)
+		dieCutterAtLimit(30717)
+		dieCutterOpened(30718)
+		dieCutterClosed(30719)
+		dieCutterTurnedOn(30720)
+		dieCutterTurnedOff(30721)
+		dieCutterOffline(30722)
+		dieCutterPowerSaver(30723)
+		dieCutterWarmingUp(30724)
+		dieCutterAdded(30725)
+		dieCutterRemoved(30726)
+		dieCutterResourceAdded(30727)
+		dieCutterResourceRemoved(30728)
+		dieCutterRecoverableFailure(30729)
+		dieCutterUnrecoverableFailure(30730)
+		dieCutterRecoverableStorageError(30731)
+		dieCutterUnrecoverableStorageError(30732)
+		dieCutterMotorFailure(30733)
+		dieCutterMemoryExhausted(30734)
+		dieCutterUnderTemperature(30735)
+		dieCutterOverTemperature(30736)
+		dieCutterTimingFailure(30737)
+		dieCutterThermistorFailure(30738)
+		puncherCoverOpen(30803)
+		puncherCoverClosed(30804)
+		puncherInterlockOpen(30805)
+		puncherInterlockClosed(30806)
+		puncherConfigurationChange(30807)
+		puncherJam(30808)
+		puncherMissing(30809)
+		puncherLifeAlmostOver(30810)
+		puncherLifeOver(30811)
+		puncherAlmostEmpty(30812)
+		puncherEmpty(30813)
+		puncherAlmostFull(30814)
+		puncherFull(30815)
+		puncherNearLimit(30816)
+		puncherAtLimit(30817)
+		puncherOpened(30818)
+		puncherClosed(30819)
+		puncherTurnedOn(30820)
+		puncherTurnedOff(30821)
+		puncherOffline(30822)
+		puncherPowerSaver(30823)
+		puncherWarmingUp(30824)
+		puncherAdded(30825)
+		puncherRemoved(30826)
+		puncherResourceAdded(30827)
+		puncherResourceRemoved(30828)
+		puncherRecoverableFailure(30829)
+		puncherUnrecoverableFailure(30830)
+		puncherRecoverableStorageError(30831)
+		puncherUnrecoverableStorageError(30832)
+		puncherMotorFailure(30833)
+		puncherMemoryExhausted(30834)
+		puncherUnderTemperature(30835)
+		puncherOverTemperature(30836)
+		puncherTimingFailure(30837)
+		puncherThermistorFailure(30838)
+		perforaterCoverOpen(30903)
+		perforaterCoverClosed(30904)
+		perforaterInterlockOpen(30905)
+		perforaterInterlockClosed(30906)
+		perforaterConfigurationChange(30907)
+		perforaterJam(30908)
+		perforaterMissing(30909)
+		perforaterLifeAlmostOver(30910)
+		perforaterLifeOver(30911)
+		perforaterAlmostEmpty(30912)
+		perforaterEmpty(30913)
+		perforaterAlmostFull(30914)
+		perforaterFull(30915)
+		perforaterNearLimit(30916)
+		perforaterAtLimit(30917)
+		perforaterOpened(30918)
+		perforaterClosed(30919)
+		perforaterTurnedOn(30920)
+		perforaterTurnedOff(30921)
+		perforaterOffline(30922)
+		perforaterPowerSaver(30923)
+		perforaterWarmingUp(30924)
+		perforaterAdded(30925)
+		perforaterRemoved(30926)
+		perforaterResourceAdded(30927)
+		perforaterResourceRemoved(30928)
+		perforaterRecoverableFailure(30929)
+		perforaterUnrecoverableFailure(30930)
+		perforaterRecoverableStorageError(30931)
+		perforaterUnrecoverableStorageError(30932)
+		perforaterMotorFailure(30933)
+		perforaterMemoryExhausted(30934)
+		perforaterUnderTemperature(30935)
+		perforaterOverTemperature(30936)
+		perforaterTimingFailure(30937)
+		perforaterThermistorFailure(30938)
+		slitterCoverOpen(31003)
+		slitterCoverClosed(31004)
+		slitterInterlockOpen(31005)
+		slitterInterlockClosed(31006)
+		slitterConfigurationChange(31007)
+		slitterJam(31008)
+		slitterMissing(31009)
+		slitterLifeAlmostOver(31010)
+		slitterLifeOver(31011)
+		slitterAlmostEmpty(31012)
+		slitterEmpty(31013)
+		slitterAlmostFull(31014)
+		slitterFull(31015)
+		slitterNearLimit(31016)
+		slitterAtLimit(31017)
+		slitterOpened(31018)
+		slitterClosed(31019)
+		slitterTurnedOn(31020)
+		slitterTurnedOff(31021)
+		slitterOffline(31022)
+		slitterPowerSaver(31023)
+		slitterWarmingUp(31024)
+		slitterAdded(31025)
+		slitterRemoved(31026)
+		slitterResourceAdded(31027)
+		slitterResourceRemoved(31028)
+		slitterRecoverableFailure(31029)
+		slitterUnrecoverableFailure(31030)
+		slitterRecoverableStorageError(31031)
+		slitterUnrecoverableStorageError(31032)
+		slitterMotorFailure(31033)
+		slitterMemoryExhausted(31034)
+		slitterUnderTemperature(31035)
+		slitterOverTemperature(31036)
+		slitterTimingFailure(31037)
+		slitterThermistorFailure(31038)
+		separationCutterCoverOpen(31103)
+		separationCutterCoverClosed(31104)
+		separationCutterInterlockOpen(31105)
+		separationCutterInterlockClosed(31106)
+		separationCutterConfigurationChange(31107)
+		separationCutterJam(31108)
+		separationCutterMissing(31109)
+		separationCutterLifeAlmostOver(31110)
+		separationCutterLifeOver(31111)
+		separationCutterAlmostEmpty(31112)
+		separationCutterEmpty(31113)
+		separationCutterAlmostFull(31114)
+		separationCutterFull(31115)
+		separationCutterNearLimit(31116)
+		separationCutterAtLimit(31117)
+		separationCutterOpened(31118)
+		separationCutterClosed(31119)
+		separationCutterTurnedOn(31120)
+		separationCutterTurnedOff(31121)
+		separationCutterOffline(31122)
+		separationCutterPowerSaver(31123)
+		separationCutterWarmingUp(31124)
+		separationCutterAdded(31125)
+		separationCutterRemoved(31126)
+		separationCutterResourceAdded(31127)
+		separationCutterResourceRemoved(31128)
+		separationCutterRecoverableFailure(31129)
+		separationCutterUnrecoverableFailure(31130)
+		separationCutterRecoverableStorageError(31131)
+		separationCutterUnrecoverableStorageError(31132)
+		separationCutterMotorFailure(31133)
+		separationCutterMemoryExhausted(31134)
+		separationCutterUnderTemperature(31135)
+		separationCutterOverTemperature(31136)
+		separationCutterTimingFailure(31137)
+		separationCutterThermistorFailure(31138)
+		imprinterCoverOpen(31203)
+		imprinterCoverClosed(31204)
+		imprinterInterlockOpen(31205)
+		imprinterInterlockClosed(31206)
+		imprinterConfigurationChange(31207)
+		imprinterJam(31208)
+		imprinterMissing(31209)
+		imprinterLifeAlmostOver(31210)
+		imprinterLifeOver(31211)
+		imprinterAlmostEmpty(31212)
+		imprinterEmpty(31213)
+		imprinterAlmostFull(31214)
+		imprinterFull(31215)
+		imprinterNearLimit(31216)
+		imprinterAtLimit(31217)
+		imprinterOpened(31218)
+		imprinterClosed(31219)
+		imprinterTurnedOn(31220)
+		imprinterTurnedOff(31221)
+		imprinterOffline(31222)
+		imprinterPowerSaver(31223)
+		imprinterWarmingUp(31224)
+		imprinterAdded(31225)
+		imprinterRemoved(31226)
+		imprinterResourceAdded(31227)
+		imprinterResourceRemoved(31228)
+		imprinterRecoverableFailure(31229)
+		imprinterUnrecoverableFailure(31230)
+		imprinterRecoverableStorageError(31231)
+		imprinterUnrecoverableStorageError(31232)
+		imprinterMotorFailure(31233)
+		imprinterMemoryExhausted(31234)
+		imprinterUnderTemperature(31235)
+		imprinterOverTemperature(31236)
+		imprinterTimingFailure(31237)
+		imprinterThermistorFailure(31238)
+		wrapperCoverOpen(31303)
+		wrapperCoverClosed(31304)
+		wrapperInterlockOpen(31305)
+		wrapperInterlockClosed(31306)
+		wrapperConfigurationChange(31307)
+		wrapperJam(31308)
+		wrapperMissing(31309)
+		wrapperLifeAlmostOver(31310)
+		wrapperLifeOver(31311)
+		wrapperAlmostEmpty(31312)
+		wrapperEmpty(31313)
+		wrapperAlmostFull(31314)
+		wrapperFull(31315)
+		wrapperNearLimit(31316)
+		wrapperAtLimit(31317)
+		wrapperOpened(31318)
+		wrapperClosed(31319)
+		wrapperTurnedOn(31320)
+		wrapperTurnedOff(31321)
+		wrapperOffline(31322)
+		wrapperPowerSaver(31323)
+		wrapperWarmingUp(31324)
+		wrapperAdded(31325)
+		wrapperRemoved(31326)
+		wrapperResourceAdded(31327)
+		wrapperResourceRemoved(31328)
+		wrapperRecoverableFailure(31329)
+		wrapperUnrecoverableFailure(31330)
+		wrapperRecoverableStorageError(31331)
+		wrapperUnrecoverableStorageError(31332)
+		wrapperMotorFailure(31333)
+		wrapperMemoryExhausted(31334)
+		wrapperUnderTemperature(31335)
+		wrapperOverTemperature(31336)
+		wrapperTimingFailure(31337)
+		wrapperThermistorFailure(31338)
+		banderCoverOpen(31403)
+		banderCoverClosed(31404)
+		banderInterlockOpen(31405)
+		banderInterlockClosed(31406)
+		banderConfigurationChange(31407)
+		banderJam(31408)
+		banderMissing(31409)
+		banderLifeAlmostOver(31410)
+		banderLifeOver(31411)
+		banderAlmostEmpty(31412)
+		banderEmpty(31413)
+		banderAlmostFull(31414)
+		banderFull(31415)
+		banderNearLimit(31416)
+		banderAtLimit(31417)
+		banderOpened(31418)
+		banderClosed(31419)
+		banderTurnedOn(31420)
+		banderTurnedOff(31421)
+		banderOffline(31422)
+		banderPowerSaver(31423)
+		banderWarmingUp(31424)
+		banderAdded(31425)
+		banderRemoved(31426)
+		banderResourceAdded(31427)
+		banderResourceRemoved(31428)
+		banderRecoverableFailure(31429)
+		banderUnrecoverableFailure(31430)
+		banderRecoverableStorageError(31431)
+		banderUnrecoverableStorageError(31432)
+		banderMotorFailure(31433)
+		banderMemoryExhausted(31434)
+		banderUnderTemperature(31435)
+		banderOverTemperature(31436)
+		banderTimingFailure(31437)
+		banderThermistorFailure(31438)
+		makeEnvelopeCoverOpen(31503)
+		makeEnvelopeCoverClosed(31504)
+		makeEnvelopeInterlockOpen(31505)
+		makeEnvelopeInterlockClosed(31506)
+		makeEnvelopeConfigurationChange(31507)
+		makeEnvelopeJam(31508)
+		makeEnvelopeMissing(31509)
+		makeEnvelopeLifeAlmostOver(31510)
+		makeEnvelopeLifeOver(31511)
+		makeEnvelopeAlmostEmpty(31512)
+		makeEnvelopeEmpty(31513)
+		makeEnvelopeAlmostFull(31514)
+		makeEnvelopeFull(31515)
+		makeEnvelopeNearLimit(31516)
+		makeEnvelopeAtLimit(31517)
+		makeEnvelopeOpened(31518)
+		makeEnvelopeClosed(31519)
+		makeEnvelopeTurnedOn(31520)
+		makeEnvelopeTurnedOff(31521)
+		makeEnvelopeOffline(31522)
+		makeEnvelopePowerSaver(31523)
+		makeEnvelopeWarmingUp(31524)
+		makeEnvelopeAdded(31525)
+		makeEnvelopeRemoved(31526)
+		makeEnvelopeResourceAdded(31527)
+		makeEnvelopeResourceRemoved(31528)
+		makeEnvelopeRecoverableFailure(31529)
+		makeEnvelopeUnrecoverableFailure(31530)
+		makeEnvelopeRecoverableStorageError(31531)
+		makeEnvelopeUnrecoverableStorageError(31532)
+		makeEnvelopeMotorFailure(31533)
+		makeEnvelopeMemoryExhausted(31534)
+		makeEnvelopeUnderTemperature(31535)
+		makeEnvelopeOverTemperature(31536)
+		makeEnvelopeTimingFailure(31537)
+		makeEnvelopeThermistorFailure(31538)
+		stackerCoverOpen(31603)
+		stackerCoverClosed(31604)
+		stackerInterlockOpen(31605)
+		stackerInterlockClosed(31606)
+		stackerConfigurationChange(31607)
+		stackerJam(31608)
+		stackerMissing(31609)
+		stackerLifeAlmostOver(31610)
+		stackerLifeOver(31611)
+		stackerAlmostEmpty(31612)
+		stackerEmpty(31613)
+		stackerAlmostFull(31614)
+		stackerFull(31615)
+		stackerNearLimit(31616)
+		stackerAtLimit(31617)
+		stackerOpened(31618)
+		stackerClosed(31619)
+		stackerTurnedOn(31620)
+		stackerTurnedOff(31621)
+		stackerOffline(31622)
+		stackerPowerSaver(31623)
+		stackerWarmingUp(31624)
+		stackerAdded(31625)
+		stackerRemoved(31626)
+		stackerResourceAdded(31627)
+		stackerResourceRemoved(31628)
+		stackerRecoverableFailure(31629)
+		stackerUnrecoverableFailure(31630)
+		stackerRecoverableStorageError(31631)
+		stackerUnrecoverableStorageError(31632)
+		stackerMotorFailure(31633)
+		stackerMemoryExhausted(31634)
+		stackerUnderTemperature(31635)
+		stackerOverTemperature(31636)
+		stackerTimingFailure(31637)
+		stackerThermistorFailure(31638)
+		sheetRotatorCoverOpen(31703)
+		sheetRotatorCoverClosed(31704)
+		sheetRotatorInterlockOpen(31705)
+		sheetRotatorInterlockClosed(31706)
+		sheetRotatorConfigurationChange(31707)
+		sheetRotatorJam(31708)
+		sheetRotatorMissing(31709)
+		sheetRotatorLifeAlmostOver(31710)
+		sheetRotatorLifeOver(31711)
+		sheetRotatorAlmostEmpty(31712)
+		sheetRotatorEmpty(31713)
+		sheetRotatorAlmostFull(31714)
+		sheetRotatorFull(31715)
+		sheetRotatorNearLimit(31716)
+		sheetRotatorAtLimit(31717)
+		sheetRotatorOpened(31718)
+		sheetRotatorClosed(31719)
+		sheetRotatorTurnedOn(31720)
+		sheetRotatorTurnedOff(31721)
+		sheetRotatorOffline(31722)
+		sheetRotatorPowerSaver(31723)
+		sheetRotatorWarmingUp(31724)
+		sheetRotatorAdded(31725)
+		sheetRotatorRemoved(31726)
+		sheetRotatorResourceAdded(31727)
+		sheetRotatorResourceRemoved(31728)
+		sheetRotatorRecoverableFailure(31729)
+		sheetRotatorUnrecoverableFailure(31730)
+		sheetRotatorRecoverableStorageError(31731)
+		sheetRotatorUnrecoverableStorageError(31732)
+		sheetRotatorMotorFailure(31733)
+		sheetRotatorMemoryExhausted(31734)
+		sheetRotatorUnderTemperature(31735)
+		sheetRotatorOverTemperature(31736)
+		sheetRotatorTimingFailure(31737)
+		sheetRotatorThermistorFailure(31738)
+		inserterCoverOpen(31803)
+		inserterCoverClosed(31804)
+		inserterInterlockOpen(31805)
+		inserterInterlockClosed(31806)
+		inserterConfigurationChange(31807)
+		inserterJam(31808)
+		inserterMissing(31809)
+		inserterLifeAlmostOver(31810)
+		inserterLifeOver(31811)
+		inserterAlmostEmpty(31812)
+		inserterEmpty(31813)
+		inserterAlmostFull(31814)
+		inserterFull(31815)
+		inserterNearLimit(31816)
+		inserterAtLimit(31817)
+		inserterOpened(31818)
+		inserterClosed(31819)
+		inserterTurnedOn(31820)
+		inserterTurnedOff(31821)
+		inserterOffline(31822)
+		inserterPowerSaver(31823)
+		inserterWarmingUp(31824)
+		inserterAdded(31825)
+		inserterRemoved(31826)
+		inserterResourceAdded(31827)
+		inserterResourceRemoved(31828)
+		inserterRecoverableFailure(31829)
+		inserterUnrecoverableFailure(31830)
+		inserterRecoverableStorageError(31831)
+		inserterUnrecoverableStorageError(31832)
+		inserterMotorFailure(31833)
+		inserterMemoryExhausted(31834)
+		inserterUnderTemperature(31835)
+		inserterOverTemperature(31836)
+		inserterTimingFailure(31837)
+		inserterThermistorFailure(31838)
+	&lt;/p>&lt;/td>&lt;/tr>&lt;/table>
+	</descr>
+      <logmsg dest="logndisplay">&lt;p>
+	printerV2Alert trap received
+	prtAlertIndex=%parm[#1]%
+	prtAlertSeverityLevel=%parm[#2]%
+	prtAlertGroup=%parm[#3]%
+	prtAlertGroupIndex=%parm[#4]%
+	prtAlertLocation=%parm[#5]%
+	prtAlertCode=%parm[#6]%&lt;/p>
+	</logmsg>
+      <severity><%= @severity %></severity>
+      <varbindsdecode>
+         <parmid>parm[#2]</parmid>
+         <decode varbindvalue="1" varbinddecodedstring="other"/>
+         <decode varbindvalue="3" varbinddecodedstring="critical"/>
+         <decode varbindvalue="4" varbinddecodedstring="warning"/>
+         <decode varbindvalue="5" varbinddecodedstring="warningBinaryChangeEvent"/>
+      </varbindsdecode>
+      <varbindsdecode>
+         <parmid>parm[#3]</parmid>
+         <decode varbindvalue="1" varbinddecodedstring="other"/>
+         <decode varbindvalue="2" varbinddecodedstring="unknown"/>
+         <decode varbindvalue="3" varbinddecodedstring="hostResourcesMIBStorageTable"/>
+         <decode varbindvalue="4" varbinddecodedstring="hostResourcesMIBDeviceTable"/>
+         <decode varbindvalue="5" varbinddecodedstring="generalPrinter"/>
+         <decode varbindvalue="6" varbinddecodedstring="cover"/>
+         <decode varbindvalue="7" varbinddecodedstring="localization"/>
+         <decode varbindvalue="8" varbinddecodedstring="input"/>
+         <decode varbindvalue="9" varbinddecodedstring="output"/>
+         <decode varbindvalue="10" varbinddecodedstring="marker"/>
+         <decode varbindvalue="11" varbinddecodedstring="markerSupplies"/>
+         <decode varbindvalue="12" varbinddecodedstring="markerColorant"/>
+         <decode varbindvalue="13" varbinddecodedstring="mediaPath"/>
+         <decode varbindvalue="14" varbinddecodedstring="channel"/>
+         <decode varbindvalue="15" varbinddecodedstring="interpreter"/>
+         <decode varbindvalue="16" varbinddecodedstring="consoleDisplayBuffer"/>
+         <decode varbindvalue="17" varbinddecodedstring="consoleLights"/>
+         <decode varbindvalue="18" varbinddecodedstring="alert"/>
+         <decode varbindvalue="30" varbinddecodedstring="finDevice"/>
+         <decode varbindvalue="31" varbinddecodedstring="finSupply"/>
+         <decode varbindvalue="32" varbinddecodedstring="finSupplyMediaInput"/>
+         <decode varbindvalue="33" varbinddecodedstring="finAttribute"/>
+         <decode varbindvalue="50" varbinddecodedstring="scanDevice"/>
+         <decode varbindvalue="51" varbinddecodedstring="scanner"/>
+         <decode varbindvalue="52" varbinddecodedstring="scanMediaPath"/>
+         <decode varbindvalue="60" varbinddecodedstring="faxDevice"/>
+         <decode varbindvalue="61" varbinddecodedstring="faxModem"/>
+         <decode varbindvalue="70" varbinddecodedstring="outputChannel"/>
+      </varbindsdecode>
+      <varbindsdecode>
+         <parmid>parm[#6]</parmid>
+         <decode varbindvalue="1" varbinddecodedstring="other"/>
+         <decode varbindvalue="2" varbinddecodedstring="unknown"/>
+         <decode varbindvalue="3" varbinddecodedstring="coverOpen"/>
+         <decode varbindvalue="4" varbinddecodedstring="coverClosed"/>
+         <decode varbindvalue="5" varbinddecodedstring="interlockOpen"/>
+         <decode varbindvalue="6" varbinddecodedstring="interlockClosed"/>
+         <decode varbindvalue="7" varbinddecodedstring="configurationChange"/>
+         <decode varbindvalue="8" varbinddecodedstring="jam"/>
+         <decode varbindvalue="9" varbinddecodedstring="subunitMissing"/>
+         <decode varbindvalue="10" varbinddecodedstring="subunitLifeAlmostOver"/>
+         <decode varbindvalue="11" varbinddecodedstring="subunitLifeOver"/>
+         <decode varbindvalue="12" varbinddecodedstring="subunitAlmostEmpty"/>
+         <decode varbindvalue="13" varbinddecodedstring="subunitEmpty"/>
+         <decode varbindvalue="14" varbinddecodedstring="subunitAlmostFull"/>
+         <decode varbindvalue="15" varbinddecodedstring="subunitFull"/>
+         <decode varbindvalue="16" varbinddecodedstring="subunitNearLimit"/>
+         <decode varbindvalue="17" varbinddecodedstring="subunitAtLimit"/>
+         <decode varbindvalue="18" varbinddecodedstring="subunitOpened"/>
+         <decode varbindvalue="19" varbinddecodedstring="subunitClosed"/>
+         <decode varbindvalue="20" varbinddecodedstring="subunitTurnedOn"/>
+         <decode varbindvalue="21" varbinddecodedstring="subunitTurnedOff"/>
+         <decode varbindvalue="22" varbinddecodedstring="subunitOffline"/>
+         <decode varbindvalue="23" varbinddecodedstring="subunitPowerSaver"/>
+         <decode varbindvalue="24" varbinddecodedstring="subunitWarmingUp"/>
+         <decode varbindvalue="25" varbinddecodedstring="subunitAdded"/>
+         <decode varbindvalue="26" varbinddecodedstring="subunitRemoved"/>
+         <decode varbindvalue="27" varbinddecodedstring="subunitResourceAdded"/>
+         <decode varbindvalue="28" varbinddecodedstring="subunitResourceRemoved"/>
+         <decode varbindvalue="29" varbinddecodedstring="subunitRecoverableFailure"/>
+         <decode varbindvalue="30" varbinddecodedstring="subunitUnrecoverableFailure"/>
+         <decode varbindvalue="31" varbinddecodedstring="subunitRecoverableStorageError"/>
+         <decode varbindvalue="32" varbinddecodedstring="subunitUnrecoverableStorageError"/>
+         <decode varbindvalue="33" varbinddecodedstring="subunitMotorFailure"/>
+         <decode varbindvalue="34" varbinddecodedstring="subunitMemoryExhausted"/>
+         <decode varbindvalue="35" varbinddecodedstring="subunitUnderTemperature"/>
+         <decode varbindvalue="36" varbinddecodedstring="subunitOverTemperature"/>
+         <decode varbindvalue="37" varbinddecodedstring="subunitTimingFailure"/>
+         <decode varbindvalue="38" varbinddecodedstring="subunitThermistorFailure"/>
+         <decode varbindvalue="501" varbinddecodedstring="doorOpen"/>
+         <decode varbindvalue="502" varbinddecodedstring="doorClosed"/>
+         <decode varbindvalue="503" varbinddecodedstring="powerUp"/>
+         <decode varbindvalue="504" varbinddecodedstring="powerDown"/>
+         <decode varbindvalue="505" varbinddecodedstring="printerNMSReset"/>
+         <decode varbindvalue="506" varbinddecodedstring="printerManualReset"/>
+         <decode varbindvalue="507" varbinddecodedstring="printerReadyToPrint"/>
+         <decode varbindvalue="801" varbinddecodedstring="inputMediaTrayMissing"/>
+         <decode varbindvalue="802" varbinddecodedstring="inputMediaSizeChange"/>
+         <decode varbindvalue="803" varbinddecodedstring="inputMediaWeightChange"/>
+         <decode varbindvalue="804" varbinddecodedstring="inputMediaTypeChange"/>
+         <decode varbindvalue="805" varbinddecodedstring="inputMediaColorChange"/>
+         <decode varbindvalue="806" varbinddecodedstring="inputMediaFormPartsChange"/>
+         <decode varbindvalue="807" varbinddecodedstring="inputMediaSupplyLow"/>
+         <decode varbindvalue="808" varbinddecodedstring="inputMediaSupplyEmpty"/>
+         <decode varbindvalue="809" varbinddecodedstring="inputMediaChangeRequest"/>
+         <decode varbindvalue="810" varbinddecodedstring="inputManualInputRequest"/>
+         <decode varbindvalue="811" varbinddecodedstring="inputTrayPositionFailure"/>
+         <decode varbindvalue="812" varbinddecodedstring="inputTrayElevationFailure"/>
+         <decode varbindvalue="813" varbinddecodedstring="inputCannotFeedSizeSelected"/>
+         <decode varbindvalue="814" varbinddecodedstring="inputMediaTrayFeedError"/>
+         <decode varbindvalue="815" varbinddecodedstring="inputMediaTrayJam"/>
+         <decode varbindvalue="816" varbinddecodedstring="inputMediaTrayFailure"/>
+         <decode varbindvalue="817" varbinddecodedstring="inputMediaTrayPickRollerLifeWarn"/>
+         <decode varbindvalue="818" varbinddecodedstring="inputMediaTrayPickRollerLifeOver"/>
+         <decode varbindvalue="819" varbinddecodedstring="inputMediaTrayPickRollerFailure"/>
+         <decode varbindvalue="820" varbinddecodedstring="inputMediaTrayPickRollerMissing"/>
+         <decode varbindvalue="901" varbinddecodedstring="outputMediaTrayMissing"/>
+         <decode varbindvalue="902" varbinddecodedstring="outputMediaTrayAlmostFull"/>
+         <decode varbindvalue="903" varbinddecodedstring="outputMediaTrayFull"/>
+         <decode varbindvalue="904" varbinddecodedstring="outputMailboxSelectFailure"/>
+         <decode varbindvalue="905" varbinddecodedstring="outputMediaTrayFeedError"/>
+         <decode varbindvalue="906" varbinddecodedstring="outputMediaTrayJam"/>
+         <decode varbindvalue="907" varbinddecodedstring="outputMediaTrayFailure"/>
+         <decode varbindvalue="1001" varbinddecodedstring="markerFuserUnderTemperature"/>
+         <decode varbindvalue="1002" varbinddecodedstring="markerFuserOverTemperature"/>
+         <decode varbindvalue="1003" varbinddecodedstring="markerFuserTimingFailure"/>
+         <decode varbindvalue="1004" varbinddecodedstring="markerFuserThermistorFailure"/>
+         <decode varbindvalue="1005" varbinddecodedstring="markerAdjustingPrintQuality"/>
+         <decode varbindvalue="1006" varbinddecodedstring="markerAdded"/>
+         <decode varbindvalue="1007" varbinddecodedstring="markerAtLimit"/>
+         <decode varbindvalue="1008" varbinddecodedstring="markerCarrierFailure"/>
+         <decode varbindvalue="1009" varbinddecodedstring="markerClosed"/>
+         <decode varbindvalue="1010" varbinddecodedstring="markerLifeAlmostOver"/>
+         <decode varbindvalue="1011" varbinddecodedstring="markerLifeOver"/>
+         <decode varbindvalue="1012" varbinddecodedstring="markerMemoryExhausted"/>
+         <decode varbindvalue="1013" varbinddecodedstring="markerMissing"/>
+         <decode varbindvalue="1014" varbinddecodedstring="markerMotorFailure"/>
+         <decode varbindvalue="1015" varbinddecodedstring="markerNearLimit"/>
+         <decode varbindvalue="1016" varbinddecodedstring="markerOffline"/>
+         <decode varbindvalue="1017" varbinddecodedstring="markerOpened"/>
+         <decode varbindvalue="1018" varbinddecodedstring="markerOverTemperature"/>
+         <decode varbindvalue="1019" varbinddecodedstring="markerPowerSaver"/>
+         <decode varbindvalue="1020" varbinddecodedstring="markerRecoverableFailure"/>
+         <decode varbindvalue="1021" varbinddecodedstring="markerRemoved"/>
+         <decode varbindvalue="1022" varbinddecodedstring="markerResourceAdded"/>
+         <decode varbindvalue="1023" varbinddecodedstring="markerResourceRemoved"/>
+         <decode varbindvalue="1024" varbinddecodedstring="markerThermistorFailure"/>
+         <decode varbindvalue="1025" varbinddecodedstring="markerTimingFailure"/>
+         <decode varbindvalue="1026" varbinddecodedstring="markerTurnedOff"/>
+         <decode varbindvalue="1027" varbinddecodedstring="markerTurnedOn"/>
+         <decode varbindvalue="1028" varbinddecodedstring="markerUnderTemperature"/>
+         <decode varbindvalue="1029" varbinddecodedstring="markerUnrecoverableFailure"/>
+         <decode varbindvalue="1030" varbinddecodedstring="markerWarmingUp"/>
+         <decode varbindvalue="1101" varbinddecodedstring="markerTonerEmpty"/>
+         <decode varbindvalue="1102" varbinddecodedstring="markerInkEmpty"/>
+         <decode varbindvalue="1103" varbinddecodedstring="markerPrintRibbonEmpty"/>
+         <decode varbindvalue="1104" varbinddecodedstring="markerTonerAlmostEmpty"/>
+         <decode varbindvalue="1105" varbinddecodedstring="markerInkAlmostEmpty"/>
+         <decode varbindvalue="1106" varbinddecodedstring="markerPrintRibbonAlmostEmpty"/>
+         <decode varbindvalue="1107" varbinddecodedstring="markerWasteTonerReceptacleAlmostFull"/>
+         <decode varbindvalue="1108" varbinddecodedstring="markerWasteInkReceptacleAlmostFull"/>
+         <decode varbindvalue="1109" varbinddecodedstring="markerWasteTonerReceptacleFull"/>
+         <decode varbindvalue="1110" varbinddecodedstring="markerWasteInkReceptacleFull"/>
+         <decode varbindvalue="1111" varbinddecodedstring="markerOpcLifeAlmostOver"/>
+         <decode varbindvalue="1112" varbinddecodedstring="markerOpcLifeOver"/>
+         <decode varbindvalue="1113" varbinddecodedstring="markerDeveloperAlmostEmpty"/>
+         <decode varbindvalue="1114" varbinddecodedstring="markerDeveloperEmpty"/>
+         <decode varbindvalue="1115" varbinddecodedstring="markerTonerCartridgeMissing"/>
+         <decode varbindvalue="1116" varbinddecodedstring="markerCleanerMissing"/>
+         <decode varbindvalue="1117" varbinddecodedstring="markerDeveloperMissing"/>
+         <decode varbindvalue="1118" varbinddecodedstring="markerFuserMissing"/>
+         <decode varbindvalue="1119" varbinddecodedstring="markerInkMissing"/>
+         <decode varbindvalue="1120" varbinddecodedstring="markerOpcMissing"/>
+         <decode varbindvalue="1121" varbinddecodedstring="markerPrintRibbonMissing"/>
+         <decode varbindvalue="1122" varbinddecodedstring="markerSupplyAlmostEmpty"/>
+         <decode varbindvalue="1123" varbinddecodedstring="markerSupplyEmpty"/>
+         <decode varbindvalue="1124" varbinddecodedstring="markerSupplyMissing"/>
+         <decode varbindvalue="1125" varbinddecodedstring="markerWasteAlmostFull"/>
+         <decode varbindvalue="1126" varbinddecodedstring="markerWasteFull"/>
+         <decode varbindvalue="1127" varbinddecodedstring="markerWasteMissing"/>
+         <decode varbindvalue="1128" varbinddecodedstring="markerWasteInkReceptacleMissing"/>
+         <decode varbindvalue="1129" varbinddecodedstring="markerWasteTonerReceptacleMissing"/>
+         <decode varbindvalue="1130" varbinddecodedstring="markerTonerMissing"/>
+         <decode varbindvalue="1131" varbinddecodedstring="markerSupplyFailure"/>
+         <decode varbindvalue="1301" varbinddecodedstring="mediaPathMediaTrayMissing"/>
+         <decode varbindvalue="1302" varbinddecodedstring="mediaPathMediaTrayAlmostFull"/>
+         <decode varbindvalue="1303" varbinddecodedstring="mediaPathMediaTrayFull"/>
+         <decode varbindvalue="1304" varbinddecodedstring="mediaPathCannotDuplexMediaSelected"/>
+         <decode varbindvalue="1305" varbinddecodedstring="mediaPathFailure"/>
+         <decode varbindvalue="1306" varbinddecodedstring="mediaPathJam"/>
+         <decode varbindvalue="1310" varbinddecodedstring="mediaPathInputRequest"/>
+         <decode varbindvalue="1311" varbinddecodedstring="mediaPathInputFeedError"/>
+         <decode varbindvalue="1312" varbinddecodedstring="mediaPathInputJam"/>
+         <decode varbindvalue="1321" varbinddecodedstring="mediaPathOutputFeedError"/>
+         <decode varbindvalue="1322" varbinddecodedstring="mediaPathOutputJam"/>
+         <decode varbindvalue="1323" varbinddecodedstring="mediaPathOutputFull"/>
+         <decode varbindvalue="1331" varbinddecodedstring="mediaPathPickRollerLifeWarn"/>
+         <decode varbindvalue="1332" varbinddecodedstring="mediaPathPickRollerLifeOver"/>
+         <decode varbindvalue="1333" varbinddecodedstring="mediaPathPickRollerFailure"/>
+         <decode varbindvalue="1334" varbinddecodedstring="mediaPathPickRollerMissing"/>
+         <decode varbindvalue="1501" varbinddecodedstring="interpreterMemoryIncrease"/>
+         <decode varbindvalue="1502" varbinddecodedstring="interpreterMemoryDecrease"/>
+         <decode varbindvalue="1503" varbinddecodedstring="interpreterCartridgeAdded"/>
+         <decode varbindvalue="1504" varbinddecodedstring="interpreterCartridgeDeleted"/>
+         <decode varbindvalue="1505" varbinddecodedstring="interpreterResourceAdded"/>
+         <decode varbindvalue="1506" varbinddecodedstring="interpreterResourceDeleted"/>
+         <decode varbindvalue="1507" varbinddecodedstring="interpreterResourceUnavailable"/>
+         <decode varbindvalue="1509" varbinddecodedstring="interpreterComplexPageEncountered"/>
+         <decode varbindvalue="1801" varbinddecodedstring="alertRemovalOfBinaryChangeEntry"/>
+         <decode varbindvalue="5101" varbinddecodedstring="scannerLightLifeAlmostOver"/>
+         <decode varbindvalue="5102" varbinddecodedstring="scannerLightLifeOver"/>
+         <decode varbindvalue="5103" varbinddecodedstring="scannerLightFailure"/>
+         <decode varbindvalue="5104" varbinddecodedstring="scannerLightMissing"/>
+         <decode varbindvalue="5111" varbinddecodedstring="scannerSensorLifeAlmostOver"/>
+         <decode varbindvalue="5112" varbinddecodedstring="scannerSensorLifeOver"/>
+         <decode varbindvalue="5113" varbinddecodedstring="scannerSensorFailure"/>
+         <decode varbindvalue="5114" varbinddecodedstring="scannerSensorMissing"/>
+         <decode varbindvalue="5201" varbinddecodedstring="scanMediaPathTrayMissing"/>
+         <decode varbindvalue="5202" varbinddecodedstring="scanMediaPathTrayAlmostFull"/>
+         <decode varbindvalue="5203" varbinddecodedstring="scanMediaPathTrayFull"/>
+         <decode varbindvalue="5205" varbinddecodedstring="scanMediaPathFailure"/>
+         <decode varbindvalue="5206" varbinddecodedstring="scanMediaPathJam"/>
+         <decode varbindvalue="5210" varbinddecodedstring="scanMediaPathInputRequest"/>
+         <decode varbindvalue="5211" varbinddecodedstring="scanMediaPathInputFeedError"/>
+         <decode varbindvalue="5212" varbinddecodedstring="scanMediaPathInputJam"/>
+         <decode varbindvalue="5221" varbinddecodedstring="scanMediaPathOutputFeedError"/>
+         <decode varbindvalue="5222" varbinddecodedstring="scanMediaPathOutputJam"/>
+         <decode varbindvalue="5223" varbinddecodedstring="scanMediaPathOutputFull"/>
+         <decode varbindvalue="5231" varbinddecodedstring="scanMediaPathPickRollerLifeWarn"/>
+         <decode varbindvalue="5232" varbinddecodedstring="scanMediaPathPickRollerLifeOver"/>
+         <decode varbindvalue="5233" varbinddecodedstring="scanMediaPathPickRollerFailure"/>
+         <decode varbindvalue="5234" varbinddecodedstring="scanMediaPathPickRollerMissing"/>
+         <decode varbindvalue="6101" varbinddecodedstring="faxModemMissing"/>
+         <decode varbindvalue="6102" varbinddecodedstring="faxModemLifeAlmostOver"/>
+         <decode varbindvalue="6103" varbinddecodedstring="faxModemLifeOver"/>
+         <decode varbindvalue="6104" varbinddecodedstring="faxModemTurnedOn"/>
+         <decode varbindvalue="6105" varbinddecodedstring="faxModemTurnedOff"/>
+         <decode varbindvalue="6110" varbinddecodedstring="faxModemInactivityTimeout"/>
+         <decode varbindvalue="6111" varbinddecodedstring="faxModemProtocolAlert"/>
+         <decode varbindvalue="6112" varbinddecodedstring="faxModemEquipmentFailure"/>
+         <decode varbindvalue="6113" varbinddecodedstring="faxModemNoDialTone"/>
+         <decode varbindvalue="6114" varbinddecodedstring="faxModemLineBusy"/>
+         <decode varbindvalue="6115" varbinddecodedstring="faxModemNoAnswer"/>
+         <decode varbindvalue="6116" varbinddecodedstring="faxModemVoiceDetected"/>
+         <decode varbindvalue="6117" varbinddecodedstring="faxModemCarrierLost"/>
+         <decode varbindvalue="6118" varbinddecodedstring="faxModemTrainingFailure"/>
+         <decode varbindvalue="30203" varbinddecodedstring="staplerCoverOpen"/>
+         <decode varbindvalue="30204" varbinddecodedstring="staplerCoverClosed"/>
+         <decode varbindvalue="30205" varbinddecodedstring="staplerInterlockOpen"/>
+         <decode varbindvalue="30206" varbinddecodedstring="staplerInterlockClosed"/>
+         <decode varbindvalue="30207" varbinddecodedstring="staplerConfigurationChange"/>
+         <decode varbindvalue="30208" varbinddecodedstring="staplerJam"/>
+         <decode varbindvalue="30209" varbinddecodedstring="staplerMissing"/>
+         <decode varbindvalue="30210" varbinddecodedstring="staplerLifeAlmostOver"/>
+         <decode varbindvalue="30211" varbinddecodedstring="staplerLifeOver"/>
+         <decode varbindvalue="30212" varbinddecodedstring="staplerAlmostEmpty"/>
+         <decode varbindvalue="30213" varbinddecodedstring="staplerEmpty"/>
+         <decode varbindvalue="30214" varbinddecodedstring="staplerAlmostFull"/>
+         <decode varbindvalue="30215" varbinddecodedstring="staplerFull"/>
+         <decode varbindvalue="30216" varbinddecodedstring="staplerNearLimit"/>
+         <decode varbindvalue="30217" varbinddecodedstring="staplerAtLimit"/>
+         <decode varbindvalue="30218" varbinddecodedstring="staplerOpened"/>
+         <decode varbindvalue="30219" varbinddecodedstring="staplerClosed"/>
+         <decode varbindvalue="30220" varbinddecodedstring="staplerTurnedOn"/>
+         <decode varbindvalue="30221" varbinddecodedstring="staplerTurnedOff"/>
+         <decode varbindvalue="30222" varbinddecodedstring="staplerOffline"/>
+         <decode varbindvalue="30223" varbinddecodedstring="staplerPowerSaver"/>
+         <decode varbindvalue="30224" varbinddecodedstring="staplerWarmingUp"/>
+         <decode varbindvalue="30225" varbinddecodedstring="staplerAdded"/>
+         <decode varbindvalue="30226" varbinddecodedstring="staplerRemoved"/>
+         <decode varbindvalue="30227" varbinddecodedstring="staplerResourceAdded"/>
+         <decode varbindvalue="30228" varbinddecodedstring="staplerResourceRemoved"/>
+         <decode varbindvalue="30229" varbinddecodedstring="staplerRecoverableFailure"/>
+         <decode varbindvalue="30230" varbinddecodedstring="staplerUnrecoverableFailure"/>
+         <decode varbindvalue="30231" varbinddecodedstring="staplerRecoverableStorageError"/>
+         <decode varbindvalue="30232" varbinddecodedstring="staplerUnrecoverableStorageError"/>
+         <decode varbindvalue="30233" varbinddecodedstring="staplerMotorFailure"/>
+         <decode varbindvalue="30234" varbinddecodedstring="staplerMemoryExhausted"/>
+         <decode varbindvalue="30235" varbinddecodedstring="staplerUnderTemperature"/>
+         <decode varbindvalue="30236" varbinddecodedstring="staplerOverTemperature"/>
+         <decode varbindvalue="30237" varbinddecodedstring="staplerTimingFailure"/>
+         <decode varbindvalue="30238" varbinddecodedstring="staplerThermistorFailure"/>
+         <decode varbindvalue="30303" varbinddecodedstring="stitcherCoverOpen"/>
+         <decode varbindvalue="30304" varbinddecodedstring="stitcherCoverClosed"/>
+         <decode varbindvalue="30305" varbinddecodedstring="stitcherInterlockOpen"/>
+         <decode varbindvalue="30306" varbinddecodedstring="stitcherInterlockClosed"/>
+         <decode varbindvalue="30307" varbinddecodedstring="stitcherConfigurationChange"/>
+         <decode varbindvalue="30308" varbinddecodedstring="stitcherJam"/>
+         <decode varbindvalue="30309" varbinddecodedstring="stitcherMissing"/>
+         <decode varbindvalue="30310" varbinddecodedstring="stitcherLifeAlmostOver"/>
+         <decode varbindvalue="30311" varbinddecodedstring="stitcherLifeOver"/>
+         <decode varbindvalue="30312" varbinddecodedstring="stitcherAlmostEmpty"/>
+         <decode varbindvalue="30313" varbinddecodedstring="stitcherEmpty"/>
+         <decode varbindvalue="30314" varbinddecodedstring="stitcherAlmostFull"/>
+         <decode varbindvalue="30315" varbinddecodedstring="stitcherFull"/>
+         <decode varbindvalue="30316" varbinddecodedstring="stitcherNearLimit"/>
+         <decode varbindvalue="30317" varbinddecodedstring="stitcherAtLimit"/>
+         <decode varbindvalue="30318" varbinddecodedstring="stitcherOpened"/>
+         <decode varbindvalue="30319" varbinddecodedstring="stitcherClosed"/>
+         <decode varbindvalue="30320" varbinddecodedstring="stitcherTurnedOn"/>
+         <decode varbindvalue="30321" varbinddecodedstring="stitcherTurnedOff"/>
+         <decode varbindvalue="30322" varbinddecodedstring="stitcherOffline"/>
+         <decode varbindvalue="30323" varbinddecodedstring="stitcherPowerSaver"/>
+         <decode varbindvalue="30324" varbinddecodedstring="stitcherWarmingUp"/>
+         <decode varbindvalue="30325" varbinddecodedstring="stitcherAdded"/>
+         <decode varbindvalue="30326" varbinddecodedstring="stitcherRemoved"/>
+         <decode varbindvalue="30327" varbinddecodedstring="stitcherResourceAdded"/>
+         <decode varbindvalue="30328" varbinddecodedstring="stitcherResourceRemoved"/>
+         <decode varbindvalue="30329" varbinddecodedstring="stitcherRecoverableFailure"/>
+         <decode varbindvalue="30330" varbinddecodedstring="stitcherUnrecoverableFailure"/>
+         <decode varbindvalue="30331" varbinddecodedstring="stitcherRecoverableStorageError"/>
+         <decode varbindvalue="30332" varbinddecodedstring="stitcherUnrecoverableStorageError"/>
+         <decode varbindvalue="30333" varbinddecodedstring="stitcherMotorFailure"/>
+         <decode varbindvalue="30334" varbinddecodedstring="stitcherMemoryExhausted"/>
+         <decode varbindvalue="30335" varbinddecodedstring="stitcherUnderTemperature"/>
+         <decode varbindvalue="30336" varbinddecodedstring="stitcherOverTemperature"/>
+         <decode varbindvalue="30337" varbinddecodedstring="stitcherTimingFailure"/>
+         <decode varbindvalue="30338" varbinddecodedstring="stitcherThermistorFailure"/>
+         <decode varbindvalue="30403" varbinddecodedstring="folderCoverOpen"/>
+         <decode varbindvalue="30404" varbinddecodedstring="folderCoverClosed"/>
+         <decode varbindvalue="30405" varbinddecodedstring="folderInterlockOpen"/>
+         <decode varbindvalue="30406" varbinddecodedstring="folderInterlockClosed"/>
+         <decode varbindvalue="30407" varbinddecodedstring="folderConfigurationChange"/>
+         <decode varbindvalue="30408" varbinddecodedstring="folderJam"/>
+         <decode varbindvalue="30409" varbinddecodedstring="folderMissing"/>
+         <decode varbindvalue="30410" varbinddecodedstring="folderLifeAlmostOver"/>
+         <decode varbindvalue="30411" varbinddecodedstring="folderLifeOver"/>
+         <decode varbindvalue="30412" varbinddecodedstring="folderAlmostEmpty"/>
+         <decode varbindvalue="30413" varbinddecodedstring="folderEmpty"/>
+         <decode varbindvalue="30414" varbinddecodedstring="folderAlmostFull"/>
+         <decode varbindvalue="30415" varbinddecodedstring="folderFull"/>
+         <decode varbindvalue="30416" varbinddecodedstring="folderNearLimit"/>
+         <decode varbindvalue="30417" varbinddecodedstring="folderAtLimit"/>
+         <decode varbindvalue="30418" varbinddecodedstring="folderOpened"/>
+         <decode varbindvalue="30419" varbinddecodedstring="folderClosed"/>
+         <decode varbindvalue="30420" varbinddecodedstring="folderTurnedOn"/>
+         <decode varbindvalue="30421" varbinddecodedstring="folderTurnedOff"/>
+         <decode varbindvalue="30422" varbinddecodedstring="folderOffline"/>
+         <decode varbindvalue="30423" varbinddecodedstring="folderPowerSaver"/>
+         <decode varbindvalue="30424" varbinddecodedstring="folderWarmingUp"/>
+         <decode varbindvalue="30425" varbinddecodedstring="folderAdded"/>
+         <decode varbindvalue="30426" varbinddecodedstring="folderRemoved"/>
+         <decode varbindvalue="30427" varbinddecodedstring="folderResourceAdded"/>
+         <decode varbindvalue="30428" varbinddecodedstring="folderResourceRemoved"/>
+         <decode varbindvalue="30429" varbinddecodedstring="folderRecoverableFailure"/>
+         <decode varbindvalue="30430" varbinddecodedstring="folderUnrecoverableFailure"/>
+         <decode varbindvalue="30431" varbinddecodedstring="folderRecoverableStorageError"/>
+         <decode varbindvalue="30432" varbinddecodedstring="folderUnrecoverableStorageError"/>
+         <decode varbindvalue="30433" varbinddecodedstring="folderMotorFailure"/>
+         <decode varbindvalue="30434" varbinddecodedstring="folderMemoryExhausted"/>
+         <decode varbindvalue="30435" varbinddecodedstring="folderUnderTemperature"/>
+         <decode varbindvalue="30436" varbinddecodedstring="folderOverTemperature"/>
+         <decode varbindvalue="30437" varbinddecodedstring="folderTimingFailure"/>
+         <decode varbindvalue="30438" varbinddecodedstring="folderThermistorFailure"/>
+         <decode varbindvalue="30503" varbinddecodedstring="binderCoverOpen"/>
+         <decode varbindvalue="30504" varbinddecodedstring="binderCoverClosed"/>
+         <decode varbindvalue="30505" varbinddecodedstring="binderInterlockOpen"/>
+         <decode varbindvalue="30506" varbinddecodedstring="binderInterlockClosed"/>
+         <decode varbindvalue="30507" varbinddecodedstring="binderConfigurationChange"/>
+         <decode varbindvalue="30508" varbinddecodedstring="binderJam"/>
+         <decode varbindvalue="30509" varbinddecodedstring="binderMissing"/>
+         <decode varbindvalue="30510" varbinddecodedstring="binderLifeAlmostOver"/>
+         <decode varbindvalue="30511" varbinddecodedstring="binderLifeOver"/>
+         <decode varbindvalue="30512" varbinddecodedstring="binderAlmostEmpty"/>
+         <decode varbindvalue="30513" varbinddecodedstring="binderEmpty"/>
+         <decode varbindvalue="30514" varbinddecodedstring="binderAlmostFull"/>
+         <decode varbindvalue="30515" varbinddecodedstring="binderFull"/>
+         <decode varbindvalue="30516" varbinddecodedstring="binderNearLimit"/>
+         <decode varbindvalue="30517" varbinddecodedstring="binderAtLimit"/>
+         <decode varbindvalue="30518" varbinddecodedstring="binderOpened"/>
+         <decode varbindvalue="30519" varbinddecodedstring="binderClosed"/>
+         <decode varbindvalue="30520" varbinddecodedstring="binderTurnedOn"/>
+         <decode varbindvalue="30521" varbinddecodedstring="binderTurnedOff"/>
+         <decode varbindvalue="30522" varbinddecodedstring="binderOffline"/>
+         <decode varbindvalue="30523" varbinddecodedstring="binderPowerSaver"/>
+         <decode varbindvalue="30524" varbinddecodedstring="binderWarmingUp"/>
+         <decode varbindvalue="30525" varbinddecodedstring="binderAdded"/>
+         <decode varbindvalue="30526" varbinddecodedstring="binderRemoved"/>
+         <decode varbindvalue="30527" varbinddecodedstring="binderResourceAdded"/>
+         <decode varbindvalue="30528" varbinddecodedstring="binderResourceRemoved"/>
+         <decode varbindvalue="30529" varbinddecodedstring="binderRecoverableFailure"/>
+         <decode varbindvalue="30530" varbinddecodedstring="binderUnrecoverableFailure"/>
+         <decode varbindvalue="30531" varbinddecodedstring="binderRecoverableStorageError"/>
+         <decode varbindvalue="30532" varbinddecodedstring="binderUnrecoverableStorageError"/>
+         <decode varbindvalue="30533" varbinddecodedstring="binderMotorFailure"/>
+         <decode varbindvalue="30534" varbinddecodedstring="binderMemoryExhausted"/>
+         <decode varbindvalue="30535" varbinddecodedstring="binderUnderTemperature"/>
+         <decode varbindvalue="30536" varbinddecodedstring="binderOverTemperature"/>
+         <decode varbindvalue="30537" varbinddecodedstring="binderTimingFailure"/>
+         <decode varbindvalue="30538" varbinddecodedstring="binderThermistorFailure"/>
+         <decode varbindvalue="30603" varbinddecodedstring="trimmerCoverOpen"/>
+         <decode varbindvalue="30604" varbinddecodedstring="trimmerCoverClosed"/>
+         <decode varbindvalue="30605" varbinddecodedstring="trimmerInterlockOpen"/>
+         <decode varbindvalue="30606" varbinddecodedstring="trimmerInterlockClosed"/>
+         <decode varbindvalue="30607" varbinddecodedstring="trimmerConfigurationChange"/>
+         <decode varbindvalue="30608" varbinddecodedstring="trimmerJam"/>
+         <decode varbindvalue="30609" varbinddecodedstring="trimmerMissing"/>
+         <decode varbindvalue="30610" varbinddecodedstring="trimmerLifeAlmostOver"/>
+         <decode varbindvalue="30611" varbinddecodedstring="trimmerLifeOver"/>
+         <decode varbindvalue="30612" varbinddecodedstring="trimmerAlmostEmpty"/>
+         <decode varbindvalue="30613" varbinddecodedstring="trimmerEmpty"/>
+         <decode varbindvalue="30614" varbinddecodedstring="trimmerAlmostFull"/>
+         <decode varbindvalue="30615" varbinddecodedstring="trimmerFull"/>
+         <decode varbindvalue="30616" varbinddecodedstring="trimmerNearLimit"/>
+         <decode varbindvalue="30617" varbinddecodedstring="trimmerAtLimit"/>
+         <decode varbindvalue="30618" varbinddecodedstring="trimmerOpened"/>
+         <decode varbindvalue="30619" varbinddecodedstring="trimmerClosed"/>
+         <decode varbindvalue="30620" varbinddecodedstring="trimmerTurnedOn"/>
+         <decode varbindvalue="30621" varbinddecodedstring="trimmerTurnedOff"/>
+         <decode varbindvalue="30622" varbinddecodedstring="trimmerOffline"/>
+         <decode varbindvalue="30623" varbinddecodedstring="trimmerPowerSaver"/>
+         <decode varbindvalue="30624" varbinddecodedstring="trimmerWarmingUp"/>
+         <decode varbindvalue="30625" varbinddecodedstring="trimmerAdded"/>
+         <decode varbindvalue="30626" varbinddecodedstring="trimmerRemoved"/>
+         <decode varbindvalue="30627" varbinddecodedstring="trimmerResourceAdded"/>
+         <decode varbindvalue="30628" varbinddecodedstring="trimmerResourceRemoved"/>
+         <decode varbindvalue="30629" varbinddecodedstring="trimmerRecoverableFailure"/>
+         <decode varbindvalue="30630" varbinddecodedstring="trimmerUnrecoverableFailure"/>
+         <decode varbindvalue="30631" varbinddecodedstring="trimmerRecoverableStorageError"/>
+         <decode varbindvalue="30632" varbinddecodedstring="trimmerUnrecoverableStorageError"/>
+         <decode varbindvalue="30633" varbinddecodedstring="trimmerMotorFailure"/>
+         <decode varbindvalue="30634" varbinddecodedstring="trimmerMemoryExhausted"/>
+         <decode varbindvalue="30635" varbinddecodedstring="trimmerUnderTemperature"/>
+         <decode varbindvalue="30636" varbinddecodedstring="trimmerOverTemperature"/>
+         <decode varbindvalue="30637" varbinddecodedstring="trimmerTimingFailure"/>
+         <decode varbindvalue="30638" varbinddecodedstring="trimmerThermistorFailure"/>
+         <decode varbindvalue="30703" varbinddecodedstring="dieCutterCoverOpen"/>
+         <decode varbindvalue="30704" varbinddecodedstring="dieCutterCoverClosed"/>
+         <decode varbindvalue="30705" varbinddecodedstring="dieCutterInterlockOpen"/>
+         <decode varbindvalue="30706" varbinddecodedstring="dieCutterInterlockClosed"/>
+         <decode varbindvalue="30707" varbinddecodedstring="dieCutterConfigurationChange"/>
+         <decode varbindvalue="30708" varbinddecodedstring="dieCutterJam"/>
+         <decode varbindvalue="30709" varbinddecodedstring="dieCutterMissing"/>
+         <decode varbindvalue="30710" varbinddecodedstring="dieCutterLifeAlmostOver"/>
+         <decode varbindvalue="30711" varbinddecodedstring="dieCutterLifeOver"/>
+         <decode varbindvalue="30712" varbinddecodedstring="dieCutterAlmostEmpty"/>
+         <decode varbindvalue="30713" varbinddecodedstring="dieCutterEmpty"/>
+         <decode varbindvalue="30714" varbinddecodedstring="dieCutterAlmostFull"/>
+         <decode varbindvalue="30715" varbinddecodedstring="dieCutterFull"/>
+         <decode varbindvalue="30716" varbinddecodedstring="dieCutterNearLimit"/>
+         <decode varbindvalue="30717" varbinddecodedstring="dieCutterAtLimit"/>
+         <decode varbindvalue="30718" varbinddecodedstring="dieCutterOpened"/>
+         <decode varbindvalue="30719" varbinddecodedstring="dieCutterClosed"/>
+         <decode varbindvalue="30720" varbinddecodedstring="dieCutterTurnedOn"/>
+         <decode varbindvalue="30721" varbinddecodedstring="dieCutterTurnedOff"/>
+         <decode varbindvalue="30722" varbinddecodedstring="dieCutterOffline"/>
+         <decode varbindvalue="30723" varbinddecodedstring="dieCutterPowerSaver"/>
+         <decode varbindvalue="30724" varbinddecodedstring="dieCutterWarmingUp"/>
+         <decode varbindvalue="30725" varbinddecodedstring="dieCutterAdded"/>
+         <decode varbindvalue="30726" varbinddecodedstring="dieCutterRemoved"/>
+         <decode varbindvalue="30727" varbinddecodedstring="dieCutterResourceAdded"/>
+         <decode varbindvalue="30728" varbinddecodedstring="dieCutterResourceRemoved"/>
+         <decode varbindvalue="30729" varbinddecodedstring="dieCutterRecoverableFailure"/>
+         <decode varbindvalue="30730" varbinddecodedstring="dieCutterUnrecoverableFailure"/>
+         <decode varbindvalue="30731" varbinddecodedstring="dieCutterRecoverableStorageError"/>
+         <decode varbindvalue="30732" varbinddecodedstring="dieCutterUnrecoverableStorageError"/>
+         <decode varbindvalue="30733" varbinddecodedstring="dieCutterMotorFailure"/>
+         <decode varbindvalue="30734" varbinddecodedstring="dieCutterMemoryExhausted"/>
+         <decode varbindvalue="30735" varbinddecodedstring="dieCutterUnderTemperature"/>
+         <decode varbindvalue="30736" varbinddecodedstring="dieCutterOverTemperature"/>
+         <decode varbindvalue="30737" varbinddecodedstring="dieCutterTimingFailure"/>
+         <decode varbindvalue="30738" varbinddecodedstring="dieCutterThermistorFailure"/>
+         <decode varbindvalue="30803" varbinddecodedstring="puncherCoverOpen"/>
+         <decode varbindvalue="30804" varbinddecodedstring="puncherCoverClosed"/>
+         <decode varbindvalue="30805" varbinddecodedstring="puncherInterlockOpen"/>
+         <decode varbindvalue="30806" varbinddecodedstring="puncherInterlockClosed"/>
+         <decode varbindvalue="30807" varbinddecodedstring="puncherConfigurationChange"/>
+         <decode varbindvalue="30808" varbinddecodedstring="puncherJam"/>
+         <decode varbindvalue="30809" varbinddecodedstring="puncherMissing"/>
+         <decode varbindvalue="30810" varbinddecodedstring="puncherLifeAlmostOver"/>
+         <decode varbindvalue="30811" varbinddecodedstring="puncherLifeOver"/>
+         <decode varbindvalue="30812" varbinddecodedstring="puncherAlmostEmpty"/>
+         <decode varbindvalue="30813" varbinddecodedstring="puncherEmpty"/>
+         <decode varbindvalue="30814" varbinddecodedstring="puncherAlmostFull"/>
+         <decode varbindvalue="30815" varbinddecodedstring="puncherFull"/>
+         <decode varbindvalue="30816" varbinddecodedstring="puncherNearLimit"/>
+         <decode varbindvalue="30817" varbinddecodedstring="puncherAtLimit"/>
+         <decode varbindvalue="30818" varbinddecodedstring="puncherOpened"/>
+         <decode varbindvalue="30819" varbinddecodedstring="puncherClosed"/>
+         <decode varbindvalue="30820" varbinddecodedstring="puncherTurnedOn"/>
+         <decode varbindvalue="30821" varbinddecodedstring="puncherTurnedOff"/>
+         <decode varbindvalue="30822" varbinddecodedstring="puncherOffline"/>
+         <decode varbindvalue="30823" varbinddecodedstring="puncherPowerSaver"/>
+         <decode varbindvalue="30824" varbinddecodedstring="puncherWarmingUp"/>
+         <decode varbindvalue="30825" varbinddecodedstring="puncherAdded"/>
+         <decode varbindvalue="30826" varbinddecodedstring="puncherRemoved"/>
+         <decode varbindvalue="30827" varbinddecodedstring="puncherResourceAdded"/>
+         <decode varbindvalue="30828" varbinddecodedstring="puncherResourceRemoved"/>
+         <decode varbindvalue="30829" varbinddecodedstring="puncherRecoverableFailure"/>
+         <decode varbindvalue="30830" varbinddecodedstring="puncherUnrecoverableFailure"/>
+         <decode varbindvalue="30831" varbinddecodedstring="puncherRecoverableStorageError"/>
+         <decode varbindvalue="30832" varbinddecodedstring="puncherUnrecoverableStorageError"/>
+         <decode varbindvalue="30833" varbinddecodedstring="puncherMotorFailure"/>
+         <decode varbindvalue="30834" varbinddecodedstring="puncherMemoryExhausted"/>
+         <decode varbindvalue="30835" varbinddecodedstring="puncherUnderTemperature"/>
+         <decode varbindvalue="30836" varbinddecodedstring="puncherOverTemperature"/>
+         <decode varbindvalue="30837" varbinddecodedstring="puncherTimingFailure"/>
+         <decode varbindvalue="30838" varbinddecodedstring="puncherThermistorFailure"/>
+         <decode varbindvalue="30903" varbinddecodedstring="perforaterCoverOpen"/>
+         <decode varbindvalue="30904" varbinddecodedstring="perforaterCoverClosed"/>
+         <decode varbindvalue="30905" varbinddecodedstring="perforaterInterlockOpen"/>
+         <decode varbindvalue="30906" varbinddecodedstring="perforaterInterlockClosed"/>
+         <decode varbindvalue="30907" varbinddecodedstring="perforaterConfigurationChange"/>
+         <decode varbindvalue="30908" varbinddecodedstring="perforaterJam"/>
+         <decode varbindvalue="30909" varbinddecodedstring="perforaterMissing"/>
+         <decode varbindvalue="30910" varbinddecodedstring="perforaterLifeAlmostOver"/>
+         <decode varbindvalue="30911" varbinddecodedstring="perforaterLifeOver"/>
+         <decode varbindvalue="30912" varbinddecodedstring="perforaterAlmostEmpty"/>
+         <decode varbindvalue="30913" varbinddecodedstring="perforaterEmpty"/>
+         <decode varbindvalue="30914" varbinddecodedstring="perforaterAlmostFull"/>
+         <decode varbindvalue="30915" varbinddecodedstring="perforaterFull"/>
+         <decode varbindvalue="30916" varbinddecodedstring="perforaterNearLimit"/>
+         <decode varbindvalue="30917" varbinddecodedstring="perforaterAtLimit"/>
+         <decode varbindvalue="30918" varbinddecodedstring="perforaterOpened"/>
+         <decode varbindvalue="30919" varbinddecodedstring="perforaterClosed"/>
+         <decode varbindvalue="30920" varbinddecodedstring="perforaterTurnedOn"/>
+         <decode varbindvalue="30921" varbinddecodedstring="perforaterTurnedOff"/>
+         <decode varbindvalue="30922" varbinddecodedstring="perforaterOffline"/>
+         <decode varbindvalue="30923" varbinddecodedstring="perforaterPowerSaver"/>
+         <decode varbindvalue="30924" varbinddecodedstring="perforaterWarmingUp"/>
+         <decode varbindvalue="30925" varbinddecodedstring="perforaterAdded"/>
+         <decode varbindvalue="30926" varbinddecodedstring="perforaterRemoved"/>
+         <decode varbindvalue="30927" varbinddecodedstring="perforaterResourceAdded"/>
+         <decode varbindvalue="30928" varbinddecodedstring="perforaterResourceRemoved"/>
+         <decode varbindvalue="30929" varbinddecodedstring="perforaterRecoverableFailure"/>
+         <decode varbindvalue="30930" varbinddecodedstring="perforaterUnrecoverableFailure"/>
+         <decode varbindvalue="30931" varbinddecodedstring="perforaterRecoverableStorageError"/>
+         <decode varbindvalue="30932" varbinddecodedstring="perforaterUnrecoverableStorageError"/>
+         <decode varbindvalue="30933" varbinddecodedstring="perforaterMotorFailure"/>
+         <decode varbindvalue="30934" varbinddecodedstring="perforaterMemoryExhausted"/>
+         <decode varbindvalue="30935" varbinddecodedstring="perforaterUnderTemperature"/>
+         <decode varbindvalue="30936" varbinddecodedstring="perforaterOverTemperature"/>
+         <decode varbindvalue="30937" varbinddecodedstring="perforaterTimingFailure"/>
+         <decode varbindvalue="30938" varbinddecodedstring="perforaterThermistorFailure"/>
+         <decode varbindvalue="31003" varbinddecodedstring="slitterCoverOpen"/>
+         <decode varbindvalue="31004" varbinddecodedstring="slitterCoverClosed"/>
+         <decode varbindvalue="31005" varbinddecodedstring="slitterInterlockOpen"/>
+         <decode varbindvalue="31006" varbinddecodedstring="slitterInterlockClosed"/>
+         <decode varbindvalue="31007" varbinddecodedstring="slitterConfigurationChange"/>
+         <decode varbindvalue="31008" varbinddecodedstring="slitterJam"/>
+         <decode varbindvalue="31009" varbinddecodedstring="slitterMissing"/>
+         <decode varbindvalue="31010" varbinddecodedstring="slitterLifeAlmostOver"/>
+         <decode varbindvalue="31011" varbinddecodedstring="slitterLifeOver"/>
+         <decode varbindvalue="31012" varbinddecodedstring="slitterAlmostEmpty"/>
+         <decode varbindvalue="31013" varbinddecodedstring="slitterEmpty"/>
+         <decode varbindvalue="31014" varbinddecodedstring="slitterAlmostFull"/>
+         <decode varbindvalue="31015" varbinddecodedstring="slitterFull"/>
+         <decode varbindvalue="31016" varbinddecodedstring="slitterNearLimit"/>
+         <decode varbindvalue="31017" varbinddecodedstring="slitterAtLimit"/>
+         <decode varbindvalue="31018" varbinddecodedstring="slitterOpened"/>
+         <decode varbindvalue="31019" varbinddecodedstring="slitterClosed"/>
+         <decode varbindvalue="31020" varbinddecodedstring="slitterTurnedOn"/>
+         <decode varbindvalue="31021" varbinddecodedstring="slitterTurnedOff"/>
+         <decode varbindvalue="31022" varbinddecodedstring="slitterOffline"/>
+         <decode varbindvalue="31023" varbinddecodedstring="slitterPowerSaver"/>
+         <decode varbindvalue="31024" varbinddecodedstring="slitterWarmingUp"/>
+         <decode varbindvalue="31025" varbinddecodedstring="slitterAdded"/>
+         <decode varbindvalue="31026" varbinddecodedstring="slitterRemoved"/>
+         <decode varbindvalue="31027" varbinddecodedstring="slitterResourceAdded"/>
+         <decode varbindvalue="31028" varbinddecodedstring="slitterResourceRemoved"/>
+         <decode varbindvalue="31029" varbinddecodedstring="slitterRecoverableFailure"/>
+         <decode varbindvalue="31030" varbinddecodedstring="slitterUnrecoverableFailure"/>
+         <decode varbindvalue="31031" varbinddecodedstring="slitterRecoverableStorageError"/>
+         <decode varbindvalue="31032" varbinddecodedstring="slitterUnrecoverableStorageError"/>
+         <decode varbindvalue="31033" varbinddecodedstring="slitterMotorFailure"/>
+         <decode varbindvalue="31034" varbinddecodedstring="slitterMemoryExhausted"/>
+         <decode varbindvalue="31035" varbinddecodedstring="slitterUnderTemperature"/>
+         <decode varbindvalue="31036" varbinddecodedstring="slitterOverTemperature"/>
+         <decode varbindvalue="31037" varbinddecodedstring="slitterTimingFailure"/>
+         <decode varbindvalue="31038" varbinddecodedstring="slitterThermistorFailure"/>
+         <decode varbindvalue="31103" varbinddecodedstring="separationCutterCoverOpen"/>
+         <decode varbindvalue="31104" varbinddecodedstring="separationCutterCoverClosed"/>
+         <decode varbindvalue="31105" varbinddecodedstring="separationCutterInterlockOpen"/>
+         <decode varbindvalue="31106" varbinddecodedstring="separationCutterInterlockClosed"/>
+         <decode varbindvalue="31107" varbinddecodedstring="separationCutterConfigurationChange"/>
+         <decode varbindvalue="31108" varbinddecodedstring="separationCutterJam"/>
+         <decode varbindvalue="31109" varbinddecodedstring="separationCutterMissing"/>
+         <decode varbindvalue="31110" varbinddecodedstring="separationCutterLifeAlmostOver"/>
+         <decode varbindvalue="31111" varbinddecodedstring="separationCutterLifeOver"/>
+         <decode varbindvalue="31112" varbinddecodedstring="separationCutterAlmostEmpty"/>
+         <decode varbindvalue="31113" varbinddecodedstring="separationCutterEmpty"/>
+         <decode varbindvalue="31114" varbinddecodedstring="separationCutterAlmostFull"/>
+         <decode varbindvalue="31115" varbinddecodedstring="separationCutterFull"/>
+         <decode varbindvalue="31116" varbinddecodedstring="separationCutterNearLimit"/>
+         <decode varbindvalue="31117" varbinddecodedstring="separationCutterAtLimit"/>
+         <decode varbindvalue="31118" varbinddecodedstring="separationCutterOpened"/>
+         <decode varbindvalue="31119" varbinddecodedstring="separationCutterClosed"/>
+         <decode varbindvalue="31120" varbinddecodedstring="separationCutterTurnedOn"/>
+         <decode varbindvalue="31121" varbinddecodedstring="separationCutterTurnedOff"/>
+         <decode varbindvalue="31122" varbinddecodedstring="separationCutterOffline"/>
+         <decode varbindvalue="31123" varbinddecodedstring="separationCutterPowerSaver"/>
+         <decode varbindvalue="31124" varbinddecodedstring="separationCutterWarmingUp"/>
+         <decode varbindvalue="31125" varbinddecodedstring="separationCutterAdded"/>
+         <decode varbindvalue="31126" varbinddecodedstring="separationCutterRemoved"/>
+         <decode varbindvalue="31127" varbinddecodedstring="separationCutterResourceAdded"/>
+         <decode varbindvalue="31128" varbinddecodedstring="separationCutterResourceRemoved"/>
+         <decode varbindvalue="31129" varbinddecodedstring="separationCutterRecoverableFailure"/>
+         <decode varbindvalue="31130" varbinddecodedstring="separationCutterUnrecoverableFailure"/>
+         <decode varbindvalue="31131" varbinddecodedstring="separationCutterRecoverableStorageError"/>
+         <decode varbindvalue="31132" varbinddecodedstring="separationCutterUnrecoverableStorageError"/>
+         <decode varbindvalue="31133" varbinddecodedstring="separationCutterMotorFailure"/>
+         <decode varbindvalue="31134" varbinddecodedstring="separationCutterMemoryExhausted"/>
+         <decode varbindvalue="31135" varbinddecodedstring="separationCutterUnderTemperature"/>
+         <decode varbindvalue="31136" varbinddecodedstring="separationCutterOverTemperature"/>
+         <decode varbindvalue="31137" varbinddecodedstring="separationCutterTimingFailure"/>
+         <decode varbindvalue="31138" varbinddecodedstring="separationCutterThermistorFailure"/>
+         <decode varbindvalue="31203" varbinddecodedstring="imprinterCoverOpen"/>
+         <decode varbindvalue="31204" varbinddecodedstring="imprinterCoverClosed"/>
+         <decode varbindvalue="31205" varbinddecodedstring="imprinterInterlockOpen"/>
+         <decode varbindvalue="31206" varbinddecodedstring="imprinterInterlockClosed"/>
+         <decode varbindvalue="31207" varbinddecodedstring="imprinterConfigurationChange"/>
+         <decode varbindvalue="31208" varbinddecodedstring="imprinterJam"/>
+         <decode varbindvalue="31209" varbinddecodedstring="imprinterMissing"/>
+         <decode varbindvalue="31210" varbinddecodedstring="imprinterLifeAlmostOver"/>
+         <decode varbindvalue="31211" varbinddecodedstring="imprinterLifeOver"/>
+         <decode varbindvalue="31212" varbinddecodedstring="imprinterAlmostEmpty"/>
+         <decode varbindvalue="31213" varbinddecodedstring="imprinterEmpty"/>
+         <decode varbindvalue="31214" varbinddecodedstring="imprinterAlmostFull"/>
+         <decode varbindvalue="31215" varbinddecodedstring="imprinterFull"/>
+         <decode varbindvalue="31216" varbinddecodedstring="imprinterNearLimit"/>
+         <decode varbindvalue="31217" varbinddecodedstring="imprinterAtLimit"/>
+         <decode varbindvalue="31218" varbinddecodedstring="imprinterOpened"/>
+         <decode varbindvalue="31219" varbinddecodedstring="imprinterClosed"/>
+         <decode varbindvalue="31220" varbinddecodedstring="imprinterTurnedOn"/>
+         <decode varbindvalue="31221" varbinddecodedstring="imprinterTurnedOff"/>
+         <decode varbindvalue="31222" varbinddecodedstring="imprinterOffline"/>
+         <decode varbindvalue="31223" varbinddecodedstring="imprinterPowerSaver"/>
+         <decode varbindvalue="31224" varbinddecodedstring="imprinterWarmingUp"/>
+         <decode varbindvalue="31225" varbinddecodedstring="imprinterAdded"/>
+         <decode varbindvalue="31226" varbinddecodedstring="imprinterRemoved"/>
+         <decode varbindvalue="31227" varbinddecodedstring="imprinterResourceAdded"/>
+         <decode varbindvalue="31228" varbinddecodedstring="imprinterResourceRemoved"/>
+         <decode varbindvalue="31229" varbinddecodedstring="imprinterRecoverableFailure"/>
+         <decode varbindvalue="31230" varbinddecodedstring="imprinterUnrecoverableFailure"/>
+         <decode varbindvalue="31231" varbinddecodedstring="imprinterRecoverableStorageError"/>
+         <decode varbindvalue="31232" varbinddecodedstring="imprinterUnrecoverableStorageError"/>
+         <decode varbindvalue="31233" varbinddecodedstring="imprinterMotorFailure"/>
+         <decode varbindvalue="31234" varbinddecodedstring="imprinterMemoryExhausted"/>
+         <decode varbindvalue="31235" varbinddecodedstring="imprinterUnderTemperature"/>
+         <decode varbindvalue="31236" varbinddecodedstring="imprinterOverTemperature"/>
+         <decode varbindvalue="31237" varbinddecodedstring="imprinterTimingFailure"/>
+         <decode varbindvalue="31238" varbinddecodedstring="imprinterThermistorFailure"/>
+         <decode varbindvalue="31303" varbinddecodedstring="wrapperCoverOpen"/>
+         <decode varbindvalue="31304" varbinddecodedstring="wrapperCoverClosed"/>
+         <decode varbindvalue="31305" varbinddecodedstring="wrapperInterlockOpen"/>
+         <decode varbindvalue="31306" varbinddecodedstring="wrapperInterlockClosed"/>
+         <decode varbindvalue="31307" varbinddecodedstring="wrapperConfigurationChange"/>
+         <decode varbindvalue="31308" varbinddecodedstring="wrapperJam"/>
+         <decode varbindvalue="31309" varbinddecodedstring="wrapperMissing"/>
+         <decode varbindvalue="31310" varbinddecodedstring="wrapperLifeAlmostOver"/>
+         <decode varbindvalue="31311" varbinddecodedstring="wrapperLifeOver"/>
+         <decode varbindvalue="31312" varbinddecodedstring="wrapperAlmostEmpty"/>
+         <decode varbindvalue="31313" varbinddecodedstring="wrapperEmpty"/>
+         <decode varbindvalue="31314" varbinddecodedstring="wrapperAlmostFull"/>
+         <decode varbindvalue="31315" varbinddecodedstring="wrapperFull"/>
+         <decode varbindvalue="31316" varbinddecodedstring="wrapperNearLimit"/>
+         <decode varbindvalue="31317" varbinddecodedstring="wrapperAtLimit"/>
+         <decode varbindvalue="31318" varbinddecodedstring="wrapperOpened"/>
+         <decode varbindvalue="31319" varbinddecodedstring="wrapperClosed"/>
+         <decode varbindvalue="31320" varbinddecodedstring="wrapperTurnedOn"/>
+         <decode varbindvalue="31321" varbinddecodedstring="wrapperTurnedOff"/>
+         <decode varbindvalue="31322" varbinddecodedstring="wrapperOffline"/>
+         <decode varbindvalue="31323" varbinddecodedstring="wrapperPowerSaver"/>
+         <decode varbindvalue="31324" varbinddecodedstring="wrapperWarmingUp"/>
+         <decode varbindvalue="31325" varbinddecodedstring="wrapperAdded"/>
+         <decode varbindvalue="31326" varbinddecodedstring="wrapperRemoved"/>
+         <decode varbindvalue="31327" varbinddecodedstring="wrapperResourceAdded"/>
+         <decode varbindvalue="31328" varbinddecodedstring="wrapperResourceRemoved"/>
+         <decode varbindvalue="31329" varbinddecodedstring="wrapperRecoverableFailure"/>
+         <decode varbindvalue="31330" varbinddecodedstring="wrapperUnrecoverableFailure"/>
+         <decode varbindvalue="31331" varbinddecodedstring="wrapperRecoverableStorageError"/>
+         <decode varbindvalue="31332" varbinddecodedstring="wrapperUnrecoverableStorageError"/>
+         <decode varbindvalue="31333" varbinddecodedstring="wrapperMotorFailure"/>
+         <decode varbindvalue="31334" varbinddecodedstring="wrapperMemoryExhausted"/>
+         <decode varbindvalue="31335" varbinddecodedstring="wrapperUnderTemperature"/>
+         <decode varbindvalue="31336" varbinddecodedstring="wrapperOverTemperature"/>
+         <decode varbindvalue="31337" varbinddecodedstring="wrapperTimingFailure"/>
+         <decode varbindvalue="31338" varbinddecodedstring="wrapperThermistorFailure"/>
+         <decode varbindvalue="31403" varbinddecodedstring="banderCoverOpen"/>
+         <decode varbindvalue="31404" varbinddecodedstring="banderCoverClosed"/>
+         <decode varbindvalue="31405" varbinddecodedstring="banderInterlockOpen"/>
+         <decode varbindvalue="31406" varbinddecodedstring="banderInterlockClosed"/>
+         <decode varbindvalue="31407" varbinddecodedstring="banderConfigurationChange"/>
+         <decode varbindvalue="31408" varbinddecodedstring="banderJam"/>
+         <decode varbindvalue="31409" varbinddecodedstring="banderMissing"/>
+         <decode varbindvalue="31410" varbinddecodedstring="banderLifeAlmostOver"/>
+         <decode varbindvalue="31411" varbinddecodedstring="banderLifeOver"/>
+         <decode varbindvalue="31412" varbinddecodedstring="banderAlmostEmpty"/>
+         <decode varbindvalue="31413" varbinddecodedstring="banderEmpty"/>
+         <decode varbindvalue="31414" varbinddecodedstring="banderAlmostFull"/>
+         <decode varbindvalue="31415" varbinddecodedstring="banderFull"/>
+         <decode varbindvalue="31416" varbinddecodedstring="banderNearLimit"/>
+         <decode varbindvalue="31417" varbinddecodedstring="banderAtLimit"/>
+         <decode varbindvalue="31418" varbinddecodedstring="banderOpened"/>
+         <decode varbindvalue="31419" varbinddecodedstring="banderClosed"/>
+         <decode varbindvalue="31420" varbinddecodedstring="banderTurnedOn"/>
+         <decode varbindvalue="31421" varbinddecodedstring="banderTurnedOff"/>
+         <decode varbindvalue="31422" varbinddecodedstring="banderOffline"/>
+         <decode varbindvalue="31423" varbinddecodedstring="banderPowerSaver"/>
+         <decode varbindvalue="31424" varbinddecodedstring="banderWarmingUp"/>
+         <decode varbindvalue="31425" varbinddecodedstring="banderAdded"/>
+         <decode varbindvalue="31426" varbinddecodedstring="banderRemoved"/>
+         <decode varbindvalue="31427" varbinddecodedstring="banderResourceAdded"/>
+         <decode varbindvalue="31428" varbinddecodedstring="banderResourceRemoved"/>
+         <decode varbindvalue="31429" varbinddecodedstring="banderRecoverableFailure"/>
+         <decode varbindvalue="31430" varbinddecodedstring="banderUnrecoverableFailure"/>
+         <decode varbindvalue="31431" varbinddecodedstring="banderRecoverableStorageError"/>
+         <decode varbindvalue="31432" varbinddecodedstring="banderUnrecoverableStorageError"/>
+         <decode varbindvalue="31433" varbinddecodedstring="banderMotorFailure"/>
+         <decode varbindvalue="31434" varbinddecodedstring="banderMemoryExhausted"/>
+         <decode varbindvalue="31435" varbinddecodedstring="banderUnderTemperature"/>
+         <decode varbindvalue="31436" varbinddecodedstring="banderOverTemperature"/>
+         <decode varbindvalue="31437" varbinddecodedstring="banderTimingFailure"/>
+         <decode varbindvalue="31438" varbinddecodedstring="banderThermistorFailure"/>
+         <decode varbindvalue="31503" varbinddecodedstring="makeEnvelopeCoverOpen"/>
+         <decode varbindvalue="31504" varbinddecodedstring="makeEnvelopeCoverClosed"/>
+         <decode varbindvalue="31505" varbinddecodedstring="makeEnvelopeInterlockOpen"/>
+         <decode varbindvalue="31506" varbinddecodedstring="makeEnvelopeInterlockClosed"/>
+         <decode varbindvalue="31507" varbinddecodedstring="makeEnvelopeConfigurationChange"/>
+         <decode varbindvalue="31508" varbinddecodedstring="makeEnvelopeJam"/>
+         <decode varbindvalue="31509" varbinddecodedstring="makeEnvelopeMissing"/>
+         <decode varbindvalue="31510" varbinddecodedstring="makeEnvelopeLifeAlmostOver"/>
+         <decode varbindvalue="31511" varbinddecodedstring="makeEnvelopeLifeOver"/>
+         <decode varbindvalue="31512" varbinddecodedstring="makeEnvelopeAlmostEmpty"/>
+         <decode varbindvalue="31513" varbinddecodedstring="makeEnvelopeEmpty"/>
+         <decode varbindvalue="31514" varbinddecodedstring="makeEnvelopeAlmostFull"/>
+         <decode varbindvalue="31515" varbinddecodedstring="makeEnvelopeFull"/>
+         <decode varbindvalue="31516" varbinddecodedstring="makeEnvelopeNearLimit"/>
+         <decode varbindvalue="31517" varbinddecodedstring="makeEnvelopeAtLimit"/>
+         <decode varbindvalue="31518" varbinddecodedstring="makeEnvelopeOpened"/>
+         <decode varbindvalue="31519" varbinddecodedstring="makeEnvelopeClosed"/>
+         <decode varbindvalue="31520" varbinddecodedstring="makeEnvelopeTurnedOn"/>
+         <decode varbindvalue="31521" varbinddecodedstring="makeEnvelopeTurnedOff"/>
+         <decode varbindvalue="31522" varbinddecodedstring="makeEnvelopeOffline"/>
+         <decode varbindvalue="31523" varbinddecodedstring="makeEnvelopePowerSaver"/>
+         <decode varbindvalue="31524" varbinddecodedstring="makeEnvelopeWarmingUp"/>
+         <decode varbindvalue="31525" varbinddecodedstring="makeEnvelopeAdded"/>
+         <decode varbindvalue="31526" varbinddecodedstring="makeEnvelopeRemoved"/>
+         <decode varbindvalue="31527" varbinddecodedstring="makeEnvelopeResourceAdded"/>
+         <decode varbindvalue="31528" varbinddecodedstring="makeEnvelopeResourceRemoved"/>
+         <decode varbindvalue="31529" varbinddecodedstring="makeEnvelopeRecoverableFailure"/>
+         <decode varbindvalue="31530" varbinddecodedstring="makeEnvelopeUnrecoverableFailure"/>
+         <decode varbindvalue="31531" varbinddecodedstring="makeEnvelopeRecoverableStorageError"/>
+         <decode varbindvalue="31532" varbinddecodedstring="makeEnvelopeUnrecoverableStorageError"/>
+         <decode varbindvalue="31533" varbinddecodedstring="makeEnvelopeMotorFailure"/>
+         <decode varbindvalue="31534" varbinddecodedstring="makeEnvelopeMemoryExhausted"/>
+         <decode varbindvalue="31535" varbinddecodedstring="makeEnvelopeUnderTemperature"/>
+         <decode varbindvalue="31536" varbinddecodedstring="makeEnvelopeOverTemperature"/>
+         <decode varbindvalue="31537" varbinddecodedstring="makeEnvelopeTimingFailure"/>
+         <decode varbindvalue="31538" varbinddecodedstring="makeEnvelopeThermistorFailure"/>
+         <decode varbindvalue="31603" varbinddecodedstring="stackerCoverOpen"/>
+         <decode varbindvalue="31604" varbinddecodedstring="stackerCoverClosed"/>
+         <decode varbindvalue="31605" varbinddecodedstring="stackerInterlockOpen"/>
+         <decode varbindvalue="31606" varbinddecodedstring="stackerInterlockClosed"/>
+         <decode varbindvalue="31607" varbinddecodedstring="stackerConfigurationChange"/>
+         <decode varbindvalue="31608" varbinddecodedstring="stackerJam"/>
+         <decode varbindvalue="31609" varbinddecodedstring="stackerMissing"/>
+         <decode varbindvalue="31610" varbinddecodedstring="stackerLifeAlmostOver"/>
+         <decode varbindvalue="31611" varbinddecodedstring="stackerLifeOver"/>
+         <decode varbindvalue="31612" varbinddecodedstring="stackerAlmostEmpty"/>
+         <decode varbindvalue="31613" varbinddecodedstring="stackerEmpty"/>
+         <decode varbindvalue="31614" varbinddecodedstring="stackerAlmostFull"/>
+         <decode varbindvalue="31615" varbinddecodedstring="stackerFull"/>
+         <decode varbindvalue="31616" varbinddecodedstring="stackerNearLimit"/>
+         <decode varbindvalue="31617" varbinddecodedstring="stackerAtLimit"/>
+         <decode varbindvalue="31618" varbinddecodedstring="stackerOpened"/>
+         <decode varbindvalue="31619" varbinddecodedstring="stackerClosed"/>
+         <decode varbindvalue="31620" varbinddecodedstring="stackerTurnedOn"/>
+         <decode varbindvalue="31621" varbinddecodedstring="stackerTurnedOff"/>
+         <decode varbindvalue="31622" varbinddecodedstring="stackerOffline"/>
+         <decode varbindvalue="31623" varbinddecodedstring="stackerPowerSaver"/>
+         <decode varbindvalue="31624" varbinddecodedstring="stackerWarmingUp"/>
+         <decode varbindvalue="31625" varbinddecodedstring="stackerAdded"/>
+         <decode varbindvalue="31626" varbinddecodedstring="stackerRemoved"/>
+         <decode varbindvalue="31627" varbinddecodedstring="stackerResourceAdded"/>
+         <decode varbindvalue="31628" varbinddecodedstring="stackerResourceRemoved"/>
+         <decode varbindvalue="31629" varbinddecodedstring="stackerRecoverableFailure"/>
+         <decode varbindvalue="31630" varbinddecodedstring="stackerUnrecoverableFailure"/>
+         <decode varbindvalue="31631" varbinddecodedstring="stackerRecoverableStorageError"/>
+         <decode varbindvalue="31632" varbinddecodedstring="stackerUnrecoverableStorageError"/>
+         <decode varbindvalue="31633" varbinddecodedstring="stackerMotorFailure"/>
+         <decode varbindvalue="31634" varbinddecodedstring="stackerMemoryExhausted"/>
+         <decode varbindvalue="31635" varbinddecodedstring="stackerUnderTemperature"/>
+         <decode varbindvalue="31636" varbinddecodedstring="stackerOverTemperature"/>
+         <decode varbindvalue="31637" varbinddecodedstring="stackerTimingFailure"/>
+         <decode varbindvalue="31638" varbinddecodedstring="stackerThermistorFailure"/>
+         <decode varbindvalue="31703" varbinddecodedstring="sheetRotatorCoverOpen"/>
+         <decode varbindvalue="31704" varbinddecodedstring="sheetRotatorCoverClosed"/>
+         <decode varbindvalue="31705" varbinddecodedstring="sheetRotatorInterlockOpen"/>
+         <decode varbindvalue="31706" varbinddecodedstring="sheetRotatorInterlockClosed"/>
+         <decode varbindvalue="31707" varbinddecodedstring="sheetRotatorConfigurationChange"/>
+         <decode varbindvalue="31708" varbinddecodedstring="sheetRotatorJam"/>
+         <decode varbindvalue="31709" varbinddecodedstring="sheetRotatorMissing"/>
+         <decode varbindvalue="31710" varbinddecodedstring="sheetRotatorLifeAlmostOver"/>
+         <decode varbindvalue="31711" varbinddecodedstring="sheetRotatorLifeOver"/>
+         <decode varbindvalue="31712" varbinddecodedstring="sheetRotatorAlmostEmpty"/>
+         <decode varbindvalue="31713" varbinddecodedstring="sheetRotatorEmpty"/>
+         <decode varbindvalue="31714" varbinddecodedstring="sheetRotatorAlmostFull"/>
+         <decode varbindvalue="31715" varbinddecodedstring="sheetRotatorFull"/>
+         <decode varbindvalue="31716" varbinddecodedstring="sheetRotatorNearLimit"/>
+         <decode varbindvalue="31717" varbinddecodedstring="sheetRotatorAtLimit"/>
+         <decode varbindvalue="31718" varbinddecodedstring="sheetRotatorOpened"/>
+         <decode varbindvalue="31719" varbinddecodedstring="sheetRotatorClosed"/>
+         <decode varbindvalue="31720" varbinddecodedstring="sheetRotatorTurnedOn"/>
+         <decode varbindvalue="31721" varbinddecodedstring="sheetRotatorTurnedOff"/>
+         <decode varbindvalue="31722" varbinddecodedstring="sheetRotatorOffline"/>
+         <decode varbindvalue="31723" varbinddecodedstring="sheetRotatorPowerSaver"/>
+         <decode varbindvalue="31724" varbinddecodedstring="sheetRotatorWarmingUp"/>
+         <decode varbindvalue="31725" varbinddecodedstring="sheetRotatorAdded"/>
+         <decode varbindvalue="31726" varbinddecodedstring="sheetRotatorRemoved"/>
+         <decode varbindvalue="31727" varbinddecodedstring="sheetRotatorResourceAdded"/>
+         <decode varbindvalue="31728" varbinddecodedstring="sheetRotatorResourceRemoved"/>
+         <decode varbindvalue="31729" varbinddecodedstring="sheetRotatorRecoverableFailure"/>
+         <decode varbindvalue="31730" varbinddecodedstring="sheetRotatorUnrecoverableFailure"/>
+         <decode varbindvalue="31731" varbinddecodedstring="sheetRotatorRecoverableStorageError"/>
+         <decode varbindvalue="31732" varbinddecodedstring="sheetRotatorUnrecoverableStorageError"/>
+         <decode varbindvalue="31733" varbinddecodedstring="sheetRotatorMotorFailure"/>
+         <decode varbindvalue="31734" varbinddecodedstring="sheetRotatorMemoryExhausted"/>
+         <decode varbindvalue="31735" varbinddecodedstring="sheetRotatorUnderTemperature"/>
+         <decode varbindvalue="31736" varbinddecodedstring="sheetRotatorOverTemperature"/>
+         <decode varbindvalue="31737" varbinddecodedstring="sheetRotatorTimingFailure"/>
+         <decode varbindvalue="31738" varbinddecodedstring="sheetRotatorThermistorFailure"/>
+         <decode varbindvalue="31803" varbinddecodedstring="inserterCoverOpen"/>
+         <decode varbindvalue="31804" varbinddecodedstring="inserterCoverClosed"/>
+         <decode varbindvalue="31805" varbinddecodedstring="inserterInterlockOpen"/>
+         <decode varbindvalue="31806" varbinddecodedstring="inserterInterlockClosed"/>
+         <decode varbindvalue="31807" varbinddecodedstring="inserterConfigurationChange"/>
+         <decode varbindvalue="31808" varbinddecodedstring="inserterJam"/>
+         <decode varbindvalue="31809" varbinddecodedstring="inserterMissing"/>
+         <decode varbindvalue="31810" varbinddecodedstring="inserterLifeAlmostOver"/>
+         <decode varbindvalue="31811" varbinddecodedstring="inserterLifeOver"/>
+         <decode varbindvalue="31812" varbinddecodedstring="inserterAlmostEmpty"/>
+         <decode varbindvalue="31813" varbinddecodedstring="inserterEmpty"/>
+         <decode varbindvalue="31814" varbinddecodedstring="inserterAlmostFull"/>
+         <decode varbindvalue="31815" varbinddecodedstring="inserterFull"/>
+         <decode varbindvalue="31816" varbinddecodedstring="inserterNearLimit"/>
+         <decode varbindvalue="31817" varbinddecodedstring="inserterAtLimit"/>
+         <decode varbindvalue="31818" varbinddecodedstring="inserterOpened"/>
+         <decode varbindvalue="31819" varbinddecodedstring="inserterClosed"/>
+         <decode varbindvalue="31820" varbinddecodedstring="inserterTurnedOn"/>
+         <decode varbindvalue="31821" varbinddecodedstring="inserterTurnedOff"/>
+         <decode varbindvalue="31822" varbinddecodedstring="inserterOffline"/>
+         <decode varbindvalue="31823" varbinddecodedstring="inserterPowerSaver"/>
+         <decode varbindvalue="31824" varbinddecodedstring="inserterWarmingUp"/>
+         <decode varbindvalue="31825" varbinddecodedstring="inserterAdded"/>
+         <decode varbindvalue="31826" varbinddecodedstring="inserterRemoved"/>
+         <decode varbindvalue="31827" varbinddecodedstring="inserterResourceAdded"/>
+         <decode varbindvalue="31828" varbinddecodedstring="inserterResourceRemoved"/>
+         <decode varbindvalue="31829" varbinddecodedstring="inserterRecoverableFailure"/>
+         <decode varbindvalue="31830" varbinddecodedstring="inserterUnrecoverableFailure"/>
+         <decode varbindvalue="31831" varbinddecodedstring="inserterRecoverableStorageError"/>
+         <decode varbindvalue="31832" varbinddecodedstring="inserterUnrecoverableStorageError"/>
+         <decode varbindvalue="31833" varbinddecodedstring="inserterMotorFailure"/>
+         <decode varbindvalue="31834" varbinddecodedstring="inserterMemoryExhausted"/>
+         <decode varbindvalue="31835" varbinddecodedstring="inserterUnderTemperature"/>
+         <decode varbindvalue="31836" varbinddecodedstring="inserterOverTemperature"/>
+         <decode varbindvalue="31837" varbinddecodedstring="inserterTimingFailure"/>
+         <decode varbindvalue="31838" varbinddecodedstring="inserterThermistorFailure"/>
+      </varbindsdecode>
+   </event>
+</events>
