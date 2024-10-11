@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 include ResourceType
 include Threshold
-include Events
 
 def whyrun_supported?
   true

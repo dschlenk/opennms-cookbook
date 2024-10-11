@@ -16,13 +16,13 @@ property :file, String, identity: true
 property :mask, [Array, String], default: '*', identity: true, callbacks: {
   'should either be an array of hashes where each hash has either keys `mename` and `mevalue` or `vbnumber` and `vbvalue`, or the string \'*\'.' => lambda {
     |p| (p.is_a?(String) && ['*', '!'].include?(p)) ||
-    !p.any? { |h| !h.is_a?(Hash) || (h.key?('mename') && !h.key?('mevalue')) || (h.key?('vbnumber') && !h.key?('vbvalue')) || (!h.key?('mename') && !h.key?('vbnumber')) }
-  }
+      !p.any? { |h| !h.is_a?(Hash) || (h.key?('mename') && !h.key?('mevalue')) || (h.key?('vbnumber') && !h.key?('vbvalue')) || (!h.key?('mename') && !h.key?('vbnumber')) }
+  },
 }
 property :priority, Integer, callbacks: {
-  'should be a non-negative integer' => lambda {
-    |p| p >= 0
-  }
+  'should be a non-negative integer' => lambda { |p|
+    p >= 0
+  },
 }
 # this is required when creating a new event, but not when updating existing
 property :event_label, String
@@ -35,12 +35,12 @@ property :logmsg_dest, String, equal_to: %w(logndisplay displayonly logonly supp
 property :logmsg_notify, [true, false]
 # an example using at least one of everything is:
 # [
-#   { 
+#   {
 #     'name' => 'nodeGroup',
 #     'resource_type' => 'nodeSnmp',
 #     'instance' => 'instanceParmName',
 #     'collections' => [{ 'name' => 'TIME', 'type' => 'counter', 'param_values' => { 'primary' => 1, 'secondary' => 2 } }],
-#     'rrd' => { 
+#     'rrd' => {
 #                'rra' => [ 'RRA:AVERAGE:0.5:1:8928' ],
 #                'step' => 60, 'heartbeat' => 120
 #              }
@@ -48,8 +48,8 @@ property :logmsg_notify, [true, false]
 # ]
 property :collection_group, Array, callbacks: {
   'should be an array of hashes that contain key `rrd` with hash value consisting of key `rra` that is an array of strings that match pattern `RRA:(AVERAGE|MIN|MAX|LAST):.*`, `step` that is an integer; `name` with a string value; and `collections` which is an array of at least one hash containing key `name` with a string value' => lambda {
-    |p| p.is_a?(Array) && !p.any?{ |h| !h.key?('name') || !h.key?('rrd') || !h['rrd'].is_a?(Hash) || !h['rrd'].key?('rra')  || !h['rrd']['rra'].is_a?(Array) || h['rrd']['rra'].any? { |a| !a.is_a?(String) || !a.match(/RRA:(AVERAGE|MIN|MAX|LAST):.*/) } || !h['rrd'].key?('step') || !h['rrd']['step'].is_a?(Integer) || !h.key?('collections') || !h['collections'].is_a?(Array) || h['collections'].length <= 0 || h['collections'].any? { |ca| !ca.is_a?(Hash) || !ca.key?('name') } }
-  }
+    |p| p.is_a?(Array) && !p.any? { |h| !h.key?('name') || !h.key?('rrd') || !h['rrd'].is_a?(Hash) || !h['rrd'].key?('rra') || !h['rrd']['rra'].is_a?(Array) || h['rrd']['rra'].any? { |a| !a.is_a?(String) || !a.match(/RRA:(AVERAGE|MIN|MAX|LAST):.*/) } || !h['rrd'].key?('step') || !h['rrd']['step'].is_a?(Integer) || !h.key?('collections') || !h['collections'].is_a?(Array) || h['collections'].length <= 0 || h['collections'].any? { |ca| !ca.is_a?(Hash) || !ca.key?('name') } }
+  },
 }
 # this is required when creating a new event, but not when updating existing. Use 'Indeterminate' if unknown.
 property :severity, String
@@ -61,8 +61,8 @@ property :operinstruct, String
 #     ]
 property :autoaction, Array, callbacks: {
   'should be an array of hashes each of which contain a key named `action` and optionally a key named `state` with value of either `on` or `off`' => lambda {
-    |p| p.is_a?(Array) && !p.any? { |h| !h.is_a?(Hash) || !h.key?('action') || (h.key?('state') && !['on', 'off'].include?(h['state'])) }
-  }
+    |p| p.is_a?(Array) && !p.any? { |h| !h.is_a?(Hash) || !h.key?('action') || (h.key?('state') && !%w(on off).include?(h['state'])) }
+  },
 }
 # Array of Hashes
 # ex: [
@@ -71,8 +71,8 @@ property :autoaction, Array, callbacks: {
 #     ]
 property :varbindsdecode, Array, callbacks: {
   'should be an array of hashes each with a `parmid` key and a `decode` key with an array value of at least one hash that contains keys `varbindvalue` and `varbinddecodedstring`' => lambda {
-    |p| p.is_a?(Array) && !p.any? { |h| !h.is_a?(Hash) || !h.key?('parmid') || !h.key?('decode') || !h['decode'].is_a?(Array) || h['decode'].length <= 0  || h['decode'].any? { |dh| !dh.is_a?(Hash) || !dh.key?('varbindvalue') || !dh.key?('varbinddecodedstring') } }
-  }
+    |p| p.is_a?(Array) && !p.any? { |h| !h.is_a?(Hash) || !h.key?('parmid') || !h.key?('decode') || !h['decode'].is_a?(Array) || h['decode'].length <= 0 || h['decode'].any? { |dh| !dh.is_a?(Hash) || !dh.key?('varbindvalue') || !dh.key?('varbinddecodedstring') } }
+  },
 }
 # Array of Hashes
 # ex: [
@@ -83,8 +83,8 @@ property :varbindsdecode, Array, callbacks: {
 # They are ignored when using 16 and the expand attribute is ignored when using 17.
 property :parameters, Array, callbacks: {
   'should be an array of hashes each with a `name` key and a `value` key and optionally an `expand` key with a boolean value' => lambda {
-    |p| p.is_a?(Array) && !p.any? { |h| !h.is_a?(Hash) || !h.key?('name') || !h.key?('value') || !(h.key?('expand') && [true, false, "true", "false"].include?(h['expand'])) }
-  }
+    |p| p.is_a?(Array) && !p.any? { |h| !h.is_a?(Hash) || !h.key?('name') || !h.key?('value') || !(h.key?('expand') && [true, false, 'true', 'false'].include?(h['expand'])) }
+  },
 }
 # Array of Hashes
 # ex: [
@@ -93,14 +93,14 @@ property :parameters, Array, callbacks: {
 #    ]
 property :operaction, Array, callbacks: {
   'should be an array of hashes each containing key `action`, key `menutext` and optionally key `state` with value of either `on` or `off`' => lambda {
-    |p| p.is_a?(Array) && !p.any? { |h| !h.is_a?(Hash) || !h.key?('action') || !h.key?('menutext') || !(h.key?('state') && ['on', 'off'].include?(h['state'])) }
-  }
+    |p| p.is_a?(Array) && !p.any? { |h| !h.is_a?(Hash) || !h.key?('action') || !h.key?('menutext') || !(h.key?('state') && %w(on off).include?(h['state'])) }
+  },
 }
 # Hash with key `info` (string) and optional key `state` of either `on` or `off`
 property :autoacknowledge, Hash, callbacks: {
-  'should be a hash with key `info` key and optionally `state` key with value `on` or `off`' => lambda {
-    |p| p.is_a?(Hash) && p.key?('info') && !(p.key?('state') && !['on', 'off'].include?(p['state']))
-  }
+  'should be a hash with key `info` key and optionally `state` key with value `on` or `off`' => lambda { |p|
+    p.is_a?(Hash) && p.key?('info') && !(p.key?('state') && !%w(on off).include?(p['state']))
+  },
 }
 
 property :loggroup, String
@@ -108,9 +108,9 @@ property :loggroup, String
 # ex:
 #       { 'info' => String, 'state' => 'on|off' }
 property :tticket, Hash, callbacks: {
-  'should be a hash with key `info` key and optionally `state` key with value `on` or `off`' => lambda {
-    |p| p.is_a?(Hash) && p.key?('info') && !(p.key?('state') && !['on', 'off'].include?(p['state']))
-  }
+  'should be a hash with key `info` key and optionally `state` key with value `on` or `off`' => lambda { |p|
+    p.is_a?(Hash) && p.key?('info') && !(p.key?('state') && !%w(on off).include?(p['state']))
+  },
 }
 # Array of Hash
 # ex: [
@@ -119,8 +119,8 @@ property :tticket, Hash, callbacks: {
 #     ]
 property :forward, Array, callbacks: {
   'should be an array of hashes each of which contains keys `info` (string) and may contain keys `state` and `mechanism`' => lambda {
-    |p| p.is_a?(Array) && !p.any?{ |h| !h.is_a?(Hash) || !h.key?('info') }
-  }
+    |p| p.is_a?(Array) && !p.any? { |h| !h.is_a?(Hash) || !h.key?('info') }
+  },
 }
 # Array of Hash
 # ex: [
@@ -128,27 +128,27 @@ property :forward, Array, callbacks: {
 #       ...
 #     ]
 property :script, Array, callbacks: {
-  'should be an array of hashes that each contain a `name` and `language` key' => lambda {
-    |p| p.is_a?(Array) && !p.any? { |h| !h.is_a?(Hash) || !h.key?('name') || !h.key?('language') }
-  }
+  'should be an array of hashes that each contain a `name` and `language` key' => lambda { |p|
+    p.is_a?(Array) && !p.any? { |h| !h.is_a?(Hash) || !h.key?('name') || !h.key?('language') }
+  },
 }
 property :mouseovertext, String
 # See schema for required key/values.
 # set to false to remove existing alarm-data
 # ex: 'update_fields' => [{'field_name' => String, 'update_on_reduction' => true*|false}, ...], 'managed_object_type' => String, 'reduction_key' => String, 'alarm_type' => Fixnum, 'clear_key' => String, 'auto_clean' => true|false*, 'x733_alarm_type' => 'CommunicationsAlarm|ProcessingErrorAlarm|EnvironmentalAlarm|QualityOfServiceAlarm|EquipmentAlarm|IntegrityViolation|SecurityViolation|TimeDomainViolation|OperationalViolation|PhysicalViolation', 'x733_probable_cause' => Fixnum
 property :alarm_data, [Hash, false], callbacks: {
-  'should be a hash that contains keys `reduction_key` (string), `alarm_type` (integer). May contain keys `update_fields` (array of hashes that include mandatory key `field_name` (string) and optional keys `update_on_reduction` (boolean), `value_expression` (string)), `clear_key` (string), `auto_clean` (boolean), `x733_alarm_type` (string), `x733_probable_cause` (int)' => lambda { |p| 
-    (p.is_a?(Hash) && p.key?('reduction_key') && p.key?('alarm_type') && p['alarm_type'].is_a?(Integer) && p['alarm_type'] > 0 )
-  }
+  'should be a hash that contains keys `reduction_key` (string), `alarm_type` (integer). May contain keys `update_fields` (array of hashes that include mandatory key `field_name` (string) and optional keys `update_on_reduction` (boolean), `value_expression` (string)), `clear_key` (string), `auto_clean` (boolean), `x733_alarm_type` (string), `x733_probable_cause` (int)' => lambda { |p|
+    (p.is_a?(Hash) && p.key?('reduction_key') && p.key?('alarm_type') && p['alarm_type'].is_a?(Integer) && p['alarm_type'] > 0)
+  },
 }
 # used to change parm values of an event instance when the named parm's value matches the regular expression
 property :filters, Array, callbacks: {
   'should be an array of hashes eachof which contains keys `eventparm` (string), `pattern` (string), `replacement` (string)' => lambda {
-    |p| p.is_a?(Array) && !p.any?{ |h| !h.is_a?(Hash) || !h.key?('eventparm') || !h.key?('pattern') || !h.key?('replacement') }
-  }
+    |p| p.is_a?(Array) && !p.any? { |h| !h.is_a?(Hash) || !h.key?('eventparm') || !h.key?('pattern') || !h.key?('replacement') }
+  },
 }
 # control where in a file the event is added. Does not guarantee that the event will remain the first or last element in the file - once it exists in the file this attribute is ignored for purposes of whether or not the resource needs to be updated.
-property :position, String, equal_to: %w{top bottom}, default: 'bottom'
+property :position, String, equal_to: %w(top bottom), default: 'bottom'
 # if a new eventconf file is created as a result of this resource executing, this property controls the relative position that the reference to the new file is added to the main eventconf file
 property :eventconf_position, String, equal_to: %w(override top bottom), default: 'bottom'
 
@@ -186,11 +186,9 @@ action :create do
     if entry.nil?
       eventconf_resource_init
       eventconf_resource.variables[:eventconf].event_files[new_resource.file[7..-1]] = { position: new_resource.eventconf_position }
-      resource_properties = %i(uei mask priority event_label descr logmsg logmsg_dest logmsg_notify collection_group severity operinstruct autoaction varbindsdecode parameters operaction autoacknowledge loggroup tticket forward script mouseovertext alarm_data filters).map{ |p| [p, new_resource.send(p)] }.to_h.compact
+      resource_properties = %i(uei mask priority event_label descr logmsg logmsg_dest logmsg_notify collection_group severity operinstruct autoaction varbindsdecode parameters operaction autoacknowledge loggroup tticket forward script mouseovertext alarm_data filters).map { |p| [p, new_resource.send(p)] }.to_h.compact
       resource_properties[:uei] = new_resource.name if new_resource.uei.nil?
-      Chef::Log.warn("resource properties: '#{resource_properties}")
       entry = Opennms::Cookbook::ConfigHelpers::Event::EventDefinition.create(**resource_properties)
-      Chef::Log.warn("created entry: '#{entry}")
       eventfile_resource.variables[:eventfile].add(entry, new_resource.position)
     else
       run_action(:update)
@@ -234,7 +232,7 @@ action :delete do
   entry = eventfile_resource.variables[:eventfile].entry(new_resource.uei || new_resource.name, new_resource.mask)
   unless entry.nil?
     eventfile_resource.variables[:eventfile].remove(entry)
-    if eventfile_resource.variables[:eventfile].entries.length == 0
+    if eventfile_resource.variables[:eventfile].entries.empty?
       file "#{node['opennms']['conf']['home']}/etc/#{new_resource.file}" do
         action :delete
       end
