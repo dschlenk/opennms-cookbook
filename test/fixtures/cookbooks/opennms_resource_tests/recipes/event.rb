@@ -1,4 +1,3 @@
-# frozen_string_literal: true
 opennms_event 'uei.opennms.org/cheftest/thresholdExceeded' do
   file 'events/chef.events.xml'
   event_label 'Chef defined event: thresholdExceeded'
@@ -9,8 +8,6 @@ opennms_event 'uei.opennms.org/cheftest/thresholdExceeded' do
   severity 'Minor'
   position 'top'
   alarm_data 'reduction_key' => '%uei%:%dpname%:%nodeid%:%interface%:%parm[ds]%:%parm[threshold]%:%parm[trigger]%:%parm[rearm]%:%parm[label]%', 'alarm_type' => 1, 'auto_clean' => false
-  # tell Eventd to reload config
-  notifies :run, 'opennms_send_event[restart_Eventd]'
 end
 
 opennms_event 'initial thresholdExceeded2' do
@@ -31,7 +28,6 @@ opennms_event 'initial thresholdExceeded2' do
   script [{ 'name' => 'anScript', 'language' => 'groovy' }]
   mouseovertext 'mouseOverText'
   alarm_data 'reduction_key' => '%uei%:%dpname%:%nodeid%:%interface%:%parm[ds]%:%parm[threshold]%:%parm[trigger]%:%parm[rearm]%:%parm[label]%', 'alarm_type' => 1, 'auto_clean' => false
-  notifies :run, 'opennms_send_event[restart_Eventd]'
 end
 
 # new event at the top of an existing file
@@ -54,7 +50,6 @@ opennms_event 'new event at the top' do
   mouseovertext 'mouseOverText'
   alarm_data 'reduction_key' => '%uei%:%dpname%:%nodeid%:%interface%:%parm[ds]%:%parm[threshold]%:%parm[trigger]%:%parm[rearm]%:%parm[label]%', 'alarm_type' => 1, 'auto_clean' => false
   position 'top'
-  notifies :run, 'opennms_send_event[restart_Eventd]'
 end
 
 opennms_event 'new event at the bottom of existing file' do
@@ -76,7 +71,6 @@ opennms_event 'new event at the bottom of existing file' do
   mouseovertext 'mouseOverText'
   alarm_data 'reduction_key' => '%uei%:%dpname%:%nodeid%:%interface%:%parm[ds]%:%parm[threshold]%:%parm[trigger]%:%parm[rearm]%:%parm[label]%', 'alarm_type' => 1, 'auto_clean' => false
   position 'bottom'
-  notifies :run, 'opennms_send_event[restart_Eventd]'
 end
 
 # new event with complex mask
@@ -98,7 +92,6 @@ opennms_event 'new event with diverse mask' do
   script [{ 'name' => 'anScript', 'language' => 'groovy' }]
   mouseovertext 'mouseOverText'
   alarm_data 'reduction_key' => '%uei%:%dpname%:%nodeid%:%interface%:%parm[ds]%:%parm[threshold]%:%parm[trigger]%:%parm[rearm]%:%parm[label]%', 'alarm_type' => 1, 'auto_clean' => false
-  notifies :run, 'opennms_send_event[restart_Eventd]'
 end
 
 # new event in new file
@@ -111,14 +104,12 @@ opennms_event 'uei.opennms.org/anUeiForANewThingInANewFile' do
   logmsg_notify true
   severity 'Minor'
   alarm_data 'reduction_key' => '%uei%:%dpname%:%nodeid%:%interface%:%parm[ds]%:%parm[threshold]%:%parm[trigger]%:%parm[rearm]%:%parm[label]%', 'alarm_type' => 1, 'auto_clean' => false
-  notifies :run, 'opennms_send_event[restart_Eventd]'
 end
 
 # test delete
 opennms_event 'uei.opennms.org/anUeiForANewThingInANewFile' do
   file 'events/chef2.events.xml'
   action :delete
-  notifies :run, 'opennms_send_event[restart_Eventd]'
 end
 
 # Test position top and eventconf_position top
@@ -133,11 +124,10 @@ opennms_event 'uei.opennms.org/anUeiForANewThingInANewFileWithPositionTop' do
   logmsg_notify true
   severity 'Minor'
   alarm_data 'reduction_key' => '%uei%:%dpname%:%nodeid%:%interface%:%parm[ds]%:%parm[threshold]%:%parm[trigger]%:%parm[rearm]%:%parm[label]%', 'alarm_type' => 1, 'auto_clean' => false
-  notifies :run, 'opennms_send_event[restart_Eventd]'
 end
 
 # Test position top and eventconf_position bottom
-# this one should be index 1 (starting at 0)
+# this one should be index 2
 opennms_event 'uei.opennms.org/fillerForANewThingInANewFile1' do
   file 'events/chef4.events.xml'
   event_label 'Chef defined event: thresholdExceeded'
@@ -148,10 +138,9 @@ opennms_event 'uei.opennms.org/fillerForANewThingInANewFile1' do
   severity 'Minor'
   alarm_data 'reduction_key' => '%uei%:%dpname%:%nodeid%:%interface%:%parm[ds]%:%parm[threshold]%:%parm[trigger]%:%parm[rearm]%:%parm[label]%', 'alarm_type' => 1, 'auto_clean' => false
   eventconf_position 'top'
-  notifies :run, 'opennms_send_event[restart_Eventd]'
 end
 
-# this one should be index 2 (starting at 0)
+# this one should be index 3
 opennms_event 'uei.opennms.org/fillerForANewThingInANewFile2' do
   file 'events/chef4.events.xml'
   event_label 'Chef defined event: thresholdExceeded'
@@ -162,10 +151,9 @@ opennms_event 'uei.opennms.org/fillerForANewThingInANewFile2' do
   severity 'Minor'
   alarm_data 'reduction_key' => '%uei%:%dpname%:%nodeid%:%interface%:%parm[ds]%:%parm[threshold]%:%parm[trigger]%:%parm[rearm]%:%parm[label]%', 'alarm_type' => 1, 'auto_clean' => false
   eventconf_position 'top'
-  notifies :run, 'opennms_send_event[restart_Eventd]'
 end
 
-# this one should be index 0 (starting at 0)
+# this one should be index 1
 opennms_event 'uei.opennms.org/eventTopFileTop' do
   file 'events/chef4.events.xml'
   event_label 'Chef defined event: thresholdExceeded'
@@ -177,10 +165,9 @@ opennms_event 'uei.opennms.org/eventTopFileTop' do
   alarm_data 'reduction_key' => '%uei%:%dpname%:%nodeid%:%interface%:%parm[ds]%:%parm[threshold]%:%parm[trigger]%:%parm[rearm]%:%parm[label]%', 'alarm_type' => 1, 'auto_clean' => false
   position 'top'
   eventconf_position 'top'
-  notifies :run, 'opennms_send_event[restart_Eventd]'
 end
 
-# this one should be index 3 (starting at 0)
+# this one should be index 4
 opennms_event 'uei.opennms.org/eventBottomFileTop' do
   file 'events/chef4.events.xml'
   event_label 'Chef defined event: thresholdExceeded'
@@ -192,5 +179,80 @@ opennms_event 'uei.opennms.org/eventBottomFileTop' do
   alarm_data 'reduction_key' => '%uei%:%dpname%:%nodeid%:%interface%:%parm[ds]%:%parm[threshold]%:%parm[trigger]%:%parm[rearm]%:%parm[label]%', 'alarm_type' => 1, 'auto_clean' => false
   position 'bottom'
   eventconf_position 'top'
-  notifies :run, 'opennms_send_event[restart_Eventd]'
+end
+
+opennms_event 'uei.opennms.org/collectionGroupTest' do
+  file 'events/chef5.events.xml'
+  event_label 'Chef defined event: thresholdExceeded'
+  descr '<p>collection group test.</p>'
+  logmsg 'A collection group test.'
+  logmsg_dest 'logndisplay'
+  logmsg_notify true
+  severity 'Indeterminate'
+  position 'bottom'
+  eventconf_position 'top'
+  collection_group [
+    {
+      'name' => 'nodeGroup',
+      'resource_type' => 'nodeSnmp',
+      'instance' => 'instanceParmName',
+      'collections' => [ { 'name' => 'TIME', 'type' => 'counter', 'param_values' => { 'primary' => 1, 'secondary' => 2 } }],
+      'rrd' => {
+        'rra' => [ 'RRA:AVERAGE:0.5:1:8928' ],
+        'step' => 60, 'heartbeat' => 120
+      }
+    }
+  ]
+end
+
+opennms_event 'uei.opennms.org/parametersTest' do
+  file 'events/chef6.events.xml'
+  event_label 'Chef defined event: parametersTest'
+  descr '<p>parameters.</p>'
+  logmsg 'parameters test.'
+  logmsg_dest 'logndisplay'
+  logmsg_notify true
+  severity 'Critical'
+  position 'bottom'
+  eventconf_position 'top'
+  parameters [{ 'name' => 'paramName', 'value' => 'someString', 'expand' => true }]
+end
+
+opennms_event 'uei.opennms.org/operactionTest' do
+  file 'events/chef6.events.xml'
+  event_label 'Chef defined event: operactionTest'
+  descr '<p>operactionTest.</p>'
+  logmsg 'operactionTest test.'
+  logmsg_dest 'logndisplay'
+  logmsg_notify true
+  severity 'Warning'
+  position 'top'
+  eventconf_position 'override'
+  operaction [{ 'action' => 'string', 'state' => 'off', 'menutext' => 'help me' }]
+end
+
+opennms_event 'uei.opennms.org/autoackTest' do
+  file 'events/chef6.events.xml'
+  event_label 'Chef defined event: autoackTest'
+  descr '<p>autoackTest.</p>'
+  logmsg 'autoackTest test.'
+  logmsg_dest 'logndisplay'
+  logmsg_notify true
+  severity 'Minor'
+  position 'bottom'
+  eventconf_position 'override'
+  autoacknowledge 'info' => 'please do not wake me up when the computer breaks', 'state' => 'off'
+end
+
+opennms_event 'uei.opennms.org/filters' do
+  file 'events/chef6.events.xml'
+  event_label 'Chef defined event: filters'
+  descr '<p>filters.</p>'
+  logmsg 'filters test.'
+  logmsg_dest 'logndisplay'
+  logmsg_notify true
+  severity 'Major'
+  position 'bottom'
+  eventconf_position 'bottom'
+  filters [{ 'eventparm' => 'one', 'pattern' => '/^one&two{;t|hree😇$/', 'replacement' => '💩' }]
 end

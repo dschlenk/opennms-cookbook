@@ -128,3 +128,10 @@ suites:
       inspec_tests:
         - path: test/integration/default
         - path: test/integration/eventconf
+  - name: event
+    provisioner:
+      policyfile: policyfiles/event.rb
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/event

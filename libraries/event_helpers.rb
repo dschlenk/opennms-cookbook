@@ -9,7 +9,7 @@ module Opennms
             else
               e = element.elements[xpath]
             end
-            e.texts.join('').strip if !element.nil? && !element.elements[xpath].nil?
+            e.texts.collect {|t| t.value }.join('').strip if !e.nil?
           end
 
           def is_positive_i?(s)
@@ -17,11 +17,11 @@ module Opennms
           end
 
           def element_multiline_text(element, xpath)
-            element.elements[xpath].texts.select { |t| t && t.to_s.strip != '' }.join("\n") if !element.nil? && !element.elements[xpath].nil?
+            element.elements[xpath].texts.select { |t| t && t.to_s.strip != '' }.collect {|t| t.value }.join("\n") if !element.nil? && !element.elements[xpath].nil?
           end
 
           def attr_value(element, xpath)
-            element.elements[xpath].value if !element.nil? && !element.elements[xpath] && element.elements[xpath].is_a?(REXML::Attribute)
+            element.elements[xpath].value if !element.nil? && !element.elements[xpath].nil? && element.elements[xpath].is_a?(REXML::Attribute)
           end
         end
 
@@ -95,10 +95,12 @@ module Opennms
                 owner node['opennms']['username']
                 group node['opennms']['groupname']
                 mode '0664'
-                variables(events: eventfile.events)
+                variables(eventfile: eventfile)
                 action :nothing
                 delayed_action :create
                 notifies :run, 'opennms_send_event[restart_Eventd]'
+                not_if { Chef::Log.warn("runnint eventfile guard, entries is #{eventfile.entries.length}");
+                                        eventfile.entries.length == 0 }
               end
             end
           end
@@ -118,7 +120,7 @@ module Opennms
             f.close
             position = 'override'
             doc.each_element('/events/event-file') do |ef|
-              event_file = ef.texts.join('').strip[7..-1] if !ef.nil? && ef.respond_to?(:texts) && ef.texts.join('').strip.length > 7
+              event_file = ef.texts.collect {|t| t.value }.join('').strip[7..-1] if !ef.nil? && ef.respond_to?(:texts) && ef.texts.collect {|t| t.value }.join('').strip.length > 7
               if node['opennms']['opennms_event_files'].include?(event_file)
                 position = 'top' if position != 'top'
                 next
@@ -167,10 +169,10 @@ module Opennms
                 event_label = element_text(event, 'event-label')
                 descr = element_multiline_text(event, 'descr')
                 logmsg = element_multiline_text(event, 'logmsg')
-                logmsg_notify = attr_value(event, 'logmsg/@notify')
+                logmsg_notify = attr_value(event, 'logmsg/@notify').downcase == 'true'
                 logmsg_dest = attr_value(event, 'logmsg/@dest')
                 collection_group = collection_groups(event)
-                severity = event.elements['severity'].texts.join('').strip
+                severity = event.elements['severity'].texts.collect {|t| t.value }.join('').strip
                 operinstruct = element_multiline_text(event, 'operinstruct')
                 autoaction = autoactions(event)
                 varbindsdecode = varbindsdecodes(event)
@@ -184,7 +186,7 @@ module Opennms
                 mouseovertext = element_multiline_text(event, 'mouseovertext')
                 alarm_data = alarm_data(event)
                 filters = filters(event)
-                @entries.push(EventDefinition.new(uei, mask, priority, event_label, descr, logmsg, logmsg_dest, logmsg_notify, collection_group, severity, operinstruct, autoaction, varbindsdecode, parameters, operaction, autoacknowledge, loggroup, tticket, forward, script, mouseovertext, alarm_data, filters))
+                @entries.push(EventDefinition.new(uei: uei, mask: mask, priority: priority, event_label: event_label, descr: descr, logmsg: logmsg, logmsg_dest: logmsg_dest, logmsg_notify: logmsg_notify, collection_group: collection_group, severity: severity, operinstruct: operinstruct, autoaction: autoaction, varbindsdecode: varbindsdecode, parameters: parameters, operaction: operaction, autoacknowledge: autoacknowledge, loggroup: loggroup, tticket: tticket, forward: forward, script: script, mouseovertext: mouseovertext, alarm_data: alarm_data, filters: filters))
               end
             end
           end
@@ -200,12 +202,12 @@ module Opennms
           end
 
           def add(entry, position)
-            @entries.insert(1, entry) if position == 'top'
+            @entries.insert(0, entry) if position == 'top'
             @entries.push(entry) if position == 'bottom'
           end
 
           def remove(entry)
-            @entries.reject! { e e.match?(entry) }
+            @entries.reject! { |e| e.match?(entry) }
           end
 
           def include?(entry)
@@ -226,20 +228,20 @@ module Opennms
             varbinds = []
             event.each_element('mask/maskelement') do |me|
               mer = {}
-              mer['mename'] = me.elements['mename'].texts.join('').strip
+              mer['mename'] = me.elements['mename'].texts.collect {|t| t.value }.join('').strip
               mevalues = []
               me.each_element('mevalue') do |mev|
-                mevalues.push mev.texts.join('').strip
+                mevalues.push mev.texts.collect {|t| t.value }.join('').strip
               end
               mer['mevalue'] = mevalues
               mes.push mer
             end
             event.each_element('mask/varbind') do |vb|
               vbr = {}
-              vbr['vbnumber'] = vb.elements['vbnumber'].texts.join('').strip
+              vbr['vbnumber'] = vb.elements['vbnumber'].texts.collect {|t| t.value }.join('').strip
               vbvalues = []
               vb.each_element('vbvalue') do |vbv|
-                vbvalues.push vbv.texts.join('').strip
+                vbvalues.push vbv.texts.collect {|t| t.value }.join('').strip
               end
               vbr['vbvalue'] = vbvalues
               varbinds.push vbr
@@ -247,15 +249,15 @@ module Opennms
             mes + varbinds
           end
 
-          def collection_groups(event)
-            return if event.elements['collectionGroup'].nil?
+          def collection_groups(event_el)
+            return if event_el.elements['collectionGroup'].nil?
             cgs = []
-            event.each_element('collectionGroup') do |g|
+            event_el.each_element('collectionGroup') do |g|
               group = { 'name' =>  attr_value(g, '@name') }
               group['resource_type'] = attr_value(g, '@resourceType') unless g.elements['@resourceType'].nil?
               group['instance'] = attr_value(g, '@instance') unless g.elements['@instance'].nil?
               rras = []
-              g.each_element['rrd/rra'] do |rra|
+              g.each_element('rrd/rra') do |rra|
                 rras.push(element_text(rra))
               end
               group['rrd'] = { 'rra' => rras, 'step' => attr_value(g, 'rrd/@step').to_i }
@@ -268,9 +270,9 @@ module Opennms
                 unless c.elements['paramValue'].nil?
                   pvs = {}
                   c.each_element('paramValue') do |pv|
-                    pvs[attr_value(pv, 'key')] = attr_value(pv, 'value').to_f
+                    pvs[attr_value(pv, '@key')] = Integer(attr_value(pv, '@value')) rescue attr_value(pv, '@value').to_f
                   end
-                  collection['paramValues'] = pvs
+                  collection['param_values'] = pvs
                 end
                 collections.push collection
               end
@@ -285,7 +287,7 @@ module Opennms
             aas = []
             event.each_element('autoaction') do |aa|
               a = {}
-              a['action'] = aa.texts.select { |t| t && t.to_s.strip != '' }.join("\n")
+              a['action'] = aa.texts.select { |t| t && t.to_s.strip != '' }.collect {|t| t.value }.join("\n")
               a['state'] = aa.attributes['state'] unless aa.attributes['state'].nil?
               aas.push(a)
             end
@@ -324,9 +326,9 @@ module Opennms
             oas = []
             event.each_element('operaction') do |oa|
               o = {}
-              o['action'] = oa.texts.select { |t| t && t.to_s.strip != '' }.join("\n")
+              o['action'] = oa.texts.select { |t| t && t.to_s.strip != '' }.collect {|t| t.value }.join("\n")
               o['menutext'] = oa.attributes['menutext']
-              o['state'] = oa.attributes['state'] unless aa.attributes['state'].nil?
+              o['state'] = oa.attributes['state'] unless oa.attributes['state'].nil?
               oas.push(o)
             end
             oas
@@ -345,7 +347,7 @@ module Opennms
             forwards = []
             event.elements.each('forward') do |fwd|
               f = {}
-              f['info'] = fwd.texts.select { |t| t && t.to_s.strip != '' }.join("\n")
+              f['info'] = fwd.texts.select { |t| t && t.to_s.strip != '' }.collect {|t| t.value }.join("\n")
               f['state'] = fwd.attributes['state'] unless fwd.attributes['state'].nil?
               f['mechanism'] = fwd.attributes['mechanism'] unless fwd.attributes['mechanism'].nil?
               forwards.push f
@@ -358,7 +360,7 @@ module Opennms
             scripts = []
             event.each_element('script') do |s|
               script = {}
-              script['name'] = s.texts.select { |t| t && t.to_s.strip != '' }.join("\n")
+              script['name'] = s.texts.select { |t| t && t.to_s.strip != '' }.collect {|t| t.value }.join("\n")
               script['language'] = s.attributes['language']
               scripts.push script
             end
@@ -414,9 +416,9 @@ module Opennms
         end
 
         class EventDefinition
-          attr_reader :uei, :mask, :priority, :event_label, :descr, :logmsg, :logmsg_dest, :logmsg_notify, :collection_group, :severity, :operinstruct, :autoaction, :varbindsdecode, :paramters, :operaction, :autoacknowledge, :loggroup, :tticket, :forward, :script, :mouseovertext, :alarm_data, :filters
+          attr_reader :uei, :mask, :priority, :event_label, :descr, :logmsg, :logmsg_dest, :logmsg_notify, :collection_group, :severity, :operinstruct, :autoaction, :varbindsdecode, :parameters, :operaction, :autoacknowledge, :loggroup, :tticket, :forward, :script, :mouseovertext, :alarm_data, :filters
 
-          def initialize(uei, mask, priority, event_label, descr, logmsg, logmsg_dest, logmsg_notify, collection_group, severity, operinstruct, autoaction, varbindsdecode, parameters, operaction, autoacknowledge, loggroup, tticket, forward, script, mouseovertext, alarm_data, filters)
+          def initialize(uei:, mask:, priority: nil, event_label:, descr:, logmsg:, logmsg_dest: nil, logmsg_notify: nil, collection_group:nil, severity:, operinstruct: nil, autoaction: nil, varbindsdecode: nil, parameters: nil, operaction: nil, autoacknowledge: nil, loggroup: nil, tticket: nil, forward: nil, script: nil, mouseovertext: nil, alarm_data: nil, filters: nil)
             @uei = uei
             @mask = mask
             @priority = priority
@@ -501,7 +503,7 @@ module Opennms
           end
 
           def match_by_id?(uei, mask)
-            return true if @uei.eql?(uei) && @mask.eql?(mask)
+            return true if @uei.eql?(uei) && ((mask.eql?('*') || @mask.eql?(mask)) || (mask.eql?('!') && @mask.nil?))
             false
           end
 

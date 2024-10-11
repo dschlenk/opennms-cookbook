@@ -39,7 +39,7 @@ property :logmsg_notify, [true, false]
 #     'name' => 'nodeGroup',
 #     'resource_type' => 'nodeSnmp',
 #     'instance' => 'instanceParmName',
-#     'collections' => [ { 'name' => 'TIME', 'type' => 'counter', 'param_values' => { 'primary` => 1, 'secondary' => 2 } }] }
+#     'collections' => [{ 'name' => 'TIME', 'type' => 'counter', 'param_values' => { 'primary' => 1, 'secondary' => 2 } }],
 #     'rrd' => { 
 #                'rra' => [ 'RRA:AVERAGE:0.5:1:8928' ],
 #                'step' => 60, 'heartbeat' => 120
@@ -48,7 +48,7 @@ property :logmsg_notify, [true, false]
 # ]
 property :collection_group, Array, callbacks: {
   'should be an array of hashes that contain key `rrd` with hash value consisting of key `rra` that is an array of strings that match pattern `RRA:(AVERAGE|MIN|MAX|LAST):.*`, `step` that is an integer; `name` with a string value; and `collections` which is an array of at least one hash containing key `name` with a string value' => lambda {
-    |p| p.is_a?(Array) && !p.any? { |h| !h.key?('name') || !h.key?('rrd') || !h['rrd'].is_a?(Hash) || !h['rrd'].any? { |h2| !h2.key?('rra') || !h2['rra'].is_a?(Array) || !h2['rra'].any? { |a| !a.is_a?(String) || !a.match(/RRA:(AVERAGE|MIN|MAX|LAST):.*/) } || !h2.key?('step') } || !h['step'].is_a?(Integer) || !h.key?('collections') || !h['collections'].is_a?(Array) || !h['collections'].length > 0 || !h['collections'].any? { |ca| !ca.is_a?(Hash) || !ca.key?('name') } }
+    |p| p.is_a?(Array) && !p.any?{ |h| !h.key?('name') || !h.key?('rrd') || !h['rrd'].is_a?(Hash) || !h['rrd'].key?('rra')  || !h['rrd']['rra'].is_a?(Array) || h['rrd']['rra'].any? { |a| !a.is_a?(String) || !a.match(/RRA:(AVERAGE|MIN|MAX|LAST):.*/) } || !h['rrd'].key?('step') || !h['rrd']['step'].is_a?(Integer) || !h.key?('collections') || !h['collections'].is_a?(Array) || h['collections'].length <= 0 || h['collections'].any? { |ca| !ca.is_a?(Hash) || !ca.key?('name') } }
   }
 }
 # this is required when creating a new event, but not when updating existing. Use 'Indeterminate' if unknown.
@@ -61,7 +61,7 @@ property :operinstruct, String
 #     ]
 property :autoaction, Array, callbacks: {
   'should be an array of hashes each of which contain a key named `action` and optionally a key named `state` with value of either `on` or `off`' => lambda {
-    |p| p.is_a?(Array) && !p.any? { |h| !h.is_a?(Hash) || !h.key?('action') || !(h.key?('state') && !['on', 'off'].include?(p['state'])) }
+    |p| p.is_a?(Array) && !p.any? { |h| !h.is_a?(Hash) || !h.key?('action') || (h.key?('state') && !['on', 'off'].include?(h['state'])) }
   }
 }
 # Array of Hashes
@@ -71,7 +71,7 @@ property :autoaction, Array, callbacks: {
 #     ]
 property :varbindsdecode, Array, callbacks: {
   'should be an array of hashes each with a `parmid` key and a `decode` key with an array value of at least one hash that contains keys `varbindvalue` and `varbinddecodedstring`' => lambda {
-    |p| p.is_a?(Array) && !p.any? { |h| !h.is_a(Hash) || !h.key?('parmid') || !h.key?('decode') || !h['decode'].is_a?(Array) || !h['decode'].length > 0  || !h['decode'].any? { |dh| !dh.is_a?(Hash) || !dh.key?('varbindvalue') || !dh.key?('varbinddecodedstring') } }
+    |p| p.is_a?(Array) && !p.any? { |h| !h.is_a?(Hash) || !h.key?('parmid') || !h.key?('decode') || !h['decode'].is_a?(Array) || h['decode'].length <= 0  || h['decode'].any? { |dh| !dh.is_a?(Hash) || !dh.key?('varbindvalue') || !dh.key?('varbinddecodedstring') } }
   }
 }
 # Array of Hashes
@@ -83,7 +83,7 @@ property :varbindsdecode, Array, callbacks: {
 # They are ignored when using 16 and the expand attribute is ignored when using 17.
 property :parameters, Array, callbacks: {
   'should be an array of hashes each with a `name` key and a `value` key and optionally an `expand` key with a boolean value' => lambda {
-    |p| p.is_a?(Array) && !p.any? { |h| !h.is_a?(Hash) || !h.key?('name') || !h.key?('value') || !(h.key?('expand') && ![true, false, "true", "false"].include?(h['expand'])) }
+    |p| p.is_a?(Array) && !p.any? { |h| !h.is_a?(Hash) || !h.key?('name') || !h.key?('value') || !(h.key?('expand') && [true, false, "true", "false"].include?(h['expand'])) }
   }
 }
 # Array of Hashes
@@ -93,7 +93,7 @@ property :parameters, Array, callbacks: {
 #    ]
 property :operaction, Array, callbacks: {
   'should be an array of hashes each containing key `action`, key `menutext` and optionally key `state` with value of either `on` or `off`' => lambda {
-    |p| p.is_a?(Array) && !p.any? { |h| !h.is_a?(Hash) || !h.key?('action') || !h.key?('menutext') || !(h.key?('state') && !['on', 'off'].include?(h['state'])) }
+    |p| p.is_a?(Array) && !p.any? { |h| !h.is_a?(Hash) || !h.key?('action') || !h.key?('menutext') || !(h.key?('state') && ['on', 'off'].include?(h['state'])) }
   }
 }
 # Hash with key `info` (string) and optional key `state` of either `on` or `off`
@@ -137,8 +137,8 @@ property :mouseovertext, String
 # set to false to remove existing alarm-data
 # ex: 'update_fields' => [{'field_name' => String, 'update_on_reduction' => true*|false}, ...], 'managed_object_type' => String, 'reduction_key' => String, 'alarm_type' => Fixnum, 'clear_key' => String, 'auto_clean' => true|false*, 'x733_alarm_type' => 'CommunicationsAlarm|ProcessingErrorAlarm|EnvironmentalAlarm|QualityOfServiceAlarm|EquipmentAlarm|IntegrityViolation|SecurityViolation|TimeDomainViolation|OperationalViolation|PhysicalViolation', 'x733_probable_cause' => Fixnum
 property :alarm_data, [Hash, false], callbacks: {
-  'should be a hash that contains keys `reduction_key` (string), `alarm_type` (integer). May contain keys `update_fields` (array of hashes that include mandatory key `field_name` (string) and optional keys `update_on_reduction` (boolean), `value_expression` (string)), `clear_key` (string), `auto_clean` (boolean), `x733_alarm_type` (string), `x733_probable_cause` (int)' => lambda {
-    |p| [false].include?(p) || (p.is_a?(Hash) && !p.any? { |h| !h.is_a?(Hash) || !h.key?('reduction_key') || !h.key?('alarm_type') || !h['alarm_type'].is_a?(Integer) || !h['alarm_type'] > 0 })
+  'should be a hash that contains keys `reduction_key` (string), `alarm_type` (integer). May contain keys `update_fields` (array of hashes that include mandatory key `field_name` (string) and optional keys `update_on_reduction` (boolean), `value_expression` (string)), `clear_key` (string), `auto_clean` (boolean), `x733_alarm_type` (string), `x733_probable_cause` (int)' => lambda { |p| 
+    (p.is_a?(Hash) && p.key?('reduction_key') && p.key?('alarm_type') && p['alarm_type'].is_a?(Integer) && p['alarm_type'] > 0 )
   }
 }
 # used to change parm values of an event instance when the named parm's value matches the regular expression
@@ -148,7 +148,7 @@ property :filters, Array, callbacks: {
   }
 }
 # control where in a file the event is added. Does not guarantee that the event will remain the first or last element in the file - once it exists in the file this attribute is ignored for purposes of whether or not the resource needs to be updated.
-property :position, String, equal_to: %{top bottom}, default: 'bottom'
+property :position, String, equal_to: %w{top bottom}, default: 'bottom'
 # if a new eventconf file is created as a result of this resource executing, this property controls the relative position that the reference to the new file is added to the main eventconf file
 property :eventconf_position, String, equal_to: %w(override top bottom), default: 'bottom'
 
@@ -169,20 +169,29 @@ load_current_value do |new_resource|
   %i(priority event_label descr logmsg logmsg_dest logmsg_notify collection_group severity operinstruct autoaction varbindsdecode parameters operaction autoacknowledge loggroup tticket forward script mouseovertext alarm_data filters).each do |p|
     send(p, event.send(p))
   end
-  # skipping `position` as we don't ever change position of an event in a file once it exists
-  eventconf_position eventconf.event_files[new_resource.file[7..-1]][:position]
+  # uei and mask don't change
+  uei new_resource.uei
+  mask new_resource.mask
+  # make the `position` related fields match.
+  # we don't ever change position of an event in a file once it exists
+  # and eventconf_position only influences location on new files
+  position new_resource.position
+  eventconf_position new_resource.eventconf_position
 end
 
 action :create do
   converge_if_changed do
-    eventconf_resource_init
-    eventconf_resource.variables[:eventconf].event_files[new_resource.file] = { position: new_resource.eventconf_position }
     eventfile_resource_init
-    entry = eventfile_resource.variables[:events].entry(new_resource.uei || new_resource.name, new_resource.mask)
+    entry = eventfile_resource.variables[:eventfile].entry(new_resource.uei || new_resource.name, new_resource.mask)
     if entry.nil?
+      eventconf_resource_init
+      eventconf_resource.variables[:eventconf].event_files[new_resource.file[7..-1]] = { position: new_resource.eventconf_position }
       resource_properties = %i(uei mask priority event_label descr logmsg logmsg_dest logmsg_notify collection_group severity operinstruct autoaction varbindsdecode parameters operaction autoacknowledge loggroup tticket forward script mouseovertext alarm_data filters).map{ |p| [p, new_resource.send(p)] }.to_h.compact
+      resource_properties[:uei] = new_resource.name if new_resource.uei.nil?
+      Chef::Log.warn("resource properties: '#{resource_properties}")
       entry = Opennms::Cookbook::ConfigHelpers::Event::EventDefinition.create(**resource_properties)
-      eventfile_resource.variables[:events].add(entry, new_resource.position)
+      Chef::Log.warn("created entry: '#{entry}")
+      eventfile_resource.variables[:eventfile].add(entry, new_resource.position)
     else
       run_action(:update)
     end
@@ -192,7 +201,7 @@ end
 action :update do
   converge_if_changed(:priority, :event_label, :descr, :logmsg, :logmsg_dest, :logmsg_notify, :collection_group, :severity, :operinstruct, :autoaction, :varbindsdecode, :parameters, :operaction, :autoacknowledge, :loggroup, :tticket, :forward, :script, :mouseovertext, :alarm_data, :filters) do
     eventfile_resource_init
-    entry = eventfile_resource.variables[:events].entry(new_resource.uei || new_resource.name, new_resource.mask)
+    entry = eventfile_resource.variables[:eventfile].entry(new_resource.uei || new_resource.name, new_resource.mask)
     raise Chef::Exceptions::CurrentValueDoesNotExist, "Cannot update event definition for '#{new_resource.name}' as it does not exist" if entry.nil?
     entry.update(priority: new_resource.priority,
                  event_label: new_resource.event_label,
@@ -220,9 +229,17 @@ action :update do
 end
 
 action :delete do
-  eventconf_resource_init
-  eventconf_resource.variables[:eventconf].event_files.delete(new_resource.file[7..-1])
-  file "#{node['opennms']['conf']['home']}/etc/#{new_resource.file}" do
-    action :delete
+  # remove this event from file and if no more events delete the file, remove it from eventconf
+  eventfile_resource_init
+  entry = eventfile_resource.variables[:eventfile].entry(new_resource.uei || new_resource.name, new_resource.mask)
+  unless entry.nil?
+    eventfile_resource.variables[:eventfile].remove(entry)
+    if eventfile_resource.variables[:eventfile].entries.length == 0
+      file "#{node['opennms']['conf']['home']}/etc/#{new_resource.file}" do
+        action :delete
+      end
+      eventconf_resource_init
+      eventconf_resource.variables[:eventconf].event_files.delete(new_resource.file[7..-1])
+    end
   end
 end
