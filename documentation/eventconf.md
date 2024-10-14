@@ -36,3 +36,4 @@ The `variables` property is passed to the derived `template` resource when `sour
 
 ## Examples
 
+See [eventconf.rb](../test/fixtures/cookbooks/opennms_resource_tests/recipes/eventconf.rb)

@@ -556,6 +556,7 @@ module Opennms
             EventDefinition.new(**properties)
           end
         end
+
         class EventDefinitionDuplicateEntry < StandardError; end
       end
     end
