@@ -258,12 +258,11 @@ EOL
 
   describe eventconf('NOTIFICATION-TEST-MIB.events.xml') do
     it { should exist }
-    its('content') { should match /<severity>Major<\/severity>/ }
+    its('content') { should match %r{<severity>Major</severity>} }
   end
 
   describe eventconf('printer.events.xml') do
     it { should exist }
-    its('content'){ should match /<severity>Minor<\/severity>/ }
+    its('content') { should match %r{<severity>Minor</severity>} }
   end
-
 end

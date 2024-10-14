@@ -36,9 +36,9 @@ class Event < Inspec.resource(1)
     @params = {}
     if @exists
       @params[:position] = e_el.parent.index(e_el)
-      @params[:event_label] = e_el.elements['event-label'].texts.collect {|t| t.value }.join("\n")
-      @params[:descr] = e_el.elements['descr'].texts.collect {|t| t.value }.join("\n")
-      @params[:logmsg] = e_el.elements['logmsg'].texts.collect {|t| t.value }.join("\n")
+      @params[:event_label] = e_el.elements['event-label'].texts.collect(&:value).join("\n")
+      @params[:descr] = e_el.elements['descr'].texts.collect(&:value).join("\n")
+      @params[:logmsg] = e_el.elements['logmsg'].texts.collect(&:value).join("\n")
       @params[:logmsg_dest] = e_el.elements['logmsg/@dest'].value unless e_el.elements['logmsg/@dest'].nil?
       truthy = e_el.elements['logmsg/@notify'].value unless e_el.elements['logmsg/@notify'].nil?
       unless truthy.nil?
@@ -49,14 +49,14 @@ class Event < Inspec.resource(1)
         end
       end
       @params[:severity] = e_el.elements['severity'].text.to_s
-      @params[:operinstruct] = e_el.elements['operinstruct'].texts.collect {|t| t.value }.join("\n") unless e_el.elements['operinstruct'].nil?
+      @params[:operinstruct] = e_el.elements['operinstruct'].texts.collect(&:value).join("\n") unless e_el.elements['operinstruct'].nil?
       @params[:autoaction] = autoactions(e_el)
       @params[:varbindsdecode] = varbindsdecodes(e_el)
       @params[:parameters] = get_parameters(e_el)
       @params[:tticket] = get_tticket(e_el)
       @params[:forward] = forwards(e_el)
       @params[:script] = scripts(e_el)
-      @params[:mouseovertext] = e_el.elements['mouseovertext'].texts.collect {|t| t.value }.join("\n") unless e_el.elements['mouseovertext'].nil?
+      @params[:mouseovertext] = e_el.elements['mouseovertext'].texts.collect(&:value).join("\n") unless e_el.elements['mouseovertext'].nil?
       @params[:alarm_data] = get_alarm_data(e_el)
       @params[:collection_group] = collection_groups(e_el)
       @params[:operaction] = operactions(e_el)
@@ -104,14 +104,14 @@ class Event < Inspec.resource(1)
   def attr_value(element, xpath)
     element.elements[xpath].value if !element.nil? && !element.elements[xpath].nil? && element.elements[xpath].is_a?(REXML::Attribute)
   end
-  
+
   def element_text(element, xpath = nil)
-    if xpath.nil?
-      e = element
-    else
-      e = element.elements[xpath]
-    end
-    e.texts.collect {|t| t.value }.join('').strip if !e.nil?
+    e = if xpath.nil?
+          element
+        else
+          element.elements[xpath]
+        end
+    e.texts.collect(&:value).join('').strip unless e.nil?
   end
 
   def infohash(event_el, xpath)
@@ -135,7 +135,7 @@ class Event < Inspec.resource(1)
     return if event_el.elements['collectionGroup'].nil?
     cgs = []
     event_el.each_element('collectionGroup') do |g|
-      group = { 'name' =>  attr_value(g, '@name') }
+      group = { 'name' => attr_value(g, '@name') }
       group['resource_type'] = attr_value(g, '@resourceType') unless g.elements['@resourceType'].nil?
       group['instance'] = attr_value(g, '@instance') unless g.elements['@instance'].nil?
       rras = []
@@ -152,7 +152,11 @@ class Event < Inspec.resource(1)
         unless c.elements['paramValue'].nil?
           pvs = {}
           c.each_element('paramValue') do |pv|
-            pvs[attr_value(pv, '@key')] = Integer(attr_value(pv, '@value')) rescue attr_value(pv, '@value').to_f
+            pvs[attr_value(pv, '@key')] = begin
+                                            Integer(attr_value(pv, '@value'))
+                                          rescue
+                                            attr_value(pv, '@value').to_f
+                                          end
           end
           collection['param_values'] = pvs
         end
@@ -169,7 +173,7 @@ class Event < Inspec.resource(1)
     oas = []
     event_el.each_element('operaction') do |oa|
       o = {}
-      o['action'] = oa.texts.select { |t| t && t.to_s.strip != '' }.collect {|t| t.value }.join("\n")
+      o['action'] = oa.texts.select { |t| t && t.to_s.strip != '' }.collect(&:value).join("\n")
       o['menutext'] = oa.attributes['menutext']
       o['state'] = oa.attributes['state'] unless oa.attributes['state'].nil?
       oas.push(o)
@@ -221,7 +225,7 @@ class Event < Inspec.resource(1)
 
   def get_tticket(event_el)
     tticket_el = event_el.elements['tticket']
-    return nil if tticket_el.nil?
+    return if tticket_el.nil?
     tt_state = tticket_el.attributes['state'] || 'on'
     tt_info = tticket_el.texts.join("\n")
     { 'info' => tt_info, 'state' => tt_state }
@@ -260,7 +264,7 @@ class Event < Inspec.resource(1)
 
   def get_alarm_data(event_el)
     ad_el = event_el.elements['alarm-data']
-    return nil if ad_el.nil?
+    return if ad_el.nil?
     alarm_type = ad_el.attributes['alarm-type'].to_i
     reduction_key = ad_el.attributes['reduction-key']
     clear_key = ad_el.attributes['clear-key']

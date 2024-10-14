@@ -436,21 +436,21 @@ module Opennms
             @logmsg = logmsg
             @logmsg_dest = logmsg_dest
             @logmsg_notify = logmsg_notify
-            @collection_group = collection_group
+            @collection_group = false.eql?(collection_group) ? nil : collection_group
             @severity = severity
             @operinstruct = operinstruct
-            @autoaction = autoaction
-            @varbindsdecode = varbindsdecode
-            @parameters = parameters
-            @operaction = operaction
-            @autoacknowledge = autoacknowledge
+            @autoaction = false.eql?(autoaction) ? nil : autoaction
+            @varbindsdecode = false.eql?(varbindsdecode) ? nil : varbindsdecode
+            @parameters = false.eql?(parameters) ? nil : parameters
+            @operaction = false.eql?(operaction) ? nil : operaction
+            @autoacknowledge = false.eql?(autoacknowledge) ? nil : autoacknowledge
             @loggroup = loggroup
-            @tticket = tticket
-            @forward = forward
-            @script = script
+            @tticket = false.eql?(tticket) ? nil : tticket
+            @forward = false.eql?(forward) ? nil : forward
+            @script = false.eql?(script) ? nil : script
             @mouseovertext = mouseovertext
-            @alarm_data = alarm_data
-            @filters = filters
+            @alarm_data = false.eql?(alarm_data) ? nil : alarm_data
+            @filters = false.eql?(filters) ? nil : filters
           end
 
           def to_s
@@ -524,20 +524,31 @@ module Opennms
             @logmsg_dest = logmsg_dest unless logmsg_dest.nil?
             @logmsg_notify = logmsg_notify unless logmsg_notify.nil?
             @collection_group = collection_group unless collection_group.nil?
+            @collection_group = nil if false.eql?(collection_group)
             @severity = severity unless severity.nil?
             @operinstruct = operinstruct unless operinstruct.nil?
             @autoaction = autoaction unless autoaction.nil?
+            @autoaction = nil if false.eql?(autoaction)
             @varbindsdecode = varbindsdecode unless varbindsdecode.nil?
+            @varbindsdecode = nil if false.eql?(varbindsdecode)
             @parameters = parameters unless parameters.nil?
+            @parameters = nil if false.eql?(parameters)
             @operaction = operaction unless operaction.nil?
+            @operaction = nil if false.eql?(operaction)
             @autoacknowledge = autoacknowledge unless autoacknowledge.nil?
+            @autoacknowledge = nil if false.eql?(autoacknowledge)
             @loggroup = loggroup unless loggroup.nil?
             @tticket = tticket unless tticket.nil?
+            @tticket = nil if false.eql?(tticket)
             @forward = forward unless forward.nil?
+            @forward = nil if false.eql?(forward)
             @script = script unless script.nil?
+            @script = nil if false.eql?(script)
             @mouseovertext = mouseovertext unless mouseovertext.nil?
             @alarm_data = alarm_data unless alarm_data.nil?
+            @alarm_data = nil if false.eql?(alarm_data)
             @filters = filters unless filters.nil?
+            @filters = nil if false.eql?(filters)
             self
           end
 
@@ -545,6 +556,7 @@ module Opennms
             EventDefinition.new(**properties)
           end
         end
+        class EventDefinitionDuplicateEntry < StandardError; end
       end
     end
   end

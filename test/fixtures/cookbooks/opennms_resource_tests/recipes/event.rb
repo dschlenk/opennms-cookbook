@@ -200,8 +200,8 @@ opennms_event 'uei.opennms.org/collectionGroupTest' do
       'rrd' => {
         'rra' => [ 'RRA:AVERAGE:0.5:1:8928' ],
         'step' => 60, 'heartbeat' => 120
-      }
-    }
+      },
+    },
   ]
 end
 

@@ -135,3 +135,206 @@ suites:
       inspec_tests:
         - path: test/integration/default
         - path: test/integration/event
+  - name: event_add_parameters
+    provisioner:
+      policyfile: policyfiles/event_add_parameters.rb
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/event_add_parameters
+  - name: event_change_parameters
+    provisioner:
+      policyfile: policyfiles/event_change_parameters.rb
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/event_change_parameters
+  - name: event_descr
+    provisioner:
+      policyfile: policyfiles/event_descr.rb
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/event_descr
+  - name: event_edit_alarm_data
+    provisioner:
+      policyfile: policyfiles/event_edit_alarm_data.rb
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/event_edit_alarm_data
+  - name: event_edit_autoaction
+    provisioner:
+      policyfile: policyfiles/event_edit_autoaction.rb
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/event_edit_autoaction
+  - name: event_edit_forward
+    provisioner:
+      policyfile: policyfiles/event_edit_forward.rb
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/event_edit_forward
+  - name: event_edit_mouseovertext
+    provisioner:
+      policyfile: policyfiles/event_edit_mouseovertext.rb
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/event_edit_mouseovertext
+  - name: event_edit_operinstruct
+    provisioner:
+      policyfile: policyfiles/event_edit_operinstruct.rb
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/event_edit_operinstruct
+  - name: event_edit_script
+    provisioner:
+      policyfile: policyfiles/event_edit_script.rb
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/event_edit_script
+  - name: event_edit_tticket
+    provisioner:
+      policyfile: policyfiles/event_edit_tticket.rb
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/event_edit_tticket
+  - name: event_edit_varbindsdecode
+    provisioner:
+      policyfile: policyfiles/event_edit_varbindsdecode.rb
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/event_edit_varbindsdecode
+  - name: event_event_label
+    provisioner:
+      policyfile: policyfiles/event_label.rb
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/event_label
+  - name: event_logmsg
+    provisioner:
+      policyfile: policyfiles/event_logmsg.rb
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/event_logmsg
+  - name: event_logmsg_dest
+    provisioner:
+      policyfile: policyfiles/event_logmsg_dest.rb
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/event_logmsg_dest
+  - name: event_logmsg_notify
+    provisioner:
+      policyfile: policyfiles/event_logmsg_notify.rb
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/event_logmsg_notify
+  - name: event_noop
+    provisioner:
+      policyfile: policyfiles/event_noop.rb
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/event_noop
+  - name: event_remove_add_alarm_data
+    provisioner:
+      policyfile: policyfiles/event_remove_add_alarm_data.rb
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/event_remove_add_alarm_data
+  - name: event_remove_add_autoaction
+    provisioner:
+      policyfile: policyfiles/event_remove_add_autoaction.rb
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/event_remove_add_autoaction
+  - name: event_remove_add_forward
+    provisioner:
+      policyfile: policyfiles/event_remove_add_forward.rb
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/event_remove_add_forward
+  - name: event_remove_add_script
+    provisioner:
+      policyfile: policyfiles/event_remove_add_script.rb
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/event_remove_add_script
+  - name: event_remove_add_tticket
+    provisioner:
+      policyfile: policyfiles/event_remove_add_tticket.rb
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/event_remove_add_tticket
+  - name: event_remove_add_varbindsdecode
+    provisioner:
+      policyfile: policyfiles/event_remove_add_varbindsdecode.rb
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/event_remove_add_varbindsdecode
+  - name: event_remove_alarm_data
+    provisioner:
+      policyfile: policyfiles/event_remove_alarm_data.rb
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/event_remove_alarm_data
+  - name: event_remove_autoaction
+    provisioner:
+      policyfile: policyfiles/event_remove_autoaction.rb
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/event_remove_autoaction
+  - name: event_remove_forward
+    provisioner:
+      policyfile: policyfiles/event_remove_forward.rb
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/event_remove_forward
+  - name: event_remove_script
+    provisioner:
+      policyfile: policyfiles/event_remove_script.rb
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/event_remove_script
+  - name: event_remove_tticket
+    provisioner:
+      policyfile: policyfiles/event_remove_tticket.rb
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/event_remove_tticket
+  - name: event_remove_varbindsdecode
+    provisioner:
+      policyfile: policyfiles/event_remove_varbindsdecode.rb
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/event_remove_varbindsdecode
+  - name: event_severity
+    provisioner:
+      policyfile: policyfiles/event_severity.rb
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/event_severity
