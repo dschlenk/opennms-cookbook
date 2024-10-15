@@ -1,28 +1,30 @@
+include Opennms::XmlHelper
 unified_mode true
-property :label,String, name_attribute: true
+property :label, String, name_property: true
 # containing CategoryGroup, default is the default OpenNMS ships with.
 # It has to exist, although no custom resource to do so exists (yet)
 property :category_group, String, default: 'WebConsole', identity: true
 property :comment, String
-property :normal, Float, default: 99.99
-property :warning, Float, default: 97.0
-property :rule, String, default: "IPADDR != '0.0.0.0'"
+property :normal, Float # defaults: 99.99 on create
+property :warning, Float # defaults: 97.0 on create
+property :rule, String #default: "IPADDR != '0.0.0.0'" on create
 # array of Strings of services in poller or collectd
-property :services, Array, default: []
+property :services, Array # at least one required on create
 
 action_class do
   include Opennms::Cookbook::ConfigHelpers::AvailCategory::AvailCategoryTemplate
+  include Opennms::XmlHelper
 end
 
 load_current_value do |new_resource|
   current_value_does_not_exist! unless ::File.exist?("#{onms_etc}/categories.xml")
-  doc = doc_from_file("#{onms_etc}/categories")
+  doc = xmldoc_from_file("#{onms_etc}/categories.xml")
   current_value_does_not_exist! if doc.elements["/catinfo/categorygroup/name[text()[contains(.,'#{new_resource.category_group}')]]"].nil?
-  cl = doc.elements["/catinfo/categorygroup[name[text()[contains(.,'#{new_resource.category_group}')]]]/categories/category/label[text()[contains(.,'#{new_resource.label}')]]"]
-  current_value_does_not_Exist! if cl.nil?
+  cl = doc.elements["/catinfo/categorygroup[name[text()[contains(.,'#{new_resource.category_group}')]]]/categories/category[label[text()[contains(.,'#{new_resource.label}')]]]"]
+  current_value_does_not_exist! if cl.nil?
   comment xml_element_text(cl, 'comment') unless xml_element_text(cl, 'comment').nil?
-  normal xml_element_text(cl, 'normal') unless xml_element_text(cl, 'normal').nil?
-  warning xml_element_text(cl, 'warning') unless xml_element_text(cl, 'warning').nil?
+  normal xml_element_text(cl, 'normal').to_f unless xml_element_text(cl, 'normal').nil?
+  warning xml_element_text(cl, 'warning').to_f unless xml_element_text(cl, 'warning').nil?
   rule xml_element_text(cl, 'rule') unless xml_element_text(cl, 'rule').nil?
   services xml_text_array(cl, 'service') unless cl.elements['service'].nil?
 end
@@ -34,8 +36,12 @@ action :create do
     raise Opennms::Cookbook::ConfigHelpers::AvailCategory::CategoryGroupNotFound, "No such category group #{new_resource.category_group} exists" if cg.nil?
     c = cg.category(new_resource.label)
     if c.nil?
+      raise Opennms::Cookbook::ConfigHelpers::AvailCategory::NoServices, "At least one service must be defined per category, but no services defined with category #{new_resource.name} in group #{new_resource.category_group}" if new_resource.services.nil? || new_resource.services.empty?
       resource_properties = %i(label comment normal warning rule services).map { |p| [p, new_resource.send(p)] }.to_h.compact
-      c = Category.new(**resource_properties)
+      resource_properties[:normal] = 99.99 if resource_properties[:normal].nil?
+      resource_properties[:warning] = 97.0 if resource_properties[:warning].nil?
+      resource_properties[:rule] = 'IPADDR != \'0.0.0.0\'' if resource_properties[:rule].nil?
+      c = Opennms::Cookbook::ConfigHelpers::AvailCategory::Category.new(**resource_properties)
       cg.add(c)
     else
       run_action(:update)

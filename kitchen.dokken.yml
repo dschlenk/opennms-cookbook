@@ -338,3 +338,10 @@ suites:
       inspec_tests:
         - path: test/integration/default
         - path: test/integration/event_severity
+  - name: avail_category
+    provisioner:
+      policyfile: policyfiles/avail_category.rb
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/avail_category
