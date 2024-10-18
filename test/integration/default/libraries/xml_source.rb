@@ -37,11 +37,11 @@ class XmlSource < Inspec.resource(1)
         @params[:request_headers][rp.attributes['name'].to_s] = rp.attributes['value'].to_s
       end
     end
-    @params[:request_content] = src.elements['request/content'].texts.join("\n") unless src.elements['request/content'].nil?
+    @params[:request_content] = src.elements['request/content'].texts.collect(&:value).join("\n") unless src.elements['request/content'].nil?
     unless src.elements['import-groups'].nil?
       @params[:import_groups] = []
       src.each_element('import-groups') do |f|
-        fn = f.texts.join('').gsub(%r{xml-datacollection/}, '')
+        fn = f.texts.collect(&:value).join('').gsub(%r{xml-datacollection/}, '')
         @params[:import_groups].push fn
       end
     end

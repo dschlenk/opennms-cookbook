@@ -28,7 +28,7 @@ class SnmpConfigProfile < Inspec.resource(1)
     doc = REXML::Document.new(inspec.file('/opt/opennms/etc/snmp-config.xml').content)
     p = nil
     doc.each_element("/snmp-config/profiles/profile[label/text()[contains(., '#{@label}')]]") do |mp|
-      if mp.elements['label'].texts.join('').strip == @label
+      if mp.elements['label'].texts.collect(&:value).join('').strip == @label
         p = mp
         break
       end
@@ -58,7 +58,7 @@ class SnmpConfigProfile < Inspec.resource(1)
     @params[:privacy_passphrase] = p.attributes['privacy-passphrase'] unless p.attributes['privacy-passphrase'].nil?
     @params[:privacy_protocol] = p.attributes['privacy-protocol'] unless p.attributes['privacy-protocol'].nil?
     @params[:enterprise_id] = p.attributes['enterprise-id'] unless p.attributes['enterprise-id'].nil?
-    @params[:filter] = p.elements['filter'].texts.join('').strip unless p.elements['filter'].nil?
+    @params[:filter] = p.elements['filter'].texts.collect(&:value).join('').strip unless p.elements['filter'].nil?
   end
 
   def exist?

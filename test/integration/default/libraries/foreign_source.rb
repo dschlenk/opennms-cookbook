@@ -22,7 +22,7 @@ class ForeignSource < Inspec.resource(1)
     doc = REXML::Document.new(fs)
     fs_el = doc.elements["/foreign-source[@name = '#{name}']"]
     @exists = !fs_el.nil?
-    @scan_interval = fs_el.elements['scan-interval'].texts.join("\n") if @exists
+    @scan_interval = fs_el.elements['scan-interval'].texts.collect(&:value).join("\n") if @exists
   end
 
   def exist?

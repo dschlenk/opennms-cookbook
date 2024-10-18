@@ -23,7 +23,7 @@ class SystemDef < Inspec.resource(1)
     unless s_el.elements['collect/includeGroup'].nil?
       @params[:groups] = []
       s_el.each_element('collect/includeGroup') do |g|
-        @params[:groups].push g.texts.join('')
+        @params[:groups].push g.texts.collect(&:value).join('')
       end
     end
   end

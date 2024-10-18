@@ -34,7 +34,7 @@ class SendEvent < Inspec.resource(1)
       if s_el.elements['parameters/parameter'].nil?
         # 16
         unless s_el.elements['parms'].nil?
-          parmstr = s_el.elements['parms'].texts.join('')
+          parmstr = s_el.elements['parms'].texts.collect(&:value).join('')
           parms = parmstr.split(';')
           parms.each do |p|
             key, value = p.split('=')

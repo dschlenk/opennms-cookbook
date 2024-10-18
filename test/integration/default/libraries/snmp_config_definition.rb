@@ -67,13 +67,13 @@ class SnmpConfigDefinition < Inspec.resource(1)
     unless d.elements['specific'].nil?
       @params[:specifics] = []
       d.each_element('specific') do |s|
-        @params[:specifics].push s.texts.join('')
+        @params[:specifics].push s.texts.collect(&:value).join('')
       end
     end
     unless d.elements['ip-match'].nil?
       @params[:ip_matches] = []
       d.each_element('ip-match') do |i|
-        @params[:ip_matches].push i.texts.join('')
+        @params[:ip_matches].push i.texts.collect(&:value).join('')
       end
     end
   end

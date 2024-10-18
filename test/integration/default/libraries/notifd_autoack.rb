@@ -26,7 +26,7 @@ class NotifdAutoack < Inspec.resource(1)
       @params[:notify] = true if aa_el.attributes['notify'].to_s == 'true'
       @params[:matches] = []
       aa_el.each_element('match') do |m_el|
-        @params[:matches].push m_el.texts.join("\n")
+        @params[:matches].push m_el.texts.collect(&:value).join("\n")
       end
     end
   end

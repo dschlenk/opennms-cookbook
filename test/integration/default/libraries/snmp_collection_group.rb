@@ -24,7 +24,7 @@ class SnmpCollectionGroup < Inspec.resource(1)
     @params[:system_def] = ic.attributes['systemDef'].to_s unless ic.attributes['systemDef'].nil?
     @params[:exclude_filters] = []
     ic.each_element('exclude-filter') do |f|
-      @params[:exclude_filters].push f.texts.join('')
+      @params[:exclude_filters].push f.texts.collect(&:value).join('')
     end
     fdoc = REXML::Document.new(inspec.file("/opt/opennms/etc/datacollection/#{file}").content)
     @params[:file_content] = inspec.file("/opt/opennms/etc/datacollection/#{file}").content

@@ -73,7 +73,7 @@ class ThreshdPackage < Inspec.resource(1)
     unless p_el.elements['outage-calendar'].nil?
       @params[:outage_calendars] = []
       p_el.each_element('outage-calendar') do |o|
-        @params[:outage_calendars].push o.texts.join('')
+        @params[:outage_calendars].push o.texts.collect(&:value).join('')
       end
     end
   end

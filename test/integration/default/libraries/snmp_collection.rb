@@ -27,7 +27,7 @@ class SnmpCollection < Inspec.resource(1)
       @params[:rrd_step] = c_el.elements['rrd'].attributes['step'].to_i
       @params[:rras] = []
       c_el.each_element('rrd/rra') do |rra|
-        @params[:rras].push rra.texts.join('')
+        @params[:rras].push rra.texts.collect(&:value).join('')
       end
     end
   end

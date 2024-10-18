@@ -25,7 +25,7 @@ class WsmanSystemDefinition < Inspec.resource(1)
       @params[:groups] = []
       s_el.each_element('include-group') do |g|
         puts 'Group name : ' + g.to_s
-        @params[:groups].push g.texts.join('')
+        @params[:groups].push g.texts.collect(&:value).join('')
       end
     end
   end

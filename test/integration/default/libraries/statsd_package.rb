@@ -21,7 +21,7 @@ class StatsdPackage < Inspec.resource(1)
     @exists = !p_el.nil?
     if @exists
       @params = {}
-      @params[:filter] = p_el.elements['filter'].texts.join('') unless p_el.elements['filter'].nil?
+      @params[:filter] = p_el.elements['filter'].texts.collect(&:value).join('') unless p_el.elements['filter'].nil?
     end
   end
 
