@@ -115,7 +115,7 @@ Property `alarm_data` defines the alarm configuration for instances of this even
 }
 ```
 
-Property `filters` allows one match a regular expression to an event's named parameter's value and replace it with a different value when matched. Use `false` to remove existing or add/update with an array of hashes eachof which contains keys `eventparm` (string), `pattern` (string), `replacement` (string).
+Property `filters` controls the remnant of feature that allowed you to match a regular expression to the named event parameter's value and replace it with a different value. It has been disabled since 2013. Use `false` to remove existing config from an existing event definition, or add/update with an array of hashes each of which contains keys `eventparm` (string), `pattern` (string), `replacement` (string). Enabling it requires editing the eventDaemon application context, which not only requires a restart, but also editing a jar file, and it was disabled for performance reasons.
 
 The `position` property dictates where in the event file a new event will be placed. It is ignored when an existing event is updated.
 
