@@ -1,13 +1,21 @@
 version: 2.1
+
 jobs:
-  build:
-    docker:
-      - image: cimg/ruby:2.5
+  test:
+    machine:
+      image: ubuntu-2404:current
     steps:
       - checkout
-      - run: bundle install
-      - run: bundle exec rake
+      - run:
+          name: install cinc workstation
+          command: curl -L https://omnitruck.cinc.sh/install.sh | sudo bash -s -- -P cinc-workstation -v 24
+      - run:
+          name: rake
+          command: chef exec rake
+      - jira/notify
+
 workflows:
-  build_and_test:
+  version: 2
+  untagged-build:
     jobs:
-      - build
+      - test:
