@@ -12,10 +12,9 @@ jobs:
       - run:
           name: rake
           command: chef exec rake
-      - jira/notify
 
 workflows:
   version: 2
   untagged-build:
     jobs:
-      - test:
+      - test
