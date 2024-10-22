@@ -158,9 +158,15 @@ action_class do
 end
 
 load_current_value do |new_resource|
-  # first we see if we exist
-  current_value_does_not_exist! unless ::File.exist?("#{node['opennms']['conf']['home']}/etc/#{new_resource.file}")
-  eventfile = Opennms::Cookbook::ConfigHelpers::Event::EventDefinitionFile.read("#{node['opennms']['conf']['home']}/etc/#{file}")
+  r = eventfile_resource
+  if r.nil?
+    # first we see if we exist
+    current_value_does_not_exist! unless ::File.exist?("#{node['opennms']['conf']['home']}/etc/#{new_resource.file}")
+    eventfile = Opennms::Cookbook::ConfigHelpers::Event::EventDefinitionFile.read("#{node['opennms']['conf']['home']}/etc/#{file}")
+  else
+    eventfile = r.variables[:eventfile]
+  end
+  current_value_does_not_exist! if eventfile.nil?
   event = eventfile.entry(new_resource.uei || new_resource.name, new_resource.mask)
   eventconf = Opennms::Cookbook::ConfigHelpers::Event::EventConf.read(node, "#{node['opennms']['conf']['home']}/etc/eventconf.xml")
   current_value_does_not_exist! if event.nil?

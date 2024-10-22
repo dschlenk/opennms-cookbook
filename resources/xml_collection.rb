@@ -1,6 +1,3 @@
-# frozen_string_literal: true
-require 'rexml/document'
-
 # Defines a collection in $ONMS_HOME/etc/xml-datacollection-config.xml.
 # Will be used by any packages in $ONMS_HOME/etc/collectd-configuration.xml
 # that have a XML service with this collection name as the collection
@@ -8,16 +5,57 @@ require 'rexml/document'
 # that service, the collection_package LWRP to define the package and the
 # xml_source LWRP to define the data to collect in this xml_collection.
 
-actions :create
-default_action :create
+unified_mode true
+use 'partial/_collection'
 
-require 'rexml/document'
+include Opennms::Cookbook::Collection::XmlCollectionTemplate
 
-actions :create, :delete
-default_action :create
+load_current_value do |new_resource|
+  r = xml_resource
+  collection = r.variables[:collections[new_resource.collection]] unless r.nil?
+  if r.nil? || collection.nil?
+    filename = "#{onms_etc}/xml-datacollection-config.xml"
+    current_value_does_not_exist! unless ::File.exist?(filename)
+    collection = Opennms::Cookbook::Collection::OpennmsCollectionConfigFile.read(filename, 'xml').collections[new_resource.collection]
+  end
+  current_value_does_not_exist! if collection.nil?
+  rrd_step collection.rrd_step
+  rras collection.rras
+end
 
-attribute :collection, name_attribute: true, kind_of: String, required: true
-attribute :rrd_step, kind_of: Integer, default: 300, required: true
-attribute :rras, kind_of: Array, default: ['RRA:AVERAGE:0.5:1:2016', 'RRA:AVERAGE:0.5:12:1488', 'RRA:AVERAGE:0.5:288:366', 'RRA:MAX:0.5:288:366', 'RRA:MIN:0.5:288:366'], required: true
+action_class do
+  include Opennms::Cookbook::Collection::XmlCollectionTemplate
+end
 
-attr_accessor :exists
+action :create do
+  converge_if_changed do
+    xml_resource_init
+    collection = xml_resource.variables[:collections][new_resource.name]
+    if collection.nil?
+      resource_properties = %i(name rrd_step rras).map{|p| [p, new_resource.send(p)] }.to_h.compact
+      collection = Opennms::Cookbook::Collection::XmlCollection.new(**resource_properties)
+      xml_resource.variables[:collections][new_resource.name] = collection
+    else
+      run_action(:update)
+    end
+  end
+end
+
+action :update do
+  converge_if_changed(:rrd_step, :rras) do
+    xml_resource_init
+    collection = xml_resource.variables[:collections][new_resource.name]
+    raise Chef::Exceptions::CurrentValueDoesNotExist if collection.nil?
+    collection.update(rrd_step: new_resource.rrd_step, rras: new_resource.rras)
+  end
+end
+
+action :delete do
+  xml_resource_init
+  collection = xml_resource.variables[:collections][new_resource.name]
+  unless collection.nil?
+    converge_by("Removing xml_collection #{new_resource.name}") do
+      xml_resource.variables[:collections].delete(new_resource.name)
+    end
+  end
+end

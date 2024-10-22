@@ -11,9 +11,15 @@ action_class do
   include Opennms::Cookbook::ConfigHelpers::Event::EventConfTemplate
 end
 
+include Opennms::Cookbook::ConfigHelpers::Event::EventConfTemplate
 load_current_value do |new_resource|
-  current_value_does_not_exist! unless ::File.exist?("#{node['opennms']['conf']['home']}/etc/events/#{new_resource.event_file}")
-  eventconf = Opennms::Cookbook::ConfigHelpers::Event::EventConf.read(node, "#{node['opennms']['conf']['home']}/etc/eventconf.xml")
+  r = eventconf_resource
+  if r.nil?
+    current_value_does_not_exist! unless ::File.exist?("#{node['opennms']['conf']['home']}/etc/events/#{new_resource.event_file}")
+    eventconf = Opennms::Cookbook::ConfigHelpers::Event::EventConf.read(node, "#{node['opennms']['conf']['home']}/etc/eventconf.xml")
+  else
+    eventconf = r.variables[:eventconf]
+  end
   current_value_does_not_exist! if eventconf.event_files[new_resource.name].nil?
   position eventconf.event_files[new_resource.name][:position]
 end
@@ -26,8 +32,8 @@ action :create do
       source new_resource.source || new_resource.name
       owner node['opennms']['username']
       group node['opennms']['groupname']
-      mode 0664
-      new_resource.source_properties.each do |k,v|
+      mode '664'
+      new_resource.source_properties.each do |k, v|
         send(k, v)
       end unless new_resource.source_properties.nil?
     end
@@ -36,9 +42,9 @@ action :create do
       source new_resource.source || "#{new_resource.name}.erb"
       owner node['opennms']['username']
       group node['opennms']['groupname']
-      mode 0664
+      mode '664'
       variables new_resource.variables
-      new_resource.source_properties.each do |k,v|
+      new_resource.source_properties.each do |k, v|
         send(k, v)
       end unless new_resource.source_properties.nil?
     end
@@ -47,8 +53,8 @@ action :create do
       source new_resource.source || new_resource.name
       owner node['opennms']['username']
       group node['opennms']['groupname']
-      mode 0664
-      new_resource.source_properties.each do |k,v|
+      mode '664'
+      new_resource.source_properties.each do |k, v|
         send(k, v)
       end unless new_resource.source_properties.nil?
     end

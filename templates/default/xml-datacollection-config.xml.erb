@@ -1,0 +1,53 @@
+<xml-datacollection-config rrdRepository="<%= node['opennms']['conf']['home'] %>/share/rrd/snmp/" xmlns="http://xmlns.opennms.org/xsd/config/xml-datacollection">
+    <!--
+    To understand how the XML Collector works, and how to configure it, please check the following link:
+    http://www.opennms.org/wiki/XML_Collector
+    -->
+
+<% @collections.each do |name, collection| -%>
+    <xml-collection name=<%= name.encode(:xml => :attr) %>>
+        <rrd step=<%= collection.rrd_step.to_s.encode(:xml => :attr) %>>
+  <% collection.rras.each do |rra| -%>
+            <rra><%= rra.encode(:xml => :text) %></rra>
+  <% end -%>
+        </rrd>
+  <% collection.sources.each do |source| -%>
+        <xml-source url=<%= source.url.encode(:xml => :attr) %>>
+    <% source.groups.each do |group| -%>
+            <xml-group name=<%= group['name'].encode(:xml => :attr) %> resource-type=<%= group['resource_type'].encode(:xml => :attr) %> resource-xpath=<%= group['resource_xpath'].encode(:xml => :attr) %><%= group['key_xpath'].nil? ? '' : " key-xpath=#{group['key_xpath'].encode(:xml => :attr)}" %><%= group['timestamp_xpath'].nil? ? '' : " timestamp-xpath=#{group['timestamp_xpath'].encode(:xml => :attr)}" %><%= group['timestamp_format'].nil? ? '' : " timestamp-format=#{group['timestamp_format'].encode(:xml => :attr)}" %>>
+      <% if !group['resource_keys'].nil? && !group['resource_keys'].empty? -%>
+                <resource-key>
+        <% group['resource_keys'].each do |rk| -%>
+                    <key-xpath><%= rk.encode(:xml => :text) %></key-xpath>
+        <% end -%>
+                </resource-key>
+      <% end -%>
+      <% if !group['objects'].nil? -%>
+	<% group['objects'].each do |obj| -%>
+                  <% Chef::Log.warn("obj: '#{obj}'") -%>
+                <xml-object name=<%= obj['name'].encode(:xml => :attr) %> type=<%= obj['type'].encode(:xml => :attr) %> xpath=<%= obj['xpath'].encode(:xml => :attr) %>/>
+        <% end -%>
+      <% end -%>
+            </xml-group>
+    <% end -%>
+    <% source.import_groups.each do |group| -%>
+            <import-groups>xml-datacollection/<%= group.encode(:xml => :text) %></import-groups>
+    <% end -%>
+    <% unless source.request.nil? -%>
+            <request method=<%= source.request['method'].encode(:xml => :attr) %>>
+      <% source.request['parameters'].each do |k,v| -%>
+                <parameter name=<%= k.encode(:xml => :attr) %> value=<%= v.to_s.encode(:xml => :attr) %>/>
+      <% end -%>
+      <% source.request['headers'].each do |k,v| -%>
+                <header name=<%= k.encode(:xml => :attr) %> value=<%= v.to_s.encode(:xml => :attr) %>/>
+      <% end -%>
+      <% unless source.request['content'].nil? -%>
+                <content type=<%= source.request['content_type'].nil? ? '"application/x-www-form-urlencoded"' : source.request['content_type'].encode(:xml => :attr) %>><%= source.request['content'].encode(:xml => :text) %></content>
+      <% end -%>
+            </request>
+    <% end -%>
+        </xml-source>
+  <% end -%>
+    </xml-collection>
+<% end -%>
+</xml-datacollection-config>

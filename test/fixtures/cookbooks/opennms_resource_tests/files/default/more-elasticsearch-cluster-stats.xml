@@ -1,0 +1,74 @@
+<xml-groups>
+    <xml-group name="cluster-nodes-count" resource-type="node" resource-xpath="/nodes/count">
+        <xml-object name="nodesCntTotal" type="GAUGE" xpath="total"/>
+        <xml-object name="nodesCntMstOnly" type="GAUGE" xpath="master_only"/>
+        <xml-object name="nodesCntDataOnly" type="GAUGE" xpath="data_only"/>
+        <xml-object name="nodesCntMasterData" type="GAUGE" xpath="master_data"/>
+        <xml-object name="nodesClient" type="GAUGE" xpath="client"/>
+    </xml-group>
+
+    <xml-group name="cluster-nodes-os" resource-type="node" resource-xpath="/nodes/os">
+        <xml-object name="osAvailProc" type="GAUGE" xpath="available_processors"/>
+    </xml-group>
+
+    <xml-group name="cluster-nodes-os-mem" resource-type="node" resource-xpath="/nodes/os/mem">
+        <xml-object name="osMemTotalBytes" type="GAUGE" xpath="total_in_bytes"/>
+    </xml-group>
+
+    <xml-group name="cluster-nodes-os-cpu" resource-type="node" resource-xpath="/nodes/os/cpu">
+        <xml-object name="cpuVendor" type="STRING" xpath="vendor"/>
+        <xml-object name="cpuModel" type="STRING" xpath="model"/>
+        <xml-object name="cpuMhz" type="STRING" xpath="mhz"/>
+        <xml-object name="cpuCacheSize" type="STRING" xpath="cache_size"/>
+        <xml-object name="cpuTotalCores" type="GAUGE" xpath="total_cores"/>
+        <xml-object name="cpuTotalSockets" type="GAUGE" xpath="total_sockets"/>
+        <xml-object name="cpuCoresPerSocket" type="GAUGE" xpath="cores_per_socket"/>
+        <xml-object name="cpuCacheSizeBytes" type="STRING" xpath="cache_size_in_bytes"/>
+        <xml-object name="cpuCount" type="GAUGE" xpath="count"/>
+    </xml-group>
+
+    <xml-group name="cluster-nodes-process-cpu" resource-type="node" resource-xpath="/nodes/process/cpu">
+        <xml-object name="procCpuPercent" type="GAUGE" xpath="percent"/>
+    </xml-group>
+
+    <xml-group name="cluster-nodes-process-open-file-descriptors" resource-type="node" resource-xpath="/nodes/process/open_file_descriptors">
+        <xml-object name="openFileDescMin" type="GAUGE" xpath="min"/>
+        <xml-object name="openFileDescMax" type="GAUGE" xpath="max"/>
+        <xml-object name="openFileDescAvg" type="GAUGE" xpath="avg"/>
+    </xml-group>
+
+    <xml-group name="cluster-nodes-jvm" resource-type="node" resource-xpath="/nodes/jvm">
+        <xml-object name="jvmMaxUptimeMillis" type="GAUGE" xpath="max_uptime_in_millis"/>
+    </xml-group>
+
+    <xml-group name="cluster-nodes-jvm-versions" resource-type="node" resource-xpath="/nodes/jvm/versions">
+        <xml-object name="jvmVersion" type="STRING" xpath="version"/>
+        <xml-object name="jvmVmName" type="STRING" xpath="vm_name"/>
+        <xml-object name="jvmVmVersion" type="STRING" xpath="vm_version"/>
+        <xml-object name="jvmVmVendor" type="STRING" xpath="vm_vendor"/>
+        <xml-object name="jvmCount" type="GAUGE" xpath="count"/>
+    </xml-group>
+
+    <xml-group name="cluster-nodes-jvm-mem" resource-type="node" resource-xpath="/nodes/jvm/mem">
+        <xml-object name="jvmMemHeapBytes" type="GAUGE" xpath="heap_used_in_bytes"/>
+        <xml-object name="jvmMemMaxBytes" type="GAUGE" xpath="heap_max_in_bytes"/>
+    </xml-group>
+
+    <xml-group name="cluster-nodes-jvm-threads" resource-type="node" resource-xpath="/nodes/jvm">
+        <xml-object name="jvmThreads" type="GAUGE" xpath="threads"/>
+    </xml-group>
+
+    <xml-group name="cluster-nodes-fs" resource-type="node" resource-xpath="/nodes/fs">
+        <xml-object name="fsTotalBytes" type="GAUGE" xpath="total_in_bytes"/>
+        <xml-object name="fsFreeBytes" type="GAUGE" xpath="free_in_bytes"/>
+        <xml-object name="fsAvailBytes" type="GAUGE" xpath="available_in_bytes"/>
+        <xml-object name="fsDskReads" type="GAUGE" xpath="disk_reads"/>
+        <xml-object name="fsDskWrites" type="GAUGE" xpath="disk_writes"/>
+        <xml-object name="fsDskIoOp" type="GAUGE" xpath="disk_io_op"/>
+        <xml-object name="fsDskReadSizeBytes" type="GAUGE" xpath="disk_read_size_in_bytes"/>
+        <xml-object name="fsDskWriteSizeBytes" type="GAUGE" xpath="disk_write_size_in_bytes"/>
+        <xml-object name="fsDskIoSizeBytes" type="GAUGE" xpath="disk_io_size_in_bytes"/>
+        <xml-object name="fsDskQueue" type="GAUGE" xpath="disk_queue"/>
+        <xml-object name="fsDskSvcTime" type="GAUGE" xpath="disk_service_time"/>
+    </xml-group>
+</xml-groups>

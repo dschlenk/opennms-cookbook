@@ -32,8 +32,14 @@ property :specifics, Array
 # Array of IPLIKE address strings ([0-9]{1,3}((,|-)[0-9]{1,3})*|\*)\.([0-9]{1,3}((,|-)[0-9]{1,3})*|\*)\.([0-9]{1,3}((,|-)[0-9]{1,3})*|\*)\.([0-9]{1,3}((,|-)[0-9]{1,3})*|\*)
 property :ip_matches, Array
 
+include Opennms::Cookbook::ConfigHelpers::SnmpConfigTemplate
 load_current_value do |new_resource|
-  snmp_config = Opennms::Cookbook::ConfigHelpers::SnmpConfig::SnmpConfigFile.read("#{node['opennms']['conf']['home']}/etc/snmp-config.xml")
+  r = xml_resource
+  snmp_config = if r.nil?
+                  Opennms::Cookbook::ConfigHelpers::SnmpConfig::SnmpConfigFile.read("#{node['opennms']['conf']['home']}/etc/snmp-config.xml")
+                else
+                  r.variables[:snmp_config]
+                end
   definition = snmp_config.definition(new_resource.port, new_resource.retry_count, new_resource.timeout, new_resource.read_community, new_resource.write_community, new_resource.proxy_host, new_resource.version, new_resource.max_vars_per_pdu, new_resource.max_repetitions, new_resource.max_request_size, new_resource.ttl, new_resource.encrypted, new_resource.security_name, new_resource.security_level, new_resource.auth_passphrase, new_resource.auth_protocol, new_resource.engine_id, new_resource.context_engine_id, new_resource.context_name, new_resource.privacy_passphrase, new_resource.privacy_protocol, new_resource.enterprise_id, new_resource.location, new_resource.profile_label)
   current_value_does_not_exist! if definition.nil?
   %i(port read_community write_community retry_count timeout proxy_host version max_vars_per_pdu max_repetitions max_request_size ttl encrypted security_name security_level auth_passphrase auth_protocol engine_id context_engine_id context_name privacy_passphrase privacy_protocol enterprise_id location profile_label ranges specifics ip_matches).each do |p|

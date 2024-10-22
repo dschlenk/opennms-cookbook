@@ -1,0 +1,18 @@
+<xml-groups>
+  <% @groupsfile.groups.each do |group| -%>
+    <xml-group name=<%= group['name'].encode(:xml => :attr) %> resource-type=<%= group['resource_type'].encode(:xml => :attr) %> resource-xpath=<%= group['resource_xpath'].encode(:xml => :attr) %><%= group.key?('key_xpath') ? " key-xpath=#{group['key_xpath'].encode(:xml => :attr)}" : '' %><%= group.key?('timestamp-xpath') ? " timestamp-xpath=#{group['timestamp_xpath'].encode(:xml => :attr)}" : '' %><%= group.key?('timestamp-format') ? " timestamp-format=#{group['timestamp_format'].encode(:xml => :attr)}" : '' %>>
+      <% if group.key?('resource_keys') -%>
+        <resource-key>
+          <% group['resource_keys'].each do |rk| -%>
+            <key-xpath><%= rk.encode(:xml => :text) %></key-xpath>
+          <% end -%>
+        </resource-key>
+      <% end -%>
+      <% if group.key?('objects') -%>
+        <% group['objects'].each do |o| -%>
+          <xml-object name=<%= o['name'].encode(:xml => :attr) %> type=<%= o['type'].encode(:xml => :attr) %> xpath=<%= o['xpath'].encode(:xml => :attr) %>/>
+        <% end -%>
+      <% end -%>
+    </xml-group>
+  <% end -%>
+</xml-groups>

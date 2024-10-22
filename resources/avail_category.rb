@@ -7,7 +7,7 @@ property :category_group, String, default: 'WebConsole', identity: true
 property :comment, String
 property :normal, Float # defaults: 99.99 on create
 property :warning, Float # defaults: 97.0 on create
-property :rule, String #default: "IPADDR != '0.0.0.0'" on create
+property :rule, String # default: "IPADDR != '0.0.0.0'" on create
 # array of Strings of services in poller or collectd
 property :services, Array # at least one required on create
 
@@ -16,17 +16,25 @@ action_class do
   include Opennms::XmlHelper
 end
 
+include Opennms::Cookbook::ConfigHelpers::AvailCategory::AvailCategoryTemplate
+
 load_current_value do |new_resource|
-  current_value_does_not_exist! unless ::File.exist?("#{onms_etc}/categories.xml")
-  doc = xmldoc_from_file("#{onms_etc}/categories.xml")
-  current_value_does_not_exist! if doc.elements["/catinfo/categorygroup/name[text()[contains(.,'#{new_resource.category_group}')]]"].nil?
-  cl = doc.elements["/catinfo/categorygroup[name[text()[contains(.,'#{new_resource.category_group}')]]]/categories/category[label[text()[contains(.,'#{new_resource.label}')]]]"]
-  current_value_does_not_exist! if cl.nil?
-  comment xml_element_text(cl, 'comment') unless xml_element_text(cl, 'comment').nil?
-  normal xml_element_text(cl, 'normal').to_f unless xml_element_text(cl, 'normal').nil?
-  warning xml_element_text(cl, 'warning').to_f unless xml_element_text(cl, 'warning').nil?
-  rule xml_element_text(cl, 'rule') unless xml_element_text(cl, 'rule').nil?
-  services xml_text_array(cl, 'service') unless cl.elements['service'].nil?
+  r = ac_resource
+  cg = r.variables[:category_groups].category_group(new_resource.category_group) unless r.nil?
+  if r.nil? || cg.nil?
+    current_value_does_not_exist! unless ::File.exist?("#{onms_etc}/categories.xml")
+    acf = Opennms::Cookbook::ConfigHelpers::AvailCategory::AvailCategoryFile.new
+    acf.read!("#{onms_etc}/categories.xml")
+    cg = acf.category_group(new_resource.category_group)
+    current_value_does_not_exist! if cg.nil?
+  end
+  c = cg.category(new_resource.category_group, new_resource.label)
+  current_value_does_not_exist! if c.nil?
+  comment c.comment
+  normal c.normal
+  warning c.warning
+  rule c.rule
+  services c.services
 end
 
 action :create do

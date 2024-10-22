@@ -345,3 +345,38 @@ suites:
       inspec_tests:
         - path: test/integration/default
         - path: test/integration/avail_category
+  - name: xml_collection
+    provisioner:
+      policyfile: policyfiles/xml_collection.rb
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/xml_collection
+  - name: xml_source
+    provisioner:
+      policyfile: policyfiles/xml_source.rb
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/xml_source
+  - name: xml_source_delete
+    provisioner:
+      policyfile: policyfiles/xml_source_delete.rb
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/xml_source_delete
+  - name: xml_group
+    provisioner:
+      policyfile: policyfiles/xml_group.rb
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/xml_group
+  - name: xml_group_delete
+    provisioner:
+      policyfile: policyfiles/xml_group_delete.rb
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/xml_group_delete

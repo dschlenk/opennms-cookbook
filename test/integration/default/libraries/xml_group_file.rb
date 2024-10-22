@@ -1,13 +1,13 @@
 require 'rexml/document'
-class XmlGroup < Inspec.resource(1)
-  name 'xml_group'
+class XmlGroupFile < Inspec.resource(1)
+  name 'xml_group_file'
 
   desc '
-    OpenNMS xml_group
+    OpenNMS xml_group_file
   '
 
   example '
-    describe xml_group(\'fxa-sc\', \'http://{ipaddr}/group-example\', \'foo\') do
+    describe xml_group_file(\'filename.xml\', \'groupname\') do
       it { should exist }
       its(\'resource_type\') { should eq \'dnsDns\' }
       its(\'key_xpath\') { should eq \'@measObjLdn\' }
@@ -19,9 +19,9 @@ class XmlGroup < Inspec.resource(1)
     end
   '
 
-  def initialize(group_name, url, collection = 'default')
-    doc = REXML::Document.new(inspec.file('/opt/opennms/etc/xml-datacollection-config.xml').content)
-    grp = doc.elements["/xml-datacollection-config/xml-collection[@name='#{collection}']/xml-source[@url='#{url}']/xml-group[@name='#{group_name}']"]
+  def initialize(file, group_name)
+    doc = REXML::Document.new(inspec.file("/opt/opennms/etc/xml-datacollection/#{file}").content)
+    grp = doc.elements["/xml-groups/xml-group[@name='#{group_name}']"]
     @exists = !grp.nil?
     return unless @exists
     @params = {}
