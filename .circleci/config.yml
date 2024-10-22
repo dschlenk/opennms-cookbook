@@ -14,7 +14,7 @@ jobs:
           command: cookstyle
       - run:
           name: kitchen
-          command: KITCHEN_LOCAL_YAML=kitchen.dokken.yml kitchen test --destroy always
+          command: KITCHEN_LOCAL_YAML=kitchen.dokken.yml kitchen test default --destroy always
 
 workflows:
   version: 2
