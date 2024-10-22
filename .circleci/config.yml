@@ -10,8 +10,11 @@ jobs:
           name: install cinc workstation
           command: curl -L https://omnitruck.cinc.sh/install.sh | sudo bash -s -- -P cinc-workstation -v 24
       - run:
-          name: rake
-          command: chef exec rake
+          name: cookstyle
+          command: cookstyle
+      - run:
+          name: kitchen
+          command: KITCHEN_LOCAL_YAML=kitchen.dokken.yml kitchen test --destroy always
 
 workflows:
   version: 2
