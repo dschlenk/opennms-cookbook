@@ -71,21 +71,21 @@ end
     action :delete
   end
 end
-postgresql_access "remove local all trust" do
+postgresql_access 'remove local all trust' do
   type 'local'
   database 'all'
   user 'all'
   auth_method 'trust'
   action :delete
 end
-postgresql_access "remove local replication trust" do
+postgresql_access 'remove local replication trust' do
   type 'local'
   database 'replication'
   user 'all'
   auth_method 'trust'
   action :delete
 end
-postgresql_access "add local scram" do
+postgresql_access 'add local scram' do
   type 'local'
   database 'all'
   user 'all'

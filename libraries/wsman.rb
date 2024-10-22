@@ -53,8 +53,7 @@ module Wsman
     doc = REXML::Document.new file
     file.close
 
-    exists = !doc.elements[element].nil?
-    exists
+    !doc.elements[element].nil?
   end
 
   def create_file(node, filename)

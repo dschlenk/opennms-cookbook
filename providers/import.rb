@@ -1,13 +1,8 @@
 # frozen_string_literal: true
 include Provision
-def whyrun_supported?
-  true
-end
-
-use_inline_resources # ~FC113
 
 action :create do
-  Chef::Application.fatal!("Missing foreign source #{@current_resource.foreign_source_name}.") unless @current_resource.foreign_source_exists
+  raise("Missing foreign source #{@current_resource.foreign_source_name}.") unless @current_resource.foreign_source_exists
   if @current_resource.exists
     Chef::Log.info "#{@new_resource} already exists - nothing to do."
   else
@@ -18,7 +13,7 @@ action :create do
 end
 
 action :sync do
-  Chef::Application.fatal!("Missing foreign source #{@current_resource.foreign_source_name}.") unless @current_resource.foreign_source_exists
+  raise("Missing foreign source #{@current_resource.foreign_source_name}.") unless @current_resource.foreign_source_exists
   if @current_resource.exists
     Chef::Log.info "#{@new_resource} already exists - syncing."
     converge_by("Sync #{@new_resource}") do

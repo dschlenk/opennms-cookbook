@@ -1,12 +1,7 @@
 # frozen_string_literal: true
-def whyrun_supported?
-  true
-end
-
-use_inline_resources # ~FC113
 
 action :create do
-  Chef::Application.fatal!("CategoryGroup specified '#{@current_resource.category_group}' doesn't exist!") unless @current_resource.catgroup_exists
+  raise("CategoryGroup specified '#{@current_resource.category_group}' doesn't exist!") unless @current_resource.catgroup_exists
   if @current_resource.changed
     Chef::Log.info "#{@new_resource} already exists but has changed - updating."
     converge_by("Update #{@new_resource}") do

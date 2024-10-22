@@ -4,7 +4,6 @@ require 'rexml/document'
 actions :create
 default_action :create
 
-attribute :name, kind_of: String, name_attribute: true
 # Map name must exist in database
 attribute :default_svg_map, kind_of: String
 attribute :comments, kind_of: String

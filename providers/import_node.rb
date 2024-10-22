@@ -1,13 +1,8 @@
 # frozen_string_literal: true
 include Provision
-def whyrun_supported?
-  true
-end
-
-use_inline_resources # ~FC113
 
 action :create do
-  Chef::Application.fatal!("Missing requisition #{@current_resource.foreign_source_name}.") unless @current_resource.import_exists
+  raise("Missing requisition #{@current_resource.foreign_source_name}.") unless @current_resource.import_exists
   if @current_resource.exists && !@current_resource.changed
     Chef::Log.info "#{@new_resource} already exists and has not changed - nothing to do."
   elsif @current_resource.exists && @current_resource.changed
@@ -23,7 +18,7 @@ action :create do
 end
 
 action :create_if_missing do
-  Chef::Application.fatal!("Missing requisition #{@current_resource.foreign_source_name}.") unless @current_resource.import_exists
+  raise("Missing requisition #{@current_resource.foreign_source_name}.") unless @current_resource.import_exists
   if @current_resource.exists
     Chef::Log.info "#{@new_resource} already exists - nothing to do."
   else

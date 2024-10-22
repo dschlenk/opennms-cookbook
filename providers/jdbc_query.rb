@@ -1,14 +1,9 @@
 # frozen_string_literal: true
 include ResourceType
-def whyrun_supported?
-  true
-end
-
-use_inline_resources # ~FC113
 
 action :create do
-  Chef::Application.fatal!("Missing jdbc-collection #{@current_resource.collection_name}.") unless @current_resource.collection_exists
-  Chef::Application.fatal!("Missing resourceType #{@current_resource.resource_type}.") unless @current_resource.resource_type_exists
+  raise("Missing jdbc-collection #{@current_resource.collection_name}.") unless @current_resource.collection_exists
+  raise("Missing resourceType #{@current_resource.resource_type}.") unless @current_resource.resource_type_exists
   if @current_resource.exists
     Chef::Log.info "#{@new_resource} already exists - nothing to do."
   else

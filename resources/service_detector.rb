@@ -5,7 +5,7 @@ actions :create, :create_if_missing, :delete
 default_action :create
 
 # identity for purposes of exists determined by service_name and foreign_source_name
-attribute :name, kind_of: String, name_attribute: true
+
 attribute :service_name, kind_of: String
 # required for create
 attribute :class_name,   kind_of: String

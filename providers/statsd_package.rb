@@ -1,10 +1,5 @@
 # frozen_string_literal: true
 include Statsd
-def whyrun_supported?
-  true
-end
-
-use_inline_resources # ~FC113
 
 action :create do
   if @current_resource.exists

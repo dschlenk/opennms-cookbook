@@ -4,7 +4,6 @@ require 'rexml/document'
 actions :create
 default_action :create
 
-attribute :name, kind_of: String, name_attribute: true
 attribute :target_name, kind_of: String, required: true
 attribute :destination_path_name, kind_of: String, required: true
 attribute :commands, kind_of: Array, required: true

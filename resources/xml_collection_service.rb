@@ -11,10 +11,9 @@ require 'rexml/document'
 actions :create, :create_if_missing, :delete
 default_action :create
 
-attribute :name, name_attribute: true, kind_of: String
-attribute :service_name, kind_of: String, default: 'XML', required: true
-attribute :package_name, kind_of: String, default: 'example1', required: true
-attribute :collection, kind_of: String, default: 'default', required: true
+attribute :service_name, kind_of: String, required: true
+attribute :package_name, kind_of: String, required: true
+attribute :collection, kind_of: String, required: true
 # during non-update create, defaults to 300000
 attribute :interval, kind_of: Integer
 # during non-update create, defaults to false

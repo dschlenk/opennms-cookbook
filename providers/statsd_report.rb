@@ -1,14 +1,8 @@
 # frozen_string_literal: true
 include Statsd
 
-def whyrun_supported?
-  true
-end
-
-use_inline_resources # ~FC113
-
 action :create do
-  Chef::Application.fatal!("Missing statsd package #{@current_resource.package_name}.") unless @current_resource.package_exists
+  raise("Missing statsd package #{@current_resource.package_name}.") unless @current_resource.package_exists
   if @current_resource.exists
     Chef::Log.info "#{@new_resource} already exists - nothing to do."
   else

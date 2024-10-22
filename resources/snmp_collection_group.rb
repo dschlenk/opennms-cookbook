@@ -23,7 +23,7 @@ default_action :create
 # this is used for group_name when group_name is nil
 attribute :group, name_attribute: true, kind_of: String, required: true
 attribute :group_name, kind_of: String, required: false
-attribute :collection_name, kind_of: String, default: 'default', required: true
+attribute :collection_name, kind_of: String, required: true
 attribute :file, kind_of: String, required: false # There's a use case where the file is created automatically with the jdbc_query resource in which case this won't get used.
 # set to the URL of your data collection file if not stored in your cookbook
 attribute :source, kind_of: String, default: 'cookbook_file'

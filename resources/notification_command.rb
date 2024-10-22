@@ -3,7 +3,6 @@ require 'rexml/document'
 actions :create
 default_action :create
 
-attribute :name, kind_of: String, name_attribute: true
 attribute :execute, kind_of: String, required: true
 attribute :comment, kind_of: String
 attribute :contact_type, kind_of: String

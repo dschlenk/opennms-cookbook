@@ -5,7 +5,7 @@ actions :create, :sync
 default_action :create
 
 # foreign_source must reference an existing foreign_source's name.
-attribute :name, kind_of: String, name_attribute: true
+
 attribute :foreign_source_name, kind_of: String, default: 'imported:'
 attribute :sync_import, kind_of: [TrueClass, FalseClass], default: false
 # If your imports take a long time to sync, you can fiddle with these

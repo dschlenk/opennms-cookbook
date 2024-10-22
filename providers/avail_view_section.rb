@@ -1,14 +1,9 @@
 # frozen_string_literal: true
-def whyrun_supported?
-  true
-end
-
-use_inline_resources # ~FC113
 
 action :create do
-  Chef::Application.fatal!("view_name specified '#{@current_resource.view_name}' doesn't exist!") unless @current_resource.view_name_exists
-  Chef::Application.fatal!("Some categories specified in '#{@current_resource}' don't exist!") unless @current_resource.categories_exist
-  Chef::Application.fatal!("position requested in '#{@current_resource}' is invalid!") unless @current_resource.position_valid
+  raise("view_name specified '#{@current_resource.view_name}' doesn't exist!") unless @current_resource.view_name_exists
+  raise("Some categories specified in '#{@current_resource}' don't exist!") unless @current_resource.categories_exist
+  raise("position requested in '#{@current_resource}' is invalid!") unless @current_resource.position_valid
   if @current_resource.changed
     Chef::Log.info "#{@new_resource} already exists but has changed - updating."
     converge_by("Update #{@new_resource}") do
@@ -98,13 +93,13 @@ def position_valid?(view_name, before, after)
   view_el = doc.elements["/viewinfo/view[view-name[text()[contains(.,'#{view_name}')]]]"]
   if !before.nil?
     Chef::Log.debug "before is defined as #{before}"
-    return !view_el.elements["section[section-name[text()[contains(.,'#{before}')]]]"].nil?
+    !view_el.elements["section[section-name[text()[contains(.,'#{before}')]]]"].nil?
   elsif !after.nil?
     Chef::Log.debug "after is defined as #{after}"
-    return !view_el.elements["section[section-name[text()[contains(.,'#{after}')]]]"].nil?
+    !view_el.elements["section[section-name[text()[contains(.,'#{after}')]]]"].nil?
   else
     Chef::Log.debug 'falling back to position'
-    return true
+    true
   end
 end
 

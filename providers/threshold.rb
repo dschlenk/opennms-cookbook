@@ -2,12 +2,6 @@
 include ResourceType
 include Threshold
 
-def whyrun_supported?
-  true
-end
-
-use_inline_resources # ~FC113
-
 action :create_if_missing do
   if @current_resource.exists
     Chef::Log.info "#{@new_resource} already exists - nothing to do."

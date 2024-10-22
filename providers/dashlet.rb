@@ -1,12 +1,7 @@
 # frozen_string_literal: true
-def whyrun_supported?
-  true
-end
-
-use_inline_resources # ~FC113
 
 action :create do
-  Chef::Application.fatal!("Wallboard specified '#{@current_resource.wallboard}' doesn't exist!") unless @current_resource.wallboard_exists
+  raise("Wallboard specified '#{@current_resource.wallboard}' doesn't exist!") unless @current_resource.wallboard_exists
   if @current_resource.changed
     converge_by("Update #{@new_resource}") do
       update_dashlet

@@ -487,7 +487,7 @@ module Provision
       sleep(wait_length)
       period += 1
     end
-    Chef::Log.warn "Waited #{(wait_periods * wait_length)} seconds for #{new_resource.foreign_source_name} to import, giving up. If a service restart occurs before it finishes, this and any pending requisitions may need to be synchronized manually." if period == wait_periods
+    Chef::Log.warn "Waited #{wait_periods * wait_length} seconds for #{new_resource.foreign_source_name} to import, giving up. If a service restart occurs before it finishes, this and any pending requisitions may need to be synchronized manually." if period == wait_periods
   end
 
   # after must be in SQL query format: '2015-12-17 21:00:00'
@@ -611,7 +611,7 @@ module Provision
       node.run_state['foreign_sources']
     rescue
       Chef::Log.warn 'Cannot retrieve foreign sources via OpenNMS ReST API.'
-      return nil
+      nil
     end
   end
 

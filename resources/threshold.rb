@@ -4,10 +4,9 @@ require 'rexml/document'
 actions :create, :create_if_missing, :delete
 default_action :create
 
-attribute :name, kind_of: String, name_attribute: true
 attribute :ds_name, kind_of: String
-attribute :group, kind_of: String, default: 'mib2', required: true
-attribute :type, kind_of: String, equal_to: %w(high low relativeChange absoluteChange), default: 'high', required: true
+attribute :group, kind_of: String, required: true
+attribute :type, kind_of: String, equal_to: %w(high low relativeChange absoluteChange), required: true
 attribute :description, kind_of: String
 attribute :ds_type, kind_of: String, default: 'node'
 # required for new thresholds

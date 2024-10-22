@@ -1,21 +1,16 @@
 # frozen_string_literal: true
 include Provision
-def whyrun_supported?
-  true
-end
-
-use_inline_resources # ~FC113
 
 action :create do
   if @new_resource.name =~ /^file:(.*$)/
     if @new_resource.file_name.nil?
-      Chef::Application.fatal!("Missing file_name attribute when a file was specified in the include-url: #{@new_resource.name}.")
+      raise("Missing file_name attribute when a file was specified in the include-url: #{@new_resource.name}.")
     end
   end
   if @current_resource.exists
     Chef::Log.info "#{@new_resource} already exists - nothing to do."
   elsif !@current_resource.foreign_source.nil? && !@current_resource.foreign_source_exists
-    Chef::Application.fatal!("Missing foreign source #{@current_resource.foreign_source}.")
+    raise("Missing foreign source #{@current_resource.foreign_source}.")
   else
     converge_by("Create #{@new_resource}") do
       create_url
@@ -60,12 +55,13 @@ end
 
 def create_url
   if new_resource.name =~ /^file:(.*$)/
-    Chef::Log.debug "Placing file in: '#{Regexp.last_match(1)}'"
+    p = Regexp.last_match(1)
+    Chef::Log.debug("Placing file in: '#{p}'")
     cookbook_file new_resource.file_name do
-      path Regexp.last_match(1)
+      path p
       owner 'root'
       group 'root'
-      mode 00644
+      mode '644'
     end
   end
   Chef::Log.debug "Adding include-url to discovery: '#{new_resource.name}'"

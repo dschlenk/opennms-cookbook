@@ -1,5 +1,3 @@
-# Encoding: utf-8
-# frozen_string_literal: true
 require 'kitchen'
 require 'cookstyle'
 require 'rubocop/rake_task'

@@ -1,14 +1,8 @@
 # frozen_string_literal: true
 include SystemDef
 
-def whyrun_supported?
-  true
-end
-
-use_inline_resources # ~FC113
-
 action :add do
-  Chef::Application.fatal!("Missing one of these data-collection groups: #{@current_resource.groups}.") unless @current_resource.groups_exist
+  raise("Missing one of these data-collection groups: #{@current_resource.groups}.") unless @current_resource.groups_exist
   if @current_resource.exists
     Chef::Log.info "#{@new_resource} already in systemDef - nothing to do."
   else

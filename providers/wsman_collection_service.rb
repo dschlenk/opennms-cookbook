@@ -1,12 +1,6 @@
 # frozen_string_literal: true
 include WsmanCollectionService
 
-def whyrun_supported?
-  true
-end
-
-use_inline_resources # ~FC113
-
 action :create do
   if @current_resource.exists
     Chef::Log.info "#{@new_resource} already exists - checking if changed."

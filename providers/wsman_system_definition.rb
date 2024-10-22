@@ -3,12 +3,6 @@
 include Wsman
 include WsmanSystemDefinition
 
-def whyrun_supported?
-  true
-end
-
-use_inline_resources # ~FC113
-
 action :add do
   if @current_resource.exists
     Chef::Log.info "#{@new_resource} already in system-definition - nothing to do."
@@ -21,9 +15,10 @@ end
 action :remove do
   if !@current_resource.exists
     Chef::Log.info "#{@new_resource} doesn't exist - nothing to do."
-  else converge_by("Remove #{@new_resource}") do
-    remove_system_definition
-  end
+  else
+    converge_by("Remove #{@new_resource}") do
+      remove_system_definition
+    end
   end
 end
 

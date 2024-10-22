@@ -1,9 +1,4 @@
 # frozen_string_literal: true
-def whyrun_supported?
-  true
-end
-
-use_inline_resources # ~FC113
 
 action :create do
   if @current_resource.exists
@@ -15,7 +10,7 @@ action :create do
               path "#{node['opennms']['conf']['home']}/etc/datacollection/#{new_resource.file}"
               owner 'root'
               group 'root'
-              mode 00644
+              mode '644'
             end
           else
             remote_file new_resource.file do
@@ -23,7 +18,7 @@ action :create do
               source new_resource.source
               owner 'root'
               group 'root'
-              mode 00644
+              mode '644'
             end
           end
       updated = f.updated_by_last_action?
@@ -97,7 +92,7 @@ def create_snmp_collection_group
         path "#{node['opennms']['conf']['home']}/etc/datacollection/#{new_resource.file}"
         owner 'root'
         group 'root'
-        mode 00644
+        mode '644'
         not_if { new_resource.file.nil? }
       end
     else
@@ -106,7 +101,7 @@ def create_snmp_collection_group
         path "#{node['opennms']['conf']['home']}/etc/datacollection/#{new_resource.file}"
         owner 'root'
         group 'root'
-        mode 00644
+        mode '644'
       end
     end
   end

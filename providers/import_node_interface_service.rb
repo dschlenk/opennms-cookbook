@@ -1,15 +1,10 @@
 # frozen_string_literal: true
 include Provision
-def whyrun_supported?
-  true
-end
-
-use_inline_resources # ~FC113
 
 action :create do
-  Chef::Application.fatal!("Missing requisition #{@current_resource.foreign_source_name}.") unless @current_resource.import_exists
-  Chef::Application.fatal!("Missing node with foreign ID #{@current_resource.foreign_id}.") unless @current_resource.node_exists
-  Chef::Application.fatal!("Missing interface #{@current_resource.ip_addr}.") unless @current_resource.interface_exists
+  raise("Missing requisition #{@current_resource.foreign_source_name}.") unless @current_resource.import_exists
+  raise("Missing node with foreign ID #{@current_resource.foreign_id}.") unless @current_resource.node_exists
+  raise("Missing interface #{@current_resource.ip_addr}.") unless @current_resource.interface_exists
   if @current_resource.exists
     Chef::Log.info "#{@new_resource} already exists - nothing to do."
   else

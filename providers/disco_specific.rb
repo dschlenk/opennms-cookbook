@@ -1,16 +1,11 @@
 # frozen_string_literal: true
 include Provision
-def whyrun_supported?
-  true
-end
-
-use_inline_resources # ~FC113
 
 action :create do
   if @current_resource.exists
     Chef::Log.info "#{@new_resource} already exists - nothing to do."
   elsif !@current_resource.foreign_source.nil? && !@current_resource.foreign_source_exists
-    Chef::Application.fatal!("Missing foreign source #{@current_resource.foreign_source}.")
+    raise("Missing foreign source #{@current_resource.foreign_source}.")
   else
     converge_by("Create #{@new_resource}") do
       create_specific

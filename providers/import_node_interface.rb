@@ -1,14 +1,9 @@
 # frozen_string_literal: true
 include Provision
-def whyrun_supported?
-  true
-end
-
-use_inline_resources # ~FC113
 
 action :create do
-  Chef::Application.fatal!("Missing requisition #{@current_resource.foreign_source_name}.") unless @current_resource.import_exists
-  Chef::Application.fatal!("Missing node with foreign ID #{@current_resource.foreign_id}.") unless @current_resource.node_exists
+  raise("Missing requisition #{@current_resource.foreign_source_name}.") unless @current_resource.import_exists
+  raise("Missing node with foreign ID #{@current_resource.foreign_id}.") unless @current_resource.node_exists
   if @current_resource.exists
     if @new_resource.sync_import && @new_resource.sync_existing
       converge_by("Exists, but syncing import #{@new_resource}") do

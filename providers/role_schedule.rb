@@ -1,14 +1,9 @@
 # frozen_string_literal: true
-def whyrun_supported?
-  true
-end
-
-use_inline_resources # ~FC113
 
 action :create do
-  Chef::Application.fatal!("Missing role  #{@current_resource.role_name}.") unless @current_resource.role_exists
-  Chef::Application.fatal!("User #{@current_resource.username} not in role.") unless @current_resource.user_in_group
-  Chef::Application.fatal!("Times array not valid #{@current_resource.times}. See resource definition for required format.") unless @current_resource.times_valid
+  raise("Missing role  #{@current_resource.role_name}.") unless @current_resource.role_exists
+  raise("User #{@current_resource.username} not in role.") unless @current_resource.user_in_group
+  raise("Times array not valid #{@current_resource.times}. See resource definition for required format.") unless @current_resource.times_valid
   if @current_resource.exists
     Chef::Log.info "#{@new_resource} already exists - nothing to do."
   else

@@ -1,9 +1,4 @@
 # frozen_string_literal: true
-def whyrun_supported?
-  true
-end
-
-use_inline_resources # ~FC113
 
 action :create do
   if @current_resource.exists
@@ -224,7 +219,7 @@ def delete_poller_service
   doc.context[:attribute_quote] = :quote
   file.close
 
-  # Note: we purposefully don't delete the monitor element from the bottom since there could be other services in other packages using it
+  # NOTE: we purposefully don't delete the monitor element from the bottom since there could be other services in other packages using it
   deleted = doc.root.elements.delete("/poller-configuration/package[@name='#{new_resource.package_name}']/service[@name='#{service_name}']")
   Chef::Log.debug "Deleted poller service #{deleted}."
   Opennms::Helpers.write_xml_file(doc, "#{node['opennms']['conf']['home']}/etc/poller-configuration.xml")

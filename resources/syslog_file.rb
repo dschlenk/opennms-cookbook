@@ -14,5 +14,5 @@ attribute :filename, name_attribute: true, kind_of: String, required: true
 # Translator.events.xml
 #
 # TODO: 'alphabetical' places it in alphabetical order with the other vendor MIBs.
-attribute :position, kind_of: String, default: 'bottom', equal_to: %w(bottom top), required: true
+attribute :position, kind_of: String, equal_to: %w(bottom top), required: true
 attr_accessor :exists

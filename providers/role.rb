@@ -1,12 +1,8 @@
-def whyrun_supported?
-  true
-end
 
-use_inline_resources # ~FC113
 
 action :create do
-  Chef::Application.fatal!("Missing group  #{@current_resource.membership_group}.") unless @current_resource.group_exists
-  Chef::Application.fatal!("Missing user  #{@current_resource.supervisor}.") unless @current_resource.supervisor_exists
+  raise("Missing group  #{@current_resource.membership_group}.") unless @current_resource.group_exists
+  raise("Missing user  #{@current_resource.supervisor}.") unless @current_resource.supervisor_exists
   if @current_resource.exists
     Chef::Log.info "#{@new_resource} already exists - nothing to do."
   else

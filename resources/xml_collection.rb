@@ -32,7 +32,7 @@ action :create do
     xml_resource_init
     collection = xml_resource.variables[:collections][new_resource.name]
     if collection.nil?
-      resource_properties = %i(name rrd_step rras).map{|p| [p, new_resource.send(p)] }.to_h.compact
+      resource_properties = %i(name rrd_step rras).map { |p| [p, new_resource.send(p)] }.to_h.compact
       collection = Opennms::Cookbook::Collection::XmlCollection.new(**resource_properties)
       xml_resource.variables[:collections][new_resource.name] = collection
     else

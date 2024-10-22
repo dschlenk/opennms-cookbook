@@ -8,6 +8,6 @@ attribute :acknowledge, kind_of: String, required: true
 attribute :resolution_prefix, kind_of: String, default: 'RESOLVED: '
 attribute :notify, kind_of: [TrueClass, FalseClass], default: true
 # Array of strings. At least one required. Defaults to a single string - 'nodeid'
-attribute :matches, kind_of: Array, default: ['nodeid'], required: true
+attribute :matches, kind_of: Array, required: true
 
 attr_accessor :exists

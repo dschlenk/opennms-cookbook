@@ -12,7 +12,7 @@ attribute :name, name_attribute: true, kind_of: String, required: true
 attribute :collection_name, name_attribute: true, kind_of: String, required: true
 attribute :if_type, kind_of: String, required: true
 attribute :recheck_interval, kind_of: Integer, default: 3_600_000
-attribute :resource_type, kind_of: String, default: 'node', required: true
+attribute :resource_type, kind_of: String, required: true
 attribute :keyvalue, kind_of: String, required: true
 attribute :wmi_class, kind_of: String, required: true
 attribute :wmi_namespace, kind_of: String

@@ -7,7 +7,7 @@ default_action :create
 attribute :name, kind_of: String, required: true, name_attribute: true
 # identity is defined exclusively by package_name
 attribute :package_name, kind_of: String
-attribute :filter, kind_of: String, default: "IPADDR != '0.0.0.0'", required: true
+attribute :filter, kind_of: String, required: true
 attribute :specifics, kind_of: Array
 # arrays of hashes each containing begin and end keys
 attribute :include_ranges, kind_of: Array

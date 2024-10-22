@@ -1,12 +1,7 @@
 # frozen_string_literal: true
-def whyrun_supported?
-  true
-end
-
-use_inline_resources # ~FC113
 
 action :create do
-  Chef::Application.fatal!("Missing jmx-collection #{@current_resource.collection_name}.") unless @current_resource.collection_exists
+  raise("Missing jmx-collection #{@current_resource.collection_name}.") unless @current_resource.collection_exists
   if @current_resource.exists
     Chef::Log.info "#{@new_resource} already exists - nothing to do."
   else

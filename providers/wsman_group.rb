@@ -4,12 +4,6 @@ include ResourceType
 include Wsman
 include WsmanGroup
 
-def whyrun_supported?
-  true
-end
-
-use_inline_resources # ~FC113
-
 action :create do
   unless @current_resource.exists
     Chef::Log.info "#{@new_resource} doesn't exist - create new wsman group."

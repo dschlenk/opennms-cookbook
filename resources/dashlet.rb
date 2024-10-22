@@ -6,7 +6,6 @@ require 'rexml/document'
 actions :create
 default_action :create
 
-attribute :name, kind_of: String, name_attribute: true
 attribute :title, kind_of: String
 attribute :wallboard, kind_of: String, required: true
 attribute :boost_duration, kind_of: Integer, default: 0

@@ -172,7 +172,7 @@ class Opennms::Upgrade
   def restore(target)
     if ::File.exist?("#{target}.bak")
       Chef::Log.warn("will restore #{target}.bak to #{target}")
-      FileUtils.mv("#{target}.bak", target) 
+      FileUtils.mv("#{target}.bak", target)
       FileUtils.chown(@node['opennms']['username'], @node['opennms']['groupname'], target)
     end
   end

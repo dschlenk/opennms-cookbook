@@ -2,12 +2,6 @@
 include Graph
 include ResourceType
 
-def whyrun_supported?
-  true
-end
-
-use_inline_resources # ~FC113
-
 action :create do
   unless @current_resource.file_exists
     Chef::Log.info "#{@new_resource} file doesn't exist - creating it."

@@ -1,11 +1,6 @@
 # frozen_string_literal: true
 include OpennmsXml
 include ResourceType
-def whyrun_supported?
-  true
-end
-
-use_inline_resources # ~FC113
 
 action :delete do
   if @current_resource.exists
@@ -18,9 +13,9 @@ action :delete do
 end
 
 action :create do
-  Chef::Application.fatal!("Missing xml-collection #{@current_resource.collection_name}.") unless @current_resource.collection_exists
-  Chef::Application.fatal!("Missing resource-type #{@current_resource.resource_type}.") unless @current_resource.resource_type
-  Chef::Application.fatal!("Missing xml-source #{@current_resource.source_url}.") unless @current_resource.source_exists
+  raise("Missing xml-collection #{@current_resource.collection_name}.") unless @current_resource.collection_exists
+  raise("Missing resource-type #{@current_resource.resource_type}.") unless @current_resource.resource_type
+  raise("Missing xml-source #{@current_resource.source_url}.") unless @current_resource.source_exists
   if @current_resource.exists
     Chef::Log.info "#{@new_resource} already exists - nothing to do."
   else

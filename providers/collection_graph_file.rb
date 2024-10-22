@@ -1,12 +1,6 @@
 # frozen_string_literal: true
 include Graph
 
-def whyrun_supported?
-  true
-end
-
-use_inline_resources # ~FC113
-
 action :create do
   if @current_resource.exists
     Chef::Log.info "#{@new_resource} already exists - maybe updating."
@@ -57,7 +51,7 @@ def create_collection_graph_file
           path "#{node['opennms']['conf']['home']}/etc/snmp-graph.properties.d/#{new_resource.file}"
           owner 'root'
           group 'root'
-          mode 00644
+          mode '644'
         end
       else
         remote_file new_resource.file do
@@ -66,7 +60,7 @@ def create_collection_graph_file
           source new_resource.source
           owner 'root'
           group 'root'
-          mode 00644
+          mode '644'
         end
       end
   touch_main_file if f.updated_by_last_action?
@@ -79,7 +73,7 @@ def delete_collection_graph_file
       action :delete
       owner 'root'
       group 'root'
-      mode 00644
+      mode '644'
     end
   else
     remote_file new_resource.file do
@@ -88,7 +82,7 @@ def delete_collection_graph_file
       source new_resource.source
       owner 'root'
       group 'root'
-      mode 00644
+      mode '644'
     end
   end
   touch_main_file

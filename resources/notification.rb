@@ -3,12 +3,11 @@ require 'rexml/document'
 actions :create, :delete
 default_action :create
 
-attribute :name, kind_of: String, name_attribute: true
 attribute :status, kind_of: String, equal_to: %w(on off), required: true
 attribute :writeable, kind_of: String, default: 'yes', equal_to: %w(yes no)
 attribute :uei, kind_of: String, required: true
 attribute :description, kind_of: String
-attribute :rule, kind_of: String, default: "IPADDR != '0.0.0.0'", required: true
+attribute :rule, kind_of: String, required: true
 # jeff says this shouldn't be changed
 # attribute :notice_queue, :kind_of => String
 attribute :destination_path, kind_of: String, required: true

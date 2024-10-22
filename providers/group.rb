@@ -1,13 +1,8 @@
 include Map
-def whyrun_supported?
-  true
-end
-
-use_inline_resources # ~FC113
 
 action :create do
-  Chef::Application.fatal!("Missing a user in #{@current_resource.users}.") unless @current_resource.users_exist
-  Chef::Application.fatal!("Missing map #{@current_resource.default_svg_map}.") unless @current_resource.map_exists
+  raise("Missing a user in #{@current_resource.users}.") unless @current_resource.users_exist
+  raise("Missing map #{@current_resource.default_svg_map}.") unless @current_resource.map_exists
   if @current_resource.exists
     Chef::Log.info "#{@new_resource} already exists - nothing to do."
   else

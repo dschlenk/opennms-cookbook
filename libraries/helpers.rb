@@ -4,7 +4,7 @@ require 'chef-vault'
 module Opennms
   module Helpers
     def self.snake_to_camel_lower(str)
-      str.split('_').inject([]){ |buffer, e| buffer.push(buffer.empty? ? e : e.capitalize) }.join
+      str.split('_').inject([]) { |acc, elem| acc.push(acc.empty? ? elem : elem.capitalize) }.join
     end
 
     def self.snake_to_kebab(str)
@@ -30,7 +30,7 @@ module Opennms
     # returns an empty list when none found
     # returns nil when p_el is nil
     def self.text_array(p_el, el_name)
-      return nil if p_el.nil?
+      return if p_el.nil?
       arr = []
       p_el.elements.each(el_name) do |el|
         arr.push el.text
@@ -55,7 +55,7 @@ module Opennms
     end
 
     def self.range_hash_array(p_el, range_name)
-      return nil if p_el.nil?
+      return if p_el.nil?
       arr = []
       p_el.elements.each(range_name) do |r_el|
         arr.push('begin' => r_el.attributes['begin'].to_s, 'end' => r_el.attributes['end'].to_s)

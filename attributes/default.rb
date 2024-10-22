@@ -57,7 +57,7 @@ default['opennms']['plugin']['addl'] = []
 default['opennms']['addl_handlers'] = []
 # change to true to generate a random password
 default['opennms']['secure_admin'] = false
-default['opennms']['conf']['home']           = onms_home
+default['opennms']['conf']['home'] = onms_home
 # opennms.conf
 default['opennms']['conf']['env'] = {
   # required because we need opennms to fully start before resources will work
@@ -273,11 +273,11 @@ default['opennms']['services']['asterisk_gw'] = false
 default['opennms']['services']['apm']         = false
 # opennms.properties
 default['opennms']['properties']['files'] = {
-#  Use to define properties overrides in `$OPENNMS_HOME/etc/opennms.properties.d`.
-#  For example, to override property `org.opennms.features.scv.jceks.key` in a file named `$OPENNMS_HOME/etc/opennms.properties.d/scv.properties`, do:
-#  'scv' => {
-#    'org.opennms.features.scv.jceks.key' => 'pw'
-#  }
+  #  Use to define properties overrides in `$OPENNMS_HOME/etc/opennms.properties.d`.
+  #  For example, to override property `org.opennms.features.scv.jceks.key` in a file named `$OPENNMS_HOME/etc/opennms.properties.d/scv.properties`, do:
+  #  'scv' => {
+  #    'org.opennms.features.scv.jceks.key' => 'pw'
+  #  }
 }
 default['opennms']['properties']['dc']['rrd_base_dir']              = "#{onms_home}/share/rrd"
 default['opennms']['properties']['misc']['bin_dir']                 = "#{onms_home}/bin"
@@ -2032,7 +2032,7 @@ default['opennms']['cors']['credentials'] = true
 default['opennms']['repos']['branches'] = %w(obsolete snapshot stable oldstable)
 default['opennms']['repos']['platforms'] = %w(common rhel9)
 # add a specific version vault repo like this:
-# node['opennms']['repos']['vault'] = ['32.0.6'] 
+# node['opennms']['repos']['vault'] = ['32.0.6']
 default['opennms']['repos']['vault'] = []
 
 default['opennms']['telemetryd']['managed'] = false
@@ -2122,7 +2122,7 @@ default['opennms']['datasources']['opennms-admin'] = {
     'min_pool' => 0,
     'max_pool' => 10,
     'max_size' => 50,
-  }
+  },
 }
 default['opennms']['datasources']['opennms-monitor'] = {
   'database_name' => 'postgres',
@@ -2135,7 +2135,7 @@ default['opennms']['datasources']['opennms-monitor'] = {
     'min_pool' => 0,
     'max_pool' => 10,
     'max_size' => 50,
-  }
+  },
 }
 default['opennms']['scv']['vault'] = Chef::Config['node_name']
 default['opennms']['scv']['item'] = 'scv'
@@ -2402,10 +2402,10 @@ default['opennms']['vendor_event_files'] = [
               'Xerox.events.xml',
 ]
 default['opennms']['catch_all_event_file'] = 'opennms.catch-all.events.xml'
-default['opennms']['secure_fields'] = [
-              'logmsg',
-              'operaction',
-              'autoaction',
-              'tticket',
-              'script'
-]
+default['opennms']['secure_fields'] = %w(
+              logmsg
+              operaction
+              autoaction
+              tticket
+              script
+)

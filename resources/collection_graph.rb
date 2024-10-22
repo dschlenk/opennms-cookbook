@@ -9,7 +9,7 @@ default_action :create
 attribute :short_name, kind_of: String, name_attribute: true
 attribute :long_name, kind_of: String, required: true
 attribute :columns, kind_of: Array, required: true
-attribute :type, kind_of: String, default: 'nodeSnmp', required: true
+attribute :type, kind_of: String, required: true
 attribute :command, kind_of: String, required: true
 attribute :file, kind_of: String # refers to the name of the file to add the graph def to
 

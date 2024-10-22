@@ -1,10 +1,5 @@
 # frozen_string_literal: true
 include Syslog
-def whyrun_supported?
-  true
-end
-
-use_inline_resources # ~FC113
 
 action :create do
   if @current_resource.exists
@@ -14,7 +9,7 @@ action :create do
         path "#{node['opennms']['conf']['home']}/etc/syslog/#{new_resource.filename}"
         owner 'root'
         group 'root'
-        mode 00644
+        mode '644'
       end
       converge_by("Update #{@new_resource}") if f.updated_by_last_action?
     end
@@ -41,7 +36,7 @@ def create_syslog_file
     path "#{node['opennms']['conf']['home']}/etc/syslog/#{new_resource.name}"
     owner 'root'
     group 'root'
-    mode 00644
+    mode '644'
   end
   add_file_to_syslog(new_resource.name, new_resource.position, node)
 end

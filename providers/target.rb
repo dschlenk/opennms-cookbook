@@ -1,15 +1,10 @@
 # frozen_string_literal: true
-def whyrun_supported?
-  true
-end
-
-use_inline_resources # ~FC113
 
 action :create do
-  Chef::Application.fatal!("Missing destination path #{@current_resource.destination_path_name}.") unless @current_resource.destination_path_exists
-  Chef::Application.fatal!('Need at least 1 command per target. ') unless @current_resource.minimum_commands
-  Chef::Application.fatal!("At least one command in #{@current_resource.commands} does not exist in notificationCommands.xml.") unless @current_resource.commands_exist
-  Chef::Application.fatal!('Missing required escalate_delay attribute for escalate type target!') unless @current_resource.delay_defined
+  raise("Missing destination path #{@current_resource.destination_path_name}.") unless @current_resource.destination_path_exists
+  raise('Need at least 1 command per target. ') unless @current_resource.minimum_commands
+  raise("At least one command in #{@current_resource.commands} does not exist in notificationCommands.xml.") unless @current_resource.commands_exist
+  raise('Missing required escalate_delay attribute for escalate type target!') unless @current_resource.delay_defined
   if @current_resource.exists
     Chef::Log.info "#{@new_resource} already exists - nothing to do."
   else

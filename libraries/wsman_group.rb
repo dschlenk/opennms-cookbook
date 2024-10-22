@@ -178,7 +178,8 @@ module WsmanGroup
            && filters_equal?(group_el, new_resource) \
            && attribute_equal?(doc, new_resource)
         true
-      else false
+      else
+        false
       end
     end
   end

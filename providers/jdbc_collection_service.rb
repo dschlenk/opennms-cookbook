@@ -1,9 +1,4 @@
 # frozen_string_literal: true
-def whyrun_supported?
-  true
-end
-
-use_inline_resources # ~FC113
 
 action :create do
   if @current_resource.exists && !@current_resource.changed
@@ -208,7 +203,7 @@ def create_jdbc_collection_service
   cookbook_file "#{driver_file}_#{new_resource.name}" do
     source new_resource.driver_file unless new_resource.driver_file.nil?
     path "#{node['opennms']['conf']['home']}/lib/#{new_resource.driver_file}"
-    mode 00644
+    mode '644'
     owner 'root'
     group 'root'
     not_if { new_resource.driver_file.to_s == '' || new_resource.driver_file.nil? }
