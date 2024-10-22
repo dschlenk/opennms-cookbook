@@ -14,12 +14,12 @@ jobs:
           command: cinc shell-init bash
       - run:
           name: bundler
-          command: bundle install
+          command: cinc exec bundle install
       - run:
-          name: cookstyle
+          name: cinc exec cookstyle
           command: cookstyle
       - run:
-          name: kitchen
+          name: cinc exec kitchen
           command: KITCHEN_LOCAL_YAML=kitchen.dokken.yml kitchen test default --destroy always
 
 workflows:
