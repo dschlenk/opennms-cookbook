@@ -1,13 +1,136 @@
 # Data Collection Resources
 
+Data collection in OpenNMS can be performed through a number of protocols, like SNMP, JDBC, JMX, XML/JSON via HTTP, etc.
+Collection is performed against services present on interfaces when that interface matches the criteria of a collection package that the service is a part of.
+There are custom resources available to manage packages and services in `collectd-configuration.xml`, and protocol-specific resources for managing the `datacollection-config` files.
+All resources use the initialized delayed accumulator pattern, so template variables are created in accordance with current state when the first resource is executed, and the execution of all subsequent resource instances that affect that file simply modify those template variables, and the template action is then executed at the end of the run once all variables are finalized.
+The templates are then rendered at the conclusion of the run as delayed `:create` actions.
+Appropriate service restarts are performed automatically.
+
+## Packages and Services
+
+### opennms\_collection\_package
+
+Manages a `package` in `collectd`.
+
+#### Actions
+
+* `:create` - Default. Adds or updates a `package` element in the file with the name matching the `package_name` property.
+* `:update` - Modify an existing `package` element. Raises an error if the package does not exist.
+* `:delete` - Remove an existing `package` element and its children if it exists.
+
+#### Properties
+
+| Name                 | Name? | Type                  | Allowed Values                                                                    |
+| -------------------- | ----- | --------------------- | --------------------------------------------------------------------------------- |
+| `package_name`       |   ✓   | String                |                                                                                   |
+| `filter`             |       | String                |                                                                                   |
+| `specifics`          |       | Array                 | array of Strings                                                                  |
+| `include_ranges`     |       | Array                 | array of Strings                                                                  |
+| `exclude_ranges`     |       | Array                 | array of Strings                                                                  |
+| `include_urls`       |       | Array                 | array of Strings                                                                  |
+| `outage_calendars`   |       | Array                 | array of Strings                                                                  |
+| `store_by_if_alias`  |       | [true, false]         |                                                                                   |
+| `store_by_node_id`   |       | [String, true, false] |                                                                                   |
+| `if_alias_domain`    |       | String                |                                                                                   |
+| `stor_flag_override` |       | [true, false]         |                                                                                   |
+| `if_alias_comment`   |       | String                |                                                                                   |
+| `remote`             |       | [true, false]         |                                                                                   |
+
+#### Examples
+
+The `default_resources` recipe contains the packages that ship with OpenNMS. For instance:
+
+```
+opennms_collection_package 'cassandra-via-jmx' do
+  filter "IPADDR != '0.0.0.0'"
+  remote false
+end
+```
+
+will result in the package:
+
+```
+<package name="cassandra-via-jmx" remote="false">
+    <filter>IPADDR != '0.0.0.0'</filter>
+    ...
+</package>
+```
+
+and
+
+```
+opennms_collection_package 'example1' do
+  filter "IPADDR != '0.0.0.0'"
+  remote false
+  include_ranges [
+    { 'begin' => '1.1.1.1', 'end' => '254.254.254.254' },
+    { 'begin' => '::1', 'end' => 'ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff' },
+  ]
+end
+```
+
+creates
+
+```
+<package name="example1" remote="false">
+    <filter>IPADDR != '0.0.0.0'</filter>
+    <include-range begin="1.1.1.1" end="254.254.254.254" />
+    <include-range begin="::1" end="ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff" />
+</package>
+```
+
+### opennms\_collection\_service
+
+Manages `service` elements in a `package` and the corresponding `collector` element in `collectd-configuration.xml`. 
+
+#### Actions
+
+* `:create` - Default. Adds or updates a `service` element in the file with the name matching `service_name` and `package_name` properties.
+* `:update` - Modify an existing `service` and `collector` element. Raises an error if either do not exist.
+* `:delete` - Remove an existing `service` and `collector` elements and their children if it exists.
+
+#### Examples
+
+The `default_resources` recipe contains the services that ship with OpenNMS. For instance:
+
+```
+opennms_collection_service 'VMware-VirtualMachine' do
+  package_name 'vmware7'
+  class_name 'org.opennms.netmgt.collectd.VmwareCollector'
+  collection '${requisition:collection|detector:collection|default-VirtualMachine7}'
+  thresholding_enabled true
+  interval 300000
+  user_defined false
+  status 'on'
+end
+```
+
+adds two elements to `collectd-configuration.xml`.
+To the `package` with name `vmware7`, the following element is added:
+
+```
+<service name="VMware-VirtualMachine" interval="300000" user-defined="false" status="on">
+   <parameter key="collection" value="${requisition:collection|detector:collection|default-VirtualMachine7}" />
+   <parameter key="thresholding-enabled" value="true" />
+</service>
+```
+
+and the `collector`:
+
+```
+<collector service="VMware-VirtualMachine" class-name="org.opennms.netmgt.collectd.VmwareCollector" />
+```
+
 ## XML
 
 The following resources are available to express XML data collection configuration as code.
-All resources use the initialized delayed accumulator pattern, so template variables are created in accordance with current state when the first resource is executed, and the execution of all subsequent resource instances that affect that file simply modify those template variables.
-The templates are then rendered as delayed `:create` actions.
-Appropriate service restarts are performed automatically.
 
-### xml\_collection
+### opennms\_xml\_collection\_service
+
+A convenience wrapper of [`opennms_collection_service`](#opennms_collection_service) that automatically sets the `class_name` property to `org.opennms.protocols.xml.collector.XmlCollector`.
+
+### opennms\_xml\_collection
 
 Manages an `xml-collection` element in `$OPENNMS_HOME/etc/xml-datacollection-config.xml`.
 
@@ -57,7 +180,7 @@ results in the addition of the following element:
 
 See [xml\_collection.rb](../test/fixtures/cookbooks/opennms_resource_tests/recipes/xml_collection.rb) for additional examples.
 
-### xml\_source
+### opennms\_xml\_source
 
 Manages the `xml-source` child of the `xml-collection` element with name `collection_name` in `$OPENNMS_HOME/etc/xml-datacollection-config.xml`.
 
@@ -101,7 +224,7 @@ The validation performed on `groups` is to assert that it is an array of hashes 
 
 See [xml\_source.rb](../test/fixtures/cookbooks/opennms_resource_tests/recipes/xml_source.rb) and [xml\_source\_delete.rb](../test/fixtures/cookbooks/opennms_resource_tests/recipes/xml_source_delete.rb).
 
-### xml\_group
+### opennms\_xml\_group
 
 Manage an `xml-group` element and its children in either an `xml-source` element of `$OPENNMS_HOME/etc/xml-datacollection-config.xml` or a tribuary file in `$OPENNMS_HOME/etc/xml-datacollection/`.
 
