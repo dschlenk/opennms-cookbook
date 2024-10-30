@@ -13,13 +13,11 @@ opennms_xml_collection_service 'XMLFoo Service' do
   retry_count 10
   port 8181
   thresholding_enabled true
-  notifies :restart, 'service[opennms]', :delayed
 end
 
 # minimal
 opennms_xml_collection_service 'XML Service' do
   collection 'default'
-  notifies :restart, 'service[opennms]', :delayed
 end
 
 # test create_if_missing

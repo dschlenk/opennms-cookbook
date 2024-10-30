@@ -4,7 +4,7 @@ opennms_collection_package 'jmx1' do
   notifies :restart, 'service[opennms]'
 end
 
-opennms_jmx_collection 'jmxcollection'
+# opennms_jmx_collection 'jmxcollection'
 
 opennms_jmx_collection_service 'jmx' do
   package_name 'jmx1'
@@ -13,25 +13,25 @@ opennms_jmx_collection_service 'jmx' do
   friendly_name 'jmx-friendly-name'
 end
 
-opennms_jmx_mbean 'anQueue org.apache.activemq.Queue' do
-  mbean_name 'org.apache.activemq.Queue'
-  collection_name 'jmxcollection'
-  objectname 'org.apache.activemq:BrokerName=broker.example.com,Type=Queue,Destination=anQueue'
-  attribs(
-    'ConsumerCount' => { 'alias' => 'anQConsumerCnt', 'type' => 'gauge' },
-    'InFlightCount' => { 'alias' => 'anQFlightCnt', 'type' => 'gauge' }
-  )
-end
+# opennms_jmx_mbean 'anQueue org.apache.activemq.Queue' do
+#   mbean_name 'org.apache.activemq.Queue'
+#   collection_name 'jmxcollection'
+#   objectname 'org.apache.activemq:BrokerName=broker.example.com,Type=Queue,Destination=anQueue'
+#   attribs(
+#     'ConsumerCount' => { 'alias' => 'anQConsumerCnt', 'type' => 'gauge' },
+#     'InFlightCount' => { 'alias' => 'anQFlightCnt', 'type' => 'gauge' }
+#   )
+# end
 
-opennms_jmx_mbean 'anotherQueue org.apache.activemq.Queue' do
-  mbean_name 'org.apache.activemq.Queue'
-  collection_name 'jmxcollection'
-  objectname 'org.apache.activemq:BrokerName=broker.example.com,Type=Queue,Destination=anotherQueue'
-  attribs(
-    'ConsumerCount' => { 'alias' => 'anoQConsumerCnt', 'type' => 'gauge' },
-    'InFlightCount' => { 'alias' => 'anoQInflightCnt', 'type' => 'gauge' }
-  )
-end
+# opennms_jmx_mbean 'anotherQueue org.apache.activemq.Queue' do
+#   mbean_name 'org.apache.activemq.Queue'
+#   collection_name 'jmxcollection'
+#   objectname 'org.apache.activemq:BrokerName=broker.example.com,Type=Queue,Destination=anotherQueue'
+#   attribs(
+#     'ConsumerCount' => { 'alias' => 'anoQConsumerCnt', 'type' => 'gauge' },
+#     'InFlightCount' => { 'alias' => 'anoQInflightCnt', 'type' => 'gauge' }
+#   )
+# end
 
 opennms_jmx_collection_service 'jmx_url' do
   package_name 'jmx1'

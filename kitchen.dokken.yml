@@ -22,6 +22,11 @@ provisioner:
           START_TIMEOUT: 60
       postgresql:
         user_vault: creds
+    yum:
+      opennms-stable-common:
+        baseurl: http://172.17.0.1:8080/opennms/opennms-stable-common/
+      opennms-stable-rhel9:
+        baseurl: http://172.17.0.1:8080/opennms/opennms-stable-rhel9/
 
 verifier:
   name: inspec
@@ -48,6 +53,7 @@ suites:
         users:
           admin:
             vault: creds
+
   - name: upgrade
     provisioner:
       policyfile: policyfiles/upgrade.rb
@@ -79,48 +85,90 @@ suites:
             - opennms-plugin-provisioning-snmp-hardware-inventory
             - opennms-plugin-provisioning-snmp-asset
             - opennms-plugin-northbounder-jms
-  - name: snmp_config_definition
+  - name: avail_category
     provisioner:
-      policyfile: policyfiles/snmp_config_definition.rb
+      policyfile: policyfiles/avail_category.rb
     verifier:
       inspec_tests:
         - path: test/integration/default
-        - path: test/integration/snmp_config_definition
-  - name: snmp_config_definition_update
+        - path: test/integration/avail_category
+  - name: collection_package
     provisioner:
-      policyfile: policyfiles/snmp_config_definition_update.rb
+      policyfile: policyfiles/collection_package.rb
     verifier:
       inspec_tests:
         - path: test/integration/default
-        - path: test/integration/snmp_config_definition_update
-  - name: snmp_config_definition_delete
+        - path: test/integration/collection_package
+  - name: collection_package_delete
     provisioner:
-      policyfile: policyfiles/snmp_config_definition_delete.rb
+      policyfile: policyfiles/collection_package_delete.rb
     verifier:
       inspec_tests:
         - path: test/integration/default
-        - path: test/integration/snmp_config_definition_delete
-  - name: snmp_config_profile
+        - path: test/integration/collection_package_delete
+  - name: collection_package_update
     provisioner:
-      policyfile: policyfiles/snmp_config_profile.rb
+      policyfile: policyfiles/collection_package_update.rb
     verifier:
       inspec_tests:
         - path: test/integration/default
-        - path: test/integration/snmp_config_profile
-  - name: snmp_config_profile_update
+        - path: test/integration/collection_package_update
+  - name: collection_package_update_excludes
     provisioner:
-      policyfile: policyfiles/snmp_config_profile_update.rb
+      policyfile: policyfiles/collection_package_update_excludes.rb
     verifier:
       inspec_tests:
         - path: test/integration/default
-        - path: test/integration/snmp_config_profile_update
-  - name: snmp_config_profile_delete
+        - path: test/integration/collection_package_update_excludes
+  - name: collection_package_update_ifaliasdomain
     provisioner:
-      policyfile: policyfiles/snmp_config_profile_delete.rb
+      policyfile: policyfiles/collection_package_update_ifaliasdomain.rb
     verifier:
       inspec_tests:
         - path: test/integration/default
-        - path: test/integration/snmp_config_profile_delete
+        - path: test/integration/collection_package_update_ifaliasdomain
+  - name: collection_package_update_includes
+    provisioner:
+      policyfile: policyfiles/collection_package_update_includes.rb
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/collection_package_update_includes
+  - name: collection_package_update_outage_calendars
+    provisioner:
+      policyfile: policyfiles/collection_package_update_outage_calendars.rb
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/collection_package_update_outage_calendars
+  - name: collection_package_update_sbifalias
+    provisioner:
+      policyfile: policyfiles/collection_package_update_sbifalias.rb
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/collection_package_update_sbifalias
+  - name: collection_package_update_specifics
+    provisioner:
+      policyfile: policyfiles/collection_package_update_specifics.rb
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/collection_package_update_specifics
+  - name: collection_package_update_urls
+    provisioner:
+      policyfile: policyfiles/collection_package_update_urls.rb
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/collection_package_update_urls
+  - name: collection_service
+    provisioner:
+      policyfile: policyfiles/collection_service.rb
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/collection_service
   - name: eventconf
     provisioner:
       policyfile: policyfiles/eventconf.rb
@@ -338,13 +386,97 @@ suites:
       inspec_tests:
         - path: test/integration/default
         - path: test/integration/event_severity
-  - name: avail_category
+  - name: jdbc_collection_service
     provisioner:
-      policyfile: policyfiles/avail_category.rb
+      policyfile: policyfiles/jdbc_collection_service.rb
     verifier:
       inspec_tests:
         - path: test/integration/default
-        - path: test/integration/avail_category
+        - path: test/integration/jdbc_collection_service
+  - name: jdbc_collection_service_edit
+    provisioner:
+      policyfile: policyfiles/jdbc_collection_service_edit.rb
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/jdbc_collection_service_edit
+  - name: jdbc_collection_service_noop
+    provisioner:
+      policyfile: policyfiles/jdbc_collection_service_noop.rb
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/jdbc_collection_service_noop
+  - name: jdbc_collection_service_delete
+    provisioner:
+      policyfile: policyfiles/jdbc_collection_service_delete.rb
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/jdbc_collection_service_delete
+  - name: jmx
+    provisioner:
+      policyfile: policyfiles/jmx.rb
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/jmx
+  - name: snmp_collection_service
+    provisioner:
+      policyfile: policyfiles/snmp_collection_service.rb
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/snmp_collection_service
+  - name: snmp_config_definition
+    provisioner:
+      policyfile: policyfiles/snmp_config_definition.rb
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/snmp_config_definition
+  - name: snmp_config_definition_update
+    provisioner:
+      policyfile: policyfiles/snmp_config_definition_update.rb
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/snmp_config_definition_update
+  - name: snmp_config_definition_delete
+    provisioner:
+      policyfile: policyfiles/snmp_config_definition_delete.rb
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/snmp_config_definition_delete
+  - name: snmp_config_profile
+    provisioner:
+      policyfile: policyfiles/snmp_config_profile.rb
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/snmp_config_profile
+  - name: snmp_config_profile_update
+    provisioner:
+      policyfile: policyfiles/snmp_config_profile_update.rb
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/snmp_config_profile_update
+  - name: snmp_config_profile_delete
+    provisioner:
+      policyfile: policyfiles/snmp_config_profile_delete.rb
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/snmp_config_profile_delete
+  - name: wsman_collection_service
+    provisioner:
+      policyfile: policyfiles/wsman_collection_service.rb
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/wsman_collection_service
   - name: xml_collection
     provisioner:
       policyfile: policyfiles/xml_collection.rb
@@ -380,3 +512,73 @@ suites:
       inspec_tests:
         - path: test/integration/default
         - path: test/integration/xml_group_delete
+  - name: xml_collection_service
+    provisioner:
+      policyfile: policyfiles/xml_collection_service.rb
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/xml_collection_service
+  - name: xml_collection_service_change_interval
+    provisioner:
+      policyfile: policyfiles/xml_collection_service_change_interval.rb
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/xml_collection_service_change_interval
+  - name: xml_collection_service_change_nothing
+    provisioner:
+      policyfile: policyfiles/xml_collection_service_change_nothing.rb
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/xml_collection_service_change_nothing
+  - name: xml_collection_service_change_port
+    provisioner:
+      policyfile: policyfiles/xml_collection_service_change_port.rb
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/xml_collection_service_change_port
+  - name: xml_collection_service_change_retrycount
+    provisioner:
+      policyfile: policyfiles/xml_collection_service_change_retrycount.rb
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/xml_collection_service_change_retrycount
+  - name: xml_collection_service_change_status
+    provisioner:
+      policyfile: policyfiles/xml_collection_service_change_status.rb
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/xml_collection_service_change_status
+  - name: xml_collection_service_change_threshold
+    provisioner:
+      policyfile: policyfiles/xml_collection_service_change_threshold.rb
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/xml_collection_service_change_threshold
+  - name: xml_collection_service_change_timeout
+    provisioner:
+      policyfile: policyfiles/xml_collection_service_change_timeout.rb
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/xml_collection_service_change_timeout
+  - name: xml_collection_service_change_userdefined
+    provisioner:
+      policyfile: policyfiles/xml_collection_service_change_userdefined.rb
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/xml_collection_service_change_userdefined
+  - name: xml_collection_service_delete
+    provisioner:
+      policyfile: policyfiles/xml_collection_service_delete.rb
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/xml_collection_service_delete

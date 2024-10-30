@@ -10,7 +10,7 @@ control 'xml_collection_service_change_nothing' do
     its('thresholding_enabled') { should eq true }
   end
 
-  describe xml_collection_service('XML', 'default', 'example1') do
+  describe xml_collection_service('XML Service', 'default', 'example1') do
     it { should exist }
     its('status') { should eq 'on' }
   end

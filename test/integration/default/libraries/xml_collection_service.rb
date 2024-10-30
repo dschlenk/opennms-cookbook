@@ -1,4 +1,3 @@
-# frozen_string_literal: true
 require 'rexml/document'
 class XmlCollectionService < Inspec.resource(1)
   name 'xml_collection_service'
@@ -26,14 +25,34 @@ class XmlCollectionService < Inspec.resource(1)
     @params = {}
     return unless @exists
     @params[:interval] = s_el.attributes['interval'].to_i
-    @params[:user_defined] = false
-    @params[:user_defined] = true if s_el.attributes['user-defined'].to_s == 'true'
-    @params[:status] = s_el.attributes['status'].to_s
-    @params[:collection_timeout] = s_el.elements["parameter[@key = 'timeout']/@value"].to_s.to_i
-    @params[:retry_count] = s_el.elements["parameter[@key = 'retry']/@value"].to_s.to_i
-    @params[:port] = s_el.elements["parameter[@key = 'port']/@value"].to_s.to_i unless s_el.elements["parameter[@key = 'port']/@value"].nil?
-    @params[:thresholding_enabled] = false
-    @params[:thresholding_enabled] = true if s_el.elements["parameter[@key = 'thresholding-enabled']/@value"].to_s == 'true'
+    unless s_el.attributes['user-defined'].nil?
+      @params[:user_defined] = s_el.attributes['user-defined'].eql?('true')
+    end
+    unless s_el.attributes['status'].nil?
+      @params[:status] = s_el.attributes['status']
+    end
+    unless s_el.elements["parameter[@key = 'timeout']/@value"].nil?
+      tv = s_el.elements["parameter[@key = 'timeout']/@value"].value
+      @params[:collection_timeout] = int_or_string(tv)
+    end
+    unless s_el.elements["parameter[@key = 'retry']/@value"].nil?
+      rc = s_el.elements["parameter[@key = 'retry']/@value"].value
+      @params[:retry_count] = int_or_string(rc)
+    end
+    unless s_el.elements["parameter[@key = 'port']/@value"].nil?
+      p = s_el.elements["parameter[@key = 'port']/@value"].value
+      @params[:port] = int_or_string(p)
+    end
+    unless s_el.elements["parameter[@key = 'thresholding-enabled']/@value"].nil?
+      tev = s_el.elements["parameter[@key = 'thresholding-enabled']/@value"].value
+      @params[:thresholding_enabled] = if tev.eql?('true')
+                                         true
+                                       elsif tev.eql?('false')
+                                         false
+                                       else
+                                         tev
+                                       end
+    end
   end
 
   def exist?
@@ -42,5 +61,25 @@ class XmlCollectionService < Inspec.resource(1)
 
   def method_missing(param)
     @params[param]
+  end
+
+  private
+
+  def bool_or_string(pv)
+    if pv.eql?('true')
+      true
+    elsif pv.eql?('false')
+      false
+    else
+      pv
+    end
+  end
+
+  def int_or_string(pv)
+    begin
+      Integer(pv)
+    rescue
+      pv
+    end
   end
 end

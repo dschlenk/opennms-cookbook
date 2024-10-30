@@ -16,10 +16,10 @@ jobs:
           name: bundler
           command: cinc exec bundle install
       - run:
-          name: cinc exec cookstyle
+          name: cookstyle
           command: cookstyle
       - run:
-          name: cinc exec kitchen
+          name: kitchen
           command: KITCHEN_LOCAL_YAML=kitchen.dokken.yml kitchen test default --destroy always
 
 workflows:

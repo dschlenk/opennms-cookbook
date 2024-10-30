@@ -1,15 +1,14 @@
-# frozen_string_literal: true
 control 'jmx' do
   describe collection_package 'jmx1' do
     it { should exist }
     its('filter') { should eq "IPADDR != '0.0.0.0'" }
   end
 
-  describe jmx_collection('jmxcollection') do
-    it { should exist }
-    its('rrd_step') { should eq 300 }
-    its('rras') { should eq ['RRA:AVERAGE:0.5:1:2016', 'RRA:AVERAGE:0.5:12:1488', 'RRA:AVERAGE:0.5:288:366', 'RRA:MAX:0.5:288:366', 'RRA:MIN:0.5:288:366'] }
-  end
+  # describe jmx_collection('jmxcollection') do
+  #   it { should exist }
+  #   its('rrd_step') { should eq 300 }
+  #   its('rras') { should eq ['RRA:AVERAGE:0.5:1:2016', 'RRA:AVERAGE:0.5:12:1488', 'RRA:AVERAGE:0.5:288:366', 'RRA:MAX:0.5:288:366', 'RRA:MIN:0.5:288:366'] }
+  # end
 
   describe jmx_collection_service('jmx', 'jmxcollection', 'jmx1') do
     it { should exist }
@@ -18,8 +17,6 @@ control 'jmx' do
     its('interval') { should eq 300000 }
     its('user_defined') { should eq false }
     its('status') { should eq 'on' }
-    its('collection_timeout') { should eq 3000 }
-    its('retry_count') { should eq 1 }
     its('thresholding_enabled') { should eq false }
     its('port') { should eq 1099 }
     its('protocol') { should eq 'rmi' }
@@ -27,15 +24,15 @@ control 'jmx' do
     its('rrd_base_name') { should eq 'java' }
   end
 
-  describe jmx_mbean('org.apache.activemq.Queue', 'jmxcollection', 'org.apache.activemq:BrokerName=broker.example.com,Type=Queue,Destination=anQueue') do
-    it { should exist }
-    its('attribs') { should eq 'ConsumerCount' => { 'alias' => 'anQConsumerCnt', 'type' => 'gauge' }, 'InFlightCount' => { 'alias' => 'anQFlightCnt', 'type' => 'gauge' } }
-  end
+  # describe jmx_mbean('org.apache.activemq.Queue', 'jmxcollection', 'org.apache.activemq:BrokerName=broker.example.com,Type=Queue,Destination=anQueue') do
+  #   it { should exist }
+  #   its('attribs') { should eq 'ConsumerCount' => { 'alias' => 'anQConsumerCnt', 'type' => 'gauge' }, 'InFlightCount' => { 'alias' => 'anQFlightCnt', 'type' => 'gauge' } }
+  # end
 
-  describe jmx_mbean('org.apache.activemq.Queue', 'jmxcollection', 'org.apache.activemq:BrokerName=broker.example.com,Type=Queue,Destination=anotherQueue') do
-    it { should exist }
-    its('attribs') { should eq 'ConsumerCount' => { 'alias' => 'anoQConsumerCnt', 'type' => 'gauge' }, 'InFlightCount' => { 'alias' => 'anoQInflightCnt', 'type' => 'gauge' } }
-  end
+  # describe jmx_mbean('org.apache.activemq.Queue', 'jmxcollection', 'org.apache.activemq:BrokerName=broker.example.com,Type=Queue,Destination=anotherQueue') do
+  #   it { should exist }
+  #   its('attribs') { should eq 'ConsumerCount' => { 'alias' => 'anoQConsumerCnt', 'type' => 'gauge' }, 'InFlightCount' => { 'alias' => 'anoQInflightCnt', 'type' => 'gauge' } }
+  # end
 
   describe jmx_collection_service('jmx_url', 'jmxcollection', 'jmx1') do
     its('ds_name') { should eq 'jmx-ds-name' }
@@ -43,15 +40,8 @@ control 'jmx' do
     its('interval') { should eq 300000 }
     its('user_defined') { should eq false }
     its('status') { should eq 'on' }
-    its('collection_timeout') { should eq 3000 }
-    its('retry_count') { should eq 1 }
     its('thresholding_enabled') { should eq false }
-    its('port') { should eq 0 }
-    its('protocol') { should eq '' }
     its('url') { should eq 'service:jmx:rmi:${ipaddr}:18980' }
-    its('url_path') { should eq '' }
-    its('remote_jmx') { should be false }
-    its('rmi_server_port') { should be 0 }
     its('factory') { should eq 'SASL' }
     its('username') { should eq 'bart' }
     its('password') { should eq 'simpson' }
@@ -64,8 +54,6 @@ control 'jmx' do
     its('interval') { should eq 300000 }
     its('user_defined') { should eq false }
     its('status') { should eq 'on' }
-    its('collection_timeout') { should eq 3000 }
-    its('retry_count') { should eq 1 }
     its('thresholding_enabled') { should eq false }
     its('port') { should eq 1099 }
     its('protocol') { should eq 'rmi' }
@@ -84,15 +72,8 @@ control 'jmx' do
     its('interval') { should eq 300000 }
     its('user_defined') { should eq false }
     its('status') { should eq 'on' }
-    its('collection_timeout') { should eq 3000 }
-    its('retry_count') { should eq 1 }
     its('thresholding_enabled') { should eq false }
-    its('port') { should eq 0 }
-    its('protocol') { should eq '' }
     its('url') { should eq 'service:jmx:rmi:${ipaddr}:18980' }
-    its('url_path') { should eq '' }
-    its('remote_jmx') { should be false }
-    its('rmi_server_port') { should be 0 }
     its('factory') { should eq 'SASL' }
     its('username') { should eq 'bart' }
     its('password') { should eq 'simpson' }

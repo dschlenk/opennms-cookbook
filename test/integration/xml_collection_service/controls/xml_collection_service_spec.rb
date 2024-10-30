@@ -10,8 +10,13 @@ control 'xml_collection_service' do
     its('thresholding_enabled') { should eq true }
   end
 
-  describe xml_collection_service('XML', 'default', 'example1') do
+  describe xml_collection_service('XML Service', 'default', 'example1') do
     it { should exist }
     its('status') { should eq 'on' }
+  end
+
+  describe xml_collection_service('create_if_missing XML Service', 'default', 'example1') do
+    it { should exist }
+    its('status') { should eq 'off' }
   end
 end

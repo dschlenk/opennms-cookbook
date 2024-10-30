@@ -1,5 +1,5 @@
 include_recipe 'opennms_resource_tests::collection_package'
-include_recipe 'opennms_resource_tests::jdbc_collection'
+# include_recipe 'opennms_resource_tests::jdbc_collection'
 # most useful options
 opennms_jdbc_collection_service 'JDBCFoo' do
   service_name 'JDBCFoo'
@@ -13,11 +13,10 @@ opennms_jdbc_collection_service 'JDBCFoo' do
   port 15_432
   thresholding_enabled true
   driver 'org.postgresql.Driver'
-  # driver_file "jdbc.jar"  # must be present in cookbook files for non-PostgreSQL databases
+  driver_file 'jdbc.jar' # must be present in cookbook files for non-PostgreSQL databases
   user 'wibble'
   password 'wobble'
   url 'jdbc:postgresql://OPENNMS_JDBC_HOSTNAME:15432/wibble_wobble'
-  notifies :restart, 'service[opennms]', :delayed
 end
 
 # minimal
@@ -27,5 +26,4 @@ opennms_jdbc_collection_service 'JDBC' do
   user 'wibble'
   password 'wobble'
   url 'jdbc:postgresql://OPENNMS_JDBC_HOSTNAME:15432/wibble_wobble'
-  notifies :restart, 'service[opennms]', :delayed
 end
