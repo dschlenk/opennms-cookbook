@@ -19,14 +19,12 @@ load_current_value do |new_resource|
   r = snmp_resource
   collection = r.variables[:collections][new_resource.collection_name] unless r.nil?
   if r.nil? || collection.nil?
-    Chef::Log.warn("getting collections from file, r is #{r.nil? ? 'nil' : r}")
     filename = "#{onms_etc}/datacollection-config.xml"
     current_value_does_not_exist! unless ::File.exist?(filename)
     collections = Opennms::Cookbook::Collection::OpennmsCollectionConfigFile.read(filename, 'snmp').collections
-    Chef::Log.warn("from file, collections is #{collections.nil? ? 'nil' : collections}")
     collection = collections[new_resource.collection_name]
   end
-  raise Opennms::Cookbook::Collection::NoSuchCollection, "No SNMP collection named #{new_resource.collection_name} found" if collection.nil?
+  current_value_does_not_exist! if collection.nil?
   gn = new_resource.group_name || new_resource.group
   group = collection.include_collection(data_collection_group: gn)
   current_value_does_not_exist! if group.nil?

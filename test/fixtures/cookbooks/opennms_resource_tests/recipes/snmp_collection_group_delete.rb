@@ -16,5 +16,6 @@ end
 
 # delete non-existing group in default collection
 opennms_snmp_collection_group 'group-name-tobe-delete' do
+  collection_name 'default'
   action :delete
 end
