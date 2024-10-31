@@ -43,7 +43,7 @@ control 'snmp_collection_group' do
 EOL
     its('file_content') { should eq acontent }
   end
-  
+
   describe snmp_collection_group('Zeus', 'zeus.xml', 'default') do
     it { should exist }
     its('exclude_filters') { should eq [ '^.*$', '^.*+$' ] }
