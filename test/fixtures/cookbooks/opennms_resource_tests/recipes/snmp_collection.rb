@@ -1,8 +1,3 @@
-# frozen_string_literal: true
-# most useful options
-# A collectd package's service references the collection to store data in with
-# a collection parameter, so this resource must be defined earlier in the run
-# list than any package service that depends references it.
 opennms_snmp_collection 'baz' do
   max_vars_per_pdu 75
   snmp_stor_flag 'all'
@@ -12,3 +7,12 @@ end
 
 # minimal
 opennms_snmp_collection 'qux'
+
+# with complex include_collections
+opennms_snmp_collection 'cisco' do
+  include_collections [
+    { data_collection_group: 'MIB2', exclude_filters: ['^Cisco AS.*$'] },
+    { data_collection_group: 'Cisco', exclude_filters: [] },
+    { data_collection_group: 'Cisco Nexus', system_def: 'Cisco Nexus 7010' },
+  ]
+end

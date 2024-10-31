@@ -7,21 +7,20 @@
   <% end -%>
       </rrd>
   <% c.include_collections.each do |ic| -%>
-      <include-collection dataCollectionGroup=<%= ic[:data_collection_group].encode(:xml => :attr) %><%= (ic[:exclude_filters].empty? && ic[:system_defs].empty?) ? '/' : '' %>>
+      <include-collection dataCollectionGroup=<%= ic[:data_collection_group].encode(:xml => :attr) %><%= ic[:system_def].nil? ? '' : " systemDef=#{ic[:system_def].encode(:xml => :attr)}" %><%= (ic[:exclude_filters].nil? || ic[:exclude_filters].empty?) ? '/' : '' %>>
     <% ic[:exclude_filters].each do |ef| -%>
          <exclude-filter><%= ef.encode(:xml => :text) %></exclude-filter>
+    <% end unless ic[:exclude_filters].nil? -%>
+    <% if !(ic[:exclude_filters].nil? || ic[:exclude_filters].empty?) -%>
+      </include-collection>
     <% end -%>
-    <% ic[:system_defs].each do |sd| -%>
-         <systemDef><%= sd.encode(:xml => :text) %></systemDef>
-    <% end -%>
-      <%= (!ic[:exclude_filters].empty? || !ic[:system_defs].empty?) ? '</include-collection>' : '' %>
   <% end -%>
   <% c.resource_types.each do |rt| -%>
   <% end -%>
   <% c.groups.each do |g| -%>
-  <% end -%>
+  <% end unless c.groups.nil? -%>
   <% c.systems.each do |s| -%>
-  <% end -%>
+  <% end unless c.systems.nil? -%>
    </snmp-collection>
-<% end -%>
+<% end unless @collections.nil? -%>
 </datacollection-config>

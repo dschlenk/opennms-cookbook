@@ -28,7 +28,7 @@ module Opennms
               source 'datacollection-config.xml.erb'
               owner node['opennms']['username']
               group node['opennms']['groupname']
-              mode '0644'
+              mode '0664'
               variables(
                 collections: file.collections,
                 rrd_base_dir: node['opennms']['properties']['dc']['rrd_base_dir'],
@@ -123,7 +123,13 @@ module Opennms
           raise ArgumentError, "File #{file} does not exist" unless ::File.exist?(file)
 
           doc = xmldoc_from_file(file)
-          doc.each_element("#{type}-datacollection-config/#{type}-collection") do |c|
+          prefix = case type
+                   when 'snmp'
+                     ''
+                   else
+                     "#{type}-"
+                   end
+          doc.each_element("#{prefix}datacollection-config/#{type}-collection") do |c|
             name = c.attributes['name']
             rrd_step = c.elements['rrd/@step'].value.to_i
             rras = []
@@ -285,29 +291,31 @@ module Opennms
 
       class SnmpCollection < OpennmsCollection
         attr_reader :include_collections, :resource_types, :groups, :systems, :max_vars_per_pdu, :snmp_stor_flag
-        def initialize(name:, type: 'snmp', rrd_step: nil, rras: nil, max_vars_per_pdu: nil, snmp_stor_flag: nil)
-          @include_collections = []
-          @resource_types = []
-          @groups = []
-          @systems = []
+        def initialize(name:, type: 'snmp', rrd_step: nil, rras: nil, max_vars_per_pdu: nil, snmp_stor_flag: nil, include_collections: nil, resource_types: nil, groups: nil, systems: nil)
+          @include_collections = include_collections || []
+          @resource_types = resource_types || []
+          @groups = groups || []
+          @systems = systems || []
           @max_vars_per_pdu = max_vars_per_pdu
           @snmp_stor_flag = snmp_stor_flag
           super(name: name, type: type, rrd_step: rrd_step, rras: rras)
         end
 
         def type_config(c)
-          @max_vars_per_pdu = c.attributes['maxVarsPerPdu']
+          @max_vars_per_pdu = begin
+                                Integer(c.attributes['maxVarsPerPdu'])
+                              rescue
+                                nil
+                              end
           @snmp_stor_flag = c.attributes['snmpStorageFlag']
           c.each_element('include-collection') do |ic|
-            exclude_filters = []
-            ic.each_element('exclude-filter') do |ef|
-              exclude_filters.push(xml_element_text(ef))
+            unless ic.elements['exclude-filter'].nil?
+              exclude_filters = []
+              ic.each_element('exclude-filter') do |ef|
+                exclude_filters.push(xml_element_text(ef))
+              end
             end
-            system_defs = []
-            ic.each_element('systemDef') do |sd|
-              system_defs.push(xml_element_text(sd))
-            end
-            @include_collections.push({ data_collection_group: c.attributes['dataCollectionGroup'], exclude_filters: exclude_filters, system_defs: system_defs })
+            @include_collections.push({ data_collection_group: ic.attributes['dataCollectionGroup'], exclude_filters: exclude_filters, system_def: ic.attributes['systemDef'] }.compact)
           end
           c.each_element('resourceType') do |rt|
             name = rt.attributes['name']
@@ -323,7 +331,7 @@ module Opennms
               ss_params[rtp.attributes['key']] = rtp.attributes['value']
             end
             ss_class = rt.elements['storageStrategy/@class'].value
-            @resource_types.push({ name: name, label: label, resource_label: resource_label, persistence_selector_strategy: { class: pss_class, parameters: pss_params }, storage_strategy: { class: ss_class, parameters: ss_params } })
+            @resource_types.push({ name: name, label: label, resource_label: resource_label, persistence_selector_strategy: { class: pss_class, parameters: pss_params }, storage_strategy: { class: ss_class, parameters: ss_params } }.compact)
           end
           c.each_element('groups/group') do |g|
             mib_objs = []
@@ -342,7 +350,7 @@ module Opennms
               end
               properties.push({ instance: p.attributes['instance'], alias: p.attributes['alias'], class_name: p.attributes['class-name'], parameters: pp })
             end
-            @groups.push({ name: g.attributes['name'], if_type: g.attributes['ifType'], mib_objs: mib_objs, include_groups: subgroups, properties: properties })
+            @groups.push({ name: g.attributes['name'], if_type: g.attributes['ifType'], mib_objs: mib_objs, include_groups: subgroups, properties: properties }.compact)
           end
           c.each_element('systems/systemDef') do |sd|
             @systems.push({ name: sd.attributes['name'],
@@ -351,12 +359,13 @@ module Opennms
                             ip_addrs: xml_text_array(sd, 'ipList/ipAddr'),
                             ip_addr_masks: xml_text_array(sd, 'ipList/ipAddrMask'),
                             include_groups: xml_text_array(sd, 'collect/includeGroup'),
-            })
+            }.compact)
           end
         end
 
-        def update(rrd_step:, rras:, max_vars_per_pdu:, snmp_stor_flag:)
+        def update(rrd_step:, rras:, max_vars_per_pdu:, snmp_stor_flag:, include_collections:)
           super(rrd_step: rrd_step, rras: rras)
+          @include_collections = include_collections unless include_collections.nil?
           @max_vars_per_pdu = max_vars_per_pdu unless max_vars_per_pdu.nil?
           @snmp_stor_flag = snmp_stor_flag unless snmp_stor_flag.nil?
         end
