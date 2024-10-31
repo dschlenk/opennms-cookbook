@@ -13,7 +13,7 @@ control 'jmx' do
   describe collection_service('jmx', 'jmx1') do
     it { should exist }
     its('collection') { should eq 'jmxcollection' }
-    its('parameters') { should cmp 'ds-name' => 'jmx-ds-name', 'friendly-name' => 'jmx-friendly-name', 'rrd-base-name' => 'java'}
+    its('parameters') { should cmp 'ds-name' => 'jmx-ds-name', 'friendly-name' => 'jmx-friendly-name', 'rrd-base-name' => 'java' }
     its('interval') { should eq 300000 }
     its('user_defined') { should eq false }
     its('status') { should eq 'on' }

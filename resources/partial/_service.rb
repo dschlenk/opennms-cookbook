@@ -13,12 +13,12 @@ property :status, String, equal_to: %w(on off)
 property :timeout, [String, Integer]
 property :port, [String, Integer]
 property :parameters, Hash, callbacks: {
-  'should be a hash with key/value pairs that are both strings' => lambda {
-    |p| !p.any? { |k, v| !k.is_a?(String) || !v.is_a?(String) }
-  }
+  'should be a hash with key/value pairs that are both strings' => lambda { |p|
+    !p.any? { |k, v| !k.is_a?(String) || !v.is_a?(String) }
+  },
 }
 property :class_parameters, Hash, callbacks: {
-  'should be a hash with key/value pairs that are both strings' => lambda {
-    |p| !p.any? { |k, v| !k.is_a?(String) || !v.is_a?(String) }
-  }
+  'should be a hash with key/value pairs that are both strings' => lambda { |p|
+    !p.any? { |k, v| !k.is_a?(String) || !v.is_a?(String) }
+  },
 }

@@ -32,7 +32,7 @@ module Opennms
               variables(
                 collections: file.collections,
                 rrd_base_dir: node['opennms']['properties']['dc']['rrd_base_dir'],
-                rrd_dc_dir: node['opennms']['properties']['dc']['rrd_dc_dir'],
+                rrd_dc_dir: node['opennms']['properties']['dc']['rrd_dc_dir']
               )
               action :nothing
               delayed_action :create
@@ -350,7 +350,7 @@ module Opennms
                             sysoid_mask: xml_element_text(sd.elements['sysoidMask']),
                             ip_addrs: xml_text_array(sd, 'ipList/ipAddr'),
                             ip_addr_masks: xml_text_array(sd, 'ipList/ipAddrMask'),
-                            include_groups: xml_text_array(sd, 'collect/includeGroup')
+                            include_groups: xml_text_array(sd, 'collect/includeGroup'),
             })
           end
         end
