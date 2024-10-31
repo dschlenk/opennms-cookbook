@@ -24,9 +24,9 @@ provisioner:
         user_vault: creds
     yum:
       opennms-stable-common:
-        baseurl: http://172.17.0.1:8080/opennms/opennms-stable-common/
+        baseurl: <%= ENV['OPENNMS_STABLE_COMMON'] || 'http://yum.opennms.org/stable/common' %>
       opennms-stable-rhel9:
-        baseurl: http://172.17.0.1:8080/opennms/opennms-stable-rhel9/
+        baseurl: <%= ENV['OPENNMS_STABLE_RHEL9'] || 'http://yum.opennms.org/stable/rhel9' %>
 
 verifier:
   name: inspec
@@ -421,6 +421,13 @@ suites:
       inspec_tests:
         - path: test/integration/default
         - path: test/integration/jmx
+  - name: snmp_collection
+    provisioner:
+      policyfile: policyfiles/snmp_collection.rb
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/snmp_collection
   - name: snmp_collection_service
     provisioner:
       policyfile: policyfiles/snmp_collection_service.rb

@@ -10,18 +10,14 @@ control 'jmx' do
   #   its('rras') { should eq ['RRA:AVERAGE:0.5:1:2016', 'RRA:AVERAGE:0.5:12:1488', 'RRA:AVERAGE:0.5:288:366', 'RRA:MAX:0.5:288:366', 'RRA:MIN:0.5:288:366'] }
   # end
 
-  describe jmx_collection_service('jmx', 'jmxcollection', 'jmx1') do
+  describe collection_service('jmx', 'jmx1') do
     it { should exist }
-    its('ds_name') { should eq 'jmx-ds-name' }
-    its('friendly_name') { should eq 'jmx-friendly-name' }
+    its('collection') { should eq 'jmxcollection' }
+    its('parameters') { should cmp 'ds-name' => 'jmx-ds-name', 'friendly-name' => 'jmx-friendly-name', 'rrd-base-name' => 'java'}
     its('interval') { should eq 300000 }
     its('user_defined') { should eq false }
     its('status') { should eq 'on' }
     its('thresholding_enabled') { should eq false }
-    its('port') { should eq 1099 }
-    its('protocol') { should eq 'rmi' }
-    its('url_path') { should eq '/jmxrmi' }
-    its('rrd_base_name') { should eq 'java' }
   end
 
   # describe jmx_mbean('org.apache.activemq.Queue', 'jmxcollection', 'org.apache.activemq:BrokerName=broker.example.com,Type=Queue,Destination=anQueue') do
@@ -34,49 +30,30 @@ control 'jmx' do
   #   its('attribs') { should eq 'ConsumerCount' => { 'alias' => 'anoQConsumerCnt', 'type' => 'gauge' }, 'InFlightCount' => { 'alias' => 'anoQInflightCnt', 'type' => 'gauge' } }
   # end
 
-  describe jmx_collection_service('jmx_url', 'jmxcollection', 'jmx1') do
-    its('ds_name') { should eq 'jmx-ds-name' }
-    its('friendly_name') { should eq 'jmx-friendly-name' }
+  describe collection_service('jmx_url', 'jmx1') do
+    its('collection') { should eq 'jmxcollection' }
+    its('parameters') { should cmp 'ds-name' => 'jmx-ds-name', 'friendly-name' => 'jmx-friendly-name', 'url' => 'service:jmx:rmi:${ipaddr}:18980', 'factory' => 'SASL', 'username' => 'bart', 'password' => 'simpson', 'rrd-base-name' => 'java' }
     its('interval') { should eq 300000 }
     its('user_defined') { should eq false }
     its('status') { should eq 'on' }
     its('thresholding_enabled') { should eq false }
-    its('url') { should eq 'service:jmx:rmi:${ipaddr}:18980' }
-    its('factory') { should eq 'SASL' }
-    its('username') { should eq 'bart' }
-    its('password') { should eq 'simpson' }
-    its('rrd_base_name') { should eq 'java' }
   end
 
-  describe jmx_collection_service('jmx_url_path', 'jmxcollection', 'jmx1') do
-    its('ds_name') { should eq 'jmx-ds-name' }
-    its('friendly_name') { should eq 'jmx-friendly-name' }
+  describe jmx_collection_service('jmx_url_path', 'jmx1') do
+    its('collection') { should eq 'jmxcollection' }
+    its('parameters') { should cmp 'ds-name' => 'jmx-ds-name', 'friendly-name' => 'jmx-friendly-name', 'factory' => 'SASL', 'username' => 'bart', 'password' => 'simpson', 'rrd-base-name' => 'java', 'urlPath' => '/jmxrmi', 'protocol' => 'rmi', 'rmiServerPort' => '45444', 'remoteJMX' => 'true' }
     its('interval') { should eq 300000 }
     its('user_defined') { should eq false }
     its('status') { should eq 'on' }
     its('thresholding_enabled') { should eq false }
-    its('port') { should eq 1099 }
-    its('protocol') { should eq 'rmi' }
-    its('url_path') { should eq '/jmxrmi' }
-    its('remote_jmx') { should be true }
-    its('rmi_server_port') { should be 45444 }
-    its('factory') { should eq 'SASL' }
-    its('username') { should eq 'bart' }
-    its('password') { should eq 'simpson' }
-    its('rrd_base_name') { should eq 'java' }
   end
 
-  describe jmx_collection_service('jmx_url_ignore_path', 'jmxcollection', 'jmx1') do
-    its('ds_name') { should eq 'jmx-ds-name' }
-    its('friendly_name') { should eq 'jmx-friendly-name' }
+  describe jmx_collection_service('jmx_url_ignore_path', 'jmx1') do
+    its('collection') { should eq 'jmxcollection' }
+    its('parameters') { should cmp 'ds-name' => 'jmx-ds-name', 'friendly-name' => 'jmx-friendly-name', 'factory' => 'SASL', 'username' => 'bart', 'password' => 'simpson', 'rrd-base-name' => 'java', 'url' => 'service:jmx:rmi:${ipaddr}:18980' }
     its('interval') { should eq 300000 }
     its('user_defined') { should eq false }
     its('status') { should eq 'on' }
     its('thresholding_enabled') { should eq false }
-    its('url') { should eq 'service:jmx:rmi:${ipaddr}:18980' }
-    its('factory') { should eq 'SASL' }
-    its('username') { should eq 'bart' }
-    its('password') { should eq 'simpson' }
-    its('rrd_base_name') { should eq 'java' }
   end
 end

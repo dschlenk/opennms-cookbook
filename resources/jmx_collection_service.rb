@@ -29,17 +29,14 @@ action :create do
       resource_properties[:user_defined] = false if new_resource.user_defined.nil?
       resource_properties[:status] = 'on' if new_resource.status.nil?
       resource_properties[:thresholding_enabled] = false if new_resource.thresholding_enabled.nil?
-      resource_properties[:port] = '1099' if new_resource.port.nil? && new_resource.url.nil?
       resource_properties[:collection] = 'default' if !resource_properties.key?(:collection) && new_resource.collection.nil? && (new_resource.parameters.nil? || new_resource.parameters['collection'].nil?)
       resource_properties[:parameters] = {} if !resource_properties.key?(:parameters) || resource_properties[:parameters].nil?
       resource_properties[:parameters]['username'] = new_resource.username unless new_resource.username.nil?
       resource_properties[:parameters]['password'] = new_resource.password unless new_resource.password.nil?
       resource_properties[:parameters]['factory'] = new_resource.factory unless new_resource.factory.nil?
       resource_properties[:parameters]['protocol'] = new_resource.protocol unless new_resource.protocol.nil? || !new_resource.url.nil?
-      resource_properties[:parameters]['protocol'] = 'rmi' if resource_properties[:parameters]['protocol'].nil? && new_resource.url.nil?
       resource_properties[:parameters]['url'] = new_resource.url unless new_resource.url.nil?
       resource_properties[:parameters]['urlPath'] = new_resource.url_path unless new_resource.url_path.nil? || !new_resource.url.nil?
-      resource_properties[:parameters]['urlPath'] = '/jmxrmi' if resource_properties[:parameters]['urlPath'].nil? && new_resource.url.nil?
       resource_properties[:parameters]['rmiServerPort'] = new_resource.rmi_server_port unless new_resource.rmi_server_port.nil? || !new_resource.url.nil?
       resource_properties[:parameters]['remoteJMX'] = new_resource.remote_jmx unless new_resource.remote_jmx.nil? || !new_resource.url.nil?
       resource_properties[:parameters]['rrd-base-name'] = new_resource.rrd_base_name unless new_resource.rrd_base_name.nil?

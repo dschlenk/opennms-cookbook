@@ -1,19 +1,62 @@
-# frozen_string_literal: true
-require 'rexml/document'
-# Defines a collection in $ONMS_HOME/etc/datacollection-config.xml.
-# Will be used by any packages in $ONMS_HOME/etc/collectd-configuration.xml
-# that have an SNMP service with this collection name as the collection
-# parameter value. You can use the snmp_collection_service LWRP to create
-# that service, the collection_package LWRP to define the package and the
-# snmp_collection_group LWRP to define the data collected in this collection.
+unified_mode true
+use 'partial/_collection'
 
-actions :create
-default_action :create
+include Opennms::Cookbook::Collection::SnmpCollectionTemplate
 
-attribute :collection, name_attribute: true, kind_of: String, required: true
-attribute :max_vars_per_pdu, kind_of: Integer, default: 50
-attribute :snmp_stor_flag, kind_of: String, equal_to: %w(all select primary), required: true
-attribute :rrd_step, kind_of: Integer, required: true
-attribute :rras, kind_of: Array, required: true
+# no default: deprecated in OpenNMS
+property :max_vars_per_pdu, Integer
+# defaults to 'select' in create
+property :snmp_stor_flag, String, equal_to: %w(all select primary)
 
-attr_accessor :exists
+load_current_value do |new_resource|
+  r = snmp_resource
+  collection = r.variables[:collections[new_resource.collection]] unless r.nil?
+  if r.nil? || collection.nil?
+    filename = "#{onms_etc}/snmp-datacollection-config.xml"
+    current_value_does_not_exist! unless ::File.exist?(filename)
+    collection = Opennms::Cookbook::Collection::OpennmsCollectionConfigFile.read(filename, 'snmp').collections[new_resource.collection]
+  end
+  current_value_does_not_exist! if collection.nil?
+  rrd_step collection.rrd_step
+  rras collection.rras
+  max_vars_per_pdu collection.max_vars_per_pdu
+  snmp_stor_flag collection.snmp_stor_flag
+end
+
+action_class do
+  include Opennms::Cookbook::Collection::SnmpCollectionTemplate
+end
+
+action :create do
+  converge_if_changed do
+    snmp_resource_init
+    collection = snmp_resource.variables[:collections][new_resource.name]
+    if collection.nil?
+      resource_properties = %i(name rrd_step rras max_vars_per_pdu snmp_stor_flag).map { |p| [p, new_resource.send(p)] }.to_h.compact
+      resource_properties[:snmp_stor_flag] = 'select' if resource_properties[:snmp_stor_flag].nil?
+      collection = Opennms::Cookbook::Collection::SnmpCollection.new(**resource_properties)
+      snmp_resource.variables[:collections][new_resource.name] = collection
+    else
+      run_action(:update)
+    end
+  end
+end
+
+action :update do
+  converge_if_changed(:rrd_step, :rras, :max_vars_per_pdu, :snmp_stor_flag) do
+    snmp_resource_init
+    collection = snmp_resource.variables[:collections][new_resource.name]
+    raise Chef::Exceptions::CurrentValueDoesNotExist if collection.nil?
+    collection.update(rrd_step: new_resource.rrd_step, rras: new_resource.rras, max_vars_per_pdu: new_resource.max_vars_per_pdu, snmp_stor_flag: new_resource.snmp_stor_flag)
+  end
+end
+
+action :delete do
+  snmp_resource_init
+  collection = snmp_resource.variables[:collections][new_resource.name]
+  unless collection.nil?
+    converge_by("Removing snmp_collection #{new_resource.name}") do
+      snmp_resource.variables[:collections].delete(new_resource.name)
+    end
+  end
+end

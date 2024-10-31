@@ -1,26 +1,21 @@
-# frozen_string_literal: true
 control 'jdbc_collection_service' do
-  describe jdbc_collection_service('JDBCFoo', 'foo', 'foo') do
+  describe collection_service('JDBCFoo', 'foo') do
     it { should exist }
+    its('parameters') { should cmp 'driver' => 'org.postgresql.Driver', 'user' => 'wibble', 'password' => 'wobble', 'url' => 'jdbc:postgresql://OPENNMS_JDBC_HOSTNAME:15432/wibble_wobble' }
+    its('collection') { should eq 'foo' }
     its('interval') { should eq 400000 }
     its('user_defined') { should eq true }
     its('status') { should eq 'off' }
     its('collection_timeout') { should eq 5000 }
     its('port') { should eq 15432 }
     its('thresholding_enabled') { should eq true }
-    its('driver') { should eq 'org.postgresql.Driver' }
-    its('user') { should eq 'wibble' }
-    its('password') { should eq 'wobble' }
     its('retry_count') { should eq 10 }
-    its('url') { should eq 'jdbc:postgresql://OPENNMS_JDBC_HOSTNAME:15432/wibble_wobble' }
   end
 
-  describe jdbc_collection_service('JDBC', 'default', 'example1') do
+  describe collection_service('JDBC', 'example1') do
     it { should exist }
-    its('driver') { should eq 'org.postgresql.Driver' }
-    its('user') { should eq 'wibble' }
-    its('password') { should eq 'wobble' }
-    its('url') { should eq 'jdbc:postgresql://OPENNMS_JDBC_HOSTNAME:15432/wibble_wobble' }
+    its('parameters') { should cmp 'driver' => 'org.postgresql.Driver', 'user' => 'wibble', 'password' => 'wobble', 'url' => 'jdbc:postgresql://OPENNMS_JDBC_HOSTNAME:15432/wibble_wobble' }
+    its('collection') { should eq 'default' }
     # values derived from defaults
     its('interval') { should eq 300000 }
     its('user_defined') { should eq false }

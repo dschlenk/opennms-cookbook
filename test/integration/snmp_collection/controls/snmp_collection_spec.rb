@@ -10,7 +10,6 @@ control 'snmp_collection' do
 
   describe snmp_collection 'qux' do
     it { should exist }
-    its('max_vars_per_pdu') { should eq 50 }
     its('snmp_stor_flag') { should eq 'select' }
     its('rrd_step') { should eq 300 }
     its('rras') { should eq ['RRA:AVERAGE:0.5:1:2016', 'RRA:AVERAGE:0.5:12:1488', 'RRA:AVERAGE:0.5:288:366', 'RRA:MAX:0.5:288:366', 'RRA:MIN:0.5:288:366'] }

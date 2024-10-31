@@ -218,20 +218,21 @@ module Opennms
             proxied_properties[:password] = 'password'
             proxied_properties[:url] = 'url'
           end
-          # when parameters is in the update, we need to preserve any property proxied items in @parameters
+          # When parameters is in the update, we need to preserve any property proxied items in @parameters
           # appropriate for @type otherwise they'll disappear and the user won't know why
           # unless they know that some of these properties are proxied by a parameter
           # and we don't want them to have to know that.
-          parameters = resource_properties.fetch(:parameters, nil)
-          unless parameters.nil?
-            proxied_properties.each do |sym, attr|
-              rpv = resource_properties.fetch(sym, nil)
-              rpv = rpv.to_s unless rpv.nil?
-              pv = @parameters[attr]
-              parameters[attr] = rpv || pv unless rpv.nil? && pv.nil?
-            end
-            @parameters = parameters
+          # And when parameters isn't in the update, we need to assemble one by merging the proxied properties
+          # and the state of the current @parameters.
+          parameters = resource_properties.fetch(:parameters, {})
+          parameters = {} if parameters.nil?
+          proxied_properties.each do |sym, attr|
+            rpv = resource_properties.fetch(sym, nil)
+            rpv = rpv.to_s unless rpv.nil?
+            pv = @parameters[attr]
+            parameters[attr] = rpv || pv unless rpv.nil? && pv.nil?
           end
+          @parameters = parameters
           # @parameters['collection'] = collection unless collection.nil?
           # @parameters['timeout'] = timeout.to_s unless timeout.nil?
           # @parameters['retry'] = retry_count.to_s unless retry_count.nil?

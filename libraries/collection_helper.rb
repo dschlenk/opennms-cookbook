@@ -1,6 +1,47 @@
 module Opennms
   module Cookbook
     module Collection
+      module SnmpCollectionTemplate
+        def snmp_resource_init
+          snmp_resource_create unless snmp_resource_exist?
+        end
+
+        def snmp_resource
+          return unless snmp_resource_exist?
+          find_resource!(:template, "#{onms_etc}/datacollection-config.xml")
+        end
+
+        private
+
+        def snmp_resource_exist?
+          !find_resource(:template, "#{onms_etc}/datacollection-config.xml").nil?
+        rescue Chef::Exceptions::ResourceNotFound
+          false
+        end
+
+        def snmp_resource_create
+          file = Opennms::Cookbook::Collection::OpennmsCollectionConfigFile.new
+          file.read!("#{onms_etc}/datacollection-config.xml", 'snmp')
+          with_run_context(:root) do
+            declare_resource(:template, "#{onms_etc}/datacollection-config.xml") do
+              cookbook 'opennms'
+              source 'datacollection-config.xml.erb'
+              owner node['opennms']['username']
+              group node['opennms']['groupname']
+              mode '0644'
+              variables(
+                collections: file.collections,
+                rrd_base_dir: node['opennms']['properties']['dc']['rrd_base_dir'],
+                rrd_dc_dir: node['opennms']['properties']['dc']['rrd_dc_dir'],
+              )
+              action :nothing
+              delayed_action :create
+              notifies :restart, 'service[opennms]'
+            end
+          end
+        end
+      end
+
       module XmlCollectionTemplate
         def xml_resource_init
           xml_resource_create unless xml_resource_exist?
@@ -236,8 +277,88 @@ module Opennms
           case properties.fetch(:type)
           when 'xml'
             XmlCollection.new(**properties)
-            # TODO: the other collection types
+          when 'snmp'
+            SnmpCollection.new(**properties)
           end
+        end
+      end
+
+      class SnmpCollection < OpennmsCollection
+        attr_reader :include_collections, :resource_types, :groups, :systems, :max_vars_per_pdu, :snmp_stor_flag
+        def initialize(name:, type: 'snmp', rrd_step: nil, rras: nil, max_vars_per_pdu: nil, snmp_stor_flag: nil)
+          @include_collections = []
+          @resource_types = []
+          @groups = []
+          @systems = []
+          @max_vars_per_pdu = max_vars_per_pdu
+          @snmp_stor_flag = snmp_stor_flag
+          super(name: name, type: type, rrd_step: rrd_step, rras: rras)
+        end
+
+        def type_config(c)
+          @max_vars_per_pdu = c.attributes['maxVarsPerPdu']
+          @snmp_stor_flag = c.attributes['snmpStorageFlag']
+          c.each_element('include-collection') do |ic|
+            exclude_filters = []
+            ic.each_element('exclude-filter') do |ef|
+              exclude_filters.push(xml_element_text(ef))
+            end
+            system_defs = []
+            ic.each_element('systemDef') do |sd|
+              system_defs.push(xml_element_text(sd))
+            end
+            @include_collections.push({ data_collection_group: c.attributes['dataCollectionGroup'], exclude_filters: exclude_filters, system_defs: system_defs })
+          end
+          c.each_element('resourceType') do |rt|
+            name = rt.attributes['name']
+            label = rt.attributes['label']
+            resource_label = rt.attributes['resourceLabel']
+            pss_params = {}
+            rt.each_element('persistenceSelectorStrategy/parameter') do |rtp|
+              pss_params[rtp.attributes['key']] = rtp.attributes['value']
+            end
+            pss_class = rt.elements['persistenceSelectorStrategy/@class'].value
+            ss_params = {}
+            rt.each_element('storageStrategy/parameter') do |rtp|
+              ss_params[rtp.attributes['key']] = rtp.attributes['value']
+            end
+            ss_class = rt.elements['storageStrategy/@class'].value
+            @resource_types.push({ name: name, label: label, resource_label: resource_label, persistence_selector_strategy: { class: pss_class, parameters: pss_params }, storage_strategy: { class: ss_class, parameters: ss_params } })
+          end
+          c.each_element('groups/group') do |g|
+            mib_objs = []
+            g.each_element('mibObj') do |mo|
+              mib_objs.push({ oid: mo.attributes['oid'], instance: mo.attributes['instance'], alias: mo.attributes['alias'], type: mo.attributes['type'], maxval: mo.attributes['maxval'], minval: mo.attributes['minval'] })
+            end
+            subgroups = []
+            g.each_element('includeGroup') do |ig|
+              subgroups.push(xml_element_text(ig))
+            end
+            properties = []
+            g.each_element('property') do |p|
+              pp = {}
+              p.each_element['parameter'] do |ppp|
+                pp[ppp.attributes['key']] = ppp.attributes['value']
+              end
+              properties.push({ instance: p.attributes['instance'], alias: p.attributes['alias'], class_name: p.attributes['class-name'], parameters: pp })
+            end
+            @groups.push({ name: g.attributes['name'], if_type: g.attributes['ifType'], mib_objs: mib_objs, include_groups: subgroups, properties: properties })
+          end
+          c.each_element('systems/systemDef') do |sd|
+            @systems.push({ name: sd.attributes['name'],
+                            sysoid: xml_element_text(sd.elements['sysoid']),
+                            sysoid_mask: xml_element_text(sd.elements['sysoidMask']),
+                            ip_addrs: xml_text_array(sd, 'ipList/ipAddr'),
+                            ip_addr_masks: xml_text_array(sd, 'ipList/ipAddrMask'),
+                            include_groups: xml_text_array(sd, 'collect/includeGroup')
+            })
+          end
+        end
+
+        def update(rrd_step:, rras:, max_vars_per_pdu:, snmp_stor_flag:)
+          super(rrd_step: rrd_step, rras: rras)
+          @max_vars_per_pdu = max_vars_per_pdu unless max_vars_per_pdu.nil?
+          @snmp_stor_flag = snmp_stor_flag unless snmp_stor_flag.nil?
         end
       end
 
@@ -391,9 +512,6 @@ module Opennms
         def self.create(url:, import_groups:, groups:, request_method:, request_params:, request_headers:, request_content:, request_content_type:)
           XmlSource.new(url: url, groups: groups, import_groups: import_groups, request: request_from_properties(request_method: request_method, request_params: request_params, request_headers: request_headers, request_content: request_content, request_content_type: request_content_type))
         end
-      end
-
-      class SnmpCollection < OpennmsCollection
       end
 
       class WsmanCollection < OpennmsCollection
