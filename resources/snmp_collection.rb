@@ -26,7 +26,7 @@ property :include_collections, Array, callbacks: {
 
 load_current_value do |new_resource|
   r = snmp_resource
-  collection = r.variables[:collections[new_resource.collection]] unless r.nil?
+  collection = r.variables[:collections][new_resource.collection] unless r.nil?
   if r.nil? || collection.nil?
     filename = "#{onms_etc}/datacollection-config.xml"
     current_value_does_not_exist! unless ::File.exist?(filename)

@@ -428,6 +428,13 @@ suites:
       inspec_tests:
         - path: test/integration/default
         - path: test/integration/snmp_collection
+  - name: snmp_collection_group
+    provisioner:
+      policyfile: policyfiles/snmp_collection_group.rb
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/snmp_collection_group
   - name: snmp_collection_service
     provisioner:
       policyfile: policyfiles/snmp_collection_service.rb

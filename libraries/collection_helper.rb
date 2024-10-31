@@ -369,6 +369,13 @@ module Opennms
           @max_vars_per_pdu = max_vars_per_pdu unless max_vars_per_pdu.nil?
           @snmp_stor_flag = snmp_stor_flag unless snmp_stor_flag.nil?
         end
+
+        def include_collection(data_collection_group:)
+          groups = @include_collections.select { |ic| ic[:data_collection_group].eql?(data_collection_group) }
+          return if groups.nil? || groups.empty?
+          raise DuplicateIncludeCollection, "More than one include-collection for dataCollectionGroup named '#{data_collection_group}' found in #{@name}" unless groups.one?
+          groups.pop
+        end
       end
 
       class XmlCollection < OpennmsCollection
@@ -539,6 +546,10 @@ module Opennms
       class XmlSourceDoesNotExist < StandardError; end
 
       class DuplicateXmlGroup < StandardError; end
+
+      class DuplicateIncludeCollection < StandardError; end
+
+      class NoSuchCollection < StandardError; end
     end
   end
 end
