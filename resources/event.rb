@@ -159,7 +159,7 @@ end
 
 include Opennms::Cookbook::ConfigHelpers::Event::EventTemplate
 load_current_value do |new_resource|
-  r = eventfile_resource
+  r = eventfile_resource(new_resource.file)
   if r.nil?
     # first we see if we exist
     current_value_does_not_exist! unless ::File.exist?("#{node['opennms']['conf']['home']}/etc/#{new_resource.file}")
@@ -188,8 +188,8 @@ end
 
 action :create do
   converge_if_changed do
-    eventfile_resource_init
-    entry = eventfile_resource.variables[:eventfile].entry(new_resource.uei || new_resource.name, new_resource.mask)
+    eventfile_resource_init(new_resource.file)
+    entry = eventfile_resource(new_resource.file).variables[:eventfile].entry(new_resource.uei || new_resource.name, new_resource.mask)
     if entry.nil?
       raise Chef::Exceptions::ValidationFailed, 'event_label is a required property for action :create when not updating' if new_resource.event_label.nil?
       raise Chef::Exceptions::ValidationFailed, 'descr is a required property for action :create when not updating' if new_resource.descr.nil?
@@ -201,7 +201,7 @@ action :create do
       resource_properties = %i(uei mask priority event_label descr logmsg logmsg_dest logmsg_notify collection_group severity operinstruct autoaction varbindsdecode parameters operaction autoacknowledge loggroup tticket forward script mouseovertext alarm_data filters).map { |p| [p, new_resource.send(p)] }.to_h.compact
       resource_properties[:uei] = new_resource.name if new_resource.uei.nil?
       entry = Opennms::Cookbook::ConfigHelpers::Event::EventDefinition.create(**resource_properties)
-      eventfile_resource.variables[:eventfile].add(entry, new_resource.position)
+      eventfile_resource(new_resource.file).variables[:eventfile].add(entry, new_resource.position)
     else
       run_action(:update)
     end
@@ -210,8 +210,8 @@ end
 
 action :update do
   converge_if_changed(:priority, :event_label, :descr, :logmsg, :logmsg_dest, :logmsg_notify, :collection_group, :severity, :operinstruct, :autoaction, :varbindsdecode, :parameters, :operaction, :autoacknowledge, :loggroup, :tticket, :forward, :script, :mouseovertext, :alarm_data, :filters) do
-    eventfile_resource_init
-    entry = eventfile_resource.variables[:eventfile].entry(new_resource.uei || new_resource.name, new_resource.mask)
+    eventfile_resource_init(new_resource.file)
+    entry = eventfile_resource(new_resource.file).variables[:eventfile].entry(new_resource.uei || new_resource.name, new_resource.mask)
     raise Chef::Exceptions::CurrentValueDoesNotExist, "Cannot update event definition for '#{new_resource.name}' as it does not exist" if entry.nil?
     entry.update(priority: new_resource.priority,
                  event_label: new_resource.event_label,
@@ -240,11 +240,11 @@ end
 
 action :delete do
   # remove this event from file and if no more events delete the file, remove it from eventconf
-  eventfile_resource_init
-  entry = eventfile_resource.variables[:eventfile].entry(new_resource.uei || new_resource.name, new_resource.mask)
+  eventfile_resource_init(new_resource.file)
+  entry = eventfile_resource(new_resource.file).variables[:eventfile].entry(new_resource.uei || new_resource.name, new_resource.mask)
   unless entry.nil?
-    eventfile_resource.variables[:eventfile].remove(entry)
-    if eventfile_resource.variables[:eventfile].entries.empty?
+    eventfile_resource(new_resource.file).variables[:eventfile].remove(entry)
+    if eventfile_resource(new_resource.file).variables[:eventfile].entries.empty?
       file "#{node['opennms']['conf']['home']}/etc/#{new_resource.file}" do
         action :delete
       end

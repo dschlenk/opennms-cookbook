@@ -72,28 +72,28 @@ module Opennms
         end
 
         module EventTemplate
-          def eventfile_resource_init
-            eventfile_resource_create unless eventfile_resource_exist?
+          def eventfile_resource_init(file)
+            eventfile_resource_create(file) unless eventfile_resource_exist?(file)
           end
 
-          def eventfile_resource
-            return unless eventfile_resource_exist?
-            find_resource!(:template, "#{node['opennms']['conf']['home']}/etc/#{new_resource.file}")
+          def eventfile_resource(file)
+            return unless eventfile_resource_exist?(file)
+            find_resource!(:template, "#{node['opennms']['conf']['home']}/etc/#{file}")
           end
 
           private
 
-          def eventfile_resource_exist?
-            !find_resource(:template, "#{node['opennms']['conf']['home']}/etc/#{new_resource.file}").nil?
+          def eventfile_resource_exist?(file)
+            !find_resource(:template, "#{node['opennms']['conf']['home']}/etc/#{file}").nil?
           rescue Chef::Exceptions::ResourceNotFound
             false
           end
 
-          def eventfile_resource_create
+          def eventfile_resource_create(file)
             eventfile = Opennms::Cookbook::ConfigHelpers::Event::EventDefinitionFile.new
-            eventfile.read!("#{node['opennms']['conf']['home']}/etc/#{new_resource.file}") if ::File.exist?("#{node['opennms']['conf']['home']}/etc/#{new_resource.file}")
+            eventfile.read!("#{node['opennms']['conf']['home']}/etc/#{file}") if ::File.exist?("#{node['opennms']['conf']['home']}/etc/#{file}")
             with_run_context :root do
-              declare_resource(:template, "#{node['opennms']['conf']['home']}/etc/#{new_resource.file}") do
+              declare_resource(:template, "#{node['opennms']['conf']['home']}/etc/#{file}") do
                 source 'eventdef.xml.erb'
                 cookbook 'opennms'
                 owner node['opennms']['username']
