@@ -28,7 +28,7 @@ load_current_value do |new_resource|
     cg = acf.category_group(new_resource.category_group)
     current_value_does_not_exist! if cg.nil?
   end
-  c = cg.category(new_resource.category_group, new_resource.label)
+  c = cg.category(new_resource.label)
   current_value_does_not_exist! if c.nil?
   comment c.comment
   normal c.normal
