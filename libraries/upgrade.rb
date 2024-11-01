@@ -162,9 +162,9 @@ class Opennms::Upgrade
           elsif type == 'rpmnew'
             orig_file = match.captures[0]
             FileUtils.cp("#{dir}/#{orig_file}", "#{dir}/#{orig_file}.bak")
-            FileUtils.chown(node['opennms']['username'], @node['opennms']['groupname'], "#{dir}/#{orig_file}.bak")
+            FileUtils.chown(@node['opennms']['username'], @node['opennms']['groupname'], "#{dir}/#{orig_file}.bak")
             FileUtils.mv("#{dir}/#{file}", "#{dir}/#{orig_file}")
-            FileUtils.chown(node['opennms']['username'], @node['opennms']['groupname'], "#{dir}/#{orig_file}")
+            FileUtils.chown(@node['opennms']['username'], @node['opennms']['groupname'], "#{dir}/#{orig_file}")
           end
         end
       end
