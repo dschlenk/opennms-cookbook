@@ -157,6 +157,7 @@ action_class do
   include Opennms::Cookbook::ConfigHelpers::Event::EventTemplate
 end
 
+include Opennms::Cookbook::ConfigHelpers::Event::EventTemplate
 load_current_value do |new_resource|
   r = eventfile_resource
   if r.nil?
