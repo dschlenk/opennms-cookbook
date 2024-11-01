@@ -39,7 +39,7 @@ control 'jmx' do
     its('thresholding_enabled') { should eq false }
   end
 
-  describe jmx_collection_service('jmx_url_path', 'jmx1') do
+  describe collection_service('jmx_url_path', 'jmx1') do
     its('collection') { should eq 'jmxcollection' }
     its('parameters') { should cmp 'ds-name' => 'jmx-ds-name', 'friendly-name' => 'jmx-friendly-name', 'factory' => 'SASL', 'username' => 'bart', 'password' => 'simpson', 'rrd-base-name' => 'java', 'urlPath' => '/jmxrmi', 'protocol' => 'rmi', 'rmiServerPort' => '45444', 'remoteJMX' => 'true' }
     its('interval') { should eq 300000 }
@@ -48,7 +48,7 @@ control 'jmx' do
     its('thresholding_enabled') { should eq false }
   end
 
-  describe jmx_collection_service('jmx_url_ignore_path', 'jmx1') do
+  describe collection_service('jmx_url_ignore_path', 'jmx1') do
     its('collection') { should eq 'jmxcollection' }
     its('parameters') { should cmp 'ds-name' => 'jmx-ds-name', 'friendly-name' => 'jmx-friendly-name', 'factory' => 'SASL', 'username' => 'bart', 'password' => 'simpson', 'rrd-base-name' => 'java', 'url' => 'service:jmx:rmi:${ipaddr}:18980' }
     its('interval') { should eq 300000 }
