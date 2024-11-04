@@ -24,6 +24,10 @@ module Opennms
       element.elements[xpath].texts.select { |t| t && t.to_s.strip != '' }.collect(&:value).join("\n") if !element.nil? && !element.elements[xpath].nil?
     end
 
+    def xml_element_multiline_blank_text(element, xpath)
+      element.elements[xpath].texts.collect(&:value).join("\n") if !element.nil? && !element.elements[xpath].nil?
+    end
+
     def xml_attr_value(element, xpath)
       element.elements[xpath].value if !element.nil? && !element.elements[xpath].nil? && element.elements[xpath].is_a?(REXML::Attribute)
     end

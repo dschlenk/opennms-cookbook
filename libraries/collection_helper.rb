@@ -42,6 +42,46 @@ module Opennms
         end
       end
 
+      module JdbcCollectionTemplate
+        def jdbc_resource_init
+          jdbc_resource_create unless jdbc_resource_exist?
+        end
+
+        def jdbc_resource
+          return unless jdbc_resource_exist?
+          find_resource!(:template, "#{onms_etc}/jdbc-datacollection-config.xml")
+        end
+
+        private
+
+        def jdbc_resource_exist?
+          !find_resource(:template, "#{onms_etc}/jdbc-datacollection-config.xml").nil?
+        rescue Chef::Exceptions::ResourceNotFound
+          false
+        end
+
+        def jdbc_resource_create
+          file = Opennms::Cookbook::Collection::OpennmsCollectionConfigFile.new
+          file.read!("#{onms_etc}/jdbc-datacollection-config.xml", 'jdbc')
+          with_run_context(:root) do
+            declare_resource(:template, "#{onms_etc}/jdbc-datacollection-config.xml") do
+              cookbook 'opennms'
+              source 'jdbc-datacollection-config.xml.erb'
+              owner node['opennms']['username']
+              group node['opennms']['groupname']
+              mode '0664'
+              variables(
+                collections: file.collections,
+                rrd_repository: node['opennms']['jdbc_dc']['rrd_repository']
+              )
+              action :nothing
+              delayed_action :create
+              notifies :restart, 'service[opennms]'
+            end
+          end
+        end
+      end
+
       module XmlCollectionTemplate
         def xml_resource_init
           xml_resource_create unless xml_resource_exist?
@@ -285,6 +325,8 @@ module Opennms
             XmlCollection.new(**properties)
           when 'snmp'
             SnmpCollection.new(**properties)
+          when 'jdbc'
+            JdbcCollection.new(**properties)
           end
         end
       end
@@ -375,6 +417,53 @@ module Opennms
           return if groups.nil? || groups.empty?
           raise DuplicateIncludeCollection, "More than one include-collection for dataCollectionGroup named '#{data_collection_group}' found in #{@name}" unless groups.one?
           groups.pop
+        end
+      end
+
+      class JdbcCollection < OpennmsCollection
+        attr_reader :queries
+        def initialize(name:, type: 'jdbc', rrd_step: nil, rras: nil)
+          @queries = []
+          super
+        end
+
+        def type_config(c)
+          c.each_element('queries/query') do |query|
+            columns = {}
+            query.each_element('columns/column') do |column|
+              columns[column.attributes['name']] = { 'type' => column.attributes['type'], 'alias' => column.attributes['alias'], 'data-source-name' => column.attributes['data-source-name'] }.compact
+            end
+            @queries.push(JdbcQuery.new(name: query.attributes['name'], if_type: query.attributes['ifType'], recheck_interval: Integer(query.attributes['recheckInterval']), resource_type: query.attributes['resourceType'], instance_column: query.attributes['instance-column'], query_string: xml_element_multiline_blank_text(query, 'statement/queryString'), columns: columns))
+          end
+        end
+
+        def query(name:)
+          query = @queries.select { |q| q.name.eql?(name) }
+          return if query.nil? || query.empty?
+          raise DuplicateJdbcQuery, "More than one query named #{name} found in JDBC collection #{@name}" unless query.one?
+          query.pop
+        end
+      end
+
+      class JdbcQuery
+        attr_reader :name, :if_type, :recheck_interval, :resource_type, :instance_column, :query_string, :columns
+        def initialize(name:, if_type:, recheck_interval:, query_string:, columns: {}, resource_type: nil, instance_column: nil)
+          @name = name
+          @if_type = if_type
+          @recheck_interval = recheck_interval
+          @resource_type = resource_type
+          @instance_column = instance_column
+          @query_string = query_string
+          @columns = columns
+        end
+
+        def update(if_type:, recheck_interval:, resource_type:, query_string:, columns:, instance_column: nil)
+          @if_type = if_type unless if_type.nil?
+          @recheck_interval = recheck_interval unless recheck_interval.nil?
+          @resource_type = resource_type unless resource_type.nil?
+          @query_string = query_string unless query_string.nil?
+          @columns = columns unless columns.nil?
+          @instance_column = instance_column unless instance_column.nil?
         end
       end
 
@@ -550,6 +639,8 @@ module Opennms
       class DuplicateIncludeCollection < StandardError; end
 
       class NoSuchCollection < StandardError; end
+
+      class DuplicateJdbcQuery < StandardError; end
     end
   end
 end

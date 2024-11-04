@@ -30,11 +30,11 @@ end
 action :create do
   converge_if_changed do
     xml_resource_init
-    collection = xml_resource.variables[:collections][new_resource.name]
+    collection = xml_resource.variables[:collections][new_resource.collection]
     if collection.nil?
       resource_properties = %i(name rrd_step rras).map { |p| [p, new_resource.send(p)] }.to_h.compact
       collection = Opennms::Cookbook::Collection::XmlCollection.new(**resource_properties)
-      xml_resource.variables[:collections][new_resource.name] = collection
+      xml_resource.variables[:collections][new_resource.collection] = collection
     else
       run_action(:update)
     end
@@ -44,7 +44,7 @@ end
 action :update do
   converge_if_changed(:rrd_step, :rras) do
     xml_resource_init
-    collection = xml_resource.variables[:collections][new_resource.name]
+    collection = xml_resource.variables[:collections][new_resource.collection]
     raise Chef::Exceptions::CurrentValueDoesNotExist if collection.nil?
     collection.update(rrd_step: new_resource.rrd_step, rras: new_resource.rras)
   end
@@ -52,10 +52,10 @@ end
 
 action :delete do
   xml_resource_init
-  collection = xml_resource.variables[:collections][new_resource.name]
+  collection = xml_resource.variables[:collections][new_resource.collection]
   unless collection.nil?
-    converge_by("Removing xml_collection #{new_resource.name}") do
-      xml_resource.variables[:collections].delete(new_resource.name)
+    converge_by("Removing xml_collection #{new_resource.collection}") do
+      xml_resource.variables[:collections].delete(new_resource.collection)
     end
   end
 end

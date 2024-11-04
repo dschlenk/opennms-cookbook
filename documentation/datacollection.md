@@ -122,6 +122,9 @@ and the `collector`:
 <collector service="VMware-VirtualMachine" class-name="org.opennms.netmgt.collectd.VmwareCollector" />
 ```
 
+## SNMP
+
+The resources `opennms_snmp_collection`, `opennms_snmp_collection_group`, and `opennms_snmp_collection_service` are available to :sp
 ## XML
 
 The following resources are available to express XML data collection configuration as code.

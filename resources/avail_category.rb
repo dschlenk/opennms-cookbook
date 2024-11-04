@@ -31,8 +31,8 @@ load_current_value do |new_resource|
   c = cg.category(new_resource.label)
   current_value_does_not_exist! if c.nil?
   comment c.comment
-  normal c.normal
-  warning c.warning
+  normal c.normal.to_f
+  warning c.warning.to_f
   rule c.rule
   services c.services
 end
@@ -44,7 +44,7 @@ action :create do
     raise Opennms::Cookbook::ConfigHelpers::AvailCategory::CategoryGroupNotFound, "No such category group #{new_resource.category_group} exists" if cg.nil?
     c = cg.category(new_resource.label)
     if c.nil?
-      raise Opennms::Cookbook::ConfigHelpers::AvailCategory::NoServices, "At least one service must be defined per category, but no services defined with category #{new_resource.name} in group #{new_resource.category_group}" if new_resource.services.nil? || new_resource.services.empty?
+      raise Opennms::Cookbook::ConfigHelpers::AvailCategory::NoServices, "At least one service must be defined per category, but no services defined with category #{new_resource.label} in group #{new_resource.category_group}" if new_resource.services.nil? || new_resource.services.empty?
       resource_properties = %i(label comment normal warning rule services).map { |p| [p, new_resource.send(p)] }.to_h.compact
       resource_properties[:normal] = 99.99 if resource_properties[:normal].nil?
       resource_properties[:warning] = 97.0 if resource_properties[:warning].nil?

@@ -1,5 +1,5 @@
 include_recipe 'opennms_resource_tests::collection_package'
-# include_recipe 'opennms_resource_tests::jdbc_collection'
+include_recipe 'opennms_resource_tests::jdbc_collection'
 # most useful options
 opennms_jdbc_collection_service 'JDBCFoo' do
   service_name 'JDBCFoo'

@@ -20,8 +20,8 @@ load_current_value do |new_resource|
   else
     eventconf = r.variables[:eventconf]
   end
-  current_value_does_not_exist! if eventconf.event_files[new_resource.name].nil?
-  position eventconf.event_files[new_resource.name][:position]
+  current_value_does_not_exist! if eventconf.event_files[new_resource.event_file].nil?
+  position eventconf.event_files[new_resource.event_file][:position]
 end
 
 action :create do
@@ -29,7 +29,7 @@ action :create do
   case new_resource.source_type
   when 'cookbook_file'
     cookbook_file "#{node['opennms']['conf']['home']}/etc/events/#{new_resource.event_file}" do
-      source new_resource.source || new_resource.name
+      source new_resource.source || new_resource.event_file
       owner node['opennms']['username']
       group node['opennms']['groupname']
       mode '664'
@@ -39,7 +39,7 @@ action :create do
     end
   when 'template'
     template "#{node['opennms']['conf']['home']}/etc/events/#{new_resource.event_file}" do
-      source new_resource.source || "#{new_resource.name}.erb"
+      source new_resource.source || "#{new_resource.event_file}.erb"
       owner node['opennms']['username']
       group node['opennms']['groupname']
       mode '664'
@@ -50,7 +50,7 @@ action :create do
     end
   when 'remote_file'
     remote_file "#{node['opennms']['conf']['home']}/etc/events/#{new_resource.event_file}" do
-      source new_resource.source || new_resource.name
+      source new_resource.source || new_resource.event_file
       owner node['opennms']['username']
       group node['opennms']['groupname']
       mode '664'

@@ -11,7 +11,7 @@ property :user, String
 property :class_name, String, default: 'org.opennms.netmgt.collectd.JdbcCollector'
 
 action :create do
-  declare_resource(:cookbook_file, "#{new_resource.driver_file}_#{new_resource.name}") do
+  declare_resource(:cookbook_file, "#{new_resource.driver_file}_#{new_resource.service_name}") do
     source new_resource.driver_file
     path "#{node['opennms']['conf']['home']}/lib/#{new_resource.driver_file}"
     mode '0664'

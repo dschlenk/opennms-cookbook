@@ -386,6 +386,48 @@ suites:
       inspec_tests:
         - path: test/integration/default
         - path: test/integration/event_severity
+  - name: jdbc_collection
+    provisioner:
+      policyfile: policyfiles/jdbc_collection.rb
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/jdbc_collection
+  - name: jdbc_collection_edit
+    provisioner:
+      policyfile: policyfiles/jdbc_collection_edit.rb
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/jdbc_collection_edit
+  - name: jdbc_collection_delete
+    provisioner:
+      policyfile: policyfiles/jdbc_collection_delete.rb
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/jdbc_collection_delete
+  - name: jdbc_query
+    provisioner:
+      policyfile: policyfiles/jdbc_query.rb
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/jdbc_query
+  - name: jdbc_query_edit
+    provisioner:
+      policyfile: policyfiles/jdbc_query_edit.rb
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/jdbc_query_edit
+  - name: jdbc_query_delete
+    provisioner:
+      policyfile: policyfiles/jdbc_query_delete.rb
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/jdbc_query_delete
   - name: jdbc_collection_service
     provisioner:
       policyfile: policyfiles/jdbc_collection_service.rb

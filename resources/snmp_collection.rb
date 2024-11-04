@@ -52,12 +52,12 @@ end
 action :create do
   converge_if_changed do
     snmp_resource_init
-    collection = snmp_resource.variables[:collections][new_resource.name]
+    collection = snmp_resource.variables[:collections][new_resource.collection]
     if collection.nil?
       resource_properties = %i(name rrd_step rras max_vars_per_pdu snmp_stor_flag include_collections).map { |p| [p, new_resource.send(p)] }.to_h.compact
       resource_properties[:snmp_stor_flag] = 'select' if resource_properties[:snmp_stor_flag].nil?
       collection = Opennms::Cookbook::Collection::SnmpCollection.new(**resource_properties)
-      snmp_resource.variables[:collections][new_resource.name] = collection
+      snmp_resource.variables[:collections][new_resource.collection] = collection
     else
       run_action(:update)
     end
@@ -67,7 +67,7 @@ end
 action :update do
   converge_if_changed(:rrd_step, :rras, :max_vars_per_pdu, :snmp_stor_flag, :include_collections) do
     snmp_resource_init
-    collection = snmp_resource.variables[:collections][new_resource.name]
+    collection = snmp_resource.variables[:collections][new_resource.collection]
     raise Chef::Exceptions::CurrentValueDoesNotExist if collection.nil?
     collection.update(rrd_step: new_resource.rrd_step, rras: new_resource.rras, max_vars_per_pdu: new_resource.max_vars_per_pdu, snmp_stor_flag: new_resource.snmp_stor_flag, include_collections: new_resource.include_collections)
   end
@@ -75,10 +75,10 @@ end
 
 action :delete do
   snmp_resource_init
-  collection = snmp_resource.variables[:collections][new_resource.name]
+  collection = snmp_resource.variables[:collections][new_resource.collection]
   unless collection.nil?
-    converge_by("Removing snmp_collection #{new_resource.name}") do
-      snmp_resource.variables[:collections].delete(new_resource.name)
+    converge_by("Removing snmp_collection #{new_resource.collection}") do
+      snmp_resource.variables[:collections].delete(new_resource.collection)
     end
   end
 end
