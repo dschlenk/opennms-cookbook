@@ -540,6 +540,13 @@ suites:
       inspec_tests:
         - path: test/integration/default
         - path: test/integration/snmp_config_profile_delete
+  - name: wsman_collection
+    provisioner:
+      policyfile: policyfiles/wsman_collection.rb
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/wsman_collection
   - name: wsman_collection_service
     provisioner:
       policyfile: policyfiles/wsman_collection_service.rb

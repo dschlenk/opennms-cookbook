@@ -34,7 +34,6 @@ action :create do
     if collection.nil?
       resource_properties = %i(name rrd_step rras).map { |p| [p, new_resource.send(p)] }.to_h.compact
       collection = Opennms::Cookbook::Collection::JmxCollection.new(**resource_properties)
-      Chef::Log.warn("made a new jmx_collection: #{collection}")
       jmx_resource.variables[:collections][new_resource.collection] = collection
     else
       run_action(:update)

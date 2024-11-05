@@ -122,6 +122,48 @@ module Opennms
         end
       end
 
+      module WsmanCollectionTemplate
+        def wsman_resource_init
+          wsman_resource_create unless wsman_resource_exist?
+        end
+
+        def wsman_resource
+          return unless wsman_resource_exist?
+          find_resource!(:template, "#{onms_etc}/wsman-datacollection-config.xml")
+        end
+
+        private
+
+        def wsman_resource_exist?
+          !find_resource(:template, "#{onms_etc}/wsman-datacollection-config.xml").nil?
+        rescue Chef::Exceptions::ResourceNotFound
+          false
+        end
+
+        def wsman_resource_create
+          file = Opennms::Cookbook::Collection::WsmanCollectionConfigFile.new
+          file.read!("#{onms_etc}/wsman-datacollection-config.xml", 'wsman')
+          with_run_context(:root) do
+            declare_resource(:template, "#{onms_etc}/wsman-datacollection-config.xml") do
+              cookbook 'opennms'
+              source 'wsman-datacollection-config.xml.erb'
+              owner node['opennms']['username']
+              group node['opennms']['groupname']
+              mode '0664'
+              variables(
+                collections: file.collections,
+                rrd_repository: node['opennms']['wsman_dc']['rrd_repository'],
+                groups: file.groups,
+                system_definitions: file.system_definitions
+              )
+              action :nothing
+              delayed_action :create
+              notifies :restart, 'service[opennms]'
+            end
+          end
+        end
+      end
+
       module XmlCollectionTemplate
         def xml_resource_init
           xml_resource_create unless xml_resource_exist?
@@ -209,7 +251,9 @@ module Opennms
                    else
                      "#{type}-"
                    end
-          doc.each_element("#{prefix}datacollection-config/#{type}-collection") do |c|
+          cel = "#{type}-collection"
+          cel = 'collection' if type.eql?('wsman')
+          doc.each_element("#{prefix}datacollection-config/#{cel}") do |c|
             name = c.attributes['name']
             rrd_step = c.elements['rrd/@step'].value.to_i
             rras = []
@@ -241,6 +285,30 @@ module Opennms
           cf = OpennmsCollectionConfigFile.new
           cf.read!(file, type)
           cf
+        end
+      end
+
+      class WsmanCollectionConfigFile < OpennmsCollectionConfigFile
+        attr_reader :groups, :system_definitions
+        def initialize
+          super
+          groups = []
+          system_definitions = []
+        end
+
+        def read!(file = 'datacollection-config.xml', type)
+          super
+          doc = xmldoc_from_file(file)
+          doc.each_element('wsman-datacollection-config/group') do |group|
+            attribs = []
+            group.each_element('attrib') do |attrib|
+              attribs.push({ 'name' => attrib.attributes['name'], 'alias' => attrib.attributes['alias'], 'type' => attrib.attributes['type'], 'index-of' => attrib.attributes['index-of'], 'filter' => attrib.attributes['filter'] })
+            end
+            @groups.push(WsmanGroup.new(name: group.attributes['name'], resource_uri: group.attributes['resource-uri'], resource_type: group.attributes['resource-type'], dialect: group.attributes['dialect'], filter: group.attributes['filter'], attribs: attribs))
+          end
+          doc.each_element('wsman-datacollection-config/system-definition') do |sd|
+            @system_definitions.push(WsmanSystemDefinition.new(name: sd.attributes['name'], rule: xml_element_text(sd, 'rule'), include_groups: xml_text_array(sd, 'include-group')))
+          end
         end
       end
 
@@ -369,6 +437,8 @@ module Opennms
             JdbcCollection.new(**properties)
           when 'jmx'
             JmxCollection.new(**properties)
+          when 'wsman'
+            WsmanCollection.new(**properties)
           end
         end
       end
@@ -566,6 +636,44 @@ module Opennms
           @attribs = attribs unless attribs.nil?
           @include_mbeans = include_mbeans unless include_mbeans.nil?
           @comp_attribs = comp_attribs unless comp_attribs.nil?
+        end
+      end
+
+      # unlike every other type of collection, the sets of things to collect (groups, in this case) are independent of the collection
+      class WsmanCollection < OpennmsCollection
+        attr_reader :include_system_definitions, :include_system_definition
+        def initialize(name:, type: 'wsman', rrd_step: nil, rras: nil, include_system_definitions: nil, include_system_definition: nil)
+          @include_system_definition = include_system_definition || []
+          @include_system_definitions = include_system_definitions
+          super(name: name, type: type, rrd_step: rrd_step, rras: rras)
+        end
+
+        def type_config(c)
+          @include_system_definitions = true unless c.elements['include-all-system-definitions'].nil?
+          c.each_element('include-system-definition') do |isd|
+            @include_system_definition.push(xml_element_text(isd))
+          end
+        end
+      end
+
+      class WsmanGroup
+        attr_reader :name, :resource_uri, :resource_type, :dialect, :filter, :attribs
+        def initialize(name:, resource_uri:, resource_type:, dialect:, filter:, attribs:)
+          @name = name
+          @resource_uri = resource_uri
+          @resource_type = resource_type
+          @dialect = dialect
+          @filter = filter
+          @attribs = attribs
+        end
+      end
+
+      class WsmanSystemDefinition
+        attr_reader :name, :rule, :include_groups
+        def initialize(name:, rule:, include_groups:)
+          @name = name
+          @rule = rule
+          @include_groups = include_groups
         end
       end
 

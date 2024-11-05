@@ -237,6 +237,7 @@ default['opennms']['poller']['example1']['opennms_jvm']['rrd_repository']     = 
 default['opennms']['poller']['strafer']['strafeping']['rrd_repository']       = def_rrd_resp_repo
 default['opennms']['jdbc_dc']['rrd_repository']                               = def_rrd_repo
 default['opennms']['jmx_dc']['rrd_repository']                                = def_rrd_repo
+default['opennms']['wsman_dc']['rrd_repository']                              = def_rrd_repo
 default['opennms']['nsclient_datacollection']['rrd_repository']               = def_rrd_repo
 default['opennms']['thresholds']['mib2']['rrd_repository']                    = def_rrd_repo
 default['opennms']['thresholds']['hrstorage']['rrd_repository']               = def_rrd_repo

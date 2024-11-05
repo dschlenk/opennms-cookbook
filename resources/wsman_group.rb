@@ -1,20 +1,12 @@
-# frozen_string_literal: true
-require 'rexml/document'
-
-# Defines data to collect in a WS-Man collection in
-# $ONMS_HOME/etc/wsman-datacollection-config.xml.
-
-actions :create, :delete
-default_action :create
-
-attribute :name, name_attribute: true, kind_of: String, required: true
-attribute :group_name, kind_of: String, required: false
-attribute :file_name, kind_of: String, required: true
-attribute :resource_type, kind_of: String, required: true
-attribute :resource_uri, kind_of: String, required: true
-attribute :dialect, kind_of: String, required: false
-attribute :filter, kind_of: String, required: false
-attribute :attribs, kind_of: Array, default: []
-attribute :position, kind_of: String, equal_to: %w(top bottom), default: 'bottom'
-
-attr_accessor :exists, :file_path
+property :group_name, String, name_attribute: true
+property :file_name, String, required: true, identity: true
+property :resource_type, String, required: true
+property :resource_uri, String, required: true
+property :dialect, String
+property :filter, String
+property :attribs, Array, required: true, callbacks: {
+  'should be an array of hashes with the following required string keys with string values: `name`, `alias`, `type` (matches `([Cc](ounter|OUNTER)|[Gg](auge|AUGE)|[Ss](tring|TRING))`) and the following optional string keys with string values: `index-of`, `filter`' => lambda { |p|
+    !p.any{ |h| !h.is_a?(Hash) || !h.key?('name') || !h['name'].is_a?(String) || !h.key?('alias') || !h['alias'].is_a?(String) || !h.key?('type') || !h['type'].is_a?(String) || !h['type'].match(/([Cc](ounter|OUNTER)|[Gg](auge|AUGE)|[Ss](tring|TRING))/) || (h.key?('index-of') && !h['index-of'].is_a?(String)) || (h.key?('filter') && !h['filter'].is_a?(String)) }
+  }
+} 
+property :position, String, equal_to: %w(top bottom), default: 'bottom', deprecated: 'there is no utility in defining group order; therefore this property is now ignored and will be removed in the next major release'
