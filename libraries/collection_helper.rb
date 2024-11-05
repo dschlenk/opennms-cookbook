@@ -82,6 +82,46 @@ module Opennms
         end
       end
 
+      module JmxCollectionTemplate
+        def jmx_resource_init
+          jmx_resource_create unless jmx_resource_exist?
+        end
+
+        def jmx_resource
+          return unless jmx_resource_exist?
+          find_resource!(:template, "#{onms_etc}/jmx-datacollection-config.xml")
+        end
+
+        private
+
+        def jmx_resource_exist?
+          !find_resource(:template, "#{onms_etc}/jmx-datacollection-config.xml").nil?
+        rescue Chef::Exceptions::ResourceNotFound
+          false
+        end
+
+        def jmx_resource_create
+          file = Opennms::Cookbook::Collection::OpennmsCollectionConfigFile.new
+          file.read!("#{onms_etc}/jmx-datacollection-config.xml", 'jmx')
+          with_run_context(:root) do
+            declare_resource(:template, "#{onms_etc}/jmx-datacollection-config.xml") do
+              cookbook 'opennms'
+              source 'jmx-datacollection-config.xml.erb'
+              owner node['opennms']['username']
+              group node['opennms']['groupname']
+              mode '0664'
+              variables(
+                collections: file.collections,
+                rrd_repository: node['opennms']['jmx_dc']['rrd_repository']
+              )
+              action :nothing
+              delayed_action :create
+              notifies :restart, 'service[opennms]'
+            end
+          end
+        end
+      end
+
       module XmlCollectionTemplate
         def xml_resource_init
           xml_resource_create unless xml_resource_exist?
@@ -327,6 +367,8 @@ module Opennms
             SnmpCollection.new(**properties)
           when 'jdbc'
             JdbcCollection.new(**properties)
+          when 'jmx'
+            JmxCollection.new(**properties)
           end
         end
       end
@@ -464,6 +506,66 @@ module Opennms
           @query_string = query_string unless query_string.nil?
           @columns = columns unless columns.nil?
           @instance_column = instance_column unless instance_column.nil?
+        end
+      end
+
+      class JmxCollection < OpennmsCollection
+        attr_reader :mbeans
+        def initialize(name:, type: 'jdbc', rrd_step: nil, rras: nil)
+          @mbeans = []
+          super
+        end
+
+        def type_config(c)
+          c.each_element('mbeans/mbean') do |mbean|
+            attribs = {}
+            mbean.each_element('attrib') do |attrib|
+              attribs[attrib.attributes['name']] = { 'type' => attrib.attributes['type'], 'alias' => attrib.attributes['alias'], 'maxval' => attrib.attributes['maxval'], 'minval' => attrib.attributes['minval'] }.compact
+            end
+            comp_attribs = {}
+            mbean.each_element('comp-attrib') do |ca|
+              comp_attribs[ca['name']] = { 'type' => ca.attributes['type'], 'alias' => ca.attributes['alias'] }.compact
+              cms = {}
+              ca.each_element('comp-member') do |cm|
+                cms[cm.attributes['name']] = { 'type' => cm.attributes['type'], 'alias' => cm.attributes['alias'], 'maxval' => cm.attributes['maxval'], 'minval' => cm.attributes['minval'] }.compact
+              end
+              comp_attribs[ca['name']]['comp_members'] = cms
+            end
+            @mbeans.push(JmxMBean.new(name: mbean.attributes['name'], objectname: mbean.attributes['objectname'], keyfield: mbean.attributes['keyfield'], resource_type: mbean.attributes['resource-type'], exclude: mbean.attributes['exclude'], key_alias: mbean.attributes['key-alias'], attribs: attribs, include_mbeans: xml_text_array(mbean, 'includeMbean'), comp_attribs: comp_attribs))
+          end
+        end
+
+        def mbean(name:, objectname:)
+          mbean = @mbeans.select { |q| q.name.eql?(name) && q.objectname.eql?(objectname) }
+          return if mbean.nil? || mbean.empty?
+          raise DuplicateJmxMBean, "More than one mbean named #{name} and objectname #{objectname} found in JMX collection #{@name}" unless mbean.one?
+          mbean.pop
+        end
+      end
+
+      class JmxMBean
+        attr_reader :name, :objectname, :keyfield, :exclude, :key_alias, :resource_type, :attribs, :include_mbeans, :comp_attribs
+
+        def initialize(name:, objectname:, keyfield: nil, exclude: nil, key_alias: nil, resource_type: nil, attribs: nil, include_mbeans: nil, comp_attribs: nil)
+          @name = name
+          @objectname = objectname
+          @keyfield = keyfield
+          @exclude = exclude
+          @key_alias = key_alias
+          @resource_type = resource_type
+          @attribs = attribs || []
+          @include_mbeans = include_mbeans || []
+          @comp_attribs = comp_attribs || []
+        end
+
+        def update(keyfield: nil, exclude: nil, key_alias: nil, resource_type: nil, attribs: nil, include_mbeans: nil, comp_attribs: nil)
+          @keyfield = keyfield unless keyfield.nil?
+          @exclude = exclude unless exclude.nil?
+          @key_alias = key_alias unless key_alias.nil?
+          @resource_type = resource_type unless resource_type.nil?
+          @attribs = attribs unless attribs.nil?
+          @include_mbeans = include_mbeans unless include_mbeans.nil?
+          @comp_attribs = comp_attribs unless comp_attribs.nil?
         end
       end
 
@@ -622,12 +724,6 @@ module Opennms
       class WsmanCollection < OpennmsCollection
       end
 
-      class JmxCollection < OpennmsCollection
-      end
-
-      class JdbcCollection < OpennmsCollection
-      end
-
       class XmlSourceDuplicateEntry < StandardError; end
 
       class XmlCollectionDoesNotExist < StandardError; end
@@ -641,6 +737,8 @@ module Opennms
       class NoSuchCollection < StandardError; end
 
       class DuplicateJdbcQuery < StandardError; end
+
+      class DuplicateJmxMBean < StandardError; end
     end
   end
 end

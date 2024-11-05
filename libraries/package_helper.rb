@@ -32,7 +32,7 @@ module Opennms
               variables(collectd_config: file)
               action :nothing
               delayed_action :create
-              notifies :restart, 'service[opennms]'
+              # notifies :restart, 'service[opennms]'
             end
           end
         end

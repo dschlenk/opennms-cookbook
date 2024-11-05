@@ -2409,3 +2409,8 @@ default['opennms']['secure_fields'] = %w(
               tticket
               script
 )
+default['opennms']['manage_collection_packages'] = true
+default['opennms']['manage_jdbc_collections'] = true
+default['opennms']['manage_jmx_collections'] = true
+default['opennms']['manage_snmp_collections'] = true
+default['opennms']['manage_xml_collections'] = true
