@@ -1,9 +1,10 @@
 include_recipe 'opennms_resource_tests::wsman_group'
 opennms_wsman_system_definition 'wsman-test' do
   name 'wsman-test'
+  rule "#productVendor matches '^.*'"
   file_name 'wsman-datacollection.d/wsman-test-group.xml'
   groups %w(wsman-dell-group wsman-test-group wsman-another-group)
-  action :add
+  action :create
 end
 
 opennms_wsman_system_definition 'same-wsman-test' do

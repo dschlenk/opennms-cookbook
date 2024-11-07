@@ -1,4 +1,3 @@
-# most useful options
 include_recipe 'opennms_resource_tests::poll_outage'
 opennms_collection_package 'foo' do
   filter "IPADDR != '0.0.0.0' & categoryName == 'foo'"
@@ -11,11 +10,9 @@ opennms_collection_package 'foo' do
   # collectd requires a restart for changes to take effect
   remote true
   outage_calendars ['ignore localhost on mondays']
-  notifies :restart, 'service[opennms]', :delayed
 end
 
 # minimal
 opennms_collection_package 'bar' do
   filter "IPADDR != '0.0.0.0'"
-  notifies :restart, 'service[opennms]', :delayed
 end

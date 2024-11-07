@@ -123,38 +123,38 @@ module Opennms
       end
 
       module WsmanCollectionTemplate
-        def wsman_resource_init
-          wsman_resource_create unless wsman_resource_exist?
+        def wsman_resource_init(file)
+          wsman_resource_create(file) unless wsman_resource_exist?(file)
         end
 
-        def wsman_resource
-          return unless wsman_resource_exist?
-          find_resource!(:template, "#{onms_etc}/wsman-datacollection-config.xml")
+        def wsman_resource(file)
+          return unless wsman_resource_exist?(file)
+          find_resource!(:template, file)
         end
 
         private
 
-        def wsman_resource_exist?
-          !find_resource(:template, "#{onms_etc}/wsman-datacollection-config.xml").nil?
+        def wsman_resource_exist?(file)
+          !find_resource(:template, file).nil?
         rescue Chef::Exceptions::ResourceNotFound
           false
         end
 
-        def wsman_resource_create
-          file = Opennms::Cookbook::Collection::WsmanCollectionConfigFile.new
-          file.read!("#{onms_etc}/wsman-datacollection-config.xml", 'wsman')
+        def wsman_resource_create(file)
+          f = Opennms::Cookbook::Collection::WsmanCollectionConfigFile.new
+          f.read!(file, 'wsman')
           with_run_context(:root) do
-            declare_resource(:template, "#{onms_etc}/wsman-datacollection-config.xml") do
+            declare_resource(:template, file) do
               cookbook 'opennms'
               source 'wsman-datacollection-config.xml.erb'
               owner node['opennms']['username']
               group node['opennms']['groupname']
               mode '0664'
               variables(
-                collections: file.collections,
+                collections: f.collections,
                 rrd_repository: node['opennms']['wsman_dc']['rrd_repository'],
-                groups: file.groups,
-                system_definitions: file.system_definitions
+                groups: f.groups,
+                system_definitions: f.system_definitions
               )
               action :nothing
               delayed_action :create
@@ -292,23 +292,36 @@ module Opennms
         attr_reader :groups, :system_definitions
         def initialize
           super
-          groups = []
-          system_definitions = []
+          @groups = []
+          @system_definitions = []
         end
 
-        def read!(file = 'datacollection-config.xml', type)
+        def read!(file, type)
+          unless ::File.exist?(file)
+            doc = REXML::Document.new
+            doc << REXML::XMLDecl.new
+            root_el = doc.add_element 'wsman-datacollection-config'
+            root_el.add_text("\n")
+            Opennms::Helpers.write_xml_file(doc, file)
+          end
           super
           doc = xmldoc_from_file(file)
           doc.each_element('wsman-datacollection-config/group') do |group|
             attribs = []
             group.each_element('attrib') do |attrib|
-              attribs.push({ 'name' => attrib.attributes['name'], 'alias' => attrib.attributes['alias'], 'type' => attrib.attributes['type'], 'index-of' => attrib.attributes['index-of'], 'filter' => attrib.attributes['filter'] })
+              attribs.push({ 'name' => attrib.attributes['name'], 'alias' => attrib.attributes['alias'], 'type' => attrib.attributes['type'], 'index-of' => attrib.attributes['index-of'], 'filter' => attrib.attributes['filter'] }.compact)
             end
             @groups.push(WsmanGroup.new(name: group.attributes['name'], resource_uri: group.attributes['resource-uri'], resource_type: group.attributes['resource-type'], dialect: group.attributes['dialect'], filter: group.attributes['filter'], attribs: attribs))
           end
           doc.each_element('wsman-datacollection-config/system-definition') do |sd|
             @system_definitions.push(WsmanSystemDefinition.new(name: sd.attributes['name'], rule: xml_element_text(sd, 'rule'), include_groups: xml_text_array(sd, 'include-group')))
           end
+        end
+
+        def self.read(file, type)
+          cf = WsmanCollectionConfigFile.new
+          cf.read!(file, type)
+          cf
         end
       end
 
@@ -666,6 +679,14 @@ module Opennms
           @filter = filter
           @attribs = attribs
         end
+
+        def update(resource_uri:, resource_type:, dialect:, filter:, attribs:)
+          @resource_uri = resource_uri unless resource_uri.nil?
+          @resource_type = resource_type unless resource_type.nil?
+          @dialect = dialect unless dialect.nil?
+          @filter = filter unless filter.nil?
+          @attribs = attribs unless attribs.nil?
+        end
       end
 
       class WsmanSystemDefinition
@@ -673,7 +694,12 @@ module Opennms
         def initialize(name:, rule:, include_groups:)
           @name = name
           @rule = rule
-          @include_groups = include_groups
+          @include_groups = include_groups || []
+        end
+
+        def update(rule:, include_groups:)
+          @rule = rule unless rule.nil?
+          @include_groups = include_groups unless include_groups.nil?
         end
       end
 
@@ -829,9 +855,6 @@ module Opennms
         end
       end
 
-      class WsmanCollection < OpennmsCollection
-      end
-
       class XmlSourceDuplicateEntry < StandardError; end
 
       class XmlCollectionDoesNotExist < StandardError; end
@@ -847,6 +870,12 @@ module Opennms
       class DuplicateJdbcQuery < StandardError; end
 
       class DuplicateJmxMBean < StandardError; end
+
+      class DuplicateWsmanGroup < StandardError; end
+
+      class DuplicatedSystemDefinition < StandardError; end
+
+      class NoSuchWsmanCollectionFile < StandardError; end
     end
   end
 end

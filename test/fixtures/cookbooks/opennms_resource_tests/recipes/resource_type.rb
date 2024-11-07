@@ -1,4 +1,3 @@
-# frozen_string_literal: true
 # typical usage
 opennms_resource_type 'wibbleWobble' do
   group_name 'metasyntactic'

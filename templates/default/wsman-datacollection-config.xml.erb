@@ -20,18 +20,18 @@
     </collection>
 <% end unless @collections.nil? -%>
 <% @groups.each do |group| -%>
-    <group name=<%= group.name.encode(:xml => :attr) %> resource-uri=<%= group.resource_uri.encode(:xml => :attr) %> resource-type=<%= group.resource_type.encode(:xml => :attr) %><%= group.dialect.nil? ? '' : " dialect=#{group.dialect.encode(:xml => :attr)}" %><%= group.filter.nil? ? '' : " filter=#{group.filter.encode(:xml => :attr)}" %>>
+    <group name=<%= group.name.encode(:xml => :attr) %> resource-uri=<%= group.resource_uri.encode(:xml => :attr) %> resource-type=<%= group.resource_type.encode(:xml => :attr) %><%= group.dialect.nil? ? '' : " dialect=#{group.dialect.encode(:xml => :attr)}" %><%= group.filter.nil? ? '' : " filter=\"#{group.filter.gsub("&", "&amp;").gsub("\"", "&quot;").gsub("<", "&lt;")}\"" %>>
   <% group.attribs.each do |attrib| -%>
-        <attrib name=<%= attrib['name'].encode(:xml => :attr) %> alias=<%= attrib['alias'].encode(:xml => :attr) %> type=<%= attrib['type'].encode(:xml => :attr) %><%= attrib['index-of'].nil? ? '' : " index-of=#{attrib['index-of'].encode(:xml => :attr)}" %><%= attrib['filter'].nil? ? '' : " filter=#{attrib['filter'].encode(:xml => :attr)}" %>/>
+        <attrib name=<%= attrib['name'].encode(:xml => :attr) %> alias=<%= attrib['alias'].encode(:xml => :attr) %> type=<%= attrib['type'].encode(:xml => :attr) %><%= attrib['index-of'].nil? ? '' : " index-of=#{attrib['index-of'].encode(:xml => :attr)}" %><%= attrib['filter'].nil? ? '' : " filter=\"#{attrib['filter'].gsub("&", "&amp;").gsub("\"", "&quot;").gsub("<", "&lt;")}\"" %>/>
   <% end unless group.attribs.nil? -%>
     </group>
 <% end unless @groups.nil? -%>
 <% @system_definitions.each do |sd| -%>
     <system-definition name=<%= sd.name.encode(:xml => :attr) %>>
-        <rule><% sd.rule.encode(:xml => :text) %></rule>
-  <% sd.groups.each do |group| -%>
-        <include-group><%= group.encode(:xml => :attr) %></include-group>
-  <% end unless sd.groups.nil? -%>
+        <rule><%= sd.rule.encode(:xml => :text) %></rule>
+  <% sd.include_groups.each do |group| -%>
+        <include-group><%= group.encode(:xml => :text) %></include-group>
+  <% end unless sd.include_groups.nil? -%>
     </system-definition>
 <% end unless @system_definitions.nil? -%>
 </wsman-datacollection-config>

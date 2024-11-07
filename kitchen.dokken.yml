@@ -554,6 +554,20 @@ suites:
       inspec_tests:
         - path: test/integration/default
         - path: test/integration/wsman_collection_service
+  - name: wsman_group
+    provisioner:
+      policyfile: policyfiles/wsman_group.rb
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/wsman_group
+  - name: wsman_system_definition
+    provisioner:
+      policyfile: policyfiles/wsman_system_definition.rb
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/wsman_system_definition
   - name: xml_collection
     provisioner:
       policyfile: policyfiles/xml_collection.rb
