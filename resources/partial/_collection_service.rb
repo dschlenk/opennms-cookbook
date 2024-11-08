@@ -104,7 +104,6 @@ load_current_value do |new_resource|
   end
   # ignore driver_file for jdbc
   driver_file new_resource.driver_file if new_resource.respond_to?(:driver_file)
-  Chef::Log.warn("sending parameters #{sp}")
   parameters sp
   class_name collector['class_name']
   class_parameters collector['parameters']

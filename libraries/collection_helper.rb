@@ -233,6 +233,169 @@ module Opennms
         end
       end
 
+      module ResourceTypeTemplate
+        def rt_resource_init(file)
+          rt_resource_create(file) unless rt_resource_exist?(file)
+        end
+
+        def rt_resource(file)
+          return unless rt_resource_exist?(file)
+          find_resource!(:template, file)
+        end
+
+        private
+
+        def rt_resource_exist?(file)
+          !find_resource(:template, file).nil?
+        rescue Chef::Exceptions::ResourceNotFound
+          false
+        end
+
+        def rt_resource_create(file)
+          f = Opennms::Cookbook::Collection::ResourceTypeConfigFile.new
+          f.read!(file)
+          with_run_context(:root) do
+            declare_resource(:template, file) do
+              cookbook 'opennms'
+              source 'resource-types.xml.erb'
+              owner node['opennms']['username']
+              group node['opennms']['groupname']
+              mode '0644'
+              variables(config: f)
+              action :nothing
+              delayed_action :create
+              notifies :restart, 'service[opennms]'
+            end
+          end
+        end
+      end
+
+      module GroupResourceTypeTemplate
+        def rtgroup_resource_init(file, group_name)
+          rtgroup_resource_create(file, group_name) unless rtgroup_resource_exist?(file)
+        end
+
+        def rtgroup_resource(file)
+          return unless rtgroup_resource_exist?(file)
+          find_resource!(:template, file)
+        end
+
+        private
+
+        def rtgroup_resource_exist?(file)
+          !find_resource(:template, file).nil?
+        rescue Chef::Exceptions::ResourceNotFound
+          false
+        end
+
+        def rtgroup_resource_create(file, group_name)
+          f = Opennms::Cookbook::Collection::CollectionGroupConfigFile.new(group_name: group_name)
+          f.read!(file)
+          with_run_context(:root) do
+            declare_resource(:template, file) do
+              cookbook 'opennms'
+              source 'datacollection-group.xml.erb'
+              owner node['opennms']['username']
+              group node['opennms']['groupname']
+              mode '0644'
+              variables(config: f)
+              action :nothing
+              delayed_action :create
+              notifies :restart, 'service[opennms]'
+            end
+          end
+        end
+      end
+
+      class ResourceTypeConfigFile
+        include Opennms::XmlHelper
+        attr_reader :resource_types
+
+        def initialize(xpath = 'resource-types')
+          @resource_types = []
+          @xpath = xpath
+        end
+
+        def read!(file = 'resource-type.xml')
+          return unless ::File.exist?(file)
+
+          doc = xmldoc_from_file(file)
+          @resource_types = SnmpCollectionUtils.resource_types(doc.elements[@xpath])
+        end
+
+        def resource_type(name:)
+          rts = @resource_types.select { |rt| rt[:name].eql?(name) }
+          return if rts.nil? || rts.empty?
+          raise DuplicateResourceType, "More than one resourceType with name #{name} found" unless rts.one?
+          rts.pop
+        end
+
+        def resource_type_update(name:, label:, resource_label:, persistence_selector_strategy:, persistence_selector_strategy_params:, storage_strategy:, storage_strategy_params:)
+          @resource_types.map do |rt|
+            next unless rt[:name].eql?(name)
+            rt[:label] = label unless label.nil?
+            rt[:resource_label] = resource_label unless resource_label.nil?
+            rt[:persistence_selector_strategy][:class] = persistence_selector_strategy unless persistence_selector_strategy.nil?
+            rt[:persistence_selector_strategy][:parameters] = persistence_selector_strategy_params unless persistence_selector_strategy_params.nil?
+            rt[:storage_strategy][:class] = storage_strategy unless storage_strategy.nil?
+            rt[:storage_strategy][:parameters] = storage_strategy_params unless storage_strategy_params.nil?
+            break
+          end
+        end
+
+        def resource_type_delete(name:)
+          @resource_types.delete_if { |rt| rt[:name].eql?(name) }
+        end
+
+        def self.read(file = 'resource-type.xml')
+          cf = ResourceTypeConfigFile.new
+          cf.read!(file)
+          cf
+        end
+      end
+
+      class CollectionGroupConfigFile < ResourceTypeConfigFile
+        include Opennms::XmlHelper
+        attr_reader :group_name, :groups, :system_defs
+
+        def initialize(group_name: nil)
+          super('datacollection-group')
+          @group_name = group_name
+          @groups = []
+          @system_defs = []
+        end
+
+        def read!(file = 'datacollection-group.xml')
+          return unless ::File.exist?(file)
+          super
+
+          doc = xmldoc_from_file(file)
+          @group_name = doc.elements[@xpath].attributes['name']
+          @groups = SnmpCollectionUtils.groups(doc.elements[@xpath], 'group')
+          @system_defs = SnmpCollectionUtils.system_defs(doc.elements[@xpath], 'systemDef')
+        end
+
+        def group(name:)
+          groups = @groups.select { |group| group[:name].eql?(name) }
+          return if groups.nil? || groups.empty?
+          raise DuplicateSnmpGroup, "More than one group with name #{name} found" unless groups.one?
+          groups.pop
+        end
+
+        def system_def(name:)
+          sds = @system_defs.select { |sd| sd[:name].eql?(name) }
+          return if sds.nil? || sds.empty?
+          raise DuplicatedSystemDefinition, "More than one systemDef with name #{name} found" unless sds.one?
+          sds.pop
+        end
+
+        def self.read(file = 'resource-type.xml')
+          cf = CollectionGroupConfigFile.new
+          cf.read!(file)
+          cf
+        end
+      end
+
       class OpennmsCollectionConfigFile
         include Opennms::XmlHelper
         attr_reader :collections
@@ -456,6 +619,88 @@ module Opennms
         end
       end
 
+      class XmlHelper
+        include Opennms::XmlHelper
+      end
+
+      module SnmpCollectionUtils
+        def self.resource_types(c)
+          resource_types = []
+          c.each_element('resourceType') do |rt|
+            name = rt.attributes['name']
+            label = rt.attributes['label']
+            resource_label = rt.attributes['resourceLabel']
+            pss_params = {}
+            rt.each_element('persistenceSelectorStrategy/parameter') do |rtp|
+              pss_params[rtp.attributes['key']] = rtp.attributes['value']
+            end
+            pss_class = rt.elements['persistenceSelectorStrategy/@class'].value
+            ss_params = {}
+            rt.each_element('storageStrategy/parameter') do |rtp|
+              ss_params[rtp.attributes['key']] = rtp.attributes['value']
+            end
+            ss_class = rt.elements['storageStrategy/@class'].value
+            resource_types.push({ name: name, label: label, resource_label: resource_label, persistence_selector_strategy: { class: pss_class, parameters: pss_params }, storage_strategy: { class: ss_class, parameters: ss_params } }.compact)
+          end
+          resource_types
+        end
+
+        def self.groups(c, xpath)
+          xh = XmlHelper.new
+          groups = []
+          c.each_element(xpath) do |g|
+            mib_objs = []
+            g.each_element('mibObj') do |mo|
+              mib_objs.push({ oid: mo.attributes['oid'], instance: mo.attributes['instance'], alias: mo.attributes['alias'], type: mo.attributes['type'], maxval: mo.attributes['maxval'], minval: mo.attributes['minval'] })
+            end
+            subgroups = []
+            g.each_element('includeGroup') do |ig|
+              subgroups.push(xh.xml_element_text(ig))
+            end
+            properties = []
+            g.each_element('property') do |p|
+              pp = {}
+              p.each_element['parameter'] do |ppp|
+                pp[ppp.attributes['key']] = ppp.attributes['value']
+              end
+              properties.push({ instance: p.attributes['instance'], alias: p.attributes['alias'], class_name: p.attributes['class-name'], parameters: pp }.compact)
+            end
+            groups.push({ name: g.attributes['name'], if_type: g.attributes['ifType'], mib_objs: mib_objs, include_groups: subgroups, properties: properties }.compact)
+          end
+          groups
+        end
+
+        def self.system_defs(c, xpath)
+          xh = XmlHelper.new
+          systems = []
+          c.each_element(xpath) do |sd|
+            systems.push({ name: sd.attributes['name'],
+                           sysoid: xh.xml_element_text(sd.elements['sysoid']),
+                           sysoid_mask: xh.xml_element_text(sd.elements['sysoidMask']),
+                           ip_addrs: xh.xml_text_array(sd, 'ipList/ipAddr'),
+                           ip_addr_masks: xh.xml_text_array(sd, 'ipList/ipAddrMask'),
+                           include_groups: xh.xml_text_array(sd, 'collect/includeGroup'),
+            }.compact)
+          end
+          systems
+        end
+
+        def self.include_collections(c)
+          xh = XmlHelper.new
+          include_collections = []
+          c.each_element('include-collection') do |ic|
+            unless ic.elements['exclude-filter'].nil?
+              exclude_filters = []
+              ic.each_element('exclude-filter') do |ef|
+                exclude_filters.push(xh.xml_element_text(ef))
+              end
+            end
+            include_collections.push({ data_collection_group: ic.attributes['dataCollectionGroup'], exclude_filters: exclude_filters, system_def: ic.attributes['systemDef'] }.compact)
+          end
+          include_collections
+        end
+      end
+
       class SnmpCollection < OpennmsCollection
         attr_reader :include_collections, :resource_types, :groups, :systems, :max_vars_per_pdu, :snmp_stor_flag
         def initialize(name:, type: 'snmp', rrd_step: nil, rras: nil, max_vars_per_pdu: nil, snmp_stor_flag: nil, include_collections: nil, resource_types: nil, groups: nil, systems: nil)
@@ -475,59 +720,10 @@ module Opennms
                                 nil
                               end
           @snmp_stor_flag = c.attributes['snmpStorageFlag']
-          c.each_element('include-collection') do |ic|
-            unless ic.elements['exclude-filter'].nil?
-              exclude_filters = []
-              ic.each_element('exclude-filter') do |ef|
-                exclude_filters.push(xml_element_text(ef))
-              end
-            end
-            @include_collections.push({ data_collection_group: ic.attributes['dataCollectionGroup'], exclude_filters: exclude_filters, system_def: ic.attributes['systemDef'] }.compact)
-          end
-          c.each_element('resourceType') do |rt|
-            name = rt.attributes['name']
-            label = rt.attributes['label']
-            resource_label = rt.attributes['resourceLabel']
-            pss_params = {}
-            rt.each_element('persistenceSelectorStrategy/parameter') do |rtp|
-              pss_params[rtp.attributes['key']] = rtp.attributes['value']
-            end
-            pss_class = rt.elements['persistenceSelectorStrategy/@class'].value
-            ss_params = {}
-            rt.each_element('storageStrategy/parameter') do |rtp|
-              ss_params[rtp.attributes['key']] = rtp.attributes['value']
-            end
-            ss_class = rt.elements['storageStrategy/@class'].value
-            @resource_types.push({ name: name, label: label, resource_label: resource_label, persistence_selector_strategy: { class: pss_class, parameters: pss_params }, storage_strategy: { class: ss_class, parameters: ss_params } }.compact)
-          end
-          c.each_element('groups/group') do |g|
-            mib_objs = []
-            g.each_element('mibObj') do |mo|
-              mib_objs.push({ oid: mo.attributes['oid'], instance: mo.attributes['instance'], alias: mo.attributes['alias'], type: mo.attributes['type'], maxval: mo.attributes['maxval'], minval: mo.attributes['minval'] })
-            end
-            subgroups = []
-            g.each_element('includeGroup') do |ig|
-              subgroups.push(xml_element_text(ig))
-            end
-            properties = []
-            g.each_element('property') do |p|
-              pp = {}
-              p.each_element['parameter'] do |ppp|
-                pp[ppp.attributes['key']] = ppp.attributes['value']
-              end
-              properties.push({ instance: p.attributes['instance'], alias: p.attributes['alias'], class_name: p.attributes['class-name'], parameters: pp })
-            end
-            @groups.push({ name: g.attributes['name'], if_type: g.attributes['ifType'], mib_objs: mib_objs, include_groups: subgroups, properties: properties }.compact)
-          end
-          c.each_element('systems/systemDef') do |sd|
-            @systems.push({ name: sd.attributes['name'],
-                            sysoid: xml_element_text(sd.elements['sysoid']),
-                            sysoid_mask: xml_element_text(sd.elements['sysoidMask']),
-                            ip_addrs: xml_text_array(sd, 'ipList/ipAddr'),
-                            ip_addr_masks: xml_text_array(sd, 'ipList/ipAddrMask'),
-                            include_groups: xml_text_array(sd, 'collect/includeGroup'),
-            }.compact)
-          end
+          @include_collections = SnmpCollectionUtils.include_collections(c)
+          @resource_types = SnmpCollectionUtils.resource_types(c)
+          @groups = SnmpCollectionUtils.groups(c, 'groups/group')
+          @systems = SnmpCollectionUtils.system_defs(c, 'systems/systemDef')
         end
 
         def update(rrd_step:, rras:, max_vars_per_pdu:, snmp_stor_flag:, include_collections:)
@@ -874,6 +1070,10 @@ module Opennms
       class DuplicateWsmanGroup < StandardError; end
 
       class DuplicatedSystemDefinition < StandardError; end
+
+      class DuplicateResourceType < StandardError; end
+
+      class DuplicateSnmpGroup < StandardError; end
 
       class NoSuchWsmanCollectionFile < StandardError; end
     end

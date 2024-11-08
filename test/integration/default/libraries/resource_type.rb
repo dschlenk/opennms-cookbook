@@ -1,4 +1,3 @@
-# frozen_string_literal: true
 class ResourceType < Inspec.resource(1)
   name 'resource_type'
 
@@ -7,7 +6,7 @@ class ResourceType < Inspec.resource(1)
   '
 
   example '
-    describe resource_type(\'wibbleWobble\', \'metasyntactic\') do,
+    describe resource_type(\'wibbleWobble\', \'metasyntactic\', \'resource-type.xml\') do,
       it { should exist }
       its(\'label\') { should eq \'Wibble Wobble\' }
       its(\'resource_label\') { should eq \'${wibble} - ${wobble}\' }
@@ -18,10 +17,18 @@ class ResourceType < Inspec.resource(1)
     end
   '
 
-  def initialize(name, group_name)
-    fn = find_group_file('/opt/opennms', group_name)
+  def initialize(name, group_name, file_name = nil)
+    # fn = find_group_file('/opt/opennms', group_name)
+    return if group_name.nil? && file_name.nil?
+    if group_name.nil?
+      fn = "/opt/opennms/etc/resource-types.d/#{file_name}"
+      xpath = "resource-types/resourceType[@name = '#{name}']"
+    else
+      fn = "/opt/opennms/etc/datacollection/#{group_name}.xml"
+      xpath = "/datacollection-group/resourceType[@name = '#{name}']"
+    end
     doc = REXML::Document.new(inspec.file(fn).content)
-    r_el = doc.elements["/datacollection-group[@name='#{group_name}']/resourceType[@name = '#{name}']"]
+    r_el = doc.elements[xpath]
     @exists = !r_el.nil?
     if @exists
       @params = {}
@@ -50,23 +57,5 @@ class ResourceType < Inspec.resource(1)
 
   def method_missing(param)
     @params[param]
-  end
-
-  private
-
-  def find_group_file(onms_home, group)
-    file_name = nil
-    files = inspec.command("ls -1 #{onms_home}/etc/datacollection").stdout
-    files.each_line do |g|
-      g.chomp!
-      next if g !~ /.*\.xml$/
-      file = inspec.file("#{onms_home}/etc/datacollection/#{g}").content
-      doc = REXML::Document.new file
-      exists = !doc.elements["/datacollection-group[@name='#{group}']"].nil?
-      next unless exists
-      file_name = "#{onms_home}/etc/datacollection/#{g}"
-      break
-    end
-    file_name
   end
 end

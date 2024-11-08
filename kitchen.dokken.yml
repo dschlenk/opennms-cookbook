@@ -463,6 +463,13 @@ suites:
       inspec_tests:
         - path: test/integration/default
         - path: test/integration/jmx
+  - name: resource_type
+    provisioner:
+      policyfile: policyfiles/resource_type.rb
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/resource_type
   - name: snmp_collection
     provisioner:
       policyfile: policyfiles/snmp_collection.rb
