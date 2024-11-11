@@ -90,9 +90,32 @@ Manages `service` elements in a `package` and the corresponding `collector` elem
 * `:update` - Modify an existing `service` and `collector` element. Raises an error if either do not exist.
 * `:delete` - Remove an existing `service` and `collector` elements and their children if it exists.
 
+#### Properties
+
+| Name                   | Name? | Type                | Validation / Usage Notes                                     |
+| ---------------------- | ----- | ------------------- | ------------------------------------------------------------ |
+| `service_name`         |   ✓   | String              |                                                              |
+| `package_name`         |       | String              | defaults to `example1`; part of identity                     |
+| `class_name`           |       | String              |                                                              |
+| `interval`             |       | Integer             | defaults to `300000` for action `:create`                    |
+| `user_defined`         |       | true, false         | `true` or `false`; defaults to `false` for action `:create`  |
+| `status`               |       | String              | `on` or `off`; defaults to `on` for action `:create`         |
+| `timeout`              |       | String, Integer     | should be a metadata expression when not an Integer          |
+| `port`                 |       | String, Integer     | should be a metadata expression when not an Integer          |
+| `parameters`           |       | Hash                | should be a hash with key/value pairs that are both strings  |
+| `class_parameters`     |       | Hash                | should be a hash with key/value pairs that are both strings  |
+| `collection`           |       | String              | defaults to `default`                                        |
+| `retry_count`          |       | String, Integer     | should be a metadata expression when not an Integer          |
+| `thresholding_enabled` |       | true, false, String | should be a metadata expression when not `true` or `false`   |
+
+Many of the properties listed are rendered as `parameter` elements in the resulting `service` element, including `timeout`, `port`, `collection`, `retry_count`, and `thresholding_enabled`. If the value is present as a property as well as a value in the `parameters` hash, the value in the property takes precedence. 
+
+`class_parameters` are parameters added to the corresponding `collector` element with `class-name` matching `class_name`.
+
 #### Examples
 
-The `default_resources` recipe contains the services that ship with OpenNMS. For instance:
+Recipe [default\_collection\_packages.rb](../recipes/default_collection_packages.rb) manages the default collection packages that ship with OpenNMS.
+For instance:
 
 ```
 opennms_collection_service 'VMware-VirtualMachine' do
@@ -122,9 +145,473 @@ and the `collector`:
 <collector service="VMware-VirtualMachine" class-name="org.opennms.netmgt.collectd.VmwareCollector" />
 ```
 
+### opennms\_resource\_type
+
+Manages `resourceType` elements in either a `datacollection-group` file in `$OPENNMS_HOME/etc/datacollection/` or a `resource-types` file in `$OPENNMS_HOME/etc/resource-types.d/`. 
+
+### Actions
+
+* `:create` - Default. Adds or updates a `resourceType` element in the file indicated by the resource properties.
+* `:update` - Modify an existing `resourceType` element according to the property values provided in the resource. Properties not specified in the resource are left unchanged. Raises an exception if the resource does not exist.
+* `:delete` - Remove an existing `resourceType` element in the file indicated by the resource properties if it exists.
+
+### Properties
+
+| Name                                   | Name? | Type    | Validation / Usage Notes                                                                            |
+| -------------------------------------- | ----- | ------- | --------------------------------------------------------------------------------------------------- |
+| `type_name`                            |   ✓   | String  |                                                                                                     |
+| `group_name`                           |       | String  | Use to manage a `resourceType` in a `datacollection-group` file                                     |
+| `file_name`                            |       | String  | Use to manage a `resourceType` in a `resource-types` file                                           |
+| `label`                                |       | String  | Required for `:create` action                                                                       |
+| `resource_label`                       |       | String  | Defaults to `${resource} (index:${index})` for action `:create`                                     |
+| `persistence_selector_strategy`        |       | String  | Defaults to `org.opennms.netmgt.collection.support.PersistAllSelectorStrategy` for action `:create` |
+| `persistence_selector_strategy_params` |       | Hash    | Must be a Hash of String key value pairs                                                            |
+| `storage_strategy`                     |       | String  | Defaults to `org.opennms.netmgt.collection.support.IndexStorageStrategy` for action `:create`       |
+| `storage_strategy_params`              |       | Hash    | Must be a Hash of String key value pairs                                                            |
+
+You must specify either `group_name` or `file_name`. If both are specified, `group_name` is used.
+
+#### `datacollection-group` Resource Types
+
+When `group_name` is present, the managed `resourceType` will be in file `$OPENNMS_HOME/etc/datacollection/<group_name>.xml` and the root element will be `datacollection-group`.
+For existing files, if the name attribute of the `datacollection-group` differs from the provided `group_name`, the existing value will be preserved.
+For new files, the name attribute of the `datacollection-group` element will match `group_name`.
+If the name of the group in the file is not already included by the `default` SNMP collection in `$OPENNMS_HOME/etc/datacollection-config.xml`, it will be added automatically.
+
+#### `resource-types` Resource Types
+
+When `group_name` is not present but `file_name` is, the managed resource type will be present in `$OPENNMS_HOME/etc/resource-types.d/<file_name>` and the root element will be `resource-types`.
+
+### Examples
+
+Create a resource type in a `datacollection-group` named `metasyntactic` in file `$OPENNMS_HOME/etc/datacollection/metasyntactic.xml`:
+
+```
+opennms_resource_type 'wibbleWobble' do
+  group_name 'metasyntactic'
+  label 'Wibble Wobble'
+  resource_label '${wibble} - ${wobble}'
+  persistence_selector_strategy 'org.opennms.netmgt.collectd.PersistRegexSelectorStrategy'
+  persistence_selector_strategy_params('theKey' => 'theValue')
+  storage_strategy 'org.opennms.netmgt.dao.support.SiblingColumnStorageStrategy'
+  storage_strategy_params('theKey' => 'theValue')
+end
+```
+
+Doing the same in a `resource-types` file in `$OPENNMS_HOME/etc/resource-types.d`: 
+
+```
+opennms_resource_type 'wibbleWobble' do
+  file_name 'metasyntactic.xml'
+  label 'Wibble Wobble'
+  resource_label '${wibble} - ${wobble}'
+  persistence_selector_strategy 'org.opennms.netmgt.collectd.PersistRegexSelectorStrategy'
+  persistence_selector_strategy_params('theKey' => 'theValue')
+  storage_strategy 'org.opennms.netmgt.dao.support.SiblingColumnStorageStrategy'
+  storage_strategy_params('theKey' => 'theValue')
+end
+```
+
+See the [resource\_type.rb](../test/fixtures/cookbooks/opennms_resource_tests/recipes/resource_type.rb) test fixture recipe and [integration\ tests](../test/integration/resource_type/controls/resource_type_spec.rb) for more examples.
+
 ## SNMP
 
-The resources `opennms_snmp_collection`, `opennms_snmp_collection_group`, and `opennms_snmp_collection_service` are available to :sp
+Along with the protocol agnostic resources above, the resources `opennms_snmp_collection`, `opennms_snmp_collection_group`, `opennms_snmp_collection_service`, and `opennms_system_def` are available to manage SNMP data collection.
+
+### opennms\_snmp\_collection\_service
+
+A convenience wrapper of [`opennms_collection_service`](#opennms_collection_service) that automatically sets the `class_name` property to `org.opennms.netmgt.collectd.SnmpCollector`.
+
+### `opennms_snmp_collection`
+
+Manages an `snmp-collection` in `$OPENNMS_HOME/etc/datacollection-config.xml`.
+
+#### Actions
+
+* `:create` - Default. Adds or updates a `snmp-collection` element in `$OPENNMS_HOME/etc/datacollection-config.xml`.
+* `:update` - Modify an existing `snmp-collection` element according to the property values provided in the resource. Properties not specified in the resource are left unchanged. Raises an exception if the resource does not exist.
+* `:delete` - Remove an existing `snmp-collection` element if it exists.
+
+#### Properties
+
+| Name                  | Name? | Type    | Allowed Values                                                                    |
+| --------------------- | ----- | ------- | --------------------------------------------------------------------------------- |
+| `collection`          |   ✓   | String  |                                                                                   |
+| `rrd_step`            |       | Integer |                                                                                   |
+| `rras`                |       | Array   | an array of strings that match regular expression `RRA:(AVERAGE|MIN|MAX|LAST):.*` |
+| `max_vars_per_pdu`    |       | Integer |                                                                                   |
+| `snmp_stor_flag`      |       | String  | `all` `select` `primary`                                                          |
+| `include_collections` |       | Array   | array of hashes  (see below for validation specifics)                             |
+
+`rrd_step` will default to 300 on `:create` when not specified.
+
+`rras` will default to `['RRA:AVERAGE:0.5:1:2016', 'RRA:AVERAGE:0.5:12:1488', 'RRA:AVERAGE:0.5:288:366', 'RRA:MAX:0.5:288:366', 'RRA:MIN:0.5:288:366']` on `:create` when not specified.
+
+`max_vars_per_pdu` is deprecated by OpenNMS and its use is discouraged
+
+`snmp_stor_flag` defaults to `select` on `:create`
+
+`include_collections` should be an array of hashes with keywords `:data_collection_group` (string, required), `:exclude_filters` (array of strings, optional), `:system_def` (string, optional).
+
+#### Examples
+
+The [default\_snmp\_resources.rb](../recipes/default_snmp_resources.rb) recipe includes an opennms\_snmp\_collection resource named `default` that manages the `default` SNMP collection.
+
+See the [snmp\_collection.rb](../test/fixtures/cookbooks/opennms_resource_tests/recipes/snmp_collection.rb) test fixture recipe and [integration\ tests](../test/integration/snmp_collection/controls/snmp_collection_spec.rb) for more examples.
+
+### `opennms_snmp_collection_group`
+
+Manages a file in `$OPENNMS_HOME/etc/datacollection/` and inclusion of the group defined in that file in an SNMP collection.
+
+#### Actions
+
+* `:create` - Default. Creates or updates a `datacollection-group` file in `$OPENNMS_HOME/etc/datacollection/` and includes it in the specified collection..
+* `:update` - Modify an existing file or how the group is included in the collection. Raises an error if the group does not exist.
+* `:delete` - Remove an existing file and the reference to the group contained therein from the specified collection if it exists.
+
+#### Properties
+
+| Name              | Name? | Type    | Allowed Values                                                                    |
+| ----------------- | ----- | ------- | --------------------------------------------------------------------------------- |
+| `group_name`      |   ✓   | String  |                                                                                   |
+| `collection_name` |       | String  | An existing `snmp-collection` in `datacollection-config.xml`.                     |
+| `file`            |       | String  |                                                                                   |
+| `source`          |       | String  |                                                                                   |
+| `system_def`      |       | String  | array of hashes  (see below for validation specifics)                             |
+| `exclude_filters` |       | Array   | array of hashes  (see below for validation specifics)                             |
+
+`group_name` is the name of the group to include in the `snmp-collection` with name `collection_name` in `$OPENNMS/etc/datacollection-config.xml`. It must be defined in the file indicated by the properties of this resource.
+
+`collection_name` an existing `snmp-collection` in `$OPENNMS_HOME/etc/datacollection-config.xml`.
+
+`file` the name of the file to deploy to `$OPENNMS_HOME/etc/datacollection` containing the `datacollection-group` definition that this resource manages (which must be present in the cookbook defining this resource) when `source` is set to `cookbook_file` (the default).
+
+`source` the URL to a valid `datacollection-group` file to be deployed to `OPENNMS_HOME/etc/datacollection` or `cookbook_file` (default) to indicate that the file to deploy is present in the cookbook that defines this resource.
+
+`system_def` a system definition name present in the file to explicitly include in this collection with this group
+
+`exclude_filters` one or more regular expression strings indicating system definitions to not include in the collection with the inclusion of this group
+
+#### Examples
+
+See the [snmp\_collection\_group.rb](../test/fixtures/cookbooks/opennms_resource_tests/recipes/snmp_collection_group.rb) test fixture recipe and [integration\ tests](../test/integration/snmp_collection_group/controls/snmp_collection_group_spec.rb) for examples of action `:create`.
+
+See the [snmp\_collection\_group\_delete.rb](../test/fixtures/cookbooks/opennms_resource_tests/recipes/snmp_collection_group_delete.rb) test fixture recipe and [integration\ tests](../test/integration/snmp_collection_group_delete/controls/snmp_collection_group_delete_spec.rb) for examples of action `:delete`.
+
+See the [snmp\_collection\_group\_edit.rb](../test/fixtures/cookbooks/opennms_resource_tests/recipes/snmp_collection_group_edit.rb) test fixture recipe and [integration\ tests](../test/integration/snmp_collection_group_edit/controls/snmp_collection_group_spec.rb) for examples of action `:edit`.
+
+### `opennms_system_def`
+
+Manages `systemDef` elements in a `datacollection-group` file in `$OPENNMS_HOME/etc/datacollection/`.
+
+#### Actions
+
+* `:add` - Add one or more groups to an existing `systemDef`.
+* `:remove` - Remove one or more groups from an existing `systemDef`.
+* `:create` - Create a new `systemDef`, potentially in a new file.
+* `:update` - Update an existing `systemDef` to match the properties provided in the resource.
+* `:delete` - Remove the `systemDef` with matching `system_name` from the file identified by the `file_name` property if it exists.
+
+#### Properties
+
+| Property      | Name? | Type   | Identity? | Validation / Usage Notes                                  |
+| ------------- | ----- | ------ | --------- | --------------------------------------------------------- |
+| `system_name` |   ✓   | String |     ✓     |                                                           |
+| `file_name`   |       | String |     ✓     | required                                                  |
+| `sysoid`      |       | String |           | required when `sysoid_mask` is nil                        |
+| `sysoid_mask` |       | String |           | required when `sysoid` is nil                             |
+| `groups`      |       | Array  |           | should be an array of strings referencing existing groups |
+
+#### Examples
+
+See the [system\_def.rb](../test/fixtures/cookbooks/opennms_resource_tests/recipes/system_def.rb) test fixture recipe and [integration\ tests](../test/integration/system_def/controls/system_def_spec.rb) for examples.
+
+## JDBC
+
+To manage JDBC data collection, use the following resources: `opennms_jdbc_collection`, `opennms_jdbc_query`, and `opennms_jdbc_collection_service`.
+
+### `opennms_jdbc_collection_service`
+
+A convenience wrapper of [`opennms_collection_service`](#opennms_collection_service) that automatically sets the `class_name` property to `org.opennms.netmgt.collectd.JdbcCollector`. It also allows you to deploy a JDBC driver file to `$OPENNMS_HOME/lib/`. 
+
+#### Properties
+
+The following extra properties are available to `opennms_jdbc_collection_service` along with those provided by the protocol agnostic resource `opennms_collection_service`.
+
+| Property      | Type   | Parameter? |
+| ------------- | ------ | ---------- |
+| `password`    | String |     ✓      |
+| `url`         | String |     ✓      |
+| `driver`      | String |     ✓      |
+| `driver_file` | String |            |
+| `user`        | String |     ✓      |
+
+Properties marked as a parameter are rendered as `parameter` elements. 
+
+`driver_file` should be the name of a jar file in the cookbook that defines this resource. It will be deployed to `$OPENNMS_HOME/lib`.
+
+#### Examples
+
+See the [jdbc\_collection_service.rb](../test/fixtures/cookbooks/opennms_resource_tests/recipes/jdbc_collection_service.rb) test fixture recipe and [integration\ tests](../test/integration/jdbc_collection_service/controls/jdbc_collection_service_spec.rb) for examples of action `:create`.
+
+See the [jdbc\_collection_service_edit.rb](../test/fixtures/cookbooks/opennms_resource_tests/recipes/jdbc_collection_service_edit.rb) test fixture recipe and [integration\ tests](../test/integration/jdbc_collection_service_edit/controls/jdbc_collection_service_edit_spec.rb) for examples of action `:edit`.
+
+See the [jdbc\_collection_service_delete.rb](../test/fixtures/cookbooks/opennms_resource_tests/recipes/jdbc_collection_service_edit.rb) test fixture recipe and [integration\ tests](../test/integration/jdbc_collection_service_delete/controls/jdbc_collection_service_noop_spec.rb) for examples of action `:delete`.
+
+### `opennms_jdbc_collection`
+
+Manages a `jdbc-collection` in `$OPENNMS_HOME/etc/jdbc-datacollection-config.xml`.
+
+#### Actions
+
+* `:create` - Default. Adds or updates a `jdbc-collection` element in `$OPENNMS_HOME/etc/jdbc-datacollection-config.xml`.
+* `:update` - Modify an existing `jdbc-collection` element according to the property values provided in the resource. Properties not specified in the resource are left unchanged. Raises an exception if the resource does not exist.
+* `:delete` - Remove an existing `jdbc-collection` element if it exists.
+
+#### Properties
+
+| Name                  | Name? | Type    | Allowed Values                                                                    |
+| --------------------- | ----- | ------- | --------------------------------------------------------------------------------- |
+| `collection`          |   ✓   | String  |                                                                                   |
+| `rrd_step`            |       | Integer |                                                                                   |
+| `rras`                |       | Array   | an array of strings that match regular expression `RRA:(AVERAGE|MIN|MAX|LAST):.*` |
+
+`rrd_step` will default to 300 on `:create` when not specified.
+
+`rras` will default to `['RRA:AVERAGE:0.5:1:2016', 'RRA:AVERAGE:0.5:12:1488', 'RRA:AVERAGE:0.5:288:366', 'RRA:MAX:0.5:288:366', 'RRA:MIN:0.5:288:366']` on `:create` when not specified.
+
+#### Examples
+
+The [default\_jdbc\_resources.rb](../recipes/default_jdbc_resources.rb) recipe includes an `opennms_jdbc_collection` resource named `default` that manages the `default` SNMP collection.
+
+See the [jdbc\_collection.rb](../test/fixtures/cookbooks/opennms_resource_tests/recipes/jdbc_collection.rb) test fixture recipe and [integration\ tests](../test/integration/jdbc_collection/controls/jdbc_collection_spec.rb) for more examples of action `:create`.
+
+See the [jdbc\_collection_edit.rb](../test/fixtures/cookbooks/opennms_resource_tests/recipes/jdbc_collection_edit.rb) test fixture recipe and [integration\ tests](../test/integration/jdbc_collection_edit/controls/jdbc_collection_spec.rb) for examples of action `:edit`.
+
+See the [jdbc\_collection_delete.rb](../test/fixtures/cookbooks/opennms_resource_tests/recipes/jdbc_collection_delete.rb) test fixture recipe and [integration\ tests](../test/integration/jdbc_collection_delete/controls/jdbc_collection_spec.rb) for examples of action `:delete`.
+
+### `opennms_jdbc_query`
+
+Manages `query` elements in the specified `jdbc-collection`.
+
+#### Actions
+
+* `:create` - Default. Adds the `query` element with attributes and children according to the defined properties of the resource.
+* `:update` - Update an existing `query` element and its children. Raises an error if the `query` does not exist.
+* `:delete` - Deletes the referenced `query` element and its children if it exists.
+
+#### Properties
+
+| Name                   | Name? | Type    | Identity? | Required? |
+| ---------------------- | ----- | --------| --------- | --------- |
+| `query_name`           |   ✓   | String  |     ✓     |     ✓     |
+| `collection_name`      |       | String  |     ✓     |     ✓     |
+| `if_type`              |       | String  |           |     ✓     |
+| `recheck_interval`     |       | Integer |           |     ✓     |
+| `resource_type`        |       | String  |           |           |
+| `instance_column`      |       | String  |           |           |
+| `query_string`         |       | String  |           |           |
+| `columns`              |       | Hash    |           |           |
+
+The `collection_name` must reference an existing collection (see the `jdbc_collection` resource above).
+
+`columns` defines the values to collect from the query and should be a Hash where each key is a string that has a Hash value with required keys `alias` (string), `type` (string) and optional key `data-source-name` (string).
+
+#### Examples
+
+See [jdbc\_query.rb](../test/fixtures/cookbooks/opennms_resource_tests/recipes/jdbc_query.rb), [jdbc\_query\_edit.rb](../test/fixtures/cookbooks/opennms_resource_tests/recipes/jdbc_query_edit.rb) and [jdbc\_query\_delete.rb](../test/fixtures/cookbooks/opennms_resource_tests/recipes/jdbc_query_delete.rb).
+
+## JMX
+
+To manage JMX data collection, use the following resources: `opennms_jmx_collection`, `opennms_jmx_mbean`, and `opennms_jmx_collection_service`.
+
+### opennms\_jmx\_collection\_service
+
+A convenience wrapper of [`opennms_collection_service`](#opennms_collection_service) that automatically sets the `class_name` property to `org.opennms.netmgt.collectd.Jsr160Collector`.
+
+#### Properties
+
+The following extra properties are available to `opennms_jdbc_collection_service` along with those provided by the protocol agnostic resource `opennms_collection_service`.
+
+| Property          | Type   | Parameter? | Deprecated? |
+| ----------------- | ------ | ---------- | ----------- |
+| `password`        | String |     ✓      |             |
+| `url`             | String |     ✓      |             |
+| `factory`         | String |     ✓      |             |
+| `protocol`        | String |     ✓      |      ✓      |
+| `username`        | String |     ✓      |             |
+| `url_path`        | String |     ✓      |      ✓      |
+| `rmi_server_port` | String |     ✓      |      ✓      |
+| `remote_jmx`      | String |     ✓      |      ✓      |
+| `port`            | String |     ✓      |      ✓      |
+| `rrd_base_name`   | String |     ✓      |             |
+| `ds_name`         | String |     ✓      |             |
+| `friendly_name`   | String |     ✓      |             |
+
+Properties marked as a parameter are rendered as `parameter` elements. Items marked deprecated are ignored when `url` is present.
+
+### `opennms_jmx_collection`
+
+Manages a `jmx-collection` in `$OPENNMS_HOME/etc/jmx-datacollection-config.xml`.
+
+#### Actions
+
+* `:create` - Default. Adds or updates a `jmx-collection` element in `$OPENNMS_HOME/etc/jmx-datacollection-config.xml`.
+* `:update` - Modify an existing `jmx-collection` element according to the property values provided in the resource. Properties not specified in the resource are left unchanged. Raises an exception if the resource does not exist.
+* `:delete` - Remove an existing `jmx-collection` element if it exists.
+
+#### Properties
+
+| Name                  | Name? | Type    | Allowed Values                                                                    |
+| --------------------- | ----- | ------- | --------------------------------------------------------------------------------- |
+| `collection`          |   ✓   | String  |                                                                                   |
+| `rrd_step`            |       | Integer |                                                                                   |
+| `rras`                |       | Array   | an array of strings that match regular expression `RRA:(AVERAGE|MIN|MAX|LAST):.*` |
+
+`rrd_step` will default to 300 on `:create` when not specified.
+
+`rras` will default to `['RRA:AVERAGE:0.5:1:2016', 'RRA:AVERAGE:0.5:12:1488', 'RRA:AVERAGE:0.5:288:366', 'RRA:MAX:0.5:288:366', 'RRA:MIN:0.5:288:366']` on `:create` when not specified.
+
+#### Examples
+
+The [default\_jmx\_resources.rb](../recipes/default_jmx_resources.rb) recipe includes an `opennms_jmx_collection` resource named `jsr160` that manages the `jsr160` SNMP collection.
+
+See the [jmx.rb](../test/fixtures/cookbooks/opennms_resource_tests/recipes/jmx.rb) test fixture recipe and [integration\ tests](../test/integration/jmx/controls/jmx_spec.rb) for more examples.
+
+### `opennms_jmx_mbean`
+
+Manages `mbean` elements in  `jmx-collection` specified by property `collection_name` in `$OPENNMS_HOME/etc/jmx-datacollection-config.xml`.
+
+#### Actions
+
+* `:create` - Default. Adds the `mbean` element with attributes and children according to the defined properties of the resource.
+* `:update` - Update an existing `mbean` element and its children. Raises an error if the `mbean` does not exist.
+* `:delete` - Deletes the referenced `mbean` element and its children if it exists.
+
+#### Properties
+
+| Name                   | Name? | Type    | Identity? | Required? |
+| ---------------------- | ----- | --------| --------- | --------- |
+| `mbean_name`           |   ✓   | String  |     ✓     |     ✓     |
+| `collection_name`      |       | String  |     ✓     |     ✓     |
+| `objectname`           |       | String  |     ✓     |     ✓     |
+| `keyfield`             |       | String  |           |           |
+| `exclude`              |       | String  |           |           |
+| `key_alias`            |       | String  |           |           |
+| `resource_type`        |       | String  |           |           |
+| `attribs`              |       | Hash    |           |           |
+| `include_mbeans`       |       | Array   |           |           |
+| `comp_attribs`         |       | Hash    |           |           |
+
+The `collection_name` must reference an existing collection (see the `opennms_jmx_collection` resource).
+
+`attribs` and `comp_attribs` define the values to collect from the mbean. 
+`attribs` should be a Hash with string keys that represent the name field of each attrib and the value is a Hash with keys `alias` (string, required), `type` (string matching regex `([Cc](ounter|OUNTER)(32|64)?|[Gg](auge|AUGE)(32|64)?|[Tt](ime|IME)[Tt](icks|ICKS)|[Ii](nteger|NTEGER)(32|64)?|[Oo](ctet|CTET)[Ss](tring|TRING))`, required), `maxval` (string, optional), `minval` (string, optional).
+`comp_attribs` should be a Hash with string keys that represent the name field of each comp-attrib and the value is a Hash with key `type` (a String matching `\[Cc](omposite|OMPOSITE)`, required),  `comp_members` (a Hash where the key (a String) is the name of the comp-member and the value is in the same format as the `attribs` hash values except `alias` is optional), and optional key `alias` (String).
+
+`include_mbeans` should be an array of strings that each reference the name of another `mbean`.
+
+#### Examples
+
+The [default\_jmx\_resources.rb](../recipes/default_jmx_resources.rb) recipe includes an `opennms_jmx_collection` resource named `jsr160` that manages the `jsr160` SNMP collection.
+
+See the [jmx.rb](../test/fixtures/cookbooks/opennms_resource_tests/recipes/jmx.rb) test fixture recipe and [integration\ tests](../test/integration/jmx/controls/jmx_spec.rb) for more examples.
+
+## WS-Man
+
+To manage WS-Man data collection, use the following resources: `opennms_wsman_collection`, `opennms_wsman_group`, `opennms_wsman_system_definition`, and `opennms_wsman_collection_service`.
+
+### `opennms_wsman_collection_service`
+
+A convenience wrapper of [`opennms_collection_service`](#opennms_collection_service) that automatically sets the `class_name` property to `org.opennms.netmgt.collectd.WsManCollector`.
+
+### `opennms_wsman_collection`
+
+Manages an `wsman-collection` in `$OPENNMS_HOME/etc/wsman-datacollection-config.xml`.
+
+#### Actions
+
+* `:create` - Default. Adds or updates a `collection` element in `$OPENNMS_HOME/etc/wsman-datacollection-config.xml`.
+* `:update` - Modify an existing `collection` element according to the property values provided in the resource. Properties not specified in the resource are left unchanged. Raises an exception if the resource does not exist.
+* `:delete` - Remove an existing `collection` element if it exists.
+
+#### Properties
+
+| Name                         | Name? | Type                | Allowed Values                                                                    |
+| ---------------------------- | ----- | ------------------- | --------------------------------------------------------------------------------- |
+| `collection`                 |   ✓   | String              |                                                                                   |
+| `rrd_step`                   |       | Integer             |                                                                                   |
+| `rras`                       |       | Array               | an array of strings that match regular expression `RRA:(AVERAGE|MIN|MAX|LAST):.*` |
+| `include_system_definitions` |       | String, true, false | true, false, "true", "false"                                                      |
+| `include_system_definition`  |       | Array               | array of strings                                                                  |
+
+`rrd_step` will default to 300 on `:create` when not specified.
+
+`rras` will default to `['RRA:AVERAGE:0.5:1:2016', 'RRA:AVERAGE:0.5:12:1488', 'RRA:AVERAGE:0.5:288:366', 'RRA:MAX:0.5:288:366', 'RRA:MIN:0.5:288:366']` on `:create` when not specified.
+
+`include_system_definitions` whether or not to include all system definitions in this collection
+
+`include_system_definition` a list of system definitions by name to include in this collection
+
+#### Examples
+
+See the [wsman\_collection.rb](../test/fixtures/cookbooks/opennms_resource_tests/recipes/wsman_collection.rb) test fixture recipe and [integration\ tests](../test/integration/wsman_collection/controls/wsman_collection_spec.rb) for more examples.
+
+### `opennms_wsman_group`
+
+Manages a group element in `file_name` inside `$OPENNMS_HOME/etc/` or `$OPENNMS_HOME?etc/wsman-datacollection-config.xml`.
+
+#### Actions
+
+* `:create` - Default. Adds the element with attributes and children according to the defined properties of the resource.
+* `:update` - Update an existing `group` element and its children. Raises an error if the `group` does not exist.
+* `:delete` - Deletes the referenced `group` element and its children if it exists.
+
+#### Properties
+
+| Name               | Name? | Type            | Identity? | Required?  |
+| ------------------ | ----- | --------------- | --------- | ---------- |
+| `group_name`       |   ✓   | String          |     ✓     |     ✓      |
+| `file_name`        |       | String          |     ✓     |            |
+| `resource_type`    |       | String          |           | on :create |
+| `resource_uri`     |       | String          |           | on :create |
+| `dialect`          |       | String          |           |            |
+| `filter`           |       | String          |           |            |
+| `attribs`          |       | Array           |           |            |
+
+When the `file_name` property is set, the group is added to a file in `$OPENNMS_HOME/etc/<file>`. Otherwise the group is added to the main config file.
+
+The validation on `attribs` ensures that it is an array of hashes with the following required string keys with string values: `name`, `alias`, `type` (matches `([Cc](ounter|OUNTER)|[Gg](auge|AUGE)|[Ss](tring|TRING))`) and the following optional string keys with string values: `index-of`, `filter`.
+
+#### Examples
+
+See the [wsman\_group.rb](../test/fixtures/cookbooks/opennms_resource_tests/recipes/wsman_group.rb) test fixture recipe and [integration\ tests](../test/integration/wsman_group/controls/wsman_group_spec.rb) for examples.
+
+### `opennms_wsman_system_definition`
+
+Manages `system-definition` elements in a `wsman-datacollection-config` file in `$OPENNMS_HOME/etc/`.
+
+#### Actions
+
+* `:add` - Add one or more groups to an existing `system-definition`.
+* `:remove` - Remove one or more groups from an existing `system-definition`.
+* `:create` - Create a new `system-definition`, potentially in a new file.
+* `:update` - Update an existing `system-definition` to match the properties provided in the resource.
+* `:delete` - Remove the `system-definition` with matching `system_name` from the file identified by the `file_name` property if it exists.
+
+#### Properties
+
+| Property      | Name? | Type   | Identity? | Validation / Usage Notes                                  |
+| ------------- | ----- | ------ | --------- | --------------------------------------------------------- |
+| `system_name` |   ✓   | String |     ✓     |                                                           |
+| `file_name`   |       | String |     ✓     |                                                           |
+| `rule`        |       | String |           | required for `:create`                                    |
+| `groups`      |       | Array  |           | should be an array of strings referencing existing groups |
+
+#### Examples
+
+See the [wsman_system\_definition.rb](../test/fixtures/cookbooks/opennms_resource_tests/recipes/wsman_system_definition.rb) test fixture recipe and [integration\ tests](../test/integration/wsman_system_definition/controls/wsman_system_definition_spec.rb) for examples.
+
 ## XML
 
 The following resources are available to express XML data collection configuration as code.
