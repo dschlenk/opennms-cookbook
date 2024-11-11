@@ -11,7 +11,11 @@ property :groups, Array, callbacks: {
 # required for :create
 property :rule, String
 # main file implied when nil
-property :file_name, String, identity: true
+property :file_name, String, identity: true, callbacks: {
+  'should not be the empty string or start with a \'\.\' or \'\/\' character' => lambda { |p|
+    !''.eql?(p) && !p.start_with?('.') && !p.start_with?('/') && p.end_with?('.xml')
+  },
+}
 property :position, String, equal_to: %w(top bottom), deprecated: 'order is not important therefore this property is now ignored and will be removed in a future release', desired_state: false
 
 include Opennms::Cookbook::Collection::WsmanCollectionTemplate
@@ -62,7 +66,7 @@ action :add do
   unless missing_groups.empty?
     converge_by "Adding #{missing_groups} to system definition #{new_resource.system_name}" do
       r.variables[:system_definitions].map do |sd|
-        next unless sd.name.eql?(new_resource.name)
+        next unless sd.name.eql?(new_resource.system_name)
         missing_groups.each do |mg|
           sd.include_groups.push(mg)
         end

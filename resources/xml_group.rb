@@ -5,7 +5,11 @@ unified_mode true
 property :group_name, kind_of: String, name_property: true
 property :source_url, kind_of: String, identity: true
 property :collection_name, kind_of: String, identity: true
-property :file, kind_of: String, identity: true
+property :file, kind_of: String, identity: true, callbacks: {
+  'should not be the empty string or start with a \'\.\' or \'\/\' character' => lambda { |p|
+    !''.eql?(p) && !p.start_with?('.') && !p.start_with?('/') && p.end_with?('.xml')
+  },
+}
 property :resource_type, kind_of: String, default: 'node'
 property :resource_xpath, kind_of: String, required: true
 property :key_xpath, kind_of: String

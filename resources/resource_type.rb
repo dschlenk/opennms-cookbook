@@ -6,9 +6,17 @@ unified_mode true
 
 property :type_name, String, name_property: true
 # use this property if you want the resource type to be in a datacollection-group named <group_name> in a file named <group_name>.xml group under `$OPENNMS_HOME/etc/datacollection`
-property :group_name, String, identity: true
+property :group_name, String, identity: true, callbacks: {
+  'should not be the empty string or start with a \'\.\' or \'\/\' character' => lambda { |p|
+    !''.eql?(p) && !p.start_with?('.') && !p.start_with?('/')
+  },
+}
 # ignored when `group_name` is set; otherwise used as the name of the file in which to manage the resource type under `$OPENNMS_HOME/etc/resource-types.d/`
-property :file_name, String, identity: true
+property :file_name, String, identity: true, callbacks: {
+  'should not be the empty string or start with a \'\.\' or \'\/\' character' => lambda { |p|
+    !''.eql?(p) && !p.start_with?('.') && !p.start_with?('/') && p.end_with?('.xml')
+  },
+}
 property :label, String
 # defaults to '${resource} (index:${index})' on :create
 property :resource_label, String

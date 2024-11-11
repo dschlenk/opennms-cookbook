@@ -1,5 +1,5 @@
 {
-  "revision_id": "0e03ff9c665ef244e7a0ab1078b105f7fe5e7c1c2894307c098fc016a1e7a9a5",
+  "revision_id": "39ec925624ec53e74a2bd9f9991084ebefdd45c32e7304c5cfa308b4eedf70b0",
   "name": "opennms-upgrade",
   "run_list": [
     "recipe[opennms::postgres]",
@@ -42,11 +42,11 @@
       "scm_info": {
         "scm": "git",
         "remote": "git@github.com:dschlenk/opennms-cookbook",
-        "revision": "abb3c3fa60e413ec4ba149a4ee79329cbaddc55d",
+        "revision": "eabf2990694e11e88cd693ad550398a4eafc8e7b",
         "working_tree_clean": false,
-        "published": false,
+        "published": true,
         "synchronized_remote_branches": [
-
+          "origin/feature/cinc-18"
         ]
       },
       "source_options": {
@@ -55,18 +55,18 @@
     },
     "opennms": {
       "version": "33.0.0",
-      "identifier": "cb2a90f80bc5a40230cf14d86c81d9bd0f48d2b1",
-      "dotted_decimal_identifier": "57186222397441444.616615919512705.239406028477105",
+      "identifier": "4c4ebbc948563b5bc995555a5d6aabc9f9e0ee4e",
+      "dotted_decimal_identifier": "21478666672821819.25835866099965290.188883969044046",
       "source": "..",
       "cache_key": null,
       "scm_info": {
         "scm": "git",
         "remote": "git@github.com:dschlenk/opennms-cookbook",
-        "revision": "abb3c3fa60e413ec4ba149a4ee79329cbaddc55d",
+        "revision": "eabf2990694e11e88cd693ad550398a4eafc8e7b",
         "working_tree_clean": false,
-        "published": false,
+        "published": true,
         "synchronized_remote_branches": [
-
+          "origin/feature/cinc-18"
         ]
       },
       "source_options": {
@@ -82,11 +82,11 @@
       "scm_info": {
         "scm": "git",
         "remote": "git@github.com:dschlenk/opennms-cookbook",
-        "revision": "abb3c3fa60e413ec4ba149a4ee79329cbaddc55d",
+        "revision": "eabf2990694e11e88cd693ad550398a4eafc8e7b",
         "working_tree_clean": false,
-        "published": false,
+        "published": true,
         "synchronized_remote_branches": [
-
+          "origin/feature/cinc-18"
         ]
       },
       "source_options": {

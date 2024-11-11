@@ -271,7 +271,7 @@ module Opennms
       end
 
       module GroupResourceTypeTemplate
-        def rtgroup_resource_init(file, group_name)
+        def rtgroup_resource_init(file, group_name = nil)
           rtgroup_resource_create(file, group_name) unless rtgroup_resource_exist?(file)
         end
 
@@ -345,6 +345,22 @@ module Opennms
 
         def resource_type_delete(name:)
           @resource_types.delete_if { |rt| rt[:name].eql?(name) }
+        end
+
+        def system_def_update(name:, sysoid: nil, sysoid_mask: nil, ip_addrs: nil, ip_addr_masks: nil, include_groups: nil)
+          @system_defs.map do |sd|
+            next unless sd[:name].eql?(name)
+            sd[:sysoid] = sysoid unless sysoid.nil?
+            sd[:sysoid_mask] = sysoid_mask unless sysoid_mask.nil?
+            sd[:ip_addrs] = ip_addrs unless ip_addrs.nil?
+            sd[:ip_addr_masks] = ip_addr_masks unless ip_addr_masks.nil?
+            sd[:include_groups] = include_groups unless include_groups.nil?
+            break
+          end
+        end
+
+        def system_def_delete(name:)
+          @system_defs.delete_if { |sd| sd[:name].eql?(name) }
         end
 
         def self.read(file = 'resource-type.xml')
@@ -862,6 +878,13 @@ module Opennms
           c.each_element('include-system-definition') do |isd|
             @include_system_definition.push(xml_element_text(isd))
           end
+        end
+
+        def update(rrd_step:, rras:, include_system_definitions:, include_system_definition:)
+          @rrd_step = rrd_step unless rrd_step.nil?
+          @rras = rras unless rras.nil?
+          @include_system_definitions = include_system_definitions unless include_system_definitions.nil?
+          @include_system_definition = include_system_definition unless include_system_definition.nil?
         end
       end
 

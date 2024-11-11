@@ -15,7 +15,7 @@
         <include-all-system-definitions/>
   <% end -%>
   <% collection.include_system_definition.each do |isd| -%>
-
+        <include-system-definition><%= isd.encode(:xml => :text) %></include-system-definition>
   <% end unless collection.include_system_definition.nil? -%>
     </collection>
 <% end unless @collections.nil? -%>

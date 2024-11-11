@@ -15,7 +15,6 @@ class WsmanSystemDefinition < Inspec.resource(1)
 
   def initialize(name)
     fn = find_system_definition(name)
-    puts 'System Definition name : ' + fn
     doc = REXML::Document.new(inspec.file(fn).content)
     s_el = doc.elements["/wsman-datacollection-config/system-definition[@name='#{name}']"]
     @exists = !s_el.nil?
@@ -24,7 +23,6 @@ class WsmanSystemDefinition < Inspec.resource(1)
     unless s_el.elements['include-group'].nil?
       @params[:groups] = []
       s_el.each_element('include-group') do |g|
-        puts 'Group name : ' + g.to_s
         @params[:groups].push g.texts.collect(&:value).join('')
       end
     end
@@ -56,7 +54,7 @@ class WsmanSystemDefinition < Inspec.resource(1)
     end
 
     if system_def_file.nil?
-      file = ::File.new('/opt/opennms/etc/wsman-datacollection-config.xml', 'r')
+      file = inspec.file('/opt/opennms/etc/wsman-datacollection-config.xml').content
       doc = REXML::Document.new file
 
       exists = !doc.elements["/wsman-datacollection-config/system-definition[@name='#{name}']"].nil?

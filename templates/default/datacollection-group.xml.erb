@@ -35,7 +35,7 @@
   <% if !sd[:sysoid].nil? -%>
       <sysoid><%= sd[:sysoid].encode(:xml => :text) %></sysoid>
   <% elsif !sd[:sysoid_mask].nil? -%>
-      <sysoidMask><%= sd[:sysoid].encode(:xml => :text) %></sysoidMask>
+      <sysoidMask><%= sd[:sysoid_mask].encode(:xml => :text) %></sysoidMask>
   <% end -%>
   <% if !sd[:ip_addrs].nil? || !sd[:ip_addr_masks].nil? -%>
       <ipList>

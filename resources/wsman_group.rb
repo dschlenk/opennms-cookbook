@@ -3,7 +3,11 @@ include Opennms::XmlHelper
 unified_mode true
 
 property :group_name, String, name_property: true
-property :file_name, String, identity: true
+property :file_name, String, identity: true, callbacks: {
+  'should not be the empty string or start with a \'\.\' or \'\/\' character' => lambda { |p|
+    !''.eql?(p) && !p.start_with?('.') && !p.start_with?('/') && p.end_with?('.xml')
+  },
+}
 # required for :create
 property :resource_type, String
 # required for :create
