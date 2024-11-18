@@ -13,7 +13,7 @@ control 'poller_edit' do
   end
 
   describe poller_package('foo') do
-    it { should exist}
+    it { should exist }
     its('filter') { should eq "(IPADDR != '0.0.0.0')" }
     its('specifics') { should eq ['10.0.0.1'] }
     its('include_ranges') { should eq [{ 'begin' => '10.0.1.1', 'end' => '10.0.1.254' }] }

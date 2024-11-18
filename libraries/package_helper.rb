@@ -408,7 +408,7 @@ module Opennms
       class PollerPackage < ServicePackage
         attr_accessor :remote, :rrd_step, :rras, :downtimes
 
-        def initialize(package_name:, filter:, specifics: nil, include_ranges: nil, exclude_ranges: nil, include_urls: nil, remote: nil,  services: nil, outage_calendars: nil, rrd_step: nil, rras: nil, downtimes: nil)
+        def initialize(package_name:, filter:, specifics: nil, include_ranges: nil, exclude_ranges: nil, include_urls: nil, remote: nil, services: nil, outage_calendars: nil, rrd_step: nil, rras: nil, downtimes: nil)
           super(package_name: package_name, filter: filter, specifics: specifics, include_ranges: include_ranges, exclude_ranges: exclude_ranges, include_urls: include_urls, services: services, outage_calendars: outage_calendars)
           @remote = remote
           @rrd_step = rrd_step || 300
@@ -673,7 +673,7 @@ module Opennms
             parameters = {} unless m.elements['parameter'].nil?
             m.each_element('parameter') do |p|
               unless p.elements[1].nil?
-                c = ""
+                c = ''
                 c = p.elements[1].to_s
               end
               parameters[p.attributes['key']] = { 'value' => p.attributes['value'], 'configuration' => c }.compact
@@ -695,12 +695,12 @@ module Opennms
           parameters = {}
           s.each_element('parameter') do |p|
             unless p.elements[1].nil?
-              c = ""
-              c = p.elements[1].to_s 
+              c = ''
+              c = p.elements[1].to_s
             end
             parameters[p.attributes['key']] = { 'value' => p.attributes['value'], 'configuration' => c }.compact
           end
-          { type: @type, service_name: name, interval: interval, user_defined: user_defined, status: status, parameters: parameters, pattern: xml_element_text(s, 'pattern')}.compact
+          { type: @type, service_name: name, interval: interval, user_defined: user_defined, status: status, parameters: parameters, pattern: xml_element_text(s, 'pattern') }.compact
         end
 
         def monitor(service_name:)

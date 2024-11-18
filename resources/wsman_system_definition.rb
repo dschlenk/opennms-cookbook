@@ -25,11 +25,11 @@ load_current_value do |new_resource|
   file = new_resource.file_name.nil? ? "#{onms_etc}/wsman-datacollection-config.xml" : "#{onms_etc}/#{new_resource.file_name}"
   current_value_does_not_exist! unless ::File.exist?(file)
   r = wsman_resource(file)
-  if r.nil?
-    all = Opennms::Cookbook::Collection::WsmanCollectionConfigFile.read(file, 'wsman').system_definitions
-  else
-    all = r.variables[:system_definitions]
-  end
+  all = if r.nil?
+          Opennms::Cookbook::Collection::WsmanCollectionConfigFile.read(file, 'wsman').system_definitions
+        else
+          r.variables[:system_definitions]
+        end
   current_value_does_not_exist! if all.empty?
   definitions = all.select { |sd| sd.name.eql?(new_resource.system_name) }
   current_value_does_not_exist! if definitions.nil? || definitions.empty?

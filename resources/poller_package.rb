@@ -15,7 +15,7 @@ property :rras, Array
 property :downtimes, Hash, callbacks: {
   'should be a hash with integer keys represeting the `begin` key with a hash value containing `interval` and (optional) `end` keys both with integer values' => lambda { |p|
     !p.any? { |k, v| !k.is_a?(Integer) || !v.is_a?(Hash) || !v.key?('interval') || !v['interval'].is_a?(Integer) || (v.key?('end') && !v['end'].is_a?(Integer)) }
-  }
+  },
 }
 
 action_class do

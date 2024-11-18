@@ -7,13 +7,25 @@ use 'partial/_service'
 property :pattern, String
 property :parameters, Hash, callbacks: {
   'should be a hash with a string key and a hash value with key `value` with string value and optional key `configuration` which must be a string of a complete and valid single XML element (with children)' => lambda { |p|
-    !p.any? {|k, v| !k.is_a?(String) || !v.is_a?(Hash) || (v.key?('value') && !v['value'].is_a?(String)) || (v.key?('configuration') && (!v['configuration'].is_a?(String) || (!(REXML::Document.new(v['configuration']) rescue false)))) }
-  }
+    !p.any? do |k, v|
+      !k.is_a?(String) || !v.is_a?(Hash) || (v.key?('value') && !v['value'].is_a?(String)) || (v.key?('configuration') && (!v['configuration'].is_a?(String) || !begin
+                                                                                                                                                                                 REXML::Document.new(v['configuration'])
+                                                                                                                                                                 rescue
+                                                                                                                                                                   false
+                                                                                                                                                                               end))
+    end
+  },
 }
 property :class_parameters, Hash, callbacks: {
   'should be a hash with a string key and a hash value with key `value` with string value and optional key `configuration` which must be a string of a complete and valid single XML element (with children)' => lambda { |p|
-    !p.any? {|k, v| !k.is_a?(String) || !v.is_a?(Hash) || (v.key?('value') && !v['value'].is_a?(String)) || (v.key?('configuration') && (!v['configuration'].is_a?(String) || (!(REXML::Document.new(v['configuration']) rescue false)))) }
-  }
+    !p.any? do |k, v|
+      !k.is_a?(String) || !v.is_a?(Hash) || (v.key?('value') && !v['value'].is_a?(String)) || (v.key?('configuration') && (!v['configuration'].is_a?(String) || !begin
+                                                                                                                                                                                 REXML::Document.new(v['configuration'])
+                                                                                                                                                                 rescue
+                                                                                                                                                                   false
+                                                                                                                                                                               end))
+    end
+  },
 }
 
 action_class do
@@ -116,7 +128,7 @@ action :update do
     service[:pattern] = new_resource.pattern unless new_resource.pattern.nil?
     service[:parameters] = new_resource.parameters unless new_resource.parameters.nil?
     service[:parameters]['timeout'] = { 'value' => new_resource.timeout } unless new_resource.timeout.nil?
-    service[:parameters]['port'] = { 'value' => new_resource.port } unless new_resource.port.nil? 
+    service[:parameters]['port'] = { 'value' => new_resource.port } unless new_resource.port.nil?
     monitor = poller_resource.variables[:config].monitor(service_name: new_resource.service_name)
     raise Chef::Exceptions::CurrentValueDoesNotExist if monitor.nil?
     monitor['class_name'] = new_resource.class_name

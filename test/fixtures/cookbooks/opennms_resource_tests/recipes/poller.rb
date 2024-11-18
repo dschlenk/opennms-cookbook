@@ -54,7 +54,7 @@ opennms_poller_service 'create ICMPBar' do
   user_defined true
   status 'off'
   timeout 5000
-  parameters 'packet-size' => { 'value' => '65'}, 'retry' => { 'value' => '3' }
+  parameters 'packet-size' => { 'value' => '65' }, 'retry' => { 'value' => '3' }
   class_name 'org.opennms.netmgt.poller.monitors.IcmpMonitor'
 end
 
@@ -90,17 +90,17 @@ opennms_poller_service 'extremely complex' do
     'port' => { 'value' => '13' },
     'timeout' => { 'value' => '400' },
     'page-sequence' => {
-      'configuration' => "<page attribute='value'><farameter>text<!-- comment  -->more text</farameter></page>"
+      'configuration' => "<page attribute='value'><farameter>text<!-- comment  -->more text</farameter></page>",
     }
   )
   class_name 'org.opennms.netmgt.poller.monitors.PageSequenceMonitor'
   class_parameters(
     'key' => { 'value' => '400' },
     'other key' => {
-      'configuration' => "<page attribute='value'><sarameter>text<!-- comment  -->more text</sarameter></page>"
+      'configuration' => "<page attribute='value'><sarameter>text<!-- comment  -->more text</sarameter></page>",
     },
     'everything key' => {
-      'configuration' => "<porg attribute='value'><qarameter>text<!-- comment  -->more text</qarameter></porg>"
+      'configuration' => "<porg attribute='value'><qarameter>text<!-- comment  -->more text</qarameter></porg>",
     }
   )
 end

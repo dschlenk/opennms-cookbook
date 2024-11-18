@@ -43,7 +43,7 @@ control 'poller' do
     its('user_defined') { should eq true }
     its('status') { should eq 'off' }
     its('time_out') { should eq 5000 }
-    its('parameters') { should eq 'packet-size' => { 'value' => '65'}, 'retry' => { 'value' => '3' } }
+    its('parameters') { should eq 'packet-size' => { 'value' => '65' }, 'retry' => { 'value' => '3' } }
     its('class_name') { should eq 'org.opennms.netmgt.poller.monitors.IcmpMonitor' }
   end
 
@@ -72,24 +72,28 @@ control 'poller' do
     its('time_out') { should eq 300 }
     its('port') { should eq 12 }
     its('pattern') { should eq '^Device&<![CDATA[/>CDATAConfig-(?<configType>.+)$' }
-    its('parameters') { should eq(
+    its('parameters') do
+      should eq(
       'page-sequence' => {
-        'configuration' => "<page attribute='value'><farameter>text<!-- comment  -->more text</farameter></page>"
+        'configuration' => "<page attribute='value'><farameter>text<!-- comment  -->more text</farameter></page>",
       }
-    ) }
+    )
+    end
     its('class_name') { should eq 'org.opennms.netmgt.poller.monitors.PageSequenceMonitor' }
-    its('class_parameters') { should eq(
+    its('class_parameters') do
+      should eq(
       'key' => { 'value' => '400' },
       'other key' => {
-        'configuration' => "<page attribute='value'><sarameter>text<!-- comment  -->more text</sarameter></page>"
+        'configuration' => "<page attribute='value'><sarameter>text<!-- comment  -->more text</sarameter></page>",
       },
       'everything key' => {
-        'configuration' => "<porg attribute='value'><qarameter>text<!-- comment  -->more text</qarameter></porg>"
+        'configuration' => "<porg attribute='value'><qarameter>text<!-- comment  -->more text</qarameter></porg>",
       }
-    ) }
+    )
+    end
   end
 
-  describe poller_service( 'ICMPBar4', 'bar') do
+  describe poller_service('ICMPBar4', 'bar') do
     it { should exist }
     its('interval') { should eq 600_000 }
     its('user_defined') { should eq true }
@@ -99,7 +103,7 @@ control 'poller' do
     its('class_name') { should eq 'org.opennms.netmgt.poller.monitors.IcmpMonitor' }
   end
 
-  describe poller_service( 'ICMPBar5', 'bar') do
+  describe poller_service('ICMPBar5', 'bar') do
     it { should exist }
     its('interval') { should eq 600_000 }
     its('user_defined') { should eq true }
@@ -109,7 +113,7 @@ control 'poller' do
     its('class_name') { should eq 'org.opennms.netmgt.poller.monitors.IcmpMonitor' }
   end
 
-  describe poller_service( 'ICMPBar6', 'bar') do
+  describe poller_service('ICMPBar6', 'bar') do
     it { should exist }
     its('interval') { should eq 600_000 }
     its('user_defined') { should eq true }
@@ -119,7 +123,7 @@ control 'poller' do
     its('class_name') { should eq 'org.opennms.netmgt.poller.monitors.IcmpMonitor' }
   end
 
-  describe poller_service( 'ICMPBar7', 'bar') do
+  describe poller_service('ICMPBar7', 'bar') do
     it { should exist }
     its('interval') { should eq 600_000 }
     its('user_defined') { should eq true }
