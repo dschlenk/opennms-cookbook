@@ -102,6 +102,7 @@ action :create do
     end
     rt = config.resource_type(name: new_resource.type_name)
     if rt.nil?
+      raise Chef::Exceptions::ValidationFailed, '`label` is a required property for action `:create`' if new_resource.label.nil?
       rt = { name: new_resource.type_name, label: new_resource.label, resource_label: new_resource.resource_label, persistence_selector_strategy: { class: new_resource.persistence_selector_strategy || 'org.opennms.netmgt.collection.support.PersistAllSelectorStrategy', parameters: new_resource.persistence_selector_strategy_params }, storage_strategy: { class: new_resource.storage_strategy || 'org.opennms.netmgt.collection.support.IndexStorageStrategy', parameters: new_resource.storage_strategy_params } }
       config.resource_types.push(rt)
     else

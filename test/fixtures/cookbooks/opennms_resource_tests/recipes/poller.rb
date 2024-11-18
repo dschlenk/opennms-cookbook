@@ -10,7 +10,6 @@ opennms_poller_package 'foo' do
   remote true
   outage_calendars ['ignore localhost on mondays']
   rras ['RRA:AVERAGE:0.5:2:4032', 'RRA:AVERAGE:0.5:24:2976', 'RRA:AVERAGE:0.5:576:732', 'RRA:MAX:0.5:576:732', 'RRA:MIN:0.5:576:732']
-  notifies :restart, 'service[opennms]', :delayed
 end
 
 # at least one service must be defined for each package
@@ -21,14 +20,12 @@ opennms_poller_service 'SNMP' do
   status 'off'
   timeout 5000
   port 161
-  parameters 'oid' => '.1.3.6.1.2.1.1.2.0'
+  parameters 'oid' => { 'value' => '.1.3.6.1.2.1.1.2.0' }
   class_name 'org.opennms.netmgt.poller.monitors.SnmpMonitor'
 end
-
 # minimal
 opennms_poller_package 'bar' do
   filter "IPADDR != '0.0.0.0'"
-  notifies :restart, 'service[opennms]', :delayed
 end
 
 # at least one service must be defined for each package
@@ -57,7 +54,7 @@ opennms_poller_service 'create ICMPBar' do
   user_defined true
   status 'off'
   timeout 5000
-  parameters 'packet-size' => '65', 'retry' => '3'
+  parameters 'packet-size' => { 'value' => '65'}, 'retry' => { 'value' => '3' }
   class_name 'org.opennms.netmgt.poller.monitors.IcmpMonitor'
 end
 
@@ -68,7 +65,7 @@ opennms_poller_service 'create ICMPBar2' do
   user_defined true
   status 'off'
   timeout 5000
-  parameters 'packet-size' => '65', 'retry' => '3'
+  parameters 'packet-size' => { 'value' => '65' }, 'retry' => { 'value' => '3' }
   class_name 'org.opennms.netmgt.poller.monitors.IcmpMonitor'
 end
 
@@ -79,8 +76,33 @@ opennms_poller_service 'create ICMPBar3' do
   user_defined true
   status 'off'
   timeout 5000
-  parameters 'packet-size' => '65', 'retry' => '3'
+  parameters 'packet-size' => { 'value' => '65' }, 'retry' => { 'value' => '3' }
   class_name 'org.opennms.netmgt.poller.monitors.IcmpMonitor'
+end
+
+opennms_poller_service 'extremely complex' do
+  service_name 'Complex'
+  package_name 'bar'
+  timeout 300
+  port 12
+  pattern '^Device&<![CDATA[/>CDATAConfig-(?<configType>.+)$'
+  parameters(
+    'port' => { 'value' => '13' },
+    'timeout' => { 'value' => '400' },
+    'page-sequence' => {
+      'configuration' => "<page attribute='value'><farameter>text<!-- comment  -->more text</farameter></page>"
+    }
+  )
+  class_name 'org.opennms.netmgt.poller.monitors.PageSequenceMonitor'
+  class_parameters(
+    'key' => { 'value' => '400' },
+    'other key' => {
+      'configuration' => "<page attribute='value'><sarameter>text<!-- comment  -->more text</sarameter></page>"
+    },
+    'everything key' => {
+      'configuration' => "<porg attribute='value'><qarameter>text<!-- comment  -->more text</qarameter></porg>"
+    }
+  )
 end
 
 opennms_poller_service 'create ICMPBar4' do
@@ -90,7 +112,7 @@ opennms_poller_service 'create ICMPBar4' do
   user_defined true
   status 'off'
   timeout 5000
-  parameters 'packet-size' => '65', 'retry' => '3'
+  parameters 'packet-size' => { 'value' => '65' }, 'retry' => { 'value' => '3' }
   class_name 'org.opennms.netmgt.poller.monitors.IcmpMonitor'
 end
 
@@ -101,7 +123,7 @@ opennms_poller_service 'create ICMPBar5' do
   user_defined true
   status 'off'
   timeout 5000
-  parameters 'packet-size' => '65', 'retry' => '3'
+  parameters 'packet-size' => { 'value' => '65' }, 'retry' => { 'value' => '3' }
   class_name 'org.opennms.netmgt.poller.monitors.IcmpMonitor'
 end
 
@@ -112,7 +134,7 @@ opennms_poller_service 'create ICMPBar6' do
   user_defined true
   status 'off'
   timeout 5000
-  parameters 'packet-size' => '65', 'retry' => '3'
+  parameters 'packet-size' => { 'value' => '65' }, 'retry' => { 'value' => '3' }
   class_name 'org.opennms.netmgt.poller.monitors.IcmpMonitor'
 end
 
@@ -123,6 +145,6 @@ opennms_poller_service 'create ICMPBar7' do
   user_defined true
   status 'off'
   timeout 5000
-  parameters 'packet-size' => '65', 'retry' => '3'
+  parameters 'packet-size' => { 'value' => '65' }, 'retry' => { 'value' => '3' }
   class_name 'org.opennms.netmgt.poller.monitors.IcmpMonitor'
 end

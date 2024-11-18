@@ -26,15 +26,12 @@ load_current_value do |new_resource|
   current_value_does_not_exist! unless ::File.exist?(file)
   r = wsman_resource(file)
   if r.nil?
-    Chef::Log.warn("no resource yet, reading from #{file}")
     all = Opennms::Cookbook::Collection::WsmanCollectionConfigFile.read(file, 'wsman').system_definitions
   else
     all = r.variables[:system_definitions]
   end
-  Chef::Log.warn("all is #{all}")
   current_value_does_not_exist! if all.empty?
   definitions = all.select { |sd| sd.name.eql?(new_resource.system_name) }
-  Chef::Log.warn("definitions is #{definitions}")
   current_value_does_not_exist! if definitions.nil? || definitions.empty?
   raise Opennms::Cookbook::Collection::DuplicateSystemDefinition, "More than one system definition with name #{new_resource.system_name} found in #{file}!" unless definitions.one?
   definition = definitions.pop

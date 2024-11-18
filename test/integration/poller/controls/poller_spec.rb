@@ -1,4 +1,3 @@
-# frozen_string_literal: true
 control 'poller' do
   describe poller_package('foo') do
     it { should exist }
@@ -20,7 +19,7 @@ control 'poller' do
     its('status') { should eq 'off' }
     its('time_out') { should eq 5000 }
     its('port') { should eq 161 }
-    its('parameters') { should eq 'oid' => '.1.3.6.1.2.1.1.2.0' }
+    its('parameters') { should eq 'oid' => { 'value' => '.1.3.6.1.2.1.1.2.0' } }
     its('class_name') { should eq 'org.opennms.netmgt.poller.monitors.SnmpMonitor' }
   end
 
@@ -37,5 +36,96 @@ control 'poller' do
   describe poller_service('SNMPBar2', 'bar') do
     it { should exist }
     its('class_name') { should eq 'org.opennms.netmgt.poller.monitors.SnmpMonitor' }
+  end
+  describe poller_service('ICMPBar', 'bar') do
+    it { should exist }
+    its('interval') { should eq 600_000 }
+    its('user_defined') { should eq true }
+    its('status') { should eq 'off' }
+    its('time_out') { should eq 5000 }
+    its('parameters') { should eq 'packet-size' => { 'value' => '65'}, 'retry' => { 'value' => '3' } }
+    its('class_name') { should eq 'org.opennms.netmgt.poller.monitors.IcmpMonitor' }
+  end
+
+  describe poller_service('ICMPBar2', 'bar') do
+    it { should exist }
+    its('interval') { should eq 600_000 }
+    its('user_defined') { should eq true }
+    its('status') { should eq 'off' }
+    its('time_out') { should eq 5000 }
+    its('parameters') { should eq 'packet-size' => { 'value' => '65' }, 'retry' => { 'value' => '3' } }
+    its('class_name') { should eq 'org.opennms.netmgt.poller.monitors.IcmpMonitor' }
+  end
+
+  describe poller_service('ICMPBar3', 'bar') do
+    it { should exist }
+    its('interval') { should eq 600_000 }
+    its('user_defined') { should eq true }
+    its('status') { should eq 'off' }
+    its('time_out') { should eq 5000 }
+    its('parameters') { should eq 'packet-size' => { 'value' => '65' }, 'retry' => { 'value' => '3' } }
+    its('class_name') { should eq 'org.opennms.netmgt.poller.monitors.IcmpMonitor' }
+  end
+
+  describe poller_service('Complex', 'bar') do
+    it { should exist }
+    its('time_out') { should eq 300 }
+    its('port') { should eq 12 }
+    its('pattern') { should eq '^Device&<![CDATA[/>CDATAConfig-(?<configType>.+)$' }
+    its('parameters') { should eq(
+      'page-sequence' => {
+        'configuration' => "<page attribute='value'><farameter>text<!-- comment  -->more text</farameter></page>"
+      }
+    ) }
+    its('class_name') { should eq 'org.opennms.netmgt.poller.monitors.PageSequenceMonitor' }
+    its('class_parameters') { should eq(
+      'key' => { 'value' => '400' },
+      'other key' => {
+        'configuration' => "<page attribute='value'><sarameter>text<!-- comment  -->more text</sarameter></page>"
+      },
+      'everything key' => {
+        'configuration' => "<porg attribute='value'><qarameter>text<!-- comment  -->more text</qarameter></porg>"
+      }
+    ) }
+  end
+
+  describe poller_service( 'ICMPBar4', 'bar') do
+    it { should exist }
+    its('interval') { should eq 600_000 }
+    its('user_defined') { should eq true }
+    its('status') { should eq 'off' }
+    its('time_out') { should eq 5000 }
+    its('parameters') { should eq 'packet-size' => { 'value' => '65' }, 'retry' => { 'value' => '3' } }
+    its('class_name') { should eq 'org.opennms.netmgt.poller.monitors.IcmpMonitor' }
+  end
+
+  describe poller_service( 'ICMPBar5', 'bar') do
+    it { should exist }
+    its('interval') { should eq 600_000 }
+    its('user_defined') { should eq true }
+    its('status') { should eq 'off' }
+    its('time_out') { should eq 5000 }
+    its('parameters') { should eq 'packet-size' => { 'value' => '65' }, 'retry' => { 'value' => '3' } }
+    its('class_name') { should eq 'org.opennms.netmgt.poller.monitors.IcmpMonitor' }
+  end
+
+  describe poller_service( 'ICMPBar6', 'bar') do
+    it { should exist }
+    its('interval') { should eq 600_000 }
+    its('user_defined') { should eq true }
+    its('status') { should eq 'off' }
+    its('time_out') { should eq 5000 }
+    its('parameters') { should eq 'packet-size' => { 'value' => '65' }, 'retry' => { 'value' => '3' } }
+    its('class_name') { should eq 'org.opennms.netmgt.poller.monitors.IcmpMonitor' }
+  end
+
+  describe poller_service( 'ICMPBar7', 'bar') do
+    it { should exist }
+    its('interval') { should eq 600_000 }
+    its('user_defined') { should eq true }
+    its('status') { should eq 'off' }
+    its('time_out') { should eq 5000 }
+    its('parameters') { should eq 'packet-size' => { 'value' => '65' }, 'retry' => { 'value' => '3' } }
+    its('class_name') { should eq 'org.opennms.netmgt.poller.monitors.IcmpMonitor' }
   end
 end

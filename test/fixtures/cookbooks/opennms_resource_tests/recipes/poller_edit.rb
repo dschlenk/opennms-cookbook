@@ -1,5 +1,23 @@
 include_recipe 'opennms_resource_tests::poller'
 
+# change filter and add everything else
+opennms_poller_package 'bar' do
+  filter "IPADDR == '10.0.0.1'"
+  specifics ['10.0.0.1']
+  include_ranges ['begin' => '10.0.0.1', 'end' => '10.0.0.1']
+  exclude_ranges ['begin' => '10.0.2.1', 'end' => '10.0.2.254']
+  include_urls ['file:/opt/opennms/etc/bar']
+  rrd_step 601
+  remote false
+  outage_calendars ['ignore localhost on tuesdays']
+  rras ['RRA:AVERAGE:0.5:2:4033', 'RRA:AVERAGE:0.5:24:2977', 'RRA:AVERAGE:0.5:576:733', 'RRA:MAX:0.5:576:733', 'RRA:MIN:0.5:576:733']
+end
+
+# change just the filter
+opennms_poller_package 'foo' do
+  filter "(IPADDR != '0.0.0.0')"
+end
+
 # you're allowed to change anything except service name / package name
 # note that the following must be specified in update resources if not default to remain as is:
 # * interval
@@ -29,7 +47,7 @@ opennms_poller_service 'add params to SNMPBar2' do
   package_name 'bar'
   timeout 5002
   port 165
-  parameters 'oid' => '.1.3.6.1.2.1.1.2.1'
+  parameters 'oid' => { 'value' => '.1.3.6.1.2.1.1.2.1' }
   class_name 'org.opennms.netmgt.poller.monitors.SnmpMonitor'
 end
 
@@ -80,7 +98,7 @@ opennms_poller_service 'change params ICMPBar5' do
   interval 600_000
   status 'off'
   timeout 5000
-  parameters 'packet-size' => '32'
+  parameters 'packet-size' => { 'value' => '32' }
   class_name 'org.opennms.netmgt.poller.monitors.IcmpMonitor'
 end
 
@@ -91,6 +109,6 @@ opennms_poller_service 'change class ICMPBar6' do
   interval 600_000
   status 'off'
   timeout 5000
-  parameters 'oid' => '.1.3.6.1.2.1.1.2.2'
+  parameters 'oid' => { 'value' => '.1.3.6.1.2.1.1.2.2' }
   class_name 'org.opennms.netmgt.poller.monitors.SnmpMonitor'
 end

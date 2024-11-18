@@ -463,6 +463,34 @@ suites:
       inspec_tests:
         - path: test/integration/default
         - path: test/integration/jmx
+  - name: poller
+    provisioner:
+      policyfile: policyfiles/poller.rb
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/poller
+  - name: poller_edit
+    provisioner:
+      policyfile: policyfiles/poller_edit.rb
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/poller_edit
+  - name: poller_delete
+    provisioner:
+      policyfile: policyfiles/poller_delete.rb
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/poller_delete
+  - name: poller_remove_parms
+    provisioner:
+      policyfile: policyfiles/poller_remove_parms.rb
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/poller_remove_parms
   - name: resource_type
     provisioner:
       policyfile: policyfiles/resource_type.rb

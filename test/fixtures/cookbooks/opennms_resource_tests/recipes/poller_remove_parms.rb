@@ -7,6 +7,6 @@ opennms_poller_service 'change class ICMPBar7' do
   interval 600_000
   status 'off'
   timeout 5000
-  parameters false
+  parameters Hash.new
   class_name 'org.opennms.netmgt.poller.monitors.SnmpMonitor'
 end

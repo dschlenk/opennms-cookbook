@@ -12,3 +12,8 @@ opennms_poller_service "delete 'SNMPBar 2'" do
   class_name 'org.opennms.netmgt.poller.monitors.SnmpMonitor'
   action :delete
 end
+
+opennms_poller_package 'foo' do
+  filter 'bananas'
+  action :delete
+end

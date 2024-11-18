@@ -154,7 +154,11 @@ A few other recipes exist that aren't listed here. They are included by others w
 
 ## Service Assurance
 
+* [Service assurance resource documentation](documentation/service_assurance.md)
+
 ## Performance Management and Thresholding
+
+* [Data collection resource documentation](documentation/datacollection.md)
 
 ## User and Group Management
 

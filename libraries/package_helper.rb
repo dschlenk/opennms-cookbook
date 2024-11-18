@@ -32,7 +32,46 @@ module Opennms
               variables(collectd_config: file)
               action :nothing
               delayed_action :create
-              # notifies :restart, 'service[opennms]'
+              notifies :restart, 'service[opennms]'
+            end
+          end
+        end
+      end
+    end
+
+    module Poller
+      module PollerTemplate
+        def poller_resource_init
+          poller_resource_create unless poller_resource_exist?
+        end
+
+        def poller_resource
+          return unless poller_resource_exist?
+          find_resource!(:template, "#{onms_etc}/poller-configuration.xml")
+        end
+
+        private
+
+        def poller_resource_exist?
+          !find_resource(:template, "#{onms_etc}/poller-configuration.xml").nil?
+        rescue Chef::Exceptions::ResourceNotFound
+          false
+        end
+
+        def poller_resource_create
+          file = Opennms::Cookbook::Package::PollerConfigFile.new
+          file.read!("#{onms_etc}/poller-configuration.xml")
+          with_run_context(:root) do
+            declare_resource(:template, "#{onms_etc}/poller-configuration.xml") do
+              cookbook 'opennms'
+              source 'poller-configuration.xml.erb'
+              owner node['opennms']['username']
+              group node['opennms']['groupname']
+              mode '0664'
+              variables(config: file)
+              action :nothing
+              delayed_action :create
+              notifies :restart, 'service[opennms]'
             end
           end
         end
@@ -250,10 +289,10 @@ module Opennms
         def initialize(package_name:, filter:, specifics: nil, include_ranges: nil, exclude_ranges: nil, include_urls: nil)
           @package_name = package_name
           @filter = filter
-          @specifics = specifics
-          @include_ranges = include_ranges
-          @exclude_ranges = exclude_ranges
-          @include_urls = include_urls
+          @specifics = specifics || []
+          @include_ranges = include_ranges || []
+          @exclude_ranges = exclude_ranges || []
+          @include_urls = include_urls || []
         end
 
         def to_s
@@ -279,6 +318,8 @@ module Opennms
           case type
           when 'collectd'
             CollectdPackage.new(package_name: package_name, filter: filter, specifics: specifics, include_ranges: include_ranges, exclude_ranges: exclude_ranges, include_urls: include_urls)
+          when 'poller'
+            PollerPackage.new(package_name: package_name, filter: filter, specifics: specifics, include_ranges: include_ranges, exclude_ranges: exclude_ranges, include_urls: include_urls)
           else
             Package.new(package_name: package_name, filter: filter, specifics: specifics, include_ranges: include_ranges, exclude_ranges: exclude_ranges, include_urls: include_urls)
           end
@@ -361,6 +402,58 @@ module Opennms
           @stor_flag_override = stor_flag_override unless stor_flag_override.nil?
           @if_alias_comment = if_alias_comment unless if_alias_comment.nil?
           @remote = remote unless remote.nil?
+        end
+      end
+
+      class PollerPackage < ServicePackage
+        attr_accessor :remote, :rrd_step, :rras, :downtimes
+
+        def initialize(package_name:, filter:, specifics: nil, include_ranges: nil, exclude_ranges: nil, include_urls: nil, remote: nil,  services: nil, outage_calendars: nil, rrd_step: nil, rras: nil, downtimes: nil)
+          super(package_name: package_name, filter: filter, specifics: specifics, include_ranges: include_ranges, exclude_ranges: exclude_ranges, include_urls: include_urls, services: services, outage_calendars: outage_calendars)
+          @remote = remote
+          @rrd_step = rrd_step || 300
+          @rras = rras || ['RRA:AVERAGE:0.5:1:2016', 'RRA:AVERAGE:0.5:12:1488', 'RRA:AVERAGE:0.5:288:366', 'RRA:MAX:0.5:288:366', 'RRA:MIN:0.5:288:366']
+          @downtimes = downtimes || { 0 => { 'interval' => 30_000, 'end' => 300_000 }, 300_000 => { 'interval' => 300_000, 'end' => 43_200_000 }, 43_200_000 => { 'interval' => 600_000, 'end' => 432_000_000 }, 432_000_000 => { 'interval' => 3600000 } }
+        end
+
+        def to_s
+          "PollerPackage #{super}; " \
+            "remote=#{@remote}; " \
+            "rrd_step=#{@rrd_step}; " \
+            "rras=#{@rras}; " \
+            "downtimes=#{@downtimes}."
+        end
+
+        def eql?(pp)
+          super &&
+            @remote.eql?(pp.remote) &&
+            @rrd_step.eql?(pp.rrd_step) &&
+            @rras.eql?(pp.rras) &&
+            @downtimes.eql?(pp.downtimes)
+        end
+
+        def service(service_name:)
+          service = @services.select { |s| s[:service_name].eql?(service_name) }
+          return if service.empty?
+          raise DuplicatePollerServices, "More than one service named #{service_name} found in #{@package_name}" unless service.one?
+          service.pop
+        end
+
+        def update(filter: nil, specifics: nil, include_ranges: nil, exclude_ranges: nil, include_urls: nil, outage_calendars: nil, remote: nil, rrd_step: nil, rras: nil, downtimes: nil)
+          @filter = filter unless filter.nil?
+          @specifics = specifics unless specifics.nil?
+          @include_ranges = include_ranges unless include_ranges.nil?
+          @exclude_ranges = exclude_ranges unless exclude_ranges.nil?
+          @include_urls = include_urls unless include_urls.nil?
+          @outage_calendars = outage_calendars unless outage_calendars.nil?
+          @remote = remote unless remote.nil?
+          @rrd_step = rrd_step unless rrd_step.nil?
+          @rras = rras unless rras.nil?
+          @downtimes = downtimes unless downtimes.nil?
+        end
+
+        def delete_service(service_name:)
+          @services.delete_if { |s| s[:service_name].eql?(service_name) } unless @services.nil?
         end
       end
 
@@ -497,7 +590,7 @@ module Opennms
 
         def populate_fields(doc)
           doc.each_element("#{@type}-configuration/collector") do |collector|
-            parameters = [] unless collector.elements['parameter'].nil?
+            parameters = {} unless collector.elements['parameter'].nil?
             collector.each_element('parameter') do |p|
               parameters[p.attributes['key']] = p.attributes['value']
             end
@@ -538,6 +631,94 @@ module Opennms
       end
 
       class PollerConfigFile < ServicePackageConfigFile
+        attr_reader :next_outage_id, :service_unresponsive_enabled, :path_outage_enabled, :default_critical_path_ip, :default_critical_path_service, :default_critical_path_timeout, :default_critical_path_retries, :async_polling_engine_enabled, :max_concurrent_async_polls, :node_outage_status, :node_outage_critical_service, :node_outage_poll_all_if_no_critical_service_defined, :monitors
+        def initialize
+          super
+          @type = 'poller'
+          @monitors = []
+        end
+
+        def populate_fields(doc)
+          # daemon level fields
+          pc = doc.elements['poller-configuration']
+          @next_outage_id = pc.attributes['nextOutageId']
+          @service_unresponsive_enabled = pc.attributes['serviceUnresponsiveEnabled']
+          @path_outage_enabled = pc.attributes['pathOutageEnabled']
+          @default_critical_path_ip = pc.attributes['defaultCriticalPathIp']
+          @default_critical_path_service = pc.attributes['defaultCriticalPathService']
+          @default_critical_path_timeout = pc.attributes['defaultCriticalPathTimeout']
+          @default_critical_path_retries = pc.attributes['defaultCriticalPathRetries']
+          @async_polling_engine_enabled = pc.attributes['asyncPollingEngineEnabled']
+          @max_concurrent_async_polls = pc.attributes['maxConcurrentAsyncPolls']
+          no = doc.elements['poller-configuration/node-outage']
+          @node_outage_status = no.attributes['status']
+          @node_outage_critical_service = no.elements['critical-service/@name'].value
+          @node_outage_poll_all_if_no_critical_service_defined = no.attributes['pollAllIfNoCriticalServiceDefined']
+          # extra package fields next
+          doc.each_element("#{@type}-configuration/package") do |p|
+            name = p.attributes['name']
+            @packages[name].rrd_step = p.elements['rrd/@step'].value.to_i
+            @packages[name].rras = xml_text_array(p, 'rrd/rra')
+            @packages[name].remote = p.attributes['remote'].eql?('true') unless p.attributes['remote'].nil?
+            downtimes = {} unless p.elements['downtime'].nil?
+            p.each_element('downtime') do |d|
+              downtimes[d.attributes['begin'].to_i] = { 'interval' => d.attributes['interval'].to_i }
+              downtimes[d.attributes['begin'].to_i]['end'] = d.attributes['end'].to_i unless d.attributes['end'].nil?
+              downtimes[d.attributes['begin'].to_i]['delete'] = d.attributes['delete'] unless d.attributes['delete'].nil?
+            end
+            @packages[name].downtimes = downtimes
+          end
+          # monitors last
+          doc.each_element("#{@type}-configuration/monitor") do |m|
+            parameters = {} unless m.elements['parameter'].nil?
+            m.each_element('parameter') do |p|
+              unless p.elements[1].nil?
+                c = ""
+                c = p.elements[1].to_s
+              end
+              parameters[p.attributes['key']] = { 'value' => p.attributes['value'], 'configuration' => c }.compact
+            end
+            @monitors.push({ 'service' => m.attributes['service'], 'class_name' => m.attributes['class-name'], 'parameters' => parameters }.compact)
+          end
+        end
+
+        def set_service_types
+          # not needed since we don't proxy parameters based on poller service type like we do for collectors
+        end
+
+        # override to handle parameters with configuration
+        def service_from_element(s)
+          name = s.attributes['name']
+          interval = s.attributes['interval'].to_i
+          user_defined = s.attributes['user-defined'].eql?('true') unless s.elements['@user-defined'].nil?
+          status = s.attributes['status'] unless s.elements['@status'].nil?
+          parameters = {}
+          s.each_element('parameter') do |p|
+            unless p.elements[1].nil?
+              c = ""
+              c = p.elements[1].to_s 
+            end
+            parameters[p.attributes['key']] = { 'value' => p.attributes['value'], 'configuration' => c }.compact
+          end
+          { type: @type, service_name: name, interval: interval, user_defined: user_defined, status: status, parameters: parameters, pattern: xml_element_text(s, 'pattern')}.compact
+        end
+
+        def monitor(service_name:)
+          monitor = @monitors.select { |m| m['service'].eql?(service_name) }
+          return if monitor.empty?
+          raise DuplicatePollerMonitor, "More than one monitor with service attribute #{service_name} found in poller configuration" unless monitor.one?
+          monitor.pop
+        end
+
+        def delete_monitor(service_name:)
+          @monitors.delete_if { |m| m['service'].eql?(service_name) }
+        end
+
+        def self.read(file)
+          f = PollerConfigFile.new
+          f.read!(file)
+          f
+        end
       end
 
       class ThreshdConfigFile < ServicePackageConfigFile

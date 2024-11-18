@@ -167,7 +167,7 @@ action :update do
     collector = collectd_resource.variables[:collectd_config].collector(service_name: new_resource.service_name)
     raise Chef::Exceptions::CurrentValueDoesNotExist if collector.nil?
     collector['class-name'] = new_resource.class_name
-    collector['parameters'] = new_resource.class_parameters
+    collector['parameters'] = new_resource.class_parameters unless new_resource.class_parameters.nil?
   end
 end
 
@@ -178,7 +178,7 @@ action :delete do
   collector = collectd_resource.variables[:collectd_config].collector(service_name: new_resource.service_name)
   if !service.nil? || !collector.nil?
     converge_by("Removing collection service #{new_resource.service_name} from #{new_resource.package_name}") do
-      collectd_resource.variables[:collectd_config].packages[new_resource.package_name].delete_service(service_name: new_resource.service_name)
+      collectd_resource.variables[:collectd_config].packages[new_resource.package_name].delete_service(service_name: new_resource.service_name) unless package.nil?
       collectd_resource.variables[:collectd_config].delete_collector(service_name: new_resource.service_name)
     end
   end

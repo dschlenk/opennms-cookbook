@@ -1,0 +1,74 @@
+<poller-configuration xmlns="http://xmlns.opennms.org/xsd/config/poller" threads=<%= @config.threads.to_s.encode(:xml => :attr) %><%= @config.next_outage_id.nil? ? '' : " nextOutageId=\"#{@config.next_outage_id.to_s.gsub("&", "&amp;").gsub("\"", "&quot;").gsub("<", "&lt;")}\"" %> serviceUnresponsiveEnabled=<%= @config.service_unresponsive_enabled.encode(:xml => :attr) %><%= @config.path_outage_enabled.nil? ? '' : " pathOutageEnabled=#{@config.path_outage_enabled.to_s.encode(:xml => :attr)}" %><%= @config.default_critical_path_ip.nil? ? '' : " defaultCriticalPathIp=#{@config.default_critical_path_ip.encode(:xml => :attr)}" %><%= @config.default_critical_path_service.nil? ? '' : " defaultCriticalPathService=#{@config.default_critical_path_service.encode(:xml => :attr)}" %><%= @config.default_critical_path_timeout.nil? ? '' : " defaultCriticalPathTimeout=#{@config.default_critical_path_timeout.to_s.encode(:xml => :attr)}" %><%= @config.default_critical_path_retries.nil? ? '' : " defaultCriticalPathRetries=#{@config.default_critical_path_retries.to_s.encode(:xml => :attr)}" %><%= @config.async_polling_engine_enabled.nil? ? '' : " asyncPollingEngineEnabled=#{@config.async_polling_engine_enabled.to_s.encode(:xml => :attr)}" %><%= @config.max_concurrent_async_polls.nil? ? '' : " maxConcurrentAsyncPolls=#{@config.max_concurrent_async_polls.to_s.encode(:xml => :attr)}" %>>
+   <node-outage status=<%= @config.node_outage_status.encode(:xml => :attr) %><%= @config.node_outage_poll_all_if_no_critical_service_defined.nil? ? '' : " pollAllIfNoCriticalServiceDefined=#{@config.node_outage_poll_all_if_no_critical_service_defined.to_s.encode(:xml => :attr)}" %>>
+<% unless @config.node_outage_critical_service.nil? -%>
+      <critical-service name=<%= @config.node_outage_critical_service.encode(:xml => :attr)%> />
+<% end -%>
+   </node-outage>
+<% @config.packages.each do |name, package| -%>
+   <package name=<%= name.encode(:xml => :attr) %><%= package.remote.nil? ? '' : " remote=#{package.remote.to_s.encode(:xml => :attr)}" %>>
+      <filter><%= package.filter.encode(:xml => :text) %></filter>
+    <% unless package.specifics.nil? -%>
+      <% package.specifics.each do |specific| -%>
+      <specific><%= specific.encode(:xml => :text) %></specific>
+      <% end -%>
+    <% end -%>
+    <% unless package.include_ranges.nil? -%>
+      <% package.include_ranges.each do |include_range| -%>
+      <include-range begin=<%= include_range['begin'].encode(:xml => :attr) %> end=<%= include_range['end'].encode(:xml => :attr) %> />
+      <% end -%>
+    <% end -%>
+    <% unless package.exclude_ranges.nil? -%>
+      <% package.exclude_ranges.each do |exclude_range| -%>
+      <exclude-range begin=<%= exclude_range['begin'].encode(:xml => :attr) %> end=<%= exclude_range['end'].encode(:xml => :attr) %> />
+      <% end -%>
+    <% end -%>
+    <% unless package.include_urls.nil? -%>
+      <% package.include_urls.each do |include_url| -%>
+      <include-url><%= include_url.encode(:xml => :text) %></include-url>
+      <% end -%>
+    <% end -%>
+      <rrd step=<%= package.rrd_step.to_s.encode(:xml => :attr) %>>
+  <% package.rras.each do |rra| -%>
+         <rra><%= rra.encode(:xml => :text) %></rra>
+  <% end -%>
+      </rrd>
+    <% unless package.services.nil? -%>
+      <% package.services.each do |service| -%>
+      <service name=<%= service[:service_name].encode(:xml => :attr) %> interval=<%= service[:interval].to_s.encode(:xml => :attr) %><%= service[:user_defined].nil? ? '' : " user-defined=#{service[:user_defined].to_s.encode(:xml => :attr)}" %><%= service[:status].nil? ? '' : " status=#{service[:status].encode(:xml => :attr)}" %>>
+        <% unless service[:pattern].nil? -%>
+         <pattern><%= service[:pattern].encode(:xml => :text) %></pattern>
+        <% end -%>
+        <% service[:parameters].each do |k, v| -%>
+         <parameter key=<%= k.encode(:xml => :attr) %><%= v['value'].nil? ? '' : " value=\"#{v['value'].to_s.gsub("&", "&amp;").gsub("\"", "&quot;").gsub("<", "&lt;")}\"" %><%= v['configuration'].nil? ? ' /' : ''%>>
+  <% unless v['configuration'].nil? -%>
+            <%= v['configuration'].to_s %>
+         </parameter>
+  <% end -%>
+        <% end unless service[:parameters].nil? -%>
+      </service>
+      <% end -%>
+    <% end -%>
+    <% unless package.outage_calendars.nil? || package.outage_calendars.empty? -%>
+      <% package.outage_calendars.each do |oc| -%>
+      <outage-calendar><%= oc.encode(:xml => :text) %></outage-calendar>
+      <% end -%>
+    <% end -%>
+    <% package.downtimes.each do |b, v| -%>
+      <downtime begin="<%= b %>"<%= v['end'].nil? ? '' : " end=\"#{v['end']}\"" %><%= v['delete'].nil? ? '' : " delete=#{v['delete'].encode(:xml => :attr)}" %> interval="<%= v['interval'] %>"/>
+    <% end -%>
+   </package>
+<% end unless @config.packages.nil? -%>
+<% @config.monitors.each do |monitor| -%>
+   <monitor service=<%= monitor['service'].encode(:xml => :attr) %> class-name=<%= monitor['class_name'].encode(:xml => :attr) %><%= monitor['parameters'].nil? || monitor['parameters'].empty? ? ' /' : '' %>>
+  <% unless monitor['parameters'].nil? -%>
+    <% monitor['parameters'].each do |k, v| -%>
+      <parameter key=<%= k.encode(:xml => :attr) %><%= v['value'].nil? ? '' : " value=\"#{v['value'].to_s.gsub("&", "&amp;").gsub("\"", "&quot;").gsub("<", "&lt;")}\"" %><%= v['configuration'].nil? ? ' /' : ''%>>
+      <% unless v['configuration'].nil? -%>
+         <%= v['configuration'].to_s %>
+      </parameter>
+      <% end -%>
+    <% end -%>
+   </monitor>
+  <% end -%>
+<% end unless @config.monitors.nil? -%>
+</poller-configuration>

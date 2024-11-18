@@ -2,8 +2,7 @@ include Opennms::Cookbook::Collection::SnmpCollectionTemplate
 include Opennms::XmlHelper
 
 unified_mode true
-property :group, String, name_property: true, identity: true
-property :group_name, String, identity: true
+property :group_name, String, name_property: true, identity: true
 property :collection_name, String, required: true, identity: true
 property :file, String, desired_state: false
 # set to the URL of your data collection file if not stored in your cookbook
@@ -25,7 +24,7 @@ load_current_value do |new_resource|
     collection = collections[new_resource.collection_name]
   end
   current_value_does_not_exist! if collection.nil?
-  gn = new_resource.group_name || new_resource.group
+  gn = new_resource.group_name
   group = collection.include_collection(data_collection_group: gn)
   current_value_does_not_exist! if group.nil?
   system_def group[:system_def]
@@ -56,7 +55,7 @@ action :create do
   converge_if_changed do
     snmp_resource_init
     collection = snmp_resource.variables[:collections][new_resource.collection_name]
-    gn = new_resource.group_name || new_resource.group
+    gn = new_resource.group_name
     group = collection.include_collection(data_collection_group: gn)
     if group.nil?
       group = { data_collection_group: gn, exclude_filters: new_resource.exclude_filters, system_def: new_resource.system_def }
@@ -86,7 +85,7 @@ action :update do
   converge_if_changed(:exclude_filters, :system_def) do
     snmp_resource_init
     collection = snmp_resource.variables[:collections][new_resource.collection_name]
-    gn = new_resource.group_name || new_resource.group
+    gn = new_resource.group_name
     raise Chef::Exceptions::CurrentValueDoesNotExist if collection.nil?
     group = collection.include_collection(data_collection_group: gn)
     group[:exclude_filters] = new_resource.exclude_filters unless new_resource.exclude_filters.nil?
@@ -102,7 +101,7 @@ action :delete do
   end
   snmp_resource_init
   collection = snmp_resource.variables[:collections][new_resource.collection_name]
-  gn = new_resource.group_name || new_resource.group
+  gn = new_resource.group_name
   group = collection.include_collection(data_collection_group: gn) unless collection.nil?
   unless group.nil?
     converge_by("Removing #{gn}") do
