@@ -1,4 +1,3 @@
-# frozen_string_literal: true
 opennms_threshd_package 'create cheftest2 with package_name' do
   package_name 'cheftest2'
   filter "IPADDR != '0.0.0.0'"
@@ -7,5 +6,4 @@ opennms_threshd_package 'create cheftest2 with package_name' do
   exclude_ranges [{ 'begin' => '10.1.0.1', 'end' => '10.254.254.254' }]
   include_urls ['file:/opt/opennms/etc/include2']
   services [{ 'name' => 'SNMP', 'interval' => 300_000, 'status' => 'on', 'params' => { 'thresholding-group' => 'cheftest2' } }]
-  notifies :run, 'opennms_send_event[restart_Threshd]'
 end

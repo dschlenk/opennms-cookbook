@@ -1,0 +1,42 @@
+<threshd-configuration xmlns="http://xmlns.opennms.org/xsd/config/thresholding" threads=<%= @config.threads.to_s.encode(:xml => :attr) %>>
+<% @config.packages.each do |name, package| -%>
+   <package name=<%= name.encode(:xml => :attr) %>>
+      <filter><%= package.filter.encode(:xml => :text) %></filter>
+    <% unless package.specifics.nil? -%>
+      <% package.specifics.each do |specific| -%>
+      <specific><%= specific.encode(:xml => :text) %></specific>
+      <% end -%>
+    <% end -%>
+    <% unless package.include_ranges.nil? -%>
+      <% package.include_ranges.each do |include_range| -%>
+      <include-range begin=<%= include_range['begin'].encode(:xml => :attr) %> end=<%= include_range['end'].encode(:xml => :attr) %>/>
+      <% end -%>
+    <% end -%>
+    <% unless package.exclude_ranges.nil? -%>
+      <% package.exclude_ranges.each do |exclude_range| -%>
+      <exclude-range begin=<%= exclude_range['begin'].encode(:xml => :attr) %> end=<%= exclude_range['end'].encode(:xml => :attr) %>/>
+      <% end -%>
+    <% end -%>
+    <% unless package.include_urls.nil? -%>
+      <% package.include_urls.each do |include_url| -%>
+      <include-url><%= include_url.encode(:xml => :text) %></include-url>
+      <% end -%>
+    <% end -%>
+    <% unless package.services.nil? -%>
+      <% package.services.each do |service| -%>
+        <% Chef::Log.warn("service: #{service}") -%>
+      <service name=<%= service[:service_name].encode(:xml => :attr) %> interval=<%= service[:interval].to_s.encode(:xml => :attr) %><%= service[:user_defined].nil? ? '' : " user-defined=#{service[:user_defined].to_s.encode(:xml => :attr)}" %><%= service[:status].nil? ? '' : " status=#{service[:status].encode(:xml => :attr)}" %>>
+        <% service[:parameters].each do |k, v| -%>
+         <parameter key=<%= k.encode(:xml => :attr) %> value="<%= v.to_s.gsub("&", "&amp;").gsub("\"", "&quot;").gsub("<", "&lt;") %>"/>
+        <% end -%>
+      </service>
+      <% end -%>
+    <% end -%>
+    <% unless package.outage_calendars.nil? || package.outage_calendars.empty? -%>
+      <% package.outage_calendars.each do |oc| -%>
+      <outage-calendar><%= oc.encode(:xml => :text) %></outage-calendar>
+      <% end -%>
+    <% end -%>
+   </package>
+<% end -%>
+</threshd-configuration>

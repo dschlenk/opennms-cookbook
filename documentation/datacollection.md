@@ -749,3 +749,35 @@ The validation on `objects` ensures that when the property value is an `Array`, 
 #### Examples
 
 See [xml\_group.rb](../test/fixtures/cookbooks/opennms_resource_tests/recipes/xml_group.rb) and [xml\_group\_delete.rb](../test/fixtures/cookbooks/opennms_resource_tests/recipes/xml_group_delete.rb).
+
+## Thresholding
+
+### opennms\_threshd\_package
+
+Manages a `package` in `threshd-configuration.xml`.
+
+#### Actions
+
+* `:create` - Default. Adds or updates a `package` element in the file with the name matching the `package_name` property.
+* `:create_if_Missing` - Adds or updates a `package` element in the file with the name matching the `package_name` property.
+* `:update` - Modify an existing `package` element. Raises an error if the package does not exist.
+* `:delete` - Remove an existing `package` element and its children if it exists.
+
+#### Properties
+
+| Name                 | Name? | Type                  | Allowed Values                                                                    |
+| -------------------- | ----- | --------------------- | --------------------------------------------------------------------------------- |
+| `package_name`       |   ✓   | String                |                                                                                   |
+| `filter`             |       | String                |                                                                                   |
+| `specifics`          |       | Array                 | array of Strings                                                                  |
+| `include_ranges`     |       | Array                 | array of Strings                                                                  |
+| `exclude_ranges`     |       | Array                 | array of Strings                                                                  |
+| `include_urls`       |       | Array                 | array of Strings                                                                  |
+| `outage_calendars`   |       | Array                 | array of Strings                                                                  |
+| `services`           |       | Array                 | see below for format                                                              |
+
+`services` should be an array of hashes with keys `name` (String, required), `interval` (Fixnum, required), `status` (`on` or `off`, required), `params` (Hash of Strings, optional).
+
+#### Examples
+
+See [threshold\_package.rb](../test/fixtures/cookbooks/opennms_resource_tests/recipes/threshold_package.rb). 

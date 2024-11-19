@@ -78,6 +78,63 @@ module Opennms
       end
     end
 
+    module Threshold
+      module ThreshdTemplate
+        def threshd_resource_init
+          threshd_resource_create unless threshd_resource_exist?
+        end
+
+        def threshd_resource
+          return unless threshd_resource_exist?
+          find_resource!(:template, "#{onms_etc}/threshd-configuration.xml")
+        end
+
+        private
+
+        def threshd_resource_exist?
+          !find_resource(:template, "#{onms_etc}/threshd-configuration.xml").nil?
+        rescue Chef::Exceptions::ResourceNotFound
+          false
+        end
+
+        def threshd_resource_create
+          file = Opennms::Cookbook::Package::ThreshdConfigFile.new
+          file.read!("#{onms_etc}/threshd-configuration.xml")
+          with_run_context(:root) do
+            declare_resource(:template, "#{onms_etc}/threshd-configuration.xml") do
+              cookbook 'opennms'
+              source 'threshd-configuration.xml.erb'
+              owner node['opennms']['username']
+              group node['opennms']['groupname']
+              mode '0664'
+              variables(config: file)
+              action :nothing
+              delayed_action :create
+              notifies :restart, 'service[opennms]'
+            end
+          end
+        end
+      end
+
+      module Helper
+        def symbol_service_adapter(services)
+          ret = []
+          services.each do |s|
+            ret.push(service_name: s['name'], interval: s['interval'], status: s['status'], parameters: s['params'])
+          end
+          ret
+        end
+
+        def string_service_adapter(services)
+          ret = []
+          services.each do |s|
+            ret.push('name': s[:service_name], 'interval': s[:interval], 'status': s[:status], 'params': s[:params])
+          end
+          ret
+        end
+      end
+    end
+
     module Package
       class Service
         attr_reader :service_name, :interval, :user_defined, :status, :parameters
@@ -320,6 +377,8 @@ module Opennms
             CollectdPackage.new(package_name: package_name, filter: filter, specifics: specifics, include_ranges: include_ranges, exclude_ranges: exclude_ranges, include_urls: include_urls)
           when 'poller'
             PollerPackage.new(package_name: package_name, filter: filter, specifics: specifics, include_ranges: include_ranges, exclude_ranges: exclude_ranges, include_urls: include_urls)
+          when 'threshd'
+            ThreshdPackage.new(package_name: package_name, filter: filter, specifics: specifics, include_ranges: include_ranges, exclude_ranges: exclude_ranges, include_urls: include_urls)
           else
             Package.new(package_name: package_name, filter: filter, specifics: specifics, include_ranges: include_ranges, exclude_ranges: exclude_ranges, include_urls: include_urls)
           end
@@ -450,6 +509,37 @@ module Opennms
           @rrd_step = rrd_step unless rrd_step.nil?
           @rras = rras unless rras.nil?
           @downtimes = downtimes unless downtimes.nil?
+        end
+
+        def delete_service(service_name:)
+          @services.delete_if { |s| s[:service_name].eql?(service_name) } unless @services.nil?
+        end
+      end
+
+      class ThreshdPackage < ServicePackage
+        def initialize(package_name:, filter:, specifics: nil, include_ranges: nil, exclude_ranges: nil, include_urls: nil, services: nil)
+          super
+        end
+
+        def to_s
+          "ThreshdPackage #{super}."
+        end
+
+        def service(service_name:)
+          service = @services.select { |s| s[:service_name].eql?(service_name) }
+          return if service.empty?
+          raise DuplicateThreshdServices, "More than one service named #{service_name} found in #{@package_name}" unless service.one?
+          service.pop
+        end
+
+        def update(filter: nil, specifics: nil, include_ranges: nil, exclude_ranges: nil, include_urls: nil, outage_calendars: nil, services: nil)
+          @filter = filter unless filter.nil?
+          @specifics = specifics unless specifics.nil?
+          @include_ranges = include_ranges unless include_ranges.nil?
+          @exclude_ranges = exclude_ranges unless exclude_ranges.nil?
+          @include_urls = include_urls unless include_urls.nil?
+          @outage_calendars = outage_calendars unless outage_calendars.nil?
+          @services = services unless services.nil?
         end
 
         def delete_service(service_name:)
@@ -722,11 +812,46 @@ module Opennms
       end
 
       class ThreshdConfigFile < ServicePackageConfigFile
+        attr_reader :thresholders
+        def initialize
+          super
+          @type = 'threshd'
+        end
+
+        def populate_fields(doc)
+          # thresholders still exist in the schema, but I believe they are a relic from when threshd was independent of collectd
+          # as such, we expect them to be nil and don't provide support for then at the custom resource level, but do allow for
+          # preserving them if they exist I guess.
+          unless doc.elements["#{@type}-configuration/thresholder"].nil?
+            @thresholders = []
+            doc.each_element("#{@type}-configuration/thresholder") do |m|
+              parameters = {} unless m.elements['parameter'].nil?
+              m.each_element('parameter') do |p|
+                parameters[p.attributes['key']] = p.attributes['value']
+              end
+              @thresholders.push({ 'service' => m.attributes['service'], 'class_name' => m.attributes['class-name'], 'parameters' => parameters }.compact)
+            end
+          end
+        end
+
+        def set_service_types
+          # not needed since we don't proxy parameters based on poller service type like we do for collectors
+        end
+
+        def self.read(file)
+          f = ThreshdConfigFile.new
+          f.read!(file)
+          f
+        end
       end
 
       class DuplicateCollectorElements < StandardError; end
 
       class DuplicateCollectdService < StandardError; end
+
+      class DuplicatePollerService < StandardError; end
+
+      class DuplicateThreshdService < StandardError; end
     end
   end
 end
