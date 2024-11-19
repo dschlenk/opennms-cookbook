@@ -24,7 +24,6 @@
       <% end -%>
       <% if !group['objects'].nil? -%>
 	<% group['objects'].each do |obj| -%>
-                  <% Chef::Log.warn("obj: '#{obj}'") -%>
                 <xml-object name=<%= obj['name'].encode(:xml => :attr) %> type=<%= obj['type'].encode(:xml => :attr) %> xpath=<%= obj['xpath'].encode(:xml => :attr) %>/>
         <% end -%>
       <% end -%>
