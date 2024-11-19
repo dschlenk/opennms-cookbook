@@ -27,19 +27,19 @@ class ThreshdPackage < Inspec.resource(1)
     return unless @exists
     @params = {}
     @params[:filter] = p_el.elements['filter'].text.to_s
-    @params[:include_ranges] = []
+    @params[:include_ranges] = [] unless p_el.elements['include-range'].nil?
     p_el.each_element('include-range') do |ir|
       @params[:include_ranges].push 'begin' => ir.attributes['begin'].to_s, 'end' => ir.attributes['end'].to_s
     end
-    @params[:exclude_ranges] = []
+    @params[:exclude_ranges] = [] unless p_el.elements['exclude-range'].nil?
     p_el.each_element('exclude-range') do |er|
       @params[:exclude_ranges].push 'begin' => er.attributes['begin'].to_s, 'end' => er.attributes['end'].to_s
     end
-    @params[:specifics] = []
+    @params[:specifics] = [] unless p_el.elements['specific'].nil?
     p_el.each_element('specific') do |s|
       @params[:specifics].push s.text.to_s
     end
-    @params[:include_urls] = []
+    @params[:include_urls] = [] unless p_el.elements['include-url'].nil?
     p_el.each_element('include-url') do |iu|
       @params[:include_urls].push iu.text.to_s
     end

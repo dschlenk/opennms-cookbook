@@ -120,7 +120,7 @@ module Opennms
         def symbol_service_adapter(services)
           ret = []
           services.each do |s|
-            ret.push(service_name: s['name'], interval: s['interval'], status: s['status'], parameters: s['params'])
+            ret.push({ service_name: s['name'], interval: s['interval'], status: s['status'], parameters: s['params'] }.compact)
           end
           ret
         end
@@ -128,7 +128,7 @@ module Opennms
         def string_service_adapter(services)
           ret = []
           services.each do |s|
-            ret.push('name': s[:service_name], 'interval': s[:interval], 'status': s[:status], 'params': s[:params])
+            ret.push({ 'name' => s[:service_name], 'interval' => s[:interval], 'status' => s[:status], 'params' => s[:parameters] }.compact)
           end
           ret
         end
