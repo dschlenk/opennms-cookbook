@@ -1749,20 +1749,14 @@ default['opennms']['syslog_north']['destination']['truncate']        = false
 default['opennms']['syslog_north']['uei']['node_down'] = false
 default['opennms']['syslog_north']['uei']['node_up']   = false
 # syslogd-configuration.xml
-default['opennms']['syslogd']['port']                   = 10_514
-default['opennms']['syslogd']['new_suspect']            = false
-default['opennms']['syslogd']['parser']                 = 'org.opennms.netmgt.syslogd.RadixTreeSyslogParser'
-default['opennms']['syslogd']['forwarding_regexp']      = '^.*\s(19|20)\d\d([-/.])(0[1-9]|1[012])\2(0[1-9]|[12][0-9]|3[01])(\s+)(\S+)(\s)(\S.+)'
-default['opennms']['syslogd']['matching_group_host']    = 6
-default['opennms']['syslogd']['matching_group_message'] = 8
-default['opennms']['syslogd']['discard_uei']            = 'DISCARD-MATCHING-MESSAGES'
-default['opennms']['syslogd']['timezone']               = ''
-default['opennms']['syslogd']['apache_httpd']           = true
-default['opennms']['syslogd']['linux_kernel']           = true
-default['opennms']['syslogd']['openssh']                = true
-default['opennms']['syslogd']['postfix']                = true
-default['opennms']['syslogd']['procmail'] = true
-default['opennms']['syslogd']['sudo'] = true
+default['opennms']['syslogd']['port']                   = nil
+default['opennms']['syslogd']['new_suspect']            = nil
+default['opennms']['syslogd']['parser']                 = nil
+default['opennms']['syslogd']['forwarding_regexp']      = nil
+default['opennms']['syslogd']['matching_group_host']    = nil
+default['opennms']['syslogd']['matching_group_message'] = nil
+default['opennms']['syslogd']['discard_uei']            = nil
+default['opennms']['syslogd']['timezone']               = nil
 # threshd-configuration.xml
 default['opennms']['threshd']['threads']                      = 5
 default['opennms']['threshd']['mib2']['filter']               = "IPADDR != '0.0.0.0'"
@@ -2410,8 +2404,8 @@ default['opennms']['secure_fields'] = %w(
               tticket
               script
 )
-default['opennms']['manage_collection_packages'] = true
-default['opennms']['manage_jdbc_collections'] = true
-default['opennms']['manage_jmx_collections'] = true
-default['opennms']['manage_snmp_collections'] = true
-default['opennms']['manage_xml_collections'] = true
+default['opennms']['manage_collection_packages'] = false
+default['opennms']['manage_jdbc_collections'] = false
+default['opennms']['manage_jmx_collections'] = false
+default['opennms']['manage_snmp_collections'] = false
+default['opennms']['manage_xml_collections'] = false

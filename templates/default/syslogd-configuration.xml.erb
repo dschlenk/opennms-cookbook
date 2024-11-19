@@ -1,0 +1,52 @@
+<?xml version="1.0"?>
+<syslogd-configuration>
+    <!--
+      optional attribute "timezone":
+          - if set it will be used as default timezone if no timezone is given
+          - if not set the system time zone will be used
+    -->
+    <configuration
+            syslog-port=<%= @config.syslog_port.to_s.encode(:xml => :attr) %>
+            new-suspect-on-message=<%= @config.new_suspect_on_message.to_s.encode(:xml => :attr) %>
+            parser=<%= @config.parser.encode(:xml => :attr) %>
+            forwarding-regexp=<%= @config.forwarding_regexp.encode(:xml => :attr) %>
+            matching-group-host=<%= @config.matching_group_host.to_s.encode(:xml => :attr) %>
+            matching-group-message=<%= @config.matching_group_message.to_s.encode(:xml => :attr) %>
+            discard-uei=<%= @config.discard_uei.encode(:xml => :attr) %>
+            timezone=<%= @config.timezone.encode(:xml => :attr) %>
+            />
+
+    <!--
+        NOTE: This uses the CustomSyslogParser and forwarding-regexp for backwards compatibility.  If your
+        syslog sources will always use a particular format, it's better to use one of the more specific parsers
+        in the "parser" attribute, above.
+
+        Available parsers:
+
+        * org.opennms.netmgt.syslogd.CustomSyslogParser: A backwards-compatible parser that has the same behavior
+          as OpenNMS 1.8 (and previous).  It has relaxed standards and can usually pull data out of most BSD-
+          or Syslog-NG-style traps.
+        * org.opennms.netmgt.syslogd.RadixTreeSyslogParser: This parser uses a set of patterns to match all
+          RFC 3164, RFC 5424, and syslog-ng message formats. Because it is the most flexible parser, it is the
+          preferred implementation in most cases. Like the legacy Rfc5424SyslogParser, it currently discards
+          RFC 5424 structured data. It ignores the forwarding-regexp, matching-group-host, and matching-group-message
+          parameters in favor of using an internal set of patterns.
+        * DEPRECATED: org.opennms.netmgt.syslogd.SyslogNGParser: A stricter variant of the CustomSyslogParser which parses
+          Syslog-NG's default format.  It ignores forwarding-regexp, matching-group-host, and matching-group-message
+          and instead relies on a well-known properly-formatted syslog message.
+        * DEPRECATED: org.opennms.netmgt.syslogd.Rfc5424SyslogParser: A parser that handles the new Syslog standard (as
+          defined in RFC5424).  It has strict parsing that should match the grammar specified in the RFC, although
+          it currently discards structured data.  Like the SyslogNGParser, it ignores forwarding-regexp,
+          matching-group-host, and matching-group-message in favor of stricter parsing of the known grammer.
+
+        *** PERFORMANCE NOTES ***
+
+        For the most deterministic performance of OpenNMS when matching syslog messages, you should *always*
+        anchor your regular expression matches with ^ and $, like in the examples below.  Failure to do so can
+        cause extreme slowdowns, especially with large amounts of <ueiMatch> tags.
+    -->
+    <!-- Custom syslog configs go here -->
+<% @config.files.each do |f| -%>
+    <import-file><%= f.encode(:xml => :text) %></import-file>
+<% end -%>
+</syslogd-configuration>

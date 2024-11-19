@@ -575,6 +575,13 @@ suites:
       inspec_tests:
         - path: test/integration/default
         - path: test/integration/snmp_config_profile_delete
+  - name: syslog_file
+    provisioner:
+      policyfile: policyfiles/syslog_file.rb
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/syslog_file
   - name: system_def
     provisioner:
       policyfile: policyfiles/system_def.rb

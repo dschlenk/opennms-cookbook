@@ -160,6 +160,10 @@ A few other recipes exist that aren't listed here. They are included by others w
 
 * [Data collection resource documentation](documentation/datacollection.md)
 
+## Syslog configuration
+
+# [opennms\_syslog\_file](documentation/syslog.md)
+
 ## User and Group Management
 
 ## Provisioning and Discovery
