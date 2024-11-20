@@ -110,7 +110,7 @@ module Opennms
               variables(config: file)
               action :nothing
               delayed_action :create
-              notifies :restart, 'service[opennms]'
+              notifies :run, 'opennms_send_event[restart_Threshd]'
             end
           end
         end

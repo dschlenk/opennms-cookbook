@@ -51,26 +51,11 @@ Manage `profile` elements and children in `$OPENNMS_HOME/etc/snmp-config.xml`. T
 
 ## Examples
 
-### Recipe:
+Recipe: [snmp\_config\_profile](../test/fixtures/cookbooks/opennms_resource_tests/recipes/snmp_config_profile.rb)
+Test: [snmp\_config\_profile\_spec.rb](../test/integration/snmp_config_profile/controls/snmp_config_profile_spec.rb)
 
-[snmp\_config\_profile](../test/fixtures/cookbooks/opennms_resource_tests/recipes/snmp_config_profile.rb)
+Recipe: [snmp\_config\_profile\_update](../test/fixtures/cookbooks/opennms_resource_tests/recipes/snmp_config_profile_update.rb)
+Test: [snmp\_config\_profile\_update\_spec.rb](../test/integration/snmp_config_profile_update/controls/snmp_config_profile_spec.rb)
 
-### Test:
-
-[snmp\_config\_profile\_spec.rb](../test/integration/snmp_config_profile/controls/snmp_config_profile_spec.rb)
-
-### Recipe:
-
-* [snmp\_config\_profile\_update](../test/fixtures/cookbooks/opennms_resource_tests/recipes/snmp_config_profile_update.rb)
-
-### Test:
-
-* [snmp\_config\_profile\_update\_spec.rb](../test/integration/snmp_config_profile_update/controls/snmp_config_profile_spec.rb)
-
-### Recipe:
-
-* [snmp\_config\_profile\_delete](../test/fixtures/cookbooks/opennms_resource_tests/recipes/snmp_config_profile_delete.rb)
-
-### Test:
-
-* [snmp\_config\_profile\_delete\_spec.rb](../test/integration/snmp_config_profile_delete/controls/snmp_config_profile_spec.rb)
+Recipe: [snmp\_config\_profile\_delete](../test/fixtures/cookbooks/opennms_resource_tests/recipes/snmp_config_profile_delete.rb)
+Test: [snmp\_config\_profile\_delete\_spec.rb](../test/integration/snmp_config_profile_delete/controls/snmp_config_profile_spec.rb)

@@ -45,7 +45,7 @@ An instance of this resource should be defined when using any of the other `open
 
 To match the out of the box config:
 
-```
+```ruby
 opennms_snmp_config 'default' do
   version 'v2c'
   read_community 'public'
@@ -56,13 +56,13 @@ end
 
 resulting in the following config:
 
-```
+```xml
 <snmp-config xmlns="http://xmlns.opennms.org/xsd/config/snmp" version="v2c" read-community="public" timeout="1800" retry="1"/>
 ```
 
 An example with all relavant v1/v2c properties set:
 
-```
+```ruby
 opennms_snmp_config `v3' do
   port 161
   retry_count 1
@@ -81,13 +81,13 @@ end
 
 resulting in the following config:
 
-```
+```xml
 <snmp-config xmlns="http://xmlns.opennms.org/xsd/config/snmp" version="v2c" port="161" read-community="public" write-community="private" timeout="3000" retry="1" proxy-host="192.0.2.1" max-vars-per-pdu="50" max-repetitions="1" max-request-size="1337" ttl="4000" encrypted="false"/>
 ```
 
 An example with all properties set that are relevent for v3:
 
-```
+```ruby
 opennms_snmp_config `v3' do
   port 161
   retry_count 1
@@ -114,7 +114,7 @@ end
 
 resulting in the following config:
 
-```
+```xml
 <snmp-config xmlns="http://xmlns.opennms.org/xsd/config/snmp" version="v3" port="161" timeout="3000" retry="1" proxy-host="192.0.2.1" max-vars-per-pdu="50" max-repetitions="1" max-request-size="1337" ttl="4000" encrypted="false" security-name="superSecure" security-level="3" auth-passphrase="0p3nNMSv3" auth-protocol="SHA-512" engine-id="3ng*n3" context-engine-id="c0nt3xt" context-name="cn@m3" privacy-passphrase="0p3nNMSv3" privacy-protocol="AES256" enterprise-id="8072"/>
 ```
 

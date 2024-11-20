@@ -54,26 +54,11 @@ Manage `definition` elements and children in `$OPENNMS_HOME/etc/snmp-config.xml`
 
 ## Examples
 
-### Recipe:
+Recipe: [snmp\_config\_definition](../test/fixtures/cookbooks/opennms_resource_tests/recipes/snmp_config_definition.rb)
+Test: [snmp\_config\_definition_spec.rb](../test/integration/snmp_config_definition/controls/snmp_config_definition_spec.rb)
 
-[snmp\_config\_definition](../test/fixtures/cookbooks/opennms_resource_tests/recipes/snmp_config_definition.rb)
+Recipe: [snmp\_config\_definition\_update](../test/fixtures/cookbooks/opennms_resource_tests/recipes/snmp_config_definition_update.rb)
+Test: [snmp\_config\_definition\_update\_spec.rb](../test/integration/snmp_config_definition_update/controls/snmp_config_definition_update_spec.rb)
 
-### Test:
-
-[snmp\_config\_definition_spec.rb](../test/integration/snmp_config_definition/controls/snmp_config_definition_spec.rb)
-
-### Recipe:
-
-* [snmp\_config\_definition\_update](../test/fixtures/cookbooks/opennms_resource_tests/recipes/snmp_config_definition_update.rb)
-
-### Test:
-
-* [snmp\_config\_definition\_update\_spec.rb](../test/integration/snmp_config_definition_update/controls/snmp_config_definition_update_spec.rb)
-
-### Recipe:
-
-* [snmp\_config\_definition\_delete](../test/fixtures/cookbooks/opennms_resource_tests/recipes/snmp_config_definition_delete.rb)
-
-### Test:
-
-* [snmp\_config\_definition\_delete\_spec.rb](../test/integration/snmp_config_definition_delete/controls/snmp_config_definition_delete_spec.rb)
+Recipe: [snmp\_config\_definition\_delete](../test/fixtures/cookbooks/opennms_resource_tests/recipes/snmp_config_definition_delete.rb)
+Test: [snmp\_config\_definition\_delete\_spec.rb](../test/integration/snmp_config_definition_delete/controls/snmp_config_definition_delete_spec.rb)

@@ -596,6 +596,13 @@ suites:
       inspec_tests:
         - path: test/integration/default
         - path: test/integration/threshd_package
+  - name: threshd_service
+    provisioner:
+      policyfile: policyfiles/threshd_service.rb
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/threshd_service
   - name: wsman_collection
     provisioner:
       policyfile: policyfiles/wsman_collection.rb

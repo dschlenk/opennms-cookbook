@@ -18,7 +18,7 @@ Manage secrets in the OpenNMS secure credentials vault.
 
 To store the passwords (retrieved from a Chef Vault) for the accounts needed for the postgres database using the alias and username used by the default config of `$OPENNMS_HOME/etc/opennms-datasources.xml`:
 
-```
+```ruby
 opennms_secret 'opennms postgresql user' do
   secret_alias 'postgres'
   username node['opennms']['username']
@@ -34,7 +34,7 @@ end
 
 with the vault item:
 
-```
+```json
 {
   "id": "postgres_users",
   "postgres": {
@@ -48,7 +48,7 @@ with the vault item:
 
 will result in the following items in the SCV:
 
-```
+```bash
 # /opt/opennms/bin/scvcli list
 [main] INFO org.opennms.features.scv.jceks.JCEKSSecureCredentialsVault - Loading existing keystore from: scv.jce
 postgres-admin

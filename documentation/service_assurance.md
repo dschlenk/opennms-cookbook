@@ -8,13 +8,13 @@ Service assurance, or pollers, in OpenNMS can be configured with custom resource
 
 Manages a `package` in `poller-configuration.xml`.
 
-#### Actions
+#### Actions for opennms\_poller\_package
 
 * `:create` - Default. Adds or updates a `package` element in the file with the name matching the `package_name` property.
 * `:update` - Modify an existing `package` element. Raises an error if the package does not exist.
 * `:delete` - Remove an existing `package` element and its children if it exists.
 
-#### Properties
+#### Properties for opennms\_poller\_package
 
 | Name                 | Name? | Type                  | Allowed Values                                                                    |
 | -------------------- | ----- | --------------------- | --------------------------------------------------------------------------------- |
@@ -31,7 +31,7 @@ Manages a `package` in `poller-configuration.xml`.
 
 `rras` defaults to `['RRA:AVERAGE:0.5:1:2016', 'RRA:AVERAGE:0.5:12:1488', 'RRA:AVERAGE:0.5:288:366', 'RRA:MAX:0.5:288:366', 'RRA:MIN:0.5:288:366']` on `:create`.
 
-#### Examples
+#### Examples for opennms\_poller\_package
 
 Recipe [poller.rb](../test/fixtures/cookbooks/openms_resource_tests/recipes/poller.rb) contains several varying examples of package creation.
 Recipe [poller\_edit.rb](../test/fixtures/cookbooks/openms_resource_tests/recipes/poller_edit.rb) contains examples of editing packages.
@@ -41,13 +41,13 @@ Recipe [poller\_delete.rb](../test/fixtures/cookbooks/openms_resource_tests/reci
 
 Manages a `service` in a `package` in `poller-configuration.xml`.
 
-#### Actions
+#### Actions for opennms\_poller\_service
 
 * `:create` - Default. Adds or updates a `service` element to the package named `package_name` in the file with the name matching the `service_name` property.
 * `:update` - Modify an existing `service` element. Raises an error if the package or service does not exist.
 * `:delete` - Remove an existing `service` element and its children if it exists.
 
-#### Properties
+#### Properties for opennms\_poller\_service
 
 | Name                   | Name? | Type                | Validation / Usage Notes                                     |
 | ---------------------- | ----- | ------------------- | ------------------------------------------------------------ |
@@ -65,8 +65,7 @@ Manages a `service` in a `package` in `poller-configuration.xml`.
 
 `parameters` and `class_parameters` are both to be hashes with string keys and hash values that include a key named `value` with a string value and an optional key `configuration` that is a complete and valid single XML element and its children.
 
-
-#### Examples
+#### Examples for opennms\_poller\_service
 
 Recipe [poller.rb](../test/fixtures/cookbooks/openms_resource_tests/recipes/poller.rb) contains several varying examples of poller service creation.
 Recipe [poller\_edit.rb](../test/fixtures/cookbooks/openms_resource_tests/recipes/poller_edit.rb) contains examples of editing services.

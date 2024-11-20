@@ -36,7 +36,6 @@ module Opennms
               )
               action :nothing
               delayed_action :create
-              notifies :restart, 'service[opennms]'
             end
           end
         end

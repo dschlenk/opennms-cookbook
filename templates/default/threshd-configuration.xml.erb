@@ -24,7 +24,6 @@
     <% end -%>
     <% unless package.services.nil? -%>
       <% package.services.each do |service| -%>
-        <% Chef::Log.warn("service: #{service}") -%>
       <service name=<%= service[:service_name].encode(:xml => :attr) %> interval=<%= service[:interval].to_s.encode(:xml => :attr) %><%= service[:user_defined].nil? ? '' : " user-defined=#{service[:user_defined].to_s.encode(:xml => :attr)}" %><%= service[:status].nil? ? '' : " status=#{service[:status].encode(:xml => :attr)}" %>>
         <% service[:parameters].each do |k, v| -%>
          <parameter key=<%= k.encode(:xml => :attr) %> value="<%= v.to_s.gsub("&", "&amp;").gsub("\"", "&quot;").gsub("<", "&lt;") %>"/>

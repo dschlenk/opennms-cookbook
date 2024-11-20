@@ -39,12 +39,11 @@ Manages an event in a file in `$OPENNMS_HOME/etc/events/`, including its presenc
 | `position`           |       | String        |           |          | `top` or `bottom` default `bottom`                                                 | relevant only for `:create`    |
 | `eventconf_position` |       | String        |           |          | `override`, `top`, or `bottom`                                                     | relevant only for `:create`    |
 
-
 The `uei` property is populated with the `name` property if not defined. It represents the text value of the `uei` element in the `event` element in `file`.
 
 The `file` property is the name of the file relative to `$OPENNMS_HOME/etc` that the managed event resides in.
 
-The `mask` property can be the string `*` or `!` or an array of hashes where each hash has either keys `mename` and `mevalue` or `vbnumber` and `vbvalue`. The string value `*` means "any" mask. If any event exists with matching `uei` in `file` of a resource with action `:create` and mask `*`, and `:update` of that event will occur. If more than one matching event exists in `file`, the first event in the file is updated. Use `!` with the `:update` action to remove the mask from the first instance of an event in `file` with the matching `uei`. 
+The `mask` property can be the string `*` or `!` or an array of hashes where each hash has either keys `mename` and `mevalue` or `vbnumber` and `vbvalue`. The string value `*` means "any" mask. If any event exists with matching `uei` in `file` of a resource with action `:create` and mask `*`, and `:update` of that event will occur. If more than one matching event exists in `file`, the first event in the file is updated. Use `!` with the `:update` action to remove the mask from the first instance of an event in `file` with the matching `uei`.
 To define a mask in `:create` or `:update`, use an array of hashes that contain key `mename` or `vbnumber` with a string value and `mevalue` or `vbvalue` with an array of string values. 'mename' indicates 'maskelement' while 'vbnumber' indicates 'varbind'.
 
 The `priority` property corresponds to the child element of the same name and must be a non-negative integer.
@@ -61,7 +60,7 @@ Property `logmsg_notify` can be `true` or `false`. `true` is implicit when not p
 
 Property `collection_group` can be `false` or an array of hashes that create a configuration for persisting measurements via SNMP trap. `false` removes an existing configuration from the event matching this resource's identity if it exists. When the value is an array, each item in the array must be a hash and it must contain key `rrd` with hash value consisting of key `rra` that is an array of strings that match pattern `RRA:(AVERAGE|MIN|MAX|LAST):.*`, `step` that is an integer; `name` with a string value; and `collections` which is an array of at least one hash containing key `name` with a string value. An example array that includes one of every possible option follows:
 
-```
+```ruby
 [
   {
     'name' => 'nodeGroup',
@@ -102,15 +101,15 @@ Property `mouseovertext` is a string stored with the event and was once displaye
 
 Property `alarm_data` defines the alarm configuration for instances of this event. Use `false` to remove existing config, or define with a hash that contains keys `reduction_key` (string), `alarm_type` (integer). May contain keys `update_fields` (array of hashes that include mandatory key `field_name` (string) and optional keys `update_on_reduction` (boolean), `value_expression` (string)), `clear_key` (string), `auto_clean` (boolean), `x733_alarm_type` (string), `x733_probable_cause` (int). A full example follows:
 
-```
+```ruby
 {
   'update_fields' => [{'field_name' => 'severity', 'update_on_reduction' => true}],
-  'managed_object_type' => 'snmp-interface-link', 
-  'reduction_key' => '%uei%:%dpname%:%nodeid%:%parm[#1]%', 
-  'alarm_type' => 2, 
-  'clear_key' => 'uei.opennms.org/raiseEvent:%dpname%:%nodeid%:%parm[#1]%, 
-  'auto_clean' => false, 
-  'x733_alarm_type' => 'CommunicationsAlarm', 
+  'managed_object_type' => 'snmp-interface-link',
+  'reduction_key' => '%uei%:%dpname%:%nodeid%:%parm[#1]%',
+  'alarm_type' => 2,
+  'clear_key' => 'uei.opennms.org/raiseEvent:%dpname%:%nodeid%:%parm[#1]%,
+  'auto_clean' => false,
+  'x733_alarm_type' => 'CommunicationsAlarm',
   'x733_probable_cause' => 12
 }
 ```
