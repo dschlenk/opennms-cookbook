@@ -16,6 +16,9 @@ jobs:
           name: bundler
           command: cinc exec bundle install
       - run:
+          name: mdl
+          command: mdl documentation/*.md
+      - run:
           name: cookstyle
           command: cookstyle
       - run:

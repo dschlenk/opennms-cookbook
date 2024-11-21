@@ -176,13 +176,6 @@ A few other recipes exist that aren't listed here. They are included by others w
 
 TODO: update and move the rest of these to individual files
 
-## opennms_snmp_config_definition
-
-
-As a general rule these custom resources support a single action: `create` and many of them behave more like `create_if_missing` does in other cookbooks. In other words, updating is generally not supported. Exceptions are noted. This behavior will change in future releases (generally whenever I encounter a use case for update of that resource IRL).
-
-The list of implemented custom resources is as follows:
-
 #### Users, Groups and Roles
 
 * `opennms_user`: add a user. Uses the REST API. Supports changes, but requires all parameters to be included, not just identity + things you want to change.
@@ -208,56 +201,12 @@ These custom resources use the OpenNMS REST interface. As such, OpenNMS has to b
 * `opennms_import_node_interface`: Add an interface to a node in a requisition.
 * `opennms_import_node_interface_service`: Add a service to an interface on a node in a requisition.
 
-#### Events
-
-* `opennms_eventconf`: adds an event-file element to events in etc/eventconf.xml.  Supports updating. By default assumes the file is a cookbook file, but set the `source` parameter to a URL to load the eventconf from somewhere else.
-* `opennms_event`: adds an event element to events in target eventconf file `file`. Not all elements from the eventconf schema are implemented, but the ones that seem to actually exist in the wild are. See resource for details and test recipes `event` and `threshold` for example usage. Supports updating and deleting existing events, so if you want to change an event in an eventconf file distributed with OpenNMS, this is the resource for you - no more merging files after an upgrade! For existing events you need to provide the file, UEI, the mask elements and the attribute(s) you want to change in your resource. If creating entirely new events, there are some attributes that are required by the eventconf schema but not enforced by the Chef resource (since they aren't required when doing an update). New in 18.2 is the ability to place new events at the top or bottom of an existing file with the 'position' attribute. Varbind filters are also now supported in masks.
-* `opennms_send_event`: creates an actual instance of an event using the `send-event.pl` script in `$ONMS_HOME/bin`. Used by the `send_events` recipe, which is included by `default` and `notemplates` recipes to cause config file reloads to take place when template resources make changes or an custom resource sends a notification.
-
 #### Notifications
 
 * `opennms_notification_command`: Create a new command in notificationCommands.xml.
 * `opennms_destination_path`: creates a destination path element in destinationPaths.xml. Requires at a minimum a single target which can be defined with the following custom resource.
 * `opennms_target`: Add a target or escalate target to a destination path (defined either in the default config or with the above custom resource).
 * `opennms_notification`: Create notification elements in notifications.xml.  Supports updating and deleting (action :delete).
-
-#### Node Service Credential Configuration
-
-These custom resources allow you to define the credentials necessary to connect to services on monitored nodes. These are some of the few that currently implement updating and deleting. Action `:create` will update if changes are detected but `:create_if_missing` will do nothing. To determine if a resource needs to be updated or deleted, existance is determined by all definition element attributes being equal (so all resource attributes except `ranges`, `specifics`, `ip_matches` and `position`).
-
-If an update occurs, the values contained in the new resource will be used. Note that all `range`, `specific` and `ip-match` elements that exist currently in the definition will be removed before the new elements are added.
-
-Currently implemented are: 
-
-* `opennms_snmp_config_definition`: add a definition element to snmp-config.xml.
-* `opennms_wmi_config_definition`: add a definition element to wmi-config.xml.
-
-#### Polling
-
-* `opennms_poller_package`: add a package to etc/poller-configuration.xml. Note that an instance of this resource without use of an accompanying `opennms_poller_service` resource will result in a failure to start opennms.
-* `opennms_poller_service`: add a service to poller package named `poller_name`. Supports updating and deleting.
-* `opennms_poll_outage`:  add a poll outage schedule that can be used by poller and collection package resources to prevent data collection and monitoring during set times.
-
-#### Data Collection
-
-* `opennms_resource_type`: adds a resourceType definition to a file in etc/datacollection and an include-collection element to the default snmp-collection. This custom resource supports a very limited form of updating - if the resource type already exists but isn't included in the default snmp-collection, an include-collection element will be added. The definition of the resource type won't be updated, however.
-* `opennms_system_def`: add or remove pre-existing groups (`/datacollection-group/group[@name]`) to or from pre-existing systemDefs (`/datacollection-group/systemDef/collect/includeGroup[text()]`) in $ONMS_HOME/etc/datacollection/*.xml.
-* `opennms_snmp_collection`: adds an snmp-collection element to etc/datacollection-config.xml.
-* `opennms_xml_collection`: adds an xml-collection element to etc/xml-datacollection-config.xml.
-* `opennms_wmi_collection`: adds a wmi-collection element to etc/wmi-datacollection-config.xml.
-* `opennms_jdbc_collection`: adds a jdbc-collection element to etc/jdbc-datacollection-config.xml.
-* `opennms_jmx_collection`: adds a jmx-collection element to etc/jmx-datacollection-config.xml.
-* `opennms_collection_package`: adds a package element to etc/collectd-configuration.xml.
-* `opennms_snmp_collection_service`: adds a service element to a package in etc/collectd-configuration.xml.
-* `opennms_xml_collection_service`: adds a service element to a package in etc/collectd-configuration.xml. Supports update & delete.
-* `opennms_wmi_collection_service`: adds a service element to a package in etc/collectd-configuration.xml.
-* `opennms_jdbc_collection_service`: adds a service element to a package in etc/collectd-configuration.xml. Supports update & delete.
-* `opennms_jmx_collection_service`: adds a service element to a package in etc/collectd-configuration.xml.
-* `opennms_snmp_collection_group`: adds an include-collection element to an snmp-collection in etc/datacollection-config.xml and drops off the specified file into etc/datacollection. Can pull file from remote URL. Supports deleting.
-* `opennms_jdbc_query`: adds a query element to a jdbc-collection in etc/jdbc-datacollection-config.xml.
-* `opennms_jmx_mbean`: adds a mbean element to a jmx-collection in etc/jmx-datacollection-config.xml.
-* `opennms_xml_source`: adds a xml-source element to a xml-collection in etc/xml-datacollection-config.xml. Supports deleting. Groups can be imported from files in the cookbook or a URL. 
-* `opennms_xml_group`: adds a xml-source element to a xml-source in etc/xml-datacollection-config.xml. Supports deleting.
 
 #### Statistics Reports
 
@@ -271,15 +220,6 @@ See `opennms::example_statsd` for example usage of these custom resources.
 * `opennms_collection_graph_file`: Add a cookbook file containing graph definitions (perhaps generated by the mib compiler) to $ONMS_HOME/etc/snmp-graph.properties.d/. Use the `source` parameter to load the file from a URL, otherwise assumes cookbook file.
 * `opennms_collection_graph`: Add a new graph definition to the main (bad idea), new or an existing graph file.
 * `opennms_response_graph`: Add a response graph to $ONMS_HOME/etc/response-graph.properties. Since there's a pretty well defined pattern to these, you can define these with just the name of the data source and it'll create a graph with min, max and average response times.
-
-#### Thresholds
-
-See examples for all of these custom resources are in a single recipe, `example_threshold`.
-
-* `opennms_threshd_package`: Create a new package in threshd-configuration.xml. Supports updating and deleting.
-* `opennms_threshold_group`: Create a new threshold group in thresholds.xml.
-* `opennms_threshold`: Create a new threshold in the specified group in thresholds.xml. Supports updating and deleting.
-* `opennms_expression`: Create a new expression threshold in the specified group in thresholds.xml. Supports updating and deleting.
 
 #### Web UI
 

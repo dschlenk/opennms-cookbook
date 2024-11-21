@@ -25,7 +25,7 @@ load_current_value do |new_resource|
                    end
   package = threshd_config.packages[new_resource.package_name]
   current_value_does_not_exist! if package.nil?
-  adapted_services = string_service_adapter(package.services)
+  adapted_services = string_service_adapter(package.services) 
   %i(filter specifics include_ranges exclude_ranges include_urls outage_calendars).each do |p|
     send(p, package.send(p))
   end
