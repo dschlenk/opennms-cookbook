@@ -8,7 +8,6 @@ opennms_user 'jimmy' do
   password_salt true
   roles %w(ROLE_ADMIN ROLE_ASSET_EDITOR ROLE_FILESYSTEM_EDITOR ROLE_DELEGATE ROLE_DEVICE_CONFIG_BACKUP ROLE_JMX ROLE_MINION ROLE_READONLY ROLE_USER ROLE_DASHBOARD ROLE_REST ROLE_RTC ROLE_MOBILE ROLE_FLOW_MANAGER ROLE_REPORT_DESIGNER ROLE_PROVISION)
   duty_schedules %w(Mo1-300 TuWe301-2359)
-  notifies :restart, 'service[opennms]'
 end
 
 # minimal - password is required
