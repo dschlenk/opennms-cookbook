@@ -6,7 +6,6 @@ opennms_user 'jimmy' do
   user_comments 'The Time'
   roles ['ROLE_ADMIN']
   duty_schedules []
-  notifies :restart, 'service[opennms]'
 end
 
 opennms_user 'jimmy' do
