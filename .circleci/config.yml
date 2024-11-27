@@ -6,7 +6,9 @@ jobs:
       image: ubuntu-2404:current
     steps:
       - checkout
-      - docker login -u $DOCKER_USER -p $DOCKER_PASS
+      - run:
+          name: docker login
+          command: docker login -u $DOCKER_USER -p $DOCKER_PASS
       - run:
           name: install cinc workstation
           command: curl -L https://omnitruck.cinc.sh/install.sh | sudo bash -s -- -P cinc-workstation -v 24
