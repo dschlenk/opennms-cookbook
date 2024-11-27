@@ -4,8 +4,6 @@ driver:
   privileged: true
   chef_image: cincproject/cinc
   chef_version: 18
-  volumes:
-    - /var/cache/test-kitchen-dnf:/var/cache/dnf
 
 transport:
   name: dokken
@@ -16,8 +14,6 @@ provisioner:
   download_url: https://omnitruck.cinc.sh/install.sh
   chef_binary: /opt/cinc/bin/cinc-client
   chef_license: accept-no-persist # until https://github.com/test-kitchen/test-kitchen/pull/1984
-  log_level: <%= ENV['KITCHEN_LOG_LEVEL'] || 'info' %>
-  clean_dokken_sandbox: <%= ENV['CLEAN_DOCKEN_SANDBOX'] || 'true' %>
   attributes:
     opennms:
       conf:
@@ -25,11 +21,6 @@ provisioner:
           START_TIMEOUT: 60
       postgresql:
         user_vault: creds
-    yum:
-      opennms-stable-common:
-        baseurl: <%= ENV['OPENNMS_STABLE_COMMON'] || 'http://yum.opennms.org/stable/common' %>
-      opennms-stable-rhel9:
-        baseurl: <%= ENV['OPENNMS_STABLE_RHEL9'] || 'http://yum.opennms.org/stable/rhel9' %>
 
 verifier:
   name: inspec
