@@ -21,6 +21,11 @@ provisioner:
           START_TIMEOUT: 60
       postgresql:
         user_vault: creds
+    yum:
+      opennms-stable-common:
+        baseurl: <%= ENV['OPENNMS_STABLE_COMMON'] || 'http://yum.opennms.org/stable/common' %>
+      opennms-stable-rhel9:
+        baseurl: <%= ENV['OPENNMS_STABLE_RHEL9'] || 'http://yum.opennms.org/stable/rhel9' %>
 
 verifier:
   name: inspec
