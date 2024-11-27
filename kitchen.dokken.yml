@@ -83,13 +83,6 @@ suites:
       opennms:
         upgrade: false
   - name: default
-  - name: mkimage
-    provisioner:
-      policyfile: policyfiles/mkimage.rb
-    lifecycle:
-      post_verify:
-        - docker tag $(docker image list | grep mkimage | tr -s ' ' | cut -d ' ' -f 3) c1og/opennms-33-oraclelinux-9:latest
-        - docker push c1og/opennms-33-oraclelinux-9:latest
   - name: plugins
     attributes:
       opennms:
