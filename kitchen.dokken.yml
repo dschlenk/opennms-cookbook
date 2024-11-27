@@ -4,6 +4,8 @@ driver:
   privileged: true
   chef_image: cincproject/cinc
   chef_version: 18
+  volumes:
+    - /var/cache/test-kitchen-dnf:/var/cache/dnf
 
 transport:
   name: dokken
@@ -15,6 +17,7 @@ provisioner:
   chef_binary: /opt/cinc/bin/cinc-client
   chef_license: accept-no-persist # until https://github.com/test-kitchen/test-kitchen/pull/1984
     # log_level: debug
+  clean_dokken_sandbox: false
   attributes:
     opennms:
       conf:
@@ -34,15 +37,19 @@ verifier:
 platforms:
   - name: oraclelinux-9
     driver:
-      image: dokken/oraclelinux-9
+      image: c1og/opennms-33-oraclelinux-9
       pid_one_command: /usr/lib/systemd/systemd
 
 suites:
   - name: recommended
+    driver:
+      ports:
+        - 1234:8980/tcp
     verifier:
       inspec_tests:
         - path: test/integration/default
         - path: test/integration/recommended
+        - path: test/integration/user
     attributes:
       opennms:
         rrdtool:
@@ -76,6 +83,13 @@ suites:
       opennms:
         upgrade: false
   - name: default
+  - name: mkimage
+    provisioner:
+      policyfile: policyfiles/mkimage.rb
+    lifecycle:
+      post_verify:
+        - docker tag $(docker image list | grep mkimage | tr -s ' ' | cut -d ' ' -f 3) c1og/opennms-33-oraclelinux-9:latest
+        - docker push c1og/opennms-33-oraclelinux-9:latest
   - name: plugins
     attributes:
       opennms:
@@ -386,6 +400,55 @@ suites:
       inspec_tests:
         - path: test/integration/default
         - path: test/integration/event_severity
+  - name: expression
+    provisioner:
+      policyfile: policyfiles/expression.rb
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/expression
+  - name: expression_change_descr
+    provisioner:
+      policyfile: policyfiles/expression_change_descr.rb
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/expression_change_descr
+  - name: expression_change_rearm
+    provisioner:
+      policyfile: policyfiles/expression_change_rearm.rb
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/expression_change_rearm
+  - name: expression_change_relaxed
+    provisioner:
+      policyfile: policyfiles/expression_change_relaxed.rb
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/expression_change_relaxed
+  - name: expression_change_trigger
+    provisioner:
+      policyfile: policyfiles/expression_change_trigger.rb
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/expression_change_trigger
+  - name: expression_change_value
+    provisioner:
+      policyfile: policyfiles/expression_change_value.rb
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/expression_change_value
+  - name: expression_delete
+    provisioner:
+      policyfile: policyfiles/expression_delete.rb
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/expression_delete
   - name: jdbc_collection
     provisioner:
       policyfile: policyfiles/jdbc_collection.rb
@@ -498,6 +561,16 @@ suites:
       inspec_tests:
         - path: test/integration/default
         - path: test/integration/resource_type
+  - name: send_event
+    driver:
+      ports:
+        - 1236:8980/tcp
+    provisioner:
+      policyfile: policyfiles/send_event.rb
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/send_event
   - name: snmp_collection
     provisioner:
       policyfile: policyfiles/snmp_collection.rb
@@ -603,6 +676,96 @@ suites:
       inspec_tests:
         - path: test/integration/default
         - path: test/integration/threshd_service
+  - name: threshold
+    provisioner:
+      policyfile: policyfiles/threshold.rb
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/threshold
+  - name: threshold_change_descr
+    provisioner:
+      policyfile: policyfiles/threshold_change_descr.rb
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/threshold_change_descr
+  - name: threshold_change_dslabel
+    provisioner:
+      policyfile: policyfiles/threshold_change_dslabel.rb
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/threshold_change_dslabel
+  - name: threshold_change_rearmeduei
+    provisioner:
+      policyfile: policyfiles/threshold_change_rearmeduei.rb
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/threshold_change_rearmeduei
+  - name: threshold_change_rearm
+    provisioner:
+      policyfile: policyfiles/threshold_change_rearm.rb
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/threshold_change_rearm
+  - name: threshold_change_triggereduei
+    provisioner:
+      policyfile: policyfiles/threshold_change_triggereduei.rb
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/threshold_change_triggereduei
+  - name: threshold_change_trigger
+    provisioner:
+      policyfile: policyfiles/threshold_change_trigger.rb
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/threshold_change_trigger
+  - name: threshold_change_value
+    provisioner:
+      policyfile: policyfiles/threshold_change_value.rb
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/threshold_change_value
+  - name: threshold_common
+    provisioner:
+      policyfile: policyfiles/threshold_common.rb
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/threshold_common
+  - name: threshold_delete
+    provisioner:
+      policyfile: policyfiles/threshold_delete.rb
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/threshold_delete
+  - name: user
+    provisioner:
+      policyfile: policyfiles/user.rb
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/user
+    driver:
+      ports:
+        - 1234:8980/tcp
+  - name: user_mod
+    provisioner:
+      policyfile: policyfiles/user_mod.rb
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/user_mod
+    driver:
+      ports:
+        - 1235:8980/tcp
   - name: wsman_collection
     provisioner:
       policyfile: policyfiles/wsman_collection.rb

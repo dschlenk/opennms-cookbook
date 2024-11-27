@@ -753,7 +753,7 @@ See [xml\_group.rb](../test/fixtures/cookbooks/opennms_resource_tests/recipes/xm
 
 ### opennms\_threshd\_package
 
-Manages a `package` in `threshd-configuration.xml`.
+Manages a `package` in `threshd-configuration.xml`, including its service(s). If you'd rather manage the service(s) with an independent resource, see the `opennms_threshd_service` resource below.
 
 #### Actions for opennms\_threshd\_package
 
@@ -779,11 +779,11 @@ Manages a `package` in `threshd-configuration.xml`.
 
 #### Examples for opennms\_threshd\_package
 
-See [threshold\_package.rb](../test/fixtures/cookbooks/opennms_resource_tests/recipes/threshold_package.rb).
+See [threshd\_package.rb](../test/fixtures/cookbooks/opennms_resource_tests/recipes/threshd_package.rb).
 
 ### opennms\_threshd\_service
 
-Manages a `service` in a `package` in `threshd-configuration.xml`.
+Manages a `service` in a `package` in `threshd-configuration.xml`. This resource lets you manage one of a package's services with an independent custom resource in contrast with the `services` property of the `opennms_threshd_package` custom resource.
 
 #### Actions for opennms\_threshd\_service
 
@@ -804,4 +804,105 @@ Manages a `service` in a `package` in `threshd-configuration.xml`.
 
 #### Examples for opennms\_threshd\_service
 
-See [threshold\_service.rb](../test/fixtures/cookbooks/opennms_resource_tests/recipes/threshold_service.rb).
+See [threshd\_service.rb](../test/fixtures/cookbooks/opennms_resource_tests/recipes/threshd_service.rb).
+
+### opennms\_threshold\_group
+
+Manages the group elements for threshold and expression rules in `thresholds.xml`.
+
+#### Actions for opennms\_threshold\_group
+
+* `:create` - Default. Adds or updates a `group` element in the file with the name matching the `group_name` property.
+* `:update` - Modify an existing `group` element. Raises an error if the group does not exist.
+* `:delete` - Remove an existing `group` element and its children if it exists.
+
+#### Properties for opennms\_threshold\_group
+
+| Name             | Name? | Type   | Validation / Usage Notes                                     |
+| ---------------- | ----- | ------ | ------------------------------------------------------------ |
+| `group_name`     |   ✓   | String |                                                              |
+| `rrd_repository` |       | String | defaults to `$OPENNMS_HOME/share/rrd/snmp` for new resources |
+
+#### Examples for opennms\_threshold\_group
+
+See [threshold\_common.rb](../test/fixtures/cookbooks/opennms_resource_tests/recipes/threshold_common.rb).
+
+### opennms\_threshold
+
+Manages `threshold` rules in `thresholds.xml`.
+
+#### Actions for opennms\_threshold
+
+* `:create` - Default. Adds or updates a `threshold` element in the group named `group`.
+* `:create_if_missing` - Adds a `threshold` element in the group named `group` if it does not exist.
+* `:update` - Modify an existing `threshold` element. Raises an error if `group` or the threshold rule does not exist.
+* `:delete` - Remove an existing `threshold` element from `group` (and any children) if it exists.
+
+#### Properties for opennms\_threshold
+
+| Name               | Name? | Identity? | Type              | Validation / Usage Notes                                                         |
+| ------------------ | ----- | --------- | ----------------- | -------------------------------------------------------------------------------- |
+| `ds_name`          |   ✓   |    ✓      | String            |                                                                                  |
+| `group`            |       |    ✓      | String            |                                                                                  |
+| `type`             |       |    ✓      | String            |                                                                                  |
+| `ds_type`          |       |    ✓      | String            |                                                                                  |
+| `filter_operator`  |       |    ✓      | String            | must match <code>/([Oo][Rr])&#124;([Aa][Nn][Dd])/</code>                         |
+| `resource_filters` |       |    ✓      | Array             |                                                                                  |
+| `description`      |       |           | String            |                                                                                  |
+| `ds_label`         |       |           | String            |                                                                                  |
+| `value`            |       |           | [Float, String]   | when String, must match <code>/[-+]?[0-9]&#42;\.?[0-9]+([eE][-+]?[0-9]+)?&#124;\$\{(.+:.+)\}</code>/ |
+| `rearm`            |       |           | [Float, String]   | when String, must match <code>/[-+]?[0-9]&#42;\.?[0-9]+([eE][-+]?[0-9]+)?&#124;\$\{(.+:.+)\}</code>/ |
+| `trigger`          |       |           | [Integer, String] | when String, must match <code>/[0-9]&#42;[1-9][0-9]&#42;&#124;\$\{(.+:.+)\}/</code>                      |
+| `triggered_uei`    |       |           | String            |                                                                                  |
+| `rearmed_uei`      |       |           | String            |                                                                                  |
+
+#### Examples for opennms\_threshold
+
+* [threshold.rb](../test/fixtures/cookbooks/opennms_resource_tests/recipes/threshold.rb)
+* [threshold\_delete.rb](../test/fixtures/cookbooks/opennms_resource_tests/recipes/threshold_delete.rb)
+* [threshold\_change\_descr.rb](../test/fixtures/cookbooks/opennms_resource_tests/recipes/threshold_change_descr.rb)
+* [threshold\_change\_dslabel.rb](../test/fixtures/cookbooks/opennms_resource_tests/recipes/threshold_change_dslabel.rb)
+* [threshold\_change\_rearmeduei.rb](../test/fixtures/cookbooks/opennms_resource_tests/recipes/threshold_change_rearmeduei.rb)
+* [threshold\_change\_rearm.rb](../test/fixtures/cookbooks/opennms_resource_tests/recipes/threshold_change_rearm.rb)
+* [threshold\_change\_triggereduei.rb](../test/fixtures/cookbooks/opennms_resource_tests/recipes/threshold_change_triggereduei.rb)
+* [threshold\_change\_trigger.rb](../test/fixtures/cookbooks/opennms_resource_tests/recipes/threshold_change_trigger.rb)
+* [threshold\_change\_value.rb](../test/fixtures/cookbooks/opennms_resource_tests/recipes/threshold_change_value.rb)
+
+### opennms\_expression
+
+Manages `expression` rules in `thresholds.xml`.
+
+#### Actions for opennms\_expression
+
+* `:create` - Default. Adds or updates a `expression` element in the group named `group`.
+* `:create_if_missing` - Adds a `expression` element in the group named `group` if it does not exist.
+* `:update` - Modify an existing `expression` element. Raises an error if `group` or the expression rule does not exist.
+* `:delete` - Remove an existing `expression` element from `group` (and any children) if it exists.
+
+#### Properties for opennms\_expression
+
+| Name               | Name? | Identity? | Type              | Validation / Usage Notes                                                         |
+| ------------------ | ----- | --------- | ----------------- | -------------------------------------------------------------------------------- |
+| `expression`       |   ✓   |    ✓      | String            |                                                                                  |
+| `group`            |       |    ✓      | String            |                                                                                  |
+| `type`             |       |    ✓      | String            |                                                                                  |
+| `ds_type`          |       |    ✓      | String            |                                                                                  |
+| `filter_operator`  |       |    ✓      | String            | must match <code>/([Oo][Rr])&#124;([Aa][Nn][Dd])/</code>                         |
+| `resource_filters` |       |    ✓      | Array             |                                                                                  |
+| `description`      |       |           | String            |                                                                                  |
+| `ds_label`         |       |           | String            |                                                                                  |
+| `value`            |       |           | [Float, String]   | when String, must match <code>/[-+]?[0-9]&#42;\.?[0-9]+([eE][-+]?[0-9]+)?&#124;\$\{(.+:.+)\}</code>/ |
+| `rearm`            |       |           | [Float, String]   | when String, must match <code>/[-+]?[0-9]&#42;\.?[0-9]+([eE][-+]?[0-9]+)?&#124;\$\{(.+:.+)\}</code>/ |
+| `trigger`          |       |           | [Integer, String] | when String, must match  <code>/[0-9]&#42;[1-9][0-9]&#42;&#124;\$\{(.+:.+)\}/</code> |
+| `triggered_uei`    |       |           | String            |                                                                                  |
+| `rearmed_uei`      |       |           | String            |                                                                                  |
+
+#### Examples for opennms\_expression
+
+* [expression.rb](../test/fixtures/cookbooks/opennms_resource_tests/recipes/expression.rb)
+* [expression\_delete.rb](../test/fixtures/cookbooks/opennms_resource_tests/recipes/expression_delete.rb)
+* [expression\_change\_descr.rb](../test/fixtures/cookbooks/opennms_resource_tests/recipes/expression_change_descr.rb)
+* [expression\_change\_relaxed.rb](../test/fixtures/cookbooks/opennms_resource_tests/recipes/expression_change_relaxed.rb)
+* [expression\_change\_rearm.rb](../test/fixtures/cookbooks/opennms_resource_tests/recipes/expression_change_rearm.rb)
+* [expression\_change\_trigger.rb](../test/fixtures/cookbooks/opennms_resource_tests/recipes/expression_change_trigger.rb)
+* [expression\_change\_value.rb](../test/fixtures/cookbooks/opennms_resource_tests/recipes/expression_change_value.rb)

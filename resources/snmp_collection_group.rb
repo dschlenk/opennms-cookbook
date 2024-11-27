@@ -94,11 +94,6 @@ action :update do
 end
 
 action :delete do
-  unless new_resource.file.nil?
-    declare_resource(:file, "#{onms_etc}/datacollection/#{new_resource.file}") do
-      action :delete
-    end
-  end
   snmp_resource_init
   collection = snmp_resource.variables[:collections][new_resource.collection_name]
   gn = new_resource.group_name
@@ -106,6 +101,13 @@ action :delete do
   unless group.nil?
     converge_by("Removing #{gn}") do
       collection.include_collections.delete_if { |ic| ic[:data_collection_group].eql?(gn) }
+    end
+  end
+  unless new_resource.file.nil?
+    declare_resource(:file, "#{onms_etc}/datacollection/#{new_resource.file}") do
+      action :nothing
+      delayed_action :delete
+      notifies :create, "template[#{onms_etc}/datacollection-config.xml]", :immediately
     end
   end
 end

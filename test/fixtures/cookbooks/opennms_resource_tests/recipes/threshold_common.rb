@@ -2,7 +2,7 @@
 # need to turn on thresholding on ICMP service first
 opennms_poller_service 'ICMP' do
   package_name 'example1'
-  parameters 'rrd-repository' => '/opt/opennms/share/rrd/response', 'rrd-base-name' => 'icmp', 'ds-name' => 'icmp', 'thresholding-enabled' => 'true'
+  parameters 'rrd-repository' => { 'value' => '/opt/opennms/share/rrd/response' }, 'rrd-base-name' => { 'value' => 'icmp' }, 'ds-name' => { 'value' => 'icmp' }, 'thresholding-enabled' => { 'value' => 'true' }
   status 'on'
   timeout 3000
   class_name 'org.opennms.netmgt.poller.monitors.IcmpMonitor'
@@ -44,4 +44,12 @@ opennms_event 'uei.opennms.org/thresholdTest/testThresholdRearmed' do
   logmsg_notify true
   severity 'Normal'
   notifies :run, 'opennms_send_event[restart_Eventd]'
+end
+
+opennms_threshold_group 'mib2' do
+  rrd_repository '/var/opennms/rrd/snmp'
+end
+
+opennms_threshold_group 'hrstorage' do
+  action :delete
 end

@@ -4,15 +4,18 @@ include_recipe 'opennms_resource_tests::user'
 opennms_user 'jimmy' do
   full_name 'Jimmy Jam'
   user_comments 'The Time'
-  password 'gU2wmSW7k9v1xg4/MrAsaI+VyddBAhJJt4zPX5SGG0BK+qiASGnJsqM8JOug/aEL'
-  password_salt true
+  roles ['ROLE_ADMIN']
+  duty_schedules []
   notifies :restart, 'service[opennms]'
 end
 
-# give the admin role to johnny (should replace ROLE_USER)
-# NOTE: unlike some other resources, you need to provide all the details you want preserved in resources that result in changes
-# as we send a POST to the API, not a PUT.
+opennms_user 'jimmy' do
+  password 'one2three4'
+  password_salt true
+  action :set_password
+end
+
+# delete johnny
 opennms_user 'johnny' do
-  password '6D639656F5EAC2E799D32870DD86046D'
-  roles ['ROLE_ADMIN']
+  action :delete
 end

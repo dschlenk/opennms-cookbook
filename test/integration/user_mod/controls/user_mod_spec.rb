@@ -1,29 +1,19 @@
 control 'user_mod' do
-  describe opennms_user('jimmy') do
-    let(:node) { json('/tmp/kitchen/dna.json').params }
-    # roles didn't exist until 19 but also that was a long time ago so just skip testing releases prior to 19
-    before do
-      puts "version is #{node['opennms']['version']}"
-      skip if node['opennms']['version'].to_i < 19
-    end
-
+  describe opennms_user('jimmy', 1235) do
     it { should exist }
     its('full_name') { should eq 'Jimmy Jam' }
     its('user_comments') { should eq 'The Time' }
-    its('password') { should eq 'gU2wmSW7k9v1xg4/MrAsaI+VyddBAhJJt4zPX5SGG0BK+qiASGnJsqM8JOug/aEL' }
-    its('password_salt') { should eq true }
-    its('roles') { should eq ['ROLE_USER'] }
+    its('roles') { should eq ['ROLE_ADMIN'] }
+    its('email') { should eq 'person@example.com' }
+    its('duty_schedules') { should eq [] }
   end
 
-  # minimal
-  describe opennms_user('johnny') do
-    let(:node) { json('/tmp/kitchen/dna.json').params }
-    # roles didn't exist until 19 but also that was a long time ago so just skip testing releases prior to 19
-    before do
-      skip if node['opennms']['version'].to_i < 19
-    end
+  # retrieve data using changed password
+  describe http('http://127.0.0.1:8980/opennms/rest/users/jimmy', auth: { user: 'jimmy', pass: 'one2three4' }, headers: { 'Accept' => 'application/json' }) do
+    its('status') { should cmp 200 }
+  end
 
-    it { should exist }
-    its('roles') { should eq ['ROLE_ADMIN'] }
+  describe opennms_user('johnny', 1235) do
+    it { should_not exist }
   end
 end

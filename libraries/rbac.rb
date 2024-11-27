@@ -17,7 +17,7 @@ module Opennms::Rbac
   end
 
   def default_admin_password?
-    Chef::Log.warn 'Checking to see if the admin user has the default password'
+    Chef::Log.info 'Checking to see if the admin user has the default password'
     if ::File.exist?("#{node['opennms']['conf']['home']}/etc/users.xml")
       file = ::File.new("#{node['opennms']['conf']['home']}/etc/users.xml", 'r')
       doc = REXML::Document.new file
@@ -25,13 +25,31 @@ module Opennms::Rbac
       doc.each_element("/userinfo/users/user[user-id/text()[contains(., 'admin')]]") do |el|
         # find the user with user-id that is exactly 'admin'
         next unless el.elements['user-id'].texts.join('').strip == 'admin'
-        Chef::Log.warn('true') if el.elements['password'].texts.join('').strip == 'gU2wmSW7k9v1xg4/MrAsaI+VyddBAhJJt4zPX5SGG0BK+qiASGnJsqM8JOug/aEL'
+        Chef::Log.info('true') if el.elements['password'].texts.join('').strip == 'gU2wmSW7k9v1xg4/MrAsaI+VyddBAhJJt4zPX5SGG0BK+qiASGnJsqM8JOug/aEL'
         return el.elements['password'].texts.join('').strip == 'gU2wmSW7k9v1xg4/MrAsaI+VyddBAhJJt4zPX5SGG0BK+qiASGnJsqM8JOug/aEL'
       end
       # I guess if there's no admin user they aren't using the default password
       Chef::Log.warn('No admin user found. This is not recommended!')
     end
     false # opennms not even installed yet, we have *no* admin password
+  end
+
+  def get_user(user_id)
+    begin
+      response = RestClient.get "#{baseurl}/users/#{user_id}", accept: :json, 'Accept-Encoding' => 'identity'
+      JSON.parse(response.to_s)
+    rescue
+      nil
+    end
+  end
+
+  def get_xml_user(user_id)
+    begin
+      response = RestClient.get "#{baseurl}/users/#{user_id}", accept: :xml, 'Accept-Encoding' => 'identity'
+      REXML::Document.new(response.to_s)
+    rescue
+      nil
+    end
   end
 
   def user_exists?(user)
@@ -79,10 +97,38 @@ module Opennms::Rbac
   end
 
   def change_admin_password(old_pw, new_pw)
-    Chef::Log.warn("Changing admin password to #{new_pw} with #{old_pw}")
     RestClient.put "#{baseurl(old_pw)}/users/admin?hashPassword=true", { 'password': new_pw }
     @admin_password = new_pw
     FileUtils.touch "#{node['opennms']['conf']['home']}/etc/users.xml"
+  end
+
+  def update_user(user)
+    user_id = user.elements['/user/user-id'].text
+    email_el = user.root.delete_element('email')
+    Chef::Log.warn("updating user: #{user} ")
+    RestClient.post("#{baseurl}/users", user.to_s, content_type: :xml)
+    unless email_el.nil?
+      Chef::Log.warn("updating email for #{user_id} to #{email_el.text}")
+      RestClient.put("#{baseurl}/users/#{user_id}", { 'email' => email_el.text })
+    end
+    FileUtils.touch("#{node['opennms']['conf']['home']}/etc/users.xml")
+  end
+
+  def update_password(user_id, password_data)
+    RestClient.put("#{baseurl}/users/#{user_id}#{password_data['passwordSalt'] ? '?hashPassword=true' : ''}",
+                   { 'password': password_data['password'] })
+  end
+
+  def delete_user(user_id)
+    RestClient.delete("#{baseurl}/users/#{user_id}")
+  end
+
+  def update_field(root, object, field_name, element_name)
+    if root.elements[element_name].nil?
+      root.add_element(element_name).text = object.send(field_name)
+    else
+      root.elements[element_name].text = object.send(field_name)
+    end
   end
 
   def add_user(new_resource)
@@ -103,10 +149,6 @@ module Opennms::Rbac
       pw_el = user_el.add_element 'password'
       pw_el.add_text new_resource.password
     end
-    if new_resource.password_salt
-      pws_el = user_el.add_element 'passwordSalt'
-      pws_el.add_text 'true'
-    end
     unless new_resource.roles.nil?
       new_resource.roles.each do |r|
         r_el = user_el.add_element 'role'
@@ -121,10 +163,14 @@ module Opennms::Rbac
     end
     begin
       tries ||= 6
-      RestClient.post "#{baseurl}/users", cu.to_s, content_type: :xml
+      RestClient.post "#{baseurl}/users#{new_resource.password_salt ? '?hashPassword=true' : ''}", cu.to_s, content_type: :xml
+      # you can't specify contact info with POST but you can update email contact info ONLY with PUT
+      unless new_resource.email.nil?
+        RestClient.put("#{baseurl}/users/#{new_resource.user_id}", { 'email' => new_resource.email })
+      end
       FileUtils.touch "#{node['opennms']['conf']['home']}/etc/users.xml"
     rescue => e
-      Chef::Log.debug("Retrying user add/update for #{new_resource.name}.")
+      Chef::Log.debug("Retrying user add/update for #{new_resource.user_id}.")
       sleep(30)
       retry if (tries -= 1) > 0
       raise e
@@ -244,7 +290,10 @@ module Opennms::Rbac
   end
 
   def baseurl(pw = nil)
-    "http://admin:#{pw || @admin_password}@localhost:#{node['opennms']['properties']['jetty']['port']}/opennms/rest"
+    if pw.nil? && @admin_password.nil?
+      @admin_password = admin_secret_from_vault('password')
+    end
+    "http://admin:#{pw || @admin_password || 'admin'}@localhost:#{node['opennms']['properties']['jetty']['port']}/opennms/rest"
   end
 end
 

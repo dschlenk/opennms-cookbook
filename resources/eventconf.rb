@@ -67,9 +67,11 @@ action :create do
 end
 
 action :delete do
-  file "#{node['opennms']['conf']['home']}/etc/events/#{new_resource.event_file}" do
-    action :delete
-  end
   eventconf_resource_init
   eventconf_resource.variables[:eventconf].event_files.delete(new_resource.event_file)
+  file "#{node['opennms']['conf']['home']}/etc/events/#{new_resource.event_file}" do
+    action :nothing
+    delayed_action :delete
+    notifies :create, "template[#{node['opennms']['conf']['home']}/etc/eventconf.xml]", :immediately
+  end
 end

@@ -45,9 +45,11 @@ action :create do
 end
 
 action :delete do
-  file "#{onms_etc}/syslog/#{new_resource.filename}" do
-    action :delete
-  end
   syslog_resource_init
   syslog_resource.variables[:config].files.delete("syslog/#{new_resource.filename}")
+  declare_resource(:file, "#{onms_etc}/syslog/#{new_resource.filename}") do
+    action :nothing
+    delayed_action :delete
+    notifies :create, "template[#{onms_etc}/syslogd-configuration.xml]", :immediately
+  end
 end

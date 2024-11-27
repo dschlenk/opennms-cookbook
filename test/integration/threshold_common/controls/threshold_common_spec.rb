@@ -1,8 +1,7 @@
-# frozen_string_literal: true
 control 'threshold_common' do
   describe poller_service('ICMP', 'example1') do
     it { should exist }
-    its('parameters') { should eq 'rrd-repository' => '/opt/opennms/share/rrd/response', 'rrd-base-name' => 'icmp', 'ds-name' => 'icmp', 'thresholding-enabled' => 'true' }
+    its('parameters') { should eq 'rrd-repository' => { 'value' => '/opt/opennms/share/rrd/response' }, 'rrd-base-name' => { 'value' => 'icmp' }, 'ds-name' => { 'value' => 'icmp' }, 'thresholding-enabled' => { 'value' => 'true' } }
     its('status') { should eq 'on' }
     its('time_out') { should eq 3000 }
     its('class_name') { should eq 'org.opennms.netmgt.poller.monitors.IcmpMonitor' }
@@ -41,5 +40,14 @@ control 'threshold_common' do
     its('logmsg_dest') { should eq 'logndisplay' }
     its('logmsg_notify') { should eq true }
     its('severity') { should eq 'Normal' }
+  end
+
+  describe threshold_group('mib2') do
+    it { should exist }
+    its('rrd_repository') { should eq '/var/opennms/rrd/snmp' }
+  end
+
+  describe threshold_group('hrstorage') do
+    it { should_not exist }
   end
 end

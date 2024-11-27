@@ -1,7 +1,15 @@
 module Opennms
   module XmlHelper
+    def onms_home
+      "#{node['opennms']['conf']['home']}"
+    end
+
     def onms_etc
-      "#{node['opennms']['conf']['home']}/etc"
+      "#{onms_home}/etc"
+    end
+
+    def onms_share
+      "#{onms_home}/share"
     end
 
     def xmldoc_from_file(file)
