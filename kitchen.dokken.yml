@@ -448,6 +448,9 @@ suites:
         - path: test/integration/default
         - path: test/integration/expression_delete
   - name: foreign_source
+    driver:
+      ports:
+        - 1237:8980/tcp
     provisioner:
       policyfile: policyfiles/foreign_source.rb
     verifier:

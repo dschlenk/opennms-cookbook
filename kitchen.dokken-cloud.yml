@@ -39,6 +39,7 @@ platforms:
 suites:
   - name: recommended
     driver:
+      image: dokken/oraclelinux-9
       ports:
         - 1234:8980/tcp
     verifier:
@@ -58,6 +59,8 @@ suites:
             vault: creds
 
   - name: upgrade
+    driver:
+      image: dokken/oraclelinux-9
     provisioner:
       policyfile: policyfiles/upgrade.rb
       multiple_converge: 2
@@ -69,6 +72,8 @@ suites:
       opennms:
         upgrade: true
   - name: no_upgrade
+    driver:
+      image: dokken/oraclelinux-9
     provisioner:
       policyfile: policyfiles/upgrade.rb
       multiple_converge: 2
@@ -438,6 +443,16 @@ suites:
       inspec_tests:
         - path: test/integration/default
         - path: test/integration/expression_delete
+  - name: foreign_source
+    driver:
+      ports:
+        - 1237:8980/tcp
+    provisioner:
+      policyfile: policyfiles/foreign_source.rb
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/foreign_source
   - name: jdbc_collection
     provisioner:
       policyfile: policyfiles/jdbc_collection.rb
