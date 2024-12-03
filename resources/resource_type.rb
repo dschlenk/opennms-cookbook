@@ -11,6 +11,8 @@ property :group_name, String, identity: true, callbacks: {
     !''.eql?(p) && !p.start_with?('.') && !p.start_with?('/')
   },
 }
+# to create/update a resource type in a group and the name of the file differs from the name of the group, use both `group_name` and `group_file_name` for best results
+property :group_file_name, String, identity: true
 # ignored when `group_name` is set; otherwise used as the name of the file in which to manage the resource type under `$OPENNMS_HOME/etc/resource-types.d/`
 property :file_name, String, identity: true, callbacks: {
   'should not be the empty string or start with a \'\.\' or \'\/\' character' => lambda { |p|
@@ -48,7 +50,8 @@ load_current_value do |new_resource|
   if new_resource.group_name.nil? && !new_resource.file_name.nil?
     file = "#{onms_etc}/resource-types.d/#{new_resource.file_name}"
   elsif !new_resource.group_name.nil?
-    file = "#{onms_etc}/datacollection/#{new_resource.group_name}.xml"
+    gfn = new_resource.group_file_name.nil? ? "#{new_resource.group_name}.xml" : new_resource.group_file_name
+    file = "#{onms_etc}/datacollection/#{gfn}"
   end
   raise Chef::Exceptions::ValidationFailed, 'Either `group_name` or `file_name` must be defined in `opennms_resource_type`' if file.nil?
   current_value_does_not_exist! unless ::File.exist?(file)
@@ -91,7 +94,8 @@ action :create do
     if new_resource.group_name.nil? && !new_resource.file_name.nil?
       file = "#{onms_etc}/resource-types.d/#{new_resource.file_name}"
     elsif !new_resource.group_name.nil?
-      file = "#{onms_etc}/datacollection/#{new_resource.group_name}.xml"
+      gfn = new_resource.group_file_name.nil? ? "#{new_resource.group_name}.xml" : new_resource.group_file_name
+      file = "#{onms_etc}/datacollection/#{gfn}"
     end
     if !new_resource.group_name.nil?
       rtgroup_resource_init(file, new_resource.group_name)
@@ -124,7 +128,8 @@ action :update do
     if new_resource.group_name.nil? && !new_resource.file_name.nil?
       file = "#{onms_etc}/resource-types.d/#{new_resource.file_name}"
     elsif !new_resource.group_name.nil?
-      file = "#{onms_etc}/datacollection/#{new_resource.group_name}.xml"
+      gfn = new_resource.group_file_name.nil? ? "#{new_resource.group_name}.xml" : new_resource.group_file_name
+      file = "#{onms_etc}/datacollection/#{gfn}"
     end
     if !new_resource.group_name.nil?
       rtgroup_resource_init(file, new_resource.group_name)
@@ -143,7 +148,8 @@ action :delete do
   if new_resource.group_name.nil? && !new_resource.file_name.nil?
     file = "#{onms_etc}/resource-types.d/#{new_resource.file_name}"
   elsif !new_resource.group_name.nil?
-    file = "#{onms_etc}/datacollection/#{new_resource.group_name}.xml"
+    gfn = new_resource.group_file_name.nil? ? "#{new_resource.group_name}.xml" : new_resource.group_file_name
+    file = "#{onms_etc}/datacollection/#{gfn}"
   end
   if !new_resource.group_name.nil?
     rtgroup_resource_init(file, new_resource.group_name)

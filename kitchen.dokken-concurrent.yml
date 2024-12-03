@@ -4,8 +4,6 @@ driver:
   privileged: true
   chef_image: cincproject/cinc
   chef_version: 18
-  volumes:
-    - /var/cache/test-kitchen-dnf:/var/cache/dnf
 
 transport:
   name: dokken

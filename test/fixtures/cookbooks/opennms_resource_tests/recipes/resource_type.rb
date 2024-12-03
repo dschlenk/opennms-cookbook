@@ -54,8 +54,10 @@ opennms_resource_type 'wmiCollector' do
 end
 
 # update an existing type - group style
+# note that group_file_name is needed since we are modifying a resource where the filename prefix and group name do not match
 opennms_resource_type 'drsPSUIndex' do
-  group_name 'dell'
+  group_name 'Dell'
+  group_file_name 'dell.xml'
   label 'Dell DRAC Power Supply Unit'
   resource_label 'Location: ${drsPSULocation}'
   persistence_selector_strategy 'org.opennms.netmgt.collectd.PersistRegexSelectorStrategy'
