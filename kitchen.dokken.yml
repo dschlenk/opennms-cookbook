@@ -447,6 +447,13 @@ suites:
       inspec_tests:
         - path: test/integration/default
         - path: test/integration/expression_delete
+  - name: foreign_source
+    provisioner:
+      policyfile: policyfiles/foreign_source.rb
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/foreign_source
   - name: jdbc_collection
     provisioner:
       policyfile: policyfiles/jdbc_collection.rb
