@@ -53,5 +53,3 @@ action :delete do
     end
   end
 end
-
- 
