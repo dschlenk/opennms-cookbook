@@ -1,9 +1,57 @@
-# frozen_string_literal: true
-# shorthand to deploy a graph file to $ONMS_HOME/etc/snmp-graph.properties.d/
-actions :create, :create_if_missing, :delete, :touch
-default_action :create
 
-attribute :file, kind_of: String, name_attribute: true
-attribute :source, kind_of: String, default: 'cookbook_file'
+include Opennms::XmlHelper
+property :file, String, name_property: true, identity: true
+property :source, String, default: 'cookbook_file', desired_state: false
 
-attr_accessor :exists
+load_current_value do |new_resource|
+  current_value_does_not_exist! unless ::File.exist?("#{onms_etc}/snmp-graph.properties.d/#{new_resource.file}")
+end
+
+action_class do
+  include Opennms::XmlHelper
+end
+
+action :create do
+  with_run_context(:root) do
+    declare_resource(:file, "#{onms_etc}/snmp-graph.properties") do
+      action :nothing
+    end
+  end
+  if new_resource.source.eql?('cookbook_file') # only do this if source
+    cookbook_file new_resource.file do
+      path "#{onms_etc}/snmp-graph.properties.d/#{new_resource.file}"
+      owner node['opennms']['username']
+      group node['opennms']['groupname']
+      mode '0644'
+      notifies :touch, "file[#{onms_etc}/snmp-graph.properties", :immediately
+    end
+  else
+    remote_file new_resource.file do
+      action :create
+      path "#{onms_etc}/snmp-graph.properties.d/#{new_resource.file}"
+      source new_resource.source
+      owner node['opennms']['username']
+      group node['opennms']['groupname']
+      mode '0644'
+      notifies :touch, "file[#{onms_etc}/snmp-graph.properties", :immediately
+    end
+  end
+end
+action :create_if_missing do
+  run_action(:create) unless ::File.exist?("#{onms_etc}/snmp-graph.properties.d/#{new_resource.file}")
+end
+action :delete do
+  if ::File.exist?("#{onms_etc}/snmp-graph.properties.d/#{new_resource.file}")
+    with_run_context(:root) do
+      declare_resource(:file, "#{onms_etc}/snmp-graph.properties") do
+        action :nothing
+      end
+    end
+    file "#{onms_etc}/snmp-graph.properties.d/#{new_resource.file}") do
+      action :delete
+      notifies :touch, "file[#{onms_etc}/snmp-graph.properties", :immediately
+    end
+  end
+end
+
+ 
