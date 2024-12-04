@@ -23,7 +23,7 @@ action :create do
       owner node['opennms']['username']
       group node['opennms']['groupname']
       mode '0644'
-      notifies :touch, "file[#{onms_etc}/snmp-graph.properties", :immediately
+      notifies :touch, "file[#{onms_etc}/snmp-graph.properties]", :immediately
     end
   else
     remote_file new_resource.file do
@@ -33,7 +33,7 @@ action :create do
       owner node['opennms']['username']
       group node['opennms']['groupname']
       mode '0644'
-      notifies :touch, "file[#{onms_etc}/snmp-graph.properties", :immediately
+      notifies :touch, "file[#{onms_etc}/snmp-graph.properties]", :immediately
     end
   end
 end
@@ -47,9 +47,9 @@ action :delete do
         action :nothing
       end
     end
-    file "#{onms_etc}/snmp-graph.properties.d/#{new_resource.file}") do
+    file "#{onms_etc}/snmp-graph.properties.d/#{new_resource.file}" do
       action :delete
-      notifies :touch, "file[#{onms_etc}/snmp-graph.properties", :immediately
+      notifies :touch, "file[#{onms_etc}/snmp-graph.properties]", :immediately
     end
   end
 end
