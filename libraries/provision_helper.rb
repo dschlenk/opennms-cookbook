@@ -27,7 +27,7 @@ module Opennms
           with_run_context(:root) do
             declare_resource(:http_request, "opennms_foreign_source POST #{name}") do
               url "#{baseurl}/foreignSources"
-              headers({'Content-Type' => 'application/xml'})
+              headers({ 'Content-Type' => 'application/xml' })
               action :nothing
               delayed_action :post
               message foreign_source.message.to_s
