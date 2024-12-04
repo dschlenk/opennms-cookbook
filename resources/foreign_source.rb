@@ -20,10 +20,11 @@ action :create do
   converge_if_changed do
     fs_resource_init(new_resource.name)
     foreign_source = REXML::Document.new(fs_resource(new_resource.name).message).root
-    if foreign_source.elements['/scan-interval'].nil?
-      foreign_source.add_element('scan-interval').text = new_resource.scan_interval
+    if foreign_source.elements['/foreign-source/scan-interval'].nil?
+      foreign_source.unshift(REXML::Element.new('scan-interval')).text = new_resource.scan_interval
     else
-      foreign_source.elements['/scan-interval'].text = new_resource.scan_interval
+      foreign_source.elements['/foreign-source/scan-interval'].text = new_resource.scan_interval
     end
+    fs_resource(new_resource.name).message foreign_source.to_s
   end
 end
