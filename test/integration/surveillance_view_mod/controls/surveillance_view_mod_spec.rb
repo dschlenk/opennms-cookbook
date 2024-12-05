@@ -8,11 +8,7 @@ control 'surveillance_view' do
   end
 
   describe surveillance_view('foo-view') do
-    it { should exist }
-    its('rows') { should eq 'Routers' => ['Routers'], 'Switches' => ['Switches'], 'Servers' => ['Servers'] }
-    its('columns') { should eq 'PROD' => ['Production'], 'TEST' => ['Test'], 'DEV' => ['Development'] }
-    its('refresh_seconds') { should eq nil }
-    its('default_view') { should eq true }
+    it { should_not exist }
   end
 
   describe surveillance_view('bar-view') do

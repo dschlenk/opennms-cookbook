@@ -637,6 +637,20 @@ suites:
       inspec_tests:
         - path: test/integration/default
         - path: test/integration/snmp_config_profile_delete
+  - name: surveillance_view
+    provisioner:
+      policyfile: policyfiles/surveillance_view.rb
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/surveillance_view
+  - name: surveillance_view_mod
+    provisioner:
+      policyfile: policyfiles/surveillance_view_mod.rb
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/surveillance_view_mod
   - name: syslog_file
     provisioner:
       policyfile: policyfiles/syslog_file.rb
