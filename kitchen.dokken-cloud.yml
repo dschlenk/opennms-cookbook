@@ -95,6 +95,13 @@ suites:
       inspec_tests:
         - path: test/integration/default
         - path: test/integration/avail_category
+  - name: collection_graph_file
+    provisioner:
+      policyfile: policyfiles/collection_graph_file.rb
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/collection_graph_file
   - name: collection_package
     provisioner:
       policyfile: policyfiles/collection_package.rb
