@@ -6,13 +6,13 @@ include Opennms::Cookbook::View::SurveillanceTemplate
 # but are optional to support updates
 property :rows, Hash, callbacks: {
   'should be a hash with at least one member having String keys that have Array of String values' => lambda { |p|
-    p.length > 0 && !p.any? { |k,v| !k.is_a?(String) || !v.is_a?(Array) || v.any? { |a| !a.is_a?(String) } }
-  }
+    !p.empty? && !p.any? { |k, v| !k.is_a?(String) || !v.is_a?(Array) || v.any? { |a| !a.is_a?(String) } }
+  },
 }
 property :columns, Hash, callbacks: {
   'should be a hash with at least one member having String keys that have Array of String values' => lambda { |p|
-    p.length > 0 && !p.any? { |k,v| !k.is_a?(String) || !v.is_a?(Array) || v.any? { |a| !a.is_a?(String) } }
-  }
+    !p.empty? && !p.any? { |k, v| !k.is_a?(String) || !v.is_a?(Array) || v.any? { |a| !a.is_a?(String) } }
+  },
 }
 # defaults to false on initial :create
 property :default_view, [true, false]
@@ -42,7 +42,7 @@ action :create do
     config = view_resource.variables[:config]
     view = config.views[new_resource.name]
     if view.nil?
-      raise Chef::Exceptions::Validation, "At least one row and column are required when creating a new surveillance view" if new_resource.rows.nil? || new_resource.rows.length < 1 || new_resource.columns.nil? || new_resource.columns.length < 1
+      raise Chef::Exceptions::Validation, 'At least one row and column are required when creating a new surveillance view' if new_resource.rows.nil? || new_resource.rows.empty? || new_resource.columns.nil? || new_resource.columns.empty?
       config.views[new_resource.name] = { 'name' => new_resource.name, 'rows' => new_resource.rows, 'columns' => new_resource.columns }
       config.views[new_resource.name]['refresh-seconds'] = new_resource.refresh_seconds unless new_resource.refresh_seconds.nil?
       config.default_view = new_resource.name if new_resource.default_view
