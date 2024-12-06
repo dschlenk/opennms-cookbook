@@ -8,8 +8,7 @@ property :retry_count, Integer
 property :timeout, Integer
 property :class_name, String
 property :foreign_source_name, String, identity: true
-property :parameters, Hash, callbacks: { 'should be a hash with key/value pairs that are both strings' => lambda { |p| !p.any? { |k, v| !k.is_a?(String) || !v.is_a?(String) }
-}, }
+property :parameters, Hash, callbacks: { 'should be a hash with key/value pairs that are both strings' => lambda { |p| !p.any? { |k, v| !k.is_a?(String) || !v.is_a?(String) } }, }
 
 load_current_value do |new_resource|
   foreign_source = REXML::Document.new(fs_resource(new_resource.foreign_source_name).message) unless fs_resource(new_resource.foreign_source_name).nil?
@@ -102,4 +101,3 @@ action :delete do
   # update fs_resource.message with foreign_source.to_s
   fs_resource(new_resource.foreign_source_name).message foreign_source.to_s
 end
-
