@@ -88,26 +88,21 @@ module Opennms
           doc = xmldoc_from_file(file)
           @default_view = doc.elements['/surveillance-view-configuration'].attributes['default-view'] unless doc.elements['surveillance-view-configuration'].attributes['default-view'].nil?
           doc.each_element('/surveillance-view-configuration/views/view') do |v|
-            Chef::Log.info("found view #{v.attributes['name']}: #{v}")
             view = {}
             view['name'] = v.attributes['name']
             view['refresh-seconds'] = v.attributes['refresh-seconds']
             rows = {}
             v.each_element('rows/row-def') do |r|
-              Chef::Log.info("adding row #{r.attributes['label']}")
               rows[r.attributes['label']] = []
               r.each_element('category') do |c|
-                Chef::Log.info("adding category #{c} to row #{r.attributes['label']}")
                 rows[r.attributes['label']].push(c.attributes['name'])
               end
             end
             view['rows'] = rows
             columns = {}
             v.each_element('columns/column-def') do |c|
-              Chef::Log.info("adding column #{c.attributes['label']}")
               columns[c.attributes['label']] = []
               c.each_element('category') do |cat|
-                Chef::Log.info("adding category #{cat} to column #{c.attributes['label']}")
                 columns[c.attributes['label']].push(cat.attributes['name'])
               end
             end
@@ -136,12 +131,10 @@ module Opennms
           doc.each_element('/wallboards/wallboard') do |w|
             wallboard = {}
             wallboard['title'] = w.attributes['title']
-            Chef::Log.info("found existing wallboard #{wallboard['title']}")
             dashlets = [] unless w.elements['dashlets/dashlet'].nil?
             w.each_element('dashlets/dashlet') do |d|
               dashlet = {}
               dashlet['title'] = xml_element_text(d, 'title')
-              Chef::Log.info("found existing dashlet #{dashlet['title']}")
               dashlet['boost_duration'] = xml_element_text(d, 'boostDuration').to_i
               dashlet['boost_priority'] = xml_element_text(d, 'boostPriority').to_i
               dashlet['dashlet_name'] = xml_element_text(d, 'dashletName')
@@ -151,11 +144,9 @@ module Opennms
                 dashlet['parameters'][xml_element_text(p, 'entry/key')] = xml_element_text(p, 'entry/value')
               end
               dashlet['priority'] = xml_element_text(d, 'priority').to_i
-              Chef::Log.info("adding dashlet #{dashlet.compact}")
               dashlets.push(dashlet.compact)
             end
             wallboard['dashlets'] = dashlets
-            Chef::Log.info("adding wallboard #{wallboard.compact} to wallboards")
             @wallboards.push(wallboard.compact)
           end
         end

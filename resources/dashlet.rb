@@ -26,10 +26,8 @@ load_current_value do |new_resource|
   config = wallboard_resource.variables[:config] unless wallboard_resource.nil?
   config = Opennms::Cookbook::View::DashboardConfig.read("#{onms_etc}/dashboard-config.xml") if config.nil?
   wallboard = config.wallboard(title: new_resource.wallboard)
-  Chef::Log.info("wallboard? #{wallboard}")
   current_value_does_not_exist! if wallboard.nil?
   dashlet = config.dashlet(wallboard: wallboard, title: new_resource.title)
-  Chef::Log.info("dashlet? #{dashlet}")
   current_value_does_not_exist! if dashlet.nil?
   %i(boost_duration boost_priority duration priority dashlet_name parameters).each do |p|
     send(p, dashlet[p.to_s])
@@ -47,7 +45,6 @@ action :create do
     config = wallboard_resource.variables[:config]
     wallboard = config.wallboard(title: new_resource.wallboard)
     raise Chef::Exceptions::ResourceNotFound, "No wallboard with title #{new_resource.wallboard} found - cannot add a dashlet to it." if wallboard.nil?
-    Chef::Log.info("wallboard: #{wallboard}")
     dashlet = config.dashlet(wallboard: wallboard, title: new_resource.title)
     if dashlet.nil? || dashlet.empty?
       raise Chef::Exceptions::ValidationFailed, 'Property dashlet_name is required for action :create' if new_resource.dashlet_name.nil?
@@ -99,9 +96,7 @@ action :delete do
   wallboard_resource_init
   config = wallboard_resource.variables[:config]
   wallboard = config.wallboard(title: new_resource.wallboard)
-  Chef::Log.info("found wallboard to delete? #{wallboard}")
   dashlet = config.dashlet(wallboard: wallboard, title: new_resource.title) unless wallboard.nil?
-  Chef::Log.info("found dashlet to delete? #{dashlet}")
   converge_by "Removing dashlet #{new_resource.title}" do
     wallboard['dashlets'].delete_if { |d| d['title'].eql?(new_resource.title) }
   end unless dashlet.nil?
