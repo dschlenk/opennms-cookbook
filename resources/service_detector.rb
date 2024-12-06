@@ -87,8 +87,6 @@ action :create_if_missing do
       run_action(:create)
     end
   end
-  # update fs_resource.message with foreign_source.to_s
-  fs_resource(new_resource.foreign_source_name).message foreign_source.to_s
 end
 
 action :delete do
