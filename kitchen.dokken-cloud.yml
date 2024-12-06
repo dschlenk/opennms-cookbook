@@ -172,6 +172,20 @@ suites:
       inspec_tests:
         - path: test/integration/default
         - path: test/integration/collection_service
+  - name: dashlet
+    provisioner:
+      policyfile: policyfiles/dashlet.rb
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/dashlet
+  - name: dashlet_update
+    provisioner:
+      policyfile: policyfiles/dashlet_update.rb
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/dashlet_update
   - name: eventconf
     provisioner:
       policyfile: policyfiles/eventconf.rb
@@ -769,6 +783,20 @@ suites:
     driver:
       ports:
         - 1235:8980/tcp
+  - name: wallboard
+    provisioner:
+      policyfile: policyfiles/wallboard.rb
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/wallboard
+  - name: wallboard_mod
+    provisioner:
+      policyfile: policyfiles/wallboard_mod.rb
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/wallboard_mod
   - name: wsman_collection
     provisioner:
       policyfile: policyfiles/wsman_collection.rb

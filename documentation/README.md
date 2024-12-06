@@ -23,8 +23,9 @@
 
 ### Presentation
 
-* [opennms\_surveillance\_view](surveillance_view.md)
 * [opennms\_avail\_category](avail_category.md)
+* [opennms\_surveillance\_view](surveillance_view.md)
+* [opennms\_wallboard and opennms\_dashlet](opsboard.md)
 
 ### Administration
 

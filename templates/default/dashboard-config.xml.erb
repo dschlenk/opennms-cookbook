@@ -1,0 +1,32 @@
+<?xml version='1.0'?>
+<wallboards>
+<% @config.wallboards.each do |w| -%>
+  <wallboard title=<%= w['title'].encode(:xml => :attr) %>>
+    <default><%= @config.default_wallboard.eql?(w['title']) ? 'true' : 'false' %></default>
+  <% unless w['dashlets'].nil? || w['dashlets'].empty? -%>
+    <dashlets>
+    <% w['dashlets'].each do |d| -%>
+      <dashlet>
+        <boostDuration><%= d['boost_duration'].to_s.encode(:xml => :text) %></boostDuration>
+        <boostPriority><%= d['boost_priority'].to_s.encode(:xml => :text) %></boostPriority>
+        <dashletName><%= d['dashlet_name'].encode(:xml => :text) %></dashletName>
+        <duration><%= d['duration'].to_s.encode(:xml => :text) %></duration>
+      <% unless d['parameters'].nil? || d['parameters'].empty? -%>
+        <parameters>
+        <% d['parameters'].each do |k, v| -%>
+          <entry>
+            <key><%= k.to_s.encode(:xml => :text) %></key>
+            <value><%= v.to_s.encode(:xml => :text) %></value>
+          </entry>
+        <% end -%>
+        </parameters>
+      <% end -%>
+        <priority><%= d['priority'].to_s.encode(:xml => :text) %></priority>
+        <title><%= d['title'].encode(:xml => :text) %></title>
+      </dashlet>
+    <% end -%>
+    </dashlets>
+  <% end -%>
+  </wallboard>
+<% end -%>
+</wallboards>

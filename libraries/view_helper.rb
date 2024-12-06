@@ -1,6 +1,43 @@
 module Opennms
   module Cookbook
     module View
+      module WallboardTemplate
+        def wallboard_resource_init
+          wallboard_resource_create unless wallboard_resource_exist?
+        end
+
+        def wallboard_resource
+          return unless wallboard_resource_exist?
+          find_resource!(:template, "#{onms_etc}/dashboard-config.xml")
+        end
+
+        private
+
+        def wallboard_resource_exist?
+          !find_resource(:template, "#{onms_etc}/dashboard-config.xml").nil?
+        rescue Chef::Exceptions::ResourceNotFound
+          false
+        end
+
+        def wallboard_resource_create
+          file = Opennms::Cookbook::View::DashboardConfig.new
+          file.read!("#{onms_etc}/dashboard-config.xml")
+          with_run_context(:root) do
+            declare_resource(:template, "#{onms_etc}/dashboard-config.xml") do
+              cookbook 'opennms'
+              source 'dashboard-config.xml.erb'
+              owner node['opennms']['username']
+              group node['opennms']['groupname']
+              mode '0664'
+              variables(config: file)
+              action :nothing
+              delayed_action :create
+              notifies :restart, 'service[opennms]'
+            end
+          end
+        end
+      end
+
       module SurveillanceTemplate
         def view_resource_init
           view_resource_create unless view_resource_exist?
@@ -85,6 +122,69 @@ module Opennms
           sc
         end
       end
+
+      class DashboardConfig
+        include Opennms::XmlHelper
+        attr_reader :wallboards
+        attr_accessor :default_wallboard
+        def initialize
+          @wallboards = []
+        end
+
+        def read!(file = 'dashboard-config.xml')
+          doc = xmldoc_from_file(file) || REXML::Document.new('<wallboards/>')
+          doc.each_element('/wallboards/wallboard') do |w|
+            wallboard = {}
+            wallboard['title'] = w.attributes['title']
+            Chef::Log.info("found existing wallboard #{wallboard['title']}")
+            dashlets = [] unless w.elements['dashlets/dashlet'].nil?
+            w.each_element('dashlets/dashlet') do |d|
+              dashlet = {}
+              dashlet['title'] = xml_element_text(d, 'title')
+              Chef::Log.info("found existing dashlet #{dashlet['title']}")
+              dashlet['boost_duration'] = xml_element_text(d, 'boostDuration').to_i
+              dashlet['boost_priority'] = xml_element_text(d, 'boostPriority').to_i
+              dashlet['dashlet_name'] = xml_element_text(d, 'dashletName')
+              dashlet['duration'] = xml_element_text(d, 'duration').to_i
+              dashlet['parameters'] = {} unless d.elements['parameters'].nil?
+              d.each_element('parameters') do |p|
+                dashlet['parameters'][xml_element_text(p, 'entry/key')] = xml_element_text(p, 'entry/value')
+              end
+              dashlet['priority'] = xml_element_text(d, 'priority').to_i
+              Chef::Log.info("adding dashlet #{dashlet.compact}")
+              dashlets.push(dashlet.compact)
+            end
+            wallboard['dashlets'] = dashlets
+            Chef::Log.info("adding wallboard #{wallboard.compact} to wallboards")
+            @wallboards.push(wallboard.compact)
+          end
+        end
+
+        def wallboard(title:)
+          wallboard = @wallboards.select { |w| w['title'].eql?(title) }
+          return if wallboard.empty?
+          raise DuplicateWallboards, "More than one wallboard with title #{title} found." unless wallboard.one?
+          wallboard.pop
+        end
+
+        def dashlet(wallboard:, title:)
+          raise ArgumentError, 'Wallboard must be a hash' unless wallboard.is_a?(Hash)
+          return if wallboard['dashlets'].nil?
+          dashlet = wallboard['dashlets'].select { |d| d['title'].eql?(title) }
+          return if dashlet.empty?
+          raise DuplicateDashlets, "More than one dashlet in wallboard #{wallboard['title']} with title #{title}" unless dashlet.one?
+          dashlet.pop
+        end
+
+        def self.read(file = 'dashboard-config.xml')
+          dc = DashboardConfig.new
+          dc.read!(file)
+          dc
+        end
+      end
+
+      class DuplicateWallboards < StandardError; end
+      class DuplicateDashlets < StandardError; end
     end
   end
 end
