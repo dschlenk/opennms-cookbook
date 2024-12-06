@@ -46,7 +46,7 @@ module Opennms
           begin
             @message = RestClient.get(url, accept: :xml).to_s
           rescue RestClient::NotFound
-            @message = "foreignSource name=#{name.encode(xml: :attr)}"
+            @message = "<foreignSource name=#{name.encode(xml: :attr)}/>"
           end
         end
       end
