@@ -73,7 +73,7 @@ action :create do
       foreign_source.add_element 'detectors' => detector
     end
     # update fs_resource.message with foreign_source.to_s
-    fs_resource(new_resource.name).message foreign_source.to_s
+    fs_resource(new_resource.foreign_source_name).message foreign_source.to_s
   end
 end
 
@@ -88,7 +88,7 @@ action :create_if_missing do
     end
   end
   # update fs_resource.message with foreign_source.to_s
-  fs_resource(new_resource.name).message foreign_source.to_s
+  fs_resource(new_resource.foreign_source_name).message foreign_source.to_s
 end
 
 action :delete do
@@ -102,6 +102,6 @@ action :delete do
     end
   end
   # update fs_resource.message with foreign_source.to_s
-  fs_resource(new_resource.name).message foreign_source.to_s
+  fs_resource(new_resource.foreign_source_name).message foreign_source.to_s
 end
 
