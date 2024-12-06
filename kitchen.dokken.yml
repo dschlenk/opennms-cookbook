@@ -457,6 +457,16 @@ suites:
       inspec_tests:
         - path: test/integration/default
         - path: test/integration/foreign_source
+  - name: service_detector
+    driver:
+      ports:
+        - 1237:8980/tcp
+    provisioner:
+      policyfile: policyfiles/service_detector.rb
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/service_detector
   - name: jdbc_collection
     provisioner:
       policyfile: policyfiles/jdbc_collection.rb
