@@ -58,30 +58,31 @@ action :create do
     # then add the element to foreign_source.elements["/detectors"]
     if detector.nil?
       detector_el = REXML::Element.new('detector', { 'name' => service_name, 'class' => new_resource.class_name })
+      detector_el.add_element 'parameter', 'key' => 'timeout', 'value' => new_resource.timeout unless new_resource.timeout.nil?
+      detector_el.add_element 'parameter', 'key' => 'port', 'value' => new_resource.port unless new_resource.port.nil?
+      detector_el.add_element 'parameter', 'key' => 'retries', 'value' => new_resource.retry_count unless new_resource.retry_count.nil?
+
       new_resource.parameters.each do |key, value|
+        next if %w(port retries timeout).include?(key)
         detector_el.add_element 'parameter', 'key' => key, 'value' => value
       end
-
     else # one already exists, so you need to maybe update class
       # and then replace all the parameters that currently exist with new_resource.parameters + timeout, retry_count, port
       unless new_resource.class_name.nil?
         detector.attributes['class'] = new_resource.class_name
       end
+      # Delete the old value
+      detector['parameter'].delete_if do |p|
+        !%w(port retries timeout).include? p['key']
+      end
+      # Update the value to new value
       update_parameter(detector['parameter'], 'port', new_resource.port)
       update_parameter(detector['parameter'], 'retries', new_resource.retry_count)
       update_parameter(detector['parameter'], 'timeout', new_resource.timeout)
 
-      unless new_resource.parameters.nil? || new_resource.parameters.empty?
-        # if you specify params, they replace all the current params. No merging of old and new occur.
-        detector['parameter'].delete_if do |p|
-          !%w(port retries timeout).include? p['key']
-        end
-      end
-
-      unless new_resource.parameters.nil?
-        new_resource.parameters.each do |k, v|
-          detector['parameter'].push('key' => k, 'value' => v)
-        end
+      new_resource.parameters.each do |key, value|
+        next if %w(port retries timeout).include?(key)
+        update_parameter(detector['parameter'], key, value)
       end
       detector_el = detector
     end
