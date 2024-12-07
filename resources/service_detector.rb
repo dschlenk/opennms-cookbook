@@ -56,11 +56,18 @@ action :create do
     detectors = foreign_source.elements["/detectors"]
     # create a REXML::Element with a name attribute and a class attribute, then add parameter children for each of new_resource.parameters + timeout, retry_count, port
     # then add the element to foreign_source.elements["/detectors"]
-    if detector.nil?
-      detector_el = REXML::Element.new('detector', { 'name' => service_name, 'class' => new_resource.class_name })
-      detector_el.add_element 'parameter', 'key' => 'timeout', 'value' => new_resource.timeout unless new_resource.timeout.nil?
-      detector_el.add_element 'parameter', 'key' => 'port', 'value' => new_resource.port unless new_resource.port.nil?
-      detector_el.add_element 'parameter', 'key' => 'retries', 'value' => new_resource.retry_count unless new_resource.retry_count.nil?
+    if detector.nil?add_element 'detector', 'name' => service_name, 'class' => new_resource.class_name
+      detector_el << REXML::XMLDecl.new
+      detector_el.add_element('detector', { 'name' => service_name, 'class' => new_resource.class_name })
+      unless new_resource.timeout.nil?
+        detector_el.add_element 'parameter', 'key' => 'timeout', 'value' => new_resource.timeout
+      end
+      unless new_resource.port.nil?
+        detector_el.add_element 'parameter', 'key' => 'port', 'value' => new_resource.port
+      end
+      unless new_resource.retry_count.nil?
+        detector_el.add_element 'parameter', 'key' => 'retries', 'value' => new_resource.retry_count
+      end
 
       new_resource.parameters.each do |key, value|
         next if %w(port retries timeout).include?(key)
