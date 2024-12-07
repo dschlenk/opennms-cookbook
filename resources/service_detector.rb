@@ -59,7 +59,7 @@ action :create do
     if detector.nil? add_element 'detector', 'name' => service_name, 'class' => new_resource.class_name
       sd = REXML::Document.new
       sd << REXML::XMLDecl.new
-      detector_el.sd.add_element('detector', { 'name' => service_name, 'class' => new_resource.class_name })
+      detector_el = sd.add_element('detector', { 'name' => service_name, 'class' => new_resource.class_name })
       unless new_resource.timeout.nil?
         detector_el.add_element 'parameter', 'key' => 'timeout', 'value' => new_resource.timeout
       end
