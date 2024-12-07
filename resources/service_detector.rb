@@ -50,26 +50,45 @@ end
 action :create do
   converge_if_changed do
     fs_resource_init(new_resource.foreign_source_name)
-    service_name = new_resource.service_name || new_resource.name
+    service_name = new_resource.service_name
     foreign_source = REXML::Document.new(fs_resource(new_resource.foreign_source_name).message).root
     detector = foreign_source.elements["/detectors/detector[@name = '#{service_name}']"]
+    detectors = foreign_source.elements["/detectors"]
     # create a REXML::Element with a name attribute and a class attribute, then add parameter children for each of new_resource.parameters + timeout, retry_count, port
     # then add the element to foreign_source.elements["/detectors"]
     if detector.nil?
-      detector_el = REXML::Element.new('detector' 'name' => service_name, 'class' => new_resource.class_name)
+      detector_el = REXML::Element.new('detector', { 'name' => service_name, 'class' => new_resource.class_name })
       new_resource.parameters.each do |key, value|
         detector_el.add_element 'parameter', 'key' => key, 'value' => value
       end
-      foreign_source.add_element 'detectors' => detector_el
+
     else # one already exists, so you need to maybe update class
       # and then replace all the parameters that currently exist with new_resource.parameters + timeout, retry_count, port
-      detector.attributes['class'] = new_resource.class_name
-
-      detector.each_element('parameter') do |parameter|
-        detector[parameter.attributes['key']] = new_resource.parameters.attributes['key']
-        detector[parameter.attributes['value']] = new_resource.parameters.attributes['value']
+      unless new_resource.class_name.nil?
+        detector.attributes['class'] = new_resource.class_name
       end
-      foreign_source.add_element 'detectors' => detector
+      update_parameter(detector['parameter'], 'port', new_resource.port)
+      update_parameter(detector['parameter'], 'retries', new_resource.retry_count)
+      update_parameter(detector['parameter'], 'timeout', new_resource.timeout)
+
+      unless new_resource.parameters.nil? || new_resource.parameters.empty?
+        # if you specify params, they replace all the current params. No merging of old and new occur.
+        detector['parameter'].delete_if do |p|
+          !%w(port retries timeout).include? p['key']
+        end
+      end
+
+      unless new_resource.parameters.nil?
+        new_resource.parameters.each do |k, v|
+          detector['parameter'].push('key' => k, 'value' => v)
+        end
+      end
+      detector_el = detector
+    end
+
+    if detectors.nil?
+      foreign_source.add_element 'detectors' => detector_el
+    else foreign_source.add_element detector_el
     end
     # update fs_resource.message with foreign_source.to_s
     fs_resource(new_resource.foreign_source_name).message foreign_source.to_s
@@ -79,7 +98,7 @@ end
 action :create_if_missing do
   converge_if_changed do
     fs_resource_init(new_resource.foreign_source_name)
-    service_name = new_resource.service_name || new_resource.name
+    service_name = new_resource.service_name
     foreign_source = REXML::Document.new(fs_resource(new_resource.foreign_source_name).message).root
     detector = foreign_source.elements["/detectors/detector[@name = '#{service_name}']"]
     if detector.nil?
@@ -90,12 +109,12 @@ end
 
 action :delete do
   fs_resource_init(new_resource.foreign_source_name)
-  service_name = new_resource.service_name || new_resource.name
+  service_name = new_resource.service_name
   foreign_source = REXML::Document.new(fs_resource(new_resource.foreign_source_name).message).root
   detector = foreign_source.elements["/detectors/detector[@name = '#{service_name}']"]
   if !detector.nil?
     converge_by("Removing service detector #{service_name} from foreign source #{new_resource.foreign_source_name}") do
-      foreign_source.delete(detector) unless detector.nil?
+      foreign_source.delete_element(detector) unless detector.nil?
     end
   end
   # update fs_resource.message with foreign_source.to_s
