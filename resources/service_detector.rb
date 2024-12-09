@@ -59,7 +59,7 @@ action :create do
     if detector.nil?
       detector_el = REXML::Element.new('detector')
       detector_el.add_attribute('name', service_name)
-      detector_el.add_attribute('class',  new_resource.class_name)
+      detector_el.add_attribute('class', new_resource.class_name)
 
       unless new_resource.timeout.nil?
         detector_el.add_element 'parameter', 'key' => 'timeout', 'value' => new_resource.timeout
@@ -105,6 +105,21 @@ action :create do
     end
     # update fs_resource.message with foreign_source.to_s
     fs_resource(new_resource.foreign_source_name).message foreign_source.to_s
+  end
+
+  def update_parameter(curr_parameters, name, new_value)
+    updated = false
+    unless new_value.nil?
+      curr_parameters.each do |p|
+        next unless p['key'] == name
+        p['value'] = new_value
+        updated = true
+        break
+      end
+      # handle adding a previously undefined common param
+      curr_parameters.push('key' => name, 'value' => new_value) unless updated
+    end
+    curr_parameters
   end
 end
 
