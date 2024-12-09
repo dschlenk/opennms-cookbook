@@ -67,10 +67,11 @@ action :create do
       unless new_resource.retry_count.nil?
         detector_el.add_element 'parameter', 'key' => 'retries', 'value' => new_resource.retry_count
       end
-
-      new_resource.parameters.each do |key, value|
-        next if %w(port retries timeout).include?(key)
-        detector_el.add_element 'parameter', 'key' => key, 'value' => value
+      unless new_resource.parameters.nil?
+        new_resource.parameters.each do |key, value|
+          next if %w(port retries timeout).include?(key)
+          detector_el.add_element 'parameter', 'key' => key, 'value' => value
+        end
       end
 
       if detectors_el.nil?
@@ -95,7 +96,7 @@ action :create do
       unless new_resource.parameters.nil?
         new_resource.parameters.each do |k, v|
           next if %w(port retries timeout).include?(k)
-          detector['parameter'].push('key' => k, 'value' => v)
+          detector.add_element 'parameter', 'key' => k, 'value' =>  v
         end
       end
     end
