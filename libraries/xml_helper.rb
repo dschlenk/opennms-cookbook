@@ -50,21 +50,6 @@ module Opennms
       end
       arr
     end
-
-    def update_parameter(curr_parameters, name, new_value)
-      updated = false
-      unless new_value.nil?
-        curr_parameters.each do |p|
-          next unless p['key'] == name
-          p['value'] = new_value
-          updated = true
-          break
-        end
-        # handle adding a previously undefined common param
-        curr_parameters.push('key' => name, 'value' => new_value) unless updated
-      end
-      curr_parameters
-    end
   end
 
   module XmlGroupHelper
