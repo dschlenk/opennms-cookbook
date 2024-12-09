@@ -18,24 +18,26 @@ load_current_value do |new_resource|
   current_value_does_not_exist! if fs_detector.nil?
   fs_detector_param = {}
   fs_params = {}
-  class_name fs_detector.attributes['class']
-  fs_detector.each_element('parameter') do |parameter|
-    fs_params[parameter.attributes['key']] = parameter.attributes['value']
-  end
-  fs_params.each do |k, v|
-    case k
-    when 'timeout', 'port', 'retry_count'
-      sym = k.to_sym
-      if new_resource.send(sym).is_a?(Integer)
-        value = begin
-          Integer(v)
-        rescue
-          v
+  class_name fs_detector.attributes['class'] if fs_detector.attributes['class'].nil?
+  unless fs_detector.nil?
+    fs_detector.each_element('parameter') do |parameter|
+      fs_params[parameter.attributes['key']] = parameter.attributes['value']
+    end
+    fs_params.each do |k, v|
+      case k
+      when 'timeout', 'port', 'retry_count'
+        sym = k.to_sym
+        if new_resource.send(sym).is_a?(Integer)
+          value = begin
+            Integer(v)
+          rescue
+            v
+          end
+          send(sym, value)
+        else fs_detector_param[k] = v
         end
-        send(sym, value)
       else fs_detector_param[k] = v
       end
-    else fs_detector_param[k] = v
     end
   end
   parameters fs_detector_param
@@ -52,8 +54,8 @@ action :create do
     fs_resource_init(new_resource.foreign_source_name)
     service_name = new_resource.service_name
     foreign_source = REXML::Document.new(fs_resource(new_resource.foreign_source_name).message).root
-    detector = foreign_source.elements["detectors/detector[@name = '#{service_name}']"]
-    detectors_el = foreign_source.elements["detectors"]
+    detector = foreign_source.elements["detectors/detector[@name = '#{service_name}']"] unless foreign_source.nil?
+    detectors_el = foreign_source.elements["detectors"] unless foreign_source.nil?
     # create a REXML::Element with a name attribute and a class attribute, then add parameter children for each of new_resource.parameters + timeout, retry_count, port
     # then add the element to foreign_source.elements["/detectors"]
     if detector.nil?
@@ -88,9 +90,9 @@ action :create do
         detector.attributes['class'] = new_resource.class_name
       end
       # Update the value to new value
-      detector['parameter'].attributes['port'] = new_resource.port
-      detector['parameter'].attributes['retries'] = new_resource.retry_count
-      detector['parameter'].attributes['timeout'] = new_resource.timeout
+      detector['parameter'].attributes['port'] = new_resource.port unless new_resource.port.nil?
+      detector['parameter'].attributes['retries'] = new_resource.retry_count unless  new_resource.retry_count.nil?
+      detector['parameter'].attributes['timeout'] = new_resource.timeout unless  new_resource.timeout.nil?
 
       # Delete the old value
       detector['parameter'].delete_if do |p|
@@ -114,7 +116,7 @@ action :create_if_missing do
     fs_resource_init(new_resource.foreign_source_name)
     service_name = new_resource.service_name
     foreign_source = REXML::Document.new(fs_resource(new_resource.foreign_source_name).message).root
-    detector = foreign_source.elements["detectors/detector[@name = '#{service_name}']"]
+    detector = foreign_source.elements["detectors/detector[@name = '#{service_name}']"] unless foreign_source.nil?
     if detector.nil?
       run_action(:create)
     end
@@ -125,7 +127,7 @@ action :delete do
   fs_resource_init(new_resource.foreign_source_name)
   service_name = new_resource.service_name
   foreign_source = REXML::Document.new(fs_resource(new_resource.foreign_source_name).message).root
-  detector = foreign_source.elements["detectors/detector[@name = '#{service_name}']"]
+  detector = foreign_source.elements["detectors/detector[@name = '#{service_name}']"] unless foreign_source.nil?
   if !detector.nil?
     converge_by("Removing service detector #{service_name} from foreign source #{new_resource.foreign_source_name}") do
       foreign_source.delete_element(detector) unless detector.nil?
