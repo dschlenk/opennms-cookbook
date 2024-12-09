@@ -53,11 +53,11 @@ action :create do
     service_name = new_resource.service_name
     foreign_source = REXML::Document.new(fs_resource(new_resource.foreign_source_name).message).root
     detector = foreign_source.elements["/detectors/detector[@name = '#{service_name}']"]
-    detectors = foreign_source.elements["/detectors"]
+    detectors_el = foreign_source.elements["/detectors"]
     # create a REXML::Element with a name attribute and a class attribute, then add parameter children for each of new_resource.parameters + timeout, retry_count, port
     # then add the element to foreign_source.elements["/detectors"]
     if detector.nil?
-      detector_el = REXML::Element.new('detector', 'name' => service_name, 'class' => new_resource.class_name)
+      detector_el = REXML::Element.new('detector', { 'name' => service_name, 'class' => new_resource.class_name })
       unless new_resource.timeout.nil?
         detector_el.add_element 'parameter', 'key' => 'timeout', 'value' => new_resource.timeout
       end
@@ -73,9 +73,9 @@ action :create do
         detector_el.add_element 'parameter', 'key' => key, 'value' => value
       end
 
-      if detectors.nil?
-        foreign_source.add_element 'detectors' => detector_el
-      else detectors.add_element detector_el
+      if detectors_el.nil?
+        foreign_source.add_element(REXML::Element.new('detectors', detector_el))
+      else detectors_el.add_element detector_el
       end
     else # one already exists, so you need to maybe update class
       # and then replace all the parameters that currently exist with new_resource.parameters + timeout, retry_count, port
