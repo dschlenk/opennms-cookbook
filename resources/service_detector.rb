@@ -58,7 +58,7 @@ action :create do
     detectors_el = foreign_source.elements["detectors"] unless foreign_source.nil?
     # create a REXML::Element with a name attribute and a class attribute,
     if detector.nil?
-      #Create detector element and add the attributes
+      # Create detector element and add the attributes
       detector_el = REXML::Element.new('detector')
       detector_el.add_attribute('name', service_name)
       detector_el.add_attribute('class', new_resource.class_name)
@@ -91,8 +91,9 @@ action :create do
       end
 
       if new_resource.parameters.is_a?(Hash) && !new_resource.parameters.empty?
-        # clear out all parameters
+        # delete all parameters
         detector.elements.delete_all 'parameter'
+
         # add them back with new values
         new_resource.parameters.each do |key, value|
           detector.add_element 'parameter', 'key' => key, 'value' => value
@@ -104,24 +105,21 @@ action :create do
         timeout_el = detector.elements["parameter[@key='timeout']"]
         if timeout_el.nil?
           detector.add_element 'parameter', 'key' => 'timeout', 'value' => new_resource.timeout
-        else
-          timeout_el.attributes['value'] = new_resource.timeout
+        else timeout_el.attributes['value'] = new_resource.timeout
         end
       end
       unless new_resource.port.nil?
         port_el = detector.elements["parameter[@key='port']"]
         if port_el.nil?
           detector.add_element 'parameter', 'key' => 'port', 'value' => new_resource.port
-        else
-          port_el.attributes['value'] = new_resource.port
+        else port_el.attributes['value'] = new_resource.port
         end
       end
       unless new_resource.retry_count.nil?
         retries_el = detector.elements["parameter[@key='retries']"]
         if retries_el.nil?
           detector.add_element 'parameter', 'key' => 'port', 'value' => new_resource.retry_count
-        else
-          retries_el.attributes['value'] = new_resource.retry_count
+        else retries_el.attributes['value'] = new_resource.retry_count
         end
       end
     end

@@ -1,4 +1,3 @@
-# frozen_string_literal: true
 control 'service_detector' do
   describe foreign_source('another-source') do
     it { should exist }
