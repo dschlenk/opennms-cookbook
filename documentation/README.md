@@ -24,6 +24,7 @@
 ### Presentation
 
 * [opennms\_avail\_category](avail_category.md)
+* [opennms\_avail\_view\_section](avail_view_section.md)
 * [opennms\_surveillance\_view](surveillance_view.md)
 * [opennms\_wallboard and opennms\_dashlet](opsboard.md)
 

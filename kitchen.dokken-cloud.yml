@@ -95,6 +95,20 @@ suites:
       inspec_tests:
         - path: test/integration/default
         - path: test/integration/avail_category
+  - name: avail_view_section
+    provisioner:
+      policyfile: policyfiles/avail_view_section.rb
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/avail_view_section
+  - name: avail_view_section_mod
+    provisioner:
+      policyfile: policyfiles/avail_view_section_mod.rb
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/avail_view_section_mod
   - name: collection_package
     provisioner:
       policyfile: policyfiles/collection_package.rb
