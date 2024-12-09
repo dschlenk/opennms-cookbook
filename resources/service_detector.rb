@@ -90,9 +90,9 @@ action :create do
         detector.attributes['class'] = new_resource.class_name
       end
       # Update the value to new value
-      detector['parameter'].attributes['port'] = new_resource.port unless new_resource.port.nil?
-      detector['parameter'].attributes['retries'] = new_resource.retry_count unless  new_resource.retry_count.nil?
-      detector['parameter'].attributes['timeout'] = new_resource.timeout unless  new_resource.timeout.nil?
+      update_parameter(detector['parameter'], 'port', new_resource.port) unless new_resource.port.nil?
+      update_parameter(detector['parameter'], 'retries', new_resource.retry_count) unless new_resource.retry_count.nil?
+      update_parameter(detector['parameter'], 'timeout', new_resource.timeout) unless new_resource.timeout.nil?
 
       # Delete the old value
       detector['parameter'].delete_if do |p|
