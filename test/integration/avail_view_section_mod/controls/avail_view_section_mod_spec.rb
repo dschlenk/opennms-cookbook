@@ -1,6 +1,6 @@
 control 'avail_view_section_mod' do
-  sections = { 
-    'Topmost' => { 
+  sections = {
+    'Topmost' => {
       'categories' => ['Database Servers'],
       'position' => 1,
     },
