@@ -95,8 +95,10 @@ action :create do
       update_parameter(detector['parameter'], 'timeout', new_resource.timeout) unless new_resource.timeout.nil?
 
       # Delete the old value
-      detector['parameter'].delete_if do |p|
-        !%w(port retries timeout).include? p['key']
+      unless detector['parameter'].nil?
+        detector['parameter'].delete_if do |p|
+          !%w(port retries timeout).include? p['key']
+        end
       end
 
       unless new_resource.parameters.nil?
