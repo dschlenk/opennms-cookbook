@@ -89,22 +89,39 @@ action :create do
       unless new_resource.class_name.nil?
         detector.attributes['class'] = new_resource.class_name
       end
-      # and then replace all the parameters that currently exist with new_resource.parameters + timeout, retry_count, port
-      detector['parameter'].push('port', new_resource.port) unless new_resource.port.nil?
-      detector['parameter'].push('retries', new_resource.retry_count) unless new_resource.retry_count.nil?
-      detector['parameter'].push('timeout', new_resource.timeout) unless new_resource.timeout.nil?
 
-      # Delete the old value
-      unless detector['parameter'].nil?
-        detector['parameter'].delete_if do |p|
-          !%w(port retries timeout).include? p['key']
+      if new_resource.parameters.is_a?(Hash) && !new_resource.parameters.empty?
+        # clear out all parameters
+        detector.elements.delete_all 'parameter'
+        # add them back with new values
+        new_resource.parameters.each do |key, value|
+          detector.add_element 'parameter', 'key' => key, 'value' => value
         end
       end
 
-      unless new_resource.parameters.nil?
-        new_resource.parameters.each do |k, v|
-          next if %w(port retries timeout).include?(k)
-          detector.add_element 'parameter', 'key' => k, 'value' => v
+      # and then replace all the parameters that currently exist with new_resource.parameters + timeout, retry_count, port
+      unless new_resource.timeout.nil?
+        timeout_el = detector.elements["parameter[@key='timeout']"]
+        if timeout_el.nil?
+          detector.add_element 'parameter', 'key' => 'timeout', 'value' => new_resource.timeout
+        else
+          timeout_el.attributes['value'] = new_resource.timeout
+        end
+      end
+      unless new_resource.port.nil?
+        port_el = detector.elements["parameter[@key='port']"]
+        if port_el.nil?
+          detector.add_element 'parameter', 'key' => 'port', 'value' => new_resource.port
+        else
+          port_el.attributes['value'] = new_resource.port
+        end
+      end
+      unless new_resource.retry_count.nil?
+        retries_el = detector.elements["parameter[@key='retries']"]
+        if retries_el.nil?
+          detector.add_element 'parameter', 'key' => 'port', 'value' => new_resource.retry_count
+        else
+          retries_el.attributes['value'] = new_resource.retry_count
         end
       end
     end
