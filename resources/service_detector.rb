@@ -94,6 +94,7 @@ action :create do
 
       unless new_resource.parameters.nil?
         new_resource.parameters.each do |k, v|
+          next if %w(port retries timeout).include?(k)
           detector['parameter'].push('key' => k, 'value' => v)
         end
       end
