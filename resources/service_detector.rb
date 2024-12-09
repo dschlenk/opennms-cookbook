@@ -57,9 +57,7 @@ action :create do
     # create a REXML::Element with a name attribute and a class attribute, then add parameter children for each of new_resource.parameters + timeout, retry_count, port
     # then add the element to foreign_source.elements["/detectors"]
     if detector.nil?
-      sd = REXML::Document.new
-      sd << REXML::XMLDecl.new
-      detector_el = sd.add_element 'detector', 'name' => service_name, 'class' => new_resource.class_name
+      detector_el = REXML::Element.new('detector', 'name' => service_name, 'class' => new_resource.class_name)
       unless new_resource.timeout.nil?
         detector_el.add_element 'parameter', 'key' => 'timeout', 'value' => new_resource.timeout
       end
