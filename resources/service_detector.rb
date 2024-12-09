@@ -13,8 +13,8 @@ property :parameters, Hash, callbacks: { 'should be a hash with key/value pairs 
 load_current_value do |new_resource|
   foreign_source = REXML::Document.new(fs_resource(new_resource.foreign_source_name).message) unless fs_resource(new_resource.foreign_source_name).nil?
   foreign_source = REXML::Document.new(Opennms::Cookbook::Provision::ForeignSource.new(new_resource.foreign_source_name, "#{baseurl}/foreignSources/#{new_resource.foreign_source_name}").message) if foreign_source.nil?
-  current_value_does_not_exist! if foreign_source.nil? || foreign_source.elements["/detectors/detector[@name = '#{new_resource.service_name}']"].nil?
-  fs_detector = foreign_source.elements["/detectors/detector[@name = '#{new_resource.service_name}']"]
+  current_value_does_not_exist! if foreign_source.nil? || foreign_source.elements["detectors/detector[@name = '#{new_resource.service_name}']"].nil?
+  fs_detector = foreign_source.elements["detectors/detector[@name = '#{new_resource.service_name}']"]
   current_value_does_not_exist! if fs_detector.nil?
   fs_detector_param = {}
   fs_params = {}
@@ -87,9 +87,9 @@ action :create do
         detector.attributes['class'] = new_resource.class_name
       end
       # Update the value to new value
-      update_parameter(detector['parameter'], 'port', new_resource.port)
-      update_parameter(detector['parameter'], 'retries', new_resource.retry_count)
-      update_parameter(detector['parameter'], 'timeout', new_resource.timeout)
+      detector['parameter'].attributes['port'] = new_resource.port
+      detector['parameter'].attributes['retries'] = new_resource.retry_count
+      detector['parameter'].attributes['timeout'] = new_resource.timeout
 
       # Delete the old value
       detector['parameter'].delete_if do |p|
@@ -105,21 +105,6 @@ action :create do
     end
     # update fs_resource.message with foreign_source.to_s
     fs_resource(new_resource.foreign_source_name).message foreign_source.to_s
-  end
-
-  def update_parameter(curr_parameters, name, new_value)
-    updated = false
-    unless new_value.nil?
-      curr_parameters.each do |p|
-        next unless p['key'] == name
-        p['value'] = new_value
-        updated = true
-        break
-      end
-      # handle adding a previously undefined common param
-      curr_parameters.push('key' => name, 'value' => new_value) unless updated
-    end
-    curr_parameters
   end
 end
 
