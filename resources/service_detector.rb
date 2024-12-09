@@ -72,30 +72,31 @@ action :create do
         next if %w(port retries timeout).include?(key)
         detector_el.add_element 'parameter', 'key' => key, 'value' => value
       end
+
+      if detectors.nil?
+        foreign_source.add_element 'detectors' => detector_el
+      else detectors.add_element detector_el
+      end
     else # one already exists, so you need to maybe update class
       # and then replace all the parameters that currently exist with new_resource.parameters + timeout, retry_count, port
       unless new_resource.class_name.nil?
         detector.attributes['class'] = new_resource.class_name
-      end
-      # Delete the old value
-      detector['parameter'].delete_if do |p|
-        !%w(port retries timeout).include? p['key']
       end
       # Update the value to new value
       update_parameter(detector['parameter'], 'port', new_resource.port)
       update_parameter(detector['parameter'], 'retries', new_resource.retry_count)
       update_parameter(detector['parameter'], 'timeout', new_resource.timeout)
 
-      new_resource.parameters.each do |key, value|
-        next if %w(port retries timeout).include?(key)
-        update_parameter(detector['parameter'], key, value)
+      # Delete the old value
+      detector['parameter'].delete_if do |p|
+        !%w(port retries timeout).include? p['key']
       end
-      detector_el = detector
-    end
 
-    if detectors.nil?
-      foreign_source.add_element 'detectors' => detector_el
-    else foreign_source.add_element detector_el
+      unless new_resource.parameters.nil?
+        new_resource.parameters.each do |k, v|
+          detector['parameter'].push('key' => k, 'value' => v)
+        end
+      end
     end
     # update fs_resource.message with foreign_source.to_s
     fs_resource(new_resource.foreign_source_name).message foreign_source.to_s
