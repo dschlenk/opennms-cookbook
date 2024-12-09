@@ -70,6 +70,7 @@ action :create do
       unless new_resource.retry_count.nil?
         detector_el.add_element 'parameter', 'key' => 'retries', 'value' => new_resource.retry_count
       end
+
       unless new_resource.parameters.nil?
         new_resource.parameters.each do |key, value|
           next if %w(port retries timeout).include?(key)
@@ -113,7 +114,7 @@ action :create_if_missing do
     fs_resource_init(new_resource.foreign_source_name)
     service_name = new_resource.service_name
     foreign_source = REXML::Document.new(fs_resource(new_resource.foreign_source_name).message).root
-    detector = foreign_source.elements["/detectors/detector[@name = '#{service_name}']"]
+    detector = foreign_source.elements["detectors/detector[@name = '#{service_name}']"]
     if detector.nil?
       run_action(:create)
     end
@@ -124,7 +125,7 @@ action :delete do
   fs_resource_init(new_resource.foreign_source_name)
   service_name = new_resource.service_name
   foreign_source = REXML::Document.new(fs_resource(new_resource.foreign_source_name).message).root
-  detector = foreign_source.elements["/detectors/detector[@name = '#{service_name}']"]
+  detector = foreign_source.elements["detectors/detector[@name = '#{service_name}']"]
   if !detector.nil?
     converge_by("Removing service detector #{service_name} from foreign source #{new_resource.foreign_source_name}") do
       foreign_source.delete_element(detector) unless detector.nil?
