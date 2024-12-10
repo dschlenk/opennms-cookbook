@@ -56,15 +56,14 @@ action :create do
     foreign_source = REXML::Document.new(fs_resource(new_resource.foreign_source_name).message).root
     detector = foreign_source.elements["detectors/detector[@name = '#{service_name}']"] unless foreign_source.nil?
     detectors_el = foreign_source.elements["detectors"] unless foreign_source.nil?
-    # create a REXML::Element with a name attribute and a class attribute,
     if detector.nil?
-      # Create detector element and add the attributes
+      # Create detector element and add the name attributes and class attribute
       detector_el = REXML::Element.new('detector')
       unless service_name.nil?
-      detector_el.add_attribute('name', service_name)
+        detector_el.add_attribute('name', service_name)
       end
       unless new_resource.class_name.nil?
-      detector_el.add_attribute('class', new_resource.class_name)
+        detector_el.add_attribute('class', new_resource.class_name)
       end
       # then add parameter children for each of new_resource.parameters + timeout, retry_count, port
       unless new_resource.timeout.nil?
@@ -76,7 +75,6 @@ action :create do
       unless new_resource.retry_count.nil?
         detector_el.add_element 'parameter', 'key' => 'retries', 'value' => new_resource.retry_count
       end
-
       unless new_resource.parameters.nil?
         new_resource.parameters.each do |key, value|
           next if %w(port retries timeout).include?(key)
@@ -92,17 +90,14 @@ action :create do
       unless new_resource.class_name.nil?
         detector.attributes['class'] = new_resource.class_name
       end
-
+      # delete all parameters
+      detector.elements.delete_all 'parameter'
+      # Add all parameter back with new values
       if new_resource.parameters.is_a?(Hash) && !new_resource.parameters.empty?
-        # delete all parameters
-        detector.elements.delete_all 'parameter'
-
-        # add them back with new values
         new_resource.parameters.each do |key, value|
           detector.add_element 'parameter', 'key' => key, 'value' => value
         end
       end
-
       # and then replace all the parameters that currently exist with new_resource.parameters + timeout, retry_count, port
       unless new_resource.timeout.nil?
         timeout_el = detector.elements["parameter[@key='timeout']"]
