@@ -31,22 +31,52 @@ load_current_value do |new_resource|
   gf = Opennms::Cookbook::Graph::CollectionGraphPropertiesFile.read("#{onms_etc}/snmp-graph.properties.d/#{new_resource.file}") if gf.nil?
   report = gf.reports[new_resource.short_name]
   current_value_does_not_exist! if report.nil?
-  # this:
   %i(long_name columns type command).each do |p|
     send(p, report.send(p))
   end
-  # is the same as this:
-  #long_name report.long_name
-  #columns report.columns
-  #type report.type
-  #command report.command
 end
 
 action :create do
+  converge_if_changed do
+    cgf_resource_init("#{onms_etc}/snmp-graph.properties.d/#{new_resource.file}")
+    gf = cgf_resource("#{onms_etc}/snmp-graph.properties.d/#{new_resource.file}").variables[:config]
+    report = gf.reports[new_resource.short_name]
+    if report.nil?
+      %i(long_name columns type command).each do |p|
+        raise Chef::Exceptions::ValidationFailed, "Property #{p} must be defined when creating a new collection graph." if new_resource.send(p).nil?
+      end
+      # make a new report in the file
+      gf.add_report(short_name: new_resource.short_name, long_name: new_resource.long_name, columns: new_resource.columns, type: new_resource.type, command: new_resource.command)
+    else
+      # update the existing report
+      run_action(:update)
+    end
+  end
 end
+
 action :create_if_missing do
+  cgf_resource_init("#{onms_etc}/snmp-graph.properties.d/#{new_resource.file}")
+  gf = cgf_resource("#{onms_etc}/snmp-graph.properties.d/#{new_resource.file}").variables[:config]
+  report = gf.reports[new_resource.short_name]
+  run_action(:create) if report.nil?
 end
+
 action :update do
+  converge_if_changed do
+    cgf_resource_init("#{onms_etc}/snmp-graph.properties.d/#{new_resource.file}")
+    gf = cgf_resource("#{onms_etc}/snmp-graph.properties.d/#{new_resource.file}").variables[:config]
+    report = gf.reports[new_resource.short_name]
+    raise Chef::Exceptions::ResourceNotFound, "No graph named #{new_resource.short_name} found in #{new_resource.file}. You must use action `:create` or `:create_if_missing` before updating." if report.nil?
+    %i(long_name columns type command).each do |p|
+      report[p.to_s] = new_resource.send(p) unless new_resource.send(p).nil?
+    end
+  end
 end
 action :delete do
+  cgf_resource_init("#{onms_etc}/snmp-graph.properties.d/#{new_resource.file}")
+  gf = cgf_resource("#{onms_etc}/snmp-graph.properties.d/#{new_resource.file}").variables[:config]
+  report = gf.reports[new_resource.short_name]
+  converge_by "Removing graph #{new_resource.short_name} from #{new_resource.file}" do
+    gf.delete_report(short_name: new_resource.short_name)
+  end unless report.nil?
 end
