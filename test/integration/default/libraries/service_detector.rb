@@ -10,7 +10,7 @@ class ServiceDetector < Inspec.resource(1)
   '
 
   example '
-    describe service_detector(\'Router\', \'another-source\') do
+    describe service_detector(\'Router\', \'another-source\', 1237) do
       its(\'class_name\') { should eq \'org.opennms.netmgt.provision.detector.snmp.SnmpDetector\' }
       its(\'port\') { should eq 161 }
       its(\'retry_count\') { should eq 3 }
@@ -19,7 +19,7 @@ class ServiceDetector < Inspec.resource(1)
     end
   '
 
-  def initialize(name, foreign_source)
+  def initialize(name, foreign_source, port =8980)
     parsed_url = Addressable::URI.parse("http://admin:admin@localhost:8980/opennms/rest/foreignSources/#{foreign_source}/detectors/#{name}").normalize.to_str
     begin
       fs = RestClient.get(parsed_url)
