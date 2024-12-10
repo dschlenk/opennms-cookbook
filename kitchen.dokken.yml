@@ -460,7 +460,7 @@ suites:
   - name: service_detector
     driver:
       ports:
-        - 1237:8980/tcp
+        - 1238:8980/tcp
     provisioner:
       policyfile: policyfiles/service_detector.rb
     verifier:

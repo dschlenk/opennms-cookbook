@@ -60,9 +60,12 @@ action :create do
     if detector.nil?
       # Create detector element and add the attributes
       detector_el = REXML::Element.new('detector')
+      unless service_name.nil?
       detector_el.add_attribute('name', service_name)
+      end
+      unless new_resource.class_name.nil?
       detector_el.add_attribute('class', new_resource.class_name)
-
+      end
       # then add parameter children for each of new_resource.parameters + timeout, retry_count, port
       unless new_resource.timeout.nil?
         detector_el.add_element 'parameter', 'key' => 'timeout', 'value' => new_resource.timeout
