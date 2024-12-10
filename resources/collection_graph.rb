@@ -13,7 +13,7 @@ property :long_name, String
 property :columns, Array, callbacks: {
   'should be an Array of Strings' => lambda { |p|
     !p.any? { |a| !a.is_a?(String) }
-  }
+  },
 }
 # required for new
 property :type, String
