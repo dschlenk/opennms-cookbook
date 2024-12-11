@@ -38,7 +38,28 @@ module Opennms
       end
 
       class CollectionGraphPropertiesFile
-        # TODO
+        require 'java-properties'
+        attr_reader :reports
+
+        def initialize
+          @reports = []
+        end
+
+        def read!(file = 'graph.properties')
+          require 'java-properties'
+          props = JavaProperties::Properties.new(file)
+          reports = props[:reports].split(/,\s*/) unless props[:reports].nil?
+          reports.each do |report|
+            # each report has at least a name, columns, type, command and maybe propertiesValues, description, suppress
+            @reports.push({ 'name' => props["report.#{report}.name".to_sym], 'columns' => props["report.#{report}.columns".to_sym].split(/,\s*/), 'command' => props["report.#{report}.command".to_sym], 'propertiesValues' => props["report.#{report}.propertiesValues".to_sym], 'description' => props["report.#{report}.description".to_sym], 'suppress' => props["report.#{report}.suppress".to_sym] }.compact)
+          end
+        end
+
+        def self.read(file = 'graph.properties')
+          cgpf = CollectionGraphPropertiesFile.new
+          cgpf.read!(file)
+          cgpf
+        end
       end
     end
   end

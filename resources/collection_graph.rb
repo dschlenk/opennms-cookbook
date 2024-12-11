@@ -2,6 +2,7 @@
 # new graph file in $ONMS_HOME/etc/snmp-graph.properties.d/
 # or the default collection graph file, $ONMS_HOME/etc/snmp-graph.properties
 
+# TODO: Pivot to light refactor using existing library
 include Opennms::XmlHelper
 include Opennms::Cookbook::Graph::CollectionGraphTemplate
 
@@ -29,7 +30,7 @@ load_current_value do |new_resource|
   current_value_does_not_exist! unless ::File.exist?("#{onms_etc}/snmp-graph.properties.d/#{new_resource.file}")
   gf = cgf_resource("#{onms_etc}/snmp-graph.properties.d/#{new_resource.file}").variables[:config] unless cgf_resource("#{onms_etc}/snmp-graph.properties.d/#{new_resource.file}").nil?
   gf = Opennms::Cookbook::Graph::CollectionGraphPropertiesFile.read("#{onms_etc}/snmp-graph.properties.d/#{new_resource.file}") if gf.nil?
-  report = gf.reports[new_resource.short_name]
+  report = gf.report(short_name: new_resource.short_name)
   current_value_does_not_exist! if report.nil?
   %i(long_name columns type command).each do |p|
     send(p, report.send(p))
@@ -40,7 +41,7 @@ action :create do
   converge_if_changed do
     cgf_resource_init("#{onms_etc}/snmp-graph.properties.d/#{new_resource.file}")
     gf = cgf_resource("#{onms_etc}/snmp-graph.properties.d/#{new_resource.file}").variables[:config]
-    report = gf.reports[new_resource.short_name]
+    report = gf.report(short_name: new_resource.short_name)
     if report.nil?
       %i(long_name columns type command).each do |p|
         raise Chef::Exceptions::ValidationFailed, "Property #{p} must be defined when creating a new collection graph." if new_resource.send(p).nil?
@@ -57,7 +58,7 @@ end
 action :create_if_missing do
   cgf_resource_init("#{onms_etc}/snmp-graph.properties.d/#{new_resource.file}")
   gf = cgf_resource("#{onms_etc}/snmp-graph.properties.d/#{new_resource.file}").variables[:config]
-  report = gf.reports[new_resource.short_name]
+  report = gf.report(short_name: new_resource.short_name)
   run_action(:create) if report.nil?
 end
 
@@ -65,7 +66,7 @@ action :update do
   converge_if_changed do
     cgf_resource_init("#{onms_etc}/snmp-graph.properties.d/#{new_resource.file}")
     gf = cgf_resource("#{onms_etc}/snmp-graph.properties.d/#{new_resource.file}").variables[:config]
-    report = gf.reports[new_resource.short_name]
+    report = gf.report(short_name: new_resource.short_name)
     raise Chef::Exceptions::ResourceNotFound, "No graph named #{new_resource.short_name} found in #{new_resource.file}. You must use action `:create` or `:create_if_missing` before updating." if report.nil?
     %i(long_name columns type command).each do |p|
       report[p.to_s] = new_resource.send(p) unless new_resource.send(p).nil?
@@ -75,7 +76,7 @@ end
 action :delete do
   cgf_resource_init("#{onms_etc}/snmp-graph.properties.d/#{new_resource.file}")
   gf = cgf_resource("#{onms_etc}/snmp-graph.properties.d/#{new_resource.file}").variables[:config]
-  report = gf.reports[new_resource.short_name]
+  report = gf.report(short_name: new_resource.short_name)
   converge_by "Removing graph #{new_resource.short_name} from #{new_resource.file}" do
     gf.delete_report(short_name: new_resource.short_name)
   end unless report.nil?
