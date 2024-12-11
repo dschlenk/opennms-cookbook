@@ -674,6 +674,13 @@ suites:
       inspec_tests:
         - path: test/integration/default
         - path: test/integration/snmp_config_profile_delete
+  - name: statsd
+    provisioner:
+      policyfile: policyfiles/statsd.rb
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/statsd
   - name: surveillance_view
     provisioner:
       policyfile: policyfiles/surveillance_view.rb

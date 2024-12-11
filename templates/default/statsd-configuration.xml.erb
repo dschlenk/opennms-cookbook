@@ -1,0 +1,42 @@
+<?xml version="1.0"?>
+<statistics-daemon-configuration
+  xmlns:this="http://www.opennms.org/xsd/config/statsd"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.opennms.org/xsd/config/statsd http://www.opennms.org/xsd/config/statistics-daemon-configuration.xsd ">
+
+  <!--
+       The following packages are simple sample configuration.
+       All of them are disabled by default (status="off").
+       Change the status to be "on" on to enable the scheduling.
+
+       To reload the configuration, use the following command:
+       /opt/opennms/bin/send-event.pl \
+         uei.opennms.org/internal/reloadDaemonConfig \
+         -p 'daemonName Statsd'
+  -->
+<% @config.packages.each do |package| -%>
+
+  <package name=<%= package.name.encode(:xml => :attr) %>>
+  <% unless package.filter.nil? -%>
+    <filter><%= package.filter.encode(:xml => :text) %></filter>
+  <% end -%>
+  <% package.reports.each do |report| -%>
+    <packageReport name=<%= report.name.encode(:xml => :attr) %> description=<%= report.description.encode(:xml => :attr) %>
+                   schedule=<%= report.schedule.encode(:xml => :attr) %> retainInterval=<%= report.retain_interval.to_s.encode(:xml => :attr) %>
+                   status=<%= report.status.encode(:xml => :attr) %>>
+    <% report.parameters.each do |k, v| -%>
+      <parameter key=<%= k.encode(:xml => :attr) %> value=<%= v.encode(:xml => :attr) %>/>
+    <% end unless report.parameters.nil? -%>
+    </packageReport>
+  <% end unless package.reports.nil? -%>
+  </package>
+<% end unless @config.packages.nil? -%>
+
+
+<% @config.packages.each do |package| -%>
+  <% package.reports.each do |report| -%>
+  <report name=<%= report.name.encode(:xml => :attr) %> class-name=<%= report.class_name.encode(:xml => :attr) %>/>
+  <% end unless package.reports.nil? -%>
+<% end unless @config.packages.nil? -%>
+
+</statistics-daemon-configuration>

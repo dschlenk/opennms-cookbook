@@ -12,10 +12,16 @@
 
 * [opennms\_eventconf](eventconf.md)
 * [opennms\_event](event.md)
+* [opennms\_syslog\_file](syslog.md)
 
 ### Service Assurance
 
+* [service\_assurance](service_assurance.md)
+
 ### Performance Management and Thresholding
+
+* [datacollection](datacollection.md)
+* [statsd](statsd.md)
 
 ### User and Group Management
 
