@@ -235,7 +235,7 @@ module Opennms::Rbac
       end
     end
     unless new_resource.users.nil?
-      if !group_el.elements['user'].nil?
+      unless group_el.elements['user'].nil?
         group_el.elements.delete_all('user')
       end
       new_resource.users.each do |user|
@@ -244,7 +244,7 @@ module Opennms::Rbac
       end
     end
     unless new_resource.duty_schedules.nil?
-      if !group_el.elements['duty-schedule'].nil?
+      unless group_el.elements['duty-schedule'].nil?
         group_el.elements.delete_all('duty-schedule')
       end
       new_resource.duty_schedules.each do |ds|

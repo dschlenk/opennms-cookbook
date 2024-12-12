@@ -5,13 +5,13 @@ property :comments, String
 property :users, Array, callbacks: {
   'should be an Array of Strings' => lambda { |p|
     !p.any? { |s| !s.is_a?(String) }
-  }
+  },
 }
 # Array of strings - further validation not performed
 property :duty_schedules, Array, callbacks: {
   'should be an Array of Strings' => lambda { |p|
     !p.any? { |s| !s.is_a?(String) }
-  }
+  },
 }
 include Opennms::Rbac
 include Opennms::XmlHelper
@@ -42,7 +42,7 @@ action :create do
 end
 
 action :validate do
-  if !new_resource.users.nil?
+  unless new_resource.users.nil?
     raise Chef::Exceptions::ValidationFailed, "Not all of the following users currently exist: #{new_resource.users.join(', ')}. Cannot create/update group #{new_resource.group_name}." unless users_exist?(new_resource.users)
   end
 end

@@ -15,7 +15,7 @@ control 'group' do
 
   describe opennms_group('update') do
     it { should exist }
-    its('users') { should eq ['admin', 'rtc'] }
+    its('users') { should eq %w(admin rtc) }
     its('duty_schedules') { should eq ['MoTuWeThFrSaSu800-1700'] }
     its('comments') { should eq 'barf' }
   end

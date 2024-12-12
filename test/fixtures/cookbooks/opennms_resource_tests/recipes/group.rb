@@ -15,7 +15,7 @@ end
 
 opennms_group 'update update' do
   group_name 'update'
-  users ['admin', 'rtc']
+  users %w(admin rtc)
   comments 'barf'
   duty_schedules ['MoTuWeThFrSaSu800-1700']
   action :update
@@ -23,7 +23,7 @@ end
 
 opennms_group 'no update' do
   group_name 'update'
-  duty_schedules ['MoTuWeThFrSaSu800-1700', 'MoTuWeThFrSaSu1701-1702']
+  duty_schedules %w(MoTuWeThFrSaSu800-1700 MoTuWeThFrSaSu1701-1702)
   action :create_if_missing
 end
 
