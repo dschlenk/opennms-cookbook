@@ -496,6 +496,13 @@ suites:
       inspec_tests:
         - path: test/integration/default
         - path: test/integration/expression_delete
+  - name: group
+    provisioner:
+      policyfile: policyfiles/group.rb
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/group
   - name: jdbc_collection
     provisioner:
       policyfile: policyfiles/jdbc_collection.rb

@@ -52,6 +52,13 @@ module Opennms::Rbac
     end
   end
 
+  def users_exist?(users)
+    users.each do |user|
+      return false unless user_exists?(user)
+    end
+    true
+  end
+
   def user_exists?(user)
     begin
       response = RestClient.get "#{baseurl}/users/#{user}", accept: :json, 'Accept-Encoding' => 'identity'
@@ -186,6 +193,13 @@ module Opennms::Rbac
     !doc.elements["/groupinfo/groups/group/name[text() = '#{group}']"].nil?
   end
 
+  def group(group)
+    file = ::File.new("#{node['opennms']['conf']['home']}/etc/groups.xml", 'r')
+    doc = REXML::Document.new file
+    file.close
+    doc.elements["/groupinfo/groups/group[name/text() = '#{group}']"]
+  end
+
   def user_in_group?(group, user)
     ingroup = false
     file = ::File.new("#{node['opennms']['conf']['home']}/etc/groups.xml", 'r')
@@ -198,6 +212,50 @@ module Opennms::Rbac
     ingroup
   end
 
+  def delete_group(group)
+    file = ::File.new("#{node['opennms']['conf']['home']}/etc/groups.xml", 'r')
+    doc = REXML::Document.new file
+    file.close
+    doc.elements.delete_all("/groupinfo/groups/group[name/text() = '#{group}']")
+    Opennms::Helpers.write_xml_file(doc, "#{node['opennms']['conf']['home']}/etc/groups.xml")
+  end
+
+  def update_group(new_resource)
+    file = ::File.new("#{node['opennms']['conf']['home']}/etc/groups.xml", 'r')
+    doc = REXML::Document.new file
+    file.close
+
+    group_el = doc.elements["/groupinfo/groups/group[name/text() = '#{new_resource.group_name}']"]
+    unless new_resource.comments.nil?
+      if group_el.elements['comments'].nil?
+        comments_el = group_el.add_element 'comments'
+        comments_el.add_text new_resource.comments
+      else
+        group_el.elements['comments'].text = new_resource.comments
+      end
+    end
+    unless new_resource.users.nil?
+      if !group_el.elements['user'].nil?
+        group_el.elements.delete_all('user')
+      end
+      new_resource.users.each do |user|
+        user_el = group_el.add_element 'user'
+        user_el.add_text user
+      end
+    end
+    unless new_resource.duty_schedules.nil?
+      if !group_el.elements['duty-schedule'].nil?
+        group_el.elements.delete_all('duty-schedule')
+      end
+      new_resource.duty_schedules.each do |ds|
+        ds_el = group_el.add_element 'duty-schedule'
+        ds_el.add_text ds
+      end
+    end
+
+    Opennms::Helpers.write_xml_file(doc, "#{node['opennms']['conf']['home']}/etc/groups.xml")
+  end
+
   def add_group(new_resource)
     file = ::File.new("#{node['opennms']['conf']['home']}/etc/groups.xml", 'r')
     doc = REXML::Document.new file
@@ -206,11 +264,7 @@ module Opennms::Rbac
     groups_el = doc.elements['/groupinfo/groups']
     group_el = groups_el.add_element 'group'
     name_el = group_el.add_element 'name'
-    name_el.add_text new_resource.name
-    unless new_resource.default_svg_map.nil?
-      map_el = group_el.add_element 'default-map'
-      map_el.add_text new_resource.default_svg_map
-    end
+    name_el.add_text new_resource.group_name
     unless new_resource.comments.nil?
       comments_el = group_el.add_element 'comments'
       comments_el.add_text new_resource.comments
