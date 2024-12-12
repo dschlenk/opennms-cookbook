@@ -140,6 +140,10 @@ module Opennms
           @class_name = class_name unless class_name.nil?
         end
       end
+
+      class DuplicateStatsdPackage < StandardError; end
+
+      class DuplicatePackageReport < StandardError; end
     end
   end
 end

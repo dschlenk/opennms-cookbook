@@ -25,7 +25,11 @@
 
 ### User and Group Management
 
+* [opennms\_user](user.md)
+
 ### Provisioning and Discovery
+
+* [opennms\_disco\_range, opennms\_disco\_specific, opennms\_disco\_url](documentation/disco.md)
 
 ### Presentation
 

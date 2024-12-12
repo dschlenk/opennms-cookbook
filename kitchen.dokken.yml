@@ -209,6 +209,27 @@ suites:
       inspec_tests:
         - path: test/integration/default
         - path: test/integration/dashlet_update
+  - name: disco_range
+    provisioner:
+      policyfile: policyfiles/disco_range.rb
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/disco_range
+  - name: disco_specific
+    provisioner:
+      policyfile: policyfiles/disco_specific.rb
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/disco_specific
+  - name: disco_url
+    provisioner:
+      policyfile: policyfiles/disco_url.rb
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/disco_url
   - name: eventconf
     provisioner:
       policyfile: policyfiles/eventconf.rb
