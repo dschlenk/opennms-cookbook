@@ -141,40 +141,7 @@ A few other recipes exist that aren't listed here. They are included by others w
 
 # Custom Resources
 
-## SNMP Config
-
-* [opennms\_snmp\_config](documentation/snmp_config.md)
-* [opennms\_snmp\_config\_definition](documentation/snmp_config_definition.md)
-* [opennms\_snmp\_config\_profile](documentation/snmp_config_profile.md)
-
-## Events, Alarms, and Notifications
-
-* [opennms\_eventconf](documentation/eventconf.md)
-* [opennms\_event](documentation/event.md)
-
-## Service Assurance
-
-* [Service assurance resource documentation](documentation/service_assurance.md)
-
-## Performance Management and Thresholding
-
-* [Data collection resource documentation](documentation/datacollection.md)
-
-## Syslog configuration
-
-# [opennms\_syslog\_file](documentation/syslog.md)
-
-## User and Group Management
-
-## Provisioning and Discovery
-
-## Presentation
-
-## Administration
-
-* [opennms\_secret](documentation/secret.md)
-
-TODO: update and move the rest of these to individual files
+A number of [custom resources are available](documentation/README.md)
 
 #### Users, Groups and Roles
 

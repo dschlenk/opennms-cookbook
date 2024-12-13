@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?><discovery-configuration xmlns="http://xmlns.opennms.org/xsd/config/discovery" initial-sleep-time="<%= @init_sleep_ms %>" packets-per-second="<%= @pps %>" restart-sleep-time="<%= @restart_sleep_ms %>" retries="<%= @retries %>" timeout="<%= @timeout %>"<% if @foreign_source -%> foreign-source="<%= @foreign_source %>"<% end -%>>
+   <!-- see examples/discovery-configuration.xml for options -->
+   <!--
+   <include-range>
+      <begin>192.168.0.1</begin>
+      <end>192.168.0.254</end>
+   </include-range>
+   -->
+<% @config.specifics.each do |s| -%>
+    <specific<%= s[:location].nil? ? '' : " location=#{s[:location].encode(:xml => :attr)}" %><%= s[:retry_count].nil? ? '' : " retries=#{s[:retry_count].to_s.encode(:xml => :attr)}" %><%= s[:timeout].nil? ? '' : " timeout=#{s[:timeout].to_s.encode(:xml => :attr)}" %><%= s[:foreign_source].nil? ? '' : " foreign-source=#{s[:foreign_source].encode(:xml => :attr)}" %>><%= s[:ipaddr].encode(:xml => :text) %></specific>
+<% end unless @config.specifics.nil? -%>
+<% @config.include_ranges.each do |r| -%>
+    <include-range<%= r[:location].nil? ? '' : " location=#{r[:location].encode(:xml => :attr)}" %><%= r[:retry_count].nil? ? '' : " retries=#{r[:retry_count].to_s.encode(:xml => :attr)}" %><%= r[:timeout].nil? ? '' : " timeout=#{r[:timeout].to_s.encode(:xml => :attr)}" %><%= r[:foreign_source].nil? ? '' : " foreign-source=#{r[:foreign_source].encode(:xml => :attr)}" %>>
+        <begin><%= r[:begin].encode(:xml => :text) %></begin>
+        <end><%= r[:end].encode(:xml => :text) %></end>
+    </include-range>
+<% end unless @config.include_ranges.nil?-%>
+<% @config.exclude_ranges.each do |r| -%>
+    <exclude-range<%= r[:location].nil? ? '' : " location=#{r[:location].encode(:xml => :attr)}" %>>
+        <begin><%= r[:begin].encode(:xml => :text) %></begin>
+        <end><%= r[:end].encode(:xml => :text) %></end>
+    </exclude-range>
+<% end unless @config.exclude_ranges.nil? -%>
+<% @config.include_urls.each do |u| -%>
+    <include-url<%= u[:location].nil? ? '' : " location=#{u[:location].encode(:xml => :attr)}" %><%= u[:retry_count].nil? ? '' : " retries=#{u[:retry_count].to_s.encode(:xml => :attr)}" %><%= u[:timeout].nil? ? '' : " timeout=#{u[:timeout].to_s.encode(:xml => :attr)}" %><%= u[:foreign_source].nil? ? '' : " foreign-source=#{u[:foreign_source].encode(:xml => :attr)}" %>><%= u[:url].encode(:xml => :text) %></include-url>
+<% end unless @config.include_urls.nil? -%>
+<% @config.exclude_urls.each do |u| -%>
+    <exclude-url<%= u[:location].nil? ? '' : " location=#{u[:location].encode(:xml => :attr)}" %>><%= u[:url].encode(:xml => :text) %></exclude-url>
+<% end unless @config.exclude_urls.nil? -%>
+</discovery-configuration>

@@ -8,7 +8,7 @@ class DiscoUrl < Inspec.resource(1)
   '
 
   example '
-    describe disco_url(\'http://example.com/include\') do
+    describe disco_url(\'include\', \'http://example.com/include\', \'Detroit\') do
       it { should exist }
       its(\'file_name\') { should eq \'include\' }
       its(\'retry_count\') { should eq 13 }
@@ -16,9 +16,10 @@ class DiscoUrl < Inspec.resource(1)
     end
   '
 
-  def initialize(url)
+  def initialize(type, url, location = nil)
     doc = REXML::Document.new(inspec.file('/opt/opennms/etc/discovery-configuration.xml').content)
-    xpath = "/discovery-configuration/include-url[text() = '#{url}']"
+    xpath = "/discovery-configuration/#{type}-url[text() = '#{url}' and not(@location)]" if location.nil?
+    xpath = "/discovery-configuration/#{type}-url[text() = '#{url}' and @location = '#{location}']" unless location.nil?
     u_el = doc.elements[xpath]
     @exists = !u_el.nil?
     if @exists
@@ -29,7 +30,6 @@ class DiscoUrl < Inspec.resource(1)
       end
       @params[:retry_count] = u_el.attributes['retries'].to_i unless u_el.attributes['retries'].nil?
       @params[:discovery_timeout] = u_el.attributes['timeout'].to_i unless u_el.attributes['timeout'].nil?
-      @params[:location] = u_el.attributes['location']
       @params[:foreign_source] = u_el.attributes['foreign-source']
     end
   end
