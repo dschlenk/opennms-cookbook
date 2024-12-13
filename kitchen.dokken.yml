@@ -125,6 +125,13 @@ suites:
       inspec_tests:
         - path: test/integration/default
         - path: test/integration/avail_view_section_mod
+  - name: collection_graph
+    provisioner:
+      policyfile: policyfiles/collection_graph.rb
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/collection_graph
   - name: collection_package_delete
     provisioner:
       policyfile: policyfiles/collection_package_delete.rb

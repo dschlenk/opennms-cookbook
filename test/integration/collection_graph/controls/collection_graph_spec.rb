@@ -1,4 +1,3 @@
-# frozen_string_literal: true
 control 'collection_graph' do
   describe snmp_collection_group('coffee', 'coffee.xml') do
     it { should exist }

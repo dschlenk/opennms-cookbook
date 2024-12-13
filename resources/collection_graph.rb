@@ -32,7 +32,7 @@ end
 # TODO: some day it would be nice to be able to handle updates and deletes
 action :create do
   converge_if_changed do
-    new_graph_file("#{onms_etc}/snmp-graph.properties.d/#{new_resource.file}", node) unless ::File.exist?("#{onms_etc}/snmp-graph.properties.d/#{new_resource.file}")
+    new_graph_file(new_resource.file, node) unless ::File.exist?("#{onms_etc}/snmp-graph.properties.d/#{new_resource.file}")
     add_collection_graph(new_resource, node)
     main_file = find_resource(:file, "#{node['opennms']['conf']['home']}/etc/snmp-graph.properties")
     if main_file.nil?
