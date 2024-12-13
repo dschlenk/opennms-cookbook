@@ -7,18 +7,14 @@ include Graph
 
 property :short_name, String, name_property: true
 property :file, String, identity: true # refers to the name of the file to add the graph def to
-# required for new
-property :long_name, String
-# required for new
-property :columns, Array, callbacks: {
+property :long_name, String, required: true
+property :columns, Array, required: true, callbacks: {
   'should be an Array of Strings' => lambda { |p|
     !p.any? { |a| !a.is_a?(String) }
   },
 }
-# required for new
-property :type, String
-# required for new
-property :command, String
+property :type, String, required: true
+property :command, String, required: true
 
 action_class do
   include Opennms::XmlHelper
