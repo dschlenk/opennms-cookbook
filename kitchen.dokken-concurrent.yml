@@ -102,6 +102,20 @@ suites:
       inspec_tests:
         - path: test/integration/default
         - path: test/integration/avail_category
+  - name: avail_view_section
+    provisioner:
+      policyfile: policyfiles/avail_view_section.rb
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/avail_view_section
+  - name: avail_view_section_mod
+    provisioner:
+      policyfile: policyfiles/avail_view_section_mod.rb
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/avail_view_section_mod
   - name: collection_package
     provisioner:
       policyfile: policyfiles/collection_package.rb
@@ -179,6 +193,41 @@ suites:
       inspec_tests:
         - path: test/integration/default
         - path: test/integration/collection_service
+  - name: dashlet
+    provisioner:
+      policyfile: policyfiles/dashlet.rb
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/dashlet
+  - name: dashlet_update
+    provisioner:
+      policyfile: policyfiles/dashlet_update.rb
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/dashlet_update
+  - name: disco_range
+    provisioner:
+      policyfile: policyfiles/disco_range.rb
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/disco_range
+  - name: disco_specific
+    provisioner:
+      policyfile: policyfiles/disco_specific.rb
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/disco_specific
+  - name: disco_url
+    provisioner:
+      policyfile: policyfiles/disco_url.rb
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/disco_url
   - name: eventconf
     provisioner:
       policyfile: policyfiles/eventconf.rb
@@ -445,6 +494,13 @@ suites:
       inspec_tests:
         - path: test/integration/default
         - path: test/integration/expression_delete
+  - name: group
+    provisioner:
+      policyfile: policyfiles/group.rb
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/group
   - name: jdbc_collection
     provisioner:
       policyfile: policyfiles/jdbc_collection.rb
@@ -644,6 +700,27 @@ suites:
       inspec_tests:
         - path: test/integration/default
         - path: test/integration/snmp_config_profile_delete
+  - name: statsd
+    provisioner:
+      policyfile: policyfiles/statsd.rb
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/statsd
+  - name: surveillance_view
+    provisioner:
+      policyfile: policyfiles/surveillance_view.rb
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/surveillance_view
+  - name: surveillance_view_mod
+    provisioner:
+      policyfile: policyfiles/surveillance_view_mod.rb
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/surveillance_view_mod
   - name: syslog_file
     provisioner:
       policyfile: policyfiles/syslog_file.rb
@@ -762,6 +839,20 @@ suites:
     driver:
       ports:
         - 1235:8980/tcp
+  - name: wallboard
+    provisioner:
+      policyfile: policyfiles/wallboard.rb
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/wallboard
+  - name: wallboard_mod
+    provisioner:
+      policyfile: policyfiles/wallboard_mod.rb
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/wallboard_mod
   - name: wsman_collection
     provisioner:
       policyfile: policyfiles/wsman_collection.rb

@@ -51,3 +51,8 @@ Lint/UselessAssignment:
 Style/OptionalArguments:
   Exclude:
     - 'libraries/collection_helper.rb'
+
+# workaround bug
+Chef/Modernize/CronDFileOrTemplate:
+  Exclude:
+    - 'resources/disco_url.rb'

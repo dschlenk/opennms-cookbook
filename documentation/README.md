@@ -12,16 +12,31 @@
 
 * [opennms\_eventconf](eventconf.md)
 * [opennms\_event](event.md)
+* [opennms\_syslog\_file](syslog.md)
 
 ### Service Assurance
 
+* [service\_assurance](service_assurance.md)
+
 ### Performance Management and Thresholding
+
+* [datacollection](datacollection.md)
+* [statsd](statsd.md)
 
 ### User and Group Management
 
+* [opennms\_user](user.md)
+
 ### Provisioning and Discovery
 
+* [opennms\_disco\_range, opennms\_disco\_specific, opennms\_disco\_url](documentation/disco.md)
+
 ### Presentation
+
+* [opennms\_avail\_category](avail_category.md)
+* [opennms\_avail\_view\_section](avail_view_section.md)
+* [opennms\_surveillance\_view](surveillance_view.md)
+* [opennms\_wallboard and opennms\_dashlet](opsboard.md)
 
 ### Administration
 

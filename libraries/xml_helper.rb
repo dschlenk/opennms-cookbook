@@ -13,6 +13,7 @@ module Opennms
     end
 
     def xmldoc_from_file(file)
+      return unless ::File.exist?(file)
       f = ::File.new(file, 'r')
       doc = REXML::Document.new(f)
       f.close
