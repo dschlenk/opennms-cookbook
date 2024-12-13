@@ -1,5 +1,4 @@
 require 'java-properties'
-require 'tempfile'
 class CollectionGraph < Inspec.resource(1)
   name 'collection_graph'
 
@@ -24,11 +23,10 @@ EOL
 
   def initialize(graph_file, graph_name)
     gf = inspec.file("/opt/opennms/etc/snmp-graph.properties.d/#{graph_file}").content
-    tf = Tempfile.new('inspec-gf')
-    tf.write(gf)
-    tf.close
-    props = JavaProperties::Properties.new(tf.path)
-    values = props[:reports].split(/,\s*/) unless props['reports'].nil?
+    props = JavaProperties.parse(gf)
+    values = props[:reports].split(/,\s*/) unless props[:reports].nil?
+    puts "props[:reports] is #{props[:reports]}"
+    puts "values is #{values}"
     found = values.include?(graph_name) unless values.nil?
     @exists = found
     if @exists
