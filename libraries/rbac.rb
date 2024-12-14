@@ -393,7 +393,7 @@ module Opennms::Rbac
       end
       if !times.difference(new_resource.times).any? && !new_resource.times.difference(times).any?
         Chef::Log.warn("found the right schedule because new_resource.times is #{new_resource.times} and times is #{times}")
-        to_delete = s 
+        to_delete = s
       else
         Chef::Log.warn("not the right schedule because new_resource.times is #{new_resource.times} and times is #{times}")
         preserve.push s
@@ -401,7 +401,7 @@ module Opennms::Rbac
     end
     doc.root.elements.delete_all("/groupinfo/roles/role[@name = '#{new_resource.role_name}']/schedule[@type = '#{new_resource.type}' and @name = '#{new_resource.username}']")
     role = doc.root.elements["/groupinfo/roles/role[@name = '#{new_resource.role_name}']"]
-    preserve.each do |s| 
+    preserve.each do |s|
       role.add_element(s)
     end
     Opennms::Helpers.write_xml_file(doc, "#{node['opennms']['conf']['home']}/etc/groups.xml")

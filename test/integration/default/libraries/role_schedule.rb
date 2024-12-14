@@ -18,8 +18,8 @@ class RoleSchedule < Inspec.resource(1)
   def initialize(type, role, user, times)
     @exists = false
     doc = REXML::Document.new(inspec.file('/opt/opennms/etc/groups.xml').content)
-    s_el = doc.elements["/groupinfo/roles/role[@name = '#{role}']/schedule[@name = '#{user}' and @type = '#{type}']"]
-    return if s_el.nil?
+    schedule = doc.elements["/groupinfo/roles/role[@name = '#{role}']/schedule[@name = '#{user}' and @type = '#{type}']"]
+    return if schedule.nil?
     doc.root.each_element("/groupinfo/roles/role[@name = '#{role}']/schedule[@name = '#{user}' and @type = '#{type}']") do |s_el|
       t = []
       s_el.each_element('time') do |time|
@@ -36,5 +36,4 @@ class RoleSchedule < Inspec.resource(1)
   def exist?
     @exists
   end
-
 end
