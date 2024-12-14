@@ -620,6 +620,13 @@ suites:
       inspec_tests:
         - path: test/integration/default
         - path: test/integration/resource_type
+  - name: role
+    provisioner:
+      policyfile: policyfiles/role.rb
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/role
   - name: send_event
     driver:
       ports:

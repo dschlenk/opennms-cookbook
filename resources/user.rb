@@ -4,7 +4,7 @@ property :full_name, String
 property :user_comments, String
 # required for new, ignored for update unless action is :set_password
 property :password, String
-property :password_salt, [true, false]
+property :password_salt, [true, false], default: true
 property :email, String
 # Array of Strings
 property :duty_schedules, Array, callbacks: {

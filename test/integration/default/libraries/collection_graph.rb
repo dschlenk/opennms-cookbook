@@ -25,8 +25,6 @@ EOL
     gf = inspec.file("/opt/opennms/etc/snmp-graph.properties.d/#{graph_file}").content
     props = JavaProperties.parse(gf)
     values = props[:reports].split(/,\s*/) unless props[:reports].nil?
-    puts "props[:reports] is #{props[:reports]}"
-    puts "values is #{values}"
     found = values.include?(graph_name) unless values.nil?
     @exists = found
     if @exists

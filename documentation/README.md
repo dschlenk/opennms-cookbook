@@ -26,6 +26,9 @@
 ### User and Group Management
 
 * [opennms\_user](user.md)
+* [opennms\_group](group.md)
+* [opennms\_role](role.md)
+* [opennms\_role\_schedule](role\_schedule.md)
 
 ### Provisioning and Discovery
 
