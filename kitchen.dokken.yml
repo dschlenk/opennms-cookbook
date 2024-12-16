@@ -594,6 +594,13 @@ suites:
       inspec_tests:
         - path: test/integration/default
         - path: test/integration/jmx
+  - name: notification_command
+    provisioner:
+      policyfile: policyfiles/notification_command.rb
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/notification_command
   - name: poller
     provisioner:
       policyfile: policyfiles/poller.rb

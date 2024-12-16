@@ -1,12 +1,62 @@
-# frozen_string_literal: true
-# all options - only comment and arguments are optional although binary defaults to true if not defined.
+# all properties
 opennms_notification_command 'wallHost' do
   execute '/usr/bin/wall'
   contact_type 'wall'
   comment 'wall the hostname'
   binary true
   arguments [{ 'streamed' => false, 'switch' => '-tm' }]
-  notifies :run, 'opennms_send_event[restart_Notifd]'
+  service_registry false
+end
+
+# minimal properties
+opennms_notification_command 'minimal' do
+  execute '/bin/true'
+end
+
+opennms_notification_command 'to update' do
+  execute '/bin/true'
+end
+
+opennms_notification_command 'update to update' do
+  command_name 'to update'
+  execute '/bin/sh'
+  comment 'testing update'
+  binary false
+  service_registry false
+  contact_type 'fax'
+  arguments [{ 'streamed' => false, 'switch' => '-tm' }]
+  action :update
+end
+
+opennms_notification_command 'testing noop create_if_missing' do
+  command_name 'wallHost'
+  execute '/usr/bin/walls'
+  contact_type 'walls'
+  comment 'walls the hostname'
+  binary false
+  arguments [{ 'streamed' => true, 'switch' => '-tmz', 'substitution' => 'atonement' }]
+  service_registry false
+  action :create_if_missing
+end
+
+opennms_notification_command 'testing functional create_if_missing' do
+  command_name 'create_if_missing'
+  execute '/bin/false'
+  action :create_if_missing
+end
+
+opennms_notification_command 'delete' do
+  execute '/usr/bin/env'
+end
+
+opennms_notification_command 'delete delete' do
+  command_name 'delete'
+  action :delete
+end
+
+opennms_notification_command 'delete nonexistent' do
+  command_name 'foo'
+  action :delete
 end
 
 # now let's use it in a destination path target
