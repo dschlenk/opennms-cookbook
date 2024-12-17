@@ -5,7 +5,7 @@ property :long_name, String, required: false
 property :columns, Array, required: false, callbacks: {
   'should be an Array of Strings' => lambda { |p|
     p.is_a?(Array) && !p.any? { |a| !a.is_a?(String) }
-  }
+  },
 }
 property :type, Array, required: true
 property :command, String, required: false
