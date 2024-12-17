@@ -1,12 +1,43 @@
-# frozen_string_literal: true
-# Adds/updates/deletes a graph in $ONMS_HOME/etc/response-graph.properties
-actions :create, :create_if_missing, :delete
-default_action :create
+include Opennms::XmlHelper
 
-attribute :short_name, kind_of: String, name_attribute: true
-attribute :long_name, kind_of: String, required: false # defaults to uppercase short_name if not present
-attribute :columns, kind_of: Array, required: false # defaults to short_name if not present
-attribute :type, kind_of: Array, required: true
-attribute :command, kind_of: String, required: false # a generic graph will be generated with min, max avg if not present
+property :short_name, String, name_property: true
+property :long_name, String, required: false
+property :columns, Array, required: false, callbacks: {
+  'should be an Array of Strings' => lambda { |p|
+    p.is_a?(Array) && !p.any? { |a| !a.is_a?(String) }
+  }
+}
+property :type, Array, required: true
+property :command, String, required: false
 
-attr_accessor :exists, :type_exists
+action_class do
+  include Opennms::XmlHelper
+end
+
+load_current_value do |new_resource|
+  current_value_does_not_exist! unless ::File.exist?("#{onms_etc}/response-graph.properties")
+  current_value_does_not_exist! unless check_graph_in_file("#{onms_etc}/response-graph.properties", new_resource.short_name)
+end
+
+action :create do
+  converge_if_changed do
+    new_graph_file("#{onms_etc}/response-graph.properties") unless ::File.exist?("#{onms_etc}/response-graph.properties")
+    add_graph_to_file(new_resource)
+    Chef::Log.info("Created graph #{new_resource.short_name} in response-graph.properties")
+  end
+end
+
+action :create_if_missing do
+  run_action(:create)
+end
+
+action :delete do
+  converge_if_changed do
+    if check_graph_in_file(graph_file_path, new_resource.short_name)
+      remove_graph_from_file(new_resource.short_name)
+      Chef::Log.info("Deleted graph #{new_resource.short_name} from #{onms_etc}/response-graph.properties")
+    else
+      Chef::Log.warn("Graph #{new_resource.short_name} not found in #{onms_etc}/response-graph.properties. Skipping deletion.")
+    end
+  end
+end
