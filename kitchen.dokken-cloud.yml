@@ -214,6 +214,13 @@ suites:
       inspec_tests:
         - path: test/integration/default
         - path: test/integration/dashlet_update
+  - name: destination_path
+    provisioner:
+      policyfile: policyfiles/destination_path.rb
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/destination_path
   - name: disco_range
     provisioner:
       policyfile: policyfiles/disco_range.rb
