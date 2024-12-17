@@ -1,19 +1,42 @@
-# frozen_string_literal: true
-require 'rexml/document'
+include Opennms::Cookbook::Provision::ModelImportHttpRequest
+include Opennms::XmlHelper
+include Opennms::Rbac
 
-actions :create, :sync
-default_action :create
 
-# foreign_source must reference an existing foreign_source's name.
+property :foreign_source_name, String, default: 'imported:'
+property :sync_import, [TrueClass, FalseClass], default: false
+property :sync_wait_periods, Integer, default: 30
+property :sync_wait_secs, Integer, default: 10
+property :class_name, String
+property :foreign_source_name, String, identity: true
 
-attribute :foreign_source_name, kind_of: String, default: 'imported:'
-attribute :sync_import, kind_of: [TrueClass, FalseClass], default: false
-# If your imports take a long time to sync, you can fiddle with these
-# to prevent convergence continuing before imports finish. One reason
-# you might want to do this is if a service restart happens at the
-# end of the converge before the syncs end, the pending syncs will
-# never happen.
-attribute :sync_wait_periods, kind_of: Integer, default: 30
-attribute :sync_wait_secs, kind_of: Integer, default: 10
+load_current_value do |new_resource|
+  model_import = REXML::Document.new(model_import(new_resource.foreign_source_name).message) unless model_import(new_resource.foreign_source_name).nil?
+  model_import = REXML::Document.new(Opennms::Cookbook::Provision::ModelImport.new(new_resource.foreign_source_name, "#{baseurl}/requisitions/#{new_resource.foreign_source_name}").message) if model_import.nil?
+  current_value_does_not_exist! if model_import.nil?
+  Chef::Log.debug "add_import response is: #{model_import}"
+end
 
-attr_accessor :exists, :foreign_source_exists
+action_class do
+  include Opennms::Cookbook::Provision::ForeignSourceHttpRequest
+  include Opennms::XmlHelper
+  include Opennms::Rbac
+end
+
+action :create do
+  converge_if_changed do
+    model_import_init(new_resource.foreign_source_name)
+    model_import = REXML::Document.new(model_import(new_resource.foreign_source_name).message).root
+    model_import(new_resource.foreign_source_name).message model_import.to_s
+    if !new_resource.sync_import.nil? && new_resource.sync_import
+      model_import_sync(new_resource.foreign_source_name, true)
+    end
+  end
+end
+
+action :sync do
+  converge_if_changed do
+    model_import_init(new_resource.foreign_source_name)
+    model_import_sync(new_resource.foreign_source_name, true)
+  end
+end
