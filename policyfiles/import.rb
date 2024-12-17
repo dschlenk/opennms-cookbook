@@ -1,4 +1,4 @@
-name 'opennms_foreign_source'
+name 'opennms_import'
 default_source :supermarket
 run_list 'opennms::postgres', 'openjdk17', 'opennms', 'opennms_resource_tests::import'
 cookbook 'opennms', path: '../'

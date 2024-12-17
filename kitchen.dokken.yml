@@ -477,7 +477,7 @@ suites:
       inspec_tests:
         - path: test/integration/default
         - path: test/integration/policy
-  - name: import
+  - name: opennms_import
     driver:
       ports:
         - 1240:8980/tcp

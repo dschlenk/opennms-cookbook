@@ -62,13 +62,13 @@ module Opennms
 
         def model_import(name)
           return unless model_import_exist?(name)
-          find_resource!(:http_request, "opennms_foreign_source POST #{name}")
+          find_resource!(:http_request, "opennms_import POST #{name}")
         end
 
         private
 
           def model_import_exist?(name)
-            !find_resource(:http_request, "opennms_foreign_source POST #{name}").nil?
+            !find_resource(:http_request, "opennms_import POST #{name}").nil?
           rescue Chef::Exceptions::ResourceNotFound
             false
           end
@@ -77,7 +77,7 @@ module Opennms
             url = "#{baseurl}/requisitions/#{name}"
             model_import = Opennms::Cookbook::Provision::ModelImport.new(name, url)
             with_run_context(:root) do
-              declare_resource(:http_request, "opennms_foreign_source POST #{name}") do
+              declare_resource(:http_request, "opennms_import POST #{name}") do
                 url "#{baseurl}/requisitions"
                 headers({ 'Content-Type' => 'application/xml' })
                 action :nothing
@@ -94,7 +94,7 @@ module Opennms
             with_run_context(:root) do
               begin
                 tries ||= 3
-                declare_resource(:http_request, "opennms_foreign_source POST #{name}") do
+                declare_resource(:http_request, "opennms_import POST #{name}") do
                   url "#{baseurl}/requisitions"
                   headers({ 'Content-Type' => 'application/xml' })
                   action :nothing
