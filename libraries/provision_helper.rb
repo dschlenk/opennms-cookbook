@@ -72,18 +72,18 @@ module Opennms
         include Opennms::Rbac
 
         def model_import_init(name, foreign_source_name)
-          model_import_create(name, foreign_source_name) unless model_import_exist?(foreign_source_name)
+          model_import_create(name, foreign_source_name) unless model_import_exist?(name)
         end
 
-        def model_import(foreign_source_name)
-          return unless model_import_exist?(foreign_source_name)
-          find_resource!(:http_request, "opennms_import POST #{foreign_source_name}")
+        def model_import(name)
+          return unless model_import_exist?(name)
+          find_resource!(:http_request, "opennms_import POST #{name}")
         end
 
         private
 
-          def model_import_exist?( foreign_source_name)
-            !find_resource(:http_request, "opennms_import POST #{foreign_source_name}").nil?
+          def model_import_exist?(name)
+            !find_resource(:http_request, "opennms_import POST #{name}").nil?
           rescue Chef::Exceptions::ResourceNotFound
             false
           end
@@ -93,7 +93,7 @@ module Opennms
             Chef::Log.debug "add_import url: #{url}"
             model_import = Opennms::Cookbook::Provision::ModelImport.new(foreign_source_name, url)
             with_run_context(:root) do
-              declare_resource(:http_request, "opennms_import POST #{foreign_source_name}") do
+              declare_resource(:http_request, "opennms_import POST #{name}") do
                 url "#{baseurl}/requisitions"
                 headers({ 'Content-Type' => 'application/xml' })
                 action :nothing
@@ -103,21 +103,18 @@ module Opennms
             end
           end
 
-          def model_import_sync(name, foreign_source_name, rescan)
+          def model_import_sync(name, foreign_source_name)
             url = "#{baseurl}/requisitions/#{name}/import"
+            Chef::Log.debug "add_import url: #{url}"
             url += '?rescanExisting=false' if !rescan.nil? && rescan == false
             model_import_sync = Opennms::Cookbook::Provision::ModelImport.new(foreign_source_name, url)
             with_run_context(:root) do
-              begin
-                declare_resource(:http_request, "opennms_import POST #{foreign_source_name}") do
-                  url "#{baseurl}/requisitions"
-                  headers({ 'Content-Type' => 'application/xml' })
-                  action :nothing
-                  delayed_action :post
-                  message model_import_sync.message.to_s
-                rescue => e
-                  raise e
-                end
+              declare_resource(:http_request, "opennms_import POST #{name}") do
+                url "#{baseurl}/requisitions"
+                headers({ 'Content-Type' => 'application/xml' })
+                action :nothing
+                delayed_action :post
+                message model_import_sync.message.to_s
               end
             end
           end
