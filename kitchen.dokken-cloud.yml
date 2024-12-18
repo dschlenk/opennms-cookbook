@@ -558,6 +558,10 @@ suites:
         - path: test/integration/default
         - path: test/integration/resource_type
   - name: response_graph
+    driver:
+      image: dokken/oraclelinux-9
+      ports:
+        - 1240:8980/tcp
     provisioner:
       policyfile: policyfiles/response_graph.rb
     verifier:
