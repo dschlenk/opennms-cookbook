@@ -122,6 +122,12 @@ module Opennms
               end
             end
           end
+          def baseurl(pw = nil)
+            if pw.nil? && @admin_password.nil?
+              @admin_password = admin_secret_from_vault('password')
+            end
+            "http://admin:#{pw || @admin_password || 'admin'}@localhost:#{node['opennms']['properties']['jetty']['port']}/opennms/rest"
+          end
       end
     end
   end
