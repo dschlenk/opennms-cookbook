@@ -103,9 +103,8 @@ module Opennms
             end
           end
 
-          def model_import_sync(name, foreign_source_name)
+          def model_import_sync(name, foreign_source_name, rescan)
             url = "#{baseurl}/requisitions/#{name}/import"
-            Chef::Log.debug "add_import url: #{url}"
             url += '?rescanExisting=false' if !rescan.nil? && rescan == false
             model_import_sync = Opennms::Cookbook::Provision::ModelImport.new(foreign_source_name, url)
             with_run_context(:root) do
