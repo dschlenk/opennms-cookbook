@@ -89,12 +89,12 @@ module Opennms
           end
 
           def model_import_create(foreign_source_name)
-            url = "#{baseurl}/requisitions"
+            url = "#{baseurl()}/requisitions"
             Chef::Log.debug "add_import url: #{url}"
             model_import = Opennms::Cookbook::Provision::ModelImport.new(foreign_source_name, url)
             with_run_context(:root) do
               declare_resource(:http_request, "opennms_import POST #{foreign_source_name}") do
-                url "#{baseurl}/requisitions"
+                url "#{baseurl()}/requisitions"
                 headers({ 'Content-Type' => 'application/xml' })
                 action :nothing
                 delayed_action :post
@@ -104,13 +104,13 @@ module Opennms
           end
 
           def model_import_sync(foreign_source_name, rescan)
-            url = "#{baseurl}/requisitions/#{foreign_source_name}/import"
+            url = "#{baseurl()}/requisitions/#{foreign_source_name}/import"
             url += '?rescanExisting=false' if !rescan.nil? && rescan == false
             model_import_sync = Opennms::Cookbook::Provision::ModelImport.new(foreign_source_name, url)
             with_run_context(:root) do
               begin
                 declare_resource(:http_request, "opennms_import POST #{foreign_source_name}") do
-                  url "#{baseurl}/requisitions"
+                  url "#{baseurl()}/requisitions"
                   headers({ 'Content-Type' => 'application/xml' })
                   action :nothing
                   delayed_action :post
