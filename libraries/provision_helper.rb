@@ -58,14 +58,15 @@ module Opennms
 
         attr_reader :message
 
-        def initialize(name, url)
+        def initialize(foreign_source_name, url)
           begin
             @message = RestClient.get(url, accept: :xml).to_s
           rescue RestClient::NotFound
-            @message = "<model-import foreign-source=#{name.encode(xml: :attr)}/>"
+            @message = "<model-import foreign-source=#{foreign_source_name}/>"
           end
         end
       end
+
       module ModelImportHttpRequest
         require_relative 'rbac'
         include Opennms::Rbac
