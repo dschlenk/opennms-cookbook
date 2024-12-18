@@ -37,7 +37,7 @@ module Opennms
           end
       end
 
-      class ForeignSourceHttpRequest
+      class ForeignSource
         require_relative 'rbac'
         include Opennms::Rbac
 
@@ -106,15 +106,14 @@ module Opennms
           def model_import_sync(name, foreign_source_name, rescan)
             url = "#{baseurl}/requisitions/#{name}/import"
             url += '?rescanExisting=false' if !rescan.nil? && rescan == false
-            model_import_sync = Opennms::Cookbook::Provision::ModelImport.new(foreign_source_name, url)
-            with_run_context(:root) do
-              declare_resource(:http_request, "opennms_import POST #{name}") do
-                url "#{baseurl}/requisitions"
-                headers({ 'Content-Type' => 'application/xml' })
-                action :nothing
-                delayed_action :post
-                message model_import_sync.message.to_s
-              end
+            begin
+              tries ||= 3
+              Chef::Log.debug("Attempting import sync for #{foreign_source_name} with URL #{url}")
+              RestClient.put url, nil
+            rescue => e
+              Chef::Log.debug("Retrying import sync for #{foreign_source_name} #{tries}")
+              retry if (tries -= 1) > 0
+              raise e
             end
           end
       end
