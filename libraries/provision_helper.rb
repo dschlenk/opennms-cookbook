@@ -93,7 +93,7 @@ module Opennms
             model_import = Opennms::Cookbook::Provision::ModelImport.new(name, url)
             with_run_context(:root) do
               declare_resource(:http_request, "opennms_import POST #{name}") do
-                url "#{baseurl}/requisitions"
+                url "#{baseurl}/requisitions/#{name}"
                 headers({ 'Content-Type' => 'application/xml' })
                 action :nothing
                 delayed_action :post
