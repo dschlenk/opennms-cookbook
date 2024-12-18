@@ -89,7 +89,7 @@ module Opennms
           end
 
           def model_import_create(foreign_source_name)
-            url = "#{baseurl}/requisitions"
+            url = "#{baseurl}/requisitions/#{foreign_source_name}"
             Chef::Log.debug "add_import url: #{url}"
             model_import = Opennms::Cookbook::Provision::ModelImport.new(foreign_source_name, url)
             with_run_context(:root) do
@@ -109,7 +109,6 @@ module Opennms
             model_import_sync = Opennms::Cookbook::Provision::ModelImport.new(foreign_source_name, url)
             with_run_context(:root) do
               begin
-                tries ||= 3
                 declare_resource(:http_request, "opennms_import POST #{foreign_source_name}") do
                   url "#{baseurl}/requisitions"
                   headers({ 'Content-Type' => 'application/xml' })
@@ -118,7 +117,6 @@ module Opennms
                   message model_import_sync.message.to_s
                 rescue => e
                   Chef::Log.debug("Retrying import sync for #{foreign_source_name} #{tries}")
-                  retry if (tries -= 1) > 0
                   raise e
                 end
               end
