@@ -83,13 +83,13 @@ module Opennms
         private
 
           def model_import_exist?(foreign_source_name)
-            !find_resource(:http_request, "opennms_import POST #{foreign_source_name}").nil? unless model_import_exist?(foreign_source_name)
+            !find_resource(:http_request, "opennms_import POST #{foreign_source_name}").nil?
           rescue Chef::Exceptions::ResourceNotFound
             false
           end
 
           def model_import_create(foreign_source_name)
-            url = "#{baseurl}/requisitions/#{foreign_source_name}"
+            url = "#{baseurl}/requisitions"
             Chef::Log.debug "add_import url: #{url}"
             model_import = Opennms::Cookbook::Provision::ModelImport.new(foreign_source_name, url)
             with_run_context(:root) do
