@@ -1,5 +1,4 @@
 include Opennms::Cookbook::Provision::ModelImportHttpRequest
-include Opennms::Cookbook::Provision::ForeignSourceHttpRequest
 include Opennms::XmlHelper
 include Opennms::Rbac
 
@@ -18,7 +17,6 @@ end
 
 action_class do
   include Opennms::Cookbook::Provision::ModelImportHttpRequest
-  include Opennms::Cookbook::Provision::ForeignSourceHttpRequest
   include Opennms::XmlHelper
   include Opennms::Rbac
 end
