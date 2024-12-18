@@ -37,7 +37,7 @@ module Opennms
           end
       end
 
-      class ForeignSource
+      class ForeignSourceHttpRequest
         require_relative 'rbac'
         include Opennms::Rbac
 
