@@ -7,28 +7,28 @@ control 'response_graph' do
     its('parameters') { should eq 'url' => '/opennms/login.jsp', 'rrd-repository' => '/opt/opennms/share/rrd/response', 'rrd-base-name' => 'onms', 'ds-name' => 'onms' }
   end
 
-#  describe foreign_source('dry-source') do
-#    it { should exist }
-#  end
+  # describe foreign_source('dry-source') do
+  #   it { should exist }
+  # end
 
-#  describe import('dry-source', 'dry-source') do
-#    it { should exist }
-#  end
+  # describe import('dry-source', 'dry-source') do
+  #   it { should exist }
+  # end
 
-#  describe import_node('20180220151655', 'dry-source') do
-#    it { should exist }
-#    its('node_label') { should eq 'responseGraphTestNode' }
-#    its('building') { should eq 'HQ' }
-#    its('categories') { should eq %w(Servers Test) }
-#  end
+  # describe import_node('20180220151655', 'dry-source') do
+  #   it { should exist }
+  #   its('node_label') { should eq 'responseGraphTestNode' }
+  #   its('building') { should eq 'HQ' }
+  #   its('categories') { should eq %w(Servers Test) }
+  # end
 
-#  describe import_node_interface('127.0.0.1', 'dry-source', '20180220151655') do
-#    it { should exist }
-#  end
+  # describe import_node_interface('127.0.0.1', 'dry-source', '20180220151655') do
+  #   it { should exist }
+  # end
 
-#  describe import_node_interface_service('ONMS', '127.0.0.1', 'dry-source', '20180220151655') do
-#    it { should exist }
-#  end
+  # describe import_node_interface_service('ONMS', '127.0.0.1', 'dry-source', '20180220151655') do
+  #   it { should exist }
+  # end
 
   describe response_graph('onms') do
     it { should exist }
