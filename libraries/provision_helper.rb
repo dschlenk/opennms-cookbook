@@ -70,21 +70,20 @@ module Opennms
       module ModelImportHttpRequest
         require_relative 'rbac'
         include Opennms::Rbac
-        include Opennms::Cookbook::Provision::ForeignSourceHttpRequest
 
         def model_import_init(foreign_source_name)
           model_import_create(foreign_source_name) unless model_import_exist?(foreign_source_name)
         end
 
         def model_import(foreign_source_name)
-          return unless fs_resource_exist?(foreign_source_name)
+          return unless model_import_exist?(foreign_source_name)
           find_resource!(:http_request, "opennms_import POST #{foreign_source_name}")
         end
 
         private
 
           def model_import_exist?(foreign_source_name)
-            !find_resource(:http_request, "opennms_import POST #{foreign_source_name}").nil? unless fs_resource_exist?(foreign_source_name)
+            !find_resource(:http_request, "opennms_import POST #{foreign_source_name}").nil? unless model_import_exist?(foreign_source_name)
           rescue Chef::Exceptions::ResourceNotFound
             false
           end
