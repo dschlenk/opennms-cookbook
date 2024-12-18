@@ -89,7 +89,7 @@ module Opennms
           end
 
           def model_import_create(foreign_source_name)
-            url = "#{baseurl}/requisitions/#{foreign_source_name}"
+            url = "#{baseurl}/requisitions"
             Chef::Log.debug "add_import url: #{url}"
             model_import = Opennms::Cookbook::Provision::ModelImport.new(foreign_source_name, url)
             with_run_context(:root) do
@@ -116,17 +116,10 @@ module Opennms
                   delayed_action :post
                   message model_import_sync.message.to_s
                 rescue => e
-                  Chef::Log.debug("Retrying import sync for #{foreign_source_name} #{tries}")
                   raise e
                 end
               end
             end
-          end
-          def baseurl(pw = nil)
-            if pw.nil? && @admin_password.nil?
-              @admin_password = admin_secret_from_vault('password')
-            end
-            "http://admin:#{pw || @admin_password || 'admin'}@localhost:#{node['opennms']['properties']['jetty']['port']}/opennms/rest"
           end
       end
     end
