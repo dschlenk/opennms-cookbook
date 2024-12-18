@@ -10,7 +10,7 @@ property :sync_wait_periods, Integer, default: 30
 property :sync_wait_secs, Integer, default: 10
 
 load_current_value do |new_resource|
-  fs_resource_initf(new_resource.foreign_source_name)
+  fs_resource_init(new_resource.foreign_source_name)
   model_import = REXML::Document.new(model_import(new_resource.name).message) unless model_import(new_resource.name).nil?
   model_import = REXML::Document.new(Opennms::Cookbook::Provision::ModelImport.new(new_resource.foreign_source_name, "#{baseurl}/requisitions/#{new_resource.name}").message) if model_import.nil?
   current_value_does_not_exist! if model_import.nil?
