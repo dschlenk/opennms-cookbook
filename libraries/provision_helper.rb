@@ -71,8 +71,8 @@ module Opennms
         include Opennms::Rbac
         include Opennms::Cookbook::Provision::ForeignSourceHttpRequest
 
-        def model_import_init(name, node)
-          model_import_create(name, node) unless model_import_exist?(name)
+        def model_import_init(name)
+          model_import_create(name) unless model_import_exist?(name)
         end
 
         def model_import(name)
@@ -88,14 +88,13 @@ module Opennms
             false
           end
 
-          def model_import_create(name, node)
-            node.run_state['imports'] = nil
-            url = "#{baseurl(node)}/requisitions"
+          def model_import_create(name)
+            url = "#{baseurl}/requisitions"
             Chef::Log.debug "add_import url: #{url}"
             model_import = Opennms::Cookbook::Provision::ModelImport.new(name, url)
             with_run_context(:root) do
               declare_resource(:http_request, "opennms_import POST #{name}") do
-                url "#{baseurl(node)}/requisitions"
+                url "#{baseurl}/requisitions"
                 headers({ 'Content-Type' => 'application/xml' })
                 action :nothing
                 delayed_action :post
