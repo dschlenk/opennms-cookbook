@@ -69,6 +69,7 @@ module Opennms
       module ModelImportHttpRequest
         require_relative 'rbac'
         include Opennms::Rbac
+        include Opennms::Cookbook::Provision::ForeignSourceHttpRequest
 
         def model_import_init(name)
           model_import_create(name) unless model_import_exist?(name)
