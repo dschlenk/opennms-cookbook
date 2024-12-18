@@ -62,7 +62,7 @@ module Opennms
           begin
             @message = RestClient.get(url, accept: :xml).to_s
           rescue RestClient::NotFound
-            @message = "<model-import foreign-source=#{foreign_source_name}/>"
+            @message = "<model-import foreign-source=#{foreign_source_name.encode(xml: :attr)}/>"
           end
         end
       end
@@ -89,7 +89,7 @@ module Opennms
           end
 
           def model_import_create(foreign_source_name)
-            url = "#{baseurl}/requisitions"
+            url = "#{baseurl}/requisitions/#{foreign_source_name}"
             Chef::Log.debug "add_import url: #{url}"
             model_import = Opennms::Cookbook::Provision::ModelImport.new(foreign_source_name, url)
             with_run_context(:root) do
