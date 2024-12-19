@@ -18,11 +18,14 @@
 ### Service Assurance
 
 * [service\_assurance](service_assurance.md)
+* [response\_graph](response_graph.md)
 
 ### Performance Management and Thresholding
 
 * [datacollection](datacollection.md)
 * [statsd](statsd.md)
+* [opennms\_collection\_graph](collection_graph.md)
+* [opennms\_collection\_graph\_file](collection_graph_file.md)
 
 ### User and Group Management
 
@@ -41,6 +44,7 @@
 * [opennms\_avail\_view\_section](avail_view_section.md)
 * [opennms\_collection\_graph](collection_graph.md)
 * [opennms\_collection\_graph\_file](collection_graph_file.md)
+* [opennms\_response\_graph](response_graph.md)
 * [opennms\_surveillance\_view](surveillance_view.md)
 * [opennms\_wallboard and opennms\_dashlet](opsboard.md)
 
