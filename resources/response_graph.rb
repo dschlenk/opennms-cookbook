@@ -1,5 +1,5 @@
 include Opennms::XmlHelper
-include Graph
+include Graph #fixed: missing module
 
 property :short_name, String, name_property: true
 property :long_name, String
@@ -13,7 +13,7 @@ property :command, String
 
 action_class do
   include Opennms::XmlHelper
-  include Graph
+  include Graph #fixed: missing module
 end
 
 load_current_value do |new_resource|
@@ -25,7 +25,8 @@ end
 action :create do
   converge_if_changed do
     new_graph_file("#{onms_etc}/response-graph.properties") unless ::File.exist?("#{onms_etc}/response-graph.properties")
-    add_graph_to_file(new_resource)
+    # fixed: method name not correct
+    add_response_graph(new_resource)
     Chef::Log.info("Created graph #{new_resource.short_name} in response-graph.properties")
   end
 end
