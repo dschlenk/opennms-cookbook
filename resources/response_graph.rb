@@ -1,14 +1,14 @@
 include Opennms::XmlHelper
 
 property :short_name, String, name_property: true
-property :long_name, String, required: false
-property :columns, Array, required: false, callbacks: {
+property :long_name, String,
+property :columns, Array, callbacks: {
   'should be an Array of Strings' => lambda { |p|
     p.is_a?(Array) && !p.any? { |a| !a.is_a?(String) }
   },
 }
-property :type, Array, required: true
-property :command, String, required: false
+property :type, Array, default: ['responseTime', 'distributedStatus']
+property :command, String
 
 action_class do
   include Opennms::XmlHelper
