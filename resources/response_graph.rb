@@ -25,8 +25,8 @@ end
 action :create do
   converge_if_changed do
     new_graph_file("#{onms_etc}/response-graph.properties") unless ::File.exist?("#{onms_etc}/response-graph.properties")
-    # fixed: method name not correct
-    add_response_graph(new_resource)
+    # fixed: method name and arguments not correct
+    add_response_graph(new_resource, node)
     Chef::Log.info("Created graph #{new_resource.short_name} in response-graph.properties")
   end
 end
