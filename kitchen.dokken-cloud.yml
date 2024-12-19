@@ -109,6 +109,13 @@ suites:
       inspec_tests:
         - path: test/integration/default
         - path: test/integration/avail_view_section_mod
+  - name: collection_graph_file
+    provisioner:
+      policyfile: policyfiles/collection_graph_file.rb
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/collection_graph_file
   - name: collection_package
     provisioner:
       policyfile: policyfiles/collection_package.rb
@@ -606,6 +613,13 @@ suites:
       inspec_tests:
         - path: test/integration/default
         - path: test/integration/resource_type
+  - name: response_graph
+    provisioner:
+      policyfile: policyfiles/response_graph.rb
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/response_graph
   - name: send_event
     driver:
       ports:

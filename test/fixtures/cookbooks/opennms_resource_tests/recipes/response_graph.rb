@@ -1,44 +1,37 @@
-# frozen_string_literal: true
-
-# opennms needs to be running for provisioning commands to work
-# as they use the ReST interface.
-log 'Start OpenNMS to perform ReST operations.' do
-  notifies :start, 'service[opennms]', :immediately
-end
 # create a poller service in the default package
 opennms_poller_service 'ONMS' do
   class_name 'org.opennms.netmgt.poller.monitors.HttpMonitor'
   port 8980
-  parameters 'url' => '/opennms/login.jsp', 'rrd-repository' => '/opt/opennms/share/rrd/response', 'rrd-base-name' => 'onms', 'ds-name' => 'onms'
+  parameters 'url' => { 'value' => '/opennms/login.jsp' }, 'rrd-repository' => { 'value' => '/opt/opennms/share/rrd/response' }, 'rrd-base-name' => { 'value' => 'onms' }, 'ds-name' => { 'value' => 'onms' }
   notifies :restart, 'service[opennms]'
 end
-opennms_foreign_source 'dry-source'
-opennms_import 'dry-source' do
-  foreign_source_name 'dry-source'
-end
-# make us a new foreign_id using the Provision library
-rgfsid = '20180220151655'
+# opennms_foreign_source 'dry-source'
+# opennms_import 'dry-source' do
+#   foreign_source_name 'dry-source'
+# end
+
+# rgfsid = '20180220151655'
 # make a node to add an interface to
-opennms_import_node 'responseGraphTestNode' do
-  foreign_source_name 'dry-source'
-  foreign_id rgfsid
-  building 'HQ'
-  categories %w(Servers Test)
-end
+# opennms_import_node 'responseGraphTestNode' do
+#   foreign_source_name 'dry-source'
+#   foreign_id rgfsid
+#   building 'HQ'
+#   categories %w(Servers Test)
+# end
 
 # add interface to node
-opennms_import_node_interface '127.0.0.1' do
-  foreign_source_name 'dry-source'
-  foreign_id rgfsid
-end
+# opennms_import_node_interface '127.0.0.1' do
+#  foreign_source_name 'dry-source'
+#   foreign_id rgfsid
+# end
 
 # add service to node
-opennms_import_node_interface_service 'ONMS' do
-  foreign_source_name 'dry-source'
-  foreign_id rgfsid
-  ip_addr '127.0.0.1'
-  sync_import true
-end
+# opennms_import_node_interface_service 'ONMS' do
+#   foreign_source_name 'dry-source'
+#   foreign_id rgfsid
+#   ip_addr '127.0.0.1'
+#   sync_import true
+# end
 
 # add a graph for that service
 opennms_response_graph 'onms'
