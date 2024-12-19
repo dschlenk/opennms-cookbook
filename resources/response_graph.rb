@@ -1,7 +1,7 @@
 include Opennms::XmlHelper
 
 property :short_name, String, name_property: true
-property :long_name, String,
+property :long_name, String
 property :columns, Array, callbacks: {
   'should be an Array of Strings' => lambda { |p|
     p.is_a?(Array) && !p.any? { |a| !a.is_a?(String) }
