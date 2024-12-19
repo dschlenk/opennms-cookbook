@@ -13,6 +13,7 @@
 * [opennms\_eventconf](eventconf.md)
 * [opennms\_event](event.md)
 * [opennms\_syslog\_file](syslog.md)
+* [notifications](notifications.md)
 
 ### Service Assurance
 

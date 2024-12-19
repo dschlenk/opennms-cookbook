@@ -71,6 +71,77 @@ module Opennms
         end
       end
 
+      module NotificationsTemplate
+        def notifs_resource_init
+          notifs_resource_create unless notifs_resource_exist?
+        end
+
+        def notifs_resource
+          return unless notifs_resource_exist?
+          find_resource!(:template, "#{onms_etc}/notifications.xml")
+        end
+
+        private
+
+        def notifs_resource_exist?
+          !find_resource(:template, "#{onms_etc}/notifications.xml").nil?
+        rescue Chef::Exceptions::ResourceNotFound
+          false
+        end
+
+        def notifs_resource_create
+          file = Opennms::Cookbook::Notification::NotificationsFile.read("#{onms_etc}/notifications.xml")
+          with_run_context(:root) do
+            declare_resource(:template, "#{onms_etc}/notifications.xml") do
+              cookbook 'opennms'
+              source 'notifications.xml.erb'
+              owner node['opennms']['username']
+              group node['opennms']['groupname']
+              mode '0664'
+              variables(config: file)
+              action :nothing
+              delayed_action :create
+            end
+          end
+        end
+      end
+
+      module NotifdTemplate
+        def notifd_resource_init
+          notifd_resource_create unless notifd_resource_exist?
+        end
+
+        def notifd_resource
+          return unless notifd_resource_exist?
+          find_resource!(:template, "#{onms_etc}/notifd-configuration.xml")
+        end
+
+        private
+
+        def notifd_resource_exist?
+          !find_resource(:template, "#{onms_etc}/notifd-configuration.xml").nil?
+        rescue Chef::Exceptions::ResourceNotFound
+          false
+        end
+
+        def notifd_resource_create
+          file = Opennms::Cookbook::Notification::NotifdConfigFile.read("#{onms_etc}/notifd-configuration.xml")
+          with_run_context(:root) do
+            declare_resource(:template, "#{onms_etc}/notifd-configuration.xml") do
+              cookbook 'opennms'
+              source 'notifd-configuration.xml.erb'
+              owner node['opennms']['username']
+              group node['opennms']['groupname']
+              mode '0664'
+              variables(config: file)
+              action :nothing
+              delayed_action :create
+              notifies :run, 'opennms_send_event[restart_Notifd]'
+            end
+          end
+        end
+      end
+
       class CommandsConfigFile
         include Opennms::XmlHelper
         attr_reader :commands
@@ -250,6 +321,170 @@ module Opennms
         end
       end
 
+      class NotificationsFile
+        include Opennms::XmlHelper
+        attr_reader :notifs
+
+        def initialize
+          @notifs = []
+        end
+
+        def read!(file = 'notifications.xml')
+          xmldoc_from_file(file).each_element('/notifications/notification') do |n|
+            parameters = {} unless n.attributes['parameter'].nil?
+            n.each_element('parameter') do |p|
+              parameters[p.attributes['name']] = p.attributes['value']
+            end
+            @notifs.push(Notification.new(name: n.attributes['name'],
+                                          status: n.attributes['status'],
+                                          writeable: n.attributes['writeable'],
+                                          uei: xml_element_text(n, 'uei'),
+                                          description: xml_element_text(n, 'description'),
+                                          rule: xml_element_text(n, 'rule'),
+                                          strict_rule: s_to_boolean(xml_attr_value(n, 'rule/@strict')),
+                                          destination_path: xml_element_text(n, 'destinationPath'),
+                                          text_message: xml_element_multiline_blank_text(n, 'text-message'),
+                                          subject: xml_element_text(n, 'subject'),
+                                          numeric_message: xml_element_text(n, 'numeric-message'),
+                                          event_severity: xml_element_text(n, 'event-severity'),
+                                          parameters: parameters,
+                                          vbname: xml_element_text(n, 'varbind/vbname'),
+                                          vbvalue: xml_element_text(n, 'varbind/vbvalue')))
+          end
+        end
+
+        def notification(name:)
+          notif = @notifs.select { |c| c.name.eql?(name) }
+          return if notif.empty?
+          raise DuplicateNotification, "More than one notification named #{name} found in config file." unless notif.one?
+          notif.pop
+        end
+
+        def delete_notification(name:)
+          @notifs.delete_if { |c| c.name.eql?(name) }
+        end
+
+        def self.read(file = 'notifications.xml')
+          ccf = NotificationsFile.new
+          ccf.read!(file)
+          ccf
+        end
+      end
+
+      class Notification
+        attr_reader :name, :status, :writeable, :uei, :description, :rule, :strict_rule, :destination_path, :text_message, :subject, :numeric_message, :event_severity, :parameters, :vbname, :vbvalue
+
+        def initialize(name:, status:, uei:, rule:, destination_path:, text_message:, writeable: nil, description: nil, strict_rule: nil, subject: nil, numeric_message: nil, event_severity: nil, parameters: nil, vbname: nil, vbvalue: nil)
+          @name = name
+          @status = status
+          @uei = uei
+          @rule = rule
+          @destination_path = destination_path
+          @text_message = text_message
+          @writeable = writeable
+          @description = description
+          @strict_rule = strict_rule
+          @subject = subject
+          @numeric_message = numeric_message
+          @event_severity = event_severity
+          @parameters = parameters
+          @vbname = vbname
+          @vbvalue = vbvalue
+        end
+
+        def update(status: nil, uei: nil, rule: nil, destination_path: nil, text_message: nil, writeable: nil, description: nil, strict_rule: nil, subject: nil, numeric_message: nil, event_severity: nil, parameters: nil, vbname: nil, vbvalue: nil)
+          @status = status unless status.nil?
+          @uei = uei unless uei.nil?
+          @rule = rule unless rule.nil?
+          @destination_path = destination_path unless destination_path.nil?
+          @text_message = text_message unless text_message.nil?
+          @writeable = writeable unless writeable.nil?
+          @description = description unless description.nil?
+          @strict_rule = strict_rule unless strict_rule.nil?
+          @subject = subject unless subject.nil?
+          @numeric_message = numeric_message unless numeric_message.nil?
+          @event_severity = event_severity unless event_severity.nil?
+          @parameters = parameters unless parameters.nil?
+          @vbname = vbname unless vbname.nil?
+          @vbvalue = vbvalue unless vbvalue.nil?
+        end
+      end
+
+      class NotifdConfigFile
+        include Opennms::XmlHelper
+        attr_reader :status, :pages_sent, :next_notif_id, :next_user_notif_id, :next_group_id, :service_id_sql, :outstanding_notices_sql, :acknowledge_id_sql, :acknowledge_update_sql, :match_all, :email_address_command, :numeric_skip_resolution_prefix, :max_threads, :auto_acknowledge_alarm, :autoacks, :queues, :outage_calendars
+
+        def initialize
+          @autoacks = []
+          @queues = []
+          @outage_calendars = []
+        end
+
+        def read!(file = 'notifd-configuration.xml')
+          root = xmldoc_from_file(file).root
+          @status = root.attributes['status']
+          @pages_sent = root.attributes['pages-sent']
+          @next_notif_id = root.attributes['next-notif-id']
+          @next_user_notif_id = root.attributes['next-user-notif-id']
+          @next_user_notif_id = root.attributes['next-user-notif-id']
+          @next_group_id = root.attributes['next-group-id']
+          @service_id_sql = root.attributes['service-id-sql']
+          @outstanding_notices_sql = root.attributes['outstanding-notices-sql']
+          @acknowledge_id_sql = root.attributes['acknowledge-id-sql']
+          @acknowledge_update_sql = root.attributes['acknowledge-update-sql']
+          @match_all = s_to_boolean(root.attributes['match-all'])
+          @email_address_command = root.attributes['email-address-command']
+          @numeric_skip_resolution_prefix = s_to_boolean(root.attributes['numeric-skip-resolution-prefix'])
+          @max_threads = root.attributes['max-threads']
+          @auto_acknowledge_alarm = { 'resolution_prefix' => xml_attr_value(root, 'auto-acknowledge-alarm/@resolution-prefix'), 'notify' => xml_attr_value(root, 'auto-acknowledge-alarm/@notify'), 'ueis' => xml_text_array(root, 'auto-acknowledge-alarm/uei') }.compact unless root.elements['auto-acknowledge-alarm'].nil?
+          root.each_element('auto-acknowledge') do |aa|
+            @autoacks.push(AutoAck.new(uei: aa.attributes['uei'], acknowledge: aa.attributes['acknowledge'], resolution_prefix: aa.attributes['resolution-prefix'], notify: s_to_boolean(aa.attributes['notify']), matches: xml_text_array(aa, 'match')))
+          end
+          root.each_element('queue') do |q|
+            init_params = {} unless q.elements['handler-class/init-params'].nil?
+            q.each_element('handler-class/init-params') do |ip|
+              init_params[xml_element_text(ip, 'param-name')] = xml_element_text(ip, 'param-value')
+            end
+            @queues.push({ 'queue_id' => xml_element_text(q, 'queue-id'), 'interval' => xml_element_text(q, 'interval'), 'handler_class' => xml_element_text(q, 'handler-class/name'), 'handler_class_init_params' => init_params }.compact)
+          end
+          @outage_calendars = xml_text_array(root, 'outage-calendar')
+        end
+
+        def autoack(uei:, acknowledge:)
+          autoack = @autoacks.select { |c| c.uei.eql?(uei) && c.acknowledge.eql?(acknowledge) }
+          return if autoack.empty?
+          raise DuplicateAutoAck, "More than one autoack with UEI #{uei} and acknowledge #{acknowledge} found in config file." unless autoack.one?
+          autoack.pop
+        end
+
+        def delete_autoack(uei:, acknowledge:)
+          @autoacks.delete_if { |c| c.uei.eql?(uei) && c.acknowledge.eql?(acknowledge) }
+        end
+
+        def self.read(file = 'notifd-configuration.xml')
+          ccf = NotifdConfigFile.new
+          ccf.read!(file)
+          ccf
+        end
+      end
+
+      class AutoAck
+        attr_reader :uei, :acknowledge, :resolution_prefix, :notify, :matches
+        def initialize(uei:, acknowledge:, resolution_prefix:, matches:, notify: nil)
+          @uei = uei
+          @acknowledge = acknowledge
+          @resolution_prefix = resolution_prefix
+          @matches = matches
+          @notify = notify
+        end
+
+        def update(resolution_prefix:, matches:, notify: nil)
+          @resolution_prefix = resolution_prefix unless resolution_prefix.nil?
+          @matches = matches unless matches.nil?
+          @notify = notify unless notify.nil?
+        end
+      end
+
       class DuplicateCommand < StandardError; end
 
       class DuplicateDestinationPath < StandardError; end
@@ -257,6 +492,10 @@ module Opennms
       class DuplicateTarget < StandardError; end
 
       class DuplicateEscalate < StandardError; end
+
+      class DuplicateNotification < StandardError; end
+
+      class DuplicateAutoAck < StandardError; end
     end
   end
 end

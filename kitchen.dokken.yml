@@ -601,6 +601,20 @@ suites:
       inspec_tests:
         - path: test/integration/default
         - path: test/integration/jmx
+  - name: notifd_autoack
+    provisioner:
+      policyfile: policyfiles/notifd_autoack.rb
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/notifd_autoack
+  - name: notification
+    provisioner:
+      policyfile: policyfiles/notification.rb
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/notification
   - name: notification_command
     provisioner:
       policyfile: policyfiles/notification_command.rb

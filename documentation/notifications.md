@@ -6,6 +6,7 @@ The following custom resources are available to manage notification configuratio
 * `opennms_destination_path`: Manage a destination path element in `$OPENNMS_HOME/etc/destinationPaths.xml`. Each must have at a minimum a single target which can be defined with the `opennms_target` custom resource.
 * `opennms_target`: Manage a target or escalate target in a destination path (defined either in the default config or with the above custom resource).
 * `opennms_notification`: Manage notification elements in `$OPENNMS_HOME/etc/notifications.xml`.
+* `opennms_notifd_autoack`: Manage `auto-acknowledge` elements in `$OPENNMS_HOME/etc/notifd-configuration.xml`.
 
 ## Actions for opennms\_notification\_command
 
@@ -73,9 +74,52 @@ See test recipe [destination\_path.rb](../test/fixtures/cookbooks/opennms_resour
 
 ## Actions for opennms\_notification
 
+* `:create` - Default. Adds a new notification or updates an existing notification to match the properties of the resource.
+* `:create_if_missing` - Add a new notification if one with the same name does not exist. Does not update an existing notification with the same name.
+* `:update` - Update an existing notification with the same name to match the properties of the resource. Raises an error if the notification does not exist.
+* `:delete` - Removes the notification with the same name if it exists.
+
 ## Properties for opennms\_notification
 
 | Name | Type | Notes |
 | ---- | ---- | ----- |
+| `notification_name` | String | Name property. |
+| `status` | String | One of `on` or `off`. Required for new. |
+| `writeable` | String | One of `yes` or `no`. |
+| `uei` | String | Required for new. |
+| `description` | String | |
+| `rule` | String | Defaults to `IPADDR != '0.0.0.0'` when new. |
+| `strict_rule` | [true, false] | |
+| `destination_path` | String | Required for new |
+| `text_message` | String | Required for new. |
+| `subject` | String | |
+| `numeric_message` | String | |
+| `event_severity` | String | |
+| `parameters` | Hash | Must be a Hash with string keys and values. |
+| `vbname` | String | |
+| `vbvalue` | String | |
 
 ## Examples for opennms\_notification
+
+See test recipe [notification.rb](../test/fixtures/cookbooks/opennms_resource_tests/recipes/notification.rb).
+
+## Actions for opennms\_notifd\_autoack
+
+* `:create` - Default. Adds a new `auto-acknowledge` element or updates an existing `auto-acknowledge` element to match the properties of the resource.
+* `:create_if_missing` - Add a new `auto-acknowledge` element if one with the same identity does not exist. Does not update an existing `auto-acknowledge` element with the same identity.
+* `:update` - Update an existing `auto-acknowledge` element with the same identity to match the properties of the resource. Raises an error if the `auto-acknowledge` element does not exist.
+* `:delete` - Removes the `auto-acknowledge` element with the same identity if it exists.
+
+## Properties for opennms\_notifd\_autoack
+
+| Name | Type | Notes |
+| ---- | ---- | ----- |
+| `uei` | String | Name property. |
+| `acknowledge` | String | Part of identity. Required. |
+| `notify` | [true, false] | |
+| `resolution_prefix` | String | Defaults to `'RESOLVED: '` for new. |
+| `matches` | Array of Strings | Must contain at least one item on new and can't be empty on update. Defaults to `nodeid` when not specified. Other common items are `interfaceid` and `serviceid`. |
+
+## Examples for opennms\_notifd\_autoack
+
+See test recipe [notifd\_autoack.rb](../test/fixtures/cookbooks/opennms_resource_tests/recipes/notifd_autoack.rb).

@@ -31,7 +31,6 @@ class Notification < Inspec.resource(1)
     if @exists
       @params = {}
       @params[:status] = n_el.attributes['status'].to_s
-      @params[:writeable] = 'yes'
       @params[:writeable] = n_el.attributes['writeable'].to_s unless n_el.attributes['writeable'].nil?
       ueitext = ''
       n_el.elements['uei'].texts.each do |t|
@@ -50,6 +49,7 @@ class Notification < Inspec.resource(1)
         rtext += t.to_s.strip
       end
       @params[:rule] = rtext
+      @params[:strict_rule] = n_el.elements['rule/@strict'].value.eql?('true') if n_el.elements['rule'] && !n_el.elements['rule'].attributes['strict'].nil?
       dptext = ''
       n_el.elements['destinationPath'].texts.each do |t|
         dptext += t.to_s.strip
@@ -81,7 +81,7 @@ class Notification < Inspec.resource(1)
         end
         @params[:event_severity] = estext unless estext == ''
       end
-      @params[:parameters] = {}
+      @params[:parameters] = {} unless n_el.elements['parameter'].nil?
       n_el.elements.each('parameter') do |p|
         @params[:parameters][p.attributes['name'].to_s] = p.attributes['value'].to_s
       end
