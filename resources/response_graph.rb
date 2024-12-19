@@ -45,7 +45,7 @@ action :delete do
       remove_graph_from_file(new_resource.short_name) # remove_graph_from_file is not (yet) a method in libraries/graph.rb
       Chef::Log.info("Deleted graph #{new_resource.short_name} from #{onms_etc}/response-graph.properties")
     else
-      # this is unnecessary. Chef will 
+      # this is unnecessary - Chef will indicate that the resource was up to date already.
       Chef::Log.warn("Graph #{new_resource.short_name} not found in #{onms_etc}/response-graph.properties. Skipping deletion.")
     end
   end
