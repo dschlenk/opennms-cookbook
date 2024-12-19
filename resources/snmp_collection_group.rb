@@ -3,7 +3,7 @@ include Opennms::XmlHelper
 
 unified_mode true
 property :group_name, String, name_property: true, identity: true
-property :collection_name, String, required: true, identity: true
+property :collection_name, String, default: 'default', identity: true
 property :file, String, desired_state: false
 # set to the URL of your data collection file if not stored in your cookbook
 property :source, String, default: 'cookbook_file', desired_state: false

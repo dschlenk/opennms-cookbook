@@ -1,0 +1,36 @@
+<destinationPaths xmlns="http://xmlns.opennms.org/xsd/destinationPaths">
+   <header>
+      <rev>1.2</rev>
+      <created>Wednesday, February 6, 2002 10:10:00 AM EST</created>
+      <mstation>localhost</mstation>
+   </header>
+<% @config.paths.each do |path| -%>
+  <% next unless path.targets.length > 0 -%>
+   <path name=<%= path.path_name.encode(:xml => :attr) %><%= path.initial_delay.nil? ? '' : " initial-delay=#{path.initial_delay.encode(:xml => :attr)}" %>>
+  <% path.targets.each do |t| -%>
+      <target<%= t.interval.nil? ? '' : " interval=#{t.interval.encode(:xml => :attr)}" %>>
+         <name><%= t.name.encode(:xml => :text) %></name>
+    <% unless t.auto_notify.nil? -%>
+         <autoNotify><%= t.auto_notify.encode(:xml => :text) %></autoNotify>
+    <% end -%>
+    <% t.commands.each do |c| -%>
+         <command><%= c.encode(:xml => :text) %></command>
+    <% end unless t.commands.nil? -%>
+      </target>
+  <% end unless path.targets.nil? -%>
+  <% path.escalates.each do |t| -%>
+      <escalate<%= t.delay.nil? ? '' : " delay=#{t.delay.encode(:xml => :attr)}" %>>
+         <target<%= t.interval.nil? ? '' : " interval=#{t.interval.encode(:xml => :attr)}" %>>
+ 	    <name><%= t.name.encode(:xml => :text) %></name>
+    <% unless t.auto_notify.nil? -%>
+            <autoNotify><%= t.auto_notify.encode(:xml => :text) %></autoNotify>
+    <% end -%>
+    <% t.commands.each do |c| -%>
+	    <command><%= c.encode(:xml => :text) %></command>
+    <% end unless t.commands.nil? -%>
+	 </target>
+      </escalate>
+  <% end unless path.escalates.nil? -%>
+   </path>
+<% end -%>
+</destinationPaths>

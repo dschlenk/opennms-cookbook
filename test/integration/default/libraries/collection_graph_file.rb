@@ -25,9 +25,12 @@ EOL
     gf = inspec.file("/opt/opennms/etc/snmp-graph.properties.d/#{graph_file}")
     @exists = gf.exist?
     @content = gf.content if @exists
+    @md5sum = gf.md5sum if @exists
   end
 
   attr_reader :content
+
+  attr_reader :md5sum
 
   def exist?
     @exists

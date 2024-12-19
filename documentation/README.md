@@ -13,6 +13,7 @@
 * [opennms\_eventconf](eventconf.md)
 * [opennms\_event](event.md)
 * [opennms\_syslog\_file](syslog.md)
+* [notifications](notifications.md)
 
 ### Service Assurance
 
@@ -26,6 +27,9 @@
 ### User and Group Management
 
 * [opennms\_user](user.md)
+* [opennms\_group](group.md)
+* [opennms\_role](role.md)
+* [opennms\_role\_schedule](role\_schedule.md)
 
 ### Provisioning and Discovery
 
@@ -35,6 +39,8 @@
 
 * [opennms\_avail\_category](avail_category.md)
 * [opennms\_avail\_view\_section](avail_view_section.md)
+* [opennms\_collection\_graph](collection_graph.md)
+* [opennms\_collection\_graph\_file](collection_graph_file.md)
 * [opennms\_surveillance\_view](surveillance_view.md)
 * [opennms\_wallboard and opennms\_dashlet](opsboard.md)
 

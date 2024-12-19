@@ -1,4 +1,3 @@
-# frozen_string_literal: true
 # drops off a new file
 opennms_collection_graph_file 'wimax-gw-graph.properties'
 # our version has changes that won't get propogated, because create_if_missing.

@@ -109,6 +109,13 @@ suites:
       inspec_tests:
         - path: test/integration/default
         - path: test/integration/avail_view_section_mod
+  - name: collection_graph
+    provisioner:
+      policyfile: policyfiles/collection_graph.rb
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/collection_graph
   - name: collection_graph_file
     provisioner:
       policyfile: policyfiles/collection_graph_file.rb
@@ -207,6 +214,13 @@ suites:
       inspec_tests:
         - path: test/integration/default
         - path: test/integration/dashlet_update
+  - name: destination_path
+    provisioner:
+      policyfile: policyfiles/destination_path.rb
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/destination_path
   - name: disco_range
     provisioner:
       policyfile: policyfiles/disco_range.rb
@@ -578,6 +592,27 @@ suites:
       inspec_tests:
         - path: test/integration/default
         - path: test/integration/jmx
+  - name: notifd_autoack
+    provisioner:
+      policyfile: policyfiles/notifd_autoack.rb
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/notifd_autoack
+  - name: notification
+    provisioner:
+      policyfile: policyfiles/notification.rb
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/notification
+  - name: notification_command
+    provisioner:
+      policyfile: policyfiles/notification_command.rb
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/notification_command
   - name: poller
     provisioner:
       policyfile: policyfiles/poller.rb
@@ -620,6 +655,13 @@ suites:
       inspec_tests:
         - path: test/integration/default
         - path: test/integration/response_graph
+  - name: role
+    provisioner:
+      policyfile: policyfiles/role.rb
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/role
   - name: send_event
     driver:
       ports:

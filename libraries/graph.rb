@@ -1,5 +1,3 @@
-
-# frozen_string_literal: true
 module Graph
   def new_graph_file(file, node)
     f = ::File.new("#{node['opennms']['conf']['home']}/etc/snmp-graph.properties.d/#{file}", 'w')

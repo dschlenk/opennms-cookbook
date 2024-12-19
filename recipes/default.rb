@@ -17,7 +17,7 @@
 # limitations under the License.
 #
 
-%w(java-properties addressable).each do |g|
+%w(addressable).each do |g|
   chef_gem g
 end
 
