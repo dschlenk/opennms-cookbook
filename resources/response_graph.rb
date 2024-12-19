@@ -7,7 +7,7 @@ property :columns, Array, callbacks: {
     p.is_a?(Array) && !p.any? { |a| !a.is_a?(String) }
   },
 }
-property :type, Array, default: ['responseTime', 'distributedStatus']
+property :type, Array, default: %w(responseTime distributedStatus)
 property :command, String
 
 action_class do
