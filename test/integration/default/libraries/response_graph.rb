@@ -1,4 +1,3 @@
-# frozen_string_literal: true
 require 'java-properties'
 require 'tempfile'
 class ResponseGraph < Inspec.resource(1)
@@ -20,26 +19,25 @@ class ResponseGraph < Inspec.resource(1)
 
   def initialize(graph_name)
     gf = inspec.file('/opt/opennms/etc/response-graph.properties').content
-    tf = Tempfile.new('inspec-gf')
-    tf.write(gf)
-    tf.close
-    props = JavaProperties::Properties.new(tf.path)
-    values = props['reports'].split(/,\s*/) unless props['reports'].nil?
+    # initializing the props object changed because the `java-propertes` library used changed
+    props = JavaProperties.parse(gf)
+    # accessing items in `props` has to be done via symbol now instead of with a string
+    values = props[:reports].split(/,\s*/) unless props[:reports].nil?
     found = values.include?(graph_name) unless values.nil?
     @exists = found
     if @exists
-      @long_name = props["report.#{graph_name}.name"]
-      @columns = props["report.#{graph_name}.columns"].split(',')
+      @long_name = props["report.#{graph_name}.name".to_sym]
+      @columns = props["report.#{graph_name}.columns".to_sym].split(',')
       @columns.each do |c|
         c.chomp!
         c.lstrip!
       end
-      @type = props["report.#{graph_name}.type"].split(',')
+      @type = props["report.#{graph_name}.type".to_sym].split(',')
       @type.each do |t|
         t.chomp!
         t.lstrip!
       end
-      @command = props["report.#{graph_name}.command"]
+      @command = props["report.#{graph_name}.command".to_sym]
     end
   end
 

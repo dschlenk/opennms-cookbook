@@ -4,7 +4,7 @@ control 'response_graph' do
     it { should exist }
     its('class_name') { should eq 'org.opennms.netmgt.poller.monitors.HttpMonitor' }
     its('port') { should eq 8980 }
-    its('parameters') { should eq 'url' => '/opennms/login.jsp', 'rrd-repository' => '/opt/opennms/share/rrd/response', 'rrd-base-name' => 'onms', 'ds-name' => 'onms' }
+    its('parameters') { should eq 'url' => { 'value' => '/opennms/login.jsp' }, 'rrd-repository' => { 'value' => '/opt/opennms/share/rrd/response' }, 'rrd-base-name' => { 'value' => 'onms' }, 'ds-name' => { 'value' => 'onms' } }
   end
 
   # describe foreign_source('dry-source') do
