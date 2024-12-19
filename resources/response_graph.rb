@@ -1,4 +1,5 @@
 include Opennms::XmlHelper
+include Graph
 
 property :short_name, String, name_property: true
 property :long_name, String
@@ -12,6 +13,7 @@ property :command, String
 
 action_class do
   include Opennms::XmlHelper
+  include Graph
 end
 
 load_current_value do |new_resource|
