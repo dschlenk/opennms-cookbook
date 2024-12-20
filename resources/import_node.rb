@@ -73,8 +73,12 @@ action :create do
       unless new_resource.parent_node_label.nil?
         node_el.attributes['parent-node-label'] = new_resource.parent_node_label
       end
-      node_el.attributes['city'] = new_resource.city unless new_resource.city.nil?
-      node_el.attributes['building'] = new_resource.building unless new_resource.building.nil?
+      unless new_resource.city.nil?
+        node_el.attributes['city'] = new_resource.city
+      end
+      unless new_resource.building.nil?
+        node_el.attributes['building'] = new_resource.building
+      end
       if !new_resource.categories.nil? && !new_resource.categories.empty?
         new_resource.categories.each do |category|
           node_el.add_element 'category', 'name' => category
@@ -95,15 +99,20 @@ action :create do
     unless new_resource.parent_node_label.nil?
       import_node.attributes['parent-node-label'] = new_resource.parent_node_label
     end
-    import_node.attributes['city'] = new_resource.city unless new_resource.city.nil?
-    import_node.attributes['building'] = new_resource.building unless new_resource.building.nil?
+    unless new_resource.city.nil?
+      import_node.attributes['city'] = new_resource.city
+    end
+    unless new_resource.building.nil?
+      import_node.attributes['building'] = new_resource.building
+    end
     if !new_resource.categories.nil? && !new_resource.categories.empty?
       new_resource.categories.each do |category|
         import_node.add_element 'category', 'name' => category
       end
     end
     # delete all assets
-    import_node.elements.delete_all 'asset'
+    assets_el = import_node.elements["asset"] unless import_node.nil?
+    import_node.elements.delete_all 'asset' unless assets_el.nil?
     unless new_resource.assets.nil?
       new_resource.assets.each do |key, value|
         import_node.add_element 'asset', 'name' => key, 'value' => value
@@ -119,7 +128,9 @@ action :delete do
     model_import_init(new_resource.name, new_resource.foreign_source_name)
     model_import = REXML::Document.new(model_import(new_resource.foreign_source_name).message).root
     import_node = model_import.elements["node[@node-label = '#{new_resource.node_label}' @foreign-id = '#{new_resource.foreign_id}']"] unless model_import.nil?
-    model_import_node_delete(new_resource.foreign_source_name, new_resource.foreign_id) if import_node.nil?
+    unless import_node.nil?
+      model_import_node_delete(new_resource.foreign_source_name, new_resource.foreign_id)
+    end
     if !new_resource.sync_import.nil? && new_resource.sync_import
       model_import_sync(new_resource.name, new_resource.foreign_source_name, true)
     end
