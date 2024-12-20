@@ -10,7 +10,7 @@ class ImportNode < Inspec.resource(1)
   '
 
   example '
-    describe import_node(\'foreign_id\', \'foreign_source_name\') do
+    describe import_node(\'foreign_id\', \'foreign_source_name\', 1241) do
       it { should exist }
       its(\'node_label\') { should eq \'nodeA\' }
       its(\'parent_foreign_source\') { should eq \'foreign_source_name\' }
@@ -23,8 +23,8 @@ class ImportNode < Inspec.resource(1)
     end
   '
 
-  def initialize(id, foreign_source_name)
-    parsed_url = Addressable::URI.parse("http://admin:admin@localhost:8980/opennms/rest/requisitions/#{foreign_source_name}/nodes/#{id}").normalize.to_str
+  def initialize(id, foreign_source_name, port=8980)
+    parsed_url = Addressable::URI.parse("http://admin:admin@localhost:#{port}/opennms/rest/requisitions/#{foreign_source_name}/nodes/#{id}").normalize.to_str
     begin
       node = RestClient.get(parsed_url)
     rescue StandardError
