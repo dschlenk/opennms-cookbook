@@ -1,11 +1,11 @@
 # frozen_string_literal: true
 control 'import_node' do
-  describe import_node('nodeA_ID', 'dry-source') do
+  describe import_node('nodeA_ID', 'dry-source', 1241) do
     it { should exist }
     its('node_label') { should eq 'nodeA' }
   end
 
-  describe import_node('nodeC', 'dry-source') do
+  describe import_node('nodeC', 'dry-source', 1241) do
     it { should exist }
     its('node_label') { should eq 'nodeC' }
     its('parent_foreign_source') { should eq 'dry-source' }

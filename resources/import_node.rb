@@ -1,30 +1,127 @@
-# frozen_string_literal: true
-require 'rexml/document'
+include Opennms::Cookbook::Provision::ModelImportHttpRequest
+include Opennms::XmlHelper
+include Opennms::Rbac
 
-actions :create, :create_if_missing, :delete
-default_action :create
-
-# name is used if node_label is omitted
-attribute :node_label, kind_of: String
+property :node_label, String
 # immutable / part of identity
-attribute :foreign_source_name, kind_of: String, required: true
+property :foreign_source_name, String, required: true
 # immutable / part of identity
-attribute :foreign_id, kind_of: String, required: true
-attribute :parent_foreign_source, kind_of: String
-attribute :parent_foreign_id, kind_of: String
-attribute :parent_node_label, kind_of: String
-attribute :city, kind_of: String
-attribute :building, kind_of: String
-attribute :categories, kind_of: Array
+property :foreign_id, String, required: true
+property :parent_foreign_source, String
+property :parent_foreign_id, String
+property :parent_node_label, String
+property :city, String
+property :building, String
+property :categories, Array
 # key/value pairs - keys must be valid asset fields!
-attribute :assets, kind_of: Hash
-attribute :sync_import, kind_of: [TrueClass, FalseClass], default: false
+property :assets, Hash, callbacks: { 'should be a hash with key/value pairs that are both strings' => lambda { |p| !p.any? { |k, v| !k.is_a?(String) || !v.is_a?(String) } }, }
+property :sync_import, [TrueClass, FalseClass], default: false
 # If your imports take a long time to sync, you can fiddle with these
 # to prevent convergence continuing before imports finish. One reason
 # you might want to do this is if a service restart happens at the
 # end of the converge before the syncs end, the pending syncs will
 # never happen.
-attribute :sync_wait_periods, kind_of: Integer, default: 30
-attribute :sync_wait_secs, kind_of: Integer, default: 10
+property :sync_wait_periods, Integer, default: 30
+property :sync_wait_secs, Integer, default: 10
 
-attr_accessor :exists, :import_exists, :changed
+load_current_value do |new_resource|
+  node_assets = {}
+  model_import = REXML::Document.new(model_import(new_resource.name).message) unless model_import(new_resource.name).nil?
+  model_import = REXML::Document.new(Opennms::Cookbook::Provision::ModelImport.new(new_resource.foreign_source_name, "#{baseurl}/requisitions/#{new_resource.name}").message) if model_import.nil?
+  current_value_does_not_exist! if model_import.nil? || model_import.elements["node[@node-label = '#{new_resource.node_label}' @foreign-id = '#{new_resource.foreign_id}']"].nil?
+  import_node = model_import.elements["node[@node-label = '#{new_resource.node_label}' @foreign-id = '#{new_resource.foreign_id}']"]
+  current_value_does_not_exist! if import_node.nil?
+  parent_foreign_source import_node.attributes['parent-foreign-source'] if import_node.attributes['parent-foreign-source'].nil?
+  parent_foreign_id import_node.attributes['parent-foreign-id'] if import_node.attributes['parent-foreign-id'].nil?
+  parent_node_label import_node.attributes['parent-node-label'] if import_node.attributes['parent-node-label'].nil?
+
+  city import_node.attributes['city'] if import_node.attributes['city'].nil?
+  building import_node.attributes['building'] if import_node.attributes['building'].nil?
+  categories import_node.attributes['categories'] if import_node.attributes['categories'].nil?
+  import_node.each_element('asset') do |asset|
+    node_assets[asset.attributes['key']] = asset.attributes['value']
+  end
+  assets = node_assets
+end
+
+action_class do
+  include Opennms::Cookbook::Provision::ModelImportHttpRequest
+  include Opennms::XmlHelper
+  include Opennms::Rbac
+end
+
+action :create do
+  converge_if_changed do
+    model_import_init(new_resource.name, new_resource.foreign_source_name)
+    model_import = REXML::Document.new(model_import(new_resource.foreign_source_name).message).root
+    import_node = model_import.elements["node[@node-label = '#{new_resource.node_label}' @foreign-id = '#{new_resource.foreign_id}']"] unless model_import.nil?
+    node_name = new_resource.node_label || new_resource.name
+    if import_node.nil?
+      node_el = REXML::Element.new('node')
+      unless node_name.nil?
+        node_el.add_attribute('node-label', node_name)
+      end
+      unless new_resource.foreign_id.nil?
+        node_el.add_attribute('foreign-id', new_resource.foreign_id)
+      end
+      unless new_resource.parent_foreign_source.nil?
+        node_el.attributes['parent-foreign-source'] = new_resource.parent_foreign_source
+      end
+      unless new_resource.parent_foreign_id.nil?
+        node_el.attributes['parent-foreign-id'] = new_resource.parent_foreign_id
+      end
+      unless new_resource.parent_node_label.nil?
+        node_el.attributes['parent-node-label'] = new_resource.parent_node_label
+      end
+      node_el.attributes['city'] = new_resource.city unless new_resource.city.nil?
+      node_el.attributes['building'] = new_resource.building unless new_resource.building.nil?
+      if !new_resource.categories.nil? && !new_resource.categories.empty?
+        new_resource.categories.each do |category|
+          node_el.add_element 'category', 'name' => category
+        end
+      end
+      unless new_resource.assets.nil?
+        new_resource.assets.each do |key, value|
+          node_el.add_element 'asset', 'name' => key, 'value' => value
+        end
+      end
+      model_import.add_element node_el
+    else unless new_resource.parent_foreign_source.nil?
+      import_node.attributes['parent-foreign-source'] = new_resource.parent_foreign_source
+    end
+    unless new_resource.parent_foreign_id.nil?
+      import_node.attributes['parent-foreign-id'] = new_resource.parent_foreign_id
+    end
+    unless new_resource.parent_node_label.nil?
+      import_node.attributes['parent-node-label'] = new_resource.parent_node_label
+    end
+    import_node.attributes['city'] = new_resource.city unless new_resource.city.nil?
+    import_node.attributes['building'] = new_resource.building unless new_resource.building.nil?
+    if !new_resource.categories.nil? && !new_resource.categories.empty?
+      new_resource.categories.each do |category|
+        import_node.add_element 'category', 'name' => category
+      end
+    end
+    # delete all assets
+    import_node.elements.delete_all 'asset'
+    unless new_resource.assets.nil?
+      new_resource.assets.each do |key, value|
+        import_node.add_element 'asset', 'name' => key, 'value' => value
+      end
+    end
+    end
+    model_import_node_create(new_resource.foreign_source_name).message model_import.to_s
+  end
+end
+
+action :delete do
+  converge_if_changed do
+    model_import_init(new_resource.name, new_resource.foreign_source_name)
+    model_import = REXML::Document.new(model_import(new_resource.foreign_source_name).message).root
+    import_node = model_import.elements["node[@node-label = '#{new_resource.node_label}' @foreign-id = '#{new_resource.foreign_id}']"] unless model_import.nil?
+    model_import_node_delete(new_resource.foreign_source_name, new_resource.foreign_id) if import_node.nil?
+    if !new_resource.sync_import.nil? && new_resource.sync_import
+      model_import_sync(new_resource.name, new_resource.foreign_source_name, true)
+    end
+  end
+end

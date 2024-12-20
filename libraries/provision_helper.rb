@@ -90,7 +90,7 @@ module Opennms
 
           def model_import_create(name, foreign_source_name)
             url = "#{baseurl}/requisitions/#{name}"
-            Chef::Log.debug "add_import url: #{url}"
+            Chef::Log.debug "model_import_create url: #{url}"
             model_import = Opennms::Cookbook::Provision::ModelImport.new(foreign_source_name, url)
             with_run_context(:root) do
               declare_resource(:http_request, "opennms_import POST #{name}") do
@@ -99,6 +99,34 @@ module Opennms
                 action :nothing
                 delayed_action :post
                 message model_import.message.to_s
+              end
+            end
+          end
+
+          def model_import_node_create(name)
+            url = "#{baseurl}/requisitions/#{name}/nodes"
+            Chef::Log.debug "model_import_node_create url: #{url}"
+            model_import_node = Opennms::Cookbook::Provision::ModelImport.new(name, url)
+            with_run_context(:root) do
+              declare_resource(:http_request, "opennms_import_node POST #{name}") do
+                url "#{baseurl}/requisitions"
+                headers({ 'Content-Type' => 'application/xml' })
+                action :nothing
+                delayed_action :post
+                message model_import_node.message.to_s
+              end
+            end
+          end
+
+          def model_import_node_delete(fsname, fsid)
+            node_url = "#{baseurl}/requisitions/#{fsname}/nodes/#{fsid}"
+            Chef::Log.debug "model_import_node_delete url: #{url}"
+            with_run_context(:root) do
+              declare_resource(:http_request, "opennms_import_node  DELETE #{fsname}") do
+                url node_url
+                headers({ 'Content-Type' => 'application/xml' })
+                action :nothing
+                delayed_action :delete
               end
             end
           end
