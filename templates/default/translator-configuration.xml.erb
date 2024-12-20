@@ -149,6 +149,28 @@
     </event-translation-spec>
    <% end -%>
 
+<% # Note that this only supports two levels of `value` elements while theoretically you can have infinite according to the schema. Something to consider fixing if/when this becomes a custom resource. -%>
+<% @addl_specs.each do |spec| -%>
+    <event-translation-spec uei=<%= spec['uei'].encode(:xml => :attr) %>>
+  <% unless spec['mappings'].nil? || spec['mappings'].empty? -%>
+      <mappings>
+    <% spec['mappings'].each do |m| -%>
+        <mapping<%= m['preserve_snmp_data'].nil? ? '' : " preserve-snmp-data=#{m['preserve_snmp_data'].to_s.encode(:xml => :attr)}" %>>
+      <% m['assignments'].each do |a| -%>
+          <assignment type=<%= a['name'].encode(:xml => :attr) %> type=<%= a['type'].encode(:xml => :attr) %><%= a['default'].nil? ? '' : " default=#{a['default'].encode(:xml => :attr)}"%>>
+            <value type=<%= a['value']['type'].encode(:xml => :attr) %><%= a['value']['matches'].nil? ? '' : " matches=#{a['value']['matches'].encode(:xml => :attr)}" %> result=<%= a['value']['result'].encode(:xml => :attr) %>>
+        <% a['value']['values'].each do |v| -%>
+              <value type=<%= a['value']['type'].encode(:xml => :attr) %><%= a['value']['matches'].nil? ? '' : " matches=#{a['value']['matches'].encode(:xml => :attr)}" %> result=<%= a['value']['result'].encode(:xml => :attr) %> />
+        <% end if !a['value']['values'].nil? && !a['value']['values'].empty? %>
+            </value>
+          </assignment>
+      <% end if !m['assignments'].nil? && !m['assignments'].empty? -%>
+        </mapping>
+    <% end -%>
+      </mappings>
+  <% end -%>
+    </event-translation-spec>
+<% end unless @addl_specs.nil? %>
   </translation>
 
 </event-translator-configuration>

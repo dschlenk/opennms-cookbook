@@ -147,7 +147,7 @@ A number of [custom resources are available](documentation/README.md)
 
 Most of the custom resources began as LWRPs and have since been refactored into custom resources. A few remain that have not yet been refactored. Their functionality is not guaranteed.
 
-#### Provisioning Requisitions
+### Provisioning Requisitions
 
 These custom resources use the OpenNMS REST interface. As such, OpenNMS has to be running for the resources to converge. (I used the term 'import' rather than the correct term 'requisition'. I can type 'import' a lot faster than 'requisition').
 
@@ -174,9 +174,9 @@ The following custom resources don't exist yet, but they should!
 
 ### Template Overview
 
-Most configuration files are templated and can be overridden with environment, role, or node attributes.  See the default attributes file for a list of configuration items that can be changed in this manner, or keep reading for a brief overview of each template available. Default attribute values set to `nil` mean that the file's default value is commented out in the original file and will remain so unless set to a non-nil value.
+Most configuration files that aren't managed with custom resources are templated and can be overridden with environment, role, or node attributes.  See the default attributes file for a list of configuration items that can be changed in this manner, or keep reading for a brief overview of each template available. Default attribute values set to `nil` mean that the file's default value is commented out in the original file and will remain so unless set to a non-nil value.
 
-Each template can also be overridden in a wrapper cookbook by manipulating the appropriate node attribute. For example, if you've got a pretty heavily customized collectd-configuration.xml file and you don't want to move to the custom resource/library cookbook workflow, turn your custom version into a template (append `.erb` to the filename and optionally add some templating logic to it) and add it to `templates/default` in your wrapper cookbook. Then set `default[:opennms][:collectd][:cookbook]` to the name of your wrapper cookbook. You could also copy all of the templates from this cookbook to your wrapper, edit them all as desired and set `default[:opennms][:default_template_cookbook]` to your wrapper cookbook's name.
+Each template can also be overridden in a wrapper cookbook by manipulating the appropriate node attribute. For example, if you've got a pretty heavily customized availability-reports.xml file, turn your custom version into a template (append `.erb` to the filename and optionally add some templating logic to it) and add it to `templates/default` in your wrapper cookbook. Then set `default['opennms']['db_reports']['avail']['cookbook']` to the name of your wrapper cookbook. You could also copy all of the templates from this cookbook to your wrapper, edit them all as desired and set `default['opennms']['default_template_cookbook']` to your wrapper cookbook's name.
 
 If you want to skip some of the templates you can use `edit_resource` to set the action to :nothing. Example:
 
@@ -214,97 +214,9 @@ If you want to change the logo or default interval, count, hour or minute you ca
    }
 ```
 
-#### etc/categories.xml
-
-Default categories can be modified by doing things like
-
-```
-   {
-     "opennms": {
-       "categories": {
-         "web": {
-           "services": [
-             "HTTP",
-             "HTTPS",
-             "HTTP-8080",
-             "HTTP-8000",
-             "HTTP-8980"
-           ]
-         }
-       }
-     }
-   }
-```
-
-That'll leave the defaults for everything except overwrite the list of services in the `web` category.
-The names of the categories are: 'overall', 'interfaces', 'email', 'web', 'jmx', 'dns', 'db', 'other', 'inet'.
-The defaults are nil, which leaves the defaults as is. Override with false to disable.
-
 #### etc/chart-configuration.xml
 
 Disable one of the three default charts by setting `severity_enabled`, `outages_enable` or `inventory_enable` to false in `node['opennms']['chart']`.
-
-#### etc/collectd-configuration.xml
-
-Use the `node['opennms']['collectd']['threads']` attribute to change the number of threads (duh). There are also attributes for each default package. As of 1.12.5 those are: vmware3, vmware4, vmware5, example1. To modify one of those, for example, to change the IPv4 include range in the example1 package, you would do:
-```
-   {
-     "opennms": {
-       "collectd": {
-           "example1": {
-             "ipv4_range": {
-                 "begin": "10.0.1.0",
-                 "end": "10.0.1.255"
-             }
-           }
-       }
-     }
-   }
-```
-
-That leaves most of the example1 package as default. Set a package's `enabled` attribute to false if you want to completely remove that package. You can also do that for specific services in that package. See the template for more options.
-
-#### etc/datacollection-config.xml
-
-You can override some settings like:
-
-```
-   {
-     "opennms": {
-       "datacollection": {
-         "default": {
-           "snmpStorageFlag": "all"
-         }
-       }
-   }
-```
-
-Or maybe you don't have any Dell gear:
-
-```
-   {
-     "opennms": {
-       "datacollection": {
-         "default": {
-           "dell": false
-         }
-       }
-     }
-   }
-```
-
-You can also remove one of the default snmp-collections, or change the step and RRA definitions.
-
-#### etc/discovery-configuration.xml
-
-Attributes are available in `node['opennms']['discovery']` to change global settings:
-
-* threads (`threads`)
-* packets-per-second (`pps`)
-* initial-sleep-time (`init_sleep_ms`)
-* restart-sleep-time (`restart_sleep_ms`)
-* retries (`retries`)
-* timeout (`timeout`)
 
 #### etc/eventd-configuration.xml
 
@@ -317,13 +229,6 @@ Attributes are available in `node['opennms']['eventd']` to change global setting
 * receivers (`receivers`)
 * socketSoTimeoutRequired (`sock_so_timeout_req` to true or false)
 * socketSoTimeoutPeriod (`socket_so_timeout_period`)
-
-#### etc/events-archiver-configuration.xml
-
-Attributes are available in `node['opennms']['events_archiver']` to change global settings:
-
-* archiveAge (`age`)
-* separator (`separator`)
 
 #### etc/javamail-configuration.properties
 
@@ -380,41 +285,18 @@ default['opennms']['javamail_config']['default_send']['password']           = "o
 
 This is useful for something I'm sure, but I don't know what. See the template or default attributes file for hints.
 
-#### etc/jdbc-datacollection-config.xml 
-
-Similar to other datacollection-config.xml files, you can change the RRD repository, step, RRA definitions and disable default collections and their queries.
-
 #### etc/jms-northbounder-configuration.xml
 
 Configures the JMS Northbounder introduced in version 17.0.0. See the default attributes under the `jms_nbi` key for configuration options. You may also need to set some JMS related attributes under the `properties` key.
 
-#### etc/jmx-datacollection-config.xml
+#### etc/enlinkd-configuration.xml
 
-Similar to other datacollection-config.xml files, you can change the RRD repository, step, RRA definitions and disable default collections and their mbeans. In the JBoss collection you can specify a JMS queue and/or topic to collect stats on. See the template and default attributes for details. 
-
-#### etc/linkd-configuration.xml & etc/enlinkd-configuration.xml
-
-Attributes available in `node['opennms']['linkd']` that allow you change global settings like:
+Attributes available in `node['opennms']['enlinkd']` that allow you change global settings like:
 
 * threads
 * initial_sleep_time
 * snmp_poll_interval
 * discovery_link_interval
-
-You can also turn off various kinds of detection, like for `iproutes`, set any of these to false to remove them from the file:
-
-* netscreen
-* cisco
-* darwin
-
-Finally there's the package element at the end of the file that you can configure with these attributes:
-
-```
-default['opennms']['linkd']['package']                      = "example1"
-default['opennms']['linkd']['filter']                       = "IPADDR != '0.0.0.0'"
-default['opennms']['linkd']['range_begin']                  = "1.1.1.1"
-default['opennms']['linkd']['range_end']                    = "254.254.254.254"
-```
 
 #### etc/log4j2.xml
 
@@ -422,136 +304,6 @@ This one is a little different. If you want to turn up logging for collectd, for
 
 ```
 default['opennms']['log4j2']['collectd'] = 'DEBUG'
-```
-
-#### magic-users.properties
-
-The rtc username and password are populated from the values set in `node['opennms']['properties']['rtc']['username']` and `node['opennms']['properties']['rtc']['password']`. TODO: Generate passwords during install! Other attributes available for configuration are:
-
-```
-default['opennms']['magic_users']['admin_users']     = "admin"
-default['opennms']['magic_users']['ro_users']        = ""
-default['opennms']['magic_users']['dashboard_users'] = ""
-default['opennms']['magic_users']['provision_users'] = ""
-default['opennms']['magic_users']['remoting_users']  = ""
-default['opennms']['magic_users']['rest_users']      = "iphone"
-```
-
-Note that this file isn't a thing in versions >= 19.
-
-#### etc/map.properties
-
-Do you love the old SVG maps but are a contrarian when it comes to color schemes? Have we got the template for you! I guess also useful for translating labels?  Check out the default attributes for details on what you can change.
-
-#### etc/notifd-configuration.xml
-
-Is ignorance about your broken network in fact bliss?  Shut off notifd by setting `node['notifd']['status']` to "off" and find out. Don't know what `match-all` even means? Find out by setting `node['opennms']['notifd']['match_all']` to false. (It controls whether only the first matching notification is used or not). You can also disable any of the default auto-acknowledge elements with `node['notifd']['auto_ack']['service_unresponsive|service_lost|interface_down|widespread_outage']`.
-
-#### etc/notificationCommands.xml
-
-Turn off one of the default notification commands by setting one of the attributes in `node['opennms']['notification_commands']` to false:
-
-* java_pager_email
-* java_email
-* xmpp_message
-* xmpp_group_message
-* irc_cat
-* call_work_phone
-* call_mobile_phone
-* call_home_phone
-* microblog_update
-* microblog_reply
-* microblog_dm
-
-#### etc/notifications.xml
-
-These attributes:
-
-* enabled
-* status
-* rule
-* destination_path
-* description
-* text_message
-* subject
-* numeric_message
-
-can be overridden to alter any of these default notifications:
-
-* interface_down
-* node_down
-* node_lost_service
-* node_added
-* interface_deleted
-* high_threshold
-* low_threshold
-
-in `node['opennms']['notifications']`.
-
-#### etc/response-graph.properties
-
-Change the image format from the default `png` to `gif` or `jpg` (if using jrobin or you like broken images) with `node['response_graph']['image_format']`. Font sizes can also be changed with `node['response_graph']['default_font_size']` and `node['response_graph']['title_font_size']` (defaults are 7 and 10 respectively). Setting these attributes to false removes them from the file:
-
-* icmp
-* avail
-* dhcp
-* dns
-* http
-* http_8080
-* http_8000
-* mail
-* pop3
-* radius
-* smtp
-* ssh
-* jboss
-* snmp
-* ldap
-* strafeping
-* memcached_bytes
-* memcached_bytesrw
-* memcached_uptime
-* memcached_rusage
-* memcached_items
-* memcached_conns
-* memcached_tconns (off by default)
-* memcached_cmds
-* memcached_gets
-* memcached_evictions
-* memcached_threads
-* memcached_struct
-* ciscoping_time
-
-If you changed the count of pings in the strafer polling package to a value higher than 20, you'll also need to define additional colors for the strafeping graph, like `default['opennms']['response_graph']['strafeping_colors'][21] = ["#f5f5f5"]`. If you want to add a STACK to the graph for another ping number (defaults to 1-4,10,19) add a second color to that attribute's value array, like `default['opennms']['response_graph']['strafeping_colors'][21] = ["#f5f5f5","#050505"]`. 
-
-#### etc/rrd-configuration.properties
-
-Tobi enthusiasts will want to set some attributes in `node['opennms']['rrd']` to switch from jrobin to rrdtool:
-
-```
-{
-  "opennms":
-  {
-    "rrd":
-    {
-      "strategy_class": "org.opennms.netmgt.rrd.rrdtool.JniRrdStrategy",
-      "interface_jar":  "/usr/share/java/jrrd.jar",
-      "jrrd":           "/usr/lib/libjrrd.so"
-    }
-  }
-}
-```
-
-There's now a recipe that does this for you, named rrdtool. Probably just use that. 
-
-If you're a unique snowflake you can change a multitude of queue settings or change the jrobin backend factory, but unless you know what you're doing that's probably a mistake. Look at the template for details if you're curious.
-
-Finally, to turn on the Google protobuf export thing described at http://www.opennms.org/wiki/Performance_Data_TCP_Export, set these attributes accordingly:
-
-```
-default['opennms']['rrd']['usetcp']      = true
-default['opennms']['rrd']['tcp']['host'] = 10.0.0.1
-default['opennms']['rrd']['tcp']['port'] = 9100     # Hope that's a JetDirect compatible network interface!
 ```
 
 #### etc/site-status-views.xml
@@ -574,59 +326,7 @@ Do you actually populate the building column in assets or site field in provisio
 
 #### etc/snmp-adhoc-graph.properties
 
-Similar to other *-graph.properties files, you can change the image format used in adhoc graphs by setting the attribute `node['opennms']['snmp_adhoc_graph']['image_format']` to `gif` or `jpg` rather than the default `png`. Note that the intersection of formats supported by both jrobin and rrdtool is `png`, though.
-
-#### etc/snmp-graph.properties & snmp-graph.properties.d/*
-
-Similar to other *-graph.properties files, you can change the image format used in predefined graphs by setting the attribute `node['opennms']['snmp_adhoc_graph']['image_format']` to `gif` or `jpg` rather than the default `png`. Note that the intersection of formats supported by both jrobin and rrdtool is `png`, though.
-You can also set the default and title font sizes like you can in the response graphs. Since these graphs are now split up by manufacturer, you can disable graphs for a manufacturer like you can in snmp-datacollection-config.xml. This example disables Dell graphs:
-
-```
-{
-  "opennms":
-  {
-    "snmp_graph":
-    {
-      "dell_openmanage": false,
-      "dell_rac": false
-    }
-  }
-}
-```
-
-Note that this doesn't delete that file, it merely comments out the `reports=...` line(s) in the file.
-
-You can also change the default KSC graph by setting `node['snmp_graph']['default_ksc_graph']` to the name of a valid graph.
-
-Also note that releases that use backshift instead of displaying generated images (17+) won't be affected by these changes.
-
-#### etc/statsd-configuration.xml
-
-You can remove either of the default packages or an individual report by setting attributes in `node['opennms']['statsd']['PACKAGE_NAME']['REPORT_NAME']` to false. Packages and their reports are:
-
-* example1
-  * top_n
-* response_time_reports
-  * top_10_weekly
-  * top_10_this_month
-  * top_10_last_month
-  * top_10_this_year
-
-#### etc/threshd-configuration.xml
-
-Like everything else that has packages, filters, ranges and services, you can override attributes to tune the defaults. See the template and default attributes for details. You can also configure the number of threads with `node['opennms']['threshd']['threads']` (default is 5).
-
-#### etc/thresholds.xml
-
-Change the RRD repository location or disable threshold groups with the `enabled` and `rrd_repository` attributes in `node['opennms']['thresholds']['GROUP']` where group can be:
-
-* mib2
-* cisco
-* hrstorage
-* netsnmp
-* netsnmp_memory_linux
-* netsnmp_memory_nonlinux
-* coffee
+Similar to other \*-graph.properties files, you can change the image format used in adhoc graphs by setting the attribute `node['opennms']['snmp_adhoc_graph']['image_format']` to `gif` or `jpg` rather than the default `png`. Note that the intersection of formats supported by both jrobin and rrdtool is `png`, though.
 
 #### etc/translator-configuration.xml
 
@@ -638,25 +338,74 @@ Remove one of the default event translations (http://www.opennms.org/wiki/Event_
 * cisco_config_man
 * juniper_cfg_change
 
+You can also add additional `event-translation-spec` elements by populating `node['opennms']['translator']['addl_specs']` with a hash where each key is a uei that has a hash value with key `'mappings'` (array of hashes each with key `'assignments'` (array of hashes that each contain keys `'name'` (string), `'type'` (string), `'default'` (string, optional), `'value'` (a hash that contains keys `'type'` (string), `'matches'` (string, optional), `'result'` (string), `'values'` (array of hashes that each contain keys `'type'` (string), `'matches'` (string, optional), `'result'` (string))))).
+
+An example:
+
+```
+default['opennms']['translator']['addl_specs'] = {
+  'uei.opennms.org/internal/telemetry/clockSkewDetected' => {
+    'mappings' => [
+      'assignments' => [
+        {
+          'name' => 'uei',
+          'type' => 'field',
+          'value' => {
+            'type' => 'constant',
+            'result' => 'uei.opennms.org/translator/telemetry/clockSkewDetected'
+          }
+        },
+        {
+          'name' => 'nodeid',
+          'type' => 'field',
+          'value' => {
+            'type' => 'sql',
+            'result' => 'SELECT n.nodeid FROM node n, ipinterface i WHERE n.nodeid = i.nodeid AND i.ipaddr = ? AND n.location = ?',
+            'values' => [
+              {
+                'type' => 'field',
+                'name' => 'interface',
+                'matches' => '.*',
+                'result' => '${0}'
+              },
+              {
+                'type' => 'parameter',
+                'name' => 'monitoringSystemLocation',
+                'matches' => '.*',
+                'result' => '${0}'
+              }
+            ]
+          }
+        }
+      ]
+    ]
+  }
+}
+```
+
+would be how to express the following `event-translation-spec`:
+
+```
+    <event-translation-spec uei="uei.opennms.org/internal/telemetry/clockSkewDetected" >
+      <mappings>
+        <mapping>
+          <assignment name="uei" type="field" >
+            <value type="constant" result="uei.opennms.org/translator/telemetry/clockSkewDetected" />
+          </assignment>
+          <assignment name="nodeid" type="field" >
+            <value type="sql" result="SELECT n.nodeid FROM node n, ipinterface i WHERE n.nodeid = i.nodeid AND i.ipaddr = ? AND n.location = ?" >
+              <value type="field" name="interface"  matches=".*" result="${0}" />
+              <value type="parameter" name="monitoringSystemLocation" matches=".*" result="${0}" />
+            </value>
+          </assignment>
+        </mapping>
+      </mappings>
+    </event-translation-spec>
+```
+
 #### etc/trapd-configuration.xml
 
-Two attributes available: `port` and `new_suspect` in `node['opennms']['trapd']` that allow you to configure the port to listen for traps on (default 162) and whether or not to create newSuspect events when a trap is received from an unmanaged host (default false).
-
-#### etc/users.xml
-
-Change your admin password by setting `node['opennms']['users']['admin']['password']` to whatever hashed value of your password OpenNMS uses. Uppercase MD5? In the future we'll generate one during install. You can also change the name and user_comments attributes, I guess.
-
-#### etc/viewsdisplay.xml
-
-Another web UI XML file, this one controls which categories are displayed in the availability box on the main landing page. Once a custom resource exists you'll be able to add sections, but until then you can disable any of the existing categories by setting one of these attributes in `node['opennms']['web_console_view']` to false:
-
-* network_interfaces
-* web_servers
-* email_servers
-* dns_dhcp_servers
-* db_servers
-* jmx_servers
-* other_servers
+Two attributes available: `port` and `new_suspect` in `node['opennms']['trapd']` that allow you to configure the port to listen for traps on (default 10162) and whether or not to create newSuspect events when a trap is received from an unmanaged host (default false).
 
 #### etc/xmpp-configuration.xml
 
@@ -678,26 +427,15 @@ Configure notifications to be sent via XMPP (aka Jabber, GTalk) with these attri
 See the template and default attributes source for more details on using these templates:
 
 * etc/microblog-configuration.xml.erb
-* etc/model-importer.properties.erb
 * etc/modemConfig.properties.erb
 * etc/nsclient-datacollection-config.xml.erb
-* etc/poller-configuration.xml.erb
-* etc/provisiond-configuration.xml.erb
-* etc/remedy.properties.erb
 * etc/reportd-configuration.xml.erb
 * etc/rtc-configuration.xml.erb
-* etc/smsPhonebook.properties.erb
 * etc/snmp-interface-poller-configuration.xml.erb
-* etc/support.properties.erb
-* etc/surveillance-views.xml.erb
 * etc/syslog-northbounder-configuration.xml.erb
-* etc/syslogd-configuration.xml.erb
 * etc/vacuumd-configuration.xml.erb
 * etc/vmware-cim-datacollection-config.xml.erb
 * etc/vmware-datacollection-config.xml.erb
-* etc/wmi-datacollection-config.xml.erb
-* etc/xml-datacollection-config.xml.erb
-* etc/xmlrpcd-configuration.xml.erb
 
 Copyright and License
 =======
@@ -719,7 +457,5 @@ So far, tests consist of:
 
 * Style Checks using foodcritic and rubocop. 
 * InSpec tests for all the custom resources.
-
-The default rake task will run the style checks. 
 
 Pull requests welcome!

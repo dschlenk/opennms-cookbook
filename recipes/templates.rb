@@ -22,9 +22,9 @@ onms_home ||= '/opt/opennms'
 template "#{onms_home}/etc/availability-reports.xml" do
   cookbook node['opennms']['db_reports']['avail']['cookbook']
   source 'availability-reports.xml.erb'
-  mode '664'
-  owner 'root'
-  group 'root'
+  mode '0664'
+  owner node['opennms']['username']
+  group node['opennms']['groupname']
   variables(
     cal_logo: node['opennms']['db_reports']['avail']['cal']['logo'],
     cal_interval: node['opennms']['db_reports']['avail']['cal']['endDate']['interval'],
@@ -44,9 +44,9 @@ end
 template "#{onms_home}/etc/service-configuration.xml" do
   cookbook node['opennms']['services']['cookbook']
   source 'service-configuration.xml.erb'
-  mode '664'
-  owner 'root'
-  group 'root'
+  mode '0664'
+  owner node['opennms']['username']
+  group node['opennms']['groupname']
   notifies :restart, 'service[opennms]'
   variables(
     dhcpd: node['opennms']['services']['dhcpd'],
@@ -64,9 +64,9 @@ end
 template "#{onms_home}/etc/chart-configuration.xml" do
   cookbook node['opennms']['chart']['cookbook']
   source 'chart-configuration.xml.erb'
-  mode '664'
-  owner 'root'
-  group 'root'
+  mode '0664'
+  owner node['opennms']['username']
+  group node['opennms']['groupname']
   notifies :restart, 'service[opennms]'
   variables(
     severity_enable: node['opennms']['chart']['severity_enable'],
@@ -76,29 +76,12 @@ template "#{onms_home}/etc/chart-configuration.xml" do
   action node['opennms']['templates'] ? :create : :nothing
 end
 
-template "#{onms_home}/etc/xml-datacollection-config.xml" do
-  cookbook node['opennms']['xml']['cookbook']
-  source 'xml-datacollection-config.xml.erb'
-  mode '664'
-  owner 'root'
-  group 'root'
-  notifies :restart, 'service[opennms]'
-  variables(
-    rrd_repository: node['opennms']['xml']['rrd_repository'],
-    threegpp_full_5min: node['opennms']['xml']['threegpp_full_5min'],
-    threegpp_full_15min: node['opennms']['xml']['threegpp_full_15min'],
-    threegpp_sample: node['opennms']['xml']['threegpp_sample']
-  )
-  only_if { node['opennms']['plugin']['xml'] }
-  action node['opennms']['templates'] ? :create : :nothing
-end
-
 template "#{onms_home}/etc/nsclient-datacollection-config.xml" do
   cookbook node['opennms']['nsclient_datacollection']['cookbook']
   source 'nsclient-datacollection-config.xml.erb'
-  mode '664'
-  owner 'root'
-  group 'root'
+  mode '0664'
+  owner node['opennms']['username']
+  group node['opennms']['groupname']
   notifies :restart, 'service[opennms]'
   variables(
     rrd_repository: node['opennms']['nsclient_datacollection']['rrd_repository'],
@@ -121,19 +104,30 @@ end
 template "#{onms_home}/etc/enlinkd-configuration.xml" do
   cookbook node['opennms']['enlinkd']['cookbook']
   source 'enlinkd-configuration.xml.erb'
-  mode '664'
-  owner 'root'
-  group 'root'
+  mode '0664'
+  owner node['opennms']['username']
+  group node['opennms']['groupname']
   notifies :restart, 'service[opennms]'
   variables(
     threads: node['opennms']['enlinkd']['threads'],
+    executor_queue_size: node['opennms']['enlinkd']['executor_queue_size'],
+    executor_threads: node['opennms']['enlinkd']['executor_threads'],
     init_sleep_time: node['opennms']['enlinkd']['init_sleep_time'],
-    rescan_interval: node['opennms']['enlinkd']['rescan_interval'],
     cdp: node['opennms']['enlinkd']['cdp'],
+    cdp_interval: node['opennms']['enlinkd']['cdp_interval'],
+    cdp_priority: node['opennms']['enlinkd']['cdp_priority'],
     bridge: node['opennms']['enlinkd']['bridge'],
+    bridge_interval: node['opennms']['enlinkd']['bridge_interval'],
+    bridge_priority: node['opennms']['enlinkd']['bridge_priority'],
     lldp: node['opennms']['enlinkd']['lldp'],
+    lldp_interval: node['opennms']['enlinkd']['lldp_interval'],
+    lldp_priority: node['opennms']['enlinkd']['lldp_priority'],
     ospf: node['opennms']['enlinkd']['ospf'],
+    ospf_interval: node['opennms']['enlinkd']['ospf_interval'],
+    ospf_priority: node['opennms']['enlinkd']['ospf_priority'],
     isis: node['opennms']['enlinkd']['isis'],
+    isis_interval: node['opennms']['enlinkd']['isis_interval'],
+    isis_priority: node['opennms']['enlinkd']['isis_priority'],
     topology_interval: node['opennms']['enlinkd']['topology_interval'],
     bridge_topo_interval: node['opennms']['enlinkd']['bridge_topo_interval'],
     max_bft: node['opennms']['enlinkd']['max_bft'],
@@ -145,9 +139,9 @@ end
 template "#{onms_home}/etc/eventd-configuration.xml" do
   cookbook node['opennms']['eventd']['cookbook']
   source 'eventd-configuration.xml.erb'
-  mode '664'
-  owner 'root'
-  group 'root'
+  mode '0664'
+  owner node['opennms']['username']
+  group node['opennms']['groupname']
   notifies :restart, 'service[opennms]'
   variables(
     tcp_address: node['opennms']['eventd']['tcp_address'],
@@ -165,9 +159,9 @@ end
 template "#{onms_home}/etc/javamail-configuration.properties" do
   cookbook node['opennms']['javamail_props']['cookbook']
   source 'javamail-configuration.properties.erb'
-  mode '664'
-  owner 'root'
-  group 'root'
+  mode '0664'
+  owner node['opennms']['username']
+  group node['opennms']['groupname']
   variables(
     from_address: node['opennms']['javamail_props']['from_address'],
     mail_host: node['opennms']['javamail_props']['mail_host'],
@@ -191,9 +185,9 @@ end
 template "#{onms_home}/etc/javamail-configuration.xml" do
   cookbook node['opennms']['javamail_config']['cookbook']
   source 'javamail-configuration.xml.erb'
-  mode '664'
-  owner 'root'
-  group 'root'
+  mode '0664'
+  owner node['opennms']['username']
+  group node['opennms']['groupname']
   notifies :restart, 'service[opennms]'
   variables(
     default_read_config_name: node['opennms']['javamail_config']['default_read_config_name'],
@@ -237,9 +231,9 @@ end
 template "#{onms_home}/etc/jcifs.properties" do
   cookbook node['opennms']['jcifs']['cookbook']
   source 'jcifs.properties.erb'
-  mode '664'
-  owner 'root'
-  group 'root'
+  mode '0664'
+  owner node['opennms']['username']
+  group node['opennms']['groupname']
   notifies :restart, 'service[opennms]'
   variables(
     loglevel: node['opennms']['jcifs']['loglevel'],
@@ -258,8 +252,8 @@ end
 template "#{onms_home}/etc/jms-northbounder-configuration.xml" do
   source 'jms-northbounder-configuration.xml.erb'
   cookbook node['opennms']['jms_nbi']['cookbook']
-  owner 'root'
-  group 'root'
+  owner node['opennms']['username']
+  group node['opennms']['groupname']
   variables(
     enabled: node['opennms']['jms_nbi']['enabled'],
     nagles_delay: node['opennms']['jms_nbi']['nagles_delay'],
@@ -271,15 +265,16 @@ template "#{onms_home}/etc/jms-northbounder-configuration.xml" do
     first_occurrence_only: node['opennms']['jms_nbi']['first_occurrence_only']
   )
   notifies :restart, 'service[opennms]'
+  only_if { node['opennms']['plugin']['addl'].include?('opennms-plugin-northbounder-jms') }
   action node['opennms']['templates'] ? :create : :nothing
 end
 
 template "#{onms_home}/etc/microblog-configuration.xml" do
   cookbook node['opennms']['microblog']['cookbook']
   source 'microblog-configuration.xml.erb'
-  mode '664'
-  owner 'root'
-  group 'root'
+  mode '0664'
+  owner node['opennms']['username']
+  group node['opennms']['groupname']
   notifies :restart, 'service[opennms]'
   variables(
     default_profile: node['opennms']['microblog']['default_profile']
@@ -290,9 +285,9 @@ end
 template "#{onms_home}/etc/modemConfig.properties" do
   cookbook node['opennms']['modem']['cookbook']
   source 'modemConfig.properties.erb'
-  mode '664'
-  owner 'root'
-  group 'root'
+  mode '0664'
+  owner node['opennms']['username']
+  group node['opennms']['groupname']
   notifies :restart, 'service[opennms]'
   variables(
     modem: node['opennms']['modem']['model'],
@@ -301,72 +296,12 @@ template "#{onms_home}/etc/modemConfig.properties" do
   action node['opennms']['templates'] ? :create : :nothing
 end
 
-template "#{onms_home}/etc/provisiond-configuration.xml" do
-  cookbook node['opennms']['importer']['cookbook']
-  source 'provisiond-configuration.xml.erb'
-  mode '664'
-  owner 'root'
-  group 'root'
-  variables(
-    foreign_source_dir: node['opennms']['importer']['foreign_source_dir'],
-    requisition_dir: node['opennms']['importer']['requisition_dir'],
-    import_threads: node['opennms']['importer']['threads'],
-    scan_threads: node['opennms']['importer']['scan_threads'],
-    rescan_threads: node['opennms']['importer']['rescan_threads'],
-    write_threads: node['opennms']['importer']['write_threads']
-  )
-  action node['opennms']['templates'] ? :create : :nothing
-end
-
-template "#{onms_home}/etc/remedy.properties" do
-  cookbook node['opennms']['remedy']['cookbook']
-  source 'remedy.properties.erb'
-  mode '664'
-  owner 'root'
-  group 'root'
-  notifies :restart, 'service[opennms]'
-  variables(
-    username: node['opennms']['remedy']['username'],
-    password: node['opennms']['remedy']['password'],
-    authentication: node['opennms']['remedy']['authentication'],
-    locale: node['opennms']['remedy']['locale'],
-    timezone: node['opennms']['remedy']['timezone'],
-    endpoint: node['opennms']['remedy']['endpoint'],
-    portname: node['opennms']['remedy']['portname'],
-    createendpoint: node['opennms']['remedy']['createendpoint'],
-    createportname: node['opennms']['remedy']['createportname'],
-    targetgroups: node['opennms']['remedy']['targetgroups'],
-    assignedgroups: node['opennms']['remedy']['assignedgroups'],
-    assignedsupportcompanies: node['opennms']['remedy']['assignedsupportcompanies'],
-    assignedsupportorganizations: node['opennms']['remedy']['assignedsupportorganizations'],
-    assignedgroup: node['opennms']['remedy']['assignedgroup'],
-    firstname: node['opennms']['remedy']['firstname'],
-    lastname: node['opennms']['remedy']['lastname'],
-    serviceCI: node['opennms']['remedy']['serviceCI'],
-    serviceCIReconID: node['opennms']['remedy']['serviceCIReconID'],
-    assignedsupportcompany: node['opennms']['remedy']['assignedsupportcompany'],
-    assignedsupportorganization: node['opennms']['remedy']['assignedsupportorganization'],
-    categorizationtier1: node['opennms']['remedy']['categorizationtier1'],
-    categorizationtier2: node['opennms']['remedy']['categorizationtier2'],
-    categorizationtier3: node['opennms']['remedy']['categorizationtier3'],
-    service_type: node['opennms']['remedy']['service_type'],
-    reported_source: node['opennms']['remedy']['reported_source'],
-    impact: node['opennms']['remedy']['impact'],
-    urgency: node['opennms']['remedy']['urgency'],
-    reason_reopen: node['opennms']['remedy']['reason_reopen'],
-    resolution: node['opennms']['remedy']['resolution'],
-    reason_resolved: node['opennms']['remedy']['reason_resolved'],
-    reason_cancelled: node['opennms']['remedy']['reason_cancelled']
-  )
-  action node['opennms']['templates'] ? :create : :nothing
-end
-
 template "#{onms_home}/etc/reportd-configuration.xml" do
   cookbook node['opennms']['reportd']['cookbook']
   source 'reportd-configuration.xml.erb'
-  mode '664'
-  owner 'root'
-  group 'root'
+  mode '0664'
+  owner node['opennms']['username']
+  group node['opennms']['groupname']
   notifies :restart, 'service[opennms]'
   variables(
     storage_location: node['opennms']['reportd']['storage_location'],
@@ -378,9 +313,9 @@ end
 template "#{onms_home}/etc/response-adhoc-graph.properties" do
   cookbook node['opennms']['response_adhoc_graph']['cookbook']
   source 'response-adhoc-graph.properties.erb'
-  mode '664'
-  owner 'root'
-  group 'root'
+  mode '0664'
+  owner node['opennms']['username']
+  group node['opennms']['groupname']
   variables(
     command_prefix: node['opennms']['response_adhoc_graph']['command_prefix']
   )
@@ -390,9 +325,9 @@ end
 template "#{onms_home}/etc/rtc-configuration.xml" do
   cookbook node['opennms']['rtc']['cookbook']
   source 'rtc-configuration.xml.erb'
-  mode '664'
-  owner 'root'
-  group 'root'
+  mode '0664'
+  owner node['opennms']['username']
+  group node['opennms']['groupname']
   notifies :restart, 'service[opennms]'
   variables(
     updaters: node['opennms']['rtc']['updaters'],
@@ -410,9 +345,9 @@ end
 template "#{onms_home}/etc/site-status-views.xml" do
   cookbook node['opennms']['site_status_views']['cookbook']
   source 'site-status-views.xml.erb'
-  mode '664'
-  owner 'root'
-  group 'root'
+  mode '0664'
+  owner node['opennms']['username']
+  group node['opennms']['groupname']
   variables(
     default_view: node['opennms']['site_status_views']['default_view']
   )
@@ -422,9 +357,9 @@ end
 template "#{onms_home}/etc/snmp-adhoc-graph.properties" do
   cookbook node['opennms']['snmp_adhoc_graph']['cookbook']
   source 'snmp-adhoc-graph.properties.erb'
-  mode '664'
-  owner 'root'
-  group 'root'
+  mode '0664'
+  owner node['opennms']['username']
+  group node['opennms']['groupname']
   variables(
     image_format: node['opennms']['snmp_adhoc_graph']['image_format'],
     command_prefix: node['opennms']['snmp_adhoc_graph']['command_prefix']
@@ -435,9 +370,9 @@ end
 template "#{onms_home}/etc/snmp-interface-poller-configuration.xml" do
   cookbook node['opennms']['snmp_iface_poller']['cookbook']
   source 'snmp-interface-poller-configuration.xml.erb'
-  mode '664'
-  owner 'root'
-  group 'root'
+  mode '0664'
+  owner node['opennms']['username']
+  group node['opennms']['groupname']
   notifies :restart, 'service[opennms]'
   variables(
     threads: node['opennms']['snmp_iface_poller']['threads'],
@@ -450,27 +385,12 @@ template "#{onms_home}/etc/snmp-interface-poller-configuration.xml" do
   action node['opennms']['templates'] ? :create : :nothing
 end
 
-template "#{onms_home}/etc/support.properties" do
-  cookbook node['opennms']['support']['cookbook']
-  source 'support.properties.erb'
-  mode '664'
-  owner 'root'
-  group 'root'
-  notifies :restart, 'service[opennms]'
-  variables(
-    queueid: node['opennms']['support']['queueid'],
-    timeout: node['opennms']['support']['timeout'],
-    retry: node['opennms']['support']['retry']
-  )
-  action node['opennms']['templates'] ? :create : :nothing
-end
-
 template "#{onms_home}/etc/syslog-northbounder-configuration.xml" do
   cookbook node['opennms']['syslog_north']['cookbook']
   source 'syslog-northbounder-configuration.xml.erb'
-  mode '664'
-  owner 'root'
-  group 'root'
+  mode '0664'
+  owner node['opennms']['username']
+  group node['opennms']['groupname']
   notifies :restart, 'service[opennms]'
   variables(
     use_defaults: node['opennms']['syslog_north']['use_defaults'],
@@ -488,16 +408,18 @@ end
 template "#{onms_home}/etc/translator-configuration.xml" do
   cookbook node['opennms']['translator']['cookbook']
   source 'translator-configuration.xml.erb'
-  mode '664'
-  owner 'root'
-  group 'root'
+  mode '0664'
+  owner node['opennms']['username']
+  group node['opennms']['groupname']
   variables(
     snmp_link_down: node['opennms']['translator']['snmp_link_down'],
     snmp_link_up: node['opennms']['translator']['snmp_link_up'],
     hyperic: node['opennms']['translator']['hyperic'],
     cisco_config_man: node['opennms']['translator']['cisco_config_man'],
     juniper_cfg_change: node['opennms']['translator']['juniper_cfg_change'],
-    telemetry_clock_skew_detected: node['opennms']['translator']['telemetry_clock_skew_detected']
+    telemetry_clock_skew_detected: node['opennms']['translator']['telemetry_clock_skew_detected'],
+    # Should be a hash where each key is a uei that has a hash value with key `'mappings'` (array of hashes each with key `'assignments'` (array of hashes that each contain keys `'name'` (string), `'type'` (string), `'default'` (string, optional), `'value'` (a hash that contains keys `'type'` (string), `'matches'` (string, optional), `'result'` (string), `'values'` (array of hashes that each contain keys `'type'` (string), `'matches'` (string, optional), `'result'` (string)))))
+    addl_specs: node['opennms']['translator']['addl_specs']
   )
   action node['opennms']['templates'] ? :create : :nothing
 end
@@ -505,9 +427,9 @@ end
 template "#{onms_home}/etc/trapd-configuration.xml" do
   cookbook node['opennms']['trapd']['cookbook']
   source 'trapd-configuration.xml.erb'
-  mode '664'
-  owner 'root'
-  group 'root'
+  mode '0664'
+  owner node['opennms']['username']
+  group node['opennms']['groupname']
   notifies :restart, 'service[opennms]'
   variables(
     port: node['opennms']['trapd']['port'],
@@ -519,9 +441,9 @@ end
 template "#{onms_home}/etc/vacuumd-configuration.xml" do
   cookbook node['opennms']['vacuumd']['cookbook']
   source 'vacuumd-configuration.xml.erb'
-  mode '664'
-  owner 'root'
-  group 'root'
+  mode '0664'
+  owner node['opennms']['username']
+  group node['opennms']['groupname']
   variables(
     period: node['opennms']['vacuumd']['period'],
     statement: node['opennms']['vacuumd']['statement'],
@@ -537,9 +459,9 @@ end
 template "#{onms_home}/etc/vmware-cim-datacollection-config.xml" do
   cookbook node['opennms']['vmware_cim']['cookbook']
   source 'vmware-cim-datacollection-config.xml.erb'
-  mode '664'
-  owner 'root'
-  group 'root'
+  mode '0664'
+  owner node['opennms']['username']
+  group node['opennms']['groupname']
   notifies :restart, 'service[opennms]'
   variables(
     rrd_repository: node['opennms']['vmware_cim']['rrd_repository'],
@@ -551,9 +473,9 @@ end
 template "#{onms_home}/etc/vmware-datacollection-config.xml" do
   cookbook node['opennms']['vmware']['cookbook']
   source 'vmware-datacollection-config.xml.erb'
-  mode '664'
-  owner 'root'
-  group 'root'
+  mode '0664'
+  owner node['opennms']['username']
+  group node['opennms']['groupname']
   notifies :restart, 'service[opennms]'
   variables(
     rrd_repository: node['opennms']['vmware']['rrd_repository'],
@@ -570,9 +492,9 @@ end
 template "#{onms_home}/etc/xmpp-configuration.properties" do
   cookbook node['opennms']['xmpp']['cookbook']
   source 'xmpp-configuration.properties.erb'
-  mode '664'
-  owner 'root'
-  group 'root'
+  mode '0664'
+  owner node['opennms']['username']
+  group node['opennms']['groupname']
   notifies :restart, 'service[opennms]'
   variables(
     server: node['opennms']['xmpp']['server'],

@@ -77,7 +77,6 @@ default['opennms']['templates'] = true
 # default cookbook for templates
 default['opennms']['default_template_cookbook'] = 'opennms'
 default['opennms']['services']['cookbook']                 = node['opennms']['default_template_cookbook']
-default['opennms']['properties']['cookbook']               = node['opennms']['default_template_cookbook']
 default['opennms']['db_reports']['avail']['cookbook']      = node['opennms']['default_template_cookbook']
 default['opennms']['chart']['cookbook']                    = node['opennms']['default_template_cookbook']
 default['opennms']['enlinkd']['cookbook']                  = node['opennms']['default_template_cookbook']
@@ -87,19 +86,14 @@ default['opennms']['javamail_config']['cookbook']          = node['opennms']['de
 default['opennms']['jcifs']['cookbook']                    = node['opennms']['default_template_cookbook']
 default['opennms']['log4j2']['cookbook']                   = node['opennms']['default_template_cookbook']
 default['opennms']['microblog']['cookbook']                = node['opennms']['default_template_cookbook']
-default['opennms']['importer']['cookbook']                 = node['opennms']['default_template_cookbook']
 default['opennms']['modem']['cookbook']                    = node['opennms']['default_template_cookbook']
 default['opennms']['nsclient_datacollection']['cookbook']  = node['opennms']['default_template_cookbook']
-default['opennms']['remedy']['cookbook']                   = node['opennms']['default_template_cookbook']
 default['opennms']['reportd']['cookbook']                  = node['opennms']['default_template_cookbook']
 default['opennms']['response_adhoc_graph']['cookbook']     = node['opennms']['default_template_cookbook']
-default['opennms']['rrd']['cookbook']                      = node['opennms']['default_template_cookbook']
 default['opennms']['rtc']['cookbook']                      = node['opennms']['default_template_cookbook']
 default['opennms']['site_status_views']['cookbook']        = node['opennms']['default_template_cookbook']
-default['opennms']['sms_phonebook']['cookbook']            = node['opennms']['default_template_cookbook']
 default['opennms']['snmp_adhoc_graph']['cookbook']         = node['opennms']['default_template_cookbook']
 default['opennms']['snmp_iface_poller']['cookbook']        = node['opennms']['default_template_cookbook']
-default['opennms']['support']['cookbook']                  = node['opennms']['default_template_cookbook']
 default['opennms']['syslog_north']['cookbook']             = node['opennms']['default_template_cookbook']
 default['opennms']['translator']['cookbook']               = node['opennms']['default_template_cookbook']
 default['opennms']['vacuumd']['cookbook']                  = node['opennms']['default_template_cookbook']
@@ -358,8 +352,8 @@ default['opennms']['properties']['jetty']['port']                   = 8980
 # default['opennms']['properties']['search_info'] = nil
 
 # database reports - availability
-default['opennms']['db_reports']['avail']['cal']['logo']                    = "#{onms_home}/etc/reports/logo.gif"
-default['opennms']['db_reports']['avail']['classic']['logo']                = "#{onms_home}/etc/reports/logo.gif"
+default['opennms']['db_reports']['avail']['cal']['logo']                    = "#{onms_home}/etc/reports/logo.png"
+default['opennms']['db_reports']['avail']['classic']['logo']                = "#{onms_home}/etc/reports/logo.png"
 default['opennms']['db_reports']['avail']['cal']['endDate']['interval']     = 'day'
 default['opennms']['db_reports']['avail']['cal']['endDate']['count']        = 1
 default['opennms']['db_reports']['avail']['cal']['endDate']['hours']        = 23
@@ -384,14 +378,25 @@ default['opennms']['discovery']['retries']          = 1
 default['opennms']['discovery']['timeout']          = 2000
 default['opennms']['discovery']['foreign_source']   = nil
 # enlinkd-configuration.xml
-default['opennms']['enlinkd']['threads'] = 5
+default['opennms']['enlinkd']['threads'] = 3
+default['opennms']['enlinkd']['executor_queue_size'] = 100
+default['opennms']['enlinkd']['executor_threads'] = 5
 default['opennms']['enlinkd']['init_sleep_time'] = 60_000
-default['opennms']['enlinkd']['rescan_interval'] = 86_400_000
 default['opennms']['enlinkd']['cdp'] = true
+default['opennms']['enlinkd']['cdp_interval'] = 86400000
+default['opennms']['enlinkd']['cdp_priority'] = 1000
 default['opennms']['enlinkd']['bridge'] = true
+default['opennms']['enlinkd']['bridge_interval'] = 86400000
+default['opennms']['enlinkd']['bridge_priority'] = 10000
 default['opennms']['enlinkd']['lldp'] = true
+default['opennms']['enlinkd']['lldp_interval'] = 86400000
+default['opennms']['enlinkd']['lldp_priority'] = 2000
 default['opennms']['enlinkd']['ospf'] = true
+default['opennms']['enlinkd']['ospf_interval'] = 86400000
+default['opennms']['enlinkd']['ospf_priority'] = 3000
 default['opennms']['enlinkd']['isis'] = true
+default['opennms']['enlinkd']['isis_interval'] = 86400000
+default['opennms']['enlinkd']['isis_priority'] = 4000
 default['opennms']['enlinkd']['topology_interval'] = 30000
 default['opennms']['enlinkd']['bridge_topo_interval'] = 300000
 default['opennms']['enlinkd']['max_bft'] = 100
@@ -587,38 +592,6 @@ default['opennms']['poller']['threads']                         = 30
 default['opennms']['poller']['service_unresponsive_enabled']    = false
 default['opennms']['poller']['node_outage']['status']           = 'on'
 default['opennms']['poller']['node_outage']['critical_service'] = 'ICMP'
-# remedy.properties
-default['opennms']['remedy']['username']                     = 'opennmstnn'
-default['opennms']['remedy']['password']                     = 'TNNwsC4ll'
-default['opennms']['remedy']['authentication']               = 'ARSystem'
-default['opennms']['remedy']['locale']                       = 'it_IT'
-default['opennms']['remedy']['timezone']                     = 'CET'
-default['opennms']['remedy']['endpoint']                     = 'http://172.20.0.76:8180/arsys/services/ARService?server=itts3h&webService=HPD_IncidentInterface_WS'
-default['opennms']['remedy']['portname']                     = 'HPD_IncidentInterface_WSPortTypeSoap'
-default['opennms']['remedy']['createendpoint']               = 'http://172.20.0.76:8180/arsys/services/ARService?server=itts3h&webService=HPD_IncidentInterface_Create_WS'
-default['opennms']['remedy']['createportname']               = 'HPD_IncidentInterface_Create_WSPortTypeSoap'
-default['opennms']['remedy']['targetgroups']                 = 'TNnet:Tetranet'
-default['opennms']['remedy']['assignedgroups']               = { 'TNnet' => 'TNnet', 'Tetranet' => 'TNnet - Tetranet' }
-default['opennms']['remedy']['assignedsupportcompanies']     = { 'TNnet' => 'Trentino Network srl', 'Tetranet' => 'Trentino Network srl' }
-default['opennms']['remedy']['assignedsupportorganizations'] = { 'TNnet' => 'Centro Gestione Rete', 'Tetranet' => 'Centro Gestione Rete' }
-default['opennms']['remedy']['assignedgroup']                = 'TNnet'
-default['opennms']['remedy']['firstname']                    = 'Opennms'
-default['opennms']['remedy']['lastname']                     = 'Tnn'
-default['opennms']['remedy']['serviceCI']                    = 'Trentino Network Connettivit\uFFFD [C.TNNCN]'
-default['opennms']['remedy']['serviceCIReconID']             = 'RE00505688005e3s-nTg4KEI5gFSov'
-default['opennms']['remedy']['assignedsupportcompany']       = 'Trentino Network srl'
-default['opennms']['remedy']['assignedsupportorganization']  = 'Centro Gestione Rete'
-default['opennms']['remedy']['categorizationtier1']          = 'Incident'
-default['opennms']['remedy']['categorizationtier2']          = 'Generic'
-default['opennms']['remedy']['categorizationtier3']          = 'Non bloccante'
-default['opennms']['remedy']['service_type']                  = 'Infrastructure Event'
-default['opennms']['remedy']['reported_source']               = 'Direct Input'
-default['opennms']['remedy']['impact']                       = '4-Minor/Localized'
-default['opennms']['remedy']['urgency']                      = '4-Low'
-default['opennms']['remedy']['reason_reopen']                = 'Pending Original Incident'
-default['opennms']['remedy']['resolution']                   = 'Chiusura da OpenNMS Web Service'
-default['opennms']['remedy']['reason_resolved']              = 'Automated Resolution Reported'
-default['opennms']['remedy']['reason_cancelled']             = 'No longer a Causal CI'
 # reportd-configuration.xml
 default['opennms']['reportd']['persist_reports'] = 'yes'
 default['opennms']['reportd']['storage_location'] = "#{onms_home}/share/reports/"
@@ -688,10 +661,6 @@ default['opennms']['statsd']['response_time_reports']['top_10_weekly']     = fal
 default['opennms']['statsd']['response_time_reports']['top_10_this_month'] = false
 default['opennms']['statsd']['response_time_reports']['top_10_last_month'] = false
 default['opennms']['statsd']['response_time_reports']['top_10_this_year']  = false
-# support.properties
-default['opennms']['support']['queueid'] = ''
-default['opennms']['support']['timeout'] = 6000
-default['opennms']['support']['retry']   = 0
 # surveillance-views.xml
 default['opennms']['surveillance_views']['default_view'] = 'default'
 default['opennms']['surveillance_views']['default']      = true
@@ -733,7 +702,7 @@ default['opennms']['translator']['cisco_config_man']              = true
 default['opennms']['translator']['juniper_cfg_change']            = true
 default['opennms']['translator']['telemetry_clock_skew_detected'] = true
 # trapd-configuration.xml
-default['opennms']['trapd']['port']        = 162
+default['opennms']['trapd']['port']        = 10162
 default['opennms']['trapd']['new_suspect'] = false
 # vacuumd-configuration.xml
 default['opennms']['vacuumd']['period']                             = 86_400_000
