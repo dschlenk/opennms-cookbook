@@ -14,6 +14,7 @@ categories = {
 }
 categories.each do |name, properties|
   describe avail_category(name) do
+    it { should exist }
     its('comment') { should eq properties['comment'] }
     its('normal') { should eq properties['normal'] }
     its('warning') { should eq properties['warning'] }
@@ -23,6 +24,7 @@ categories.each do |name, properties|
 end
 
 describe avail_category('Email Servers') do
+  it { should exist }
   its('comment') { should eq 'This category includes all managed interfaces which are running an Email service, including SMTP, POP3, or IMAP.  This will include MS Exchange servers running these protocols.' }
   its('normal') { should eq '99.99' }
   its('warning') { should eq '97' }
@@ -31,6 +33,7 @@ describe avail_category('Email Servers') do
 end
 
 describe avail_category('Web Servers') do
+  it { should exist }
   its('comment') { should eq 'This category includes all managed interfaces which are running an HTTP server on port 80 or other common ports.' }
   its('normal') { should eq '99.99' }
   its('warning') { should eq '97' }
@@ -43,6 +46,7 @@ describe avail_category('JMX Servers') do
 end
 
 describe avail_category('Database Servers') do
+  it { should exist }
   its('normal') { should eq '99.0' }
   its('warning') { should eq '97' }
   its('service') { should eq %w(MySQL Oracle Postgres SQLServer) }
@@ -51,9 +55,19 @@ describe avail_category('Database Servers') do
 end
 
 describe avail_category('Other Servers') do
+  it { should exist }
   its('comment') { should eq 'This category includes all managed interfaces which are running FTP (file transfer protocol) servers or SSH (secure shell) servers.' }
   its('normal') { should eq '99.99' }
   its('warning') { should eq '98.6' }
   its('service') { should eq %w(FTP SSH) }
   its('rule') { should eq 'isFTP | isSSH' }
+end
+
+describe avail_category('create_if_missing') do
+  it { should exist }
+  its('comment') { should eq nil }
+  its('normal') { should eq '99.99' }
+  its('warning') { should eq '97.0' }
+  its('service') { should eq %w(ICMP) }
+  its('rule') { should eq "IPADDR != '0.0.0.0'" }
 end

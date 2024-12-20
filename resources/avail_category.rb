@@ -57,6 +57,14 @@ action :create do
   end
 end
 
+action :create_if_missing do
+  ac_resource_init
+  cg = ac_resource.variables[:category_groups].category_group(new_resource.category_group)
+  raise Opennms::Cookbook::ConfigHelpers::AvailCategory::CategoryGroupNotFound, "No such category group #{new_resource.category_group} exists" if cg.nil?
+  c = cg.category(new_resource.label)
+  run_action(:create) if c.nil?
+end
+
 action :update do
   converge_if_changed(:comment, :normal, :warning, :rule, :services) do
     ac_resource_init
