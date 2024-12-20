@@ -693,7 +693,7 @@ default['opennms']['syslogd']['discard_uei']            = nil
 default['opennms']['syslogd']['timezone']               = nil
 # threshd-configuration.xml
 # set to overwrite current value in file
-default['opennms']['threshd']['threads']                      = nil
+default['opennms']['threshd']['threads'] = nil
 # translator-configuration.xml
 default['opennms']['translator']['snmp_link_down']                = true
 default['opennms']['translator']['snmp_link_up']                  = true
