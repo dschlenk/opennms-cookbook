@@ -1,4 +1,3 @@
-
 unified_mode true
 
 property :secret_alias, String, required: true
@@ -29,4 +28,3 @@ action :create_if_missing do
     not_if "bin/scvcli list | grep '#{new_resource.secret_alias}'"
   end
 end
-
