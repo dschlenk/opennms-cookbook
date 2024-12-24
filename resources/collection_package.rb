@@ -44,6 +44,16 @@ action :create do
   end
 end
 
+action :create_if_missing do
+  collectd_resource_init
+  package = collectd_resource.variables[:collectd_config].packages[new_resource.package_name]
+  if package.nil?
+    resource_properties = %i(package_name filter specifics include_ranges exclude_ranges include_urls outage_calendars store_by_if_alias store_by_node_id if_alias_domain stor_flag_override if_alias_comment remote).map { |p| [p, new_resource.send(p)] }.to_h.compact
+    package = Opennms::Cookbook::Package::CollectdPackage.new(**resource_properties)
+    collectd_resource.variables[:collectd_config].packages[new_resource.package_name] = package
+  end
+end
+
 action :update do
   converge_if_changed(:filter, :specifics, :include_ranges, :exclude_ranges, :include_urls, :outage_calendars, :store_by_if_alias, :store_by_node_id, :if_alias_domain, :stor_flag_override, :if_alias_comment, :remote) do
     collectd_resource_init
