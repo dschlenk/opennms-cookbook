@@ -64,6 +64,12 @@ action :create do
   end
 end
 
+action :create_if_missing do
+  snmp_resource_init
+  collection = snmp_resource.variables[:collections][new_resource.collection]
+  run_action(:create) if collection.nil?
+end
+
 action :update do
   converge_if_changed(:rrd_step, :rras, :max_vars_per_pdu, :snmp_stor_flag, :include_collections) do
     snmp_resource_init
