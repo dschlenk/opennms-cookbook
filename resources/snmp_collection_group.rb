@@ -66,6 +66,14 @@ action :create do
   end
 end
 
+action :create_if_missing do
+  snmp_resource_init
+  collection = snmp_resource.variables[:collections][new_resource.collection_name]
+  gn = new_resource.group_name
+  group = collection.include_collection(data_collection_group: gn)
+  run_action(:create) if group.nil?
+end
+
 action :update do
   unless new_resource.file.nil?
     if 'cookbook_file'.eql?(new_resource.source)
