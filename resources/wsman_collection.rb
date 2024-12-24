@@ -54,6 +54,12 @@ action :create do
   end
 end
 
+action :create_if_missing do
+  wsman_resource_init("#{onms_etc}/wsman-datacollection-config.xml")
+  collection = wsman_resource("#{onms_etc}/wsman-datacollection-config.xml").variables[:collections][new_resource.collection]
+  run_action(:create) if collection.nil?
+end
+
 action :update do
   converge_if_changed(:rrd_step, :rras, :include_system_definitions, :include_system_definition) do
     wsman_resource_init("#{onms_etc}/wsman-datacollection-config.xml")
