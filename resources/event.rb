@@ -208,6 +208,12 @@ action :create do
   end
 end
 
+action :create_if_missing do
+  eventfile_resource_init(new_resource.file)
+  entry = eventfile_resource(new_resource.file).variables[:eventfile].entry(new_resource.uei || new_resource.name, new_resource.mask)
+  run_action(:create) if entry.nil?
+end
+
 action :update do
   converge_if_changed(:priority, :event_label, :descr, :logmsg, :logmsg_dest, :logmsg_notify, :collection_group, :severity, :operinstruct, :autoaction, :varbindsdecode, :parameters, :operaction, :autoacknowledge, :loggroup, :tticket, :forward, :script, :mouseovertext, :alarm_data, :filters) do
     eventfile_resource_init(new_resource.file)
