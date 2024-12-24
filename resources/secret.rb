@@ -1,3 +1,4 @@
+
 unified_mode true
 
 property :secret_alias, String, required: true
@@ -17,4 +18,11 @@ action :create do
       command "bin/scvcli --password '#{pw}' set '#{new_resource.secret_alias}' '#{new_resource.username}' '#{new_resource.password}'"
     end
   end
+end
+
+action :create_if_missing do
+  cwd node['opennms']['conf']['home']
+  user 'opennms'
+  sensitive true
+  run_action(:create) if pw.nil?
 end
