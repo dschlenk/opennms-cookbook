@@ -66,6 +66,10 @@ action :create do
   end
 end
 
+action :create_if_missing do
+  run_action(:create) unless ::File.exist?("#{node['opennms']['conf']['home']}/etc/events/#{new_resource.event_file}")
+end
+
 action :delete do
   eventconf_resource_init
   eventconf_resource.variables[:eventconf].event_files.delete(new_resource.event_file)
