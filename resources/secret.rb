@@ -21,7 +21,6 @@ action :create do
 end
 
 action :create_if_missing do
-  pw = opennms_scv_password
   execute "create OpenNMS secret #{new_resource.name}" do
     cwd node['opennms']['conf']['home']
     user 'opennms'
