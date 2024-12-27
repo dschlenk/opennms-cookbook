@@ -96,7 +96,7 @@ action :create do
           node_el.add_element 'asset', 'name' => key, 'value' => value
         end
       end
-      model_import.add_element node_el
+      model_import_node_create(new_resource.foreign_source_name).message node.to_s
     else
       unless new_resource.parent_foreign_source.nil?
         import_node.attributes['parent-foreign-source'] = new_resource.parent_foreign_source
@@ -126,8 +126,8 @@ action :create do
           import_node.add_element 'asset', 'name' => key, 'value' => value
         end
       end
+      model_import_node_create(new_resource.foreign_source_name).message model_import.to_s
     end
-    model_import_node_create(new_resource.foreign_source_name).message model_import.to_s
   end
 end
 
