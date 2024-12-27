@@ -29,8 +29,8 @@ load_current_value do |new_resource|
   node_category = []
   model_import = REXML::Document.new(model_import(new_resource.name).message) unless model_import(new_resource.name).nil?
   model_import = REXML::Document.new(Opennms::Cookbook::Provision::ModelImport.new(new_resource.foreign_source_name, "#{baseurl}/requisitions/#{new_resource.name}").message) unless model_import.nil?
-  current_value_does_not_exist! if model_import.nil? || model_import.elements["node[@node-label = '#{new_resource.node_label}' @foreign-id = '#{new_resource.foreign_id}']"].nil?
-  import_node = model_import.elements["node[@node-label = '#{new_resource.node_label}' @foreign-id = '#{new_resource.foreign_id}']"]
+  current_value_does_not_exist! if model_import.nil? || model_import.elements["node[@foreign-id = '#{new_resource.foreign_id}']"].nil?
+  import_node = model_import.elements["node[@foreign-id = '#{new_resource.foreign_id}']"]
   current_value_does_not_exist! if import_node.nil?
   parent_foreign_source import_node.attributes['parent-foreign-source'] unless import_node.attributes['parent-foreign-source'].nil?
   parent_foreign_id import_node.attributes['parent-foreign-id'] unless import_node.attributes['parent-foreign-id'].nil?
