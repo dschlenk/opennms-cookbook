@@ -60,8 +60,4 @@ action :create_if_missing do
   package = collectd_resource.variables[:collectd_config].packages[new_resource.package_name]
   service = package.service(service_name: new_resource.service_name)
   run_action(:create) if service.nil?
-
-  else
-    Chef::Log.info("Service #{new_resource.service_name} already exists, skipping creation.")
-  end
 end
