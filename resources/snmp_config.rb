@@ -20,3 +20,9 @@ action :create do
     Opennms::Cookbook::ConfigHelpers::SnmpConfig::Helper.attributes_from_properties(snmp_config, new_resource)
   end
 end
+
+action :create_if_missing do
+  unless ::File.exist?("#{node['opennms']['conf']['home']}/etc/snmp-config.xml")
+    run_action(:create)
+  end
+end
