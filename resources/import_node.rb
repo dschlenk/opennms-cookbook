@@ -96,6 +96,8 @@ action :create do
       end
       model_import_node_create(new_resource.foreign_source_name).message model_import.to_s
     else
+      import_node.attributes['node-label'] = new_resource.node_label
+      import_node.attributes['foreign-id'] = new_resource.foreign_id
       unless new_resource.parent_foreign_source.nil?
         import_node.attributes['parent-foreign-source'] = new_resource.parent_foreign_source
       end
