@@ -28,27 +28,28 @@ load_current_value do |new_resource|
   node_assets = {}
   node_category = []
   model_import = REXML::Document.new(model_import(new_resource.name).message) unless model_import(new_resource.name).nil?
-  current_value_does_not_exist! if import_node.nil?
-  model_import = REXML::Document.new(Opennms::Cookbook::Provision::ModelImport.new(new_resource.foreign_source_name, "#{baseurl}/requisitions/#{new_resource.foreign_source_name}/nodes/#{new_resource.foreign_id}").message) unless model_import.nil?
-  current_value_does_not_exist! if model_import.nil? || model_import.elements["node[@foreign-id = '#{new_resource.foreign_id}']"].nil?
-  import_node = model_import.elements["node[@foreign-id = '#{new_resource.foreign_id}']"]
-  current_value_does_not_exist! if import_node.nil?
-  parent_foreign_source import_node.attributes['parent-foreign-source'] unless import_node.attributes['parent-foreign-source'].nil?
-  parent_foreign_id import_node.attributes['parent-foreign-id'] unless import_node.attributes['parent-foreign-id'].nil?
-  parent_node_label import_node.attributes['parent-node-label'] unless import_node.attributes['parent-node-label'].nil?
+  current_value_does_not_exist! if model_import.nil?
+  foreign_source_name = URI.escape(new_resource.foreign_source_name)
+  foreign_id = URI.escape(new_resource.foreign_id)
+  model_import_node = REXML::Document.new(Opennms::Cookbook::Provision::ModelImport.new("#{foreign_source_name}", "#{baseurl}/requisitions/#{foreign_source_name}/nodes/#{foreign_id}").message) unless model_import.nil?
+  current_value_does_not_exist! if model_import_node.nil?
+  node_label model_import_node.attributes['node-label'] unless import_node.attributes['node-label'].nil?
+  parent_foreign_source model_import_node.attributes['parent-foreign-source'] unless model_import_node.attributes['parent-foreign-source'].nil?
+  parent_foreign_id model_import_node.attributes['parent-foreign-id'] unless model_import_node.attributes['parent-foreign-id'].nil?
+  parent_node_label model_import_node.attributes['parent-node-label'] unless model_import_node.attributes['parent-node-label'].nil?
 
-  city import_node.attributes['city'] unless import_node.attributes['city'].nil?
-  building import_node.attributes['building'] unless import_node.attributes['building'].nil?
+  city model_import_node.attributes['city'] unless model_import_node.attributes['city'].nil?
+  building model_import_node.attributes['building'] unless model_import_node.attributes['building'].nil?
 
-  unless import_node.elements['categories'].nil?
-    import_node.each_element('category') do |category|
+  unless model_import_node.elements['category'].nil?
+    model_import_node.each_element('category') do |category|
       node_category.push category.attributes['name']
     end
     categories = node_category
   end
 
-  unless import_node.elements 'assets'.nil?
-    import_node.each_element('asset') do |asset|
+  unless model_import_node.elements 'asset'.nil?
+    model_import_node.each_element('asset') do |asset|
       node_assets[asset.attributes['key']] = asset.attributes['value']
     end
     assets = node_assets
@@ -64,17 +65,12 @@ end
 action :create do
   converge_if_changed do
     model_import_init(new_resource.name, new_resource.foreign_source_name)
-    model_import = REXML::Document.new(model_import(new_resource.foreign_source_name).message).root
-    import_node = model_import.elements["node[@node-label = '#{new_resource.node_label}' @foreign-id = '#{new_resource.foreign_id}']"] unless model_import.nil?
+    model_import = REXML::Document.new(model_import(new_resource.foreign_source_name).message).root unless model_import.nil?
+    import_node = model_import.elements["node[@foreign-id = '#{new_resource.foreign_id}']"] unless model_import.nil?
     node_name = new_resource.node_label || new_resource.name
     if import_node.nil?
-      node_el = REXML::Element.new('node')
-      unless node_name.nil?
-        node_el.add_attribute('node-label', node_name)
-      end
-      unless new_resource.foreign_id.nil?
-        node_el.add_attribute('foreign-id', new_resource.foreign_id)
-      end
+      node = REXML::Element.new
+      node_el = node.add_element 'node', 'node-label' => node_name, 'foreign-id' => new_resource.foreign_id
       unless new_resource.parent_foreign_source.nil?
         node_el.attributes['parent-foreign-source'] = new_resource.parent_foreign_source
       end
@@ -101,34 +97,35 @@ action :create do
         end
       end
       model_import.add_element node_el
-    else unless new_resource.parent_foreign_source.nil?
-      import_node.attributes['parent-foreign-source'] = new_resource.parent_foreign_source
-    end
-    unless new_resource.parent_foreign_id.nil?
-      import_node.attributes['parent-foreign-id'] = new_resource.parent_foreign_id
-    end
-    unless new_resource.parent_node_label.nil?
-      import_node.attributes['parent-node-label'] = new_resource.parent_node_label
-    end
-    unless new_resource.city.nil?
-      import_node.attributes['city'] = new_resource.city
-    end
-    unless new_resource.building.nil?
-      import_node.attributes['building'] = new_resource.building
-    end
-    if !new_resource.categories.nil? && !new_resource.categories.empty?
-      new_resource.categories.each do |category|
-        import_node.add_element 'category', 'name' => category
+    else
+      unless new_resource.parent_foreign_source.nil?
+        import_node.attributes['parent-foreign-source'] = new_resource.parent_foreign_source
       end
-    end
-    # delete all assets
-    assets_el = import_node.elements["asset"] unless import_node.nil?
-    import_node.elements.delete_all 'asset' unless assets_el.nil?
-    unless new_resource.assets.nil?
-      new_resource.assets.each do |key, value|
-        import_node.add_element 'asset', 'name' => key, 'value' => value
+      unless new_resource.parent_foreign_id.nil?
+        import_node.attributes['parent-foreign-id'] = new_resource.parent_foreign_id
       end
-    end
+      unless new_resource.parent_node_label.nil?
+        import_node.attributes['parent-node-label'] = new_resource.parent_node_label
+      end
+      unless new_resource.city.nil?
+        import_node.attributes['city'] = new_resource.city
+      end
+      unless new_resource.building.nil?
+        import_node.attributes['building'] = new_resource.building
+      end
+      if !new_resource.categories.nil? && !new_resource.categories.empty?
+        import_node.elements.delete_all 'category'
+        new_resource.categories.each do |category|
+          import_node.add_element 'category', 'name' => category
+        end
+      end
+
+      unless new_resource.assets.nil?
+        import_node.elements.delete_all 'asset'
+        new_resource.assets.each do |key, value|
+          import_node.add_element 'asset', 'name' => key, 'value' => value
+        end
+      end
     end
     model_import_node_create(new_resource.foreign_source_name).message model_import.to_s
   end
