@@ -26,22 +26,32 @@ property :sync_wait_secs, Integer, default: 10
 
 load_current_value do |new_resource|
   node_assets = {}
+  node_category = []
   model_import = REXML::Document.new(model_import(new_resource.name).message) unless model_import(new_resource.name).nil?
-  model_import = REXML::Document.new(Opennms::Cookbook::Provision::ModelImport.new(new_resource.foreign_source_name, "#{baseurl}/requisitions/#{new_resource.name}").message) if model_import.nil?
+  model_import = REXML::Document.new(Opennms::Cookbook::Provision::ModelImport.new(new_resource.foreign_source_name, "#{baseurl}/requisitions/#{new_resource.name}").message) unless model_import.nil?
   current_value_does_not_exist! if model_import.nil? || model_import.elements["node[@node-label = '#{new_resource.node_label}' @foreign-id = '#{new_resource.foreign_id}']"].nil?
   import_node = model_import.elements["node[@node-label = '#{new_resource.node_label}' @foreign-id = '#{new_resource.foreign_id}']"]
   current_value_does_not_exist! if import_node.nil?
-  parent_foreign_source import_node.attributes['parent-foreign-source'] if import_node.attributes['parent-foreign-source'].nil?
-  parent_foreign_id import_node.attributes['parent-foreign-id'] if import_node.attributes['parent-foreign-id'].nil?
-  parent_node_label import_node.attributes['parent-node-label'] if import_node.attributes['parent-node-label'].nil?
+  parent_foreign_source import_node.attributes['parent-foreign-source'] unless import_node.attributes['parent-foreign-source'].nil?
+  parent_foreign_id import_node.attributes['parent-foreign-id'] unless import_node.attributes['parent-foreign-id'].nil?
+  parent_node_label import_node.attributes['parent-node-label'] unless import_node.attributes['parent-node-label'].nil?
 
-  city import_node.attributes['city'] if import_node.attributes['city'].nil?
-  building import_node.attributes['building'] if import_node.attributes['building'].nil?
-  categories import_node.attributes['categories'] if import_node.attributes['categories'].nil?
-  import_node.each_element('asset') do |asset|
-    node_assets[asset.attributes['key']] = asset.attributes['value']
+  city import_node.attributes['city'] unless import_node.attributes['city'].nil?
+  building import_node.attributes['building'] unless import_node.attributes['building'].nil?
+
+  unless import_node.elements['categories'].nil?
+    import_node.each_element('category') do |category|
+      node_category.push category.attributes['name']
+    end
+    categories = node_category
   end
-  assets = node_assets
+
+  unless import_node.elements 'assets'.nil?
+    import_node.each_element('asset') do |asset|
+      node_assets[asset.attributes['key']] = asset.attributes['value']
+    end
+    assets = node_assets
+  end
 end
 
 action_class do
