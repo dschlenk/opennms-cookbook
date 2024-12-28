@@ -50,7 +50,7 @@ load_current_value do |new_resource|
     categories = node_category
   end
 
-  unless node.elements 'asset'.nil?
+  unless node.elements['asset'].nil?.nil?
     node.each_element('asset') do |asset|
       node_assets[asset.attributes['key']] = asset.attributes['value']
     end
@@ -68,7 +68,8 @@ action :create do
   converge_if_changed do
     model_import = model_import_init(new_resource.name, new_resource.foreign_source_name)
     model_import = REXML::Document.new(model_import(new_resource.foreign_source_name).message).root unless model_import.nil?
-    import_node = model_import.elements["node[@foreign-id = '#{new_resource.foreign_id}']"] unless model_import.nil?
+    model_import_node = REXML::Document.new(Opennms::Cookbook::Provision::ModelImport.new("#{new_resource.foreign_source_name}", "#{baseurl}/requisitions/#{new_resource.foreign_source_name}/nodes/#{new_resource.foreign_id}").message) unless model_import.nil?
+    import_node = model_import_node.elements["node[@foreign-id = '#{new_resource.foreign_id}']"] unless model_import_node.nil?
     node_name = new_resource.node_label || new_resource.name
     if import_node.nil?
       node_el = model_import.add_element 'node', 'node-label' => node_name, 'foreign-id' => new_resource.foreign_id
