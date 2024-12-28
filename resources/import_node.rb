@@ -31,26 +31,27 @@ load_current_value do |new_resource|
   current_value_does_not_exist! if model_import.nil?
   #model_import = REXML::Document.new(Opennms::Cookbook::Provision::ModelImport.new(new_resource.foreign_source_name, "#{baseurl}/requisitions/#{new_resource.name}").message) if model_import.nil?
   #model_import_node = model_import.elements["node[@foreign-id = '#{new_resource.foreign_id}']"]
-  model_import_node = REXML::Document.new(Opennms::Cookbook::Provision::ModelImport.new("#{new_resource.foreign_source_name}", "#{baseurl}/requisitions/#{new_resource.foreign_id}/nodes/#{foreign_id}").message) unless model_import.nil?
+  model_import_node = REXML::Document.new(Opennms::Cookbook::Provision::ModelImport.new("#{new_resource.foreign_source_name}", "#{baseurl}/requisitions/#{new_resource.foreign_source_name}/nodes/#{new_resource.foreign_id}").message) unless model_import.nil?
   current_value_does_not_exist! if model_import_node.nil?
-  foreign_id model_import_node.attributes['foreign_id'] unless import_node.attributes['foreign_id'].nil?
-  node_label model_import_node.attributes['node-label'] unless import_node.attributes['node-label'].nil?
-  parent_foreign_source model_import_node.attributes['parent-foreign-source'] unless model_import_node.attributes['parent-foreign-source'].nil?
-  parent_foreign_id model_import_node.attributes['parent-foreign-id'] unless model_import_node.attributes['parent-foreign-id'].nil?
-  parent_node_label model_import_node.attributes['parent-node-label'] unless model_import_node.attributes['parent-node-label'].nil?
+  node = model_import_node.elements["node[@foreign-id = '#{new_resource.foreign_id}']"]
+  foreign_id node.attributes['foreign_id'] unless import_node.attributes['foreign_id'].nil?
+  node_label node.attributes['node-label'] unless import_node.attributes['node-label'].nil?
+  parent_foreign_source node.attributes['parent-foreign-source'] unless node.attributes['parent-foreign-source'].nil?
+  parent_foreign_id node.attributes['parent-foreign-id'] unless node.attributes['parent-foreign-id'].nil?
+  parent_node_label node.attributes['parent-node-label'] unless node.attributes['parent-node-label'].nil?
 
-  city model_import_node.attributes['city'] unless model_import_node.attributes['city'].nil?
-  building model_import_node.attributes['building'] unless model_import_node.attributes['building'].nil?
+  city node.attributes['city'] unless node.attributes['city'].nil?
+  building node.attributes['building'] unless node.attributes['building'].nil?
 
-  unless model_import_node.elements['category'].nil?
-    model_import_node.each_element('category') do |category|
+  unless node.elements['category'].nil?
+    node.each_element('category') do |category|
       node_category.push category.attributes['name']
     end
     categories = node_category
   end
 
-  unless model_import_node.elements 'asset'.nil?
-    model_import_node.each_element('asset') do |asset|
+  unless node.elements 'asset'.nil?
+    node.each_element('asset') do |asset|
       node_assets[asset.attributes['key']] = asset.attributes['value']
     end
     assets = node_assets
