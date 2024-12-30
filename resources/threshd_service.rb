@@ -47,7 +47,6 @@ action :create_if_missing do
   run_action(:create) if service.nil?
 end
 
-
 action :update do
   converge_if_changed do
     threshd_resource_init
