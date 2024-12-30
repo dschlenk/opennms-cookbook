@@ -10,15 +10,15 @@ class ImportNodeInterface < Inspec.resource(1)
   '
 
   example '
-    describe import_node_interface(\'ip_addr\', \'foreign_source_name\', \'foreign_id\') do
+    describe import_node_interface(\'ip_addr\', \'foreign_source_name\', \'foreign_id\', 1242) do
       it { should exist }
       its(\'managed\') { should be true }
       its(\'snmp_primary\') { should eq \'P\' }
     end
   '
 
-  def initialize(ip_addr, foreign_source_name, foreign_id)
-    parsed_url = Addressable::URI.parse("http://admin:admin@localhost:8980/opennms/rest/requisitions/#{foreign_source_name}/nodes/#{foreign_id}/interfaces/#{ip_addr}").normalize.to_str
+  def initialize(ip_addr, foreign_source_name, foreign_id, port=8980)
+    parsed_url = Addressable::URI.parse("http://admin:admin@localhost:#{port}/opennms/rest/requisitions/#{foreign_source_name}/nodes/#{foreign_id}/interfaces/#{ip_addr}").normalize.to_str
     begin
       interface = RestClient.get(parsed_url)
     rescue StandardError
