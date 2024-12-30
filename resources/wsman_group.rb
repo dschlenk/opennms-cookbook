@@ -77,6 +77,22 @@ action :create do
   end
 end
 
+action :create_if_missing do
+  file = new_resource.file_name.nil? ? "#{onms_etc}/wsman-datacollection-config.xml" : "#{onms_etc}/#{new_resource.file_name}"
+  r = wsman_resource(file)
+  all = if r.nil?
+          Opennms::Cookbook::Collection::WsmanCollectionConfigFile.read(file, 'wsman').groups
+        else
+          r.variables[:groups]
+        end
+  groups = all.select { |sd| sd.name.eql?(new_resource.group_name) }
+  unless groups.empty?
+    raise Opennms::Cookbook::Collection::DuplicateWsmanGroup, "More than one group with name #{new_resource.group_name} found in #{file}!" unless groups.one?
+    group = groups.pop
+  end
+  run_action(:create) if group.nil?
+end
+
 action :update do
   converge_if_changed do
     file = new_resource.file_name.nil? ? "#{onms_etc}/wsman-datacollection-config.xml" : "#{onms_etc}/#{new_resource.file_name}"
