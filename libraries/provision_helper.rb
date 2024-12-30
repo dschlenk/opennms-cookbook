@@ -118,6 +118,21 @@ module Opennms
             end
           end
 
+          def model_import_node_interface_create(name, foreign_id)
+            url = "#{baseurl}/requisitions/#{name}/nodes/#{foreign_id}/interfaces"
+            Chef::Log.debug "model_import_node_create url: #{url}"
+            model_import_node = Opennms::Cookbook::Provision::ModelImport.new(name, url)
+            with_run_context(:root) do
+              declare_resource(:http_request, "opennms_import_node_interface POST #{name}") do
+                url "#{baseurl}/requisitions"
+                headers({ 'Content-Type' => 'application/xml' })
+                action :nothing
+                delayed_action :post
+                message model_import_node.message.to_s
+              end
+            end
+          end
+
           def model_import_node_delete(fsname, fsid)
             node_url = "#{baseurl}/requisitions/#{fsname}/nodes/#{fsid}"
             Chef::Log.debug "model_import_node_delete url: #{url}"

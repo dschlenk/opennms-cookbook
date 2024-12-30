@@ -1,25 +1,73 @@
-# frozen_string_literal: true
-require 'rexml/document'
+include Opennms::Cookbook::Provision::ModelImportHttpRequest
+include Opennms::XmlHelper
+include Opennms::Rbac
 
-actions :create
-default_action :create
-
-attribute :ip_addr, kind_of: String, name_attribute: true
-attribute :foreign_source_name, kind_of: String, required: true
-attribute :foreign_id, kind_of: String, required: true
-attribute :status, kind_of: Integer
-attribute :managed, kind_of: [TrueClass, FalseClass]
-attribute :snmp_primary, kind_of: String, equal_to: %w(P S N)
+property :ip_addr, String, name_property: true
+property :foreign_source_name, String, required: true
+property :foreign_id, String, required: true
+property :status, Integer
+property :managed, [TrueClass, FalseClass]
+property :snmp_primary, String, equal_to: %w(P S N)
 # sync the import. Re-runs discovery.
-attribute :sync_import, kind_of: [TrueClass, FalseClass], default: false
+property :sync_import, [TrueClass, FalseClass], default: false
 # if the interface already exists, should we still sync?
-attribute :sync_existing, kind_of: [TrueClass, FalseClass], default: false
+property :sync_existing, [TrueClass, FalseClass], default: false
 # If your imports take a long time to sync, you can fiddle with these
 # to prevent convergence continuing before imports finish. One reason
 # you might want to do this is if a service restart happens at the
 # end of the converge before the syncs end, the pending syncs will
 # never happen.
-attribute :sync_wait_periods, kind_of: Integer, default: 30
-attribute :sync_wait_secs, kind_of: Integer, default: 10
+property :sync_wait_periods, Integer, default: 30
+property :sync_wait_secs, Integer, default: 10
 
-attr_accessor :exists, :import_exists, :node_exists
+load_current_value do |new_resource|
+  model_import = REXML::Document.new(model_import(new_resource.name).message) unless model_import(new_resource.name).nil?
+  current_value_does_not_exist! if model_import.nil?
+  model_import_node_interface = REXML::Document.new(Opennms::Cookbook::Provision::ModelImport.new("#{new_resource.foreign_source_name}", "#{baseurl}/requisitions/#{new_resource.foreign_source_name}/nodes/#{new_resource.foreign_id}/interfaces").message) unless model_import.nil?
+  current_value_does_not_exist! if model_import_node_interface.nil?
+  interface = model_import_node_interface.elements["interface[@ip-addr = '#{new_resource.ip_addr}']"]
+  current_value_does_not_exist! if interface.nil?
+  status interface.attributes['status'] unless interface.attributes['status'].nil?
+  managed interface.attributes['managed'] unless interface.attributes['managed'].nil?
+  snmp_primary interface.attributes['snmp-primary'] unless interface.attributes['snmp-primary'].nil?
+end
+
+action_class do
+  include Opennms::Cookbook::Provision::ModelImportHttpRequest
+  include Opennms::XmlHelper
+  include Opennms::Rbac
+end
+
+action :create do
+  converge_if_changed do
+    model_import = model_import_init(new_resource.name, new_resource.foreign_source_name)
+    model_import = REXML::Document.new(model_import(new_resource.foreign_source_name).message).root unless model_import.nil?
+    model_import_node_interface = REXML::Document.new(Opennms::Cookbook::Provision::ModelImport.new("#{new_resource.foreign_source_name}", "#{baseurl}/requisitions/#{new_resource.foreign_source_name}/nodes/#{new_resource.foreign_id}/interfaces").message) unless model_import.nil?
+    import_node_interface = model_import_node_interface.elements["interface[@ip-addr = '#{new_resource.foreign_id}']"] unless model_import_node_interface.nil?
+    if import_node_interface.nil?
+      i_el = model_import.add_element 'interface', 'ip-addr' => new_resource.ip_addr
+      unless new_resource.status.nil?
+        i_el.attributes['status'] = new_resource.status
+      end
+      unless new_resource.managed.nil?
+        i_el.attributes['managed'] = new_resource.managed
+      end
+      unless new_resource.snmp_primary.nil?
+        i_el.attributes['snmp-primary'] = new_resource.snmp_primary
+      end
+      model_import_node_interface_create(new_resource.foreign_source_name, new_resource.foreign_id).message model_import.to_s
+    else
+      unless new_resource.status.nil?
+        import_node_interface.attributes['status'] = new_resource.status
+      end
+      unless new_resource.managed.nil?
+        import_node_interface.attributes['managed'] = new_resource.managed
+      end
+      unless new_resource.snmp_primary.nil?
+        import_node_interface.attributes['snmp-primary'] = new_resource.snmp_primary
+      end
+      model_import_node_interface_create(new_resource.foreign_source_name, new_resource.foreign_id).message model_import.to_s
+    end
+  end
+end
+
