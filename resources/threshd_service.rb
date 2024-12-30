@@ -39,6 +39,15 @@ action :create do
   end
 end
 
+action :create_if_missing do
+  threshd_resource_init
+  package = threshd_resource.variables[:config].packages[new_resource.package_name]
+  raise Chef::Exceptions::ValidationFailed, "package #{new_resource.package_name} must exist before service #{new_resource.service_name} can be added to it" if package.nil?
+  service = package.service(service_name: new_resource.service_name)
+  run_action(:create) if service.nil?
+end
+
+
 action :update do
   converge_if_changed do
     threshd_resource_init
