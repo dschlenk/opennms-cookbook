@@ -127,6 +127,23 @@ action :create do
   end
 end
 
+action :create_if_missing do
+  file = new_resource.file_name.nil? ? "#{onms_etc}/wsman-datacollection-config.xml" : "#{onms_etc}/#{new_resource.file_name}"
+  wsman_resource_init(file)
+  r = wsman_resource(file)
+  all = if r.nil?
+          Opennms::Cookbook::Collection::WsmanCollectionConfigFile.read(file, 'wsman').system_definitions
+        else
+          r.variables[:system_definitions]
+        end
+  definitions = all.select { |sd| sd.name.eql?(new_resource.system_name) }
+  unless definitions.empty?
+    raise Opennms::Cookbook::Collection::DuplicateSystemDefinition, "More than one system definition with name #{new_resource.system_name} found in #{file}!" unless definitions.one?
+    definition = definitions.pop
+  end
+  run_action(:create) if definition.nil?
+end
+
 # makes definition named `system_name` in `file` match this resource
 action :update do
   converge_if_changed do
