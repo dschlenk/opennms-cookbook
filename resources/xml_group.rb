@@ -98,6 +98,22 @@ action :create do
   end
 end
 
+action :create_if_missing do
+  converge_if_changed do
+  if !property_is_set?(:file)
+    xml_resource_init
+    collection = xml_resource.variables[:collections][new_resource.collection_name]
+    raise Opennms::Cookbook::Collection::XmlCollectionDoesNotExist, "No xml-collection named #{new_resource.collection_name} found. Cannot add xml-source." if collection.nil?
+    parent = collection.source(url: new_resource.source_url)
+    raise Opennms::Cookbook::Collection::XmlSourceDoesNotExist, "No xml-source for url #{new_resource.source_url} in collection #{new_resource.collection_name} found. Cannot add xml-group #{new_resource.group_name}." if parent.nil?
+  else
+    groupsfile_resource_init(new_resource.file)
+    parent = groupsfile_resource(new_resource.file).variables[:groupsfile]
+  end
+  group = parent.group(name: new_resource.group_name) unless parent.nil?
+  run_action(:create) if group.nil?
+end
+
 action :update do
   converge_if_changed do
     if !property_is_set?(:file)
