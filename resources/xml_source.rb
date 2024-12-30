@@ -102,6 +102,15 @@ action :create do
   end
 end
 
+action :create_if_missing do
+  xml_resource_init
+  collection = xml_resource.variables[:collections][new_resource.collection_name]
+  raise Opennms::Cookbook::Collection::XmlCollectionDoesNotExist, "No xml-collection named #{new_resource.collection_name} found. Cannot add xml-source." if collection.nil?
+  import_groups_resources
+  source = collection.source(url: new_resource.url)
+  run_action(:create) if source.nil?
+end
+
 action :update do
   import_groups_resources
   converge_if_changed(:request_method, :request_headers, :request_params, :request_content, :request_content_type, :import_groups, :groups) do
