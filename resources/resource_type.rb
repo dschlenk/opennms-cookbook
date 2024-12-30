@@ -135,7 +135,6 @@ action :create_if_missing do
   run_action(:create) unless ::File.exist?(file)
 end
 
-
 action :update do
   snmp_resource_init
   unless new_resource.group_name.nil?
