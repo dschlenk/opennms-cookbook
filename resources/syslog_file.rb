@@ -44,6 +44,10 @@ action :create do
   end
 end
 
+action :create_if_missing do
+  run_action(:create) unless ::File.exist?("#{onms_etc}/syslog/#{new_resource.filename}")
+end
+
 action :delete do
   syslog_resource_init
   syslog_resource.variables[:config].files.delete("syslog/#{new_resource.filename}")
