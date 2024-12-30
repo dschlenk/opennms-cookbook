@@ -99,7 +99,6 @@ action :create do
 end
 
 action :create_if_missing do
-  converge_if_changed do
   if !property_is_set?(:file)
     xml_resource_init
     collection = xml_resource.variables[:collections][new_resource.collection_name]
