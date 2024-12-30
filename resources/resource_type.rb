@@ -115,6 +115,27 @@ action :create do
   end
 end
 
+action :create_if_missing do
+  snmp_resource_init
+  unless new_resource.group_name.nil?
+    dc = snmp_resource.variables[:collections]['default']
+    ics = dc.include_collections.select { |ic| ic[:data_collection_group].eql?(new_resource.group_name) } unless dc.nil?
+    if ics.nil? || ics.empty?
+      snmp_resource.variables[:collections]['default'].include_collections.push({ data_collection_group: new_resource.group_name })
+    end
+  end
+
+    if new_resource.group_name.nil? && !new_resource.file_name.nil?
+      file = "#{onms_etc}/resource-types.d/#{new_resource.file_name}"
+    elsif !new_resource.group_name.nil?
+      gfn = new_resource.group_file_name.nil? ? "#{new_resource.group_name}.xml" : new_resource.group_file_name
+      file = "#{onms_etc}/datacollection/#{gfn}"
+    end
+
+  run_action(:create) unless ::File.exist?(file)
+
+end
+
 action :update do
   snmp_resource_init
   unless new_resource.group_name.nil?
