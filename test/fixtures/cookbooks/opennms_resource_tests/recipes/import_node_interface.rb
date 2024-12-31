@@ -1,7 +1,7 @@
 class Chef::Recipe
   include Provision
 end
-#include_recipe 'opennms_resource_tests::foreign_source'
+include_recipe 'opennms_resource_tests::foreign_source'
 include_recipe 'opennms_resource_tests::import'
 # need a node to add an interface to
 iface_node_foreign_id = 'interfaceTestNodeID'
