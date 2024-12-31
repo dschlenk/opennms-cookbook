@@ -21,14 +21,14 @@ property :sync_wait_periods, Integer, default: 30
 property :sync_wait_secs, Integer, default: 10
 
 load_current_value do |new_resource|
-  model_import = REXML::Document.new(model_import(new_resource.name).message) unless model_import(new_resource.name).nil?
-  #model_import = REXML::Document.new(Opennms::Cookbook::Provision::ModelImport.new(new_resource.foreign_source_name, "#{baseurl}/requisitions/#{new_resource.name}").message) if model_import.nil?
-  current_value_does_not_exist! if model_import.nil?
-  #model_import_node = REXML::Document.new(Opennms::Cookbook::Provision::ModelImport.new("#{new_resource.foreign_source_name}", "#{baseurl}/requisitions/#{new_resource.foreign_source_name}/nodes/#{new_resource.foreign_id}").message) unless model_import.nil?
-  #current_value_does_not_exist! if model_import_node.nil?
-  model_import_node_interface = REXML::Document.new(Opennms::Cookbook::Provision::ModelImport.new("#{new_resource.foreign_source_name}", "#{baseurl}/requisitions/#{new_resource.foreign_source_name}/nodes/#{new_resource.foreign_id}/interfaces/#{new_resource.ip_addr}").message) unless model_import.nil?
-  current_value_does_not_exist! if model_import_node_interface.nil?
-  interface = model_import_node_interface.elements["node/interface[@ip-addr = '#{new_resource.ip_addr}']"]
+  model_import = model_import_init(new_resource.name, new_resource.foreign_source_name)
+  model_import = REXML::Document.new(model_import(new_resource.foreign_source_name).message).root unless model_import.nil?
+  model_import_node = REXML::Document.new(Opennms::Cookbook::Provision::ModelImport.new("#{new_resource.foreign_source_name}", "#{baseurl}/requisitions/#{new_resource.foreign_source_name}/nodes/#{new_resource.foreign_id}").message) unless model_import.nil?
+  import_node = model_import_node.elements["node[@foreign-id = '#{new_resource.foreign_id}']"] unless model_import_node.nil?
+  current_value_does_not_exist! if import_node.nil?
+  Chef::Log.debug "Interface: #{import_node}"
+  current_value_does_not_exist! if import_node.nil?
+  interface = import_node.elements["interface[@ip-addr = '#{new_resource.ip_addr}']"]
   current_value_does_not_exist! if interface.nil?
   status interface.attributes['status'] unless interface.attributes['status'].nil?
   managed interface.attributes['managed'] unless interface.attributes['managed'].nil?
@@ -43,24 +43,17 @@ end
 
 action :create do
   converge_if_changed do
-    model_import = REXML::Document.new(model_import(new_resource.name).message) unless model_import(new_resource.name).nil?
-    #model_import = REXML::Document.new(Opennms::Cookbook::Provision::ModelImport.new(new_resource.foreign_source_name, "#{baseurl}/requisitions/#{new_resource.name}").message) if model_import.nil?
-    current_value_does_not_exist! if model_import.nil?
-    #model_import = model_import_init(new_resource.name, new_resource.foreign_source_name)
-    #model_import = REXML::Document.new(model_import(new_resource.foreign_source_name).message).root unless model_import.nil?
-    #model_import_node = REXML::Document.new(Opennms::Cookbook::Provision::ModelImport.new("#{new_resource.foreign_source_name}", "#{baseurl}/requisitions/#{new_resource.foreign_source_name}/nodes/#{new_resource.foreign_id}").message) unless model_import.nil?
-    #current_value_does_not_exist! if model_import_node.nil?
-    #node = model_import.elements["node[@foreign-id = '#{new_resource.foreign_id}']"]
-    model_import = REXML::Document.new(Opennms::Cookbook::Provision::ModelImport.new("#{new_resource.foreign_source_name}", "#{baseurl}/requisitions/#{new_resource.foreign_source_name}/nodes/#{new_resource.foreign_id}/interfaces/#{new_resource.ip_addr}").message) unless model_import.nil?
-    Chef::Log.debug "Interface: #{model_import}"
-    current_value_does_not_exist! if model_import.nil?
-    #node = node.elements["node[@foreign-id = '#{new_resource.foreign_id}']"]
-    #current_value_does_not_exist! if node.nil?
-    interface = model_import.elements["interface[@ip-addr = '#{new_resource.ip_addr}']"]
+    model_import = model_import_init(new_resource.name, new_resource.foreign_source_name)
+    model_import = REXML::Document.new(model_import(new_resource.foreign_source_name).message).root unless model_import.nil?
+    model_import_node = REXML::Document.new(Opennms::Cookbook::Provision::ModelImport.new("#{new_resource.foreign_source_name}", "#{baseurl}/requisitions/#{new_resource.foreign_source_name}/nodes/#{new_resource.foreign_id}").message) unless model_import.nil?
+    import_node = model_import_node.elements["node[@foreign-id = '#{new_resource.foreign_id}']"] unless model_import_node.nil?
+    current_value_does_not_exist! if import_node.nil?
+    Chef::Log.debug "Interface: #{import_node}"
+    current_value_does_not_exist! if import_node.nil?
+    interface = import_node.elements["interface[@ip-addr = '#{new_resource.ip_addr}']"]
 
     if interface.nil?
-      node_el = model_import.add_element 'node', 'node-label' => node_name, 'foreign-id' => new_resource.foreign_id
-      i_el = node_el.add_element 'interface', 'ip-addr' => new_resource.ip_addr
+      i_el = import_node.add_element 'interface', 'ip-addr' => new_resource.ip_addr
       unless new_resource.status.nil?
         i_el.attributes['status'] = new_resource.status
       end
