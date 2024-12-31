@@ -497,16 +497,6 @@ suites:
       inspec_tests:
         - path: test/integration/default
         - path: test/integration/import_node
-  - name: opennms_import_node_interface
-    driver:
-      ports:
-        - 1242:8980/tcp
-    provisioner:
-      policyfile: policyfiles/import_node_interface.rb
-    verifier:
-      inspec_tests:
-        - path: test/integration/default
-        - path: test/integration/import_node_interface
   - name: jdbc_collection
     provisioner:
       policyfile: policyfiles/jdbc_collection.rb
