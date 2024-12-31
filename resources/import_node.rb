@@ -55,14 +55,14 @@ load_current_value do |new_resource|
     node.each_element('category') do |category|
       node_category.push category.attributes['name']
     end
-    categories = node_category
+    categories = node_category.dup
   end
 
   unless node.elements['asset'].nil?.nil?
     node.each_element('asset') do |asset|
       node_assets[asset.attributes['key']] = asset.attributes['value']
     end
-    assets = node_assets
+    assets = node_assets.dup
   end
 end
 
@@ -101,7 +101,7 @@ action :create do
           node_el.add_element 'category', 'name' => category
         end
       end
-      unless new_resource.assets.nil?
+      if !new_resource.assets.nil? && !new_resource.assets.empty?
         new_resource.assets.each do |key, value|
           node_el.add_element 'asset', 'name' => key, 'value' => value
         end
@@ -134,8 +134,7 @@ action :create do
         import_node.add_element 'category', 'name' => category
       end
     end
-
-    unless new_resource.assets.nil?
+    if !new_resource.assets.nil? && !new_resource.assets.empty?
       import_node.elements.delete_all 'asset'
       new_resource.assets.each do |key, value|
         import_node.add_element 'asset', 'name' => key, 'value' => value
