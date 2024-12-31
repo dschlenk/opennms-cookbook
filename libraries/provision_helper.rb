@@ -123,7 +123,7 @@ module Opennms
             Chef::Log.debug "model_import_node_interface_create url: #{url}"
             model_import_node_interface = Opennms::Cookbook::Provision::ModelImport.new(name, url)
             with_run_context(:root) do
-              declare_resource(:http_request, "opennms_import_node_interface POST #{ip_addr}") do
+              declare_resource(:http_request, "opennms_import_node_interface POST #{name}") do
                 url "#{baseurl}/requisitions"
                 headers({ 'Content-Type' => 'application/xml' })
                 action :nothing
