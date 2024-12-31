@@ -23,7 +23,7 @@ property :sync_wait_secs, Integer, default: 10
 load_current_value do |new_resource|
   model_import = REXML::Document.new(model_import(new_resource.name).message) unless model_import(new_resource.name).nil?
   current_value_does_not_exist! if model_import.nil?
-  model_import_node_interface = REXML::Document.new(Opennms::Cookbook::Provision::ModelImport.new("#{new_resource.foreign_source_name}", "#{baseurl}/requisitions/#{new_resource.foreign_source_name}/nodes/#{new_resource.foreign_id}/interfaces").message) unless model_import.nil?
+  model_import_node_interface = REXML::Document.new(Opennms::Cookbook::Provision::ModelImport.new("#{new_resource.foreign_source_name}", "#{baseurl}/requisitions/#{new_resource.foreign_source_name}/nodes/#{new_resource.foreign_id}/interfaces/#{new_resource.ip_addr}").message) unless model_import.nil?
   current_value_does_not_exist! if model_import_node_interface.nil?
   interface = model_import_node_interface.elements["interface[@ip-addr = '#{new_resource.ip_addr}']"]
   current_value_does_not_exist! if interface.nil?
@@ -42,7 +42,7 @@ action :create do
   converge_if_changed do
     model_import = model_import_init(new_resource.name, new_resource.foreign_source_name)
     model_import = REXML::Document.new(model_import(new_resource.foreign_source_name).message).root unless model_import.nil?
-    model_import_node_interface = REXML::Document.new(Opennms::Cookbook::Provision::ModelImport.new("#{new_resource.foreign_source_name}", "#{baseurl}/requisitions/#{new_resource.foreign_source_name}/nodes/#{new_resource.foreign_id}/interfaces").message) unless model_import.nil?
+    model_import_node_interface = REXML::Document.new(Opennms::Cookbook::Provision::ModelImport.new("#{new_resource.foreign_source_name}", "#{baseurl}/requisitions/#{new_resource.foreign_source_name}/nodes/#{new_resource.foreign_id}/interfaces/#{new_resource.ip_addr}").message) unless model_import.nil?
     import_node_interface = model_import_node_interface.elements["interface[@ip-addr = '#{new_resource.ip_addr}']"] unless model_import_node_interface.nil?
     if import_node_interface.nil?
       i_el = model_import.add_element 'interface', 'ip-addr' => new_resource.ip_addr
@@ -55,7 +55,7 @@ action :create do
       unless new_resource.snmp_primary.nil?
         i_el.attributes['snmp-primary'] = new_resource.snmp_primary
       end
-      model_import_node_interface_create(new_resource.foreign_source_name, new_resource.foreign_id).message model_import.to_s
+      model_import_node_interface_create(new_resource.foreign_source_name, new_resource.foreign_id, new_resource.ip_addr).message model_import.to_s
     else
       unless new_resource.status.nil?
         import_node_interface.attributes['status'] = new_resource.status
@@ -66,7 +66,7 @@ action :create do
       unless new_resource.snmp_primary.nil?
         import_node_interface.attributes['snmp-primary'] = new_resource.snmp_primary
       end
-      model_import_node_interface_create(new_resource.foreign_source_name, new_resource.foreign_id).message model_import.to_s
+      model_import_node_interface_create(new_resource.foreign_source_name, new_resource.foreign_id, new_resource.ip_addr).message model_import.to_s
     end
   end
 end

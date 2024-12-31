@@ -118,8 +118,8 @@ module Opennms
             end
           end
 
-          def model_import_node_interface_create(name, foreign_id)
-            url = "#{baseurl}/requisitions/#{name}/nodes/#{foreign_id}/interfaces"
+          def model_import_node_interface_create(name, foreign_id, ip_addr)
+            url = "#{baseurl}/requisitions/#{name}/nodes/#{foreign_id}/interfaces/#{ip_addr}"
             Chef::Log.debug "model_import_node_interface_create url: #{url}"
             model_import_node = Opennms::Cookbook::Provision::ModelImport.new(name, url)
             with_run_context(:root) do
