@@ -2,7 +2,7 @@ include Opennms::Cookbook::Provision::ModelImportHttpRequest
 include Opennms::XmlHelper
 include Opennms::Rbac
 
-property :ip_addr, String, name_property: true
+property :ip_addr, String, required: true
 property :foreign_source_name, String, required: true
 property :foreign_id, String, required: true
 property :status, Integer
@@ -43,8 +43,8 @@ action :create do
     model_import = model_import_init(new_resource.name, new_resource.foreign_source_name)
     model_import = REXML::Document.new(model_import(new_resource.foreign_source_name).message).root unless model_import.nil?
     model_import_node_interface = REXML::Document.new(Opennms::Cookbook::Provision::ModelImport.new("#{new_resource.foreign_source_name}", "#{baseurl}/requisitions/#{new_resource.foreign_source_name}/nodes/#{new_resource.foreign_id}/interfaces").message) unless model_import.nil?
-    import_node_interface = model_import_node_interface.elements["interface[@ip-addr = '#{new_resource.foreign_id}']"] unless model_import_node_interface.nil?
-    if import_node_interface.nil?
+    import_node_interface = model_import_node_interface.elements["interface[@ip-addr = '#{new_resource.ip_addr}']"] unless model_import_node_interface.nil?
+    if import_node_interface.
       i_el = model_import.add_element 'interface', 'ip-addr' => new_resource.ip_addr
       unless new_resource.status.nil?
         i_el.attributes['status'] = new_resource.status
