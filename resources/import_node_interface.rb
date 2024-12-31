@@ -2,7 +2,7 @@ include Opennms::Cookbook::Provision::ModelImportHttpRequest
 include Opennms::XmlHelper
 include Opennms::Rbac
 
-property :ip_addr, String, required: true
+property :ip_addr, String, name_property: true
 property :foreign_source_name, String, required: true
 property :foreign_id, String, required: true
 property :status, Integer
