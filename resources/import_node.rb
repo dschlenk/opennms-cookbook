@@ -64,7 +64,7 @@ action :create do
     model_import_init(new_resource.name, new_resource.foreign_source_name)
     model_import = REXML::Document.new(model_import(new_resource.foreign_source_name).message).root
     model_import_node = REXML::Document.new(Opennms::Cookbook::Provision::ModelImport.new("#{new_resource.foreign_source_name}", "#{baseurl}/requisitions/#{new_resource.foreign_source_name}/nodes/#{new_resource.foreign_id}").message) unless model_import.nil?
-    import_node = model_import_node.elements["node[@foreign-id = '#{new_resource.foreign_id}']"] unless model_import_node.nil?
+    import_node = model_import_node.elements["node[@foreign-id = '#{new_resource.foreign_id}'][@node-label = '#{new_resource.node_label}']"] unless model_import_node.nil?
     node_name = new_resource.node_label || new_resource.name
     if import_node.nil?
       node_el = model_import.add_element 'node', 'node-label' => node_name, 'foreign-id' => new_resource.foreign_id
