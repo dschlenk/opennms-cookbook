@@ -40,16 +40,16 @@ load_current_value do |new_resource|
 
   unless node.elements['category'].nil? || node.elements['category'].empty?
     node.each_element('category') do |category|
-      node_category.push category.attributes['name']
+      node_category.push category.attributes['name'].to_s
     end
-    categories node_category.dup
+    categories node_category
   end
 
   unless node.elements['asset'].nil?
     node.each_element('asset') do |asset|
-      node_assets[asset.attributes['key']] = asset.attributes['value']
+      node_assets[asset.attributes['key'].to_s] = asset.attributes['value'].to_s
     end
-    assets node_assets.clone
+    assets node_assets
   end
 end
 
@@ -62,7 +62,7 @@ end
 action :create do
   converge_if_changed do
     model_import_init(new_resource.name, new_resource.foreign_source_name)
-    model_import = REXML::Document.new(model_import(new_resource.foreign_source_name).message).root
+    model_import = REXML::Document.new(model_import(new_resource.foreign_source_name).message).root unless model_import(new_resource.name).nil?
     model_import_node = REXML::Document.new(Opennms::Cookbook::Provision::ModelImport.new("#{new_resource.foreign_source_name}", "#{baseurl}/requisitions/#{new_resource.foreign_source_name}/nodes/#{new_resource.foreign_id}").message) unless model_import.nil?
     import_node = model_import_node.elements["node[@foreign-id = '#{new_resource.foreign_id}'][@node-label = '#{new_resource.node_label}']"] unless model_import_node.nil?
     node_name = new_resource.node_label || new_resource.name
@@ -134,7 +134,7 @@ action :delete do
   converge_if_changed do
     model_import_init(new_resource.name, new_resource.foreign_source_name)
     model_import = REXML::Document.new(model_import(new_resource.foreign_source_name).message).root
-    import_node = model_import.elements["node[@foreign-id = '#{new_resource.foreign_id}']"] unless model_import.nil?
+    import_node = model_import.elements["node[@foreign-id = '#{new_resource.foreign_id}'][@node-label = '#{new_resource.node_label}']"] unless model_import.nil?
     unless import_node.nil?
       model_import_node_delete(new_resource.foreign_source_name, new_resource.foreign_id)
     end
