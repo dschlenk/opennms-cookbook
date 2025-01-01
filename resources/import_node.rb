@@ -35,34 +35,25 @@ load_current_value do |new_resource|
   current_value_does_not_exist! if node.nil?
   foreign_id node.attributes['foreign_id'] unless node.attributes['foreign_id'].nil?
   node_label node.attributes['node-label'] unless node.attributes['node-label'].nil?
-  unless node.attributes['parent-foreign-source'].nil?
-    parent_foreign_source node.attributes['parent-foreign-source']
-  end
-  unless node.attributes['parent-foreign-id'].nil?
-    parent_foreign_id node.attributes['parent-foreign-id']
-  end
-  unless node.attributes['parent-node-label'].nil?
-    parent_node_label node.attributes['parent-node-label']
-  end
-  unless node.attributes['city'].nil?
-    city node.attributes['city']
-  end
-  unless node.attributes['building'].nil?
-    building node.attributes['building']
-  end
+  parent_foreign_source node.attributes['parent-foreign-source'] unless node.attributes['parent-foreign-source'].nil?
+  parent_foreign_id node.attributes['parent-foreign-id'] unless node.attributes['parent-foreign-id'].nil?
+  parent_node_label node.attributes['parent-node-label'] unless node.attributes['parent-node-label'].nil?
+
+  city node.attributes['city'] unless node.attributes['city'].nil?
+  building node.attributes['building'] unless node.attributes['building'].nil?
 
   unless node.elements['category'].nil?
     node.each_element('category') do |category|
       node_category.push category.attributes['name']
     end
-    categories = node_category.dup
+    categories = node_category
   end
 
   unless node.elements['asset'].nil?.nil?
     node.each_element('asset') do |asset|
       node_assets[asset.attributes['key']] = asset.attributes['value']
     end
-    assets = node_assets.dup
+    assets = node_assets
   end
 end
 
@@ -101,46 +92,44 @@ action :create do
           node_el.add_element 'category', 'name' => category
         end
       end
-      if !new_resource.assets.nil? && !new_resource.assets.empty?
+      unless new_resource.assets.nil?
         new_resource.assets.each do |key, value|
           node_el.add_element 'asset', 'name' => key, 'value' => value
         end
       end
       model_import_node_create(new_resource.foreign_source_name).message model_import.to_s
-    else unless new_resource.node_label.nil?
+    else
       import_node.attributes['node-label'] = new_resource.node_label
-    end
-    unless new_resource.foreign_id
       import_node.attributes['foreign-id'] = new_resource.foreign_id
-    end
-    unless new_resource.parent_foreign_source.nil?
-      import_node.attributes['parent-foreign-source'] = new_resource.parent_foreign_source
-    end
-    unless new_resource.parent_foreign_id.nil?
-      import_node.attributes['parent-foreign-id'] = new_resource.parent_foreign_id
-    end
-    unless new_resource.parent_node_label.nil?
-      import_node.attributes['parent-node-label'] = new_resource.parent_node_label
-    end
-    unless new_resource.city.nil?
-      import_node.attributes['city'] = new_resource.city
-    end
-    unless new_resource.building.nil?
-      import_node.attributes['building'] = new_resource.building
-    end
-    if !new_resource.categories.nil? && !new_resource.categories.empty?
-      import_node.elements.delete_all 'category'
-      new_resource.categories.each do |category|
-        import_node.add_element 'category', 'name' => category
+      unless new_resource.parent_foreign_source.nil?
+        import_node.attributes['parent-foreign-source'] = new_resource.parent_foreign_source
       end
-    end
-    if !new_resource.assets.nil? && !new_resource.assets.empty?
-      import_node.elements.delete_all 'asset'
-      new_resource.assets.each do |key, value|
-        import_node.add_element 'asset', 'name' => key, 'value' => value
+      unless new_resource.parent_foreign_id.nil?
+        import_node.attributes['parent-foreign-id'] = new_resource.parent_foreign_id
       end
-    end
-    model_import_node_create(new_resource.foreign_source_name).message model_import.to_s
+      unless new_resource.parent_node_label.nil?
+        import_node.attributes['parent-node-label'] = new_resource.parent_node_label
+      end
+      unless new_resource.city.nil?
+        import_node.attributes['city'] = new_resource.city
+      end
+      unless new_resource.building.nil?
+        import_node.attributes['building'] = new_resource.building
+      end
+      if !new_resource.categories.nil? && !new_resource.categories.empty?
+        import_node.elements.delete_all 'category'
+        new_resource.categories.each do |category|
+          import_node.add_element 'category', 'name' => category
+        end
+      end
+
+      unless new_resource.assets.nil?
+        import_node.elements.delete_all 'asset'
+        new_resource.assets.each do |key, value|
+          import_node.add_element 'asset', 'name' => key, 'value' => value
+        end
+      end
+      model_import_node_create(new_resource.foreign_source_name).message model_import.to_s
     end
   end
 end
