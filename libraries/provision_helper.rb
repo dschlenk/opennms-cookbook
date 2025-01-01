@@ -67,7 +67,6 @@ module Opennms
         end
       end
 
-
       module ModelImportHttpRequest
         require_relative 'rbac'
         include Opennms::Rbac
@@ -127,8 +126,8 @@ module Opennms
         end
 
         def model_import_node(nodeName)
-          return unless model_import_exist?(nodeName)
-          find_resource!(:http_request, "opennms_import POST #{nodeName}")
+          return unless model_import_node_exist?(nodeName)
+          find_resource!(:http_request, "opennms_import_node POST #{nodeName}")
         end
 
         private
@@ -144,7 +143,7 @@ module Opennms
             Chef::Log.debug "model_import_node_create url: #{url}"
             model_import_node = Opennms::Cookbook::Provision::ModelImport.new(foreign_source_name, url)
             with_run_context(:root) do
-              declare_resource(:http_request, "opennms_import_node POST #{foreign_source_name}") do
+              declare_resource(:http_request, "opennms_import_node POST #{nodeName}") do
                 url "#{baseurl}/requisitions"
                 headers({ 'Content-Type' => 'application/xml' })
                 action :nothing
@@ -166,7 +165,7 @@ module Opennms
               end
             end
           end
-          end
+      end
     end
   end
 end
