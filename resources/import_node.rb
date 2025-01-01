@@ -43,15 +43,14 @@ load_current_value do |new_resource|
     node.each_element('category') do |category|
       node_category.push category.attributes['name'].to_s
     end
-    categories node_category.dup
   end
-
+  categories node_category
   unless node.elements['asset'].nil?
     node.each_element('asset') do |asset|
       node_assets[asset.attributes['key'].to_s] = asset.attributes['value'].to_s
     end
-    assets node_assets.clone
   end
+  assets node_assets
 end
 
 action_class do
@@ -93,7 +92,7 @@ action :create do
           node_el.add_element 'asset', 'name' => key, 'value' => value
         end
       end
-      model_import_node_create(new_resource.foreign_source_name).message model_import_node.to_s
+      model_import_node_create(new_resource.foreign_source_name).message model_import.to_s
     else
       import_node.attributes['node-label'] = new_resource.node_label
       import_node.attributes['foreign-id'] = new_resource.foreign_id
@@ -125,7 +124,7 @@ action :create do
           import_node.add_element 'asset', 'name' => key, 'value' => value
         end
       end
-      model_import_node_create(new_resource.foreign_source_name).message model_import_node.to_s
+      model_import_node_create(new_resource.foreign_source_name).message model_import.to_s
     end
   end
 end
