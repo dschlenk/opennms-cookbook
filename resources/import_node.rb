@@ -66,7 +66,7 @@ action :create do
     import_node = model_import_node.elements["node[@foreign-id = '#{new_resource.foreign_id}']"] unless model_import_node.nil?
     node_name = new_resource.node_label || new_resource.name
     if import_node.nil?
-      node_el = model_import.add_element 'node', 'node-label' => node_name, 'foreign-id' => new_resource.foreign_id
+      node_el = model_import_node.add_element 'node', 'node-label' => node_name, 'foreign-id' => new_resource.foreign_id
       unless new_resource.parent_foreign_source.nil?
         node_el.attributes['parent-foreign-source'] = new_resource.parent_foreign_source
       end
