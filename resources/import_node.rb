@@ -32,6 +32,8 @@ load_current_value do |new_resource|
   current_value_does_not_exist! if model_import_node.nil?
   import_node = model_import_node.elements["node [@node-label = '#{new_resource.name}' and @foreign-id = '#{new_resource.foreign_id}']"]
   current_value_does_not_exist! if import_node.nil?
+  node_label import_node.attributes['node-label'] if import_node.attributes['node-label'].nil?
+  foreign_id import_node.attributes['foreign-id'] if import_node.attributes['foreign-id'].nil?
   parent_foreign_source import_node.attributes['parent-foreign-source'] if import_node.attributes['parent-foreign-source'].nil?
   parent_foreign_id import_node.attributes['parent-foreign-id'] if import_node.attributes['parent-foreign-id'].nil?
   parent_node_label import_node.attributes['parent-node-label'] if import_node.attributes['parent-node-label'].nil?
