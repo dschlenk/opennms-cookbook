@@ -93,7 +93,7 @@ module Opennms
             Chef::Log.debug "model_import_create url: #{url}"
             model_import = Opennms::Cookbook::Provision::ModelImport.new(foreign_source_name, url)
             with_run_context(:root) do
-              declare_resource(:http_request, "opennms_import POST  #{name}") do
+              declare_resource(:http_request, "opennms_import POST #{name}") do
                 url "#{baseurl}/requisitions"
                 headers({ 'Content-Type' => 'application/xml' })
                 action :nothing
@@ -114,21 +114,6 @@ module Opennms
                 action :nothing
                 delayed_action :post
                 message model_import_node.message.to_s
-              end
-            end
-          end
-
-          def model_import_node_interface_create(name, foreign_id, ip_addr)
-            url = "#{baseurl}/requisitions/#{name}/nodes/#{foreign_id}/interfaces/#{ip_addr}"
-            Chef::Log.debug "model_import_node_interface_create url: #{url}"
-            model_import_node_interface = Opennms::Cookbook::Provision::ModelImport.new(name, url)
-            with_run_context(:root) do
-              declare_resource(:http_request, "opennms_import_node_interface POST #{name}") do
-                url "#{baseurl}/requisitions"
-                headers({ 'Content-Type' => 'application/xml' })
-                action :nothing
-                delayed_action :post
-                message model_import_node_interface.message.to_s
               end
             end
           end

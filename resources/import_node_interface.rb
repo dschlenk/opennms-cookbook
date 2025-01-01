@@ -49,31 +49,6 @@ action :create do
     interface = model_import_node_interface.elements["interface[@ip-addr = '#{new_resource.ip_addr}']"]
     current_value_does_not_exist! if import_node.nil?
     Chef::Log.debug "Interface: #{interface}"
-
-    if interface.nil?
-      i_el = model_import_node_interface.add_element 'interface', 'ip-addr' => new_resource.ip_addr
-      unless new_resource.status.nil?
-        i_el.attributes['status'] = new_resource.status
-      end
-      unless new_resource.managed.nil?
-        i_el.attributes['managed'] = new_resource.managed
-      end
-      unless new_resource.snmp_primary.nil?
-        i_el.attributes['snmp-primary'] = new_resource.snmp_primary
-      end
-      model_import_node_interface_create(new_resource.foreign_source_name, new_resource.foreign_id, new_resource.ip_addr).message model_import.to_s
-    else
-      unless new_resource.status.nil?
-        interface.attributes['status'] = new_resource.status
-      end
-      unless new_resource.managed.nil?
-        interface.attributes['managed'] = new_resource.managed
-      end
-      unless new_resource.snmp_primary.nil?
-        interface.attributes['snmp-primary'] = new_resource.snmp_primary
-      end
-      model_import_node_interface_create(new_resource.foreign_source_name, new_resource.foreign_id, new_resource.ip_addr).message model_import.to_s
-    end
   end
 end
 
