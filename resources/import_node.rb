@@ -26,7 +26,6 @@ property :sync_wait_secs, Integer, default: 10
 load_current_value do |new_resource|
   node_assets = {}
   node_category = []
-  model_import_init(new_resource.name)
   model_import = REXML::Document.new(model_import(new_resource.foreign_source_name).message).root unless model_import(new_resource.foreign_source_name).nil?
   current_value_does_not_exist! if model_import.nil?
   model_import_node = REXML::Document.new(Opennms::Cookbook::Provision::ModelImport.new("#{new_resource.foreign_source_name}", "#{baseurl}/requisitions/#{new_resource.foreign_source_name}/nodes/#{new_resource.foreign_id}").message) unless model_import.nil?
@@ -61,8 +60,7 @@ end
 
 action :create do
   converge_if_changed do
-    model_import_Node_init(new_resource.name, new_resource.foreign_source_name)
-    model_import = REXML::Document.new(model_import_node(new_resource.foreign_source_name).message).root unless model_import_node(new_resource.foreign_source_name).nil?
+    model_import = REXML::Document.new(model_import(new_resource.foreign_source_name).message).root unless model_import(new_resource.foreign_source_name).nil?
     model_import_node = REXML::Document.new(Opennms::Cookbook::Provision::ModelImport.new("#{new_resource.foreign_source_name}", "#{baseurl}/requisitions/#{new_resource.foreign_source_name}/nodes/#{new_resource.foreign_id}").message) unless model_import.nil?
     import_node = model_import_node.elements["node [@node-label = '#{new_resource.name}' and @foreign-id = '#{new_resource.foreign_id}']"] unless model_import_node.nil?
     if import_node.nil?
@@ -131,7 +129,7 @@ end
 
 action :delete do
   converge_if_changed do
-    model_import = REXML::Document.new(model_import_node(new_resource.foreign_source_name).message).root unless model_import_node(new_resource.foreign_source_name).nil?
+    model_import = REXML::Document.new(model_import(new_resource.foreign_source_name).message).root unless model_import(new_resource.foreign_source_name).nil?
     import_node = model_import.elements["node [@node-label = '#{new_resource.name}' and @foreign-id = '#{new_resource.foreign_id}']"] unless model_import.nil?
     unless import_node.nil?
       model_import_node_delete(new_resource.foreign_source_name, new_resource.foreign_id)
