@@ -82,7 +82,7 @@ action :create do
       unless new_resource.building.nil?
         node_el.attributes['building'] = new_resource.building
       end
-      if !new_resource.categories.nil? && !new_resource.categories.empty?
+      if !new_resource.categories.nil?
         new_resource.categories.each do |category|
           node_el.add_element 'category', 'name' => category
         end
@@ -94,7 +94,7 @@ action :create do
       end
       model_import_node_create(new_resource.foreign_source_name).message model_import.to_s
     else
-      import_node.attributes['node-label'] = new_resource.node_label
+      import_node.attributes['node-label'] = node_name
       import_node.attributes['foreign-id'] = new_resource.foreign_id
       unless new_resource.parent_foreign_source.nil?
         import_node.attributes['parent-foreign-source'] = new_resource.parent_foreign_source
@@ -111,7 +111,7 @@ action :create do
       unless new_resource.building.nil?
         import_node.attributes['building'] = new_resource.building
       end
-      if !new_resource.categories.nil? && !new_resource.categories.empty?
+      if !new_resource.categories.nil? 
         import_node.elements.delete_all 'category'
         new_resource.categories.each do |category|
           import_node.add_element 'category', 'name' => category
