@@ -3,8 +3,8 @@ include Opennms::XmlHelper
 include Opennms::Rbac
 
 property :ip_addr, String, name_property: true
-property :foreign_source_name, String, required: true
-property :foreign_id, String, required: true
+property :foreign_source_name, String
+property :foreign_id, String
 property :status, Integer
 property :managed, [TrueClass, FalseClass]
 property :snmp_primary, String, equal_to: %w(P S N)
@@ -24,7 +24,6 @@ load_current_value do |new_resource|
   model_import = REXML::Document.new(model_import(new_resource.foreign_source_name).message).root unless model_import(new_resource.foreign_source_name).nil?
   current_value_does_not_exist! if model_import.nil?
   model_import_node_interface = REXML::Document.new(Opennms::Cookbook::Provision::ModelImport.new("#{new_resource.foreign_source_name}", "#{baseurl}/requisitions/#{new_resource.foreign_source_name}/nodes/#{new_resource.foreign_id}/interfaces/#{new_resource.ip_addr}").message) unless model_import.nil?
-  current_value_does_not_exist! if model_import_node_interface.nil?
   current_value_does_not_exist! if model_import_node_interface.nil?
   Chef::Log.debug "Interface: #{model_import_node_interface}"
   interface = model_import_node_interface.elements["interface[@ip-addr = '#{new_resource.ip_addr}']"]
@@ -72,7 +71,7 @@ action :create do
       unless new_resource.snmp_primary.nil?
         interface.attributes['snmp-primary'] = new_resource.snmp_primary
       end
-      model_import_node_interface_create(new_resource.foreign_source_name, new_resource.foreign_id, new_resource.ip_addr).message model_import_node_interface.to_s
+      model_import_node_interface_create(new_resource.foreign_source_name, new_resource.foreign_id, new_resource.ip_addr).message model_import.to_s
     end
   end
 end
