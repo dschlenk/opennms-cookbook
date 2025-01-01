@@ -26,7 +26,6 @@ load_current_value do |new_resource|
   node_assets = {}
   node_category = []
   model_import = REXML::Document.new(model_import(new_resource.name).message) unless model_import(new_resource.name).nil?
-  #model_import = REXML::Document.new(model_import(new_resource.foreign_source_name).message).root unless model_import(new_resource.foreign_source_name).nil?
   current_value_does_not_exist! if model_import.nil?
   model_import_node = REXML::Document.new(Opennms::Cookbook::Provision::ModelImport.new("#{new_resource.foreign_source_name}", "#{baseurl}/requisitions/#{new_resource.foreign_source_name}/nodes/#{new_resource.foreign_id}").message) unless model_import.nil?
   current_value_does_not_exist! if model_import_node.nil?
@@ -46,12 +45,14 @@ load_current_value do |new_resource|
       node_category.push category.attributes['name'].to_s
     end
   end
-  categories node_category
+
   unless node.elements['asset'].nil?
     node.each_element('asset') do |asset|
       node_assets[asset.attributes['key'].to_s] = asset.attributes['value'].to_s
     end
   end
+
+  categories node_category
   assets node_assets
 end
 
@@ -64,7 +65,7 @@ end
 action :create do
   converge_if_changed do
     model_import = model_import_init(new_resource.name, new_resource.foreign_source_name)
-    model_import = REXML::Document.new(model_import(new_resource.foreign_source_name).message).root unless model_import.nil?
+    model_import = REXML::Document.new(model_import(new_resource.name).message).root unless model_import.nil?
     model_import_node = REXML::Document.new(Opennms::Cookbook::Provision::ModelImport.new("#{new_resource.foreign_source_name}", "#{baseurl}/requisitions/#{new_resource.foreign_source_name}/nodes/#{new_resource.foreign_id}").message) unless model_import.nil?
     import_node = model_import_node.elements["node[@foreign-id = '#{new_resource.foreign_id}']"] unless model_import_node.nil?
     if import_node.nil?
