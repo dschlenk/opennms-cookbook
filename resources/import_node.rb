@@ -39,7 +39,7 @@ load_current_value do |new_resource|
   city node.attributes['city'] unless node.attributes['city'].nil?
   building node.attributes['building'] unless node.attributes['building'].nil?
 
-  unless node.elements['category'].nil? || node.elements['category'].empty?
+  unless node.elements['category'].nil?
     node.each_element('category') do |category|
       node_category.push category.attributes['name'].to_s
     end
@@ -111,7 +111,7 @@ action :create do
       unless new_resource.building.nil?
         import_node.attributes['building'] = new_resource.building
       end
-      if !new_resource.categories.nil? 
+      if !new_resource.categories.nil?
         import_node.elements.delete_all 'category'
         new_resource.categories.each do |category|
           import_node.add_element 'category', 'name' => category
