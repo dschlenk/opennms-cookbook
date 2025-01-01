@@ -4,7 +4,7 @@ include Opennms::Rbac
 
 property :node_label, String
 property :foreign_source_name, String
-property :foreign_id, String, required: true
+property :foreign_id, String
 property :parent_foreign_source, String
 property :parent_foreign_id, String
 property :parent_node_label, String
