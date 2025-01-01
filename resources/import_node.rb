@@ -71,12 +71,12 @@ action :create do
     model_import = REXML::Document.new(model_import(new_resource.foreign_source_name).message).root unless model_import.nil?
     model_import_init(new_resource.name, new_resource.foreign_source_name)
     model_import = REXML::Document.new(model_import(new_resource.foreign_source_name).message).root
-    import_node = model_import.elements["node[@foreign-id = '#{new_resource.foreign_id}']"] unless model_import.nil?
-    #model_import_node = REXML::Document.new(Opennms::Cookbook::Provision::ModelImport.new("#{new_resource.foreign_source_name}", "#{baseurl}/requisitions/#{new_resource.foreign_source_name}/nodes/#{new_resource.foreign_id}").message) unless model_import.nil?
+    model_import_node = REXML::Document.new(Opennms::Cookbook::Provision::ModelImport.new("#{new_resource.foreign_source_name}", "#{baseurl}/requisitions/#{new_resource.foreign_source_name}/nodes/#{new_resource.foreign_id}").message) unless model_import.nil?
+    import_node = model_import.elements["node[@foreign-id = '#{new_resource.foreign_id}']"] unless model_import_node.nil?
     #import_node = model_import_node.elements["node[@foreign-id = '#{new_resource.foreign_id}']"] unless model_import_node.nil?
     node_name = new_resource.node_label || new_resource.name
     if import_node.nil?
-      node_el = model_import.add_element 'node', 'node-label' => node_name, 'foreign-id' => new_resource.foreign_id
+      node_el = model_import_node.add_element 'node', 'node-label' => node_name, 'foreign-id' => new_resource.foreign_id
       unless new_resource.parent_foreign_source.nil?
         node_el.attributes['parent-foreign-source'] = new_resource.parent_foreign_source
       end
@@ -102,7 +102,7 @@ action :create do
           node_el.add_element 'asset', 'name' => key, 'value' => value
         end
       end
-      model_import_node_create(new_resource.foreign_source_name).message model_import.to_s
+      model_import_node_create(new_resource.foreign_source_name).message model_import_node.to_s
     else
       import_node.attributes['node-label'] = new_resource.node_label
       import_node.attributes['foreign-id'] = new_resource.foreign_id
@@ -134,7 +134,7 @@ action :create do
           import_node.add_element 'asset', 'name' => key, 'value' => value
         end
       end
-      model_import_node_create(new_resource.foreign_source_name).message model_import.to_s
+      model_import_node_create(new_resource.foreign_source_name).message model_import_node.to_s
     end
   end
 end
