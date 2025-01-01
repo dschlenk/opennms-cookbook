@@ -3,9 +3,7 @@ include Opennms::XmlHelper
 include Opennms::Rbac
 
 property :node_label, String
-# immutable / part of identity
 property :foreign_source_name, String, required: true
-# immutable / part of identity
 property :foreign_id, String, required: true
 property :parent_foreign_source, String
 property :parent_foreign_id, String
@@ -33,8 +31,6 @@ load_current_value do |new_resource|
   current_value_does_not_exist! if model_import_node.nil?
   node = model_import_node.elements["node[@foreign-id = '#{new_resource.foreign_id}'][@node-label = '#{new_resource.node_label}']"]
   current_value_does_not_exist! if node.nil?
-  #foreign_id node.attributes['foreign_id'] unless node.attributes['foreign_id'].nil?
-  #node_label node.attributes['node-label'] unless node.attributes['node-label'].nil?
   parent_foreign_source node.attributes['parent-foreign-source'] unless node.attributes['parent-foreign-source'].nil?
   parent_foreign_id node.attributes['parent-foreign-id'] unless node.attributes['parent-foreign-id'].nil?
   parent_node_label node.attributes['parent-node-label'] unless node.attributes['parent-node-label'].nil?
@@ -42,18 +38,18 @@ load_current_value do |new_resource|
   city node.attributes['city'] unless node.attributes['city'].nil?
   building node.attributes['building'] unless node.attributes['building'].nil?
 
-  unless node.elements['category'].nil?
+  unless node.elements['category'].nil? || node.elements['category'].empty?
     node.each_element('category') do |category|
       node_category.push category.attributes['name']
     end
-    categories = node_category
+    categories node_category.dup
   end
 
-  unless node.elements['asset'].nil?.nil?
+  unless node.elements['asset'].nil?
     node.each_element('asset') do |asset|
       node_assets[asset.attributes['key']] = asset.attributes['value']
     end
-    assets = node_assets
+    assets node_assets.clone
   end
 end
 
