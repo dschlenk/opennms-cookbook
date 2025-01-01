@@ -31,22 +31,18 @@ load_current_value do |new_resource|
   current_value_does_not_exist! if model_import_node.nil?
   node = model_import_node.elements["node[@foreign-id = '#{new_resource.foreign_id}']"]
   current_value_does_not_exist! if node.nil?
-  foreign_id node.attributes['foreign_id'] if !node.attributes['foreign_id'].nil?
-  node_label node.attributes['node-label'] if !node.attributes['node-label'].nil?
-  parent_foreign_source node.attributes['parent-foreign-source'] if !node.attributes['parent-foreign-source'].nil?
-  parent_foreign_id node.attributes['parent-foreign-id'] if !node.attributes['parent-foreign-id'].nil?
-  parent_node_label node.attributes['parent-node-label'] if !node.attributes['parent-node-label'].nil?
-
+  node_label node.attributes['node-label'] if node.attributes['node-label'].nil?
+  parent_foreign_source node.attributes['parent-foreign-source'] if node.attributes['parent-foreign-source'].nil?
+  parent_foreign_id node.attributes['parent-foreign-id'] if node.attributes['parent-foreign-id'].nil?
+  parent_node_label node.attributes['parent-node-label'] if node.attributes['parent-node-label'].nil?
   city node.attributes['city'] if !node.attributes['city'].nil?
   building node.attributes['building'] if !node.attributes['building'].nil?
-
   unless node.elements['category'].nil?
     node.each_element('category') do |category|
       node_category.push category.attributes['name'].to_s
     end
     categories node_category
   end
-
   unless node.elements['asset'].nil?
     node.each_element('asset') do |asset|
       node_assets[asset.attributes['key'].to_s] = asset.attributes['value'].to_s
