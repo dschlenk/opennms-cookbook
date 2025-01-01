@@ -32,7 +32,8 @@ load_current_value do |new_resource|
   current_value_does_not_exist! if model_import_node.nil?
   node = model_import_node.elements["node[@foreign-id = '#{new_resource.foreign_id}']"]
   current_value_does_not_exist! if node.nil?
-  node_label node.attributes['node-label']  unless node.attributes['node-label'].nil?
+  foreign_id node.attributes['foreign_id'] unless node.attributes['foreign_id'].nil?
+  node_label node.attributes['node-label'] unless node.attributes['node-label'].nil?
   parent_foreign_source node.attributes['parent-foreign-source'] unless node.attributes['parent-foreign-source'].nil?
   parent_foreign_id node.attributes['parent-foreign-id'] unless node.attributes['parent-foreign-id'].nil?
   parent_node_label node.attributes['parent-node-label'] unless node.attributes['parent-node-label'].nil?
@@ -62,8 +63,8 @@ end
 
 action :create do
   converge_if_changed do
-    model_import = REXML::Document.new(model_import(new_resource.name).message) unless model_import(new_resource.name).nil?
-    #model_import = REXML::Document.new(model_import(new_resource.foreign_source_name).message).root unless model_import(new_resource.foreign_source_name).nil?
+    model_import = model_import_init(new_resource.name, new_resource.foreign_source_name)
+    model_import = REXML::Document.new(model_import(new_resource.foreign_source_name).message).root unless model_import.nil?
     model_import_node = REXML::Document.new(Opennms::Cookbook::Provision::ModelImport.new("#{new_resource.foreign_source_name}", "#{baseurl}/requisitions/#{new_resource.foreign_source_name}/nodes/#{new_resource.foreign_id}").message) unless model_import.nil?
     import_node = model_import_node.elements["node[@foreign-id = '#{new_resource.foreign_id}']"] unless model_import_node.nil?
     if import_node.nil?
@@ -125,14 +126,15 @@ action :create do
           import_node.add_element 'asset', 'name' => key, 'value' => value
         end
       end
-      model_import_node_create(new_resource.foreign_source_name).message model_import_node.to_s
+      model_import_node_create(new_resource.foreign_source_name).message model_import.to_s
     end
   end
 end
 
 action :delete do
   converge_if_changed do
-    model_import = REXML::Document.new(model_import(new_resource.foreign_source_name).message).root  unless model_import(new_resource.foreign_source_name).nil?
+    model_import_init(new_resource.name, new_resource.foreign_source_name)
+    model_import = REXML::Document.new(model_import(new_resource.foreign_source_name).message).root
     import_node = model_import.elements["node[@foreign-id = '#{new_resource.foreign_id}']"] unless model_import.nil?
     unless import_node.nil?
       model_import_node_delete(new_resource.foreign_source_name, new_resource.foreign_id)
