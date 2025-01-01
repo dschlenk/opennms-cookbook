@@ -99,34 +99,34 @@ action :create do
       end
       model_import_node_create(new_resource.foreign_source_name).message model_import.to_s
     else
-      model_import_node.attributes['node-label'] = new_resource.node_label
-      model_import_node.attributes['foreign-id'] = new_resource.foreign_id
+      import_node.attributes['node-label'] = new_resource.node_label
+      import_node.attributes['foreign-id'] = new_resource.foreign_id
       unless new_resource.parent_foreign_source.nil?
-        model_import_node.attributes['parent-foreign-source'] = new_resource.parent_foreign_source
+        import_node.attributes['parent-foreign-source'] = new_resource.parent_foreign_source
       end
       unless new_resource.parent_foreign_id.nil?
-        model_import_node.attributes['parent-foreign-id'] = new_resource.parent_foreign_id
+        import_node.attributes['parent-foreign-id'] = new_resource.parent_foreign_id
       end
       unless new_resource.parent_node_label.nil?
-        model_import_node.attributes['parent-node-label'] = new_resource.parent_node_label
+        import_node.attributes['parent-node-label'] = new_resource.parent_node_label
       end
       unless new_resource.city.nil?
-        model_import_node.attributes['city'] = new_resource.city
+        import_node.attributes['city'] = new_resource.city
       end
       unless new_resource.building.nil?
-        model_import_node.attributes['building'] = new_resource.building
+        import_node.attributes['building'] = new_resource.building
       end
       if !new_resource.categories.nil? && !new_resource.categories.empty?
-        model_import_node.elements.delete_all 'category'
+        import_node.elements.delete_all 'category'
         new_resource.categories.each do |category|
-          model_import_node.add_element 'category', 'name' => category
+          import_node.add_element 'category', 'name' => category
         end
       end
 
       unless new_resource.assets.nil?
-        model_import_node.elements.delete_all 'asset'
+        import_node.elements.delete_all 'asset'
         new_resource.assets.each do |key, value|
-          model_import_node.add_element 'asset', 'name' => key, 'value' => value
+          import_node.add_element 'asset', 'name' => key, 'value' => value
         end
       end
       model_import_node_create(new_resource.foreign_source_name).message model_import.to_s
