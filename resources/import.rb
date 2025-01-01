@@ -23,18 +23,18 @@ end
 
 action :create do
   converge_if_changed do
-    model_import_init(new_resource.name, new_resource.foreign_source_name)
-    model_import = REXML::Document.new(model_import(new_resource.foreign_source_name).message).root
-    model_import(new_resource.foreign_source_name).message model_import.to_s
+    model_import_init(new_resource.name)
+    model_import = REXML::Document.new(model_import(new_resource.name).message).root
+    model_import(new_resource.name).message model_import.to_s
     if !new_resource.sync_import.nil? && new_resource.sync_import
-      model_import_sync(new_resource.name, new_resource.foreign_source_name, true)
+      model_import_sync(new_resource.name,  true)
     end
   end
 end
 
 action :sync do
   converge_if_changed do
-    model_import_init(new_resource.name, new_resource.foreign_source_name)
-    model_import_sync(new_resource.name, new_resource.foreign_source_name, true)
+    model_import_init(new_resource.name)
+    model_import_sync(new_resource.name, true)
   end
 end

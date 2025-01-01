@@ -67,12 +67,13 @@ module Opennms
         end
       end
 
+
       module ModelImportHttpRequest
         require_relative 'rbac'
         include Opennms::Rbac
 
-        def model_import_init(name, foreign_source_name)
-          model_import_create(name, foreign_source_name) unless model_import_exist?(name)
+        def model_import_init(name)
+          model_import_create(name) unless model_import_exist?(name)
         end
 
         def model_import(name)
@@ -88,10 +89,10 @@ module Opennms
             false
           end
 
-          def model_import_create(name, foreign_source_name)
+          def model_import_create(name)
             url = "#{baseurl}/requisitions/#{name}"
             Chef::Log.debug "model_import_create url: #{url}"
-            model_import = Opennms::Cookbook::Provision::ModelImport.new(foreign_source_name, url)
+            model_import = Opennms::Cookbook::Provision::ModelImport.new(name, url)
             with_run_context(:root) do
               declare_resource(:http_request, "opennms_import POST #{name}") do
                 url "#{baseurl}/requisitions"
@@ -103,12 +104,47 @@ module Opennms
             end
           end
 
-          def model_import_node_create(name)
-            url = "#{baseurl}/requisitions/#{name}/nodes"
+          def model_import_sync(name, rescan)
+            url = "#{baseurl}/requisitions/#{name}/import"
+            url += '?rescanExisting=false' if !rescan.nil? && rescan == false
+            begin
+              tries ||= 3
+              Chef::Log.debug("Attempting import sync for #{name} with URL #{url}")
+              RestClient.put url, nil
+            rescue => e
+              Chef::Log.debug("Retrying import sync for #{name} #{tries}")
+              retry if (tries -= 1) > 0
+              raise e
+            end
+          end
+      end
+      module ModelImportNodeHttpRequest
+        require_relative 'rbac'
+        include Opennms::Rbac
+
+        def model_import_Node_init(nodeName, foreign_source_name)
+          model_import_node_create(nodeName, foreign_source_name) unless model_import_node_exist?(nodeName)
+        end
+
+        def model_import_node(nodeName)
+          return unless model_import_exist?(nodeName)
+          find_resource!(:http_request, "opennms_import POST #{nodeName}")
+        end
+
+        private
+
+          def model_import_node_exist?(nodeName)
+            !find_resource(:http_request, "opennms_import_node POST #{nodeName}").nil?
+          rescue Chef::Exceptions::ResourceNotFound
+            false
+          end
+
+          def model_import_node_create(nodeName, foreign_source_name)
+            url = "#{baseurl}/requisitions/#{foreign_source_name}/nodes"
             Chef::Log.debug "model_import_node_create url: #{url}"
-            model_import_node = Opennms::Cookbook::Provision::ModelImport.new(name, url)
+            model_import_node = Opennms::Cookbook::Provision::ModelImport.new(foreign_source_name, url)
             with_run_context(:root) do
-              declare_resource(:http_request, "opennms_import_node POST #{name}") do
+              declare_resource(:http_request, "opennms_import_node POST #{foreign_source_name}") do
                 url "#{baseurl}/requisitions"
                 headers({ 'Content-Type' => 'application/xml' })
                 action :nothing
@@ -130,35 +166,7 @@ module Opennms
               end
             end
           end
-
-          def model_import_sync(name, foreign_source_name, rescan)
-            url = "#{baseurl}/requisitions/#{name}/import"
-            url += '?rescanExisting=false' if !rescan.nil? && rescan == false
-            begin
-              tries ||= 3
-              Chef::Log.debug("Attempting import sync for #{foreign_source_name} with URL #{url}")
-              RestClient.put url, nil
-            rescue => e
-              Chef::Log.debug("Retrying import sync for #{foreign_source_name} #{tries}")
-              retry if (tries -= 1) > 0
-              raise e
-            end
           end
-          def model_import_node_interface_create(name, foreign_id, ip_addr)
-            url = "#{baseurl}/requisitions/#{name}/nodes/#{foreign_id}/interfaces/#{ip_addr}"
-            Chef::Log.debug "model_import_node_interface_create url: #{url}"
-            model_import_node_interface = Opennms::Cookbook::Provision::ModelImport.new(name, url)
-            with_run_context(:root) do
-              declare_resource(:http_request, "opennms_import_node_interface POST #{name}") do
-                url "#{baseurl}/requisitions"
-                headers({ 'Content-Type' => 'application/xml' })
-                action :nothing
-                delayed_action :post
-                message model_import_node_interface.message.to_s
-              end
-            end
-          end
-      end
     end
   end
 end
