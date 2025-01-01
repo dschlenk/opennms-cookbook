@@ -62,9 +62,8 @@ action :create do
   converge_if_changed do
     model_import = REXML::Document.new(model_import(new_resource.foreign_source_name).message).root unless model_import(new_resource.foreign_source_name).nil?
     model_import_node = REXML::Document.new(Opennms::Cookbook::Provision::ModelImport.new("#{new_resource.foreign_source_name}", "#{baseurl}/requisitions/#{new_resource.foreign_source_name}/nodes/#{new_resource.foreign_id}").message) unless model_import.nil?
-    if model_import_node.nil?
-      import_node = REXML::Document.new
-      import_node << REXML::XMLDecl.new
+    import_node = model_import_node.elements["node [@node-label = '#{new_resource.name}' and @foreign-id = '#{new_resource.foreign_id}']"] unless model_import_node.nil?
+    if import_node.nil?
       node_el = model_import.add_element 'node', 'node-label' => new_resource.name, 'foreign-id' => new_resource.foreign_id
       unless new_resource.parent_foreign_source.nil?
         node_el.attributes['parent-foreign-source'] = new_resource.parent_foreign_source
@@ -92,39 +91,39 @@ action :create do
         end
       end
       model_import_node_create(new_resource.name, new_resource.foreign_source_name).message model_import.to_s
-    else import_node = model_import_node.elements["node [@node-label = '#{new_resource.name}' and @foreign-id = '#{new_resource.foreign_id}']"]
-    import_node.attributes['node-label'] = new_resource.name
-    import_node.attributes['foreign-id'] = new_resource.foreign_id
-    unless new_resource.parent_foreign_source.nil?
-      import_node.attributes['parent-foreign-source'] = new_resource.parent_foreign_source
-    end
-    unless new_resource.parent_foreign_id.nil?
-      import_node.attributes['parent-foreign-id'] = new_resource.parent_foreign_id
-    end
-    unless new_resource.parent_node_label.nil?
-      import_node.attributes['parent-node-label'] = new_resource.parent_node_label
-    end
-    unless new_resource.city.nil?
-      import_node.attributes['city'] = new_resource.city
-    end
-    unless new_resource.building.nil?
-      import_node.attributes['building'] = new_resource.building
-    end
-    if !new_resource.categories.nil?
-      import_node.elements.delete_all 'category'
-      new_resource.categories.each do |category|
-        import_node.add_element 'category', 'name' => category
+    else
+      import_node.attributes['node-label'] = new_resource.name
+      import_node.attributes['foreign-id'] = new_resource.foreign_id
+      unless new_resource.parent_foreign_source.nil?
+        import_node.attributes['parent-foreign-source'] = new_resource.parent_foreign_source
       end
-    end
+      unless new_resource.parent_foreign_id.nil?
+        import_node.attributes['parent-foreign-id'] = new_resource.parent_foreign_id
+      end
+      unless new_resource.parent_node_label.nil?
+        import_node.attributes['parent-node-label'] = new_resource.parent_node_label
+      end
+      unless new_resource.city.nil?
+        import_node.attributes['city'] = new_resource.city
+      end
+      unless new_resource.building.nil?
+        import_node.attributes['building'] = new_resource.building
+      end
+      if !new_resource.categories.nil?
+        import_node.elements.delete_all 'category'
+        new_resource.categories.each do |category|
+          import_node.add_element 'category', 'name' => category
+        end
+      end
 
-    unless new_resource.assets.nil?
-      import_node.elements.delete_all 'asset'
-      new_resource.assets.each do |key, value|
-        import_node.add_element 'asset', 'name' => key, 'value' => value
+      unless new_resource.assets.nil?
+        import_node.elements.delete_all 'asset'
+        new_resource.assets.each do |key, value|
+          import_node.add_element 'asset', 'name' => key, 'value' => value
+        end
       end
-    end
-    model_import_node_create(new_resource.name, new_resource.foreign_source_name).message model_import.to_s
-    end
+      model_import_node_create(new_resource.name, new_resource.foreign_source_name).message model_import.to_s
+      end
   end
 end
 
