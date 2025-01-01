@@ -43,14 +43,14 @@ load_current_value do |new_resource|
     node.each_element('category') do |category|
       node_category.push category.attributes['name'].to_s
     end
-    categories node_category
+    categories node_category.dup
   end
 
   unless node.elements['asset'].nil?
     node.each_element('asset') do |asset|
       node_assets[asset.attributes['key'].to_s] = asset.attributes['value'].to_s
     end
-    assets node_assets
+    assets node_assets.clone
   end
 end
 
