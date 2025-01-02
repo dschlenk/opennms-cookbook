@@ -50,7 +50,7 @@ action :create do
     current_value_does_not_exist! if interface.nil?
     Chef::Log.debug "Interface: #{interface}"
     if interface.nil?
-      i_el = model_import.add_element 'interface', 'ip-addr' => new_resource.ip_addr
+      i_el = model_import_node.add_element 'interface', 'ip-addr' => new_resource.ip_addr
       unless new_resource.status.nil?
         i_el.attributes['status'] = new_resource.status
       end
