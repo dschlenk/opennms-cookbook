@@ -25,11 +25,9 @@ load_current_value do |new_resource|
   current_value_does_not_exist! if model_import.nil?
   model_import_node = REXML::Document.new(Opennms::Cookbook::Provision::ModelImport.new("#{new_resource.foreign_source_name}", "#{baseurl}/requisitions/#{new_resource.foreign_source_name}/nodes/#{new_resource.foreign_id}").message) unless model_import.nil?
   current_value_does_not_exist! if model_import_node.nil?
-  #import_node = model_import_node.elements["node [@node-label = '#{new_resource.name}' and @foreign-id = '#{new_resource.foreign_id}']"]
-  #model_import_node_interface = REXML::Document.new(Opennms::Cookbook::Provision::ModelImport.new("#{new_resource.foreign_source_name}", "#{baseurl}/requisitions/#{new_resource.foreign_source_name}/nodes/#{new_resource.foreign_id}/interfaces/#{new_resource.ip_addr}").message) unless model_import.nil?
-  current_value_does_not_exist! if model_import_node.nil?
-  Chef::Log.debug "Interface: #{model_import_node}"
-  interface = model_import_node.elements["node/interface[@ip-addr = '#{new_resource.ip_addr}']"]
+  Chef::Log.debug "model_import_node: #{model_import_node}"
+  import_node = model_import_node.elements["node [@node-label = '#{new_resource.name}' and @foreign-id = '#{new_resource.foreign_id}']"] unless model_import_node.nil?
+  interface = import_node.elements["interface[@ip-addr = '#{new_resource.ip_addr}']"]
   current_value_does_not_exist! if interface.nil?
   status interface.attributes['status'] unless interface.attributes['status'].nil?
   managed interface.attributes['managed'] unless interface.attributes['managed'].nil?
@@ -45,14 +43,13 @@ end
 action :create do
   converge_if_changed do
     model_import = REXML::Document.new(model_import(new_resource.foreign_source_name).message).root unless model_import(new_resource.foreign_source_name).nil?
-    current_value_does_not_exist! if model_import.nil?
     model_import_node = REXML::Document.new(Opennms::Cookbook::Provision::ModelImport.new("#{new_resource.foreign_source_name}", "#{baseurl}/requisitions/#{new_resource.foreign_source_name}/nodes/#{new_resource.foreign_id}").message) unless model_import.nil?
     current_value_does_not_exist! if model_import_node.nil?
-    #model_import_node_interface = REXML::Document.new(Opennms::Cookbook::Provision::ModelImport.new("#{new_resource.foreign_source_name}", "#{baseurl}/requisitions/#{new_resource.foreign_source_name}/nodes/#{new_resource.foreign_id}/interfaces/#{new_resource.ip_addr}").message) unless model_import.nil?
-    current_value_does_not_exist! if model_import_node.nil?
     Chef::Log.debug "Interface: #{model_import_node}"
-    interface = model_import_node.elements["node/interface[@ip-addr = '#{new_resource.ip_addr}']"]
+    import_node = model_import_node.elements["node [@node-label = '#{new_resource.name}' and @foreign-id = '#{new_resource.foreign_id}']"] unless model_import_node.nil?
     current_value_does_not_exist! if import_node.nil?
+    interface = import_node.elements["interface[@ip-addr = '#{new_resource.ip_addr}']"]
+    current_value_does_not_exist! if interface.nil?
     Chef::Log.debug "Interface: #{interface}"
     if interface.nil?
       i_el = model_import.add_element 'interface', 'ip-addr' => new_resource.ip_addr
@@ -65,7 +62,7 @@ action :create do
       unless new_resource.snmp_primary.nil?
         i_el.attributes['snmp-primary'] = new_resource.snmp_primary
       end
-      model_import_node_interface_create(new_resource.foreign_source_name, new_resource.foreign_id, new_resource.ip_addr).message model_import.to_s
+      model_import(new_resource.foreign_source_name).message model_import.to_s
     else
       unless new_resource.status.nil?
         interface.attributes['status'] = new_resource.status
@@ -76,7 +73,7 @@ action :create do
       unless new_resource.snmp_primary.nil?
         interface.attributes['snmp-primary'] = new_resource.snmp_primary
       end
-      model_import_node_interface_create(new_resource.foreign_source_name, new_resource.foreign_id, new_resource.ip_addr).message model_import.to_s
+      model_import(new_resource.foreign_source_name).message model_import.to_s
     end
   end
 end
