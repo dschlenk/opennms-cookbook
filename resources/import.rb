@@ -7,7 +7,7 @@ property :foreign_source_name, String, default: 'imported:'
 property :sync_import, [TrueClass, FalseClass], default: false
 property :sync_wait_periods, Integer, default: 30
 property :sync_wait_secs, Integer, default: 10
-attr_accessor :import_url, String
+property :import_url, String
 load_current_value do |new_resource|
   import_url "/requisitions/#{new_resource.name}"
   model_import = REXML::Document.new(model_import(new_resource.name).message) unless model_import(new_resource.name).nil?
