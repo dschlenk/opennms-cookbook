@@ -60,6 +60,9 @@ end
 
 action :create do
   converge_if_changed do
+    import_node_url "/requisitions/#{new_resource.foreign_source_name}/nodes"
+    model_import_init(new_resource.name, import_node_url)
+    #model_import = REXML::Document.new(model_import(new_resource.name).message).root
     model_import = REXML::Document.new(model_import(new_resource.foreign_source_name).message).root unless model_import(new_resource.foreign_source_name).nil?
     model_import_node = REXML::Document.new(Opennms::Cookbook::Provision::ModelImport.new("#{new_resource.foreign_source_name}", "#{baseurl}/requisitions/#{new_resource.foreign_source_name}/nodes/#{new_resource.foreign_id}").message) unless model_import.nil?
     import_node = model_import_node.elements["node [@node-label = '#{new_resource.name}' and @foreign-id = '#{new_resource.foreign_id}']"] unless model_import_node.nil?
@@ -90,7 +93,7 @@ action :create do
           node_el.add_element 'asset', 'name' => key, 'value' => value
         end
       end
-      model_import_node_create(new_resource.name, new_resource.foreign_source_name).message model_import.to_s
+      model_import(new_resource.foreign_source_name).message model_import.to_s
     else
       import_node.attributes['node-label'] = new_resource.name
       import_node.attributes['foreign-id'] = new_resource.foreign_id
@@ -122,7 +125,7 @@ action :create do
           import_node.add_element 'asset', 'name' => key, 'value' => value
         end
       end
-      #model_import_node_create(new_resource.name, new_resource.foreign_source_name).message model_import.to_s
+      model_import(new_resource.foreign_source_name).message model_import.to_s
       end
   end
 end
