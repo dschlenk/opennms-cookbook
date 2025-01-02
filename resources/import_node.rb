@@ -1,5 +1,4 @@
 include Opennms::Cookbook::Provision::ModelImportHttpRequest
-include Opennms::Cookbook::Provision::ModelImportNodeHttpRequest
 include Opennms::XmlHelper
 include Opennms::Rbac
 
@@ -55,7 +54,6 @@ end
 
 action_class do
   include Opennms::Cookbook::Provision::ModelImportHttpRequest
-  include Opennms::Cookbook::Provision::ModelImportNodeHttpRequest
   include Opennms::XmlHelper
   include Opennms::Rbac
 end
@@ -124,7 +122,7 @@ action :create do
           import_node.add_element 'asset', 'name' => key, 'value' => value
         end
       end
-      model_import_node_create(new_resource.name, new_resource.foreign_source_name).message model_import.to_s
+      #model_import_node_create(new_resource.name, new_resource.foreign_source_name).message model_import.to_s
       end
   end
 end
