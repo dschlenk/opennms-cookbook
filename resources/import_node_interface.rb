@@ -46,8 +46,9 @@ action :create do
     model_import = REXML::Document.new(model_import(new_resource.foreign_source_name).message).root unless model_import(new_resource.foreign_source_name).nil?
     model_import_node = REXML::Document.new(Opennms::Cookbook::Provision::ModelImport.new("#{new_resource.foreign_source_name}", "#{baseurl}/requisitions/#{new_resource.foreign_source_name}/nodes/#{new_resource.foreign_id}").message) unless model_import.nil?
     current_value_does_not_exist! if model_import_node.nil?
-    Chef::Log.debug "Interface: #{model_import_node}"
-    interface = import_node.elements["interface[@ip-addr = '#{new_resource.ip_addr}']"]
+    model_import_node_interface = REXML::Document.new(Opennms::Cookbook::Provision::ModelImport.new("#{new_resource.foreign_source_name}", "#{baseurl}/requisitions/#{new_resource.foreign_source_name}/nodes/#{new_resource.foreign_id}/interfaces/#{new_resource.ip_addr}").message) unless model_import.nil?
+    Chef::Log.debug "Interface: #{model_import_node_interface}"
+    interface = model_import_node_interface.elements["interface[@ip-addr = '#{new_resource.ip_addr}']"]
     current_value_does_not_exist! if interface.nil?
     Chef::Log.debug "Interface: #{interface}"
     if interface.nil?
