@@ -10,7 +10,6 @@ property :sync_wait_secs, Integer, default: 10
 
 
 load_current_value do |new_resource|
-  import_url "/requisitions/#{new_resource.name}"
   model_import = REXML::Document.new(model_import(new_resource.name).message) unless model_import(new_resource.name).nil?
   model_import = REXML::Document.new(Opennms::Cookbook::Provision::ModelImport.new(new_resource.foreign_source_name, "#{baseurl}/requisitions/#{new_resource.name}").message) if model_import.nil?
   current_value_does_not_exist! if model_import.nil?
@@ -21,11 +20,11 @@ action_class do
   include Opennms::Cookbook::Provision::ModelImportHttpRequest
   include Opennms::XmlHelper
   include Opennms::Rbac
-  attr_accessor :import_url, String
 end
 
 action :create do
   converge_if_changed do
+    import_url = "/requisitions/#{new_resource.name}"
     model_import_init(new_resource.name, import_url)
     model_import = REXML::Document.new(model_import(new_resource.name).message).root
     model_import(new_resource.name).message model_import.to_s
@@ -37,6 +36,7 @@ end
 
 action :sync do
   converge_if_changed do
+    import_url = "/requisitions/#{new_resource.name}"
     model_import_init(new_resource.name, import_url)
     model_import_sync(new_resource.name, true)
   end
