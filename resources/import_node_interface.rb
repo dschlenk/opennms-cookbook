@@ -28,7 +28,7 @@ load_current_value do |new_resource|
   Chef::Log.debug "model_import_node: #{model_import_node}"
   import_node = model_import_node.elements["node [@node-label = '#{new_resource.name}' and @foreign-id = '#{new_resource.foreign_id}']/interface[@ip-addr = '#{new_resource.ip_addr}']"] unless model_import_node.nil?
   #interface = import_node.elements["interface[@ip-addr = '#{new_resource.ip_addr}']"]
-  current_value_does_not_exist! if interface.nil?
+  current_value_does_not_exist! if import_node.nil?
   status import_node.attributes['status'] unless import_node.attributes['status'].nil?
   managed import_node.attributes['managed'] unless import_node.attributes['managed'].nil?
   snmp_primary import_node.attributes['snmp-primary'] unless import_node.attributes['snmp-primary'].nil?
