@@ -37,10 +37,10 @@ action :create do
     model_import = REXML::Document.new(model_import(new_resource.foreign_source_name).message).root
     model_import = REXML::Document.new(Opennms::Cookbook::Provision::ModelImport.new("#{new_resource.foreign_source_name}", "#{baseurl}/requisitions/#{new_resource.foreign_source_name}/nodes/#{new_resource.foreign_id}").message) if model_import.nil?
     node_el = model_import.elements["node[@foreign-id = '#{new_resource.foreign_id}']"] unless model_import.nil?
-    interface_el = node_el.elements["interface[@ip-addr = '#{new_resource.ip_addr}']"] unless node_el.nil?
+    interface_el = node_el.elements["interface[@ip-addr = '#{new_resource.name}']"] unless node_el.nil?
     if interface_el.nil?
       i_el = REXML::Element.new('interface')
-      i_el.attributes['ip-addr'] = new_resource.ip_addr
+      i_el.attributes['ip-addr'] = new_resource.name
       unless new_resource.status.nil?
         i_el.attributes['status'] = new_resource.status
       end
