@@ -15,7 +15,7 @@ property :sync_wait_secs, Integer, default: 10
 
 
 load_current_value do |new_resource|
-  model_import = REXML::Document.new(model_import(new_resource.name, "opennms_import_node_interface").message).root unless model_import(new_resource.name, "opennms_import_node_interface").nil?
+  model_import = REXML::Document.new(model_import(new_resource.foreign_source_name, "opennms_import_node").message).root unless model_import(new_resource.foreign_source_name, "opennms_import_node").nil?
   model_import = REXML::Document.new(Opennms::Cookbook::Provision::ModelImport.new("#{new_resource.foreign_source_name}", "#{baseurl}/requisitions/#{new_resource.foreign_source_name}/nodes/#{new_resource.foreign_id}").message) if model_import.nil?
   node_el = model_import.elements["node[@foreign-id = '#{new_resource.foreign_id}']"] unless model_import.nil?
   interface = node_el.elements["interface[@ip-addr = '#{new_resource.name}']"] unless node_el.nil?
@@ -33,8 +33,8 @@ end
 
 action :create do
   converge_if_changed do
-    model_import_init(new_resource.foreign_source_name, "opennms_import_node_interface")
-    model_import_root = REXML::Document.new(model_import(new_resource.name,  "opennms_import_node_interface").message).root
+    model_import_init(new_resource.foreign_source_name, "opennms_import_node")
+    model_import_root = REXML::Document.new(model_import(new_resource.foreign_source_name,  "opennms_import_node").message).root
     model_import_root = REXML::Document.new(Opennms::Cookbook::Provision::ModelImport.new("#{new_resource.foreign_source_name}", "#{baseurl}/requisitions/#{new_resource.foreign_source_name}/nodes/#{new_resource.foreign_id}").message) if model_import_root.nil?
     node_el = model_import_root.elements["node[@foreign-id = '#{new_resource.foreign_id}']"] unless model_import_root.nil?
     interface_el = node_el.elements["interface[@ip-addr = '#{new_resource.name}']"] unless node_el.nil?
@@ -62,7 +62,7 @@ action :create do
         interface_el.attributes['snmp-primary'] = new_resource.snmp_primary
       end
     end
-    model_import(new_resource.foreign_source_name, "opennms_import_node_interface").message model_import_root.to_s
+    model_import(new_resource.foreign_source_name, "opennms_import_node").message model_import_root.to_s
 
     if !new_resource.sync_import.nil? && new_resource.sync_import
       model_import_sync(new_resource.foreign_source_name, true)
