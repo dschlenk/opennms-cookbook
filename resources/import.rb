@@ -24,7 +24,7 @@ end
 
 action :create do
   converge_if_changed do
-    model_import_init(new_resource.name)
+    model_import_init(new_resource.name, "opennms_import")
     model_import = REXML::Document.new(model_import(new_resource.name).message).root
     model_import(new_resource.name).message model_import.to_s
     if !new_resource.sync_import.nil? && new_resource.sync_import
@@ -35,7 +35,7 @@ end
 
 action :sync do
   converge_if_changed do
-    model_import_init(new_resource.name)
+    model_import_init(new_resource.name, "opennms_import")
     model_import_sync(new_resource.name, true)
   end
 end
