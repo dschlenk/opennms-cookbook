@@ -77,7 +77,7 @@ module Opennms
 
         def model_import(name)
           return unless model_import_exist?(name)
-          find_resource!(:http_request, "#{import_type} POST #{name}")
+          find_resource!(:http_request, "opennms_import POST #{name}")
         end
 
         private
