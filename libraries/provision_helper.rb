@@ -71,8 +71,8 @@ module Opennms
         require_relative 'rbac'
         include Opennms::Rbac
 
-        def model_import_init(name, url)
-          model_import_create(name, url) unless model_import_exist?(name)
+        def model_import_init(name)
+          model_import_create(name) unless model_import_exist?(name)
         end
 
         def model_import(name)
@@ -88,8 +88,8 @@ module Opennms
             false
           end
 
-          def model_import_create(name, url)
-            url = "#{baseurl}/#{url}"
+          def model_import_create(name)
+            url = "#{baseurl}/requisitions/#{name}"
             Chef::Log.debug "model_import_create url: #{url}"
             model_import = Opennms::Cookbook::Provision::ModelImport.new(name, url)
             with_run_context(:root) do
