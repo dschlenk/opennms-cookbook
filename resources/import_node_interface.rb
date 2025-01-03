@@ -40,8 +40,8 @@ action :create do
   converge_if_changed do
     model_import_init(new_resource.foreign_source_name)
     model_import = REXML::Document.new(model_import(new_resource.foreign_source_name).message).root
-    model_import_node = REXML::Document.new(Opennms::Cookbook::Provision::ModelImport.new("#{new_resource.foreign_source_name}", "#{baseurl}/requisitions/#{new_resource.foreign_source_name}/nodes/#{new_resource.foreign_id}").message) unless model_import.nil?
-    node_el = model_import_node.elements["node[@foreign-id = '#{new_resource.foreign_id}']"]
+    #model_import_node = REXML::Document.new(Opennms::Cookbook::Provision::ModelImport.new("#{new_resource.foreign_source_name}", "#{baseurl}/requisitions/#{new_resource.foreign_source_name}/nodes/#{new_resource.foreign_id}").message) unless model_import.nil?
+    node_el = model_import.elements["node[@foreign-id = '#{new_resource.foreign_id}']"]
 
     if node_el.nil?
       node_el = REXML::Element.new('node')
