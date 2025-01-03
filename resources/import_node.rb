@@ -19,7 +19,7 @@ property :sync_wait_secs, Integer, default: 10
 load_current_value do |new_resource|
   node_assets = {}
   node_category = []
-  model_import = REXML::Document.new(model_import(new_resource.foreign_source_name, "opennms_import_node").message).root unless model_import(new_resource.foreign_source_name, "opennms_import_node").nil?
+  model_import = REXML::Document.new(model_import(new_resource.foreign_source_name, "opennms_import").message).root unless model_import(new_resource.foreign_source_name, "opennms_import").nil?
   model_import = REXML::Document.new(Opennms::Cookbook::Provision::ModelImport.new("#{new_resource.foreign_source_name}", "#{baseurl}/requisitions/#{new_resource.foreign_source_name}/nodes/#{new_resource.foreign_id}").message) if model_import.nil?
   current_value_does_not_exist! if model_import.nil?
   import_node = model_import.elements["node [@node-label = '#{new_resource.name}' and @foreign-id = '#{new_resource.foreign_id}']"]
