@@ -60,7 +60,7 @@ action :create do
     else
       interface_el = model_import_node.elements["interface[@ip-addr = '#{new_resource.ip_addr}']"]
       if interface_el.nil?
-        i_el = REXML::Element.new('interface')
+        i_el = REXML::Element.new('node/interface')
         i_el.attributes['ip-addr'] = new_resource.ip_addr
         unless new_resource.status.nil?
           i_el.attributes['status'] = new_resource.status
@@ -71,7 +71,7 @@ action :create do
         unless new_resource.snmp_primary.nil?
           i_el.attributes['snmp-primary'] = new_resource.snmp_primary
         end
-        model_import_node.add_element i_el
+        model_import.add_element i_el
         model_import(new_resource.foreign_source_name).message model_import.to_s
       else
         unless new_resource.status.nil?
