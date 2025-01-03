@@ -71,7 +71,7 @@ action :create do
         unless new_resource.snmp_primary.nil?
           i_el.attributes['snmp-primary'] = new_resource.snmp_primary
         end
-        model_import_node.add_element i_el
+        model_import.add_element i_el
         model_import(new_resource.foreign_source_name).message model_import.to_s
       else
         unless new_resource.status.nil?
