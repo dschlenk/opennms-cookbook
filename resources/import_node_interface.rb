@@ -21,7 +21,7 @@ load_current_value do |new_resource|
   interface = node_el.elements["interface[@ip-addr = '#{new_resource.ip_addr}']"] unless model_import_node.nil?
   current_value_does_not_exist! if interface.nil?
   status interface.attributes['status'] unless interface.attributes['status'].nil?
-  managed interface.attributes['managed'] unless interface.attributes['managed']
+  managed interface.attributes['managed'] unless interface.attributes['managed'].nil?
   snmp_primary interface.attributes['snmp-primary'] unless interface.attributes['snmp-primary'].nil?
 end
 
@@ -44,7 +44,7 @@ action :create do
       unless new_resource.status.nil?
         i_el.attributes['status'] = new_resource.status
       end
-      unless new_resource.managed
+      unless new_resource.managed.nil?
         i_el.attributes['managed'] = new_resource.managed
       end
       unless new_resource.snmp_primary.nil?
@@ -56,7 +56,7 @@ action :create do
       unless new_resource.status.nil?
         interface_el.attributes['status'] = new_resource.status
       end
-      nless new_resource.managed
+      nless new_resource.managed.nil?
         interface_el.attributes['managed'] = new_resource.managed
       end
       unless new_resource.snmp_primary.nil?
