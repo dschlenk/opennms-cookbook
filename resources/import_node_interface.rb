@@ -58,8 +58,8 @@ action :create do
       model_import_node.add_element node_el
       model_import(new_resource.foreign_source_name).message model_import.to_s
     else
-      node_el = model_import_node.elements["interface[@ip-addr = '#{new_resource.ip_addr}']"]
-      if node_el.nil?
+      interface_el = model_import_node.elements["interface[@ip-addr = '#{new_resource.ip_addr}']"]
+      if interface_el.nil?
         i_el = REXML::Element.new('interface')
         i_el.attributes['ip-addr'] = new_resource.ip_addr
         unless new_resource.status.nil?
@@ -71,17 +71,17 @@ action :create do
         unless new_resource.snmp_primary.nil?
           i_el.attributes['snmp-primary'] = new_resource.snmp_primary
         end
-        model_import.add_element i_el
+        model_import_node.add_element i_el
         model_import(new_resource.foreign_source_name).message model_import.to_s
       else
         unless new_resource.status.nil?
-          node_el.attributes['status'] = new_resource.status
+          interface_el.attributes['status'] = new_resource.status
         end
         unless new_resource.managed.nil?
-          node_el.attributes['managed'] = new_resource.managed
+          interface_el.attributes['managed'] = new_resource.managed
         end
         unless new_resource.snmp_primary.nil?
-          node_el.attributes['snmp-primary'] = new_resource.snmp_primary
+          interface_el.attributes['snmp-primary'] = new_resource.snmp_primary
         end
         model_import(new_resource.foreign_source_name).message model_import.to_s
       end
