@@ -26,6 +26,7 @@ load_current_value do |new_resource|
   # model_import_node = REXML::Document.new(Opennms::Cookbook::Provision::ModelImport.new("#{new_resource.foreign_source_name}", "#{baseurl}/requisitions/#{new_resource.foreign_source_name}/nodes/#{new_resource.foreign_id}").message) unless model_import.nil?
   # current_value_does_not_exist! if model_import_node.nil?
   import_node = model_import.elements["node [@node-label = '#{new_resource.name}' and @foreign-id = '#{new_resource.foreign_id}']"] unless model_import.nil?
+  current_value_does_not_exist! if import_node.nil?
   import_node.each do |n|
     next unless n['foreign-id'] == new_resource.foreign_id
     n['interface'].each do |iface|
