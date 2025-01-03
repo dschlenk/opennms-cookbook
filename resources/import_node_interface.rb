@@ -6,7 +6,7 @@ property :ip_addr, String, name_property: true
 property :foreign_source_name, String
 property :foreign_id, String
 property :status, Integer
-property :managed, [TrueClass, FalseClass]
+property :managed, [TrueClass, FalseClass], default: false
 property :snmp_primary, String, equal_to: %w(P S N)
 property :sync_import, [TrueClass, FalseClass], default: false
 property :sync_existing, [TrueClass, FalseClass], default: false
