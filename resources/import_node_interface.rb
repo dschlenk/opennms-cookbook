@@ -20,9 +20,9 @@ load_current_value do |new_resource|
   node_el = model_import.elements["node[@foreign-id = '#{new_resource.foreign_id}']"] unless model_import_node.nil?
   interface = node_el.elements["interface[@ip-addr = '#{new_resource.ip_addr}']"] unless node_el.nil?
   current_value_does_not_exist! if interface.nil?
-  status interface.attributes['status'] unless interface.attributes['status'].nil?
-  managed interface.attributes['managed'] unless interface.attributes['managed'].nil?
-  snmp_primary interface.attributes['snmp-primary'] unless interface.attributes['snmp-primary'].nil?
+  status interface.attributes['status'] if  interface.attributes['status'].nil?
+  managed interface.attributes['managed'] if interface.attributes['managed'].nil?
+  snmp_primary interface.attributes['snmp-primary'] if interface.attributes['snmp-primary'].nil?
 end
 
 action_class do
