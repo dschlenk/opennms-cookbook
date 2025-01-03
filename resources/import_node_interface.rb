@@ -56,7 +56,7 @@ action :create do
       unless new_resource.status.nil?
         interface_el.attributes['status'] = new_resource.status
       end
-      nless new_resource.managed.nil?
+      unless new_resource.managed.nil?
         interface_el.attributes['managed'] = new_resource.managed
       end
       unless new_resource.snmp_primary.nil?
@@ -68,4 +68,5 @@ action :create do
       model_import_sync(new_resource.foreign_source_name, true)
     end
   end
+end
 
