@@ -85,7 +85,6 @@ action :create do
           node_el.add_element 'asset', 'name' => key, 'value' => value
         end
       end
-      model_import(new_resource.foreign_source_name).message model_import.to_s
     else
       import_node.attributes['node-label'] = new_resource.name
       import_node.attributes['foreign-id'] = new_resource.foreign_id
@@ -117,8 +116,8 @@ action :create do
           import_node.add_element 'asset', 'name' => key, 'value' => value
         end
       end
-      model_import(new_resource.foreign_source_name).message model_import.to_s
-      end
+    end
+    model_import(new_resource.foreign_source_name).message model_import.to_s
   end
 end
 
