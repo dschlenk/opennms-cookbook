@@ -53,8 +53,8 @@ end
 
 action :create do
   converge_if_changed do
-    model_import_init(new_resource.foreign_source_name, "opennms_import_node")
-    model_import = REXML::Document.new(model_import(new_resource.foreign_source_name, "opennms_import_node").message).root
+    model_import_init(new_resource.foreign_source_name, "opennms_import")
+    model_import = REXML::Document.new(model_import(new_resource.foreign_source_name, "opennms_import").message).root
     model_import = REXML::Document.new(Opennms::Cookbook::Provision::ModelImport.new("#{new_resource.foreign_source_name}", "#{baseurl}/requisitions/#{new_resource.foreign_source_name}/nodes/#{new_resource.foreign_id}").message) if model_import.nil?
     import_node = model_import.elements["node [@node-label = '#{new_resource.name}' and @foreign-id = '#{new_resource.foreign_id}']"] unless model_import.nil?
     if import_node.nil?
@@ -116,13 +116,13 @@ action :create do
         end
       end
     end
-    model_import(new_resource.foreign_source_name, "opennms_import_node").message model_import.to_s
+    model_import(new_resource.foreign_source_name, "opennms_import").message model_import.to_s
   end
 end
 
 action :delete do
   converge_if_changed do
-    model_import = REXML::Document.new(model_import(new_resource.name, "opennms_import_node").message).root unless model_import(new_resource.name, "opennms_import_node").nil?
+    model_import = REXML::Document.new(model_import(new_resource.name, "opennms_import").message).root unless model_import(new_resource.name, "opennms_import").nil?
     import_node = model_import.elements["node [@node-label = '#{new_resource.name}' and @foreign-id = '#{new_resource.foreign_id}']"] unless model_import.nil?
     unless import_node.nil?
       model_import_node_delete(new_resource.foreign_source_name, new_resource.foreign_id)
