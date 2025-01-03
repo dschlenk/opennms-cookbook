@@ -35,8 +35,8 @@ action :create do
   converge_if_changed do
     model_import_init(new_resource.foreign_source_name, "opennms_import_node_interface")
     model_import = REXML::Document.new(model_import(new_resource.foreign_source_name).message).root
-    model_import = REXML::Document.new(Opennms::Cookbook::Provision::ModelImport.new("#{new_resource.foreign_source_name}", "#{baseurl}/requisitions/#{new_resource.foreign_source_name}/nodes/#{new_resource.foreign_id}").message) if model_import.nil?
-    node_el = model_import.elements["node[@foreign-id = '#{new_resource.foreign_id}']"] unless model_import.nil?
+    model_import = REXML::Document.new(Opennms::Cookbook::Provision::ModelImport.new("#{new_resource.foreign_source_name}", "#{baseurl}/requisitions/#{new_resource.foreign_source_name}/nodes/#{new_resource.foreign_id}/interfaces/#{new_resource.name}").message) if model_import.nil?
+    # node_el = model_import.elements["node[@foreign-id = '#{new_resource.foreign_id}']"] unless model_import.nil?
     interface_el = node_el.elements["interface[@ip-addr = '#{new_resource.name}']"] unless node_el.nil?
     if interface_el.nil?
       i_el = REXML::Element.new('interface')
@@ -50,7 +50,7 @@ action :create do
       unless new_resource.snmp_primary.nil?
         i_el.attributes['snmp-primary'] = new_resource.snmp_primary
       end
-      node_el.add_element i_el
+      model_import.add_element i_el
     else
       unless new_resource.status.nil?
         interface_el.attributes['status'] = new_resource.status
