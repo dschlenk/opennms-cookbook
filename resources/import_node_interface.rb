@@ -51,7 +51,6 @@ action :create do
         i_el.attributes['snmp-primary'] = new_resource.snmp_primary
       end
       node_el.add_element i_el
-      model_import(new_resource.foreign_source_name).message model_import.to_s
     else
       unless new_resource.status.nil?
         interface_el.attributes['status'] = new_resource.status
@@ -62,8 +61,9 @@ action :create do
       unless new_resource.snmp_primary.nil?
         interface_el.attributes['snmp-primary'] = new_resource.snmp_primary
       end
-      model_import(new_resource.foreign_source_name).message model_import.to_s
     end
+    model_import(new_resource.foreign_source_name).message model_import.to_s
+
     if !new_resource.sync_import.nil? && new_resource.sync_import
       model_import_sync(new_resource.foreign_source_name, true)
     end
