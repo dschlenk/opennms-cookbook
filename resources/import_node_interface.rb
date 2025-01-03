@@ -26,18 +26,12 @@ load_current_value do |new_resource|
   model_import_node = REXML::Document.new(Opennms::Cookbook::Provision::ModelImport.new("#{new_resource.foreign_source_name}", "#{baseurl}/requisitions/#{new_resource.foreign_source_name}/nodes/#{new_resource.foreign_id}").message) unless model_import.nil?
   # current_value_does_not_exist! if model_import_node.nil?
   #import_node = model_import.elements["node[@foreign-id = '#{new_resource.foreign_id}']"] unless model_import.nil?
-  current_value_does_not_exist! if model_import_node.nil?
-  model_import_node.each do |n|
-    next unless n['foreign-id'] == new_resource.foreign_id
-    n['interface'].each do |iface|
-      if iface['ip-addr'] == new_resource.ip_addr do ||
-        status iface.attributes['status'] unless iface.attributes['status'].nil?
-        managed iface.attributes['managed'] unless iface.attributes['managed'].nil?
-        snmp_primary iface.attributes['snmp-primary'] unless iface.attributes['snmp-primary'].nil?
-      end
-      end
-    end
-  end
+  interface = model_import_node.elements["interface[@ip-addr = '#{new_resource.ip_addr}']"] unless model_import_node.nil?
+  current_value_does_not_exist! if interface.nil?
+  status interface.attributes['status'] unless interface.attributes['status'].nil?
+  managed interface.attributes['managed'] unless interface.attributes['managed'].nil?
+  snmp_primary interface.attributes['snmp-primary'] unless interface.attributes['snmp-primary'].nil?
+
   # model_import_node_interface = REXML::Document.new(Opennms::Cookbook::Provision::ModelImport.new("#{new_resource.foreign_source_name}", "#{baseurl}/requisitions/#{new_resource.foreign_source_name}/nodes/#{new_resource.foreign_id}/interfaces/#{new_resource.ip_addr}").message) unless model_import.nil?
   # interface = model_import_node_interface.elements["interface[@ip-addr = '#{new_resource.ip_addr}']"] unless model_import_node_interface.nil?
   # current_value_does_not_exist! if interface.nil?
