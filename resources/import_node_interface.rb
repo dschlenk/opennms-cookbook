@@ -8,17 +8,8 @@ property :foreign_id, String
 property :status, Integer
 property :managed, [TrueClass, FalseClass]
 property :snmp_primary, String, equal_to: %w(P S N)
-# sync the import. Re-runs discovery.
 property :sync_import, [TrueClass, FalseClass], default: false
-# if the interface already exists, should we still sync?
-property :sync_existing, [TrueClass, FalseClass], default: false
-# If your imports take a long time to sync, you can fiddle with these
-# to prevent convergence continuing before imports finish. One reason
-# you might want to do this is if a service restart happens at the
-# end of the converge before the syncs end, the pending syncs will
-# never happen.
-property :sync_wait_periods, Integer, default: 30
-property :sync_wait_secs, Integer, default: 10
+
 
 load_current_value do |new_resource|
   model_import = REXML::Document.new(model_import(new_resource.foreign_source_name).message).root unless model_import(new_resource.foreign_source_name).nil?

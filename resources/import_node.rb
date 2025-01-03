@@ -11,16 +11,8 @@ property :parent_node_label, String
 property :city, String
 property :building, String
 property :categories, Array
-# key/value pairs - keys must be valid asset fields!
 property :assets, Hash, callbacks: { 'should be a hash with key/value pairs that are both strings' => lambda { |p| !p.any? { |k, v| !k.is_a?(String) || !v.is_a?(String) } }, }
 property :sync_import, [TrueClass, FalseClass], default: false
-# If your imports take a long time to sync, you can fiddle with these
-# to prevent convergence continuing before imports finish. One reason
-# you might want to do this is if a service restart happens at the
-# end of the converge before the syncs end, the pending syncs will
-# never happen.
-property :sync_wait_periods, Integer, default: 30
-property :sync_wait_secs, Integer, default: 10
 
 load_current_value do |new_resource|
   node_assets = {}
