@@ -62,7 +62,7 @@ action :create do
   converge_if_changed do
     import_url = "/requisitions/#{new_resource.foreign_source_name}"
     model_import_init(new_resource.foreign_source_name, import_url)
-    model_import = REXML::Document.new(model_import(new_resource.name).message).root
+    model_import = REXML::Document.new(model_import(new_resource.foreign_source_name).message).root
     #model_import = REXML::Document.new(Opennms::Cookbook::Provision::ModelImport.new(new_resource.foreign_source_name, "#{baseurl}/requisitions/#{new_resource.foreign_source_name}").message) if model_import.nil?
     #model_import = REXML::Document.new(model_import(new_resource.foreign_source_name).message).root unless model_import(new_resource.foreign_source_name).nil?
     #model_import_node = REXML::Document.new(Opennms::Cookbook::Provision::ModelImport.new("#{new_resource.foreign_source_name}", "#{baseurl}/requisitions/#{new_resource.foreign_source_name}/nodes/#{new_resource.foreign_id}").message) unless model_import.nil?
