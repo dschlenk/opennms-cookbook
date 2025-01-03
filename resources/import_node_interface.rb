@@ -9,6 +9,9 @@ property :status, Integer
 property :managed, [TrueClass, FalseClass]
 property :snmp_primary, String, equal_to: %w(P S N)
 property :sync_import, [TrueClass, FalseClass], default: false
+property :sync_existing, [TrueClass, FalseClass], default: false
+property :sync_wait_periods, Integer, default: 30
+property :sync_wait_secs, Integer, default: 10
 
 
 load_current_value do |new_resource|

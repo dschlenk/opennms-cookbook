@@ -13,6 +13,8 @@ property :building, String
 property :categories, Array
 property :assets, Hash, callbacks: { 'should be a hash with key/value pairs that are both strings' => lambda { |p| !p.any? { |k, v| !k.is_a?(String) || !v.is_a?(String) } }, }
 property :sync_import, [TrueClass, FalseClass], default: false
+property :sync_wait_periods, Integer, default: 30
+property :sync_wait_secs, Integer, default: 10
 
 load_current_value do |new_resource|
   node_assets = {}
