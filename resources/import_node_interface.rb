@@ -17,7 +17,7 @@ property :sync_wait_secs, Integer, default: 10
 load_current_value do |new_resource|
   model_import = REXML::Document.new(model_import(new_resource.foreign_source_name).message).root unless model_import(new_resource.foreign_source_name).nil?
   model_import = REXML::Document.new(Opennms::Cookbook::Provision::ModelImport.new("#{new_resource.foreign_source_name}", "#{baseurl}/requisitions/#{new_resource.foreign_source_name}/nodes/#{new_resource.foreign_id}").message) if model_import.nil?
-  node_el = model_import.elements["node[@foreign-id = '#{new_resource.foreign_id}']"] unless model_import_node.nil?
+  node_el = model_import.elements["node[@foreign-id = '#{new_resource.foreign_id}']"] unless model_import.nil?
   interface = node_el.elements["interface[@ip-addr = '#{new_resource.ip_addr}']"] unless node_el.nil?
   current_value_does_not_exist! if interface.nil?
   status interface.attributes['status'] if  interface.attributes['status'].nil?
@@ -36,7 +36,7 @@ action :create do
     model_import_init(new_resource.foreign_source_name)
     model_import = REXML::Document.new(model_import(new_resource.foreign_source_name).message).root
     model_import = REXML::Document.new(Opennms::Cookbook::Provision::ModelImport.new("#{new_resource.foreign_source_name}", "#{baseurl}/requisitions/#{new_resource.foreign_source_name}/nodes/#{new_resource.foreign_id}").message) if model_import.nil?
-    node_el = model_import.elements["node[@foreign-id = '#{new_resource.foreign_id}']"] unless model_import_node.nil?
+    node_el = model_import.elements["node[@foreign-id = '#{new_resource.foreign_id}']"] unless model_import.nil?
     interface_el = node_el.elements["interface[@ip-addr = '#{new_resource.ip_addr}']"] unless node_el.nil?
     if interface_el.nil?
       i_el = REXML::Element.new('interface')
