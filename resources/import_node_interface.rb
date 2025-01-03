@@ -22,22 +22,12 @@ property :sync_wait_secs, Integer, default: 10
 
 load_current_value do |new_resource|
   model_import = REXML::Document.new(model_import(new_resource.foreign_source_name).message).root unless model_import(new_resource.foreign_source_name).nil?
-  # current_value_does_not_exist! if model_import.nil?
   model_import_node = REXML::Document.new(Opennms::Cookbook::Provision::ModelImport.new("#{new_resource.foreign_source_name}", "#{baseurl}/requisitions/#{new_resource.foreign_source_name}/nodes/#{new_resource.foreign_id}").message) unless model_import.nil?
-  # current_value_does_not_exist! if model_import_node.nil?
-  #import_node = model_import.elements["node[@foreign-id = '#{new_resource.foreign_id}']"] unless model_import.nil?
   interface = model_import_node.elements["interface[@ip-addr = '#{new_resource.ip_addr}']"] unless model_import_node.nil?
   current_value_does_not_exist! if interface.nil?
   status interface.attributes['status'] unless interface.attributes['status'].nil?
   managed interface.attributes['managed'] unless interface.attributes['managed'].nil?
   snmp_primary interface.attributes['snmp-primary'] unless interface.attributes['snmp-primary'].nil?
-
-  # model_import_node_interface = REXML::Document.new(Opennms::Cookbook::Provision::ModelImport.new("#{new_resource.foreign_source_name}", "#{baseurl}/requisitions/#{new_resource.foreign_source_name}/nodes/#{new_resource.foreign_id}/interfaces/#{new_resource.ip_addr}").message) unless model_import.nil?
-  # interface = model_import_node_interface.elements["interface[@ip-addr = '#{new_resource.ip_addr}']"] unless model_import_node_interface.nil?
-  # current_value_does_not_exist! if interface.nil?
-  # status interface.attributes['status'] unless interface.attributes['status'].nil?
-  # managed interface.attributes['managed'] unless interface.attributes['managed'].nil?
-  # snmp_primary interface.attributes['snmp-primary'] unless interface.attributes['snmp-primary'].nil?
 end
 
 action_class do
@@ -51,34 +41,46 @@ action :create do
     model_import_init(new_resource.foreign_source_name)
     model_import = REXML::Document.new(model_import(new_resource.foreign_source_name).message).root
     model_import_node = REXML::Document.new(Opennms::Cookbook::Provision::ModelImport.new("#{new_resource.foreign_source_name}", "#{baseurl}/requisitions/#{new_resource.foreign_source_name}/nodes/#{new_resource.foreign_id}").message) unless model_import.nil?
-    #import_node = model_import_node.elements["node [@node-label = '#{new_resource.name}' and @foreign-id = '#{new_resource.foreign_id}']"] unless model_import_node.nil?
-    #model_import_node_interface = REXML::Document.new(Opennms::Cookbook::Provision::ModelImport.new("#{new_resource.foreign_source_name}", "#{baseurl}/requisitions/#{new_resource.foreign_source_name}/nodes/#{new_resource.foreign_id}/interfaces/#{new_resource.ip_addr}").message) unless model_import.nil?
-    #import_node = model_import.elements["node [@node-label = '#{new_resource.name}' and @foreign-id = '#{new_resource.foreign_id}']"] unless model_import.nil?
-    interface = model_import_node.elements["interface[@ip-addr = '#{new_resource.ip_addr}']"] unless model_import_node.nil?
-    if interface.nil?
-      i_el = model_import.add_element 'interface', 'ip-addr' => new_resource.ip_addr
+    if model_import_node.nil?
+      node_el = model_import.add_element 'node', 'foreign-id' => new_resource.foreign_id
+      node_el.add_element 'interface', 'ip-addr' => new_resource.ip_addr
       unless new_resource.status.nil?
-        i_el.attributes['status'] = new_resource.status
+        node_el.attributes['status'] = new_resource.status
       end
       unless new_resource.managed.nil?
-        i_el.attributes['managed'] = new_resource.managed
+        node_el.attributes['managed'] = new_resource.managed
       end
       unless new_resource.snmp_primary.nil?
-        i_el.attributes['snmp-primary'] = new_resource.snmp_primary
+        node_el.attributes['snmp-primary'] = new_resource.snmp_primary
       end
       model_import(new_resource.foreign_source_name).message model_import.to_s
     else
-      unless new_resource.status.nil?
-        interface.attributes['status'] = new_resource.status
+      node_el = model_import_node.elements["node/interface[@ip-addr = '#{new_resource.ip_addr}']"]
+      if node_el.nil?
+        i_el = model_import.add_element 'interface', 'ip-addr' => new_resource.ip_addr
+        unless new_resource.status.nil?
+          i_el.attributes['status'] = new_resource.status
+        end
+        unless new_resource.managed.nil?
+          i_el.attributes['managed'] = new_resource.managed
+        end
+        unless new_resource.snmp_primary.nil?
+          i_el.attributes['snmp-primary'] = new_resource.snmp_primary
+        end
+        model_import(new_resource.foreign_source_name).message model_import.to_s
+      else
+        unless new_resource.status.nil?
+          node_el.attributes['status'] = new_resource.status
+        end
+        unless new_resource.managed.nil?
+          node_el.attributes['managed'] = new_resource.managed
+        end
+        unless new_resource.snmp_primary.nil?
+          node_el.attributes['snmp-primary'] = new_resource.snmp_primary
+        end
+        model_import(new_resource.foreign_source_name).message model_import.to_s
       end
-      unless new_resource.managed.nil?
-        interface.attributes['managed'] = new_resource.managed
-      end
-      unless new_resource.snmp_primary.nil?
-        interface.attributes['snmp-primary'] = new_resource.snmp_primary
-      end
-      model_import(new_resource.foreign_source_name).message model_import.to_s
-      end
+    end
   end
 end
 
