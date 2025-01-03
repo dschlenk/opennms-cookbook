@@ -75,9 +75,9 @@ module Opennms
           model_import_create(name, import_type) unless model_import_exist?(name)
         end
 
-        def model_import(name)
+        def model_import(name, import_type)
           return unless model_import_exist?(name)
-          find_resource!(:http_request, "opennms_import POST #{name}")
+          find_resource!(:http_request, "#{import_type} POST #{name}")
         end
 
         private
@@ -102,6 +102,7 @@ module Opennms
               end
             end
           end
+
 
           def model_import_sync(name, rescan)
             url = "#{baseurl}/requisitions/#{name}/import"
