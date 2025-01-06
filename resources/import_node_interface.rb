@@ -2,9 +2,9 @@ include Opennms::Cookbook::Provision::ModelImportHttpRequest
 include Opennms::XmlHelper
 include Opennms::Rbac
 
-property :ip_addr, String, name_property: true
-property :foreign_source_name, String
-property :foreign_id, String
+property :ip_addr, String, identity: true
+property :foreign_source_name,  String, required: true
+property :foreign_id, String, required: true
 property :status, Integer
 property :managed, [TrueClass, FalseClass], default: false
 property :snmp_primary, String, equal_to: %w(P S N)
@@ -12,7 +12,6 @@ property :sync_import, [TrueClass, FalseClass], default: false
 property :sync_existing, [TrueClass, FalseClass], default: false
 property :sync_wait_periods, Integer, default: 30
 property :sync_wait_secs, Integer, default: 10
-
 
 load_current_value do |new_resource|
   model_import = REXML::Document.new(model_import(new_resource.foreign_source_name).message).root unless model_import(new_resource.foreign_source_name).nil?
@@ -22,7 +21,20 @@ load_current_value do |new_resource|
   node_el = model_import.elements["node[@foreign-id = '#{new_resource.foreign_id}']"] unless model_import.nil?
   interface = node_el.elements["interface[@ip-addr = '#{new_resource.name}']"] unless node_el.nil?
   current_value_does_not_exist! if interface.nil?
-  status interface.attributes['status'] if  interface.attributes['status'].nil?
+
+  sym = 'status' if interface.attributes['status'].nil?
+  status_value = interface.attributes['status']
+  if new_resource.send(sym).is_a?(Integer)
+    value = begin
+      Integer(status_value)
+    rescue
+      status_value
+    end
+    send(sym, value)
+  else
+    status interface.attributes['status'] if interface.attributes['status'].nil?
+  end
+
   managed interface.attributes['managed'] if interface.attributes['managed'].nil?
   snmp_primary interface.attributes['snmp-primary'] if interface.attributes['snmp-primary'].nil?
 end
