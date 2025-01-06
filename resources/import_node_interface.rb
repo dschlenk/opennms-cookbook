@@ -22,17 +22,20 @@ load_current_value do |new_resource|
   interface = node_el.elements["interface[@ip-addr = '#{new_resource.name}']"] unless node_el.nil?
   current_value_does_not_exist! if interface.nil?
 
-  sym = 'status' if interface.attributes['status'].nil?
-  status_value = interface.attributes['status']
-  if new_resource.send(sym).is_a?(Integer)
-    value = begin
-      Integer(status_value)
-    rescue
-      status_value
+  unless interface.attributes['status'].nil?
+    sym = 'status' if interface.attributes['status'].nil?
+    status_value = interface.attributes['status']
+
+    if new_resource.send(sym).is_a?(Integer)
+      value = begin
+        Integer(status_value)
+      rescue
+        status_value
+      end
+      send(sym, value)
+    else
+      status interface.attributes['status'] if interface.attributes['status'].nil?
     end
-    send(sym, value)
-  else
-    status interface.attributes['status'] if interface.attributes['status'].nil?
   end
 
   managed interface.attributes['managed'] if interface.attributes['managed'].nil?
