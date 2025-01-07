@@ -15,8 +15,10 @@ property :sync_wait_secs, Integer, default: 10
 
 load_current_value do |new_resource|
   model_import = REXML::Document.new(model_import(new_resource.foreign_source_name).message).root unless model_import(new_resource.foreign_source_name).nil?
+  Chef::Log.debug "Missing requisition #{new_resource.foreign_source_name}." unless model_import.nil?
   current_value_does_not_exist! if model_import.nil?
   model_import = REXML::Document.new(Opennms::Cookbook::Provision::ModelImport.new("#{new_resource.foreign_source_name}", "#{baseurl}/requisitions/#{new_resource.foreign_source_name}/nodes/#{new_resource.foreign_id}").message)
+  Chef::Log.debug "Missing Node #{new_resource.foreign_source_name}." unless model_import.nil?
   current_value_does_not_exist! if model_import.nil?
   node_el = model_import.elements["node[@foreign-id = '#{new_resource.foreign_id}']"] unless model_import.nil?
   interface = node_el.elements["interface[@ip-addr = '#{new_resource.name}']"] unless node_el.nil?
@@ -52,12 +54,12 @@ action :create do
   converge_if_changed do
     model_import_init(new_resource.foreign_source_name)
     model_import_root = REXML::Document.new(model_import(new_resource.foreign_source_name).message).root
-    Chef::Application.fatal!("Missing requisition #{new_resource.foreign_source_name}.") unless model_import_root.nil?
+    Chef::Log.debug"Missing requisition #{new_resource.foreign_source_name}." unless model_import_root.nil?
     current_value_does_not_exist! if model_import_root.nil?
     model_import_root = REXML::Document.new(Opennms::Cookbook::Provision::ModelImport.new("#{new_resource.foreign_source_name}", "#{baseurl}/requisitions/#{new_resource.foreign_source_name}/nodes/#{new_resource.foreign_id}").message) if model_import_root.nil?
     current_value_does_not_exist! if model_import_root.nil?
     node_el = model_import_root.elements["node[@foreign-id = '#{new_resource.foreign_id}']"] unless model_import_root.nil?
-    Chef::Application.fatal!("Missing node with foreign ID #{new_resource.foreign_id}.") unless node_el.nil?
+    Chef::Log.debug "Missing node with foreign ID #{new_resource.foreign_id}." unless node_el.nil?
     interface_el = node_el.elements["interface[@ip-addr = '#{new_resource.name}']"] unless node_el.nil?
     if interface_el.nil?
       i_el = REXML::Element.new('interface')
