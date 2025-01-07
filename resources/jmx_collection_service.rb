@@ -54,10 +54,3 @@ action :create do
     end
   end
 end
-
-action :create_if_missing do
-  collectd_resource_init
-  package = collectd_resource.variables[:collectd_config].packages[new_resource.package_name]
-  service = package.service(service_name: new_resource.service_name)
-  run_action(:create) if service.nil?
-end
