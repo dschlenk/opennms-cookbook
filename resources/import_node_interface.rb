@@ -40,7 +40,7 @@ load_current_value do |new_resource|
   meta_datas = []
   meta_data = {}
   node_category = []
-  managed interface.attributes['managed'] if interface.attributes['managed'].nil?
+  managed interface.attributes['managed']
   snmp_primary interface.attributes['snmp-primary'] if interface.attributes['snmp-primary'].nil?
 
   unless interface.elements['category'].nil?
