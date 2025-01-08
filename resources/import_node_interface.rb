@@ -43,8 +43,8 @@ load_current_value do |new_resource|
   managed interface.attributes['managed'] if interface.attributes['managed'].nil?
   snmp_primary interface.attributes['snmp-primary'] if interface.attributes['snmp-primary'].nil?
 
-  unless import_node.elements['category'].nil?
-    import_node.each_element('category') do |category|
+  unless interface.elements['category'].nil?
+    interface.each_element('category') do |category|
       node_category.push category.attributes['name'].to_s
     end
     categories node_category
