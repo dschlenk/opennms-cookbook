@@ -1,6 +1,5 @@
-include Opennms::Cookbook::Provision::ModelImportHttpRequest
-include Opennms::XmlHelper
-include Opennms::Rbac
+use 'partial/_import'
+unified_mode true
 
 property :service_name, String, name_attribute: true
 property :foreign_source_name, String, required: true
