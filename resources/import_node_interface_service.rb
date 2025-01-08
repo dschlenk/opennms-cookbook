@@ -93,14 +93,13 @@ action :create do
           ms_el.add_element 'asset', 'name' => key, 'value' => value
         end
       end
-      interface_el.unshift ms_el
     else
       unless name.nil?
         service.attributes['service-name'] = name
       end
       if !new_resource.categories.nil?
         new_resource.categories.each do |category|
-          service.unshift 'category', 'name' => category
+          service.add_element 'category', 'name' => category
         end
       end
       unless new_resource.meta_data.nil?
