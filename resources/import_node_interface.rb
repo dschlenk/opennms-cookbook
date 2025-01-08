@@ -2,7 +2,7 @@ use 'partial/_import'
 unified_mode true
 
 property :ip_addr, String, identity: true
-property :foreign_source_name,  String, required: true
+property :foreign_source_name,  String, identity: true, required: true
 property :foreign_id, String, required: true
 property :status, Integer
 property :managed, [TrueClass, FalseClass], default: false
@@ -22,7 +22,7 @@ load_current_value do |new_resource|
   node_el = model_import.elements["node[@foreign-id = '#{new_resource.foreign_id}']"] unless model_import.nil?
   interface = node_el.elements["interface[@ip-addr = '#{new_resource.name}']"] unless node_el.nil?
   current_value_does_not_exist! if interface.nil?
-
+  foreign_source_name new_resource.foreign_source_name
   unless interface.attributes['status'].nil?
     sym = 'status' if interface.attributes['status'].nil?
     status_value = interface.attributes['status']
