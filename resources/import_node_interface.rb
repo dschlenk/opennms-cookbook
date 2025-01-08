@@ -19,6 +19,7 @@ load_current_value do |new_resource|
   current_value_does_not_exist! if model_import.nil?
   node_el = model_import.elements["node[@foreign-id = '#{new_resource.foreign_id}']"] unless model_import.nil?
   interface = node_el.elements["interface[@ip-addr = '#{new_resource.name}']"] unless node_el.nil?
+  current_value_does_not_exist! if interface.nil?
   foreign_source_name new_resource.foreign_source_name
   foreign_id new_resource.foreign_id
   unless interface.attributes['status'].nil?
