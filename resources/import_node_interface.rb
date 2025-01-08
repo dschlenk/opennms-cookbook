@@ -109,7 +109,6 @@ action :create do
         end
       end
       unless new_resource.meta_data.nil?
-        mdata = {}
         new_resource.meta_data.each do |metadata|
           metadata.each do |context, key, value|
             if key == 'context'
@@ -141,7 +140,6 @@ action :create do
         end
       end
       unless new_resource.meta_data.nil?
-        mdata = {}
         new_resource.meta_data.each do |metadata|
           metadata.each do |context, key, value|
             if key == 'context'

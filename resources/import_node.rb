@@ -17,6 +17,8 @@ property :sync_wait_secs, Integer, default: 10
 load_current_value do |new_resource|
   node_assets = {}
   node_category = []
+  meta_datas = []
+  meta_data = {}
   model_import = REXML::Document.new(model_import(new_resource.foreign_source_name).message).root unless model_import(new_resource.foreign_source_name).nil?
   model_import = REXML::Document.new(Opennms::Cookbook::Provision::ModelImport.new("#{new_resource.foreign_source_name}", "#{baseurl}/requisitions/#{new_resource.foreign_source_name}/nodes/#{new_resource.foreign_id}").message) if model_import.nil?
   current_value_does_not_exist! if model_import.nil?
@@ -40,6 +42,15 @@ load_current_value do |new_resource|
       node_assets[asset.attributes['key'].to_s] = asset.attributes['value'].to_s
     end
     assets node_assets
+  end
+  unless import_node.elements['meta-data'].nil?
+    import_node.each_element('meta-data') do |mdata|
+      mdata.each do |key, value|
+        meta_data[key.to_s] = value
+      end
+      meta_datas.push (meta_data)
+      meta_data meta_datas
+    end
   end
 end
 
@@ -82,6 +93,15 @@ action :create do
           node_el.add_element 'asset', 'name' => key, 'value' => value
         end
       end
+      unless new_resource.meta_data.nil?
+        new_resource.meta_data.each do |metadata|
+          metadata.each do |context, key, value|
+            if key == 'context'
+              node_el.add_element 'meta-data', 'context' => context, 'key' => key, 'value' => value
+            end
+          end
+        end
+      end
     else
       import_node.attributes['node-label'] = new_resource.name
       import_node.attributes['foreign-id'] = new_resource.foreign_id
@@ -111,6 +131,16 @@ action :create do
         import_node.elements.delete_all 'asset'
         new_resource.assets.each do |key, value|
           import_node.add_element 'asset', 'name' => key, 'value' => value
+        end
+      end
+
+      unless new_resource.meta_data.nil?
+        new_resource.meta_data.each do |metadata|
+          metadata.each do |context, key, value|
+            if key == 'context'
+              import_node.add_element 'meta-data', 'context' => context, 'key' => key, 'value' => value
+            end
+          end
         end
       end
     end
