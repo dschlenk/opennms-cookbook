@@ -10,13 +10,13 @@ class ImportNodeInterfaceService < Inspec.resource(1)
   '
 
   example '
-    describe import_node_interface_service(\'service\', \'ip_addr\', \'foreign_source_name\', \'foreign_id\') do
+    describe import_node_interface_service(\'service\', \'ip_addr\', \'foreign_source_name\', \'foreign_id\', 1243) do
       it { should exist }
     end
   '
 
-  def initialize(service, ip_addr, foreign_source_name, foreign_id)
-    parsed_url = Addressable::URI.parse("http://admin:admin@localhost:8980/opennms/rest/requisitions/#{foreign_source_name}/nodes/#{foreign_id}/interfaces/#{ip_addr}/services/#{service}").normalize.to_str
+  def initialize(service, ip_addr, foreign_source_name, foreign_id, port=8980)
+    parsed_url = Addressable::URI.parse("http://admin:admin@localhost:#{port}/opennms/rest/requisitions/#{foreign_source_name}/nodes/#{foreign_id}/interfaces/#{ip_addr}/services/#{service}").normalize.to_str
     begin
       service = RestClient.get(parsed_url)
     rescue StandardError
