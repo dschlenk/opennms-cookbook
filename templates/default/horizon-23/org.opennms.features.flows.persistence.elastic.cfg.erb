@@ -1,5 +1,0 @@
-elasticUrl = <%= @elastic['url'] %>
-<% @elastic.each do |k, v| -%>
-  <% next if k == 'url' -%>
-<%= k %> = <%= v %>
-<% end -%>
