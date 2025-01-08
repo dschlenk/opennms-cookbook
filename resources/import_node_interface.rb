@@ -15,8 +15,7 @@ property :sync_wait_secs, Integer, default: 10
 load_current_value do |new_resource|
   model_import = REXML::Document.new(model_import(new_resource.foreign_source_name).message).root unless model_import(new_resource.foreign_source_name).nil?
   Chef::Log.debug "Missing requisition #{new_resource.foreign_source_name}." unless model_import.nil?
-  current_value_does_not_exist! if model_import.nil?
-  model_import = REXML::Document.new(Opennms::Cookbook::Provision::ModelImport.new("#{new_resource.foreign_source_name}", "#{baseurl}/requisitions/#{new_resource.foreign_source_name}/nodes/#{new_resource.foreign_id}").message)
+  model_import = REXML::Document.new(Opennms::Cookbook::Provision::ModelImport.new("#{new_resource.foreign_source_name}", "#{baseurl}/requisitions/#{new_resource.foreign_source_name}/nodes/#{new_resource.foreign_id}").message) if model_import.nil?
   Chef::Log.debug "Missing Node #{new_resource.foreign_source_name}." unless model_import.nil?
   current_value_does_not_exist! if model_import.nil?
   node_el = model_import.elements["node[@foreign-id = '#{new_resource.foreign_id}']"] unless model_import.nil?
