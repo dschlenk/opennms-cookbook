@@ -4,7 +4,7 @@ unified_mode true
 property :name, String, identity: true
 property :node_label, String
 property :foreign_source_name,  String, identity: true, required: true
-property :foreign_id, String, required: true
+property :foreign_id, String, identity: true, required: true
 property :parent_foreign_source, String
 property :parent_foreign_id, String
 property :parent_node_label, String
@@ -25,6 +25,7 @@ load_current_value do |new_resource|
   import_node = model_import.elements["node [@node-label = '#{new_resource.name}' and @foreign-id = '#{new_resource.foreign_id}']"]
   current_value_does_not_exist! if import_node.nil?
   foreign_source_name new_resource.foreign_source_name
+  foreign_id new_resource.foreign_id
   node_label import_node.attributes['node-label'] if import_node.attributes['node-label'].nil?
   foreign_id import_node.attributes['foreign-id'] if import_node.attributes['foreign-id'].nil?
   parent_foreign_source import_node.attributes['parent-foreign-source'] if import_node.attributes['parent-foreign-source'].nil?
