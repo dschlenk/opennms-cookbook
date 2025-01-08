@@ -87,12 +87,7 @@ action :create do
       end
       if !new_resource.categories.nil?
         new_resource.categories.each do |category|
-          node_el.add_element 'category', 'name' => category
-        end
-      end
-      unless new_resource.assets.nil?
-        new_resource.assets.each do |key, value|
-          node_el.add_element 'asset', 'name' => key, 'value' => value
+          node_el.unshift 'category', 'name' => category
         end
       end
       unless new_resource.meta_data.nil?
@@ -102,6 +97,11 @@ action :create do
               node_el.add_element 'meta-data', 'context' => context, 'key' => key, 'value' => value
             end
           end
+        end
+      end
+      unless new_resource.assets.nil?
+        new_resource.assets.each do |key, value|
+          node_el.add_element 'asset', 'name' => key, 'value' => value
         end
       end
     else
