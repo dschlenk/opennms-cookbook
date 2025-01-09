@@ -17,11 +17,12 @@ property :sync_wait_secs, kind_of: Integer, default: 10
 load_current_value do |new_resource|
   name = new_resource.name || new_resource.service_name
   model_import_root = REXML::Document.new(model_import(new_resource.foreign_source_name).message).root unless model_import(new_resource.foreign_source_name).nil?
-  model_import_root = REXML::Document.new(Opennms::Cookbook::Provision::ModelImport.new("#{new_resource.foreign_source_name}", "#{baseurl}/requisitions/#{new_resource.foreign_source_name}/nodes/#{new_resource.foreign_id}").message) if model_import_root.nil?
   current_value_does_not_exist! if model_import_root.nil?
-  node_el = model_import_root.elements["node[@foreign-id = '#{new_resource.foreign_id}']"] unless model_import_root.nil?
-  interface_el = node_el.elements["interface[@ip-addr = '#{new_resource.ip_addr}']"] unless node_el.nil?
-  service = interface_el.elements["monitored-service[@service-name = '#{name}']"] unless interface_el.nil?
+  model_import_interface_service = REXML::Document.new(Opennms::Cookbook::Provision::ModelImport.new("#{new_resource.foreign_source_name}", "#{baseurl}/requisitions/#{new_resource.foreign_source_name}/nodes/#{new_resource.foreign_id}").message) if model_import_root.nil?
+  current_value_does_not_exist! if model_import_interface_service.nil?
+  #node_el = model_import_root.elements["node[@foreign-id = '#{new_resource.foreign_id}']"] unless model_import_root.nil?
+  #interface_el = node_el.elements["interface[@ip-addr = '#{new_resource.ip_addr}']"] unless node_el.nil?
+  #service = interface_el.elements["monitored-service[@service-name = '#{name}']"] unless interface_el.nil?
   current_value_does_not_exist! if service.nil?
   foreign_source_name new_resource.foreign_source_name
   foreign_id new_resource.foreign_id
@@ -67,11 +68,13 @@ action :create do
     model_import_init(new_resource.foreign_source_name)
     model_import_root = REXML::Document.new(model_import(new_resource.foreign_source_name).message).root unless model_import(new_resource.foreign_source_name).nil?
     model_import_root = REXML::Document.new(Opennms::Cookbook::Provision::ModelImport.new("#{new_resource.foreign_source_name}", "#{baseurl}/requisitions/#{new_resource.foreign_source_name}/nodes/#{new_resource.foreign_id}").message) if model_import_root.nil?
-    current_value_does_not_exist! if model_import_root.nil?
+    model_import_root = REXML::Document.new(Opennms::Cookbook::Provision::ModelImport.new("#{new_resource.foreign_source_name}", "#{baseurl}/requisitions/#{new_resource.foreign_source_name}/nodes/#{new_resource.foreign_id}/services/#{name}").message) if model_import_root.nil?
     node_el = model_import_root.elements["node[@foreign-id = '#{new_resource.foreign_id}']"] unless model_import_root.nil?
     interface_el = node_el.elements["interface[@ip-addr = '#{new_resource.ip_addr}']"] unless node_el.nil?
-    service = interface_el.elements["monitored-service[@service-name = '#{name}']"] unless interface_el.nil?
-    if service.nil?
+    current_value_does_not_exist! if model_import_root.nil?
+    service = REXML::Document.new(Opennms::Cookbook::Provision::ModelImport.new("#{new_resource.foreign_source_name}", "#{baseurl}/requisitions/#{new_resource.foreign_source_name}/nodes/#{new_resource.foreign_id}/services/#{name}").message) if model_import_root.nil?
+    service = interface_el.elements["monitored-service[@service-name = '#{name}']"] unless service.nil?
+    if model_import_interface_service.nil?
       ms_el = REXML::Element.new('monitored-service')
       ms_el.attributes['service-name'] = name
       if !new_resource.categories.nil?
