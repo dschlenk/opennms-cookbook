@@ -92,9 +92,7 @@ action :create do
       end
       unless new_resource.meta_data.nil?
         new_resource.meta_data.each do |metadata|
-          metadata.each do |context, key, value|
-            node_el.add_element 'meta-data', 'context' => context, 'key' => key, 'value' => value
-          end
+            node_el.add_element 'meta-data', 'context' => metadata.attributes['context'], 'key' => metadata.attributes['key'], 'value' => metadata.attributes['key']
         end
       end
       unless new_resource.assets.nil?
@@ -136,7 +134,7 @@ action :create do
     unless new_resource.meta_data.nil?
       new_resource.meta_data.each do |metadata|
         metadata.each do |context, key, value|
-          import_node.add_element 'meta-data', 'context' => context, 'key' => key, 'value' => value
+          import_node.add_element 'meta-data', 'context' => metadata.acontext, 'key' => key, 'value' => value
         end
       end
     end
