@@ -7,7 +7,7 @@ load_current_value do |new_resource|
   foreign_source = REXML::Document.new(fs_resource(new_resource.name).message) unless fs_resource(new_resource.name).nil?
   foreign_source = REXML::Document.new(Opennms::Cookbook::Provision::ForeignSource.new(new_resource.name, "#{baseurl}/foreignSources/#{new_resource.name}").message) if foreign_source.nil?
   current_value_does_not_exist! if foreign_source.nil?
-  scan_interval xml_element_text(foreign_source.elements['/scan-interval'])
+  scan_interval xml_element_text(foreign_source.elements['/foreign-source/scan-interval'])
 end
 
 action_class do
