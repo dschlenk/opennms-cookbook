@@ -1,18 +1,9 @@
-use 'partial/_import'
+use 'partial/_import_node'
 unified_mode true
 
 property :service_name, String, name_attribute: true
-property :foreign_source_name, String, required: true
 property :foreign_id, String, required: true
 property :ip_addr, String, required: true, identity: true
-property :sync_import, [TrueClass, FalseClass], default: false
-# If your imports take a long time to sync, you can fiddle with these
-# to prevent convergence continuing before imports finish. One reason
-# you might want to do this is if a service restart happens at the
-# end of the converge before the syncs end, the pending syncs will
-# never happen.
-property :sync_wait_periods, kind_of: Integer, default: 30
-property :sync_wait_secs, kind_of: Integer, default: 10
 
 load_current_value do |new_resource|
   name = new_resource.name || new_resource.service_name
@@ -76,48 +67,39 @@ action :create do
       ms_el.attributes['service-name'] = name
       if !new_resource.categories.nil?
         new_resource.categories.each do |category|
-          ms_el.unshift 'category', 'name' => category
+          ms_el.add_element 'category', 'name' => category
         end
       end
       unless new_resource.meta_data.nil?
         new_resource.meta_data.each do |metadata|
-          metadata.each do |context, key, value|
-            if key == 'context'
-              ms_el.add_element 'meta-data', 'context' => context, 'key' => key, 'value' => value
-            end
-          end
-        end
-      end
-      unless new_resource.assets.nil?
-        new_resource.assets.each do |key, value|
-          ms_el.add_element 'asset', 'name' => key, 'value' => value
+          ms_el.add_element 'meta-data', 'context' => metadata['context'], 'key' => metadata['key'], 'value' => metadata['value']
         end
       end
       interface_el.unshift ms_el
     else
-      unless name.nil?
-        service.attributes['service-name'] = name
-      end
       if !new_resource.categories.nil?
+        service.elements.delete_all 'category'
+        # find the sibling to insert before
+        b = service.elements['asset']
+        b = service.elements['meta-data'] if b.nil?
         new_resource.categories.each do |category|
-          service.add_element 'category', 'name' => category
-        end
-      end
-      unless new_resource.meta_data.nil?
-        new_resource.meta_data.each do |metadata|
-          metadata.each do |context, key, value|
-            if key == 'context'
-              service.add_element 'meta-data', 'context' => context, 'key' => key, 'value' => value
-            end
+          if b.nil?
+            service.add_element 'category', 'name' => category
+          else
+            c = REXML::Element.new('category')
+            c.attributes['name'] = category
+            service.insert_before(b, c)
           end
         end
       end
-      unless new_resource.assets.nil?
-        new_resource.assets.each do |key, value|
-          service.add_element 'asset', 'name' => key, 'value' => value
+      unless new_resource.meta_data.nil?
+        service.elements.delete_all 'meta-data'
+        new_resource.meta_data.each do |metadata|
+          service.add_element 'meta-data', 'context' => metadata['context'], 'key' => metadata['key'], 'value' => metadata['value']
         end
       end
     end
+    model_import(new_resource.foreign_source_name).message model_import_root.to_s
     if !new_resource.sync_import.nil? && new_resource.sync_import
       model_import_sync(new_resource.foreign_source_name, true)
     end

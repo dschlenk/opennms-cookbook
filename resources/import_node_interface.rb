@@ -1,16 +1,12 @@
-use 'partial/_import'
+use 'partial/_import_node'
 unified_mode true
 
 property :ip_addr, String, identity: true
-property :foreign_source_name,  String, identity: true, required: true
 property :foreign_id, String, required: true
 property :status, Integer
 property :managed, [TrueClass, FalseClass], default: false
 property :snmp_primary, String, equal_to: %w(P S N)
-property :sync_import, [TrueClass, FalseClass], default: false
-property :sync_existing, [TrueClass, FalseClass], default: false
-property :sync_wait_periods, Integer, default: 30
-property :sync_wait_secs, Integer, default: 10
+property :sync_existing, [TrueClass, FalseClass], default: false, desired_state: false
 
 load_current_value do |new_resource|
   model_import = REXML::Document.new(model_import(new_resource.foreign_source_name).message).root unless model_import(new_resource.foreign_source_name).nil?
@@ -95,21 +91,12 @@ action :create do
       end
       if !new_resource.categories.nil?
         new_resource.categories.each do |category|
-          i_el.unshift 'category', 'name' => category
+          i_el.add_element 'category', 'name' => category
         end
       end
       unless new_resource.meta_data.nil?
         new_resource.meta_data.each do |metadata|
-          metadata.each do |context, key, value|
-            if key == 'context'
-              i_el.add_element 'meta-data', 'context' => context, 'key' => key, 'value' => value
-            end
-          end
-        end
-      end
-      unless new_resource.assets.nil?
-        new_resource.assets.each do |key, value|
-          i_el.add_element 'asset', 'name' => key, 'value' => value
+          i_el.add_element 'meta-data', 'context' => metadata['context'], 'key' => metadata['key'], 'value' => metadata['value']
         end
       end
       node_el.unshift i_el
@@ -124,23 +111,22 @@ action :create do
         interface_el.attributes['snmp-primary'] = new_resource.snmp_primary
       end
       if !new_resource.categories.nil?
+        interface_el.elements.delete_all 'category'
+        b = interface_el.elements['meta-data'] if b.nil?
         new_resource.categories.each do |category|
-          interface_el.add_element 'category', 'name' => category
-        end
-      end
-
-      unless new_resource.assets.nil?
-        new_resource.assets.each do |key, value|
-          interface_el.add_element 'asset', 'name' => key, 'value' => value
+          if b.nil?
+            interface_el.add_element 'category', 'name' => category
+          else
+            c = REXML::Element.new('category')
+            c.attributes['name'] = category
+            interface_el.insert_before(b, c)
+          end
         end
       end
       unless new_resource.meta_data.nil?
+        interface_el.elements.delete_all 'meta-data'
         new_resource.meta_data.each do |metadata|
-          metadata.each do |context, key, value|
-            if key == 'context'
-              interface_el.add_element 'meta-data', 'context' => context, 'key' => key, 'value' => value
-            end
-          end
+          interface_el.add_element 'meta-data', 'context' => metadata['context'], 'key' => metadata['key'], 'value' => metadata['value']
         end
       end
     end
