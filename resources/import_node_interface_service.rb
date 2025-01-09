@@ -70,9 +70,6 @@ action :create do
     current_value_does_not_exist! if model_import_root.nil?
     node_el = model_import_root.elements["node[@foreign-id = '#{new_resource.foreign_id}']"] unless model_import_root.nil?
     interface_el = node_el.elements["interface[@ip-addr = '#{new_resource.ip_addr}']"] unless node_el.nil?
-    if interface_el.nil?
-      node_el.add_element 'interface', 'ip-addr' => new_resource.ip_addr
-    end
     service = interface_el.elements["monitored-service[@service-name = '#{name}']"] unless interface_el.nil?
     if service.nil?
       ms_el = REXML::Element.new('monitored-service')
@@ -97,10 +94,9 @@ action :create do
         end
       end
       if interface_el.nil?
-        node_el.add_element 'interface'
-      else
-        interface_el.unshift ms_el
+        interface_el = node_el.add_element 'interface', 'ip-addr' => new_resource.ip_addr
       end
+      interface_el.unshift ms_el
     else
       unless name.nil?
         service.attributes['service-name'] = name
