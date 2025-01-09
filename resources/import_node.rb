@@ -92,7 +92,7 @@ action :create do
       end
       unless new_resource.meta_data.nil?
         new_resource.meta_data.each do |metadata|
-          import_node.add_element 'meta-data', 'context' => metadata['context'], 'key' => metadata['key'], 'value' => metadata['value']
+          node_el.add_element 'meta-data', 'context' => metadata['context'], 'key' => metadata['key'], 'value' => metadata['value']
         end
       end
     else
