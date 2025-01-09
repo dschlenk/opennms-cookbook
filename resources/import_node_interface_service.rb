@@ -22,7 +22,7 @@ load_current_value do |new_resource|
   #interface = model_import.elements["node[@foreign-id = '#{new_resource.foreign_id}']"] unless model_import.nil?
   #model_import = REXML::Document.new(Opennms::Cookbook::Provision::ModelImport.new("#{new_resource.foreign_source_name}", "#{baseurl}/requisitions/#{new_resource.foreign_source_name}/nodes/#{new_resource.foreign_id}/services/#{name}").message) if model_import_root.nil?
   #interface = model_import.elements["interface[@ip-addr = '#{new_resource.ip_addr}']"] unless node_el.nil?
-  service = model_import.elements["node[@foreign-id = '#{new_resource.foreign_id}']/interface[@ip-addr = '#{new_resource.ip_addr}']/monitored-service[@service-name = '#{name}']"]  unless model_import.nil?
+  service = model_import.elements["node[@foreign-id = '#{new_resource.foreign_id}'] and node/interface[@ip-addr = '#{new_resource.ip_addr}'] and node/interface/monitored-service[@service-name = '#{name}']"]  unless model_import.nil?
   current_value_does_not_exist! if service.nil?
   foreign_source_name new_resource.foreign_source_name
   foreign_id new_resource.foreign_id
@@ -69,8 +69,8 @@ action :create do
     model_import_root = REXML::Document.new(Opennms::Cookbook::Provision::ModelImport.new("#{new_resource.foreign_source_name}", "#{baseurl}/requisitions/#{new_resource.foreign_source_name}/nodes/#{new_resource.foreign_id}").message) if model_import_root.nil?
     #node_el = model_import_root.elements["node[@foreign-id = '#{new_resource.foreign_id}']"] unless model_import_root.nil?
     #model_import_root = REXML::Document.new(Opennms::Cookbook::Provision::ModelImport.new("#{new_resource.foreign_source_name}", "#{baseurl}/requisitions/#{new_resource.foreign_source_name}/nodes/#{new_resource.foreign_id}/services/#{name}").message) if model_import_root.nil?
-    interface_el = model_import_root.elements["node[@foreign-id = '#{new_resource.foreign_id}']/interface[@ip-addr = '#{new_resource.ip_addr}']"] unless model_import_root.nil?
-    service = model_import.elements["node[@foreign-id = '#{new_resource.foreign_id}']/interface[@ip-addr = '#{new_resource.ip_addr}']/monitored-service[@service-name = '#{name}']"]  unless model_import_root.nil?
+    interface_el = model_import_root.elements["node[@foreign-id = '#{new_resource.foreign_id}'] and node/interface[@ip-addr = '#{new_resource.ip_addr}']"] unless model_import_root.nil?
+    service = model_import.elements["node[@foreign-id = '#{new_resource.foreign_id}']and node/interface[@ip-addr = '#{new_resource.ip_addr}'] and node/interface/monitored-service[@service-name = '#{name}']"]  unless model_import_root.nil?
     #current_value_does_not_exist! if model_import_root.nil?
     #interface_el = node_el.elements["interface[@ip-addr = '#{new_resource.ip_addr}']"] unless node_el.nil?
     #current_value_does_not_exist! if interface_el.nil?
