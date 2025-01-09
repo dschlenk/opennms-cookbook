@@ -4,7 +4,7 @@ unified_mode true
 property :service_name, String, name_attribute: true
 property :foreign_source_name, String, required: true
 property :foreign_id, String, required: true
-property :ip_addr, String, required: true
+property :ip_addr, String, required: true, identity: true
 property :sync_import, [TrueClass, FalseClass], default: false
 # If your imports take a long time to sync, you can fiddle with these
 # to prevent convergence continuing before imports finish. One reason
@@ -26,6 +26,7 @@ load_current_value do |new_resource|
   current_value_does_not_exist! if service.nil?
   foreign_source_name new_resource.foreign_source_name
   foreign_id new_resource.foreign_id
+  ip_addr new_resource.ip_addr
   service_name name
   node_assets = {}
   meta_datas = []
