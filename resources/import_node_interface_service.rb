@@ -19,8 +19,8 @@ load_current_value do |new_resource|
   model_import_root = REXML::Document.new(model_import(new_resource.foreign_source_name).message).root unless model_import(new_resource.foreign_source_name).nil?
   model_import_root = REXML::Document.new(Opennms::Cookbook::Provision::ModelImport.new("#{new_resource.foreign_source_name}", "#{baseurl}/requisitions/#{new_resource.foreign_source_name}/nodes/#{new_resource.foreign_id}").message) if model_import_root.nil?
   current_value_does_not_exist! if model_import_root.nil?
-  interface_el = model_import_root.elements["node[@foreign-id = '#{new_resource.foreign_id}' and node/interface[@ip-addr = '#{new_resource.ip_addr}']"] unless model_import_root.nil?
-  service = interface_el.elements["monitored-service[@service-name = '#{name}']"] if  service.nil?
+  interface_el = model_import_root.elements["interface[@ip-addr = '#{new_resource.ip_addr}']"] unless model_import_root.nil?
+  service = interface_el.elements["monitored-service[@service-name = '#{name}']"] unless interface_el.nil?
   current_value_does_not_exist! if service.nil?
   foreign_source_name new_resource.foreign_source_name
   foreign_id new_resource.foreign_id
