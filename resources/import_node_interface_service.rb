@@ -19,10 +19,10 @@ load_current_value do |new_resource|
   model_import = REXML::Document.new(model_import(new_resource.foreign_source_name).message).root unless model_import(new_resource.foreign_source_name).nil?
   Chef::Log.debug "Missing requisition #{new_resource.foreign_source_name}." unless model_import.nil?
   model_import = REXML::Document.new(Opennms::Cookbook::Provision::ModelImport.new("#{new_resource.foreign_source_name}", "#{baseurl}/requisitions/#{new_resource.foreign_source_name}/nodes/#{new_resource.foreign_id}").message) if model_import.nil?
-  current_value_does_not_exist! if model_import.nil?
-  node_el = model_import.elements["node[@foreign-id = '#{new_resource.foreign_id}']"] unless model_import.nil?
-  interface = node_el.elements["interface[@ip-addr = '#{new_resource.ip_addr}']"] unless node_el.nil?
-  service = interface.elements["monitored-service[@service-name = '#{name}']"]  unless interface.nil?
+  #interface = model_import.elements["node[@foreign-id = '#{new_resource.foreign_id}']"] unless model_import.nil?
+  #model_import = REXML::Document.new(Opennms::Cookbook::Provision::ModelImport.new("#{new_resource.foreign_source_name}", "#{baseurl}/requisitions/#{new_resource.foreign_source_name}/nodes/#{new_resource.foreign_id}/services/#{name}").message) if model_import_root.nil?
+  #interface = model_import.elements["interface[@ip-addr = '#{new_resource.ip_addr}']"] unless node_el.nil?
+  service = model_import.elements["node[@foreign-id = '#{new_resource.foreign_id}']/interface[@ip-addr = '#{new_resource.ip_addr}']/monitored-service[@service-name = '#{name}']"]  unless model_import.nil?
   current_value_does_not_exist! if service.nil?
   foreign_source_name new_resource.foreign_source_name
   foreign_id new_resource.foreign_id
@@ -67,13 +67,15 @@ action :create do
     model_import_init(new_resource.foreign_source_name)
     model_import_root = REXML::Document.new(model_import(new_resource.foreign_source_name).message).root unless model_import(new_resource.foreign_source_name).nil?
     model_import_root = REXML::Document.new(Opennms::Cookbook::Provision::ModelImport.new("#{new_resource.foreign_source_name}", "#{baseurl}/requisitions/#{new_resource.foreign_source_name}/nodes/#{new_resource.foreign_id}").message) if model_import_root.nil?
-    node_el = model_import_root.elements["node[@foreign-id = '#{new_resource.foreign_id}']"] unless model_import_root.nil?
-    model_import_root = REXML::Document.new(Opennms::Cookbook::Provision::ModelImport.new("#{new_resource.foreign_source_name}", "#{baseurl}/requisitions/#{new_resource.foreign_source_name}/nodes/#{new_resource.foreign_id}//services/#{name}").message) if model_import_root.nil?
-    current_value_does_not_exist! if model_import_root.nil?
-    interface_el = node_el.elements["interface[@ip-addr = '#{new_resource.ip_addr}']"] unless node_el.nil?
-    current_value_does_not_exist! if interface_el.nil?
-    Chef::Log.debug "Missing interface #{new_resource.ip_addr}." if interface_el.nil?
-    service = interface_el.elements["monitored-service[@service-name = '#{name}']"] unless interface_el.nil?
+    #node_el = model_import_root.elements["node[@foreign-id = '#{new_resource.foreign_id}']"] unless model_import_root.nil?
+    #model_import_root = REXML::Document.new(Opennms::Cookbook::Provision::ModelImport.new("#{new_resource.foreign_source_name}", "#{baseurl}/requisitions/#{new_resource.foreign_source_name}/nodes/#{new_resource.foreign_id}/services/#{name}").message) if model_import_root.nil?
+    interface_el = model_import_root.elements["node[@foreign-id = '#{new_resource.foreign_id}']/interface[@ip-addr = '#{new_resource.ip_addr}']"] unless model_import_root.nil?
+    service = model_import.elements["node[@foreign-id = '#{new_resource.foreign_id}']/interface[@ip-addr = '#{new_resource.ip_addr}']/monitored-service[@service-name = '#{name}']"]  unless model_import_root.nil?
+    #current_value_does_not_exist! if model_import_root.nil?
+    #interface_el = node_el.elements["interface[@ip-addr = '#{new_resource.ip_addr}']"] unless node_el.nil?
+    #current_value_does_not_exist! if interface_el.nil?
+    #Chef::Log.debug "Missing interface #{new_resource.ip_addr}." if interface_el.nil?
+    #service = interface_el.elements["monitored-service[@service-name = '#{name}']"] unless interface_el.nil?
     if service.nil?
       ms_el = REXML::Element.new('monitored-service')
       ms_el.attributes['service-name'] = name
