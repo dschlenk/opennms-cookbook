@@ -92,10 +92,9 @@ action :create do
       end
       unless new_resource.meta_data.nil?
         new_resource.meta_data.each do |metadata|
-          metadata.each do |key, value|
-
+          metadata.each do |context, key, value|
+            node_el.add_element 'meta-data', 'context' => context, 'key' => key, 'value' => value
           end
-          node_el.add_element 'meta-data', 'context' => context, 'key' => key, 'value' => value
         end
       end
       unless new_resource.assets.nil?
