@@ -20,6 +20,7 @@ opennms_import_node 'nodeB' do
   categories %w(Servers Test)
   assets 'vendorPhone' => '411', 'serialNumber' => 'SN12838931'
   sync_import false
+  meta_data [{'context' => 'foo', 'key' => 'bar', 'value' => 'baz' }, {'context' => 'foofoo', 'key' => 'barbar', 'value' => 'bazbaz' }]
 end
 
 node_c_foreign_id = 'nodeC'
@@ -34,6 +35,7 @@ opennms_import_node 'nodeC' do
   building 'Barn'
   categories %w(Servers Test)
   assets 'vendorPhone' => '511', 'serialNumber' => 'SN12838932'
+  meta_data [{'context' => 'foo', 'key' => 'bar', 'value' => 'baz' }, {'context' => 'foofoo', 'key' => 'barbar', 'value' => 'bazbaz' }]
   sync_import false
   sync_wait_periods 30
   sync_wait_secs 10

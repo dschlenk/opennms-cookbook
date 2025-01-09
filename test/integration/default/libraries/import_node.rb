@@ -20,6 +20,8 @@ class ImportNode < Inspec.resource(1)
       its(\'city\') { should eq \'Tulsa\' }
       its(\'categories\') { should eq [\'Servers\', \'Test\'] }
       its(\'assets\') { should eq { \'vendorPhone\' => \'411\' }
+      its(\'meta_data\') { should eq [{ \'context\' => \'foo\' \'key\' => \'bar\', \'value\' => \'baz\'}]
+
     end
   '
 
@@ -53,6 +55,15 @@ class ImportNode < Inspec.resource(1)
         assets[a_el.attributes['name']] = a_el.attributes['value']
       end
       @params[:assets] = assets
+      meta_data = {}
+      meta_datas = []
+      n_el.each_element('meta-data') do |a_el|
+        a_el.each do |key, value|
+          meta_data[key.to_s] = value
+        end
+        meta_datas.push (meta_data)
+      end
+      @params[:meta_data] = meta_datas
     end
   end
 
