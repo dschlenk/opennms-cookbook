@@ -21,6 +21,7 @@ provisioner:
       conf:
         env:
           START_TIMEOUT: 60
+      upgrade: true
       postgresql:
         user_vault: creds
     yum:
@@ -55,7 +56,6 @@ suites:
           enabled: true
         scv:
           vault: creds
-        upgrade: true
         users:
           admin:
             vault: creds
@@ -71,9 +71,6 @@ suites:
       inspec_tests:
         - path: test/integration/default
         - path: test/integration/upgrade
-    attributes:
-      opennms:
-        upgrade: true
   - name: no_upgrade
     driver:
       image: dokken/oraclelinux-9
