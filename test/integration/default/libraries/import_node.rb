@@ -57,11 +57,12 @@ class ImportNode < Inspec.resource(1)
       @params[:assets] = assets
       meta_data = {}
       meta_datas = []
+      @params = {}
       n_el.each_element('meta-data') do |a_el|
-        a_el.each do |key, value|
-          meta_data[key.to_s] = value
-        end
-        meta_datas.push (meta_data)
+        meta_data[a_el.attributes['context']] = a_el.attributes['context']
+        meta_data[a_el.attributes['key']] = a_el.attributes['key']
+        meta_data[a_el.attributes['value']] = a_el.attributes['value']
+        meta_datas.push meta_data
       end
       @params[:meta_data] = meta_datas
     end
