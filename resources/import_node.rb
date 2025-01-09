@@ -42,12 +42,12 @@ load_current_value do |new_resource|
   end
   unless import_node.elements['meta-data'].nil?
     import_node.each_element('meta-data') do |mdata|
-      mdata.each do |key, value|
-        meta_data[key.to_s] = value
-      end
+      meta_data['context'] = mdata['context']
+      meta_data['key'] =  mdata['key']
+      meta_data['value'] =  mdata['value']
       meta_datas.push (meta_data)
-      meta_data meta_datas
     end
+    meta_data meta_datas
   end
 end
 
