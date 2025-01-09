@@ -93,9 +93,6 @@ action :create do
           ms_el.add_element 'asset', 'name' => key, 'value' => value
         end
       end
-      if interface_el.nil?
-        interface_el = node_el.add_element 'interface', 'ip-addr' => new_resource.ip_addr
-      end
       interface_el.unshift ms_el
     else
       unless name.nil?
