@@ -93,7 +93,7 @@ action :create do
           ms_el.add_element 'asset', 'name' => key, 'value' => value
         end
       end
-      interface_el.unshift ms_el
+      interface_el.add_element ms_el
     else
       unless name.nil?
         service.attributes['service-name'] = name
