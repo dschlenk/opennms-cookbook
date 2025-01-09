@@ -19,7 +19,8 @@ load_current_value do |new_resource|
   model_import_root = REXML::Document.new(model_import(new_resource.foreign_source_name).message).root unless model_import(new_resource.foreign_source_name).nil?
   model_import_root = REXML::Document.new(Opennms::Cookbook::Provision::ModelImport.new("#{new_resource.foreign_source_name}", "#{baseurl}/requisitions/#{new_resource.foreign_source_name}/nodes/#{new_resource.foreign_id}").message) if model_import_root.nil?
   current_value_does_not_exist! if model_import_root.nil?
-  interface_el = model_import_root.elements["interface[@ip-addr = '#{new_resource.ip_addr}']"] unless model_import_root.nil?
+  node_el = model_import_root.elements["node[@foreign-id = '#{new_resource.foreign_id}']"] unless model_import_root.nil?
+  interface_el = node_el.elements["interface[@ip-addr = '#{new_resource.name}']"] unless node_el.nil?
   service = interface_el.elements["monitored-service[@service-name = '#{name}']"] unless interface_el.nil?
   current_value_does_not_exist! if service.nil?
   foreign_source_name new_resource.foreign_source_name
@@ -67,8 +68,9 @@ action :create do
     model_import_root = REXML::Document.new(model_import(new_resource.foreign_source_name).message).root unless model_import(new_resource.foreign_source_name).nil?
     model_import_root = REXML::Document.new(Opennms::Cookbook::Provision::ModelImport.new("#{new_resource.foreign_source_name}", "#{baseurl}/requisitions/#{new_resource.foreign_source_name}/nodes/#{new_resource.foreign_id}").message) if model_import_root.nil?
     current_value_does_not_exist! if model_import_root.nil?
-    interface_el = node_el.elements["interface[@ip-addr = '#{new_resource.ip_addr}']"] unless model_import_root.nil?
-    service = interface_el.elements["monitored-service[@service-name = '#{name}']"] if interface_el.nil?
+    node_el = model_import_root.elements["node[@foreign-id = '#{new_resource.foreign_id}']"] unless model_import_root.nil?
+    interface_el = node_el.elements["interface[@ip-addr = '#{new_resource.name}']"] unless node_el.nil?
+    service = interface_el.elements["monitored-service[@service-name = '#{name}']"] unless interface_el.nil?
     if service.nil?
       ms_el = REXML::Element.new('monitored-service')
       ms_el.attributes['service-name'] = name
