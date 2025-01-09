@@ -90,14 +90,17 @@ action :create do
           node_el.add_element 'category', 'name' => category
         end
       end
-      unless new_resource.meta_data.nil?
-        new_resource.meta_data.each do |metadata|
-            node_el.add_element 'meta-data', 'context' => metadata.attributes['context'], 'key' => metadata.attributes['key'], 'value' => metadata.attributes['key']
-        end
-      end
       unless new_resource.assets.nil?
         new_resource.assets.each do |key, value|
           node_el.add_element 'asset', 'name' => key, 'value' => value
+        end
+      end
+      unless new_resource.meta_data.nil?
+        new_resource.meta_data.each do |metadata|
+          metadata.each do |context, key, value|
+            meta_data['meta-data', 'context' => context, 'key' => key, 'value' => value]
+          end
+          node_el.add_element meta_data
         end
       end
     else import_node.attributes['node-label'] = new_resource.name
@@ -123,18 +126,16 @@ action :create do
         import_node.add_element 'category', 'name' => category
       end
     end
-
     unless new_resource.assets.nil?
       import_node.elements.delete_all 'asset'
       new_resource.assets.each do |key, value|
         import_node.add_element 'asset', 'name' => key, 'value' => value
       end
     end
-
     unless new_resource.meta_data.nil?
       new_resource.meta_data.each do |metadata|
         metadata.each do |context, key, value|
-          import_node.add_element 'meta-data', 'context' => metadata.acontext, 'key' => key, 'value' => value
+          import_node.add_element 'meta-data', 'context' => metadata.context, 'key' => key, 'value' => value
         end
       end
     end
