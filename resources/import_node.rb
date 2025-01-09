@@ -3,7 +3,7 @@ unified_mode true
 
 property :name, String, identity: true
 property :node_label, String
-property :foreign_source_name,  String, identity: true, required: true
+property :foreign_source_name, String, identity: true, required: true
 property :foreign_id, String, identity: true, required: true
 property :parent_foreign_source, String
 property :parent_foreign_id, String
@@ -47,12 +47,12 @@ load_current_value do |new_resource|
   end
   unless import_node.elements['meta-data'].nil?
     import_node.each_element('meta-data') do |mdata|
-      mdata.each do |key, value|
-        meta_data[key.to_s] = value
-      end
-      meta_datas.push (meta_data)
-      meta_data meta_datas
+      meta_data[mdata.attributes['context']] = mdata.attributes['context']
+      meta_data[mdata.attributes['key']] = mdata.attributes['key']
+      meta_data[mdata.attributes['value']] = mdata.attributes['value']
+      meta_datas.push meta_data
     end
+    meta_data meta_datas
   end
 end
 
@@ -103,47 +103,44 @@ action :create do
           node_el.add_element 'asset', 'name' => key, 'value' => value
         end
       end
-    else
-      import_node.attributes['node-label'] = new_resource.name
-      import_node.attributes['foreign-id'] = new_resource.foreign_id
-      unless new_resource.parent_foreign_source.nil?
-        import_node.attributes['parent-foreign-source'] = new_resource.parent_foreign_source
+    else import_node.attributes['node-label'] = new_resource.name
+    import_node.attributes['foreign-id'] = new_resource.foreign_id
+    unless new_resource.parent_foreign_source.nil?
+      import_node.attributes['parent-foreign-source'] = new_resource.parent_foreign_source
+    end
+    unless new_resource.parent_foreign_id.nil?
+      import_node.attributes['parent-foreign-id'] = new_resource.parent_foreign_id
+    end
+    unless new_resource.parent_node_label.nil?
+      import_node.attributes['parent-node-label'] = new_resource.parent_node_label
+    end
+    unless new_resource.city.nil?
+      import_node.attributes['city'] = new_resource.city
+    end
+    unless new_resource.building.nil?
+      import_node.attributes['building'] = new_resource.building
+    end
+    if !new_resource.categories.nil?
+      import_node.elements.delete_all 'category'
+      new_resource.categories.each do |category|
+        import_node.add_element 'category', 'name' => category
       end
-      unless new_resource.parent_foreign_id.nil?
-        import_node.attributes['parent-foreign-id'] = new_resource.parent_foreign_id
-      end
-      unless new_resource.parent_node_label.nil?
-        import_node.attributes['parent-node-label'] = new_resource.parent_node_label
-      end
-      unless new_resource.city.nil?
-        import_node.attributes['city'] = new_resource.city
-      end
-      unless new_resource.building.nil?
-        import_node.attributes['building'] = new_resource.building
-      end
-      if !new_resource.categories.nil?
-        import_node.elements.delete_all 'category'
-        new_resource.categories.each do |category|
-          import_node.add_element 'category', 'name' => category
-        end
-      end
+    end
 
-      unless new_resource.assets.nil?
-        import_node.elements.delete_all 'asset'
-        new_resource.assets.each do |key, value|
-          import_node.add_element 'asset', 'name' => key, 'value' => value
-        end
+    unless new_resource.assets.nil?
+      import_node.elements.delete_all 'asset'
+      new_resource.assets.each do |key, value|
+        import_node.add_element 'asset', 'name' => key, 'value' => value
       end
+    end
 
-      unless new_resource.meta_data.nil?
-        new_resource.meta_data.each do |metadata|
-          metadata.each do |context, key, value|
-            if key == 'context'
-              import_node.add_element 'meta-data', 'context' => context, 'key' => key, 'value' => value
-            end
-          end
+    unless new_resource.meta_data.nil?
+      new_resource.meta_data.each do |metadata|
+        metadata.each do |context, key, value|
+          import_node.add_element 'meta-data', 'context' => context, 'key' => key, 'value' => value
         end
       end
+    end
     end
     model_import(new_resource.foreign_source_name).message model_import.to_s
   end
