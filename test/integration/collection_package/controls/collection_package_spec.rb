@@ -17,7 +17,7 @@ control 'collection_package' do
   end
 
   describe collection_package('create_if_missing') do
-    package_name 'foo'  
+    package_name 'foo'
     its('remote') { should eq true }
     its('filter') { should eq "IPADDR != '0.0.0.0' & categoryName == 'foo'" }
     its('specifics') { should eq ['10.0.0.1'] }
