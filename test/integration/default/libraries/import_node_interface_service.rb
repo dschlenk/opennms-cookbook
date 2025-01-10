@@ -2,6 +2,7 @@
 require 'rexml/document'
 require 'rest_client'
 require 'addressable/uri'
+use 'partial/_import_node'
 class ImportNodeInterfaceService < Inspec.resource(1)
   name 'import_node_interface_service'
 
