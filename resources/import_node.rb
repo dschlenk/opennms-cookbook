@@ -14,7 +14,7 @@ load_current_value do |new_resource|
   node_assets = {}
   node_category = []
   meta_datas = []
-  meta_data = {}
+  mdata = {}
   model_import = REXML::Document.new(model_import(new_resource.foreign_source_name).message).root unless model_import(new_resource.foreign_source_name).nil?
   model_import = REXML::Document.new(Opennms::Cookbook::Provision::ModelImport.new("#{new_resource.foreign_source_name}", "#{baseurl}/requisitions/#{new_resource.foreign_source_name}/nodes/#{new_resource.foreign_id}").message) if model_import.nil?
   current_value_does_not_exist! if model_import.nil?
@@ -41,11 +41,11 @@ load_current_value do |new_resource|
     assets node_assets
   end
   unless import_node.elements['meta-data'].nil?
-    import_node.each_element('meta-data') do |mdata|
-      meta_data['context'] = mdata['context']
-      meta_data['key'] =  mdata['key']
-      meta_data['value'] =  mdata['value']
-      meta_datas.push (meta_data)
+    import_node.each_element('meta-data') do |data|
+      mdata['context'] = data['context']
+      mdata['key'] =  data['key']
+      mdata['value'] =  data['value']
+      meta_datas.push (mdata)
     end
     meta_data meta_datas
   end

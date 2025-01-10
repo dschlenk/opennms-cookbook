@@ -20,7 +20,7 @@ load_current_value do |new_resource|
   service_name name
   node_assets = {}
   meta_datas = []
-  meta_data = {}
+  mdata = {}
   node_category = []
 
   unless service.elements['category'].nil?
@@ -35,14 +35,14 @@ load_current_value do |new_resource|
     end
     assets node_assets
   end
-  unless service.elements['meta-data'].nil?
-    service.each_element('meta-data') do |mdata|
-      mdata.each do |key, value|
-        meta_data[key.to_s] = value
-      end
-      meta_datas.push (meta_data)
-      meta_data meta_datas
+  unless import_node.elements['meta-data'].nil?
+    import_node.each_element('meta-data') do |data|
+      mdata['context'] = data['context']
+      mdata['key'] =  data['key']
+      mdata['value'] =  data['value']
+      meta_datas.push (mdata)
     end
+    meta_data meta_datas
   end
 end
 
