@@ -265,7 +265,7 @@ EOL
     it { should exist }
     its('content') { should match %r{<severity>Minor</severity>} }
   end
-  
+
   describe eventconf('create-if-missing-event.xml') do
     it { should exist }
     its('position') { should eq 26 }
