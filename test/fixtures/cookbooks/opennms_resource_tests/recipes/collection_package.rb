@@ -19,6 +19,7 @@ end
 
 # functional :create_if_missing
 opennms_collection_package 'create_if_missing' do
+  package_name 'foo'
   filter "IPADDR != '0.0.0.0' & categoryName == 'foo'"
   specifics ['10.0.0.1']
   include_ranges [{ 'begin' => '10.0.1.1', 'end' => '10.0.1.254' }]
