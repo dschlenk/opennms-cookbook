@@ -2,9 +2,8 @@ include Opennms::Cookbook::Provision::ModelImportHttpRequest
 include Opennms::XmlHelper
 include Opennms::Rbac
 
-use 'partial/_import'
-unified_mode true
 property :name, String, identity: true
+property :foreign_source_name, String, default: 'imported:'
 
 load_current_value do |new_resource|
   model_import = REXML::Document.new(model_import(new_resource.name).message) unless model_import(new_resource.name).nil?
