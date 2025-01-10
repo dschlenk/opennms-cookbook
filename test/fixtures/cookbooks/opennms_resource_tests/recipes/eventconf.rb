@@ -55,3 +55,13 @@ opennms_eventconf 'apache.httpd.syslog.events.xml' do
   source 'https://raw.githubusercontent.com/opennms-config-modules/apache/039f5011485f508ec49177883c8f36cceb4120f4/events/apache.httpd.syslog.events.xml'
   action [:create, :delete]
 end
+
+opennms_eventconf 'create-if-missing-event.xml' do
+  position 'override'
+  action :create_if_missing
+end
+
+opennms_eventconf 'noop-create-if-missing-event.xml' do
+  position 'override'
+  action :noop_create_if_missing
+end
