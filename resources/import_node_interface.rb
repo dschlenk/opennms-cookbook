@@ -45,12 +45,6 @@ load_current_value do |new_resource|
     end
     categories node_category
   end
-  unless interface.elements['asset'].nil?
-    interface.each_element('asset') do |asset|
-      node_assets[asset.attributes['key'].to_s] = asset.attributes['value'].to_s
-    end
-    assets node_assets
-  end
   unless interface.elements['meta-data'].nil?
     interface.each_element('meta-data') do |data|
       mdata['context'] = data['context']
