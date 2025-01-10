@@ -28,19 +28,19 @@ class ImportNodeInterfaceService < Inspec.resource(1)
     @exists = !s_el.nil?
     if @exists
       @params = {}
-      n_el.each_element('category') do |c_el|
+      s_el.each_element('category') do |c_el|
         categories.push c_el.attributes['name']
       end
       @params[:categories] = categories
       assets = {}
-      n_el.each_element('asset') do |a_el|
+      s_el.each_element('asset') do |a_el|
         assets[a_el.attributes['name']] = a_el.attributes['value']
       end
       @params[:assets] = assets
       meta_data = {}
       meta_datas = []
       @params = {}
-      n_el.each_element('meta-data') do |a_el|
+      s_el.each_element('meta-data') do |a_el|
         meta_data['context'] = a_el['context']
         meta_data['key'] =  a_el['key']
         meta_data['value'] =  a_el['value']
