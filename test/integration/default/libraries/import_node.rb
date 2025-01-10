@@ -54,16 +54,15 @@ class ImportNode < Inspec.resource(1)
         assets[a_el.attributes['name']] = a_el.attributes['value']
       end
       @params[:assets] = assets
-      meta_data = {}
       meta_datas = []
-      @params = {}
       n_el.each_element('meta-data') do |a_el|
+        meta_data = {}
         meta_data['context'] = a_el['context']
         meta_data['key'] =  a_el['key']
         meta_data['value'] =  a_el['value']
         meta_datas.push meta_data
       end
-      @params[:meta_data] = meta_datas
+      @meta_data = meta_datas
     end
   end
 
@@ -74,4 +73,5 @@ class ImportNode < Inspec.resource(1)
   def method_missing(name)
     @params[name]
   end
+  attr_reader :meta_data
 end

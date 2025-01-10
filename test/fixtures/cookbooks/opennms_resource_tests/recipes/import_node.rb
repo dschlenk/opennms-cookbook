@@ -19,8 +19,8 @@ opennms_import_node 'nodeB' do
   building 'HQ'
   categories %w(Servers Test)
   assets 'vendorPhone' => '411', 'serialNumber' => 'SN12838931'
-  sync_import false
   meta_data [{'context' => 'foo', 'key' => 'bar', 'value' => 'baz' }, {'context' => 'foofoo', 'key' => 'barbar', 'value' => 'bazbaz' }]
+  sync_import false
 end
 
 node_c_foreign_id = 'nodeC'
