@@ -47,4 +47,7 @@ class ImportNodeInterfaceService < Inspec.resource(1)
   def exist?
     @exists
   end
+  attr_reader :categories
+
+  attr_reader :meta_data
 end
