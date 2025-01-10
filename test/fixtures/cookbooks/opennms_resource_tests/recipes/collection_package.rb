@@ -32,7 +32,8 @@ opennms_collection_package 'create_if_missing' do
 end
 
 # create_if_missing that doesn't do anything
-opennms_collection_package 'create_if_missing' do
+opennms_collection_package 'noop create_if_missing' do
+  package_name 'foo'  # The package name is specified as 'foo', but it does nothing
   filter "IPADDR != '0.0.0.0'"
   specifics ['10.0.0.1']
   include_ranges [{ 'begin' => '10.0.1.1', 'end' => '10.0.1.254' }]
@@ -42,5 +43,5 @@ opennms_collection_package 'create_if_missing' do
   if_alias_domain 'foo.com'
   remote true
   outage_calendars ['ignore localhost on mondays']
-  action :create_if_missing
+  action :create_if_missing  # This will not perform any changes if package 'foo' already exists
 end
