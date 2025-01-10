@@ -28,6 +28,5 @@ opennms_import_node_interface_service 'ICMP' do
   sync_wait_periods 30
   sync_wait_secs 10
   categories %w(Servers Test)
-  assets 'vendorPhone' => '511', 'serialNumber' => 'SN12838932'
   meta_data [{'context' => 'foo', 'key' => 'bar', 'value' => 'baz' }, {'context' => 'foofoo', 'key' => 'barbar', 'value' => 'bazbaz' }]
 end
