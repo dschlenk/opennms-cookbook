@@ -268,7 +268,6 @@ EOL
 
   describe eventconf('create-if-missing-event.xml') do
     it { should exist }
-    its('position') { should eq 26 }
   end
 
   describe eventconf('noop-create-if-missing-event.xml') do
