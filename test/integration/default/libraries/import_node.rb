@@ -20,8 +20,7 @@ class ImportNode < Inspec.resource(1)
       its(\'city\') { should eq \'Tulsa\' }
       its(\'categories\') { should eq [\'Servers\', \'Test\'] }
       its(\'assets\') { should eq { \'vendorPhone\' => \'411\' }
-      its(\'meta_data\') { should eq [{ \'context\' => \'foo\' \'key\' => \'bar\', \'value\' => \'baz\'}]
-
+      its(\'meta_data\') { should eq [{ \'context\' => \'foo\' \'key\' => \'bar\', \'value\' => \'baz\'}, {\'context\' => \'foofoo\', \'key\' => \'barbar\', \'value\' => \'bazbaz\' }]
     end
   '
 
