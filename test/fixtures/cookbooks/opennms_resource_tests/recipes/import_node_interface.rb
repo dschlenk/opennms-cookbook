@@ -24,6 +24,8 @@ opennms_import_node_interface '10.0.0.1' do
   sync_import true
   sync_wait_periods 30
   sync_wait_secs 10
+  categories %w(Servers Test)
+  assets 'vendorPhone' => '511', 'serialNumber' => 'SN12838932'
   meta_data [{'context' => 'foo', 'key' => 'bar', 'value' => 'baz' }, {'context' => 'foofoo', 'key' => 'barbar', 'value' => 'bazbaz' }]
 end
 
@@ -31,5 +33,7 @@ end
 opennms_import_node_interface '72.72.72.73' do
   foreign_source_name 'dry-source'
   foreign_id iface_node_foreign_id
+  categories %w(Servers Test)
+  assets 'vendorPhone' => '511', 'serialNumber' => 'SN12838932'
   meta_data [{'context' => 'foo', 'key' => 'bar', 'value' => 'baz' }, {'context' => 'foofoo', 'key' => 'barbar', 'value' => 'bazbaz' }]
 end
