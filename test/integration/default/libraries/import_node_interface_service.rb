@@ -12,6 +12,8 @@ class ImportNodeInterfaceService < Inspec.resource(1)
   example '
     describe import_node_interface_service(\'service\', \'ip_addr\', \'foreign_source_name\', \'foreign_id\', 1243) do
       it { should exist }
+      its(categories) { should eq %w(Servers Test) }
+      its(meta_data) { should eq([{ context => foo, key => bar, value => baz}, { context => foofoo, key => barbar, value => bazbaz }])}
     end
   '
 
