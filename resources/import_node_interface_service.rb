@@ -35,8 +35,8 @@ load_current_value do |new_resource|
     end
     assets node_assets
   end
-  unless import_node.elements['meta-data'].nil?
-    import_node.each_element('meta-data') do |data|
+  unless service.elements['meta-data'].nil?
+    service.each_element('meta-data') do |data|
       mdata['context'] = data['context']
       mdata['key'] =  data['key']
       mdata['value'] =  data['value']
