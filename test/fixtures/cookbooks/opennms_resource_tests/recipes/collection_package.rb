@@ -43,5 +43,5 @@ opennms_collection_package 'noop create_if_missing' do
   if_alias_domain 'foo.com'
   remote true
   outage_calendars ['ignore localhost on mondays']
-  action :create_if_missing  # This will not perform any changes if package 'foo' already exists
+  action :create_if_missing
 end
