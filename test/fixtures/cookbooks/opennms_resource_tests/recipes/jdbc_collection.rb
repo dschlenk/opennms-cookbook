@@ -14,3 +14,17 @@ end
 opennms_jdbc_collection 'bar' do
   notifies :restart, 'service[opennms]', :delayed
 end
+
+opennms_jdbc_collection 'create_if_missing' do
+  rrd_step 600
+  rras ['RRA:AVERAGE:0.5:2:4032', 'RRA:AVERAGE:0.5:24:2976', 'RRA:AVERAGE:0.5:576:732', 'RRA:MAX:0.5:576:732', 'RRA:MIN:0.5:576:732']
+  action :create_if_missing
+  notifies :restart, 'service[opennms]', :delayed
+end
+
+opennms_jdbc_collection 'noop_create_if_missing' do
+  rrd_step 600
+  rras ['RRA:AVERAGE:0.5:2:4032', 'RRA:AVERAGE:0.5:24:2976', 'RRA:AVERAGE:0.5:576:732', 'RRA:MAX:0.5:576:732', 'RRA:MIN:0.5:576:732']
+  action :create_if_missing
+  notifies :nothing, 'service[opennms]', :delayed
+end
