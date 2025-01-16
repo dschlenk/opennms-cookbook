@@ -1,4 +1,4 @@
-<collectd-configuration xmlns="http://xmlns.opennms.org/xsd/config/collectd" threads=<%= @collectd_config.threads.to_s.encode(:xml => :attr) %>>
+<collectd-configuration xmlns="http://xmlns.opennms.org/xsd/config/collectd" threads=<%= (node['opennms']['collectd']['threads'] || @collectd_config.threads).to_s.encode(:xml => :attr) %>>
   <% @collectd_config.packages.each do |name, package| -%>
    <package name=<%= name.encode(:xml => :attr) %><%= package.remote.nil? ? '' : " remote=#{package.remote.to_s.encode(:xml => :attr)}" %>>
       <filter><%= package.filter.encode(:xml => :text) %></filter>

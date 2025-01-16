@@ -85,3 +85,4 @@ end
 
 include_recipe 'opennms::adminpw'
 include_recipe 'opennms::default_resources'
+include_recipe 'opennms::templates'
