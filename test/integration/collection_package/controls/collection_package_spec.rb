@@ -17,7 +17,6 @@ control 'collection_package' do
   end
 
   describe collection_package('create_if_missing') do
-    package_name 'foo'
     its('remote') { should eq true }
     its('filter') { should eq "IPADDR != '0.0.0.0' & categoryName == 'foo'" }
     its('specifics') { should eq ['10.0.0.1'] }
@@ -30,7 +29,6 @@ control 'collection_package' do
   end
 
   describe collection_package 'noop create_if_missing' do
-    package_name 'foo'
     its('filter') { should eq "IPADDR != '0.0.0.0'" }
     its('specifics') { should eq ['10.0.0.1'] }
     its('include_ranges') { should eq [{ 'begin' => '10.0.1.1', 'end' => '10.0.1.254' }] }
