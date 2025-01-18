@@ -28,10 +28,10 @@ opennms_jdbc_collection_service 'JDBC' do
   url 'jdbc:postgresql://OPENNMS_JDBC_HOSTNAME:15432/wibble_wobble'
 end
 
-opennms_jdbc_collection_service 'create_if_missing' do
-  service_name 'create_if_missing'
+opennms_jdbc_collection_service 'JDBC_create_if_missing' do
+  service_name 'JDBC_create_if_missing'
   collection 'create_if_missing'
-  package_name 'jdbc_package_create_if_missing'
+  package_name 'create_if_missing'
   interval 400_000
   user_defined true
   status 'off'
@@ -47,10 +47,10 @@ opennms_jdbc_collection_service 'create_if_missing' do
   action :create_if_missing
 end
 
-opennms_jdbc_collection_service 'noop_create_if_missing' do
-  service_name 'noop_create_if_missing'
+opennms_jdbc_collection_service 'JDBC_noop_create_if_missing' do
+  service_name 'JDBC_noop_create_if_missing'
   collection 'create_if_missing'
-  package_name 'jdbc_package_noop_create_if_missing'
+  package_name 'noop_create_if_missing'
   interval 400_000
   user_defined true
   status 'off'
