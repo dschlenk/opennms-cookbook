@@ -23,6 +23,23 @@ control 'jdbc_collection_service' do
     its('thresholding_enabled') { should eq false }
   end
 
+    describe collection_service('create_if_missing', 'create_if_missing') do
+    it { should exist }
+    its('parameters') { should cmp 'driver' => 'org.postgresql.Driver', 'user' => 'wibble', 'password' => 'wobble', 'url' => 'jdbc:postgresql://OPENNMS_JDBC_HOSTNAME:15432/wibble_wobble' }
+    its('collection') { should eq 'create_if_missing' }
+    its('interval') { should eq 400000 }
+    its('user_defined') { should eq true }
+    its('status') { should eq 'off' }
+    its('collection_timeout') { should eq 5000 }
+    its('port') { should eq 15432 }
+    its('thresholding_enabled') { should eq true }
+    its('retry_count') { should eq 10 }
+  end
+
+  describe collection_service('noop_create_if_missing', 'create_if_missing') do
+    it { should_not exist }
+  end
+
   describe file('/opt/opennms/lib/jdbc.jar') do
     it { should exist }
     its('mode') { should cmp '0664' }
