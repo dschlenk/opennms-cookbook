@@ -57,7 +57,7 @@ control 'resource_type' do
 
   describe resource_type('create_if_missing', 'metasyntactic') do
     it { should_not exist }
-    its('label') { should eq 'Create If Missing'}
+    its('label') { should eq 'Create If Missing' }
     its('resource_label') { should eq '${resource} (index:${index})' }
     it 'creates the resource' do
       expect(subject.exists?).to be true
@@ -66,7 +66,7 @@ control 'resource_type' do
 
   describe resource_type('noop_create_if_missing', 'metasyntactic') do
     it { should_not exist }
-    its('label') { should eq 'Noop Create If Missing'}
+    its('label') { should eq 'Noop Create If Missing' }
     its('resource_label') { should eq '${resource} (index:${index})' }
   end
 end
