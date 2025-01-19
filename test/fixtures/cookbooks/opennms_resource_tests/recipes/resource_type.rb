@@ -89,7 +89,7 @@ opennms_resource_type 'create_if_missing' do
     elsif !new_resource.group_name.nil?
       gfn = new_resource.group_file_name.nil? ? "#{new_resource.group_name}.xml" : new_resource.group_file_name
       file_path = "#{onms_etc}/datacollection/#{gfn}"
-  end
+    end
 end
 
 # noop create if missing
