@@ -84,10 +84,10 @@ opennms_resource_type 'create_if_missing' do
   resource_label '${resource} (index:${index})'
   action :create_if_missing
   not_if do
-    if new_resource.group_name.nil? && !new_resource.file_name.nil?
-      file_path = "#{onms_etc}/resource-types.d/#{new_resource.file_name}"
-    elsif !new_resource.group_name.nil?
-      gfn = new_resource.group_file_name.nil? ? "#{new_resource.group_name}.xml" : new_resource.group_file_name
+    if self.group_name.nil? && !self.file_name.nil?
+      file_path = "#{onms_etc}/resource-types.d/#{self.file_name}"
+    elsif !self.group_name.nil?
+      gfn = self.group_file_name.nil? ? "#{self.group_name}.xml" : self.group_file_name
       file_path = "#{onms_etc}/datacollection/#{gfn}"
     end
     File.exist?(file_path)
