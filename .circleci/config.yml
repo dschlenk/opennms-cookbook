@@ -26,7 +26,7 @@ jobs:
           command: cookstyle
       - run:
           name: kitchen
-          command: kitchen test wsman-collection --destroy always
+          command: kitchen test xml-collection --destroy always
 workflows:
   version: 2
   untagged-build:
