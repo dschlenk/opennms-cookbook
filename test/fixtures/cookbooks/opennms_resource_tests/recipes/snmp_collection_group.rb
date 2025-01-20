@@ -20,7 +20,6 @@ opennms_snmp_collection_group 'Didactum-Monitoring-System-2' do
 end
 
 opennms_snmp_collection_group 'create_if_missing' do
-  collection_name 'create_if_missing'
   file 'create-if-missing.xml'
   action :create_if_missing
 end
