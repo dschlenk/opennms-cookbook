@@ -12,7 +12,7 @@ control 'poller' do
     its('rras') { should eq ['RRA:AVERAGE:0.5:2:4032', 'RRA:AVERAGE:0.5:24:2976', 'RRA:AVERAGE:0.5:576:732', 'RRA:MAX:0.5:576:732', 'RRA:MIN:0.5:576:732'] }
   end
 
-    describe poller_package('create_if_missing') do
+  describe poller_package('create_if_missing') do
     it { should exist }
     its('filter') { should eq "(IPADDR != '0.0.0.0') & (categoryName == 'create_if_missing')" }
     its('specifics') { should eq ['10.0.0.1'] }
