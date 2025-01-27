@@ -46,12 +46,12 @@ EOL
     it { should_not exist }
   end
 
-  describe snmp_collection_group('create_if_missing', 'create-if-missing-snmp-collection-group.xml', 'create_if_missing') do
+  describe snmp_collection_group('create_if_missing', 'create-if-missing-snmp-collection-group.xml', 'createifmissing') do
     it { should exist }
     its('system_def') { should eq 'CreateIfMissing' }
   end
 
-  describe snmp_collection_group('noop_create_if_missing', 'noop-create-if-missing.xml', 'create_if_missing') do
+  describe snmp_collection_group('noop_create_if_missing', nil, 'createifmissing') do
     it { should_not exist }
     its('system_def') { should eq 'NoopCreateIfMissing' }
   end
