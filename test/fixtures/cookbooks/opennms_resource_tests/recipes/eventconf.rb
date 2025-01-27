@@ -62,5 +62,6 @@ opennms_eventconf 'create-if-missing-event.xml' do
 end
 
 opennms_eventconf 'noop-create-if-missing-event.xml' do
+  event_file 'create-if-missing-event.xml'
   action :create_if_missing
 end
