@@ -39,4 +39,12 @@ EOL
   describe syslog_file('NetgearProsafeSmartSwitch.syslog.xml') do
     it { should_not exist }
   end
+
+  describe eventconf('create-if-missing-syslog-file.xml') do
+    it { should exist }
+  end
+
+  describe eventconf('noop-create-if-missing-syslog-file.xml') do
+    it { should_not exist }
+  end
 end
