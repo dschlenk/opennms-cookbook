@@ -96,9 +96,9 @@ end
 
 # noop create if missing
 opennms_resource_type 'noop_create_if_missing' do
+  type_name 'create_if_missing'
   group_name 'metasyntactic'
   label 'Noop Create If Missing'
-  resource_label '${resource} (index:${index})'
+  resource_label '${resource} (index:${indexs})'
   action :create_if_missing
-  only_if { false }
 end
