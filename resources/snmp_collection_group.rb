@@ -70,7 +70,6 @@ action :create do
   end
 end
 
-
 action :create_if_missing do
   snmp_resource_init
   collection = snmp_resource.variables[:collections][new_resource.collection_name]
@@ -85,7 +84,6 @@ action :create_if_missing do
     Chef::Log.info("Group '#{gn}' already exists in collection '#{new_resource.collection_name}'.")
   end
 end
-
 
 action :update do
   unless new_resource.file.nil?
