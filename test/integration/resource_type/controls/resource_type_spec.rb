@@ -56,7 +56,7 @@ control 'resource_type' do
   end
 
   describe resource_type('create_if_missing', 'metasyntactic') do
-    it { should_not exist }
+    it { should exist }
   end
 
   describe resource_type('noop_create_if_missing', 'metasyntactic') do
