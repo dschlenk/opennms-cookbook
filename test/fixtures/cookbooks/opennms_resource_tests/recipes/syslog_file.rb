@@ -13,7 +13,3 @@ end
 opennms_syslog_file 'create-if-missing-syslog-file.xml' do
   action :create_if_missing
 end
-
-opennms_syslog_file 'noop-create-if-missing-syslog-file.xml' do
-  action :create_if_missing
-end
