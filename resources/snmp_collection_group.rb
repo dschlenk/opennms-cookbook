@@ -56,7 +56,9 @@ action :create do
     snmp_resource_init
     collection = snmp_resource.variables[:collections][new_resource.collection_name]
     gn = new_resource.group_name
-    group = collection.include_collection(data_collection_group: gn)
+    if collection.respond_to?(:include_collection)
+      group = collection.include_collection(data_collection_group: gn)
+    end
     if group.nil?
       group = { data_collection_group: gn, exclude_filters: new_resource.exclude_filters, system_def: new_resource.system_def }
       collection.include_collections.push(group)
@@ -70,7 +72,9 @@ action :create_if_missing do
   snmp_resource_init
   collection = snmp_resource.variables[:collections][new_resource.collection_name]
   gn = new_resource.group_name
-  group = collection.include_collection(data_collection_group: gn)
+  if collection.respond_to?(:include_collection)
+    group = collection.include_collection(data_collection_group: gn)
+  end
   run_action(:create) if group.nil?
 end
 
