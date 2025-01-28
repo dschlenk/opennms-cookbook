@@ -52,13 +52,15 @@ action :create do
       mode '0664'
     end
   end
+
   converge_if_changed do
     snmp_resource_init
     collection = snmp_resource.variables[:collections][new_resource.collection_name]
-    gn = new_resource.group_name
-    if collection.respond_to?(:include_collection)
-      group = collection.include_collection(data_collection_group: gn)
+    if collection.nil?
+      raise Chef::Exceptions::ResourceNotFound, "Collection '#{new_resource.collection_name}' not found."
     end
+    gn = new_resource.group_name
+    group = collection.include_collection(data_collection_group: gn)
     if group.nil?
       group = { data_collection_group: gn, exclude_filters: new_resource.exclude_filters, system_def: new_resource.system_def }
       collection.include_collections.push(group)
@@ -68,15 +70,22 @@ action :create do
   end
 end
 
+
 action :create_if_missing do
   snmp_resource_init
   collection = snmp_resource.variables[:collections][new_resource.collection_name]
-  gn = new_resource.group_name
-  if collection.respond_to?(:include_collection)
-    group = collection.include_collection(data_collection_group: gn)
+  if collection.nil?
+    raise Chef::Exceptions::ResourceNotFound, "Collection '#{new_resource.collection_name}' not found."
   end
-  run_action(:create) if group.nil?
+  gn = new_resource.group_name
+  group = collection.include_collection(data_collection_group: gn)
+  if group.nil?
+    run_action(:create)  # If the group is missing, create it
+  else
+    Chef::Log.info("Group '#{gn}' already exists in collection '#{new_resource.collection_name}'.")
+  end
 end
+
 
 action :update do
   unless new_resource.file.nil?
