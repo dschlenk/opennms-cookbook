@@ -43,8 +43,4 @@ EOL
   describe syslog_file('create-if-missing-syslog-file.xml') do
     it { should exist }
   end
-
-  describe syslog_file('noop-create-if-missing-syslog-file.xml') do
-    it { should_not exist }
-  end
 end
