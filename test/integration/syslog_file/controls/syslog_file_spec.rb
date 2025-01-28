@@ -36,15 +36,15 @@ EOL
     its('position') { should eq 24 }
   end
 
-  describe syslog_file('NetgearProsafeSmartSwitch.syslog.xml') do
-    it { should_not exist }
-  end
-
   describe syslog_file('create-if-missing-syslog-file.xml') do
     it { should exist }
   end
 
   describe syslog_file('noop-create-if-missing-syslog-file.xml') do
+    it { should_not exist }
+  end
+  
+  describe syslog_file('NetgearProsafeSmartSwitch.syslog.xml') do
     it { should_not exist }
   end
 end
