@@ -26,7 +26,7 @@ jobs:
           command: cookstyle
       - run:
           name: kitchen
-          command: kitchen test poller --destroy always
+          command: kitchen test wsman-group --destroy always
 workflows:
   version: 2
   untagged-build:
