@@ -54,3 +54,19 @@ opennms_xml_group 'file2' do
   key_xpath '@inode'
   objects [{ 'name' => 'atime', 'type' => 'string', 'xpath' => '@atime' }, { 'name' => 'mtime', 'type' => 'string', 'xpath' => '@mtime' }]
 end
+
+opennms_xml_group 'create-if-missing' do
+  source_url 'http://{ipaddr}/group-example'
+  collection_name 'foo'
+  resource_type 'dnsDns'
+  resource_xpath "/measCollecFile/measData/measInfo[@measInfoId='dns|dns']/measValue"
+  action :create_if_missing
+end
+
+opennms_xml_group 'noop-create-if-missing' do
+  source_url 'http://{ipaddr}/group-example'
+  collection_name 'foo'
+  resource_type 'dnsDnss'
+  resource_xpath "/measCollecFile/measData/measInfo[@measInfoId='dns|dnss']/measValue"
+  action :create_if_missing
+end
