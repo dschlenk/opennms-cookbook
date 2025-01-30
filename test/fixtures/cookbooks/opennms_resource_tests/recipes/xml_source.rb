@@ -86,7 +86,7 @@ opennms_xml_source 'http://{ipaddr}/rpc' do
         { 'name' => 'V21', 'type' => 'GAUGE', 'xpath' => 'cfm-iter-ethlm-entry/cfm-last-measured-near-end-eir-loss-stats' },
         { 'name' => 'V22', 'type' => 'GAUGE', 'xpath' => 'cfm-iter-ethlm-entry/cfm-last-measured-far-end-eir-loss-stats' },
       ]
-    },
+    }
   ]
 end
 
