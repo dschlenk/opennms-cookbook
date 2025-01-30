@@ -37,6 +37,11 @@ opennms_xml_source 'modify OOTB source' do
   action :update
 end
 
+opennms_xml_source 'create-if-missing' do
+  collection_name 'createifmissing'
+  url 'http://192.168.64.2/snapmirror.xml'
+end
+
 # something with groups
 opennms_xml_source 'sftp.3gpp://opennms:Op3nNMS!@{ipaddr}/opt/3gpp/data/?step={step}&amp;neId={foreignId}' do
   collection_name 'foo'
