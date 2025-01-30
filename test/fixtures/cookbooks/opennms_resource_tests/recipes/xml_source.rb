@@ -89,3 +89,9 @@ opennms_xml_source 'http://{ipaddr}/rpc' do
     },
   ]
 end
+
+opennms_xml_source 'create_if_missing' do
+  url http://{ipaddr}/get-minimal
+  collection_name 'foo'
+  action :create_if_missing
+end
