@@ -83,3 +83,9 @@ opennms_wsman_group 'drac-power-test-bottom' do
   resource_uri 'http://schemas.dmtf.org/wbem/wscim/1/*'
   action :delete
 end
+
+opennms_wsman_group 'create-if-missing' do
+  group_name 'create-if-missing'
+  file_name 'wsman-datacollection.d/wsman-test-group.xml'
+  action :create_if_missing
+end
