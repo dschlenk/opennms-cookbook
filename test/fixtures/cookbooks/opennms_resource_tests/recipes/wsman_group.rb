@@ -87,5 +87,6 @@ end
 opennms_wsman_group 'create-if-missing' do
   group_name 'create-if-missing'
   file_name 'wsman-datacollection.d/wsman-test-group.xml'
+  resource_type 'node'
   action :create_if_missing
 end
