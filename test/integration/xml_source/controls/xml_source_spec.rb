@@ -23,4 +23,4 @@ control 'xml_source' do
 
   describe xml_source('create-if-missing', 'http://{ipaddr}/get-minimal', 'foo') do
     it { should exist }    
-end
+  end
