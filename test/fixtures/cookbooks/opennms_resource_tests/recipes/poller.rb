@@ -14,6 +14,7 @@ end
 
 opennms_poller_package 'create_if_missing' do
   filter "(IPADDR != '0.0.0.0') & (categoryName = 'create_if_missing')"
+  package_name 'createifmissing'
   specifics ['10.0.0.1']
   include_ranges ['begin' => '10.0.1.1', 'end' => '10.0.1.254']
   exclude_ranges ['begin' => '10.0.2.1', 'end' => '10.0.2.254']
@@ -25,8 +26,8 @@ opennms_poller_package 'create_if_missing' do
 end
 
 opennms_poller_package 'noop_create_if_missing' do
-  collection 'create_if_missing'
   filter "(IPADDR != '0.0.0.0')"
+  package_name 'createifmissing'
   specifics ['10.0.0.1']
   include_ranges ['begin' => '10.0.1.1', 'end' => '10.0.1.254']
   exclude_ranges ['begin' => '10.0.2.1', 'end' => '10.0.2.254']
