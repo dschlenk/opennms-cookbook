@@ -14,4 +14,8 @@ control 'wsman_system_definition' do
   describe wsman_system_definition('Dell iDRAC 8') do
     it { should_not exist }
   end
+
+  describe wsman_system_definition('create-if-missing') do
+    it { should exist }
+  end
 end
