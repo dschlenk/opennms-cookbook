@@ -25,3 +25,9 @@ opennms_wsman_system_definition 'Dell iDRAC 8' do
   file_name 'wsman-datacollection.d/dell-idrac.xml'
   action :delete
 end
+opennms_wsman_system_definition 'create-if-missing' do
+  system_name 'create-if-missing'
+  file_name 'wsman-datacollection.d/wsman-test-group.xml'
+  groups %w(drac-power-delltest drac-power-test)
+  action :create_if_missing
+end
