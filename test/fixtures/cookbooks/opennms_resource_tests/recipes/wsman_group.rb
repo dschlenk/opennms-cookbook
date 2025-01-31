@@ -89,5 +89,6 @@ opennms_wsman_group 'create-if-missing' do
   file_name 'wsman-datacollection.d/wsman-test-group.xml'
   resource_type 'node'
   resource_uri 'http://schemas.dmtf.org/wbem/wscim/1/*'
+  attribs [{ 'name' => 'Info', 'alias' => 'serviceTag', 'type' => 'string' }]
   action :create_if_missing
 end
