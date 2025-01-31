@@ -73,19 +73,10 @@ end
 action :create_if_missing do
   snmp_resource_init
   collection = snmp_resource.variables[:collections][new_resource.collection_name]
-  if collection.nil?
-    Chef::Log.info("Collection '#{new_resource.collection_name}' not found, creating it.")
-    collection = { new_resource.collection_name => { include_collections: [] } }
-    snmp_resource.variables[:collections][new_resource.collection_name] = collection
-  end
+  raise Chef::Exceptions::ResourceNotFound, "Collection '#{new_resource.collection_name}' not found." if collection.nil?
   gn = new_resource.group_name
   group = collection.include_collection(data_collection_group: gn)
-  if group.nil?
-    group = { data_collection_group: gn, exclude_filters: new_resource.exclude_filters, system_def: new_resource.system_def }
-    collection.include_collections.push(group)
-  else
-    Chef::Log.info("Group '#{gn}' already exists in collection '#{new_resource.collection_name}'.")
-  end
+  run_action(:create) if group.nil?
 end
 
 action :update do

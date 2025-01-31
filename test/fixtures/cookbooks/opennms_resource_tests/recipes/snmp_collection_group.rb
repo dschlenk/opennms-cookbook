@@ -27,6 +27,7 @@ opennms_snmp_collection_group 'create_if_missing' do
 end
 
 opennms_snmp_collection_group 'noop_create_if_missing' do
+  group_name 'create_if_missing'
   collection_name 'createifmissing'
   system_def 'NoopCreateIfMissing'
   action :create_if_missing
