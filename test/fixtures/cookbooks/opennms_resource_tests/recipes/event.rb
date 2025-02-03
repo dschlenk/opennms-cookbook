@@ -256,3 +256,9 @@ opennms_event 'uei.opennms.org/filters' do
   eventconf_position 'bottom'
   filters [{ 'eventparm' => 'one', 'pattern' => '/^one&two{;t|hree😇$/', 'replacement' => '💩' }]
 end
+
+opennms_event 'create_if_missing' do
+  file 'events/chef.events.xml'
+  event_label 'Chef defined event: createifmissing'
+  action :create_if_missing
+end
