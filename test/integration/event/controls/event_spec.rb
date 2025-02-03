@@ -220,4 +220,8 @@ control 'event' do
     its('position') { should eq 4 }
     its('event_filters') { should eq [{ 'eventparm' => 'one', 'pattern' => '/^one&two{;t|hree😇$/', 'replacement' => '💩' }] }
   end
+  describe event('events/chef.events.xml') do
+    it { should exist }
+    its('event_label') { should eq 'Chef defined event: createifmissing' }
+  end
 end
