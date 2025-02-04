@@ -18,7 +18,7 @@ opennms_threshd_service 'SNMP' do
   action :delete
 end
 
-opennms_threshd_service 'SNMP' do
-  package_name 'createifmissing'
+opennms_threshd_service 'WS-Man' do
+  package_name 'cheftest2'
   action :create_if_missing
 end
