@@ -29,3 +29,14 @@ opennms_system_def 'Cisco PIX 506' do
   file_name 'cisco.xml'
   action :delete
 end
+
+opennms_system_definition 'create_if_missing' do
+  file_name 'my_system.xml'
+  system_name 'MySystem'
+  sysoid '1.3.6.1.2.1.1.1.0'
+  sysoid_mask nil
+  ip_addrs ['192.168.1.1', '192.168.1.2']
+  ip_addr_masks ['255.255.255.0', '255.255.255.0']
+  action :create_if_missing
+end
+
