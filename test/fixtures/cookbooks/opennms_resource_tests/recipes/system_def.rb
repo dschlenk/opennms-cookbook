@@ -39,4 +39,3 @@ opennms_system_definition 'create_if_missing' do
   ip_addr_masks ['255.255.255.0', '255.255.255.0']
   action :create_if_missing
 end
-
