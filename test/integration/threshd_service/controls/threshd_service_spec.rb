@@ -28,7 +28,7 @@ control 'threshd_service' do
     its('include_urls') { should be.nil? }
     its('services') { should be.nil? }
   end
-  describe threshd_package('createifmissing') do
+  describe threshd_package('cheftest2') do
     it { should exist }
   end
 end
