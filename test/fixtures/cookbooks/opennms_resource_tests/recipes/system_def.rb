@@ -30,7 +30,7 @@ opennms_system_def 'Cisco PIX 506' do
   action :delete
 end
 
-opennms_system_definition 'create_if_missing' do
+opennms_system_def 'create_if_missing' do
   file_name 'my_system.xml'
   system_name 'MySystem'
   sysoid '1.3.6.1.2.1.1.1.0'
