@@ -18,7 +18,7 @@ opennms_threshd_service 'SNMP' do
   action :delete
 end
 
-opennms_threshd_service 'create_if_missing' do
+opennms_threshd_service 'SNMP' do
   package_name 'createifmissing'
   action :create_if_missing
 end
