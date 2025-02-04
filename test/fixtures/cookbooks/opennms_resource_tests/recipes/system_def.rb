@@ -31,8 +31,8 @@ opennms_system_def 'Cisco PIX 506' do
 end
 
 opennms_system_def 'create_if_missing' do
-  file_name 'my_system.xml'
-  system_name 'MySystem'
+  file_name 'foo.xml'
+  system_name 'createifmissing'
   sysoid '1.3.6.1.2.1.1.1.0'
   sysoid_mask nil
   ip_addrs ['192.168.1.1', '192.168.1.2']
