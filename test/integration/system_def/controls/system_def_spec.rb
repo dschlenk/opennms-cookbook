@@ -10,4 +10,7 @@ control 'system_def' do
     its('groups') { should_not include 'cisco-pix' }
     its('groups') { should_not include 'cisco-memory' }
   end
+  describe system_def('create_if_missing') do
+    it { should exist }
+  end
 end
