@@ -264,5 +264,6 @@ opennms_event 'create_if_missing' do
   logmsg 'creating file if its missing.'
   logmsg_dest 'logndisplay'
   logmsg_notify true
+  severity 'Major'
   action :create_if_missing
 end
