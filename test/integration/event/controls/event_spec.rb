@@ -223,5 +223,6 @@ control 'event' do
   describe event('events/chef.events.xml') do
     it { should exist }
     its('event_label') { should eq 'Chef defined event: createifmissing' }
+    its('descr') { should eq '<p>Trying to create a file if its missing.</p>' }
   end
 end
