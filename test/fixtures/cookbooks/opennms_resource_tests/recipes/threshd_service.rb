@@ -20,5 +20,11 @@ end
 
 opennms_threshd_service 'WS-Man' do
   package_name 'cheftest2'
+  interval 3000001
+  action :create_if_missing
+end
+
+opennms_threshd_service 'WS-Man2' do
+  package_name 'cheftest2'
   action :create_if_missing
 end
