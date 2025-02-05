@@ -26,7 +26,7 @@ jobs:
           command: cookstyle
       - run:
           name: kitchen
-          command: kitchen test event-oraclelinux-9 --destroy always
+          command: kitchen test threshd-service --destroy always
 workflows:
   version: 2
   untagged-build:
