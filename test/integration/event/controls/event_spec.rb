@@ -220,7 +220,7 @@ control 'event' do
     its('position') { should eq 4 }
     its('event_filters') { should eq [{ 'eventparm' => 'one', 'pattern' => '/^one&two{;t|hree😇$/', 'replacement' => '💩' }] }
   end
-  describe event('events/chef.events.xml') do
+  describe event('create_if_missing', 'events/chef.events.xml') do
     it { should exist }
     its('event_label') { should eq 'Chef defined event: createifmissing' }
     its('descr') { should eq '<p>Trying to create a file if its missing.</p>' }
