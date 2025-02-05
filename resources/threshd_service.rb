@@ -32,6 +32,9 @@ action :create do
     service = package.service(service_name: new_resource.service_name)
     if service.nil?
       s = %i(service_name interval user_defined status parameters).map { |p| [p, new_resource.send(p)] }.to_h.compact
+      s[:interval] = 300000 unless s.key?(:interval)
+      s[:user_defined] = false unless s.key?(:user_defined)
+      s[:status] = 'on' unless s.key?(:status)
       package.services.push(s)
     else
       run_action(:update)
