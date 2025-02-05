@@ -225,5 +225,7 @@ control 'event' do
     its('event_label') { should eq 'Chef defined event: createifmissing' }
     its('descr') { should eq '<p>Trying to create a file if its missing.</p>' }
     its('logmsg') { should eq 'creating file if its missing.' }
+    its('logmsg_dest') { should eq 'logndisplay' }
+    its('logmsg_notify') { should eq true }
   end
 end
