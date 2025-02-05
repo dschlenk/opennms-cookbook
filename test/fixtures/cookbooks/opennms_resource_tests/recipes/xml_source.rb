@@ -38,8 +38,9 @@ opennms_xml_source 'modify OOTB source' do
 end
 
 opennms_xml_source 'create-if-missing' do
-  collection_name 'createifmissing'
+  collection_name 'create_if_missing'
   url 'http://192.168.64.2/snapmirror.xml'
+  action :create_if_missing
 end
 
 # something with groups
