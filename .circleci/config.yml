@@ -26,7 +26,7 @@ jobs:
           command: cookstyle
       - run:
           name: kitchen
-          command: kitchen test snmp-config --destroy always
+          command: kitchen test snmp-config-definition --destroy always
 workflows:
   version: 2
   untagged-build:
