@@ -227,6 +227,6 @@ control 'event' do
     its('logmsg') { should eq 'creating file if its missing.' }
     its('logmsg_dest') { should eq 'logndisplay' }
     its('logmsg_notify') { should eq true }
-    its('severity') { should eq 'Major' }
+    its('severity') { should eq 'Minor' }
   end
 end
