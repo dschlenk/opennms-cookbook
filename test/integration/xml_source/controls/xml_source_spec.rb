@@ -21,7 +21,7 @@ control 'xml_source' do
     it { should exist }
   end
 
-  describe xml_source('http://192.168.64.2/snapmirror.xml', 'createifmissing') do
+  describe xml_source('http://192.168.64.2/snapmirror.xml', 'create_if_missing') do
     it { should exist }
   end
 end
