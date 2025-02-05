@@ -262,5 +262,7 @@ opennms_event 'create_if_missing' do
   event_label 'Chef defined event: createifmissing'
   descr '<p>Trying to create a file if its missing.</p>'
   logmsg 'creating file if its missing.'
+  logmsg_dest 'logndisplay'
+  logmsg_notify true
   action :create_if_missing
 end
