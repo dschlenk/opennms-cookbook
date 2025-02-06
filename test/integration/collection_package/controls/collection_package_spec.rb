@@ -27,4 +27,16 @@ control 'collection_package' do
     its('if_alias_domain') { should eq 'foo.com' }
     its('outage_calendars') { should eq ['ignore localhost on mondays'] }
   end
+
+  describe collection_package('noop_create_if_missing') do
+    its('remote') { should eq true }
+    its('filter') { should eq "IPADDR != '0.0.0.0'" }
+    its('specifics') { should eq ['10.0.0.5'] }
+    its('include_ranges') { should eq [{ 'begin' => '10.0.1.1', 'end' => '10.0.1.254' }] }
+    its('exclude_ranges') { should eq [{ 'begin' => '10.0.2.1', 'end' => '10.0.2.254' }] }
+    its('include_urls') { should eq ['file:/opt/opennms/etc/fooo'] }
+    its('store_by_if_alias') { should eq true }
+    its('if_alias_domain') { should eq 'foo.com' }
+    its('outage_calendars') { should eq ['ignore localhost on mondays'] }
+  end
 end
