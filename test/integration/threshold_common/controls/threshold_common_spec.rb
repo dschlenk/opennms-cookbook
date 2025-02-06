@@ -51,7 +51,12 @@ control 'threshold_common' do
     it { should_not exist }
   end
 
-  describe threshold_group('create_if_missing') do
+  describe threshold_group('create_if_missingg') do
     it { should_not exist }
+  end
+
+  describe threshold_group('create_if_missing') do
+    it { should exist }
+    its('rrd_repository') { should eq '/opt/opennms/share/rrd/snmp' }
   end
 end
