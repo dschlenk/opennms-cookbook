@@ -53,3 +53,7 @@ end
 opennms_threshold_group 'hrstorage' do
   action :delete
 end
+
+opennms_threshold_group 'create_if_missing' do
+  action :create_if_missing
+end
