@@ -50,7 +50,7 @@ end
 opennms_jdbc_collection_service 'JDBC_noop_create_if_missing' do
   service_name 'JDBC_noop_create_if_missing'
   collection 'create_if_missing'
-  package_name 'noop_create_if_missing'
+  package_name 'create_if_missing'
   interval 400_000
   user_defined true
   status 'off'
@@ -59,10 +59,9 @@ opennms_jdbc_collection_service 'JDBC_noop_create_if_missing' do
   port 15_432
   thresholding_enabled true
   driver 'org.postgresql.Driver'
-  driver_file 'jdbc.jar'
+  driver_file 'jdbc.jarr'
   user 'wibble'
   password 'wobble'
-  url 'jdbc:postgresql://OPENNMS_JDBC_HOSTNAME:15432/wibble_wobble'
+  url 'jdbc:postgresql://OPENNMS_JDBC_HOSTNAME:15432/wibble_wobblee'
   action :create_if_missing
-  only_if { false }
 end
