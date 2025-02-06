@@ -54,6 +54,12 @@ opennms_threshold_group 'hrstorage' do
   action :delete
 end
 
-opennms_threshold_group 'cheftest' do
+opennms_threshold_group 'create-if-missing' do
+  action :create_if_missing
+end
+
+opennms_threshold_group 'create-if-missingg' do
+  group_name 'create-if-missing'
+  rrd_repository '/var/opennms/rrd/snmps'
   action :create_if_missing
 end
