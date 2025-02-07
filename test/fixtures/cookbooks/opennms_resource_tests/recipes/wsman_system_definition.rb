@@ -38,6 +38,6 @@ opennms_wsman_system_definition 'noop-create-if-missing' do
   system_name 'create-if-missing'
   rule 'default'
   file_name 'wsman-datacollections.d/wsman-test-group.xml'
-  groups %w(drac-power-delltest drac-power-tests)
+  groups %w(drac-power-delltest drac-power-test)
   action :create_if_missing
 end
