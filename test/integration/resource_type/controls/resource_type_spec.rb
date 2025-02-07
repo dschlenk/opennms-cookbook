@@ -57,6 +57,8 @@ control 'resource_type' do
 
   describe resource_type('create_if_missing', 'metasyntactic') do
     it { should exist }
+    its('label') { should eq 'Create If Missing' }
+    its('resource_label') { should eq '${resource} (index:${index})' }
   end
 
   describe resource_type('noop_create_if_missing', 'metasyntactic') do
