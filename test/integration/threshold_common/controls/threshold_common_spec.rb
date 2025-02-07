@@ -51,7 +51,7 @@ control 'threshold_common' do
     it { should_not exist }
   end
 
-  describe threshold_group('create_if_missingg') do
+  describe threshold_group('noop-create_if_missing') do
     it { should_not exist }
   end
 
