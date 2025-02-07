@@ -50,4 +50,8 @@ EOL
     it { should exist }
     its('system_def') { should eq 'CreateIfMissing' }
   end
+
+  describe snmp_collection_group('noop-create_if_missing', 'create-if-missing-snmp-collection-group.xml', 'createifmissing') do
+    it { should_not exist }
+  end
 end
