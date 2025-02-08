@@ -57,6 +57,7 @@ control 'wsman_group' do
     it { should exist }
     its('resource_type') { should eq 'node' }
     its('resource_uri') { should eq 'http://schemas.dmtf.org/wbem/wscim/1/*' }
+    its('attribs') { should eq [{ 'name' => 'Info', 'alias' => 'serviceTag', 'type' => 'string' }] }
   end
 
   describe wsman_group('noop-create-if-missing', 'wsman-datacollection.d/wsman-test-group.xm') do
