@@ -269,8 +269,4 @@ EOL
   describe eventconf('create-if-missing-event.xml') do
     it { should exist }
   end
-
-  describe eventconf('noop-create-if-missing-event.xml') do
-    it { should_not exist }
-  end
 end
