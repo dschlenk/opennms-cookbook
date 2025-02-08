@@ -18,7 +18,6 @@ control 'system_def' do
     its('ip_addrs') { should eq ['192.168.1.1', '192.168.1.2'] }
     its('ip_addr_masks') { should eq ['255.255.255.0', '255.255.255.0'] }
   end
-
   describe threshold_group('noop_create_if_missing') do
     it { should_not exist }
   end
