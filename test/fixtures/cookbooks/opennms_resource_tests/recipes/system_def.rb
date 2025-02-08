@@ -39,3 +39,13 @@ opennms_system_def 'create_if_missing' do
   ip_addr_masks ['255.255.255.0', '255.255.255.0']
   action :create_if_missing
 end
+
+opennms_system_def 'noop_create_if_missing' do
+  file_name 'foo.xml'
+  system_name 'createifmissing'
+  sysoid '1.3.6.1.2.1.1.1.1'
+  sysoid_mask nil
+  ip_addrs ['192.168.1.3', '192.168.1.1']
+  ip_addr_masks ['255.255.254.0', '255.255.253.0']
+  action :create_if_missing
+end
