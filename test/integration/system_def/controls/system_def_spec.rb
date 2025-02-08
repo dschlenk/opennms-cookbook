@@ -12,5 +12,10 @@ control 'system_def' do
   end
   describe system_def('createifmissing') do
     it { should exist }
+    its('file_name') { should eq 'foo.xml' }
+    its('sysoid') { should eq  '1.3.6.1.2.1.1.1.0' }
+    its('sysoid_mask') { should eq nil }
+    its('ip_addrs') { should eq ['192.168.1.1', '192.168.1.2'] }
+    its('ip_addr_masks') { should eq ['255.255.255.0', '255.255.255.0'] }
   end
 end
