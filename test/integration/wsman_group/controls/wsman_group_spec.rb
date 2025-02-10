@@ -53,14 +53,14 @@ control 'wsman_group' do
     it { should_not exist }
   end
 
-  describe wsman_group('create-if-missing', 'wsman-datacollection.d/wsman-test-group.xm') do
+  describe wsman_group('create-if-missing', 'wsman-datacollection.d/wsman-test-group.xml') do
     it { should exist }
     its('resource_type') { should eq 'node' }
     its('resource_uri') { should eq 'http://schemas.test.group.com/' }
     its('attribs') { should eq [{ 'name' => 'Info', 'alias' => 'serviceTag', 'type' => 'string' }] }
   end
 
-  describe wsman_group('noop-create-if-missing', 'wsman-datacollection.d/wsman-test-group.xm') do
+  describe wsman_group('noop-create-if-missing', 'wsman-datacollection.d/wsman-test-group.xml') do
     it { should_not exist }
   end
 end
