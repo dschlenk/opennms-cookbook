@@ -83,15 +83,6 @@ opennms_resource_type 'create_if_missing' do
   label 'Create If Missing'
   resource_label '${resource} (index:${index})'
   action :create_if_missing
-  not_if do
-    if group_name.nil? && !file_name.nil?
-      file_path = "#{onms_etc}/resource-types.d/#{file_name}"
-    elsif !group_name.nil?
-      gfn = group_file_name.nil? ? "#{group_name}.xml" : group_file_name
-      file_path = "#{onms_etc}/datacollection/#{gfn}"
-    end
-    File.exist?(file_path)
-  end
 end
 
 # noop create if missing
