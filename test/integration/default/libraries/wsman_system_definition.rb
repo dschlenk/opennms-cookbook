@@ -26,6 +26,8 @@ class WsmanSystemDefinition < Inspec.resource(1)
         @params[:groups].push g.texts.collect(&:value).join('')
       end
     end
+    @params[:rule] = s_el.elements['rule'].texts.collect(&:value).join('') unless s_el.elements['rule'].nil?
+    @params[:file_name] = fn
   end
 
   def exist?
