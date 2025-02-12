@@ -43,7 +43,7 @@ end
 opennms_system_def 'noop create if missing' do
   file_name 'foo.xml'
   system_name 'createifmissing'
-  sysoid '1.3.6.1.2.1.1.1.1'
+  sysoid '1.3.6.1.2.1.1.1.0'
   sysoid_mask nil
   ip_addrs ['192.168.1.3', '192.168.1.1']
   ip_addr_masks ['255.255.254.0', '255.255.253.0']
