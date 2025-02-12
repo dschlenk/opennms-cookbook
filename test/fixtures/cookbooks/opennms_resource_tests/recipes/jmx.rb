@@ -85,8 +85,8 @@ opennms_jmx_mbean 'noop create if missing' do
   mbean_name 'create.if.missing'
   collection_name 'jmxcollection'
   attribs(
-    'ConsumerCount' => { 'alias' => 'anQConsumerCnt', 'type' => 'string' },
-    'InFlightCount' => { 'alias' => 'anQFlightCnt', 'type' => 'string' }
+    'ConsumerCount' => { 'alias' => 'anQConsumerCnt', 'type' => 'Counter' },
+    'InFlightCount' => { 'alias' => 'anQFlightCnt', 'type' => 'gauge' }
   )
   action :create_if_missing
 end
