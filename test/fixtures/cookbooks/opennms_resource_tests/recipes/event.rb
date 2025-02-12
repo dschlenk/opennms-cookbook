@@ -269,7 +269,7 @@ opennms_event 'create_if_missing' do
 end
 
 opennms_event 'noop_create_if_missing' do
-  event_name 'create_if_missing'
+  uei 'create_if_missing'
   file 'events/chef.events.xml'
   event_label 'Chef defined event: noopcreateifmissing'
   descr '<p>Trying to create create if missing that does nothing.</p>'
