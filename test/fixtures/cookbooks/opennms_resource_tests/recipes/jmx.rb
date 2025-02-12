@@ -74,6 +74,7 @@ end
 opennms_jmx_mbean 'create if missing' do
   mbean_name 'create.if.missing'
   collection_name 'jmxcollection'
+  objectname 'create.if.missing:BrokerName=broker.example.com,Type=Queue,Destination=anQueue'
   attribs(
     'ConsumerCount' => { 'alias' => 'anQConsumerCnt', 'type' => 'gauge' },
     'InFlightCount' => { 'alias' => 'anQFlightCnt', 'type' => 'gauge' }
@@ -84,6 +85,7 @@ end
 opennms_jmx_mbean 'noop create if missing' do
   mbean_name 'create.if.missing'
   collection_name 'jmxcollection'
+  objectname 'create.if.missing:BrokerName=broker.example.com,Type=Queue,Destination=anQueue'
   attribs(
     'ConsumerCount' => { 'alias' => 'anQConsumerCnt', 'type' => 'Counter' },
     'InFlightCount' => { 'alias' => 'anQFlightCnt', 'type' => 'gauge' }
