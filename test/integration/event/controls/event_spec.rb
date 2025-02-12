@@ -229,4 +229,8 @@ control 'event' do
     its('logmsg_notify') { should eq true }
     its('severity') { should eq 'Minor' }
   end
+
+  describe event('noop_create_if_missing', 'events/chef.events.xml') do
+    it { should_not exist }
+  end
 end
