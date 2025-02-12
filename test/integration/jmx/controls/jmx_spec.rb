@@ -57,7 +57,7 @@ control 'jmx' do
     its('thresholding_enabled') { should eq false }
   end
 
-  describe jmx_mbean('create.if.missing', 'jmxcollection',''create.if.missing:BrokerName=broker.example.com,Type=Queue,Destination=anQueue') do
+  describe jmx_mbean('create.if.missing', 'jmxcollection','create.if.missing:BrokerName=broker.example.com,Type=Queue,Destination=anQueue') do
     it { should exist }
     its('attribs') { should eq 'ConsumerCount' => { 'alias' => 'anQConsumerCnt', 'type' => 'gauge' }, 'InFlightCount' => { 'alias' => 'anQFlightCnt', 'type' => 'gauge' } }
   end
