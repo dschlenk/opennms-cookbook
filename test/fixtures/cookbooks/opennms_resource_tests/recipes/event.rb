@@ -267,3 +267,15 @@ opennms_event 'create_if_missing' do
   severity 'Minor'
   action :create_if_missing
 end
+
+opennms_event 'noop_create_if_missing' do
+  event_name 'create_if_missing'
+  file 'events/chef.events.xml'
+  event_label 'Chef defined event: noopcreateifmissing'
+  descr '<p>Trying to create create if missing that does nothing.</p>'
+  logmsg 'creating create if missing that does nothing.'
+  logmsg_dest 'logndisplay'
+  logmsg_notify true
+  severity 'Minor'
+  action :create_if_missing
+end
