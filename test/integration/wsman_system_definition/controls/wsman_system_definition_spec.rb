@@ -17,5 +17,8 @@ control 'wsman_system_definition' do
 
   describe wsman_system_definition('create-if-missing') do
     it { should exist }
+    its('rule') { should eq 'default' }
+    its('file_name') { should eq 'wsman-datacollection.d/wsman-test-group.xml' }
+    its('groups') { should eq %w(drac-power-delltest drac-power-test) }
   end
 end
