@@ -56,4 +56,9 @@ control 'jmx' do
     its('status') { should eq 'on' }
     its('thresholding_enabled') { should eq false }
   end
+
+  describe jmx_mbean('create.if.missing', 'jmxcollection') do
+    it { should exist }
+    its('attribs') { should eq 'ConsumerCount' => { 'alias' => 'anQConsumerCnt', 'type' => 'gauge' }, 'InFlightCount' => { 'alias' => 'anQFlightCnt', 'type' => 'gauge' } }
+  end
 end
