@@ -26,7 +26,7 @@ jobs:
           command: cookstyle
       - run:
           name: kitchen
-          command: kitchen test event --destroy always
+          command: kitchen test jmx --destroy always
 workflows:
   version: 2
   untagged-build:
