@@ -31,7 +31,7 @@ end
 opennms_jdbc_collection_service 'JDBC_create_if_missing' do
   service_name 'JDBC_create_if_missing'
   collection 'create_if_missing'
-  package_name 'create_if_missing'
+  package_name 'createifmissing'
   interval 400_000
   user_defined true
   status 'off'
@@ -49,7 +49,7 @@ end
 
 opennms_jdbc_collection_service 'JDBC_noop_create_if_missing' do
   service_name 'JDBC_create_if_missing'
-  package_name 'create_if_missing'
+  package_name 'createifmissing'
   collection 'default'
   interval 400_001
   user_defined false
