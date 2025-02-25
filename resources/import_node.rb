@@ -151,7 +151,7 @@ action :create do
         end
       end
     end
-    Chef::Log.warn("model import message body now #{model_import.to_s}")
+    Chef::Log.debug("model import message body now #{model_import.to_s}")
     model_import(new_resource.foreign_source_name).message model_import.to_s
   end
 end
