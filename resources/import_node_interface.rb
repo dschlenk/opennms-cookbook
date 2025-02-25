@@ -32,33 +32,26 @@ load_current_value do |new_resource|
     else status interface.attributes['status'] if interface.attributes['status'].nil?
     end
   end
-  node_assets = {}
-  meta_datas = []
-  meta_data = {}
-  node_category = []
   managed interface.attributes['managed'] if interface.attributes['managed'].nil?
   snmp_primary interface.attributes['snmp-primary'] if interface.attributes['snmp-primary'].nil?
 
   unless interface.elements['category'].nil?
+    node_category = []
     interface.each_element('category') do |category|
       node_category.push category.attributes['name'].to_s
     end
     categories node_category
   end
-  unless interface.elements['asset'].nil?
-    interface.each_element('asset') do |asset|
-      node_assets[asset.attributes['key'].to_s] = asset.attributes['value'].to_s
-    end
-    assets node_assets
-  end
   unless interface.elements['meta-data'].nil?
-    interface.each_element('meta-data') do |mdata|
-      mdata.each do |key, value|
-        meta_data[key.to_s] = value
-      end
-      meta_datas.push (meta_data)
-      meta_data meta_datas
+    meta_datas = []
+    interface.each_element('meta-data') do |data|
+      mdata = {}
+      mdata['context'] = data['context']
+      mdata['key'] =  data['key']
+      mdata['value'] =  data['value']
+      meta_datas.push (mdata)
     end
+    meta_data meta_datas
   end
 end
 

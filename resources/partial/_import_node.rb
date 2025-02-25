@@ -1,5 +1,12 @@
-use 'partial/_import'
+include Opennms::Cookbook::Provision::ModelImportHttpRequest
+include Opennms::XmlHelper
+include Opennms::Rbac
+
 unified_mode true
+property :foreign_source_name, String, identity: true, required: true
+property :sync_import, [TrueClass, FalseClass], default: false, desired_state: false
+property :sync_wait_periods, Integer, default: 30, desired_state: false
+property :sync_wait_secs, Integer, default: 10, desired_state: false
 property :categories, Array, callbacks: { 'should be an array with string values' => lambda { |p| !p.any? { |a| !a.is_a?(String) } } }
 property :meta_data, kind_of:  [Array, Hash], default: [], callbacks: {
   'should be an array of hashes with keys `context`, `key`, and `value` (strings) or a hash where each key is a string representing `name` and which has a hash value with keys `type` and `context` (strings)' => lambda {

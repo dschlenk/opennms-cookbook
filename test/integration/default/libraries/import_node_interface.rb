@@ -14,6 +14,8 @@ class ImportNodeInterface < Inspec.resource(1)
       it { should exist }
       its(\'managed\') { should be true }
       its(\'snmp_primary\') { should eq \'P\' }
+      its(\'categories\') { should eq %w(Servers Test) }
+      its(\'meta_data\') { should eq([{ \'context\' => \'foo\', \'key\' => \'bar\', \'value\' => \'baz\'}, { \'context\' => \'foofoo\', \'key\' => \'barbar\', \'value\' => \'bazbaz\' }])}
     end
   '
 
@@ -33,6 +35,19 @@ class ImportNodeInterface < Inspec.resource(1)
       @params[:managed] = true
       @params[:managed] = false if i_el.attributes['managed'] == 'false'
       @params[:snmp_primary] = i_el.attributes['snmp-primary'] unless i_el.attributes['snmp-primary'].nil?
+      @categories = []
+      i_el.each_element('category') do |c_el|
+        @categories.push c_el.attributes['name']
+      end
+      meta_datas = []
+      i_el.each_element('meta-data') do |a_el|
+        meta_data = {}
+        meta_data['context'] = a_el['context']
+        meta_data['key'] =  a_el['key']
+        meta_data['value'] =  a_el['value']
+        meta_datas.push meta_data
+      end
+      @meta_data = meta_datas
     end
   end
 
@@ -43,4 +58,6 @@ class ImportNodeInterface < Inspec.resource(1)
   def method_missing(name)
     @params[name]
   end
+  attr_reader :categories
+  attr_reader :meta_data
 end
