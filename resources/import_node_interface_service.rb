@@ -6,7 +6,7 @@ property :foreign_id, String, required: true
 property :ip_addr, String, required: true, identity: true
 
 load_current_value do |new_resource|
-  name = new_resource.name || new_resource.service_name
+  name = new_resource.service_name
   model_import_root = REXML::Document.new(model_import(new_resource.foreign_source_name).message).root unless model_import(new_resource.foreign_source_name).nil?
   model_import_root = REXML::Document.new(Opennms::Cookbook::Provision::ModelImport.new("#{new_resource.foreign_source_name}", "#{baseurl}/requisitions/#{new_resource.foreign_source_name}/nodes/#{new_resource.foreign_id}").message) if model_import_root.nil?
   current_value_does_not_exist! if model_import_root.nil?
@@ -14,10 +14,6 @@ load_current_value do |new_resource|
   interface_el = node_el.elements["interface[@ip-addr = '#{new_resource.ip_addr}']"] unless node_el.nil?
   service = interface_el.elements["monitored-service[@service-name = '#{name}']"] unless interface_el.nil?
   current_value_does_not_exist! if service.nil?
-  foreign_source_name new_resource.foreign_source_name
-  foreign_id new_resource.foreign_id
-  ip_addr new_resource.ip_addr
-  service_name name
 
   unless service.elements['category'].nil?
     node_category = []
@@ -54,14 +50,15 @@ end
 
 action :create do
   converge_if_changed do
-    name = new_resource.name || new_resource.service_name
+    name = new_resource.service_name
     model_import_init(new_resource.foreign_source_name)
-    model_import_root = REXML::Document.new(model_import(new_resource.foreign_source_name).message).root unless model_import(new_resource.foreign_source_name).nil?
-    model_import_root = REXML::Document.new(Opennms::Cookbook::Provision::ModelImport.new("#{new_resource.foreign_source_name}", "#{baseurl}/requisitions/#{new_resource.foreign_source_name}/nodes/#{new_resource.foreign_id}").message) if model_import_root.nil?
-    current_value_does_not_exist! if model_import_root.nil?
+    raise Chef::Exceptions::ValidationFailed "No requisition named #{new_resource.foreign_source_name} found. Create it with an opennms_import[#{new_resource.foreign_source_name}] resource." if model_import(new_resource.foreign_source_name).nil?
+    model_import_root = REXML::Document.new(model_import(new_resource.foreign_source_name).message).root
     node_el = model_import_root.elements["node[@foreign-id = '#{new_resource.foreign_id}']"] unless model_import_root.nil?
-    interface_el = node_el.elements["interface[@ip-addr = '#{new_resource.ip_addr}']"] unless node_el.nil?
-    service = interface_el.elements["monitored-service[@service-name = '#{name}']"] unless interface_el.nil?
+    raise Chef::Exceptions::ValidationFailed "No node with foreign ID #{new_resource.foreign_id} found. Create one with an opennms_import_node resource." if node_el.nil?
+    interface_el = node_el.elements["interface[@ip-addr = '#{new_resource.ip_addr}']"]
+    raise Chef::Exceptions::ValidationFailed "No interface with IP #{new_resource.ip_addr} found. Create one with an opennms_import_node_interface resource." if interface_el.nil?
+    service = interface_el.elements["monitored-service[@service-name = '#{name}']"]
     if service.nil?
       ms_el = REXML::Element.new('monitored-service')
       ms_el.attributes['service-name'] = name
