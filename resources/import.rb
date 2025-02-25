@@ -4,9 +4,9 @@ include Opennms::Rbac
 
 property :name, String, identity: true
 property :foreign_source_name, String, default: 'imported:'
-property :sync_import, [true, false], default: false
-property :sync_wait_periods, Integer, default: 30
-property :sync_wait_secs, Integer, default: 10
+property :sync_import, [true, false], default: false, desired_state: false
+property :sync_wait_periods, Integer, default: 30, desired_state: false
+property :sync_wait_secs, Integer, default: 10, desired_state: false
 
 load_current_value do |new_resource|
   model_import = REXML::Document.new(model_import(new_resource.name).message) unless model_import(new_resource.name).nil?
