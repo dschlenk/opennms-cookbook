@@ -63,10 +63,10 @@ end
 action :create do
   converge_if_changed do
     model_import_init(new_resource.foreign_source_name)
+    raise Chef::Exceptions::ValidationFailed "No requisition named #{new_resource.foreign_source_name} found. Create it with an opennms_import[#{new_resource.foreign_source_name}] resource." if model_import(new_resource.foreign_source_name).nil?
     model_import_root = REXML::Document.new(model_import(new_resource.foreign_source_name).message).root unless model_import(new_resource.foreign_source_name).nil?
-    model_import_root = REXML::Document.new(Opennms::Cookbook::Provision::ModelImport.new("#{new_resource.foreign_source_name}", "#{baseurl}/requisitions/#{new_resource.foreign_source_name}/nodes/#{new_resource.foreign_id}").message) if model_import_root.nil?
-    current_value_does_not_exist! if model_import_root.nil?
     node_el = model_import_root.elements["node[@foreign-id = '#{new_resource.foreign_id}']"] unless model_import_root.nil?
+    raise Chef::Exceptions::ValidationFailed "No node with foreign ID #{new_resource.foreign_id} found. Create one with an opennms_import_node resource." if node_el.nil?
     interface_el = node_el.elements["interface[@ip-addr = '#{new_resource.name}']"] unless node_el.nil?
     if interface_el.nil?
       i_el = REXML::Element.new('interface')
