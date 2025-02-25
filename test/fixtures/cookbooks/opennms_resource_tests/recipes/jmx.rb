@@ -87,8 +87,8 @@ opennms_jmx_mbean 'noop create if missing' do
   collection_name 'jmxcollection'
   objectname 'create.if.missing:BrokerName=broker.example.com,Type=Queue,Destination=anQueue'
   attribs(
-    'ConsumerCount' => { 'alias' => 'anQConsumerCnt', 'type' => 'Counter' },
-    'InFlightCount' => { 'alias' => 'anQFlightCnt', 'type' => 'gauge' }
+    'ConsumerCount2' => { 'alias' => 'anRConsumerCnt', 'type' => 'Counter' },
+    'InFlightCount3' => { 'alias' => 'anRFlightCnt', 'type' => 'gauge' }
   )
   action :create_if_missing
 end
