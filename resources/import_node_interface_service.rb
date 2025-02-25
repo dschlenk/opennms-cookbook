@@ -1,7 +1,7 @@
 use 'partial/_import_node'
 unified_mode true
 
-property :service_name, String, name_attribute: true
+property :service_name, String, name_property: true
 property :foreign_id, String, required: true
 property :ip_addr, String, required: true, identity: true
 
@@ -38,9 +38,9 @@ load_current_value do |new_resource|
     service.each_element('meta-data') do |data|
       mdata = {}
       mdata['context'] = data['context']
-      mdata['key'] =  data['key']
-      mdata['value'] =  data['value']
-      meta_datas.push (mdata)
+      mdata['key'] = data['key']
+      mdata['value'] = data['value']
+      meta_datas.push(mdata)
     end
     meta_data meta_datas
   end
@@ -65,7 +65,7 @@ action :create do
     if service.nil?
       ms_el = REXML::Element.new('monitored-service')
       ms_el.attributes['service-name'] = name
-      if !new_resource.categories.nil?
+      unless new_resource.categories.nil?
         new_resource.categories.each do |category|
           ms_el.add_element 'category', 'name' => category
         end
@@ -77,7 +77,7 @@ action :create do
       end
       interface_el.add_element ms_el
     else
-      if !new_resource.categories.nil?
+      unless new_resource.categories.nil?
         service.elements.delete_all 'category'
         # find the sibling to insert before
         b = service.elements['asset']
@@ -105,4 +105,3 @@ action :create do
     end
   end
 end
-

@@ -16,25 +16,25 @@ module Opennms
 
         private
 
-          def fs_resource_exist?(name)
-            !find_resource(:http_request, "opennms_foreign_source POST #{name}").nil?
-          rescue Chef::Exceptions::ResourceNotFound
-            false
-          end
+        def fs_resource_exist?(name)
+          !find_resource(:http_request, "opennms_foreign_source POST #{name}").nil?
+        rescue Chef::Exceptions::ResourceNotFound
+          false
+        end
 
-          def fs_resource_create(name)
-            url = "#{baseurl}/foreignSources/#{name}"
-            foreign_source = Opennms::Cookbook::Provision::ForeignSource.new(name, url)
-            with_run_context(:root) do
-              declare_resource(:http_request, "opennms_foreign_source POST #{name}") do
-                url "#{baseurl}/foreignSources"
-                headers({ 'Content-Type' => 'application/xml' })
-                action :nothing
-                delayed_action :post
-                message foreign_source.message.to_s
-              end
+        def fs_resource_create(name)
+          url = "#{baseurl}/foreignSources/#{name}"
+          foreign_source = Opennms::Cookbook::Provision::ForeignSource.new(name, url)
+          with_run_context(:root) do
+            declare_resource(:http_request, "opennms_foreign_source POST #{name}") do
+              url "#{baseurl}/foreignSources"
+              headers({ 'Content-Type' => 'application/xml' })
+              action :nothing
+              delayed_action :post
+              message foreign_source.message.to_s
             end
           end
+        end
       end
 
       class ForeignSource
@@ -82,54 +82,53 @@ module Opennms
 
         private
 
-          def model_import_exist?(name)
-            !find_resource(:http_request, "opennms_import POST #{name}").nil?
-          rescue Chef::Exceptions::ResourceNotFound
-            false
-          end
+        def model_import_exist?(name)
+          !find_resource(:http_request, "opennms_import POST #{name}").nil?
+        rescue Chef::Exceptions::ResourceNotFound
+          false
+        end
 
-          def model_import_create(name)
-            url = "#{baseurl}/requisitions/#{name}"
-            Chef::Log.debug "model_import_create url: #{url}"
-            model_import = Opennms::Cookbook::Provision::ModelImport.new(name, url)
-            with_run_context(:root) do
-              declare_resource(:http_request, "opennms_import POST #{name}") do
-                url "#{baseurl}/requisitions"
-                headers({ 'Content-Type' => 'application/xml' })
-                action :nothing
-                delayed_action :post
-                message model_import.message.to_s
-              end
+        def model_import_create(name)
+          url = "#{baseurl}/requisitions/#{name}"
+          Chef::Log.debug "model_import_create url: #{url}"
+          model_import = Opennms::Cookbook::Provision::ModelImport.new(name, url)
+          with_run_context(:root) do
+            declare_resource(:http_request, "opennms_import POST #{name}") do
+              url "#{baseurl}/requisitions"
+              headers({ 'Content-Type' => 'application/xml' })
+              action :nothing
+              delayed_action :post
+              message model_import.message.to_s
             end
           end
+        end
 
+        def model_import_sync(name, rescan)
+          url = "#{baseurl}/requisitions/#{name}/import"
+          url += '?rescanExisting=false' if !rescan.nil? && rescan == false
+          begin
+            tries ||= 3
+            Chef::Log.debug("Attempting import sync for #{name} with URL #{url}")
+            RestClient.put url, nil
+          rescue => e
+            Chef::Log.debug("Retrying import sync for #{name} #{tries}")
+            retry if (tries -= 1) > 0
+            raise e
+          end
+        end
 
-          def model_import_sync(name, rescan)
-            url = "#{baseurl}/requisitions/#{name}/import"
-            url += '?rescanExisting=false' if !rescan.nil? && rescan == false
-            begin
-              tries ||= 3
-              Chef::Log.debug("Attempting import sync for #{name} with URL #{url}")
-              RestClient.put url, nil
-            rescue => e
-              Chef::Log.debug("Retrying import sync for #{name} #{tries}")
-              retry if (tries -= 1) > 0
-              raise e
+        def model_import_node_delete(fsname, fsid)
+          node_url = "#{baseurl}/requisitions/#{fsname}/nodes/#{fsid}"
+          Chef::Log.debug "model_import_node_delete url: #{url}"
+          with_run_context(:root) do
+            declare_resource(:http_request, "opennms_import_node  DELETE #{fsname}") do
+              url node_url
+              headers({ 'Content-Type' => 'application/xml' })
+              action :nothing
+              delayed_action :delete
             end
           end
-
-          def model_import_node_delete(fsname, fsid)
-            node_url = "#{baseurl}/requisitions/#{fsname}/nodes/#{fsid}"
-            Chef::Log.debug "model_import_node_delete url: #{url}"
-            with_run_context(:root) do
-              declare_resource(:http_request, "opennms_import_node  DELETE #{fsname}") do
-                url node_url
-                headers({ 'Content-Type' => 'application/xml' })
-                action :nothing
-                delayed_action :delete
-              end
-            end
-          end
+        end
       end
     end
   end

@@ -4,10 +4,9 @@ include Opennms::Rbac
 
 property :name, String, identity: true
 property :foreign_source_name, String, default: 'imported:'
-property :sync_import, [TrueClass, FalseClass], default: false
+property :sync_import, [true, false], default: false
 property :sync_wait_periods, Integer, default: 30
 property :sync_wait_secs, Integer, default: 10
-
 
 load_current_value do |new_resource|
   model_import = REXML::Document.new(model_import(new_resource.name).message) unless model_import(new_resource.name).nil?
@@ -29,7 +28,7 @@ action :create do
     model_import = REXML::Document.new(model_import(new_resource.name).message).root
     model_import(new_resource.name).message model_import.to_s
     if !new_resource.sync_import.nil? && new_resource.sync_import
-      model_import_sync(new_resource.name,  true)
+      model_import_sync(new_resource.name, true)
     end
   end
 end

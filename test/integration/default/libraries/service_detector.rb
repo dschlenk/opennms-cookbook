@@ -19,7 +19,7 @@ class ServiceDetector < Inspec.resource(1)
     end
   '
 
-  def initialize(name, foreign_source, port =8980)
+  def initialize(name, foreign_source, port = 8980)
     parsed_url = Addressable::URI.parse("http://admin:admin@localhost:#{port}/opennms/rest/foreignSources/#{foreign_source}/detectors/#{name}").normalize.to_str
     begin
       fs = RestClient.get(parsed_url)

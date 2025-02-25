@@ -4,9 +4,9 @@ unified_mode true
 property :ip_addr, String, identity: true
 property :foreign_id, String, required: true
 property :status, Integer
-property :managed, [TrueClass, FalseClass], default: false
+property :managed, [true, false], default: false
 property :snmp_primary, String, equal_to: %w(P S N)
-property :sync_existing, [TrueClass, FalseClass], default: false, desired_state: false
+property :sync_existing, [true, false], default: false, desired_state: false
 
 load_current_value do |new_resource|
   model_import = REXML::Document.new(model_import(new_resource.foreign_source_name).message).root unless model_import(new_resource.foreign_source_name).nil?
@@ -25,11 +25,12 @@ load_current_value do |new_resource|
     if new_resource.send(sym).is_a?(Integer)
       value = begin
         Integer(status_value)
-      rescue
-        status_value
+              rescue
+                status_value
       end
       send(sym, value)
-    else status interface.attributes['status'] if interface.attributes['status'].nil?
+    elsif interface.attributes['status'].nil?
+      status interface.attributes['status']
     end
   end
   managed interface.attributes['managed'] if interface.attributes['managed'].nil?
@@ -47,9 +48,9 @@ load_current_value do |new_resource|
     interface.each_element('meta-data') do |data|
       mdata = {}
       mdata['context'] = data['context']
-      mdata['key'] =  data['key']
-      mdata['value'] =  data['value']
-      meta_datas.push (mdata)
+      mdata['key'] = data['key']
+      mdata['value'] = data['value']
+      meta_datas.push(mdata)
     end
     meta_data meta_datas
   end
@@ -82,7 +83,7 @@ action :create do
       unless new_resource.snmp_primary.nil?
         i_el.attributes['snmp-primary'] = new_resource.snmp_primary
       end
-      if !new_resource.categories.nil?
+      unless new_resource.categories.nil?
         new_resource.categories.each do |category|
           i_el.add_element 'category', 'name' => category
         end
@@ -103,7 +104,7 @@ action :create do
       unless new_resource.snmp_primary.nil?
         interface_el.attributes['snmp-primary'] = new_resource.snmp_primary
       end
-      if !new_resource.categories.nil?
+      unless new_resource.categories.nil?
         interface_el.elements.delete_all 'category'
         b = interface_el.elements['meta-data'] if b.nil?
         new_resource.categories.each do |category|
@@ -130,4 +131,3 @@ action :create do
     end
   end
 end
-

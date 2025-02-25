@@ -8,7 +8,7 @@ property :retry_count, Integer
 property :timeout, Integer
 property :class_name, String
 property :foreign_source_name, String, identity: true
-property :parameters, Hash, callbacks: { 'should be a hash with key/value pairs that are both strings' => lambda { |p| !p.any? { |k, v| !k.is_a?(String) || !v.is_a?(String) } }, }
+property :parameters, Hash, callbacks: { 'should be a hash with key/value pairs that are both strings' => ->(p) { !p.any? { |k, v| !k.is_a?(String) || !v.is_a?(String) } } }
 
 load_current_value do |new_resource|
   foreign_source = REXML::Document.new(fs_resource(new_resource.foreign_source_name).message) unless fs_resource(new_resource.foreign_source_name).nil?
@@ -30,11 +30,12 @@ load_current_value do |new_resource|
         if new_resource.send(sym).is_a?(Integer)
           value = begin
             Integer(v)
-          rescue
-            v
+                  rescue
+                    v
           end
           send(sym, value)
-        else fs_detector_param[k] = v
+        else
+          fs_detector_param[k] = v
         end
       else fs_detector_param[k] = v
       end
@@ -55,7 +56,7 @@ action :create do
     service_name = new_resource.service_name
     foreign_source = REXML::Document.new(fs_resource(new_resource.foreign_source_name).message).root
     detector = foreign_source.elements["detectors/detector[@name = '#{service_name}']"] unless foreign_source.nil?
-    detectors_el = foreign_source.elements["detectors"] unless foreign_source.nil?
+    detectors_el = foreign_source.elements['detectors'] unless foreign_source.nil?
     if detector.nil?
       # Create detector element and add the name attributes and class attribute
       detector_el = REXML::Element.new('detector')
@@ -84,7 +85,8 @@ action :create do
       # then add the element to foreign_source.elements["/detectors"]
       if detectors_el.nil?
         foreign_source.add_element(REXML::Element.new('detectors', detector_el))
-      else detectors_el.add_element detector_el
+      else
+        detectors_el.add_element detector_el
       end
     else # one already exists, so you need to maybe update class
       unless new_resource.class_name.nil?
@@ -103,21 +105,24 @@ action :create do
         timeout_el = detector.elements["parameter[@key='timeout']"]
         if timeout_el.nil?
           detector.add_element 'parameter', 'key' => 'timeout', 'value' => new_resource.timeout
-        else timeout_el.attributes['value'] = new_resource.timeout
+        else
+          timeout_el.attributes['value'] = new_resource.timeout
         end
       end
       unless new_resource.port.nil?
         port_el = detector.elements["parameter[@key='port']"]
         if port_el.nil?
           detector.add_element 'parameter', 'key' => 'port', 'value' => new_resource.port
-        else port_el.attributes['value'] = new_resource.port
+        else
+          port_el.attributes['value'] = new_resource.port
         end
       end
       unless new_resource.retry_count.nil?
         retries_el = detector.elements["parameter[@key='retries']"]
         if retries_el.nil?
           detector.add_element 'parameter', 'key' => 'port', 'value' => new_resource.retry_count
-        else retries_el.attributes['value'] = new_resource.retry_count
+        else
+          retries_el.attributes['value'] = new_resource.retry_count
         end
       end
     end
@@ -143,7 +148,7 @@ action :delete do
   service_name = new_resource.service_name
   foreign_source = REXML::Document.new(fs_resource(new_resource.foreign_source_name).message).root
   detector = foreign_source.elements["detectors/detector[@name = '#{service_name}']"] unless foreign_source.nil?
-  if !detector.nil?
+  unless detector.nil?
     converge_by("Removing service detector #{service_name} from foreign source #{new_resource.foreign_source_name}") do
       foreign_source.delete_element(detector) unless detector.nil?
     end

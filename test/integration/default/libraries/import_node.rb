@@ -24,7 +24,7 @@ class ImportNode < Inspec.resource(1)
     end
   '
 
-  def initialize(id, foreign_source_name, port=8980)
+  def initialize(id, foreign_source_name, port = 8980)
     parsed_url = Addressable::URI.parse("http://admin:admin@localhost:#{port}/opennms/rest/requisitions/#{foreign_source_name}/nodes/#{id}").normalize.to_str
     begin
       node = RestClient.get(parsed_url)
@@ -58,7 +58,7 @@ class ImportNode < Inspec.resource(1)
       n_el.each_element('meta-data') do |a_el|
         meta_data = {}
         meta_data['context'] = a_el['context']
-        meta_data['key'] =  a_el['key']
+        meta_data['key'] = a_el['key']
         meta_data['value'] =  a_el['value']
         meta_datas.push meta_data
       end

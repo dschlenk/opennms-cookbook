@@ -5,7 +5,7 @@ include Opennms::Rbac
 property :policy_name, String, name_property: true
 property :class_name, String, required: true
 property :foreign_source_name, String, identity: true
-property :parameters, Hash, callbacks: { 'should be a hash with key/value pairs that are both strings' => lambda { |p| !p.any? { |k, v| !k.is_a?(String) || !v.is_a?(String) } }, }
+property :parameters, Hash, callbacks: { 'should be a hash with key/value pairs that are both strings' => ->(p) { !p.any? { |k, v| !k.is_a?(String) || !v.is_a?(String) } } }
 
 load_current_value do |new_resource|
   foreign_source = REXML::Document.new(fs_resource(new_resource.foreign_source_name).message) unless fs_resource(new_resource.foreign_source_name).nil?
@@ -36,7 +36,7 @@ action :create do
     policy_name = new_resource.policy_name
     foreign_source = REXML::Document.new(fs_resource(new_resource.foreign_source_name).message).root
     policy = foreign_source.elements["policies/policy[@name = '#{policy_name}']"] unless foreign_source.nil?
-    policies_el = foreign_source.elements["policies"] unless foreign_source.nil?
+    policies_el = foreign_source.elements['policies'] unless foreign_source.nil?
     if policy.nil?
       # Create detector element and add the name attributes and class attribute
       policy_el = REXML::Element.new('policy')
@@ -54,7 +54,8 @@ action :create do
       # then add the element to foreign_source.elements["/detectors"]
       if policies_el.nil?
         foreign_source.add_element(REXML::Element.new('policies', policy_el))
-      else policies_el.add_element policy_el
+      else
+        policies_el.add_element policy_el
       end
     else # one already exists, so you need to maybe update class
       unless new_resource.class_name.nil?
@@ -91,7 +92,7 @@ action :delete do
   policy_name = new_resource.policy_name
   foreign_source = REXML::Document.new(fs_resource(new_resource.foreign_source_name).message).root
   policy = foreign_source.elements["policies/policy[@name = '#{policy_name}']"] unless foreign_source.nil?
-  if !policy.nil?
+  unless policy.nil?
     converge_by("Removing service detector #{policy_name} from foreign source #{new_resource.foreign_source_name}") do
       foreign_source.delete_element(policy) unless policy.nil?
     end

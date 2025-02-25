@@ -8,7 +8,7 @@ property :parent_foreign_id, String
 property :parent_node_label, String
 property :city, String
 property :building, String
-property :assets, Hash, callbacks: { 'should be a hash with key/value pairs that are both strings' => lambda { |p| !p.any? { |k, v| !k.is_a?(String) || !v.is_a?(String) } }, }
+property :assets, Hash, callbacks: { 'should be a hash with key/value pairs that are both strings' => ->(p) { !p.any? { |k, v| !k.is_a?(String) || !v.is_a?(String) } } }
 
 load_current_value do |new_resource|
   model_import = REXML::Document.new(model_import(new_resource.foreign_source_name).message).root unless model_import(new_resource.foreign_source_name).nil?
@@ -43,9 +43,9 @@ load_current_value do |new_resource|
     import_node.each_element('meta-data') do |data|
       mdata = {}
       mdata['context'] = data['context']
-      mdata['key'] =  data['key']
-      mdata['value'] =  data['value']
-      meta_datas.push (mdata)
+      mdata['key'] = data['key']
+      mdata['value'] = data['value']
+      meta_datas.push(mdata)
     end
     meta_data meta_datas
   end
@@ -80,7 +80,7 @@ action :create do
       unless new_resource.building.nil?
         node_el.attributes['building'] = new_resource.building
       end
-      if !new_resource.categories.nil?
+      unless new_resource.categories.nil?
         new_resource.categories.each do |category|
           node_el.add_element 'category', 'name' => category
         end
@@ -113,7 +113,7 @@ action :create do
       unless new_resource.building.nil?
         import_node.attributes['building'] = new_resource.building
       end
-      if !new_resource.categories.nil?
+      unless new_resource.categories.nil?
         import_node.elements.delete_all 'category'
         # find the sibling to insert before
         b = import_node.elements['asset']
