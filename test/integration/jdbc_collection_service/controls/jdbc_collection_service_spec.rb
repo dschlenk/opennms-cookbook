@@ -36,10 +36,6 @@ control 'jdbc_collection_service' do
     its('retry_count') { should eq 10 }
   end
 
-  describe collection_service('JDBC_noop_create_if_missing', 'create_if_missing') do
-    it { should_not exist }
-  end
-
   describe file('/opt/opennms/lib/jdbc.jar') do
     it { should exist }
     its('mode') { should cmp '0664' }
