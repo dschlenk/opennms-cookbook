@@ -48,7 +48,7 @@ load_current_value do |new_resource|
   current_value_does_not_exist! if sd.nil?
   %i(sysoid sysoid_mask ip_addrs ip_addr_masks).each do |p|
     if sd[p].nil?
-      Chef::Log.warn("Missing attribute #{p} for system_def #{new_resource.system_name}")
+      Chef::Log.debug("No property #{p} for system_def #{new_resource.system_name}")
     else
       send(p, sd[p])
     end
