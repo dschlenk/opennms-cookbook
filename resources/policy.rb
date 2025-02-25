@@ -16,10 +16,8 @@ load_current_value do |new_resource|
   fs_policy_param = {}
   fs_params = {}
   class_name fs_policy.attributes['class'] if fs_policy.attributes['class'].nil?
-  unless fs_policy.nil?
-    fs_policy.each_element('parameter') do |parameter|
-      fs_params[parameter.attributes['key']] = parameter.attributes['value']
-    end
+  fs_policy.each_element('parameter') do |parameter|
+    fs_params[parameter.attributes['key']] = parameter.attributes['value']
   end
   parameters fs_policy_param
 end
@@ -35,10 +33,10 @@ action :create do
     fs_resource_init(new_resource.foreign_source_name)
     policy_name = new_resource.policy_name
     foreign_source = REXML::Document.new(fs_resource(new_resource.foreign_source_name).message).root
-    policy = foreign_source.elements["policies/policy[@name = '#{policy_name}']"] unless foreign_source.nil?
-    policies_el = foreign_source.elements['policies'] unless foreign_source.nil?
+    raise Chef::Exceptions::ValidationFailed "No foreign source definition named #{new_resource.foreign_source_name} found. Create it with an opennms_foreign_source[#{new_resource.foreign_source_name}] resource." if foreign_source.nil?
+    policy = foreign_source.elements["policies/policy[@name = '#{policy_name}']"]
     if policy.nil?
-      # Create detector element and add the name attributes and class attribute
+      policies_el = foreign_source.elements['policies'] unless foreign_source.nil?
       policy_el = REXML::Element.new('policy')
       unless policy_name.nil?
         policy_el.add_attribute('name', policy_name)
@@ -51,7 +49,6 @@ action :create do
           policy_el.add_element 'parameter', 'key' => key, 'value' => value
         end
       end
-      # then add the element to foreign_source.elements["/detectors"]
       if policies_el.nil?
         foreign_source.add_element(REXML::Element.new('policies', policy_el))
       else
