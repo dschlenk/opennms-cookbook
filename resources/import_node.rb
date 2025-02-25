@@ -16,8 +16,6 @@ load_current_value do |new_resource|
   current_value_does_not_exist! if model_import.nil?
   import_node = model_import.elements["node[@foreign-id = '#{new_resource.foreign_id}']"]
   current_value_does_not_exist! if import_node.nil?
-  foreign_source_name new_resource.foreign_source_name
-  foreign_id new_resource.foreign_id
   node_label import_node.attributes['node-label']
   parent_foreign_source import_node.attributes['parent-foreign-source']
   parent_foreign_id import_node.attributes['parent-foreign-id']
