@@ -34,6 +34,13 @@ action :create do
   end
 end
 
+action :create_if_missing do
+  thresholds_resource_init
+  config = thresholds_resource.variables[:config]
+  group = config.groups[new_resource.group_name]
+  run_action(:create) if group.nil?
+end
+
 action :update do
   thresholds_resource_init
   config = thresholds_resource.variables[:config]

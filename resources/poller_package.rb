@@ -45,6 +45,12 @@ action :create do
   end
 end
 
+action :create_if_missing do
+  poller_resource_init
+  package = poller_resource.variables[:config].packages[new_resource.package_name]
+  run_action(:create) if package.nil?
+end
+
 action :update do
   converge_if_changed do
     poller_resource_init

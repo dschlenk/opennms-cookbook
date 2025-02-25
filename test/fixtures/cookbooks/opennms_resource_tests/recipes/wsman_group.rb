@@ -83,3 +83,20 @@ opennms_wsman_group 'drac-power-test-bottom' do
   resource_uri 'http://schemas.dmtf.org/wbem/wscim/1/*'
   action :delete
 end
+
+opennms_wsman_group 'create-if-missing' do
+  file_name 'wsman-datacollection.d/wsman-test-group.xml'
+  resource_type 'node'
+  resource_uri 'http://schemas.test.group.com/'
+  attribs [{ 'name' => 'Info', 'alias' => 'serviceTag', 'type' => 'string' }]
+  action :create_if_missing
+end
+
+opennms_wsman_group 'noop-create-if-missing' do
+  group_name 'create-if-missing'
+  file_name 'wsman-datacollection.d/wsman-test-group.xml'
+  resource_type 'node'
+  resource_uri 'http://schemas.dmtf.org/wbem/wscim/12/*'
+  attribs [{ 'name' => 'Info', 'alias' => 'serviceTag', 'type' => 'Gauge' }]
+  action :create_if_missing
+end

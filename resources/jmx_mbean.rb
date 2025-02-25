@@ -68,6 +68,14 @@ action :create do
   end
 end
 
+action :create_if_missing do
+  jmx_resource_init
+  collection = jmx_resource.variables[:collections][new_resource.collection_name]
+  raise Opennms::Cookbook::Collection::NoSuchCollection, "No JMX collection named #{new_resource.collection_name}, cannot add jmx_mbean to it." if collection.nil?
+  mbean = collection.mbean(name: new_resource.mbean_name, objectname: new_resource.objectname)
+  run_action(:create) if mbean.nil?
+end
+
 action :update do
   converge_if_changed(:keyfield, :exclude, :key_alias, :resource_type, :attribs, :include_mbeans, :comp_attribs) do
     jmx_resource_init

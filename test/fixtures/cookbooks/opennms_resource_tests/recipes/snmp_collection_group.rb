@@ -18,3 +18,20 @@ opennms_snmp_collection_group 'Didactum-Monitoring-System-2' do
   source 'https://raw.githubusercontent.com/opennms-config-modules/didactum-monitoring-system-2/065430db9db4d883a7d7befa47fb27b722b2ecf2/datacollection/didactum-monitoring-system-2.xml'
   action [:create, :delete]
 end
+
+opennms_snmp_collection 'createifmissing'
+
+opennms_snmp_collection_group 'create_if_missing' do
+  collection_name 'createifmissing'
+  file 'create-if-missing-snmp-collection-group.xml'
+  system_def 'CreateIfMissing'
+  action :create_if_missing
+end
+
+opennms_snmp_collection_group 'noop_create_if_missing' do
+  group_name 'create_if_missing'
+  collection_name 'createifmissing'
+  file 'create-if-missing-snmp-collection-group.xml'
+  system_def 'NoopCreateIfMissing'
+  action :create_if_missing
+end

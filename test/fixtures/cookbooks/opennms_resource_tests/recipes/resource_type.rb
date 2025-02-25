@@ -76,3 +76,20 @@ opennms_resource_type 'pgTableSpace' do
   storage_strategy 'org.opennms.netmgt.dao.support.SiblingColumnStorageStrategy'
   storage_strategy_params('theKey' => 'theValue')
 end
+
+# create if missing
+opennms_resource_type 'create_if_missing' do
+  group_name 'metasyntactic'
+  label 'Create If Missing'
+  resource_label '${resource} (index:${index})'
+  action :create_if_missing
+end
+
+# noop create if missing
+opennms_resource_type 'noop_create_if_missing' do
+  type_name 'create_if_missing'
+  group_name 'metasyntactic'
+  label 'Noop Create If Missing'
+  resource_label '${resource} (index:${indexs})'
+  action :create_if_missing
+end

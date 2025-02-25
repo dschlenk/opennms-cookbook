@@ -256,3 +256,26 @@ opennms_event 'uei.opennms.org/filters' do
   eventconf_position 'bottom'
   filters [{ 'eventparm' => 'one', 'pattern' => '/^one&two{;t|hree😇$/', 'replacement' => '💩' }]
 end
+
+opennms_event 'create_if_missing' do
+  file 'events/chef.events.xml'
+  event_label 'Chef defined event: createifmissing'
+  descr '<p>Trying to create a file if its missing.</p>'
+  logmsg 'creating file if its missing.'
+  logmsg_dest 'logndisplay'
+  logmsg_notify true
+  severity 'Minor'
+  action :create_if_missing
+end
+
+opennms_event 'noop_create_if_missing' do
+  uei 'create_if_missing'
+  file 'events/chef.events.xml'
+  event_label 'Chef defined event: noopcreateifmissing'
+  descr '<p>Trying to create create if missing that does nothing.</p>'
+  logmsg 'creating create if missing that does nothing.'
+  logmsg_dest 'logndisplay'
+  logmsg_notify true
+  severity 'Minor'
+  action :create_if_missing
+end

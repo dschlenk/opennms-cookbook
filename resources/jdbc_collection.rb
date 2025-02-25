@@ -34,6 +34,12 @@ action :create do
   end
 end
 
+action :create_if_missing do
+  jdbc_resource_init
+  collection = jdbc_resource.variables[:collections][new_resource.collection]
+  run_action(:create) if collection.nil?
+end
+
 action :update do
   converge_if_changed(:rrd_step, :rras) do
     jdbc_resource_init

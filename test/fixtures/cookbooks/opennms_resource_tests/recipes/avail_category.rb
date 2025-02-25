@@ -1,4 +1,3 @@
-# frozen_string_literal: true
 opennms_avail_category 'Cats' do
   comment 'Cats that are pingable and run web server somehow.'
   services %w(ICMP HTTP)
@@ -40,4 +39,18 @@ end
 # remove this category entirely
 opennms_avail_category 'JMX Servers' do
   action :delete
+end
+
+# functional :create_if_missing
+opennms_avail_category 'create_if_missing' do
+  services %w(ICMP)
+  action :create_if_missing
+end
+
+# create_if_missing that doesn't do anything
+opennms_avail_category 'noop create_if_missing' do
+  label 'Email Servers'
+  services %w(LDAP HTTP)
+  rule "IPADDR != '0.0.0.0'"
+  action :create_if_missing
 end

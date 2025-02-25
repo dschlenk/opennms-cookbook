@@ -48,4 +48,10 @@ control 'xml_group' do
     its('key_xpath') { should eq '@inode' }
     its('objects') { should eq 'atime' => { 'type' => 'string', 'xpath' => '@atime' }, 'mtime' => { 'type' => 'string', 'xpath' => '@mtime' } }
   end
+
+  describe xml_group('create-if-missing', 'http://{ipaddr}/group-example', 'foo') do
+    it { should exist }
+    its('resource_type') { should eq 'dnsDns' }
+    its('resource_xpath') { should eq "/measCollecFile/measData/measInfo[@measInfoId='dns|dns']/measValue" }
+  end
 end

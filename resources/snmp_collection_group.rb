@@ -52,9 +52,13 @@ action :create do
       mode '0664'
     end
   end
+
   converge_if_changed do
     snmp_resource_init
     collection = snmp_resource.variables[:collections][new_resource.collection_name]
+    if collection.nil?
+      raise Chef::Exceptions::ResourceNotFound, "Collection '#{new_resource.collection_name}' not found."
+    end
     gn = new_resource.group_name
     group = collection.include_collection(data_collection_group: gn)
     if group.nil?
@@ -64,6 +68,15 @@ action :create do
       run_action(:update)
     end
   end
+end
+
+action :create_if_missing do
+  snmp_resource_init
+  collection = snmp_resource.variables[:collections][new_resource.collection_name]
+  raise Chef::Exceptions::ResourceNotFound, "Collection '#{new_resource.collection_name}' not found." if collection.nil?
+  gn = new_resource.group_name
+  group = collection.include_collection(data_collection_group: gn)
+  run_action(:create) if group.nil?
 end
 
 action :update do

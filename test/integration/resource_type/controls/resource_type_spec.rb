@@ -54,4 +54,14 @@ control 'resource_type' do
     its('storage_strategy') { should eq 'org.opennms.netmgt.dao.support.SiblingColumnStorageStrategy' }
     its('storage_strategy_params') { should eq [{ 'theKey' => 'theValue' }] }
   end
+
+  describe resource_type('create_if_missing', 'metasyntactic') do
+    it { should exist }
+    its('label') { should eq 'Create If Missing' }
+    its('resource_label') { should eq '${resource} (index:${index})' }
+  end
+
+  describe resource_type('noop_create_if_missing', 'metasyntactic') do
+    it { should_not exist }
+  end
 end

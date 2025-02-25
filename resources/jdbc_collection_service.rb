@@ -22,6 +22,9 @@ action :create do
   converge_if_changed do
     collectd_resource_init
     package = collectd_resource.variables[:collectd_config].packages[new_resource.package_name]
+    if package.nil?
+      raise "Package '#{new_resource.package_name}' not found in collectd config."
+    end
     service = package.service(service_name: new_resource.service_name)
     if service.nil?
       resource_properties = %i(service_name interval user_defined status collection timeout retry_count port parameters thresholding_enabled).map { |p| [p, new_resource.send(p)] }.to_h.compact
@@ -45,4 +48,14 @@ action :create do
       run_action(:update)
     end
   end
+end
+
+action :create_if_missing do
+  collectd_resource_init
+  package = collectd_resource.variables[:collectd_config].packages[new_resource.package_name]
+  if package.nil?
+    raise "Package '#{new_resource.package_name}' not found in collectd config."
+  end
+  service = package.service(service_name: new_resource.service_name)
+  run_action(:create) if service.nil?
 end

@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<datacollection-group name="create_if_missing">
+    <group name="CreateIfMissing" ifType="ignore">
+    </group>
+
+    <group name="CreateIfMissing" ifType="ignore">
+    </group>
+
+    <systemDef name="CreateIfMissing">
+        <sysoidMask>.1.3.6.1.4.1.8072.3.</sysoidMask>
+        <collect>
+            <includeGroup>CreateIfMissing</includeGroup>
+        </collect>
+    </systemDef>
+</datacollection-group>

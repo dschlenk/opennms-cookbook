@@ -17,3 +17,15 @@ opennms_threshd_service 'SNMP' do
   package_name 'hrstorage'
   action :delete
 end
+
+opennms_threshd_service 'noop WS-Man' do
+  service_name 'WS-Man'
+  package_name 'cheftest2'
+  interval 3000001
+  action :create_if_missing
+end
+
+opennms_threshd_service 'WS-Man2' do
+  package_name 'cheftest2'
+  action :create_if_missing
+end

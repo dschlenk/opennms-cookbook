@@ -115,6 +115,25 @@ action :create do
   end
 end
 
+action :create_if_missing do
+  snmp_resource_init
+  if new_resource.group_name.nil? && !new_resource.file_name.nil?
+    file = "#{onms_etc}/resource-types.d/#{new_resource.file_name}"
+  elsif !new_resource.group_name.nil?
+    gfn = new_resource.group_file_name.nil? ? "#{new_resource.group_name}.xml" : new_resource.group_file_name
+    file = "#{onms_etc}/datacollection/#{gfn}"
+  end
+  if !new_resource.group_name.nil?
+    rtgroup_resource_init(file, new_resource.group_name)
+    config = rtgroup_resource(file).variables[:config]
+  else
+    rt_resource_init(file)
+    config = rt_resource(file).variables[:config]
+  end
+  rt = config.resource_type(name: new_resource.type_name)
+  run_action(:create) if rt.nil?
+end
+
 action :update do
   snmp_resource_init
   unless new_resource.group_name.nil?

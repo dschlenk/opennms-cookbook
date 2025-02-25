@@ -12,6 +12,42 @@ opennms_poller_package 'foo' do
   rras ['RRA:AVERAGE:0.5:2:4032', 'RRA:AVERAGE:0.5:24:2976', 'RRA:AVERAGE:0.5:576:732', 'RRA:MAX:0.5:576:732', 'RRA:MIN:0.5:576:732']
 end
 
+opennms_poller_package 'create_if_missing' do
+  filter "(IPADDR != '0.0.0.0') & (categoryName == 'create_if_missing')"
+  package_name 'createifmissing'
+  specifics ['10.0.0.1']
+  include_ranges ['begin' => '10.0.1.1', 'end' => '10.0.1.254']
+  exclude_ranges ['begin' => '10.0.2.1', 'end' => '10.0.2.254']
+  rrd_step 600
+  remote true
+  outage_calendars ['ignore localhost on mondays']
+  rras ['RRA:AVERAGE:0.5:2:4032', 'RRA:AVERAGE:0.5:24:2976', 'RRA:AVERAGE:0.5:576:732', 'RRA:MAX:0.5:576:732', 'RRA:MIN:0.5:576:732']
+  action :create_if_missing
+end
+
+opennms_poller_service 'ICMP - createifmissing' do
+  service_name 'ICMP'
+  package_name 'createifmissing'
+  interval 600_000
+  user_defined true
+  status 'off'
+  timeout 5000
+  class_name 'org.opennms.netmgt.poller.monitors.IcmpMonitor'
+end
+
+opennms_poller_package 'noop_create_if_missing' do
+  filter "(IPADDR != '0.0.0.0')"
+  package_name 'createifmissing'
+  specifics ['10.0.0.1']
+  include_ranges ['begin' => '10.0.1.1', 'end' => '10.0.1.254']
+  exclude_ranges ['begin' => '10.0.2.1', 'end' => '10.0.2.254']
+  rrd_step 700
+  remote true
+  outage_calendars ['ignore localhost on mondays']
+  rras ['RRA:AVERAGE:0.5:2:4033', 'RRA:AVERAGE:0.5:24:2977', 'RRA:AVERAGE:0.5:576:733', 'RRA:MAX:0.5:576:733', 'RRA:MIN:0.5:576:733']
+  action :create_if_missing
+end
+
 # at least one service must be defined for each package
 opennms_poller_service 'SNMP' do
   package_name 'foo'

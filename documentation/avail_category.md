@@ -22,4 +22,4 @@ Manage categories in an existing category group in `$OPENNMS_HOME/etc/categories
 
 ## Examples
 
-See [avail_category.rb](../test/fixtures/cookbooks/opennms_resource_tests/recipes/avail_category.rb)
+See [avail\_category.rb](../test/fixtures/cookbooks/opennms_resource_tests/recipes/avail_category.rb)
