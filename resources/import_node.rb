@@ -62,7 +62,7 @@ action :create do
     model_import_init(new_resource.foreign_source_name)
     model_import = REXML::Document.new(model_import(new_resource.foreign_source_name).message).root
     model_import = REXML::Document.new(Opennms::Cookbook::Provision::ModelImport.new("#{new_resource.foreign_source_name}", "#{baseurl}/requisitions/#{new_resource.foreign_source_name}/nodes/#{new_resource.foreign_id}").message) if model_import.nil?
-    import_node = model_import.elements["node [@node-label = '#{new_resource.name}' and @foreign-id = '#{new_resource.foreign_id}']"] unless model_import.nil?
+    import_node = model_import.elements["node[@foreign-id = '#{new_resource.foreign_id}']"] unless model_import.nil?
     if import_node.nil?
       node_el = model_import.add_element 'node', 'node-label' => new_resource.name, 'foreign-id' => new_resource.foreign_id
       unless new_resource.parent_foreign_source.nil?
@@ -97,7 +97,6 @@ action :create do
       end
     else
       import_node.attributes['node-label'] = new_resource.name
-      import_node.attributes['foreign-id'] = new_resource.foreign_id
       unless new_resource.parent_foreign_source.nil?
         import_node.attributes['parent-foreign-source'] = new_resource.parent_foreign_source
       end
@@ -156,10 +155,18 @@ action :create do
   end
 end
 
+action :create_if_missing do
+    model_import_init(new_resource.foreign_source_name)
+    model_import = REXML::Document.new(model_import(new_resource.foreign_source_name).message).root
+    model_import = REXML::Document.new(Opennms::Cookbook::Provision::ModelImport.new("#{new_resource.foreign_source_name}", "#{baseurl}/requisitions/#{new_resource.foreign_source_name}/nodes/#{new_resource.foreign_id}").message) if model_import.nil?
+    import_node = model_import.elements["node [@node-label = '#{new_resource.name}' and @foreign-id = '#{new_resource.foreign_id}']"] unless model_import.nil?
+    run_action(:create) if import_node.nil?
+end
+
 action :delete do
   converge_if_changed do
     model_import = REXML::Document.new(model_import(new_resource.name).message).root unless model_import(new_resource.name).nil?
-    import_node = model_import.elements["node [@node-label = '#{new_resource.name}' and @foreign-id = '#{new_resource.foreign_id}']"] unless model_import.nil?
+    import_node = model_import.elements["node[@foreign-id = '#{new_resource.foreign_id}']"] unless model_import.nil?
     unless import_node.nil?
       model_import_node_delete(new_resource.foreign_source_name, new_resource.foreign_id)
     end
