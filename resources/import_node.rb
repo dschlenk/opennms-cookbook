@@ -11,10 +11,6 @@ property :building, String
 property :assets, Hash, callbacks: { 'should be a hash with key/value pairs that are both strings' => lambda { |p| !p.any? { |k, v| !k.is_a?(String) || !v.is_a?(String) } }, }
 
 load_current_value do |new_resource|
-  node_assets = {}
-  node_category = []
-  meta_datas = []
-  mdata = {}
   model_import = REXML::Document.new(model_import(new_resource.foreign_source_name).message).root unless model_import(new_resource.foreign_source_name).nil?
   model_import = REXML::Document.new(Opennms::Cookbook::Provision::ModelImport.new("#{new_resource.foreign_source_name}", "#{baseurl}/requisitions/#{new_resource.foreign_source_name}/nodes/#{new_resource.foreign_id}").message) if model_import.nil?
   current_value_does_not_exist! if model_import.nil?
@@ -29,19 +25,23 @@ load_current_value do |new_resource|
   city import_node.attributes['city']
   building import_node.attributes['building']
   unless import_node.elements['category'].nil?
+    node_category = []
     import_node.each_element('category') do |category|
       node_category.push category.attributes['name'].to_s
     end
     categories node_category
   end
   unless import_node.elements['asset'].nil?
+    node_assets = {}
     import_node.each_element('asset') do |asset|
       node_assets[asset.attributes['name'].to_s] = asset.attributes['value'].to_s
     end
     assets node_assets
   end
   unless import_node.elements['meta-data'].nil?
+    meta_datas = []
     import_node.each_element('meta-data') do |data|
+      mdata = {}
       mdata['context'] = data['context']
       mdata['key'] =  data['key']
       mdata['value'] =  data['value']

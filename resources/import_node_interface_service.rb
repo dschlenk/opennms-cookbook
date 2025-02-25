@@ -18,25 +18,25 @@ load_current_value do |new_resource|
   foreign_id new_resource.foreign_id
   ip_addr new_resource.ip_addr
   service_name name
-  node_assets = {}
-  meta_datas = []
-  mdata = {}
-  node_category = []
 
   unless service.elements['category'].nil?
+    node_category = []
     service.each_element('category') do |category|
       node_category.push category.attributes['name'].to_s
     end
     categories node_category
   end
   unless service.elements['asset'].nil?
+    node_assets = {}
     service.each_element('asset') do |asset|
       node_assets[asset.attributes['key'].to_s] = asset.attributes['value'].to_s
     end
     assets node_assets
   end
   unless service.elements['meta-data'].nil?
+    meta_datas = []
     service.each_element('meta-data') do |data|
+      mdata = {}
       mdata['context'] = data['context']
       mdata['key'] =  data['key']
       mdata['value'] =  data['value']
