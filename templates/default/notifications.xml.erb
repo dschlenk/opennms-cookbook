@@ -1,0 +1,36 @@
+<notifications xmlns="http://xmlns.opennms.org/xsd/notifications">
+   <header>
+      <rev>1.2</rev>
+      <created>Wednesday, February 6, 2002 10:10:00 AM EST</created>
+      <mstation>localhost</mstation>
+   </header>
+<% @config.notifs.each do |n| -%>
+   <notification name=<%= n.name.encode(:xml => :attr) %> status=<%= n.status.encode(:xml => :attr) %><%= n.writeable.nil? ? '' : " writeable=#{n.writeable.encode(:xml => :attr)}" %>>
+      <uei><%= n.uei.encode(:xml => :text) %></uei>
+  <% unless n.description.nil? -%>
+      <description><%= n.description.encode(:xml => :text) %></description>
+  <% end -%>
+      <rule<%= n.strict_rule.nil? ? '' : " strict=#{n.strict_rule.to_s.encode(:xml => :attr)}" %>><%= n.rule.encode(:xml => :text) %></rule>
+      <destinationPath><%= n.destination_path.encode(:xml => :text) %></destinationPath>
+      <text-message><%= n.text_message.encode(:xml => :text) %></text-message>
+  <% unless n.subject.nil? -%>
+      <subject><%= n.subject.encode(:xml => :text) %></subject>
+  <% end -%>
+  <% unless n.numeric_message.nil? -%>
+      <numeric-message><%= n.numeric_message.encode(:xml => :text) %></numeric-message>
+  <% end -%>
+  <% unless n.event_severity.nil? -%>
+      <event-severity><%= n.event_severity.encode(:xml => :text) %></event-severity>
+  <% end -%>
+  <% n.parameters.each do |k, v| -%>
+      <parameter name=<%= k.encode(:xml => :attr) %> value=<%= v.encode(:xml => :attr) %>/>
+  <% end unless n.parameters.nil? -%>
+  <% if !n.vbname.nil? && !n.vbvalue.nil? -%>
+      <varbind>
+         <vbname><%= n.vbname.encode(:xml => :text) %></vbname>
+         <vbvalue><%= n.vbvalue.encode(:xml => :text) %></vbvalue>
+      </varbind>
+  <% end -%>
+   </notification>
+<% end -%>
+</notifications>

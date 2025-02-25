@@ -9,8 +9,9 @@ class SurveillanceView < Inspec.resource(1)
 
   example '
     describe surveillance_view(\'default\') do
-      rows \'Routers\' => [\'Routers\'], \'Servers\' => [\'Servers\']
-      columns \'PROD\' => [\'Production\'], \'TEST\' => %w(Test Development)
+      its(\'refresh_seconds\') { should be 300 }
+      its(\'rows\') { should cmp \'Routers\' => [\'Routers\'], \'Servers\' => [\'Servers\'] }
+      its(\'columns\') { should cmp \'PROD\' => [\'Production\'], \'TEST\' => %w(Test Development) }
     end
   '
 
@@ -20,6 +21,7 @@ class SurveillanceView < Inspec.resource(1)
     @exists = !svel.nil?
     return unless @exists
     @params = {}
+    @params[:refresh_seconds] = svel.attributes['refresh-seconds'].to_i unless svel.attributes['refresh-seconds'].nil?
     unless svel.elements['rows'].nil?
       @params[:rows] = {}
       svel.each_element('rows/row-def') do |rd|

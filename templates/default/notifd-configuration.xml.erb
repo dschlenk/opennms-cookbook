@@ -1,0 +1,34 @@
+<notifd-configuration xmlns="http://xmlns.opennms.org/xsd/config/notifd" status=<%= (node['opennms']['notifd']['status'] || @config.status).encode(:xml => :attr)%> match-all=<%= (node['opennms']['notifd']['match_all'] || @config.match_all).to_s.encode(:xml => :attr) %><%= @config.pages_sent.nil? ? '' : " pages-sent=#{@config.pages_sent.encode(:xml => :attr)}" %><%= @config.next_notif_id.nil? ? '' : " next-notif-id=#{@config.next_notif_id.encode(:xml => :attr)}" %><%= @config.next_user_notif_id.nil? ? '' : " next-user-notif-id=#{@config.next_user_notif_id.encode(:xml => :attr)}" %><%= @config.next_group_id.nil? ? '' : " next-group-id=#{@config.next_group_id.encode(:xml => :attr)}" %><%= @config.service_id_sql.nil? ? '' : " service-id-sql=#{@config.service_id_sql.encode(:xml => :attr)}" %><%= @config.outstanding_notices_sql.nil? ? '' : " outstanding-notices-sql=#{@config.outstanding_notices_sql.encode(:xml => :attr)}" %><%= @config.acknowledge_id_sql.nil? ? '' : " acknowledge-id-sql=#{@config.acknowledge_id_sql.encode(:xml => :attr)}" %><%= @config.acknowledge_update_sql.nil? ? '' : " acknowledge-update-sql=#{@config.acknowledge_update_sql.encode(:xml => :attr)}" %><%= @config.email_address_command.nil? ? '' : " email-address-command=#{@config.email_address_command.encode(:xml => :attr)}" %><%= @config.numeric_skip_resolution_prefix.nil? ? '' : " numeric-skip-resolution-prefix=#{@config.numeric_skip_resolution_prefix.to_s.encode(:xml => :attr)}" %><%= @config.max_threads.nil? ? '' : " max-threads=#{@config.max_threads.encode(:xml => :attr)}" %>>
+<% unless @config.auto_acknowledge_alarm.nil? -%>
+   <auto-acknowledge-alarm<%= @config.auto_acknowledge_alarm['resolution_prefix'].nil? ? '' : " resolution-prefix=#{@config.auto_acknowledge_alarm['resolution_prefix'].encode(:xml => :attr)}" %><%= @config.auto_acknowledge_alarm['notify'].nil? ? '' : " notify=#{@config.auto_acknowledge_alarm['notify'].to_s.encode(:xml => :attr)}" %>>
+  <% @config.auto_acknowledge_alarm['ueis'].each do |u| -%>
+      <uei><%= u.encode(:xml => :text) %></uei>
+  <% end unless @config.auto_acknowledge_alarm['ueis'].nil? -%>
+   </auto-acknowledge-alarm>
+<% end -%>
+<% @config.autoacks.each do |autoack| -%>
+   <auto-acknowledge<%= autoack.resolution_prefix.nil? ? '' : " resolution-prefix=#{autoack.resolution_prefix.encode(:xml => :attr)}" %> uei=<%= autoack.uei.encode(:xml => :attr) %> acknowledge=<%= autoack.acknowledge.encode(:xml => :attr) %><%= autoack.notify.nil? ? '' : " notify=#{autoack.notify.to_s.encode(:xml => :attr)}" %>>
+  <% autoack.matches.each do |m| -%>
+      <match><%= m.encode(:xml => :text) %></match>
+  <% end -%>
+   </auto-acknowledge>
+<% end -%>
+<% @config.queues.each do |queue| -%>
+   <queue>
+      <queue-id><%= queue['queue_id'].encode(:xml => :text) %></queue-id>
+      <interval><%= queue['interval'].encode(:xml => :text) %></interval>
+      <handler-class>
+         <name><%= queue['handler_class'].encode(:xml => :text) %></name>
+  <% queue['handler_class_init_params'].each do |k, v| -%>
+         <init-params>
+            <param-name><%= k.encode(:xml => :text) %></param-name>
+            <param-value><%= v.encode(:xml => :text) %></param-value>
+         </init-params>
+  <% end unless queue['handler_class_init_params'].nil? -%>
+      </handler-class>
+   </queue>
+<% end -%>
+<% @config.outage_calendars.each do |cal| -%>
+   <outage-calendar><%= cal.encode(:xml => :attr) %></outage-calendar>
+<% end unless @config.outage_calendars.nil? -%>
+</notifd-configuration>

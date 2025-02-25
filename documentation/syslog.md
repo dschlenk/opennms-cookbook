@@ -39,4 +39,4 @@ When `position` is `top`, the file is included before all other `include-file` e
 
 ### Examples
 
-See [syslog_file.rb](../test/fixtures/cookbooks/opennms_resource_tests/recipes/syslog_file.rb)
+See [syslog\_file.rb](../test/fixtures/cookbooks/opennms_resource_tests/recipes/syslog_file.rb)

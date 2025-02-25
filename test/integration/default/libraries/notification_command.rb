@@ -1,4 +1,3 @@
-# frozen_string_literal: true
 class NotificationCommand < Inspec.resource(1)
   name 'notification_command'
 
@@ -14,6 +13,7 @@ class NotificationCommand < Inspec.resource(1)
       its(\'comment\') { should eq \'wall the hostname\' }
       its(\'binary\') { should eq true }
       its(\'arguments\') { should eq [{ \'streamed\' => false, \'switch\' => \'-tm\' }] }
+      its(\'service_registry\') { should eq false }
     end
   '
 
@@ -45,6 +45,9 @@ class NotificationCommand < Inspec.resource(1)
           end
           @params[:arguments].push hash
         end
+      end
+      if !n_el.nil? && !n_el.attributes['service-registry'].nil?
+        @params[:service_registry] = (n_el.attributes['service-registry'].to_s.downcase.eql?('true') || n_el.attributes['service-registry'].to_s.eql?('1'))
       end
     end
   end

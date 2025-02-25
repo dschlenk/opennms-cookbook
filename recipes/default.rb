@@ -17,7 +17,7 @@
 # limitations under the License.
 #
 
-%w(java-properties addressable).each do |g|
+%w(addressable).each do |g|
   chef_gem g
 end
 
@@ -85,3 +85,4 @@ end
 
 include_recipe 'opennms::adminpw'
 include_recipe 'opennms::default_resources'
+include_recipe 'opennms::templates'

@@ -52,6 +52,13 @@ module Opennms::Rbac
     end
   end
 
+  def users_exist?(users)
+    users.each do |user|
+      return false unless user_exists?(user)
+    end
+    true
+  end
+
   def user_exists?(user)
     begin
       response = RestClient.get "#{baseurl}/users/#{user}", accept: :json, 'Accept-Encoding' => 'identity'
@@ -186,6 +193,13 @@ module Opennms::Rbac
     !doc.elements["/groupinfo/groups/group/name[text() = '#{group}']"].nil?
   end
 
+  def group(group)
+    file = ::File.new("#{node['opennms']['conf']['home']}/etc/groups.xml", 'r')
+    doc = REXML::Document.new file
+    file.close
+    doc.elements["/groupinfo/groups/group[name/text() = '#{group}']"]
+  end
+
   def user_in_group?(group, user)
     ingroup = false
     file = ::File.new("#{node['opennms']['conf']['home']}/etc/groups.xml", 'r')
@@ -198,6 +212,50 @@ module Opennms::Rbac
     ingroup
   end
 
+  def delete_group(group)
+    file = ::File.new("#{node['opennms']['conf']['home']}/etc/groups.xml", 'r')
+    doc = REXML::Document.new file
+    file.close
+    doc.elements.delete_all("/groupinfo/groups/group[name/text() = '#{group}']")
+    Opennms::Helpers.write_xml_file(doc, "#{node['opennms']['conf']['home']}/etc/groups.xml")
+  end
+
+  def update_group(new_resource)
+    file = ::File.new("#{node['opennms']['conf']['home']}/etc/groups.xml", 'r')
+    doc = REXML::Document.new file
+    file.close
+
+    group_el = doc.elements["/groupinfo/groups/group[name/text() = '#{new_resource.group_name}']"]
+    unless new_resource.comments.nil?
+      if group_el.elements['comments'].nil?
+        comments_el = group_el.add_element 'comments'
+        comments_el.add_text new_resource.comments
+      else
+        group_el.elements['comments'].text = new_resource.comments
+      end
+    end
+    unless new_resource.users.nil?
+      unless group_el.elements['user'].nil?
+        group_el.elements.delete_all('user')
+      end
+      new_resource.users.each do |user|
+        user_el = group_el.add_element 'user'
+        user_el.add_text user
+      end
+    end
+    unless new_resource.duty_schedules.nil?
+      unless group_el.elements['duty-schedule'].nil?
+        group_el.elements.delete_all('duty-schedule')
+      end
+      new_resource.duty_schedules.each do |ds|
+        ds_el = group_el.add_element 'duty-schedule'
+        ds_el.add_text ds
+      end
+    end
+
+    Opennms::Helpers.write_xml_file(doc, "#{node['opennms']['conf']['home']}/etc/groups.xml")
+  end
+
   def add_group(new_resource)
     file = ::File.new("#{node['opennms']['conf']['home']}/etc/groups.xml", 'r')
     doc = REXML::Document.new file
@@ -206,11 +264,7 @@ module Opennms::Rbac
     groups_el = doc.elements['/groupinfo/groups']
     group_el = groups_el.add_element 'group'
     name_el = group_el.add_element 'name'
-    name_el.add_text new_resource.name
-    unless new_resource.default_svg_map.nil?
-      map_el = group_el.add_element 'default-map'
-      map_el.add_text new_resource.default_svg_map
-    end
+    name_el.add_text new_resource.group_name
     unless new_resource.comments.nil?
       comments_el = group_el.add_element 'comments'
       comments_el.add_text new_resource.comments
@@ -266,12 +320,49 @@ module Opennms::Rbac
     Opennms::Helpers.write_xml_file(doc, "#{node['opennms']['conf']['home']}/etc/groups.xml")
   end
 
-  # assumes validity of arguments
-  def schedule_exists?(role, user, type)
+  def role(role)
     file = ::File.new("#{node['opennms']['conf']['home']}/etc/groups.xml", 'r')
     doc = REXML::Document.new file
     file.close
-    !doc.elements["/groupinfo/roles/role[@name = '#{role}']/schedule[@type = '#{type}' and @name = '#{user}']"].nil?
+    doc.elements["/groupinfo/roles/role[@name = '#{role}']"]
+  end
+
+  def update_role_attributes(new_resource)
+    file = ::File.new("#{node['opennms']['conf']['home']}/etc/groups.xml", 'r')
+    doc = REXML::Document.new file
+    file.close
+
+    role_el = doc.elements["/groupinfo/roles/role[@name = '#{new_resource.role_name}']"]
+    role_el.add_attribute('membership-group', new_resource.membership_group) unless new_resource.membership_group.nil?
+    role_el.add_attribute('supervisor', new_resource.supervisor) unless new_resource.supervisor.nil?
+    role_el.add_attribute('description', new_resource.description) unless new_resource.description.nil?
+
+    Opennms::Helpers.write_xml_file(doc, "#{node['opennms']['conf']['home']}/etc/groups.xml")
+  end
+
+  def delete_role(role)
+    file = ::File.new("#{node['opennms']['conf']['home']}/etc/groups.xml", 'r')
+    doc = REXML::Document.new file
+    file.close
+    doc.elements.delete_all("/groupinfo/roles/role[@name = '#{role}']")
+    Opennms::Helpers.write_xml_file(doc, "#{node['opennms']['conf']['home']}/etc/groups.xml")
+  end
+
+  # assumes validity of arguments
+  def schedule_exists?(new_resource)
+    file = ::File.new("#{node['opennms']['conf']['home']}/etc/groups.xml", 'r')
+    doc = REXML::Document.new file
+    file.close
+    doc.root.each_element("/groupinfo/roles/role[@name = '#{new_resource.role_name}']/schedule[@type = '#{new_resource.type}' and @name = '#{new_resource.username}']") do |s|
+      Chef::Log.warn("parsing times for #{s}")
+      times = []
+      s.each_element('time') do |t|
+        times.push({ 'begins' => t.attributes['begins'], 'ends' => t.attributes['ends'], 'day' => t.attributes['day'] }.compact)
+      end
+      Chef::Log.warn("times is #{times}; new_resource.times is #{new_resource.times}")
+      return true if !times.difference(new_resource.times).any? && !new_resource.times.difference(times).any?
+    end
+    false
   end
 
   def add_schedule_to_role(new_resource)
@@ -287,6 +378,61 @@ module Opennms::Rbac
     end
 
     Opennms::Helpers.write_xml_file(doc, "#{node['opennms']['conf']['home']}/etc/groups.xml")
+  end
+
+  def delete_role_schedule(new_resource)
+    file = ::File.new("#{node['opennms']['conf']['home']}/etc/groups.xml", 'r')
+    doc = REXML::Document.new file
+    file.close
+    to_delete = nil
+    preserve = []
+    doc.root.each_element("/groupinfo/roles/role[@name = '#{new_resource.role_name}']/schedule[@type = '#{new_resource.type}' and @name = '#{new_resource.username}']") do |s|
+      times = []
+      s.each_element('time') do |t|
+        times.push({ 'begins' => t.attributes['begins'], 'ends' => t.attributes['ends'], 'day' => t.attributes['day'] }.compact)
+      end
+      if !times.difference(new_resource.times).any? && !new_resource.times.difference(times).any?
+        Chef::Log.warn("found the right schedule because new_resource.times is #{new_resource.times} and times is #{times}")
+        to_delete = s
+      else
+        Chef::Log.warn("not the right schedule because new_resource.times is #{new_resource.times} and times is #{times}")
+        preserve.push s
+      end
+    end
+    doc.root.elements.delete_all("/groupinfo/roles/role[@name = '#{new_resource.role_name}']/schedule[@type = '#{new_resource.type}' and @name = '#{new_resource.username}']")
+    role = doc.root.elements["/groupinfo/roles/role[@name = '#{new_resource.role_name}']"]
+    preserve.each do |s|
+      role.add_element(s)
+    end
+    Opennms::Helpers.write_xml_file(doc, "#{node['opennms']['conf']['home']}/etc/groups.xml")
+  end
+
+  def times_valid?(times)
+    validity = true
+    if !times.nil? && !times.empty?
+      times.each do |time|
+        if time.key?('begins') && time.key?('ends')
+          # check format of begins and ends
+          unless time['begins'] =~ /^[0-9]{1,2}-(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)-[0-9]{4} [0-9]{1,2}:[0-9]{2}:[0-9]{2}$/ || time['begins'] =~ /^[0-9]{1,2}:[0-9]{2}:[0-9]{2}$/
+            validity = false
+          end
+          unless time['ends'] =~ /^[0-9]{1,2}-(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)-[0-9]{4} [0-9]{1,2}:[0-9]{2}:[0-9]{2}$/ || time['ends'] =~ /^[0-9]{1,2}:[0-9]{2}:[0-9]{2}$/
+            validity = false
+          end
+          # if has day, check that too
+          if time.key?('day')
+            validity = false unless time['day'] =~ /^(monday|tuesday|wednesday|thursday|friday|saturday|sunday|[1-3][0-9]|[1-9])$/
+          end
+        else
+          # because missing beings/ends keys
+          validity = false
+        end
+      end
+    else
+      # because times is nil or empty - need at least one
+      validity = false
+    end
+    validity
   end
 
   def baseurl(pw = nil)

@@ -1,0 +1,26 @@
+<surveillance-view-configuration xmlns="http://xmlns.opennms.org/xsd/config/surveillance-views"<%= @config.default_view ? " default-view=#{@config.default_view.encode(:xml => :attr)}" : '' %>>
+   <views>
+<% @config.views.each do |name, view| -%>
+      <view name=<%= name.encode(:xml => :attr) %><%= view['refresh-seconds'].nil? ? '' : " refresh-seconds=#{view['refresh-seconds'].to_s.encode(:xml => :attr)}" %>>
+         <rows>
+  <% view['rows'].each do |label, categories| -%>
+            <row-def label=<%= label.encode(:xml => :attr) %>>
+    <% categories.each do |cat| -%>
+               <category name=<%= cat.encode(:xml => :attr) %>/>
+    <% end -%>
+            </row-def>
+  <% end -%>
+         </rows>
+         <columns>
+  <% view['columns'].each do |label, categories| -%>
+            <column-def label=<%= label.encode(:xml => :attr) %>>
+    <% categories.each do |cat| -%>
+               <category name=<%= cat.encode(:xml => :attr) %>/>
+    <% end -%>
+            </column-def>
+  <% end -%>
+         </columns>
+      </view>
+<% end -%>
+   </views>
+</surveillance-view-configuration>

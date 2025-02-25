@@ -1,4 +1,3 @@
-# frozen_string_literal: true
 control 'collection_graph_file' do
   files = ['wimax-gw-graph.properties',
            'xups-graph.properties',

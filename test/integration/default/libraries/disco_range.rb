@@ -8,18 +8,18 @@ class DiscoRange < Inspec.resource(1)
   '
 
   example '
-    describe disco_range(\'type\', \'range_begin\', \'range_end\') do
+    describe disco_range(\'type\', \'range_begin\', \'range_end\', \'location\') do
       it { should exist }
       its(\'retry_count\') { should eq 37 }
       its(\'discovery_timeout\') { should eq 6000 }
-      its(\'location\') { should eq \'Detroit\' }
       its(\'foreign_source\') { should eq \'disco-source\' }
     end
   '
 
-  def initialize(type, range_begin, range_end)
+  def initialize(type, range_begin, range_end, location = nil)
     doc = REXML::Document.new(inspec.file('/opt/opennms/etc/discovery-configuration.xml').content)
-    xpath = "/discovery-configuration/#{type}-range[begin[text() = '#{range_begin}']]"
+    xpath = "/discovery-configuration/#{type}-range[begin[text() = '#{range_begin}'] and not(@location)]" if location.nil?
+    xpath = "/discovery-configuration/#{type}-range[begin[text() = '#{range_begin}'] and @location = '#{location}']" unless location.nil?
     r_el = nil
     # well this is ugly, but apparently REXML can't handle siblings in a compound predicate each with text equality checks
     doc.each_element(xpath) do |rr|
@@ -30,9 +30,8 @@ class DiscoRange < Inspec.resource(1)
     @exists = !r_el.nil?
     if @exists
       @params = {}
-      @params[:retry_count] = r_el.attributes['retries'].to_i
-      @params[:discovery_timeout] = r_el.attributes['timeout'].to_i
-      @params[:location] = r_el.attributes['location']
+      @params[:retry_count] = r_el.attributes['retries'].to_i unless r_el.attributes['retries'].nil?
+      @params[:discovery_timeout] = r_el.attributes['timeout'].to_i unless r_el.attributes['timeout'].nil?
       @params[:foreign_source] = r_el.attributes['foreign-source']
     end
   end

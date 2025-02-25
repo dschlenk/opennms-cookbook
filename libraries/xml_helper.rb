@@ -13,6 +13,7 @@ module Opennms
     end
 
     def xmldoc_from_file(file)
+      return unless ::File.exist?(file)
       f = ::File.new(file, 'r')
       doc = REXML::Document.new(f)
       f.close
@@ -49,6 +50,19 @@ module Opennms
         arr.push xml_element_text(el)
       end
       arr
+    end
+
+    # s can be anything that can be coerced to a string
+    # returns nil if s is nil
+    # returns true of s.to_s.eql?("1") or s.to_s.downcase.eql?("true")
+    # false otherwise
+    def s_to_boolean(s)
+      return if s.nil?
+      s = s.to_s
+      ret = false
+      ret = true if s.downcase.eql?('true')
+      ret = true if s.eql?('1')
+      ret
     end
   end
 

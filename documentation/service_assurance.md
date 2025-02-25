@@ -33,9 +33,9 @@ Manages a `package` in `poller-configuration.xml`.
 
 #### Examples for opennms\_poller\_package
 
-Recipe [poller.rb](../test/fixtures/cookbooks/openms_resource_tests/recipes/poller.rb) contains several varying examples of package creation.
-Recipe [poller\_edit.rb](../test/fixtures/cookbooks/openms_resource_tests/recipes/poller_edit.rb) contains examples of editing packages.
-Recipe [poller\_delete.rb](../test/fixtures/cookbooks/openms_resource_tests/recipes/poller_delete.rb) contains an example of deleting packages.
+Recipe [poller.rb](../test/fixtures/cookbooks/opennms_resource_tests/recipes/poller.rb) contains several varying examples of package creation.
+Recipe [poller\_edit.rb](../test/fixtures/cookbooks/opennms_resource_tests/recipes/poller_edit.rb) contains examples of editing packages.
+Recipe [poller\_delete.rb](../test/fixtures/cookbooks/opennms_resource_tests/recipes/poller_delete.rb) contains an example of deleting packages.
 
 ### opennms\_poller\_service
 
@@ -67,6 +67,6 @@ Manages a `service` in a `package` in `poller-configuration.xml`.
 
 #### Examples for opennms\_poller\_service
 
-Recipe [poller.rb](../test/fixtures/cookbooks/openms_resource_tests/recipes/poller.rb) contains several varying examples of poller service creation.
-Recipe [poller\_edit.rb](../test/fixtures/cookbooks/openms_resource_tests/recipes/poller_edit.rb) contains examples of editing services.
-Recipe [poller\_delete.rb](../test/fixtures/cookbooks/openms_resource_tests/recipes/poller_delete.rb) contains an example of deleting services.
+Recipe [poller.rb](../test/fixtures/cookbooks/opennms_resource_tests/recipes/poller.rb) contains several varying examples of poller service creation.
+Recipe [poller\_edit.rb](../test/fixtures/cookbooks/opennms_resource_tests/recipes/poller_edit.rb) contains examples of editing services.
+Recipe [poller\_delete.rb](../test/fixtures/cookbooks/opennms_resource_tests/recipes/poller_delete.rb) contains an example of deleting services.
