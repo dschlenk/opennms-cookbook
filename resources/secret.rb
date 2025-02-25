@@ -20,11 +20,17 @@ action :create do
 end
 
 action :create_if_missing do
+  pw = opennms_scv_password
   execute "create OpenNMS secret #{new_resource.name}" do
     cwd node['opennms']['conf']['home']
     user 'opennms'
     sensitive true
-    command "bin/scvcli set '#{new_resource.secret_alias}' '#{new_resource.username}' '#{new_resource.password}'"
-    not_if "bin/scvcli list | grep '#{new_resource.secret_alias}'"
+    if pw.nil?
+      command "bin/scvcli set '#{new_resource.secret_alias}' '#{new_resource.username}' '#{new_resource.password}'"
+      not_if "bin/scvcli list | grep '#{new_resource.secret_alias}'"
+    else
+      command "bin/scvcli --password '#{pw}' set '#{new_resource.secret_alias}' '#{new_resource.username}' '#{new_resource.password}'"
+      not_if "bin/scvcli --password '#{pw}' list | grep '#{new_resource.secret_alias}'"
+    end
   end
 end
