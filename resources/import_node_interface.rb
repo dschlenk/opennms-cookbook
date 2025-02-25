@@ -16,8 +16,6 @@ load_current_value do |new_resource|
   node_el = model_import.elements["node[@foreign-id = '#{new_resource.foreign_id}']"] unless model_import.nil?
   interface = node_el.elements["interface[@ip-addr = '#{new_resource.name}']"] unless node_el.nil?
   current_value_does_not_exist! if interface.nil?
-  foreign_source_name new_resource.foreign_source_name
-  foreign_id new_resource.foreign_id
   unless interface.attributes['status'].nil?
     sym = 'status' if interface.attributes['status'].nil?
     status_value = interface.attributes['status']
@@ -70,7 +68,6 @@ action :create do
     current_value_does_not_exist! if model_import_root.nil?
     node_el = model_import_root.elements["node[@foreign-id = '#{new_resource.foreign_id}']"] unless model_import_root.nil?
     interface_el = node_el.elements["interface[@ip-addr = '#{new_resource.name}']"] unless node_el.nil?
-    Chef::Log.debug "Missing requisition #{new_resource.foreign_source_name}." if interface_el.nil?
     if interface_el.nil?
       i_el = REXML::Element.new('interface')
       i_el.attributes['ip-addr'] = new_resource.name
