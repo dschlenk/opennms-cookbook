@@ -19,26 +19,24 @@ load_current_value do |new_resource|
   fs_detector_param = {}
   fs_params = {}
   class_name fs_detector.attributes['class'] if fs_detector.attributes['class'].nil?
-  unless fs_detector.nil?
-    fs_detector.each_element('parameter') do |parameter|
-      fs_params[parameter.attributes['key']] = parameter.attributes['value']
-    end
-    fs_params.each do |k, v|
-      case k
-      when 'timeout', 'port', 'retry_count'
-        sym = k.to_sym
-        if new_resource.send(sym).is_a?(Integer)
-          value = begin
-            Integer(v)
-                  rescue
-                    v
-          end
-          send(sym, value)
-        else
-          fs_detector_param[k] = v
+  fs_detector.each_element('parameter') do |parameter|
+    fs_params[parameter.attributes['key']] = parameter.attributes['value']
+  end
+  fs_params.each do |k, v|
+    case k
+    when 'timeout', 'port', 'retry_count'
+      sym = k.to_sym
+      if new_resource.send(sym).is_a?(Integer)
+        value = begin
+          Integer(v)
+                rescue
+                  v
         end
-      else fs_detector_param[k] = v
+        send(sym, value)
+      else
+        fs_detector_param[k] = v
       end
+    else fs_detector_param[k] = v
     end
   end
   parameters fs_detector_param
@@ -55,9 +53,10 @@ action :create do
     fs_resource_init(new_resource.foreign_source_name)
     service_name = new_resource.service_name
     foreign_source = REXML::Document.new(fs_resource(new_resource.foreign_source_name).message).root
-    detector = foreign_source.elements["detectors/detector[@name = '#{service_name}']"] unless foreign_source.nil?
-    detectors_el = foreign_source.elements['detectors'] unless foreign_source.nil?
+    raise Chef::Exceptions::ValidationFailed "No foreign source definition named #{new_resource.foreign_source_name} found. Create it with an opennms_foreign_source[#{new_resource.foreign_source_name}] resource." if foreign_source.nil?
+    detector = foreign_source.elements["detectors/detector[@name = '#{service_name}']"]
     if detector.nil?
+      detectors_el = foreign_source.elements['detectors'] unless foreign_source.nil?
       # Create detector element and add the name attributes and class attribute
       detector_el = REXML::Element.new('detector')
       unless service_name.nil?
