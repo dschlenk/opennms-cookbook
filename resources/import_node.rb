@@ -150,6 +150,9 @@ action :create do
     end
     Chef::Log.debug("model import message body now #{model_import.to_s}")
     model_import(new_resource.foreign_source_name).message model_import.to_s
+    if !new_resource.sync_import.nil? && new_resource.sync_import
+      model_import_sync(new_resource.foreign_source_name, true)
+    end
   end
 end
 

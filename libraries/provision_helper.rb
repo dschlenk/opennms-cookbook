@@ -32,6 +32,7 @@ module Opennms
               action :nothing
               delayed_action :post
               message foreign_source.message.to_s
+              sensitive true
             end
           end
         end
@@ -64,6 +65,16 @@ module Opennms
           rescue RestClient::NotFound
             @message = "<model-import foreign-source=#{foreign_source_name.encode(xml: :attr)}/>"
           end
+        end
+
+        def self.existing_model_import(foreign_source_name, url)
+          message = nil
+          begin
+            message = RestClient.get(url, accept: :xml).to_s
+          rescue RestClient::NotFound
+            Chef::Log.debug("No requisition with name #{foreign_source_name} found")
+          end
+          ModelImport.new(foreign_source_name, url) unless message.nil?
         end
       end
 
@@ -99,6 +110,7 @@ module Opennms
               action :nothing
               delayed_action :post
               message model_import.message.to_s
+              sensitive true
             end
           end
         end
@@ -106,14 +118,17 @@ module Opennms
         def model_import_sync(name, rescan)
           url = "#{baseurl}/requisitions/#{name}/import"
           url += '?rescanExisting=false' if !rescan.nil? && rescan == false
-          begin
-            tries ||= 3
-            Chef::Log.debug("Attempting import sync for #{name} with URL #{url}")
-            RestClient.put url, nil
-          rescue => e
-            Chef::Log.debug("Retrying import sync for #{name} #{tries}")
-            retry if (tries -= 1) > 0
-            raise e
+          with_run_context(:root) do
+            declare_resource(:http_request, "sync opennms_import #{name}") do
+              url url
+              headers({ 'Content-Type' => 'application/x-www-form-urlencoded' })
+              action :nothing
+              delayed_action :put
+              message ''
+              retries 3
+              retry_delay 10
+              sensitive true
+            end if find_resource(:http_request, "sync opennms_import #{name}").nil?
           end
         end
 
@@ -126,6 +141,7 @@ module Opennms
               headers({ 'Content-Type' => 'application/xml' })
               action :nothing
               delayed_action :delete
+              sensitive true
             end
           end
         end
