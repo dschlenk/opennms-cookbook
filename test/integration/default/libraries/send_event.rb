@@ -16,8 +16,8 @@ class SendEvent < Inspec.resource(1)
     end
   '
 
-  def initialize(uei)
-    parsed_url = Addressable::URI.parse("http://admin:admin@localhost:8980/opennms/rest/events?eventUei=#{uei}&orderBy=id&order=desc&limit=1").normalize.to_str
+  def initialize(uei, port = 8980)
+    parsed_url = Addressable::URI.parse("http://admin:admin@localhost:#{port}/opennms/rest/events?eventUei=#{uei}&orderBy=id&order=desc&limit=1").normalize.to_str
     begin
       e = RestClient.get(parsed_url)
     rescue StandardError => ee
@@ -34,7 +34,7 @@ class SendEvent < Inspec.resource(1)
       if s_el.elements['parameters/parameter'].nil?
         # 16
         unless s_el.elements['parms'].nil?
-          parmstr = s_el.elements['parms'].texts.join('')
+          parmstr = s_el.elements['parms'].texts.collect(&:value).join('')
           parms = parmstr.split(';')
           parms.each do |p|
             key, value = p.split('=')

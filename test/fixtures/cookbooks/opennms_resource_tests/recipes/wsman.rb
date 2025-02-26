@@ -1,0 +1,1 @@
+include_recipe 'opennms_resource_tests::wsman_system_definition'

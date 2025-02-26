@@ -13,19 +13,34 @@ class SystemDef < Inspec.resource(1)
     end
   '
 
-  def initialize(name)
-    fn = find_system_def(name)
+  def initialize(name, file = nil)
+    fn = if file.nil?
+           find_system_def(name)
+         else
+           "/opt/opennms/etc/datacollection/#{file}"
+         end
     doc = REXML::Document.new(inspec.file(fn).content)
     s_el = doc.elements["/datacollection-group/systemDef[@name='#{name}']"]
     @exists = !s_el.nil?
     return unless @exists
     @params = {}
+    @params[:file_name] = fn
     unless s_el.elements['collect/includeGroup'].nil?
       @params[:groups] = []
       s_el.each_element('collect/includeGroup') do |g|
-        @params[:groups].push g.texts.join('')
+        @params[:groups].push g.texts.collect(&:value).join('')
       end
     end
+    @params[:sysoid] = s_el.elements['sysoid'].texts.collect(&:value).join('') unless s_el.elements['sysoid'].nil?
+    @params[:sysoid_mask] = s_el.elements['sysoidMask'].texts.collect(&:value).join('') unless s_el.elements['sysoid_mask'].nil?
+    @params[:ip_addrs] = [] unless s_el.elements['ipList/ipAddr'].nil?
+    s_el.each_element('ipList/ipAddr') do |ip|
+      @params[:ip_addrs].push ip.texts.collect(&:value).join('')
+    end unless s_el.elements['ipList/ipAddr'].nil?
+    @params[:ip_addr_masks] = [] unless s_el.elements['ipList/ipAddrMask'].nil?
+    s_el.each_element('ipList/ipAddrMask') do |ip|
+      @params[:ip_addr_masks].push ip.texts.collect(&:value).join('')
+    end unless s_el.elements['ipList/ipAddrMask'].nil?
   end
 
   def exist?

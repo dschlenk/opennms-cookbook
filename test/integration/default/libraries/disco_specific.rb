@@ -8,25 +8,27 @@ class DiscoSpecific < Inspec.resource(1)
   '
 
   example '
-    describe disco_specific(\'ipaddr\') do
+    describe disco_specific(\'ipaddr\', \'Minneapolis\') do
       it { should exist }
       its(\'retry_count\') { should eq 37 }
       its(\'discovery_timeout\') { should eq 6000 }
-      its(\'location\') { should eq \'Detroit\' }
       its(\'foreign_source\') { should eq \'disco-source\' }
     end
   '
 
-  def initialize(ipaddr)
+  def initialize(ipaddr, location = nil)
     doc = REXML::Document.new(inspec.file('/opt/opennms/etc/discovery-configuration.xml').content)
-    xpath = "/discovery-configuration/specific[text() = '#{ipaddr}']"
+    xpath = if location.nil?
+              "/discovery-configuration/specific[text() = '#{ipaddr}' and not(@location)]"
+            else
+              "/discovery-configuration/specific[text() = '#{ipaddr}' and @location = '#{location}']"
+            end
     s_el = doc.elements[xpath]
     @exists = !s_el.nil?
     if @exists
       @params = {}
-      @params[:retry_count] = s_el.attributes['retries'].to_i
-      @params[:discovery_timeout] = s_el.attributes['timeout'].to_i
-      @params[:location] = s_el.attributes['location']
+      @params[:retry_count] = s_el.attributes['retries'].nil? ? nil : s_el.attributes['retries'].to_i
+      @params[:discovery_timeout] = s_el.attributes['timeout'].nil? ? nil : s_el.attributes['timeout'].to_i
       @params[:foreign_source] = s_el.attributes['foreign-source']
     end
   end

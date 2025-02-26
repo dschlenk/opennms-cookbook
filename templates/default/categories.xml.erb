@@ -1,0 +1,36 @@
+<catinfo>
+    <header>
+        <rev>1.3</rev>
+        <created>Wednesday, February 6, 2002 10:10:00 AM EST</created>
+        <mstation>checkers</mstation>
+    </header>
+<% @category_groups.category_groups.each do |cg| -%>
+    <categorygroup>
+        <name><%= cg.name.encode(:xml => :text) %></name>
+  <% unless cg.comment.nil? -%>
+        <comment><%= cg.comment.encode(:xml => :text) %></comment>
+  <% end -%>
+        <common>
+            <rule><![CDATA[<%= cg.common_rule %>]]></rule>
+        </common>
+        <categories>
+  <% cg.categories.each do |c| -%>
+            <category>
+                <label><![CDATA[<%= c.label %>]]></label>
+    <% unless c.comment.nil? -%>
+                <comment><%= c.comment.encode(:xml => :text) %></comment>
+    <% end -%>
+                <normal><%= c.normal.to_s.encode(:xml => :text) %></normal>
+                <warning><%= c.warning.to_s.encode(:xml => :text) %></warning>
+    <% unless c.services.nil? -%>
+      <% c.services.each do |s| -%>
+                <service><%= s.encode(:xml => :text) %></service>
+      <% end -%>
+                <rule><![CDATA[<%= c.rule %>]]></rule>
+    <% end -%>
+            </category>
+  <% end -%>
+        </categories>
+    </categorygroup>
+<% end -%>
+</catinfo>

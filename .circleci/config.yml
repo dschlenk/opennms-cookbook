@@ -1,13 +1,34 @@
 version: 2.1
+
 jobs:
-  build:
-    docker:
-      - image: cimg/ruby:2.5
+  test:
+    machine:
+      image: ubuntu-2404:current
     steps:
       - checkout
-      - run: bundle install
-      - run: bundle exec rake
+      - run:
+          name: docker login
+          command: docker login -u $DOCKER_USER -p $DOCKER_PASSWORD
+      - run:
+          name: install cinc workstation
+          command: curl -L https://omnitruck.cinc.sh/install.sh | sudo bash -s -- -P cinc-workstation -v 24
+      - run:
+          name: cinc
+          command: cinc shell-init bash
+      - run:
+          name: bundler
+          command: cinc exec bundle install
+      - run:
+          name: mdl
+          command: cinc exec mdl documentation/*.md
+      - run:
+          name: cookstyle
+          command: cookstyle
+      - run:
+          name: kitchen
+          command: kitchen test default --destroy always
 workflows:
-  build_and_test:
+  version: 2
+  untagged-build:
     jobs:
-      - build
+      - test

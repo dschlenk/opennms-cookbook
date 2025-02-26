@@ -13,7 +13,7 @@ end
 
 cookbook_file '/etc/hsflowd.conf' do
   source 'hsflowd.conf'
-  mode 00644
+  mode '644'
   owner 'root'
   group 'root'
 end

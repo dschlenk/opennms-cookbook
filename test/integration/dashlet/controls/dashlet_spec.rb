@@ -14,4 +14,14 @@ control 'dashlet' do
     its('priority') { should eq 5 }
     its('parameters') { should eq 'timeslot' => '3600' }
   end
+
+  describe dashlet('rtc', 'schlazorboard') do
+    it { should exist }
+    its('dashlet_name') { should eq 'RTC' }
+    its('boost_duration') { should eq 0 }
+    its('boost_priority') { should eq 0 }
+    its('duration') { should eq 15 }
+    its('priority') { should eq 5 }
+    its('parameters') { should eq nil }
+  end
 end

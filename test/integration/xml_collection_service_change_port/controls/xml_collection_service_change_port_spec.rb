@@ -1,6 +1,7 @@
-# frozen_string_literal: true
 control 'xml_collection_service_change_port' do
-  describe xml_collection_service('XMLFoo', 'foo', 'foo') do
+  describe collection_service('XMLFoo', 'foo') do
+    it { should exist }
+    its('collection') { should eq 'foo' }
     its('interval') { should eq 400_000 }
     its('user_defined') { should eq true }
     its('status') { should eq 'off' }

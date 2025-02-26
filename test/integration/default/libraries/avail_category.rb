@@ -22,7 +22,9 @@ class AvailCategory < Inspec.resource(1)
     cf = inspec.file(category_file)
     doc = REXML::Document.new(cf.content)
     cat_el = doc.elements[category_path(@cat_name)]
-    @comment = cat_el.elements['comment'].text.to_s
+    @exists = !cat_el.nil?
+    return unless @exists
+    @comment = cat_el.elements['comment'].text.to_s unless cat_el.elements['comment'].nil?
     @normal = cat_el.elements['normal'].text.to_s
     @warning = cat_el.elements['warning'].text.to_s
     @service = []
@@ -41,6 +43,10 @@ class AvailCategory < Inspec.resource(1)
   attr_reader :service
 
   attr_reader :rule
+
+  def exist?
+    @exists
+  end
 
   private
 

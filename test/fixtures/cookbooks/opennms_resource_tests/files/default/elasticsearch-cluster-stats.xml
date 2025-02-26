@@ -1,0 +1,83 @@
+<xml-groups>
+    <!--
+        Elasticsearch Performance metrics.
+
+        The idea to define this on a external file is to share the content between multiple XML sources
+
+        IMPORTANT: because of the current limitation for the data source inside RRDs/JRBs of 19
+                   characters, the XML objects are using a auto-generated ID to ensure the DS
+                   length. The real variable name is displayed as a comment after the XML object
+                   definition for information purposes. For graph templates use should refer to
+                   the performance metrics using the XML Object Name (auto-generated ID)
+    -->
+    <xml-group name="cluster" resource-type="node" resource-xpath="/">
+        <xml-object name="clusterName" type="STRING" xpath="cluster_name"/>
+    </xml-group>
+
+    <xml-group name="cluster-indices" resource-type="node" resource-xpath="/indices">
+        <xml-object name="indicesCount" type="GAUGE" xpath="count"/>
+    </xml-group>
+
+    <xml-group name="cluster-indices-shards-index-shards" resource-type="node" resource-xpath="/indices/shards/index/shards">
+        <xml-object name="shardsMin" type="GAUGE" xpath="min"/>
+        <xml-object name="shardsMax" type="GAUGE" xpath="max"/>
+        <xml-object name="shardsAvg" type="GAUGE" xpath="avg"/>
+    </xml-group>
+
+    <xml-group name="cluster-indices-shards-index-primaries" resource-type="node" resource-xpath="/indices/shards/index/primaries">
+        <xml-object name="primariesMin" type="GAUGE" xpath="min"/>
+        <xml-object name="primariesMax" type="GAUGE" xpath="max"/>
+        <xml-object name="primariesAvg" type="GAUGE" xpath="avg"/>
+    </xml-group>
+
+    <xml-group name="cluster-indices-shards-index-replication" resource-type="node" resource-xpath="/indices/shards/index/replication">
+        <xml-object name="replicationMin" type="GAUGE" xpath="min"/>
+        <xml-object name="replicationMax" type="GAUGE" xpath="max"/>
+        <xml-object name="replicationAvg" type="GAUGE" xpath="avg"/>
+    </xml-group>
+
+    <xml-group name="cluster-indices-docs" resource-type="node" resource-xpath="/indices/docs">
+        <xml-object name="docsCount" type="COUNTER" xpath="count"/>
+        <xml-object name="docsDeleted" type="COUNTER" xpath="deleted"/>
+    </xml-group>
+
+    <xml-group name="cluster-indices-store" resource-type="node" resource-xpath="/indices/store">
+        <xml-object name="storeSizeBytes" type="GAUGE" xpath="size_in_bytes"/>
+        <xml-object name="throttleTimeMillis" type="GAUGE" xpath="throttle_time_in_millis"/>
+    </xml-group>
+
+    <xml-group name="cluster-indices-fielddata" resource-type="node" resource-xpath="/indices/fielddata">
+        <xml-object name="memorySizeBytes" type="GAUGE" xpath="memory_size_in_bytes"/>
+        <xml-object name="memoryEvictions" type="GAUGE" xpath="evictions"/>
+    </xml-group>
+
+    <xml-group name="cluster-indices-filtercache" resource-type="node" resource-xpath="/indices/filter_cache">
+        <xml-object name="fltrCacheBytes" type="GAUGE" xpath="memory_size_in_bytes"/>
+        <xml-object name="fltrCacheEvictions" type="GAUGE" xpath="evictions"/>
+    </xml-group>
+
+    <xml-group name="cluster-indices-idcache" resource-type="node" resource-xpath="/indices/id_cache">
+        <xml-object name="idCacheBytes" type="GAUGE" xpath="memory_size_in_bytes"/>
+    </xml-group>
+
+    <xml-group name="cluster-indices-completion" resource-type="node" resource-xpath="/indices/completion">
+        <xml-object name="completionSizeBytes" type="GAUGE" xpath="memory_size_in_bytes"/>
+    </xml-group>
+
+    <xml-group name="cluster-indices-segments" resource-type="node" resource-xpath="/indices/segments">
+        <xml-object name="segCount" type="GAUGE" xpath="count"/>
+        <xml-object name="segMemory" type="GAUGE" xpath="memory_in_bytes"/>
+        <xml-object name="segWriterMem" type="GAUGE" xpath="index_writer_memory_in_bytes"/>
+        <xml-object name="segWriterMemMax" type="GAUGE" xpath="index_writer_max_memory_in_bytes"/>
+        <xml-object name="segVerMapMem" type="GAUGE" xpath="version_map_memory_in_bytes"/>
+        <xml-object name="segFixBitSetMem" type="GAUGE" xpath="fixed_bit_set_memory_in_bytes"/>
+    </xml-group>
+
+    <xml-group name="cluster-indices-percolate" resource-type="node" resource-xpath="/indices/percolate">
+        <xml-object name="percTotal" type="GAUGE" xpath="total"/>
+        <xml-object name="percTimeInMillis" type="GAUGE" xpath="time_in_millis"/>
+        <xml-object name="percCurrent" type="GAUGE" xpath="current"/>
+        <xml-object name="percMemSizeBytes" type="GAUGE" xpath="memory_size_in_bytes"/>
+        <xml-object name="percQueries" type="GAUGE" xpath="queries"/>
+    </xml-group>
+</xml-groups>

@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 #
-# Cookbook Name:: opennms-cookbook
+# Cookbook:: opennms-cookbook
 # Recipe:: telemetryd
 # Enables all the OOTB telemetryd protocols and allows further customization of telemetryd
 # via template. See hash format required for additional protocols in attributes/default.rb
-# Copyright 2018, ConvergeOne
+# Copyright:: 2018, ConvergeOne
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -36,7 +36,7 @@ template "#{node['opennms']['conf']['home']}/etc/elastic-credentials.xml" do
   source "#{template_dir}elastic-credentials.xml.erb"
   owner 'root'
   group 'root'
-  mode 00664
+  mode '664'
   notifies :restart, 'service[opennms]'
   variables(
     hosts: node['opennms']['es']['hosts']
@@ -54,7 +54,7 @@ template "#{node['opennms']['conf']['home']}/etc/org.opennms.features.flows.pers
   source "#{template_dir}org.opennms.features.flows.persistence.elastic.cfg.erb"
   owner 'root'
   group 'root'
-  mode 00664
+  mode '664'
   variables(
     elastic: node['opennms']['es']['flows']['persistence']
   )
@@ -70,7 +70,7 @@ template "#{node['opennms']['conf']['home']}/etc/telemetryd-configuration.xml" d
   source "#{template_dir}telemetryd-configuration.xml.erb"
   owner 'root'
   group 'root'
-  mode 00664
+  mode '664'
   notifies :run, 'opennms_send_event[restart_Telemetryd]'
   variables(
     telemetryd: node['opennms']['telemetryd']
@@ -83,7 +83,7 @@ template "#{node['opennms']['conf']['home']}/etc/org.opennms.netmgt.flows.rest.c
   source "#{template_dir}org.opennms.netmgt.flows.rest.cfg.erb"
   owner 'root'
   group 'root'
-  mode 00664
+  mode '664'
   variables(
     grafana_host: node['opennms']['properties']['grafana']['hostname'],
     grafana_port: node['opennms']['properties']['grafana']['port'],

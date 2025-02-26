@@ -1,9 +1,8 @@
-# frozen_string_literal: true
 #
-# Cookbook Name:: opennms-cookbook
-# Recipe:: packages
+# Cookbook:: opennms-cookbook
+# Recipe:: postgres
 #
-# Copyright 2015-2018, ConvergeOne
+# Copyright:: 2015-2024, ConvergeOne Holding Corp
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,66 +15,89 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-node.default['postgresql']['version'] = '11'
-node.default['postgresql']['version'] = '9.6' if Opennms::Helpers.major(node['opennms']['version']).to_i < 25
-node.default['postgresql']['version'] = '9.5' if Opennms::Helpers.major(node['opennms']['version']).to_i < 18
 
-node.default['postgresql']['config']['stats_temp_directory'] = '/var/lib/pgsql/11/data/pg_stat_tmp' if node['postgresql']['version'] == '11'
+# until https://issues.redhat.com/browse/RHEL-59715
+cookbook_file "#{Chef::Config['file_cache_path']}/openldap-2.6.6-4.el9.x86_64.rpm" do
+  source 'openldap-2.6.6-4.el9.x86_64.rpm'
+  notifies :upgrade, 'dnf_package[openldap]', :immediately
+end
 
-if node['opennms']['postgresql']['attempt_upgrade'] && upgrade_required?
+dnf_package 'openldap' do
+  source "#{Chef::Config['file_cache_path']}/openldap-2.6.6-4.el9.x86_64.rpm"
+  allow_downgrade true
+  action :nothing
+end
 
-  check_required_disk_space
+postgresql_install 'postgres' do
+  version node['opennms']['postgresql']['version']
+  source 'repo'
+  repo_pgdg node['opennms']['postgresql']['setup_repo']
+  repo_pgdg_common node['opennms']['postgresql']['setup_repo']
+  initdb_encoding 'UTF8'
+  action %i(install init_server)
+end
 
-  log 'stopping opennms before postgresql upgrade' do
-    notifies :stop, 'service[opennms]', :immediately
+postgresql_config 'postgresql-server' do
+  version '15'
+
+  server_config({
+    'autovacuum' => 'on',
+    'checkpoint_timeout' => '15min',
+    'shared_preload_libraries' => 'pg_stat_statements',
+    'track_activities' => 'on',
+    'track_counts' => 'on',
+    'vacuum_cost_delay' => 50,
+    'max_connections' => 160,
+  })
+
+  notifies :restart, 'postgresql_service[postgresql]', :delayed
+  action :create
+end
+
+%w(127.0.0.1/32 ::1/128).each do |h|
+  postgresql_access "postgresql #{h} host access" do
+    type 'host'
+    database 'all'
+    user 'all'
+    address h
+    auth_method 'scram-sha-256'
   end
-
-  old_version = version_from_data_dir(old_data_dir)
-  new_version = node.default['postgresql']['version']
-
-  service "postgresql-#{old_version}" do
-    action [:stop]
+  postgresql_access "remove host replication trust access from #{h}" do
+    type 'host'
+    database 'replication'
+    user 'all'
+    address h
+    auth_method 'trust'
+    action :delete
   end
+end
+postgresql_access 'remove local all trust' do
+  type 'local'
+  database 'all'
+  user 'all'
+  auth_method 'trust'
+  action :delete
+end
+postgresql_access 'remove local replication trust' do
+  type 'local'
+  database 'replication'
+  user 'all'
+  auth_method 'trust'
+  action :delete
+end
+postgresql_access 'add local scram' do
+  type 'local'
+  database 'all'
+  user 'all'
+  auth_method 'scram-sha-256'
+end
 
-  include_recipe 'opennms::postgres_install'
+postgresql_service 'postgresql' do
+  action %i(enable start)
+end
 
-  old_bins = binary_path_for(old_version)
-  new_bins = binary_path_for(new_version)
-
-  odd = old_data_dir
-  ndd = new_data_dir
-
-  s_file = sentinel_file
-
-  log "stopping postgres-#{new_version}" do
-    notifies :stop, "service[postgresql-#{new_version}]", :immediately
-  end
-
-  execute 'upgrade postgresql' do
-    command <<-EOM.gsub(/\s+/, ' ').strip!
-       #{new_bins}/pg_upgrade
-        --old-datadir=#{odd}
-        --new-datadir=#{ndd}
-        --old-bindir=#{old_bins}
-        --new-bindir=#{new_bins}
-        --old-options=" -c config_file=#{::File.join(odd, 'postgresql.conf')}"
-        --new-options=" -c config_file=#{::File.join(ndd, 'postgresql.conf')}"
-      && date > #{s_file}
-    EOM
-    user node['opennms']['collectd']['example1']['service']['postgresql']['user']
-    cwd ndd
-    creates s_file
-    timeout node['opennms']['posgresql']['pg_upgrade_timeout']
-    notifies :start, "service[postgresql-#{new_version}]", :immediately
-  end
-
-  log 'starting opennms after postgresql upgrade' do
-    notifies :start, 'service[opennms]', :immediately
-    only_if { node['opennms']['postgresql']['start_after_upgrade'] }
-  end
-elsif upgrade_required?
-  raise "PostgreSQL upgrade required, but node['opennms']['postgresql']['attempt_upgrade'] is '#{node['opennms']['postgresql']['attempt_upgrade']}'. Upgrade PostgreSQL manually or adjust node attributes."
-else
-  Chef::Log.info 'Not upgrading PostgreSQL'
-  include_recipe 'opennms::postgres_install'
+postgresql_user 'postgres' do
+  ignore_failure true # this fails after the password gets set initially
+  unencrypted_password chef_vault_item(node['opennms']['postgresql']['user_vault'], node['opennms']['postgresql']['user_vault_item'])['postgres']['password']
+  action :set_password
 end

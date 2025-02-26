@@ -1,0 +1,29 @@
+<notification-commands xmlns="http://xmlns.opennms.org/xsd/notificationCommands">
+   <header>
+      <ver>.9</ver>
+      <created>Wednesday, February 6, 2002 10:10:00 AM EST</created>
+      <mstation>master.nmanage.com</mstation>
+   </header>
+<% @config.commands.each do |command| -%>
+   <command binary=<%= command.binary.to_s.encode(:xml => :attr) %><%= command.service_registry.nil? ? '' : " service-registry=#{command.service_registry.to_s.encode(:xml => :attr)}" %>>
+      <name><%= command.command_name.encode(:xml => :text) %></name>
+      <execute><%= command.execute.encode(:xml => :text) %></execute>
+  <% unless command.comment.nil? -%>
+      <comment><%= command.comment.encode(:xml => :text) %></comment>
+  <% end -%>
+  <% unless command.contact_type.nil? -%>
+      <contact-type><%= command.contact_type.encode(:xml => :text) %></contact-type>
+  <% end -%>
+  <% command.arguments.each do |argument| -%>
+      <argument streamed=<%= argument['streamed'].to_s.encode(:xml => :attr) %>>
+    <% unless argument['substitution'].nil? -%>
+         <substitution><%= argument['substitution'].encode(:xml => :text) %></substitution>
+    <% end -%>
+    <% unless argument['switch'].nil? -%>
+         <switch><%= argument['switch'].encode(:xml => :text) %></switch>
+    <% end -%>
+      </argument>
+  <% end unless command.arguments.nil? -%>
+   </command>
+<% end -%>
+</notification-commands>

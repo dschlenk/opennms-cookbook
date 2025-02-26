@@ -16,7 +16,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-return unless node['platform_family'] == 'rhel' && node['platform_version'].to_i == 6
+return unless platform_family?('rhel') && node['platform_version'].to_i == 6
 
 ruby_block 'xenserver $releasever' do
   only_if { platform?('xenserver') }

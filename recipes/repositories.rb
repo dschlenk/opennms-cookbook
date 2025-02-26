@@ -1,9 +1,8 @@
-# frozen_string_literal: true
 #
-# Cookbook Name:: opennms-cookbook
+# Cookbook:: opennms
 # Recipe:: repositories
 #
-# Copyright 2018, ConvergeOne
+# Copyright:: 2018-2024, ConvergeOne Holding Corp
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,20 +17,6 @@
 # limitations under the License.
 #
 
-node['opennms']['yum_gpg_keys'].each do |key, descr|
-  cookbook_file "/etc/yum.repos.d/#{key}" do
-    source key
-    mode 00644
-    owner 'root'
-    group 'root'
-  end
-
-  bash "import OpenNMS GPG key #{key}" do
-    code "rpm --import /etc/yum.repos.d/#{key}"
-    not_if "rpm -qai \"*gpg*\" | grep -q \"#{descr}\""
-  end
-end
-
 def yum_attr(branch, platform, attr)
   node['yum']["opennms-#{branch}-#{platform}"][attr]
 end
@@ -41,12 +26,11 @@ platforms = node['opennms']['repos']['platforms']
 branches.each do |branch|
   platforms.each do |platform|
     skip = false
-    Chef::Log.debug "branch is '#{branch}' and stable is #{node['opennms']['stable']}"
     if (branch == 'stable' && !node['opennms']['stable']) ||
-       (branch == 'snapshot' && node['opennms']['stable'])
+       ((branch == 'snapshot' || branch == 'obsolete' || branch == 'oldstable') && node['opennms']['stable'])
       skip = true
     end
-    next if skip
+    # next if skip
     bu = yum_attr(branch, platform, 'baseurl')
     ml = yum_attr(branch, platform, 'url')
     fom = yum_attr(branch, platform, 'failovermethod')
@@ -57,12 +41,23 @@ branches.each do |branch|
       description "#{platform} OpenNMS RPMs (#{branch})"
       baseurl bu unless bu.nil? || bu == ''
       mirrorlist ml unless ml.nil? || ml == ''
-      gpgkey 'file:///etc/yum.repos.d/OPENNMS-GPG-KEY'
+      gpgkey node['opennms']['yum_gpg_keys']
       failovermethod fom unless fom.nil? || fom == ''
-      enabled false if repo_enabled == false
+      enabled false if repo_enabled == false || skip
+      make_cache false if repo_enabled == false || skip
       includepkgs inc_pkgs unless inc_pkgs.nil? || inc_pkgs == ''
       exclude ex unless ex.nil? || ex == ''
+      only_if { node['opennms']['manage_repos'] }
       action :create
     end
+  end
+end
+
+node['opennms']['repos']['vault'].each do |k|
+  yum_repository "opennms-vault-#{k}" do
+    description "Vault for OpenNMS #{k} RPMs"
+    baseurl "https://vault.opennms.com/horizon/#{k}/rpm"
+    gpgkey node['opennms']['yum_gpg_keys']
+    enabled true
   end
 end

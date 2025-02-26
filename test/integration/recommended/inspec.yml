@@ -1,0 +1,10 @@
+name: opennms_recommended
+title: OpenNMS recommended minimal config
+maintainer: David Schlenk
+copyright: ConvergeOne
+copyright_email: dschlenk@convergeone.com
+license: Apache 2.0
+summary: Verify OpenNMS recommended minimal config features work
+version: 1.0.0
+supports:
+  - os-family: redhat

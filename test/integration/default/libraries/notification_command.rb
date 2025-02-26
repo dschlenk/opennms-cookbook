@@ -1,4 +1,3 @@
-# frozen_string_literal: true
 class NotificationCommand < Inspec.resource(1)
   name 'notification_command'
 
@@ -14,6 +13,7 @@ class NotificationCommand < Inspec.resource(1)
       its(\'comment\') { should eq \'wall the hostname\' }
       its(\'binary\') { should eq true }
       its(\'arguments\') { should eq [{ \'streamed\' => false, \'switch\' => \'-tm\' }] }
+      its(\'service_registry\') { should eq false }
     end
   '
 
@@ -23,12 +23,12 @@ class NotificationCommand < Inspec.resource(1)
     @exists = !n_el.nil?
     if @exists
       @params = {}
-      @params[:execute] = n_el.elements['execute'].texts.join("\n")
+      @params[:execute] = n_el.elements['execute'].texts.collect(&:value).join("\n")
       unless n_el.elements['contact-type'].nil?
-        @params[:contact_type] = n_el.elements['contact-type'].texts.join("\n")
+        @params[:contact_type] = n_el.elements['contact-type'].texts.collect(&:value).join("\n")
       end
       unless n_el.elements['comment'].nil?
-        @params[:comment] = n_el.elements['comment'].texts.join("\n")
+        @params[:comment] = n_el.elements['comment'].texts.collect(&:value).join("\n")
       end
       @params[:binary] = true
       @params[:binary] = false if n_el.attributes['binary'] == 'false'
@@ -38,13 +38,16 @@ class NotificationCommand < Inspec.resource(1)
           hash = {}
           hash['streamed'] = arg.attributes['streamed'].to_s
           unless arg.elements['substitution'].nil?
-            hash['substitution'] = arg.elements['substitution'].texts.join("\n")
+            hash['substitution'] = arg.elements['substitution'].texts.collect(&:value).join("\n")
           end
           unless arg.elements['switch'].nil?
-            hash['switch'] = arg.elements['switch'].texts.join("\n")
+            hash['switch'] = arg.elements['switch'].texts.collect(&:value).join("\n")
           end
           @params[:arguments].push hash
         end
+      end
+      if !n_el.nil? && !n_el.attributes['service-registry'].nil?
+        @params[:service_registry] = (n_el.attributes['service-registry'].to_s.downcase.eql?('true') || n_el.attributes['service-registry'].to_s.eql?('1'))
       end
     end
   end

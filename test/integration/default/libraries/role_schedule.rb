@@ -10,34 +10,30 @@ class RoleSchedule < Inspec.resource(1)
   '
 
   example '
-    describe role_schedule(\'specific\', \'chefrole\', \'admin\') do
+    describe role_schedule(\'specific\', \'chefrole\', \'admin\', [{ \'begins\' => \'20-Mar-2014 00:00:00\' }]) do
       it { should exist }
-      its(\'times\') { should eq [{ \'begins\' => \'20-Mar-2014 00:00:00\', \'ends\' => \'20-Mar-2014 11:00:00\' }, { \'begins\' => \'21-Mar-2014 15:00:00\', \'ends\' => \'21-Mar-2014 23:00:00\' }] }
     end
   '
 
-  def initialize(type, role, user)
+  def initialize(type, role, user, times)
+    @exists = false
     doc = REXML::Document.new(inspec.file('/opt/opennms/etc/groups.xml').content)
-    s_el = doc.elements["/groupinfo/roles/role[@name = '#{role}']/schedule[@name = '#{user}' and @type = '#{type}']"]
-    @exists = !s_el.nil?
-    return unless @exists
-    @params = {}
-    @params[:times] = []
-    s_el.each_element('time') do |t|
-      begins = t.attributes['begins'].to_s
-      ends = t.attributes['ends'].to_s
-      day = t.attributes['day'].to_s unless t.attributes['day'].nil?
-      h = { 'begins' => begins, 'ends' => ends }
-      h['day'] = day unless day.nil?
-      @params[:times].push h
+    schedule = doc.elements["/groupinfo/roles/role[@name = '#{role}']/schedule[@name = '#{user}' and @type = '#{type}']"]
+    return if schedule.nil?
+    doc.root.each_element("/groupinfo/roles/role[@name = '#{role}']/schedule[@name = '#{user}' and @type = '#{type}']") do |s_el|
+      t = []
+      s_el.each_element('time') do |time|
+        begins = time.attributes['begins']
+        ends = time.attributes['ends']
+        day = time.attributes['day']
+        h = { 'begins' => begins, 'ends' => ends, 'day' => day }.compact
+        t.push h
+      end
+      @exists = true if !times.difference(t).any? && !t.difference(times).any?
     end
   end
 
   def exist?
     @exists
-  end
-
-  def method_missing(name)
-    @params[name]
   end
 end

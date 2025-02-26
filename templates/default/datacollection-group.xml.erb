@@ -1,0 +1,63 @@
+<datacollection-group xmlns="http://xmlns.opennms.org/xsd/config/datacollection" name=<%= @config.group_name.encode(:xml => :attr) %>>
+<% @config.resource_types.each do |rt| -%>
+   <resourceType name=<%= rt[:name].encode(:xml => :attr) %> label=<%= rt[:label].encode(:xml => :attr) %><%= rt[:resource_label].nil? ? '' : " resourceLabel=#{rt[:resource_label].encode(:xml => :attr)}" %>>
+      <persistenceSelectorStrategy class=<%= rt[:persistence_selector_strategy][:class].encode(:xml => :attr) %>>
+  <% rt[:persistence_selector_strategy][:parameters].each do |k,v| -%>
+         <parameter key=<%= k.encode(:xml => :attr) %> value=<%= v.encode(:xml => :attr) %>/>
+  <% end unless rt[:persistence_selector_strategy][:parameters].nil? -%>
+      </persistenceSelectorStrategy>
+      <storageStrategy class=<%= rt[:storage_strategy][:class].encode(:xml => :attr) %>>
+  <% rt[:storage_strategy][:parameters].each do |k,v| -%>
+         <parameter key=<%= k.encode(:xml => :attr) %> value=<%= v.encode(:xml => :attr) %>/>
+  <% end unless rt[:storage_strategy][:parameters].nil? -%>
+      </storageStrategy>
+   </resourceType>
+<% end -%>
+<% @config.groups.each do |group| -%>
+   <group name=<%= group[:name].encode(:xml => :attr) %> ifType=<%= group[:if_type].encode(:xml => :attr) %>>
+  <% group[:mib_objs].each do |mibobj| -%>
+      <mibObj oid=<%= mibobj[:oid].encode(:xml => :attr) %> instance=<%= mibobj[:instance].encode(:xml => :attr) %> alias=<%= mibobj[:alias].encode(:xml => :attr) %> type=<%= mibobj[:type].encode(:xml => :attr) %><%= mibobj[:maxval].nil? ? '' : " maxval=#{mibobj[:maxval].encode(:xml => :attr)}" %><%= mibobj[:minval].nil? ? '' : " minval=#{mibobj[:minval].encode(:xml => :attr)}" %>/>
+  <% end unless group[:mib_objs].nil? -%>
+  <% group[:include_groups].each do |ig| -%>
+      <includeGroup><%= ig.encode(:xml => :text) %></includeGroup>
+  <% end unless group[:include_groups].nil? -%>
+  <% group[:properties].each do |property| -%>
+      <property instance=<%= property[:instance].encode(:xml => :attr) %> alias=<%= property[:alias].encode(:xml => :attr) %><%= property[:class_name].nil? ? '' : " class-name=#{property[:class_name].encode(:xml => :attr)}" %>>
+    <% property[:parameters].each do |k,v| -%>
+         <parameter key=<%= k.encode(:xml => :attr) %> value=<%= v.encode(:xml => :attr) %>/>
+    <% end unless property[:parameters].nil? -%>
+      </property>
+  <% end unless group[:properties].nil? -%>
+   </group>
+<% end -%>
+<% @config.system_defs.each do |sd| -%>
+   <systemDef name=<%= sd[:name].encode(:xml => :attr) %>>
+  <% if !sd[:sysoid].nil? -%>
+      <sysoid><%= sd[:sysoid].encode(:xml => :text) %></sysoid>
+  <% elsif !sd[:sysoid_mask].nil? -%>
+      <sysoidMask><%= sd[:sysoid_mask].encode(:xml => :text) %></sysoidMask>
+  <% end -%>
+  <% if !sd[:ip_addrs].nil? || !sd[:ip_addr_masks].nil? -%>
+      <ipList>
+    <% if !sd[:ip_addrs].nil? -%>
+      <% sd[:ip_addrs].each do |ip| -%>
+         <ipAddr><%= ip.encode(:xml => :text) %></ipAddr>
+      <% end -%>
+    <% end -%>
+    <% if !sd[:ip_addr_masks].nil? -%>
+      <% sd[:ip_addr_masks].each do |ipm| -%>
+         <ipAddrMask><%= ipm.encode(:xml => :text) %></ipAddrMask>
+      <% end -%>
+    <% end -%>
+      </ipList>
+  <% end -%>
+  <% if !sd[:include_groups].nil? -%>
+      <collect>
+    <% sd[:include_groups].each do |ig| -%>
+         <includeGroup><%= ig.encode(:xml => :text) %></includeGroup>
+    <% end -%>
+      </collect>
+  <% end -%>
+   </systemDef>
+<% end -%>
+</datacollection-group>

@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<syslogd-configuration-group>
+    <ueiList>
+        <ueiMatch>
+            <process-match expression="^file2$" />
+            <match type="regex" expression="file2:.*?:\s+authentication failure; logname=(.*?) uid=(\d+) euid=(\d+) tty=(.*?) ruser=.*? rhost=.*? user=(.*?)$" />
+            <uei>uei.opennms.org/vendor/posix/syslog/su/authenFailure</uei>
+        </ueiMatch>
+    </ueiList>
+</syslogd-configuration-group>

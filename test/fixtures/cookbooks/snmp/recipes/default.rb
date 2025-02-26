@@ -11,6 +11,6 @@ cookbook_file '/etc/snmp/snmpd.conf' do
   owner 'root'
   source 'snmpd.conf'
   group 'root'
-  mode 00600
+  mode '600'
   notifies :restart, 'service[snmpd]', :immediately
 end

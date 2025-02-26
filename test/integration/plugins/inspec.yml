@@ -8,6 +8,3 @@ summary: Verify OpenNMS LWRP plugins works.
 version: 1.0.0
 supports:
   - os-family: redhat
-depends:
-  - name: opennms
-    path: test/integration/default
