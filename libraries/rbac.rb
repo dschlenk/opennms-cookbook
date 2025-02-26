@@ -441,6 +441,10 @@ module Opennms::Rbac
     end
     "http://admin:#{pw || @admin_password || 'admin'}@localhost:#{node['opennms']['properties']['jetty']['port']}/opennms/rest"
   end
+
+  def resturl
+    "http://localhost:#{node['opennms']['properties']['jetty']['port']}/opennms/rest"
+  end
 end
 
 ::Chef::DSL::Recipe.send(:include, Opennms::Rbac)
