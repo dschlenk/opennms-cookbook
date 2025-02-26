@@ -84,7 +84,6 @@ module Opennms
           end
       end
 
-        
     end
   end
 end
