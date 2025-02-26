@@ -1,4 +1,3 @@
-# frozen_string_literal: true
 control 'snmp_config_definition_update' do
   v1v2c_all = {
     'port' => 161,
@@ -14,7 +13,7 @@ control 'snmp_config_definition_update' do
   }
   describe snmp_config_definition(v1v2c_all) do
     it { should exist }
-    its('ranges') { should eq '10.0.0.1' => '10.0.0.254', '172.17.16.1' => '172.17.16.254' }
+    its('ranges') { should eq [{ '10.0.0.1' => '10.0.0.254' }, { '172.17.16.1' => '172.17.16.254' }] }
     its('specifics') { should eq ['192.168.0.1', '192.168.1.2', '192.168.2.3'] }
     its('ip_matches') { should eq ['172.17.21.*', '172.17.20.*'] }
   end
@@ -41,7 +40,7 @@ control 'snmp_config_definition_update' do
   }
   describe snmp_config_definition(v3all) do
     it { should exist }
-    its('ranges') { should eq '10.0.1.1' => '10.0.1.254', '172.17.17.1' => '172.17.17.254' }
+    its('ranges') { should eq [{ '10.0.1.1' => '10.0.1.254' }, { '172.17.17.1' => '172.17.17.254' }] }
     its('specifics') { should eq ['192.168.10.1', '192.168.11.2', '192.168.12.3'] }
     its('ip_matches') { should eq ['172.17.22.*', '172.17.20.*'] }
   end

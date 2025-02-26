@@ -24,8 +24,8 @@ class OnmsGroup < Inspec.resource(1)
     @exists = !g_el.nil?
     return unless @exists
     @params = {}
-    @params[:default_svg_map] = g_el.elements['default-map'].texts.join('') unless g_el.elements['default-map'].nil?
-    @params[:comments] = g_el.elements['comments'].texts.join('\n') unless g_el.elements['comments'].nil?
+    @params[:default_svg_map] = g_el.elements['default-map'].texts.collect(&:value).join('') unless g_el.elements['default-map'].nil?
+    @params[:comments] = g_el.elements['comments'].texts.collect(&:value).join('\n') unless g_el.elements['comments'].nil?
     unless g_el.elements['user'].nil?
       @params[:users] = []
       g_el.each_element('user') do |u|

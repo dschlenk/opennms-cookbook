@@ -1,0 +1,5 @@
+include_recipe 'opennms::default_collection_packages' if node['opennms']['manage_collection_packages']
+include_recipe 'opennms::default_jdbc_resources' if node['opennms']['manage_jdbc_collections']
+include_recipe 'opennms::default_jmx_resources' if node['opennms']['manage_jmx_collections']
+include_recipe 'opennms::default_snmp_resources' if node['opennms']['manage_snmp_collections']
+include_recipe 'opennms::default_xml_resources' if node['opennms']['manage_xml_collections']

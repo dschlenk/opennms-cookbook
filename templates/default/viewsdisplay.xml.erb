@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<viewinfo>
+<% @views.each do |name, view| -%>
+	<view>
+		<view-name><%= name.encode(:xml => :text) %></view-name>
+  <% view.sections.each do |section| -%>
+		<section>
+			<section-name><![CDATA[<%= section['name'] %>]]></section-name>
+    <% section['categories'].each do |category| %>
+			<category><![CDATA[<%= category %>]]></category>
+    <% end -%>
+		</section>
+  <% end -%>
+	</view>
+<% end -%>
+</viewinfo>

@@ -1,0 +1,133 @@
+<events xmlns="http://xmlns.opennms.org/xsd/eventconf">
+<!-- 
+  This file is managed by one or more `opennms_event` resources.
+  Changes made to the file by hand may disappear the next time this node is converged.
+-->
+<% @eventfile.entries.each do |event| -%>
+   <event>
+  <% if !event.mask.nil? && event.mask.is_a?(Array) -%>
+      <mask>
+    <% event.mask.each do |me| -%>
+      <% if me.key?('mename') -%>
+        <maskelement>
+          <mename><%= me['mename'].encode(:xml => :text) %></mename>
+        <% me['mevalue'].each do |mevalue| -%>
+          <mevalue><%= mevalue.encode(:xml => :text) %></mevalue>
+        <% end -%>
+        </maskelement>
+      <% else -%>
+        <varbind>
+          <vbnumber><%= me['vbnumber'].to_s.encode(:xml => :text) %></vbnumber>
+        <% me['vbvalue'].each do |vbvalue| -%>
+          <vbvalue><%= vbvalue.encode(:xml => :text) %></vbvalue>
+        <% end -%>
+        </varbind>
+      <% end -%>
+    <% end -%>
+      </mask>
+  <% end -%>
+      <uei><%= event.uei.encode(:xml => :text) %></uei>
+  <% unless event.priority.nil? -%>
+      <priority><%= event.priority.encode(:xml => :text) %></priority>
+  <% end -%>
+      <event-label><%= event.event_label.encode(:xml => :text) %></event-label>
+      <descr><%= event.descr.encode(:xml => :text) %></descr>
+      <logmsg<%= event.logmsg_notify.nil? ? '' : " notify=#{event.logmsg_notify.to_s.encode(:xml => :attr)}" %><%= event.logmsg_dest.nil? ? '' : " dest=#{event.logmsg_dest.encode(:xml => :attr)}"%>><%= event.logmsg.encode(:xml => :text) %></logmsg>
+  <% unless event.collection_group.nil? -%>
+    <% event.collection_group.each do |cg| -%>
+        <% Chef::Log.warn("cg: '#{cg}'") -%>
+      <collectionGroup name=<%= cg['name'].encode(:xml => :attr) %><%= cg['resource_type'].nil? ? '' : " resourceType=#{cg['resource_type'].encode(:xml => :attr)}" %><%= cg['instance'].nil? ? '' : " instance=#{cg['instance'].encode(:xml => :attr)}" %>>
+         <rrd step=<%= cg['rrd']['step'].to_s.encode(:xml => :attr) %><%= cg['rrd']['heartbeat'].nil? ? '' : " heartBeat=#{cg['rrd']['heartbeat'].to_s.encode(:xml => :attr)}" %>>
+        <% cg['rrd']['rra'].each do |rra| -%>
+            <rra><%= rra.encode(:xml => :text) %></rra>
+        <% end -%>
+         </rrd>
+      <% unless cg['collections'].nil? -%>
+        <% cg['collections'].each do |c| -%>
+         <collection name=<%= c['name'].encode(:xml => :attr) %><%= c['rename'].nil? ? '' : " rename=#{c['rename'].encode(:xml => :attr)}" %><%= c['type'].nil? ? '' : " type=#{c['type'].encode(:xml => :attr)}" %>>
+          <% unless c['param_values'].nil? -%>
+            <% c['param_values'].each do |k,v| -%>
+            <paramValue key=<%= k.encode(:xml => :attr) %> value=<%= v.to_s.encode(:xml => :attr) %>/>
+            <% end -%>
+          <% end -%>
+         </collection>
+        <% end -%>
+      <% end -%>
+      </collectionGroup>
+    <% end -%>
+  <% end -%>
+      <severity><%= event.severity.encode(:xml => :text) %></severity>
+  <% unless event.operinstruct.nil? -%>
+      <operinstruct><%= event.operinstruct.encode(:xml => :text) %></operinstruct>
+  <% end -%>
+  <% unless event.autoaction.nil? -%>
+    <% event.autoaction.each do |aa| -%>
+      <autoaction<%= aa['state'].nil? ? '' : " state=#{aa['state'].encode(:xml => :attr)}" %>><%= aa['action'].encode(:xml => :text) %></autoaction>
+    <% end -%>
+  <% end -%>
+  <% unless event.varbindsdecode.nil? -%>
+    <% event.varbindsdecode.each do |vbd| -%>
+      <varbindsdecode>
+         <parmid><%= vbd['parmid'].encode(:xml => :text) %></parmid>
+      <% vbd['decode'].each do |d| -%>
+         <decode varbindvalue=<%= d['varbindvalue'].encode(:xml => :attr) %> varbinddecodedstring=<%= d['varbinddecodedstring'].encode(:xml => :attr) %>/>
+      <% end -%>
+      </varbindsdecode>
+    <% end -%>
+  <% end -%>
+  <% unless event.parameters.nil? -%>
+    <% event.parameters.each do |p| -%>
+      <parameter name=<%= p['name'].encode(:xml => :attr) %> value=<%= p['value'].encode(:xml => :attr) %><%= p['expand'].nil? ? '' : " expand=#{p['expand'].to_s.encode(:xml => :attr)}" %>/>
+    <% end -%>
+  <% end -%>
+  <% unless event.operaction.nil? -%>
+    <% event.operaction.each do |o| -%>
+      <operaction menutext=<%= o['menutext'].encode(:xml => :attr) %><%= o['state'].nil? ? '' : " state=#{o['state'].encode(:xml => :attr)}" %>><%= o['action'].encode(:xml => :text) %></operaction>
+    <% end -%>
+  <% end -%>
+  <% unless event.autoacknowledge.nil? -%>
+      <autoacknowledge<%= event.autoacknowledge['state'].nil? ? '' : " state=#{event.autoacknowledge['state'].encode(:xml => :attr)}" %>><%= event.autoacknowledge['info'].encode(:xml => :text) %></autoacknowledge>
+  <% end -%>
+  <% unless event.loggroup.nil? -%>
+      <loggroup><%= event.loggroup.encode(:xml => :text) %></loggroup>
+  <% end -%>
+  <% unless event.tticket.nil? -%>
+      <tticket<%= event.tticket['state'].nil? ? '' : " state=#{event.tticket['state'].encode(:xml => :attr)}" %>><%= event.tticket['info'].encode(:xml => :text) %></tticket>
+  <% end -%>
+  <% unless event.forward.nil? -%>
+    <% event.forward.each do |fwd| -%>
+      <forward<%= fwd['state'].nil? ? '' : " state=#{fwd['state'].encode(:xml => :attr)}" %><%= fwd['mechanism'].nil? ? '' : " mechanism=#{fwd['mechanism'].encode(:xml => :attr)}" %>><%= fwd['info'].encode(:xml => :text) %></forward>
+    <% end -%>
+  <% end -%>
+  <% unless event.script.nil? -%>
+    <% event.script.each do |s| -%>
+      <script language=<%= s['language'].encode(:xml => :attr) %>><%= s['name'].encode(:xml => :text) %></script>
+    <% end -%>
+  <% end -%>
+  <% unless event.mouseovertext.nil? -%>
+      <mouseovertext><%= event.mouseovertext.encode(:xml => :text) %></mouseovertext>
+  <% end -%>
+  <% unless event.alarm_data.nil? -%>
+      <alarm-data reduction-key=<%= event.alarm_data['reduction_key'].encode(:xml => :attr) %> alarm-type=<%= event.alarm_data['alarm_type'].to_s.encode(:xml => :attr) %><%= event.alarm_data['clear_key'].nil? ? '' : " clear-key=#{event.alarm_data['clear_key'].encode(:xml => :attr)}" %><%= event.alarm_data['auto_clean'].nil? ? '' : " auto-clean=#{event.alarm_data['auto_clean'].to_s.encode(:xml => :attr)}" %><%= event.alarm_data['x733_alarm_type'].nil? ? '' : " x733-alarm-type=#{event.alarm_data['x733_alarm_type'].encode(:xml => :attr)}" %><%= event.alarm_data['x733_probable_cause'].nil? ? '' : " x733-probable-cause=#{event.alarm_data['x733_probable_cause'].to_s.encode(:xml => :attr)}" %><%= event.alarm_data['update_fields'].nil? && event.alarm_data['managed_object_type'].nil? ? '/' : '' %>>
+        <% unless event.alarm_data['update_fields'].nil? -%>
+          <% event.alarm_data['update_fields'].each do |u| -%>
+          <update-field field-name=<%= u['field_name'].encode(:xml => :attr) %><%= u['update_on_reduction'].nil? ? '' : " update-on-reduction=#{u['update_on_reduction'].to_s.encode(:xml => :attr)}" %><%= u['value_expression'].nil? ? '' : " value-expression=#{u['value_expression'].encode(:xml => :attr)}" %>/>
+          <% end -%>
+        <% end -%>
+        <% unless event.alarm_data['managed_object_type'].nil? %>
+          <managed-object type=<%= event.alarm_data['managed_object_type'].encode(:xml => :attr) %>/>
+        <% end -%>
+      <% if !event.alarm_data['update_fields'].nil? || !event.alarm_data['managed_object_type'].nil? -%>
+      </alarm-data>
+      <% end -%>
+  <% end -%>
+  <% unless event.filters.nil? -%>
+      <filters>
+    <% event.filters.each do |f| -%>
+         <filter eventparm=<%= f['eventparm'].encode(:xml => :attr) %> pattern=<%= f['pattern'].encode(:xml => :attr) %> replacement=<%= f['replacement'].encode(:xml => :attr) %>/>
+    <% end -%>
+      </filters>
+  <% end -%>
+   </event>
+<% end -%>
+</events>

@@ -1,0 +1,46 @@
+---
+driver:
+  name: dokken
+  privileged: true
+  chef_image: cincproject/cinc
+  chef_version: 18
+
+transport:
+  name: dokken
+
+provisioner:
+  name: dokken
+  project_name: cinc
+  download_url: https://omnitruck.cinc.sh/install.sh
+  chef_binary: /opt/cinc/bin/cinc-client
+  chef_license: accept-no-persist # until https://github.com/test-kitchen/test-kitchen/pull/1984
+  attributes:
+    opennms:
+      conf:
+        env:
+          START_TIMEOUT: 60
+      postgresql:
+        user_vault: creds
+    yum:
+      opennms-stable-common:
+        baseurl: http://yum.opennms.org/stable/common
+      opennms-stable-rhel9:
+        baseurl: http://yum.opennms.org/stable/rhel9
+
+verifier:
+  name: inspec
+
+platforms:
+  - name: oraclelinux-9
+    driver:
+      image: dokken/oraclelinux-9
+      pid_one_command: /usr/lib/systemd/systemd
+
+suites:
+  - name: mkimage
+    provisioner:
+      policyfile: policyfiles/mkimage.rb
+    lifecycle:
+      post_verify:
+        - docker commit $(docker ps | grep mkimage | tr -s ' ' | cut -d ' ' -f 1) c1og/opennms-33-oraclelinux-9:latest
+        - docker push c1og/opennms-33-oraclelinux-9:latest

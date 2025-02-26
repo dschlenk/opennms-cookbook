@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<wsman-datacollection-config rrd-repository=<%= @rrd_repository.encode(:xml => :attr) %>>
+<% @collections.each do |name, collection| -%>
+    <collection name=<%= name.encode(:xml => :attr) %>>
+        <rrd step=<%= collection.rrd_step.to_s.encode(:xml => :attr) %>>
+  <% collection.rras.each do |rra| -%>
+            <rra><%= rra.encode(:xml => :text) %></rra>
+  <% end unless collection.rras.nil? -%>
+        </rrd>
+  <% if collection.include_system_definitions.to_s.eql?('true') -%>
+
+        <!--
+             Include all of the available system definitions
+         -->
+        <include-all-system-definitions/>
+  <% end -%>
+  <% collection.include_system_definition.each do |isd| -%>
+        <include-system-definition><%= isd.encode(:xml => :text) %></include-system-definition>
+  <% end unless collection.include_system_definition.nil? -%>
+    </collection>
+<% end unless @collections.nil? -%>
+<% @groups.each do |group| -%>
+    <group name=<%= group.name.encode(:xml => :attr) %> resource-uri=<%= group.resource_uri.encode(:xml => :attr) %> resource-type=<%= group.resource_type.encode(:xml => :attr) %><%= group.dialect.nil? ? '' : " dialect=#{group.dialect.encode(:xml => :attr)}" %><%= group.filter.nil? ? '' : " filter=\"#{group.filter.gsub("&", "&amp;").gsub("\"", "&quot;").gsub("<", "&lt;")}\"" %>>
+  <% group.attribs.each do |attrib| -%>
+        <attrib name=<%= attrib['name'].encode(:xml => :attr) %> alias=<%= attrib['alias'].encode(:xml => :attr) %> type=<%= attrib['type'].encode(:xml => :attr) %><%= attrib['index-of'].nil? ? '' : " index-of=#{attrib['index-of'].encode(:xml => :attr)}" %><%= attrib['filter'].nil? ? '' : " filter=\"#{attrib['filter'].gsub("&", "&amp;").gsub("\"", "&quot;").gsub("<", "&lt;")}\"" %>/>
+  <% end unless group.attribs.nil? -%>
+    </group>
+<% end unless @groups.nil? -%>
+<% @system_definitions.each do |sd| -%>
+    <system-definition name=<%= sd.name.encode(:xml => :attr) %>>
+        <rule><%= sd.rule.encode(:xml => :text) %></rule>
+  <% sd.include_groups.each do |group| -%>
+        <include-group><%= group.encode(:xml => :text) %></include-group>
+  <% end unless sd.include_groups.nil? -%>
+    </system-definition>
+<% end unless @system_definitions.nil? -%>
+</wsman-datacollection-config>

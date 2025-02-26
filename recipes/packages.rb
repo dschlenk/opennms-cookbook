@@ -1,9 +1,8 @@
-# frozen_string_literal: true
 #
-# Cookbook Name:: opennms-cookbook
+# Cookbook:: opennms
 # Recipe:: packages
 #
-# Copyright 2015-2018, ConvergeOne
+# Copyright:: 2015-2024, ConvergeOne Holding Corp
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -17,28 +16,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-include_recipe 'opennms::repositories' if node['opennms']['manage_repos']
-onms_packages = ['opennms-core', 'opennms-webapp-jetty', 'opennms-docs']
-
-onms_versions = [node['opennms']['version'], node['opennms']['version'],
-                 node['opennms']['version']]
-
-# version 28.0.1-1 remove opennms-docs
-if node['opennms']['version'].to_i >= 28
-  onms_packages = ['opennms-core', 'opennms-webapp-jetty']
-  onms_versions = [node['opennms']['version'], node['opennms']['version']]
+if !node['opennms']['upgrade'] && upgrade.upgrade?
+  Chef::Log.warn('The current version does not match the configured version, but upgrades are disabled, so we\'re bailing out of the `packages` recipe early.')
+  return
 end
 
-if node['opennms']['plugin']['xml'] && Opennms::Helpers.major(node['opennms']['version']).to_i <= 18
-  onms_packages.push 'opennms-plugin-protocol-xml'
-  onms_versions.push node['opennms']['version']
-end
+include_recipe 'opennms::repositories'
 
-if node['opennms']['plugin']['nsclient']
-  onms_packages.push 'opennms-plugin-protocol-nsclient'
-  onms_versions.push node['opennms']['version']
-end
-
+onms_packages = %w(opennms-core opennms-webapp-jetty)
+onms_versions = [node['opennms']['version'], node['opennms']['version']]
 node['opennms']['plugin']['addl'].each do |plugin|
   Chef::Log.warn "adding plugin #{plugin}"
   onms_packages.push plugin
@@ -47,48 +33,28 @@ end
 
 ruby_block 'stop opennms before upgrade' do
   block do
-    Opennms::Upgrade.stop_opennms(node)
+    resources(service: 'opennms').run_action(:stop)
   end
-  only_if { node['opennms']['upgrade'] && Opennms::Upgrade.upgrade?(node) }
+  only_if { node['opennms']['upgrade'] && upgrade.upgrade? }
 end
 
-yum_package 'yum-versionlock'
+# the former is needed for dnf_package action `:lock` and the latter for `$OPENNMS_HOME/bin/send-event.pl
+dnf_package %w(python3-dnf-plugin-versionlock perl-Sys-Hostname)
 
-onms_packages.each do |pkg|
-  pv = "#{pkg}-#{node['opennms']['version']}"
-  # remove any version locks that don't match current version
-  execute "remove old versionlocks for #{pkg}" do
-    command "yum versionlock delete 0:#{pkg}*"
-    ignore_failure true
-    not_if "yum versionlock list #{pv} | grep -q #{pv}"
-    node['opennms']['repos']['branches'].each do |branch|
-      node['opennms']['repos']['platforms'].each do |platform|
-        skip = false
-        Chef::Log.debug "branch is '#{branch}' and stable is #{node['opennms']['stable']}"
-        if (branch == 'stable' && !node['opennms']['stable']) ||
-           (branch == 'snapshot' && node['opennms']['stable'])
-          skip = true
-        end
-        next if skip
-        notifies :makecache, "yum_repository[opennms-#{branch}-#{platform}]", :immediately if node['opennms']['manage_repos']
-      end
-    end
-  end
-  execute "add yum versionlock for #{pkg}" do
-    command "yum versionlock add #{pv}"
-    not_if "yum versionlock list #{pv} | grep -q #{pv}"
-  end
+dnf_package onms_packages do
+  action :unlock
+  only_if { node['opennms']['upgrade'] && upgrade.upgrade? }
 end
-
-yum_package onms_packages do
+dnf_package onms_packages do
   version onms_versions
-  allow_downgrade node['opennms']['allow_downgrade']
   timeout node['yum_timeout']
-  action :install
+  flush_cache :before
+  action [:install, :lock]
 end
 
-%w(iplike perl-libwww-perl perl-XML-Twig).each do |p|
-  package p do
-    action :install
+ruby_block 'do post-upgrade cleanup' do
+  block do
+    upgrade.upgrade
   end
+  only_if { node['opennms']['upgrade'] && upgrade.upgraded? }
 end

@@ -1,0 +1,27 @@
+<jdbc-datacollection-config xmlns="http://xmlns.opennms.org/xsd/config/jdbc-datacollection" rrdRepository="<%=@rrd_repository%>">
+<% @collections.each do |name, collection| -%>
+   <jdbc-collection name=<%= name.encode(:xml => :attr) %>>
+      <rrd step=<%= collection.rrd_step.to_s.encode(:xml => :attr) %>>
+  <% collection.rras.each do |rra| -%>
+         <rra><%=rra%></rra>
+  <% end -%>
+      </rrd>
+      <queries>
+  <% collection.queries.each do |query| -%>
+         <query name=<%= query.name.encode(:xml => :attr) %> recheckInterval=<%= query.recheck_interval.to_s.encode(:xml => :attr) %> ifType=<%= query.if_type.encode(:xml => :attr) %><%= query.resource_type.nil? ? '' : " resourceType=#{query.resource_type.encode(:xml => :attr)}" %><%= query.instance_column.nil? ? '' : " instance-column=#{query.instance_column.encode(:xml => :attr)}" %>>
+            <statement>
+               <queryString><%= query.query_string.encode(:xml => :text) %></queryString>
+            </statement>
+    <% unless query.columns.nil? || query.columns.empty? -%>
+            <columns>
+      <% query.columns.each do |name, column| -%>
+               <column name=<%= name.encode(:xml => :attr) %><%= column['data-source-name'].nil? ? '' : " data-source-name=#{column['data-source-name'].encode(:xml => :attr)}" %> alias=<%= column['alias'].encode(:xml => :attr) %> type=<%= column['type'].encode(:xml => :attr) %>/>
+      <% end -%>
+            </columns>
+    <% end -%>
+         </query>
+  <% end unless collection.queries.nil? -%>
+      </queries>
+   </jdbc-collection>
+<% end -%>
+</jdbc-datacollection-config>

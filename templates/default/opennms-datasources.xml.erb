@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<datasource-configuration xmlns:this="http://xmlns.opennms.org/xsd/config/opennms-datasources"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://xmlns.opennms.org/xsd/config/opennms-datasources
+  http://www.opennms.org/xsd/config/opennms-datasources.xsd ">
+
+  <connection-pool factory="org.opennms.core.db.HikariCPConnectionFactory"
+<% @datasources['connection_pool'].each do |k, v| -%>
+                   <%= Opennms::Helpers.snake_to_camel_lower(k) %>="<%= v %>"
+<% end -%>
+  />
+
+<% @datasources.each do |source, definition| -%>
+    <% next if source == 'connection_pool' -%>
+  <jdbc-data-source name="<%= source %>"
+    <% definition.each do |k, v| -%>
+      <% next if k == "connection_pool" -%>
+                    <%= Opennms::Helpers.snake_to_kebab(k) %>="<%= v %>"
+    <% end -%>
+    <% if !definition['connection_pool'].nil? -%>
+                    >
+    <connection-pool
+      <% definition['connection_pool'].each do |k, v| -%>
+                     <%= Opennms::Helpers.snake_to_camel_lower(k) %>="<%= v %>"
+      <% end -%>
+      />
+  </jdbc-data-source>
+    <% else -%>
+  />
+    <% end -%>
+<% end -%>
+</datasource-configuration>

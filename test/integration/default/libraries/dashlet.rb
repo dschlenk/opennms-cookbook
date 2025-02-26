@@ -30,7 +30,7 @@ class Dashlet < Inspec.resource(1)
       @params[:boost_priority] = d_el.elements['boostPriority'].text.to_i unless d_el.elements['boostPriority'].nil?
       @params[:duration] = d_el.elements['duration'].text.to_i unless d_el.elements['duration'].nil?
       @params[:priority] = d_el.elements['priority'].text.to_i unless d_el.elements['priority'].nil?
-      @params[:parameters] = {}
+      @params[:parameters] = {} unless d_el.elements['parameters/entry'].nil?
       d_el.each_element('parameters/entry') do |e|
         @params[:parameters][e.elements['key'].text.to_s] = e.elements['value'].text.to_s
       end

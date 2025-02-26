@@ -49,14 +49,14 @@ class PollerPackage < Inspec.resource(1)
       @params[:rrd_step] = p_el.elements['rrd'].attributes['step'].to_i
       @params[:rras] = []
       p_el.each_element('rrd/rra') do |rra|
-        @params[:rras].push rra.texts.join("\n")
+        @params[:rras].push rra.texts.collect(&:value).join("\n")
       end
       @params[:remote] = false
       @params[:remote] = true if p_el.attributes['remote'].to_s == 'true'
       unless p_el.elements['outage-calendar'].nil?
         @params[:outage_calendars] = []
         p_el.each_element('outage-calendar') do |oc|
-          @params[:outage_calendars].push oc.texts.join("\n")
+          @params[:outage_calendars].push oc.texts.collect(&:value).join("\n")
         end
       end
       @params[:downtimes] = {}

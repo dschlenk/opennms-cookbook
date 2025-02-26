@@ -1,19 +1,157 @@
-# frozen_string_literal: true
-require 'rexml/document'
+include Opennms::Cookbook::Provision::ForeignSourceHttpRequest
+include Opennms::XmlHelper
+include Opennms::Rbac
 
-actions :create, :create_if_missing, :delete
-default_action :create
+property :service_name, String, name_property: true
+property :port, Integer
+property :retry_count, Integer
+property :timeout, Integer
+property :class_name, String
+property :foreign_source_name, String, identity: true
+property :parameters, Hash, callbacks: { 'should be a hash with key/value pairs that are both strings' => ->(p) { !p.any? { |k, v| !k.is_a?(String) || !v.is_a?(String) } } }
 
-# identity for purposes of exists determined by service_name and foreign_source_name
-attribute :name, kind_of: String, name_attribute: true
-attribute :service_name, kind_of: String
-# required for create
-attribute :class_name,   kind_of: String
-attribute :foreign_source_name, kind_of: String
-attribute :port,         kind_of: Integer
-attribute :retry_count,  kind_of: Integer
-attribute :timeout,      kind_of: Integer
-# If this is a changed resource and action is create, the params specified will replace all existing.
-# So even if you need to change just one param, you need to include the entire set for this detector.
-attribute :parameters, kind_of: Hash
-attr_accessor :exists, :changed, :foreign_source_exists
+load_current_value do |new_resource|
+  foreign_source = REXML::Document.new(fs_resource(new_resource.foreign_source_name).message) unless fs_resource(new_resource.foreign_source_name).nil?
+  foreign_source = REXML::Document.new(Opennms::Cookbook::Provision::ForeignSource.new(new_resource.foreign_source_name, "#{baseurl}/foreignSources/#{new_resource.foreign_source_name}").message) if foreign_source.nil?
+  current_value_does_not_exist! if foreign_source.nil? || foreign_source.elements["detectors/detector[@name = '#{new_resource.service_name}']"].nil?
+  fs_detector = foreign_source.elements["detectors/detector[@name = '#{new_resource.service_name}']"]
+  current_value_does_not_exist! if fs_detector.nil?
+  fs_detector_param = {}
+  fs_params = {}
+  class_name fs_detector.attributes['class'] if fs_detector.attributes['class'].nil?
+  fs_detector.each_element('parameter') do |parameter|
+    fs_params[parameter.attributes['key']] = parameter.attributes['value']
+  end
+  fs_params.each do |k, v|
+    case k
+    when 'timeout', 'port', 'retry_count'
+      sym = k.to_sym
+      if new_resource.send(sym).is_a?(Integer)
+        value = begin
+          Integer(v)
+                rescue
+                  v
+        end
+        send(sym, value)
+      else
+        fs_detector_param[k] = v
+      end
+    else fs_detector_param[k] = v
+    end
+  end
+  parameters fs_detector_param
+end
+
+action_class do
+  include Opennms::Cookbook::Provision::ForeignSourceHttpRequest
+  include Opennms::XmlHelper
+  include Opennms::Rbac
+end
+
+action :create do
+  converge_if_changed do
+    fs_resource_init(new_resource.foreign_source_name)
+    service_name = new_resource.service_name
+    foreign_source = REXML::Document.new(fs_resource(new_resource.foreign_source_name).message).root
+    raise Chef::Exceptions::ValidationFailed "No foreign source definition named #{new_resource.foreign_source_name} found. Create it with an opennms_foreign_source[#{new_resource.foreign_source_name}] resource." if foreign_source.nil?
+    detector = foreign_source.elements["detectors/detector[@name = '#{service_name}']"]
+    if detector.nil?
+      detectors_el = foreign_source.elements['detectors'] unless foreign_source.nil?
+      # Create detector element and add the name attributes and class attribute
+      detector_el = REXML::Element.new('detector')
+      unless service_name.nil?
+        detector_el.add_attribute('name', service_name)
+      end
+      unless new_resource.class_name.nil?
+        detector_el.add_attribute('class', new_resource.class_name)
+      end
+      # then add parameter children for each of new_resource.parameters + timeout, retry_count, port
+      unless new_resource.timeout.nil?
+        detector_el.add_element 'parameter', 'key' => 'timeout', 'value' => new_resource.timeout
+      end
+      unless new_resource.port.nil?
+        detector_el.add_element 'parameter', 'key' => 'port', 'value' => new_resource.port
+      end
+      unless new_resource.retry_count.nil?
+        detector_el.add_element 'parameter', 'key' => 'retries', 'value' => new_resource.retry_count
+      end
+      unless new_resource.parameters.nil?
+        new_resource.parameters.each do |key, value|
+          next if %w(port retries timeout).include?(key)
+          detector_el.add_element 'parameter', 'key' => key, 'value' => value
+        end
+      end
+      # then add the element to foreign_source.elements["/detectors"]
+      if detectors_el.nil?
+        foreign_source.add_element(REXML::Element.new('detectors', detector_el))
+      else
+        detectors_el.add_element detector_el
+      end
+    else # one already exists, so you need to maybe update class
+      unless new_resource.class_name.nil?
+        detector.attributes['class'] = new_resource.class_name
+      end
+      # delete all parameters
+      detector.elements.delete_all 'parameter'
+      # Add all parameter back with new values
+      if new_resource.parameters.is_a?(Hash) && !new_resource.parameters.empty?
+        new_resource.parameters.each do |key, value|
+          detector.add_element 'parameter', 'key' => key, 'value' => value
+        end
+      end
+      # and then replace all the parameters that currently exist with new_resource.parameters + timeout, retry_count, port
+      unless new_resource.timeout.nil?
+        timeout_el = detector.elements["parameter[@key='timeout']"]
+        if timeout_el.nil?
+          detector.add_element 'parameter', 'key' => 'timeout', 'value' => new_resource.timeout
+        else
+          timeout_el.attributes['value'] = new_resource.timeout
+        end
+      end
+      unless new_resource.port.nil?
+        port_el = detector.elements["parameter[@key='port']"]
+        if port_el.nil?
+          detector.add_element 'parameter', 'key' => 'port', 'value' => new_resource.port
+        else
+          port_el.attributes['value'] = new_resource.port
+        end
+      end
+      unless new_resource.retry_count.nil?
+        retries_el = detector.elements["parameter[@key='retries']"]
+        if retries_el.nil?
+          detector.add_element 'parameter', 'key' => 'port', 'value' => new_resource.retry_count
+        else
+          retries_el.attributes['value'] = new_resource.retry_count
+        end
+      end
+    end
+    # update fs_resource.message with foreign_source.to_s
+    fs_resource(new_resource.foreign_source_name).message foreign_source.to_s
+  end
+end
+
+action :create_if_missing do
+  converge_if_changed do
+    fs_resource_init(new_resource.foreign_source_name)
+    service_name = new_resource.service_name
+    foreign_source = REXML::Document.new(fs_resource(new_resource.foreign_source_name).message).root
+    detector = foreign_source.elements["detectors/detector[@name = '#{service_name}']"] unless foreign_source.nil?
+    if detector.nil?
+      run_action(:create)
+    end
+  end
+end
+
+action :delete do
+  fs_resource_init(new_resource.foreign_source_name)
+  service_name = new_resource.service_name
+  foreign_source = REXML::Document.new(fs_resource(new_resource.foreign_source_name).message).root
+  detector = foreign_source.elements["detectors/detector[@name = '#{service_name}']"] unless foreign_source.nil?
+  unless detector.nil?
+    converge_by("Removing service detector #{service_name} from foreign source #{new_resource.foreign_source_name}") do
+      foreign_source.delete_element(detector) unless detector.nil?
+    end
+  end
+  # update fs_resource.message with foreign_source.to_s
+  fs_resource(new_resource.foreign_source_name).message foreign_source.to_s
+end

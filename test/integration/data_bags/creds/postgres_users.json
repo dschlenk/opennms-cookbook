@@ -1,0 +1,9 @@
+{
+  "id": "postgres_users",
+  "postgres": {
+    "password": "one2three4"
+  },
+  "opennms": {
+    "password": "five6seven8"
+  }
+}

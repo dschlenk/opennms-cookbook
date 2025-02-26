@@ -1,5 +1,3 @@
-
-# frozen_string_literal: true
 module Graph
   def new_graph_file(file, node)
     f = ::File.new("#{node['opennms']['conf']['home']}/etc/snmp-graph.properties.d/#{file}", 'w')
@@ -28,7 +26,7 @@ module Graph
   end
 
   def check_file_for_graph(file, name)
-    require 'java_properties'
+    require 'java-properties'
     props = JavaProperties::Properties.new(file)
     found = false
     values = props[:reports].split(/,\s*/) unless props[:reports].nil?

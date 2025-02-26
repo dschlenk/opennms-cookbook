@@ -1,9 +1,8 @@
-# frozen_string_literal: true
 #
-# Cookbook Name:: opennms
+# Cookbook:: opennms
 # Recipe:: default
 #
-# Copyright 2014 - 2016, ConvergeOne
+# Copyright:: 2014 - 2016, ConvergeOne
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.

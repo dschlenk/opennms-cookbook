@@ -35,6 +35,7 @@ class CollectionService < Inspec.resource(1)
       @params[:user_defined] = true if s_el.attributes['user-defined'] == 'true'
       @params[:status] = s_el.attributes['status']
       @params[:time_out] = s_el.elements["parameter[@key = 'timeout']"].attributes['value'].to_i unless s_el.elements["parameter[@key = 'timeout']"].nil?
+      @params[:collection_timeout] = @params[:time_out]
       @params[:retry_count] = s_el.elements["parameter[@key = 'retry']"].attributes['value'].to_i unless s_el.elements["parameter[@key = 'retry']"].nil?
       @params[:port] = s_el.elements["parameter[@key = 'port']"].attributes['value'].to_i unless s_el.elements["parameter[@key = 'port']"].nil?
       @params[:thresholding_enabled] = false

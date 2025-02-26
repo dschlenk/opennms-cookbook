@@ -1,287 +1,451 @@
-# frozen_string_literal: true
 require 'rexml/document'
 require 'json'
 require 'fileutils'
-require 'digest'
+require 'rest-client'
 
-module Opennms
-  module Rbac
-    def self.admin_password(adminpw, node)
-      pwhash = Digest::MD5.hexdigest(adminpw).upcase
-      admin = user('admin', node)
-      if !admin.nil? && admin.is_a?(Hash) && admin.key?('password') && admin['password'] == '21232F297A57A5A743894A0E4A801FC3' && node['opennms']['users']['admin']['password'] != 'admin'
-        Chef::Log.debug('Hardcoded password not yet applied')
-        pwhash = Digest::MD5.hexdigest(node['opennms']['users']['admin']['password']).upcase
-        change_admin_password('admin', pwhash, node)
-      elsif node['opennms']['secure_admin'] && node['opennms']['secure_admin_password'].nil?
-        Chef::Log.debug('random password not yet applied since secure_admin_password is nil')
-        change_admin_password('admin', pwhash, node)
-        node.default['opennms']['users']['admin']['password'] = adminpw
-        node.normal['opennms']['secure_admin_password'] = adminpw
-      elsif node['opennms']['secure_admin'] && !node['opennms']['secure_admin_password'].nil?
-        Chef::Log.debug('Random password already applied. Why am I here?')
-      elsif node['opennms']['users']['admin']['password'] != 'admin' && !node['opennms']['secure_admin']
-        Chef::Log.debug('hardcoded password already applied.')
-        pwhash = Digest::MD5.hexdigest(node['opennms']['users']['admin']['password']).upcase
-      else
-        Chef::Log.debug("Unhandled adminpw call. secure_admin? #{node['opennms']['secure_admin']} pwhash: #{node['opennms']['users']['admin']['pwhash']}.")
-      end
-      node.default['opennms']['users']['admin']['pwhash'] = pwhash
-      # make sure any auto-generated attributes get saved, even when chef fails later
-      node.save # ~FC075
+module Opennms::Rbac
+  @admin_password = nil
+
+  def admin_secret_from_vault(secret)
+    adminpw = 'admin' if secret == 'password' # default
+    begin
+      adminpw = chef_vault_item(node['opennms']['users']['admin']['vault'], node['opennms']['users']['admin']['vault_item'])[secret]
+    rescue => e
+      Chef::Log.warn("Unable to retrieve admin password from vault #{node['opennms']['users']['admin']['vault']} item #{node['opennms']['users']['admin']['vault_item']} due to #{e.message}. The default password will continue to be used. This is not recommended!")
     end
+    adminpw
+  end
 
-    def self.user(user, node)
-      require 'rest_client'
-      begin
-        retries ||= 0
-        sleep(10) if retries > 0
-        response = RestClient.get "#{baseurl(node)}/users/#{user}", accept: :json, 'Accept-Encoding' => 'identity'
-        return JSON.parse(response.to_s)
-      rescue => e
-        Chef::Log.warn "Unable to retrieve current admin user using supplied password: #{e}"
-        retry if (retries += 1) < 3 && e.to_s.match(/Connection refused.*/)
-        begin
-          iretries ||= 0
-          sleep(10) if iretries > 0
-          Chef::Log.debug 'falling back to default password'
-          response = RestClient.get "#{baseurl(node, 'admin')}/users/#{user}", accept: :json, 'Accept-Encoding' => 'identity'
-          return JSON.parse(response.to_s)
-        rescue => e
-          Chef::Log.warn "Unable to retrieve current admin user using supplied or default password: #{e}"
-          retry if (iretries += 1) < 3 && e.to_s.match(/Connection refused.*/)
-        end
-      end
-    end
-
-    def user_exists?(user, node)
-      require 'rest_client'
-      begin
-        response = RestClient.get "#{baseurl(node)}/users/#{user}", accept: :json, 'Accept-Encoding' => 'identity'
-        return true if response.code == 200
-      rescue
-        return false
-      end
-      false
-    end
-
-    def user_changed?(new_user, node)
-      require 'rest-client'
-      begin
-        response = RestClient.get "#{baseurl(node)}/users/#{new_user.name}", accept: :json, 'Accept-Encoding' => 'identity'
-        curr_user = JSON.parse(response.to_s)
-        Chef::Log.debug("#{new_user.full_name} == #{curr_user['full-name']}?")
-        return true if new_user.full_name.to_s != curr_user['full-name'].to_s
-        Chef::Log.debug("#{new_user.user_comments} == #{curr_user['user-comments']}?")
-        return true if new_user.user_comments.to_s != curr_user['user-comments'].to_s
-        Chef::Log.debug("#{new_user.password} == #{curr_user['password']}?")
-        return true if new_user.password.to_s != curr_user['password'].to_s
-        Chef::Log.debug("#{new_user.password_salt} == #{(curr_user['password']['salt'].to_s.downcase == true)}?")
-        return true if new_user.password_salt != (curr_user['password']['salt'].to_s.downcase == true)
-        major_version = Opennms::Helpers.major(node['opennms']['version']).to_i
-        if major_version >= 19
-          curr_roles = []
-          curr_user['role'].each do |r_el|
-            curr_roles.push r_el.to_s
-          end
-          Chef::Log.debug("#{new_user.roles} == #{curr_roles}?")
-          return true if new_user.roles != curr_roles
-        end
-        curr_ds = []
-        curr_user['duty-schedule'].each do |ds_el|
-          curr_ds.push ds_el.to_s
-        end
-        Chef::Log.debug("#{new_user.duty_schedules} == #{curr_ds}?")
-        return true if new_user.duty_schedules != curr_ds
-      rescue => e
-        Chef::Log.warn "Unable to get current users from OpenNMS REST API becaue #{e}. Assuming this user, #{new_user.name}, has not changed."
-      end
-      false
-    end
-
-    def self.change_admin_password(old_pw, new_pw_hash, node)
-      require 'rest_client'
-      cu = REXML::Document.new
-      cu << REXML::XMLDecl.new
-      user_el = cu.add_element 'user'
-      userid_el = user_el.add_element 'user-id'
-      userid_el.add_text 'admin'
-      pw_el = user_el.add_element 'password'
-      pw_el.add_text new_pw_hash
-      if node['opennms']['version'].match(/(\d+)\..*/).captures[0].to_i >= 19
-        role_el = user_el.add_element 'role'
-        role_el.add_text 'ROLE_ADMIN'
-      end
-      RestClient.post "#{baseurl(node, old_pw)}/users", cu.to_s, content_type: :xml
-      FileUtils.touch "#{node['opennms']['conf']['home']}/etc/users.xml"
-    end
-
-    def add_user(new_resource, node)
-      require 'rest_client'
-      cu = REXML::Document.new
-      cu << REXML::XMLDecl.new
-      user_el = cu.add_element 'user'
-      userid_el = user_el.add_element 'user-id'
-      userid_el.add_text new_resource.name
-      unless new_resource.full_name.nil?
-        fn_el = user_el.add_element 'full-name'
-        fn_el.add_text new_resource.full_name
-      end
-      unless new_resource.user_comments.nil?
-        uc_el = user_el.add_element 'user-comments'
-        uc_el.add_text new_resource.user_comments
-      end
-      unless new_resource.password.nil?
-        pw_el = user_el.add_element 'password'
-        pw_el.add_text new_resource.password
-      end
-      if new_resource.password_salt
-        pws_el = user_el.add_element 'passwordSalt'
-        pws_el.add_text 'true'
-      end
-      major_version = Opennms::Helpers.major(node['opennms']['version']).to_i
-      if major_version >= 19 && !new_resource.roles.nil?
-        new_resource.roles.each do |r|
-          r_el = user_el.add_element 'role'
-          r_el.add_text r
-        end
-      end
-      unless new_resource.duty_schedules.nil?
-        new_resource.duty_schedules.each do |ds|
-          ds_el = user_el.add_element 'duty-schedule'
-          ds_el.add_text ds
-        end
-      end
-      begin
-        tries ||= 6
-        RestClient.post "#{baseurl(node)}/users", cu.to_s, content_type: :xml
-        FileUtils.touch "#{node['opennms']['conf']['home']}/etc/users.xml"
-      rescue => e
-        Chef::Log.debug("Retrying user add/update for #{new_resource.name}.")
-        sleep(30)
-        retry if (tries -= 1) > 0
-        raise e
-      end
-    end
-
-    # could use REST for this, but we're doing file based for creates as the REST API is very limited so let's be consistent
-    def group_exists?(group, node)
-      Chef::Log.debug "Checking to see if this group exists: '#{group}'"
-      file = ::File.new("#{node['opennms']['conf']['home']}/etc/groups.xml", 'r')
+  def default_admin_password?
+    Chef::Log.info 'Checking to see if the admin user has the default password'
+    if ::File.exist?("#{node['opennms']['conf']['home']}/etc/users.xml")
+      file = ::File.new("#{node['opennms']['conf']['home']}/etc/users.xml", 'r')
       doc = REXML::Document.new file
       file.close
-      !doc.elements["/groupinfo/groups/group/name[text() = '#{group}']"].nil?
-    end
-
-    def user_in_group?(group, user, node)
-      ingroup = false
-      file = ::File.new("#{node['opennms']['conf']['home']}/etc/groups.xml", 'r')
-      doc = REXML::Document.new file
-      file.close
-      group_el = doc.elements["/groupinfo/groups/group/name[text() = '#{group}']"].parent
-      unless group_el.nil?
-        ingroup = true unless group_el.elements["user[text() = '#{user}']"].nil?
+      doc.each_element("/userinfo/users/user[user-id/text()[contains(., 'admin')]]") do |el|
+        # find the user with user-id that is exactly 'admin'
+        next unless el.elements['user-id'].texts.join('').strip == 'admin'
+        Chef::Log.info('true') if el.elements['password'].texts.join('').strip == 'gU2wmSW7k9v1xg4/MrAsaI+VyddBAhJJt4zPX5SGG0BK+qiASGnJsqM8JOug/aEL'
+        return el.elements['password'].texts.join('').strip == 'gU2wmSW7k9v1xg4/MrAsaI+VyddBAhJJt4zPX5SGG0BK+qiASGnJsqM8JOug/aEL'
       end
-      ingroup
+      # I guess if there's no admin user they aren't using the default password
+      Chef::Log.warn('No admin user found. This is not recommended!')
     end
+    false # opennms not even installed yet, we have *no* admin password
+  end
 
-    def add_group(new_resource, node)
-      file = ::File.new("#{node['opennms']['conf']['home']}/etc/groups.xml", 'r')
-      doc = REXML::Document.new file
-      file.close
-
-      groups_el = doc.elements['/groupinfo/groups']
-      group_el = groups_el.add_element 'group'
-      name_el = group_el.add_element 'name'
-      name_el.add_text new_resource.name
-      unless new_resource.default_svg_map.nil?
-        map_el = group_el.add_element 'default-map'
-        map_el.add_text new_resource.default_svg_map
-      end
-      unless new_resource.comments.nil?
-        comments_el = group_el.add_element 'comments'
-        comments_el.add_text new_resource.comments
-      end
-      unless new_resource.users.nil?
-        new_resource.users.each do |user|
-          user_el = group_el.add_element 'user'
-          user_el.add_text user
-        end
-      end
-      unless new_resource.duty_schedules.nil?
-        new_resource.duty_schedules.each do |ds|
-          ds_el = group_el.add_element 'duty-schedule'
-          ds_el.add_text ds
-        end
-      end
-
-      Opennms::Helpers.write_xml_file(doc, "#{node['opennms']['conf']['home']}/etc/groups.xml")
-    end
-
-    def role_exists?(role, node)
-      Chef::Log.debug "Checking to see if this role exists: '#{role}'"
-      file = ::File.new("#{node['opennms']['conf']['home']}/etc/groups.xml", 'r')
-      doc = REXML::Document.new file
-      file.close
-      !doc.elements["/groupinfo/roles/role[@name = '#{role}']"].nil?
-    end
-
-    def group_for_role(role, node)
-      group = nil
-      Chef::Log.debug "Checking to see if this role exists: '#{role}'"
-      file = ::File.new("#{node['opennms']['conf']['home']}/etc/groups.xml", 'r')
-      doc = REXML::Document.new file
-      file.close
-      role_el = doc.elements["/groupinfo/roles/role[@name = '#{role}']"]
-      group = role_el.attributes['membership-group'] unless role_el.nil?
-      Chef::Log.debug "Found group #{group} for role #{role}."
-      group
-    end
-
-    def add_role(new_resource, node)
-      file = ::File.new("#{node['opennms']['conf']['home']}/etc/groups.xml", 'r')
-      doc = REXML::Document.new file
-      file.close
-
-      roles_el = doc.elements['/groupinfo/roles']
-      roles_el = doc.root.add_element 'roles' if roles_el.nil?
-      role_el = roles_el.add_element 'role', 'name' => new_resource.name, 'membership-group' => new_resource.membership_group, 'supervisor' => new_resource.supervisor
-      unless new_resource.description.nil?
-        role_el.attributes['description'] = new_resource.description
-      end
-
-      Opennms::Helpers.write_xml_file(doc, "#{node['opennms']['conf']['home']}/etc/groups.xml")
-    end
-
-    # assumes validity of arguments
-    def schedule_exists?(role, user, type, node)
-      file = ::File.new("#{node['opennms']['conf']['home']}/etc/groups.xml", 'r')
-      doc = REXML::Document.new file
-      file.close
-      !doc.elements["/groupinfo/roles/role[@name = '#{role}']/schedule[@type = '#{type}' and @name = '#{user}']"].nil?
-    end
-
-    def add_schedule_to_role(new_resource, node)
-      file = ::File.new("#{node['opennms']['conf']['home']}/etc/groups.xml", 'r')
-      doc = REXML::Document.new file
-      file.close
-
-      role_el = doc.elements["/groupinfo/roles/role[@name = '#{new_resource.role_name}']"]
-      sched_el = role_el.add_element 'schedule', 'name' => new_resource.username, 'type' => new_resource.type
-      new_resource.times.each do |time|
-        time_el = sched_el.add_element 'time', 'begins' => time['begins'], 'ends' => time['ends']
-        time_el.attributes['day'] = time['day'] unless time['day'].nil?
-      end
-
-      Opennms::Helpers.write_xml_file(doc, "#{node['opennms']['conf']['home']}/etc/groups.xml")
-    end
-
-    def baseurl(node, pw = nil)
-      "http://admin:#{pw || node['opennms']['users']['admin']['password']}@localhost:#{node['opennms']['properties']['jetty']['port']}/opennms/rest"
-    end
-
-    def self.baseurl(node, pw = nil)
-      "http://admin:#{pw || node['opennms']['users']['admin']['password']}@localhost:#{node['opennms']['properties']['jetty']['port']}/opennms/rest"
+  def get_user(user_id)
+    begin
+      response = RestClient.get "#{baseurl}/users/#{user_id}", accept: :json, 'Accept-Encoding' => 'identity'
+      JSON.parse(response.to_s)
+    rescue
+      nil
     end
   end
+
+  def get_xml_user(user_id)
+    begin
+      response = RestClient.get "#{baseurl}/users/#{user_id}", accept: :xml, 'Accept-Encoding' => 'identity'
+      REXML::Document.new(response.to_s)
+    rescue
+      nil
+    end
+  end
+
+  def users_exist?(users)
+    users.each do |user|
+      return false unless user_exists?(user)
+    end
+    true
+  end
+
+  def user_exists?(user)
+    begin
+      response = RestClient.get "#{baseurl}/users/#{user}", accept: :json, 'Accept-Encoding' => 'identity'
+      return true if response.code == 200
+    rescue
+      return false
+    end
+    false
+  end
+
+  def user_changed?(new_user)
+    begin
+      response = RestClient.get "#{baseurl}/users/#{new_user.name}", accept: :json, 'Accept-Encoding' => 'identity'
+      curr_user = JSON.parse(response.to_s)
+      Chef::Log.debug("#{new_user.full_name} == #{curr_user['full-name']}?")
+      return true if new_user.full_name.to_s != curr_user['full-name'].to_s
+      Chef::Log.debug("#{new_user.user_comments} == #{curr_user['user-comments']}?")
+      return true if new_user.user_comments.to_s != curr_user['user-comments'].to_s
+      Chef::Log.debug('comparing passwords')
+      return true if new_user.password.to_s != curr_user['password'].to_s
+      Chef::Log.debug("#{new_user.password_salt} == #{curr_user['password']['salt'].to_s.downcase == true}?")
+      return true if new_user.password_salt != (curr_user['password']['salt'].to_s.downcase == true)
+      curr_roles = []
+      curr_user['role'].each do |r_el|
+        curr_roles.push r_el.to_s
+      end
+      Chef::Log.debug("#{new_user.roles} == #{curr_roles}?")
+      return true if new_user.roles != curr_roles
+      curr_ds = []
+      curr_user['duty-schedule'].each do |ds_el|
+        curr_ds.push ds_el.to_s
+      end
+      Chef::Log.debug("#{new_user.duty_schedules} == #{curr_ds}?")
+      return true if new_user.duty_schedules != curr_ds
+    rescue => e
+      Chef::Log.warn "Unable to get current users from OpenNMS REST API becaue #{e}. Assuming this user, #{new_user.name}, has not changed."
+    end
+    false
+  end
+
+  def set_admin_password(new_pw)
+    change_admin_password('admin', new_pw)
+  end
+
+  def change_admin_password(old_pw, new_pw)
+    RestClient.put "#{baseurl(old_pw)}/users/admin?hashPassword=true", { 'password': new_pw }
+    @admin_password = new_pw
+    FileUtils.touch "#{node['opennms']['conf']['home']}/etc/users.xml"
+  end
+
+  def update_user(user)
+    user_id = user.elements['/user/user-id'].text
+    email_el = user.root.delete_element('email')
+    Chef::Log.warn("updating user: #{user} ")
+    RestClient.post("#{baseurl}/users", user.to_s, content_type: :xml)
+    unless email_el.nil?
+      Chef::Log.warn("updating email for #{user_id} to #{email_el.text}")
+      RestClient.put("#{baseurl}/users/#{user_id}", { 'email' => email_el.text })
+    end
+    FileUtils.touch("#{node['opennms']['conf']['home']}/etc/users.xml")
+  end
+
+  def update_password(user_id, password_data)
+    RestClient.put("#{baseurl}/users/#{user_id}#{password_data['passwordSalt'] ? '?hashPassword=true' : ''}",
+                   { 'password': password_data['password'] })
+  end
+
+  def delete_user(user_id)
+    RestClient.delete("#{baseurl}/users/#{user_id}")
+  end
+
+  def update_field(root, object, field_name, element_name)
+    if root.elements[element_name].nil?
+      root.add_element(element_name).text = object.send(field_name)
+    else
+      root.elements[element_name].text = object.send(field_name)
+    end
+  end
+
+  def add_user(new_resource)
+    cu = REXML::Document.new
+    cu << REXML::XMLDecl.new
+    user_el = cu.add_element 'user'
+    userid_el = user_el.add_element 'user-id'
+    userid_el.add_text new_resource.name
+    unless new_resource.full_name.nil?
+      fn_el = user_el.add_element 'full-name'
+      fn_el.add_text new_resource.full_name
+    end
+    unless new_resource.user_comments.nil?
+      uc_el = user_el.add_element 'user-comments'
+      uc_el.add_text new_resource.user_comments
+    end
+    unless new_resource.password.nil?
+      pw_el = user_el.add_element 'password'
+      pw_el.add_text new_resource.password
+    end
+    unless new_resource.roles.nil?
+      new_resource.roles.each do |r|
+        r_el = user_el.add_element 'role'
+        r_el.add_text r
+      end
+    end
+    unless new_resource.duty_schedules.nil?
+      new_resource.duty_schedules.each do |ds|
+        ds_el = user_el.add_element 'duty-schedule'
+        ds_el.add_text ds
+      end
+    end
+    begin
+      tries ||= 6
+      RestClient.post "#{baseurl}/users#{new_resource.password_salt ? '?hashPassword=true' : ''}", cu.to_s, content_type: :xml
+      # you can't specify contact info with POST but you can update email contact info ONLY with PUT
+      unless new_resource.email.nil?
+        RestClient.put("#{baseurl}/users/#{new_resource.user_id}", { 'email' => new_resource.email })
+      end
+      FileUtils.touch "#{node['opennms']['conf']['home']}/etc/users.xml"
+    rescue => e
+      Chef::Log.debug("Retrying user add/update for #{new_resource.user_id}.")
+      sleep(30)
+      retry if (tries -= 1) > 0
+      raise e
+    end
+  end
+
+  # could use REST for this, but we're doing file based for creates as the REST API is very limited so let's be consistent
+  def group_exists?(group)
+    Chef::Log.debug "Checking to see if this group exists: '#{group}'"
+    file = ::File.new("#{node['opennms']['conf']['home']}/etc/groups.xml", 'r')
+    doc = REXML::Document.new file
+    file.close
+    !doc.elements["/groupinfo/groups/group/name[text() = '#{group}']"].nil?
+  end
+
+  def group(group)
+    file = ::File.new("#{node['opennms']['conf']['home']}/etc/groups.xml", 'r')
+    doc = REXML::Document.new file
+    file.close
+    doc.elements["/groupinfo/groups/group[name/text() = '#{group}']"]
+  end
+
+  def user_in_group?(group, user)
+    ingroup = false
+    file = ::File.new("#{node['opennms']['conf']['home']}/etc/groups.xml", 'r')
+    doc = REXML::Document.new file
+    file.close
+    group_el = doc.elements["/groupinfo/groups/group/name[text() = '#{group}']"].parent
+    unless group_el.nil?
+      ingroup = true unless group_el.elements["user[text() = '#{user}']"].nil?
+    end
+    ingroup
+  end
+
+  def delete_group(group)
+    file = ::File.new("#{node['opennms']['conf']['home']}/etc/groups.xml", 'r')
+    doc = REXML::Document.new file
+    file.close
+    doc.elements.delete_all("/groupinfo/groups/group[name/text() = '#{group}']")
+    Opennms::Helpers.write_xml_file(doc, "#{node['opennms']['conf']['home']}/etc/groups.xml")
+  end
+
+  def update_group(new_resource)
+    file = ::File.new("#{node['opennms']['conf']['home']}/etc/groups.xml", 'r')
+    doc = REXML::Document.new file
+    file.close
+
+    group_el = doc.elements["/groupinfo/groups/group[name/text() = '#{new_resource.group_name}']"]
+    unless new_resource.comments.nil?
+      if group_el.elements['comments'].nil?
+        comments_el = group_el.add_element 'comments'
+        comments_el.add_text new_resource.comments
+      else
+        group_el.elements['comments'].text = new_resource.comments
+      end
+    end
+    unless new_resource.users.nil?
+      unless group_el.elements['user'].nil?
+        group_el.elements.delete_all('user')
+      end
+      new_resource.users.each do |user|
+        user_el = group_el.add_element 'user'
+        user_el.add_text user
+      end
+    end
+    unless new_resource.duty_schedules.nil?
+      unless group_el.elements['duty-schedule'].nil?
+        group_el.elements.delete_all('duty-schedule')
+      end
+      new_resource.duty_schedules.each do |ds|
+        ds_el = group_el.add_element 'duty-schedule'
+        ds_el.add_text ds
+      end
+    end
+
+    Opennms::Helpers.write_xml_file(doc, "#{node['opennms']['conf']['home']}/etc/groups.xml")
+  end
+
+  def add_group(new_resource)
+    file = ::File.new("#{node['opennms']['conf']['home']}/etc/groups.xml", 'r')
+    doc = REXML::Document.new file
+    file.close
+
+    groups_el = doc.elements['/groupinfo/groups']
+    group_el = groups_el.add_element 'group'
+    name_el = group_el.add_element 'name'
+    name_el.add_text new_resource.group_name
+    unless new_resource.comments.nil?
+      comments_el = group_el.add_element 'comments'
+      comments_el.add_text new_resource.comments
+    end
+    unless new_resource.users.nil?
+      new_resource.users.each do |user|
+        user_el = group_el.add_element 'user'
+        user_el.add_text user
+      end
+    end
+    unless new_resource.duty_schedules.nil?
+      new_resource.duty_schedules.each do |ds|
+        ds_el = group_el.add_element 'duty-schedule'
+        ds_el.add_text ds
+      end
+    end
+
+    Opennms::Helpers.write_xml_file(doc, "#{node['opennms']['conf']['home']}/etc/groups.xml")
+  end
+
+  def role_exists?(role)
+    Chef::Log.debug "Checking to see if this role exists: '#{role}'"
+    file = ::File.new("#{node['opennms']['conf']['home']}/etc/groups.xml", 'r')
+    doc = REXML::Document.new file
+    file.close
+    !doc.elements["/groupinfo/roles/role[@name = '#{role}']"].nil?
+  end
+
+  def group_for_role(role)
+    group = nil
+    Chef::Log.debug "Checking to see if this role exists: '#{role}'"
+    file = ::File.new("#{node['opennms']['conf']['home']}/etc/groups.xml", 'r')
+    doc = REXML::Document.new file
+    file.close
+    role_el = doc.elements["/groupinfo/roles/role[@name = '#{role}']"]
+    group = role_el.attributes['membership-group'] unless role_el.nil?
+    Chef::Log.debug "Found group #{group} for role #{role}."
+    group
+  end
+
+  def add_role(new_resource)
+    file = ::File.new("#{node['opennms']['conf']['home']}/etc/groups.xml", 'r')
+    doc = REXML::Document.new file
+    file.close
+
+    roles_el = doc.elements['/groupinfo/roles']
+    roles_el = doc.root.add_element 'roles' if roles_el.nil?
+    role_el = roles_el.add_element 'role', 'name' => new_resource.name, 'membership-group' => new_resource.membership_group, 'supervisor' => new_resource.supervisor
+    unless new_resource.description.nil?
+      role_el.attributes['description'] = new_resource.description
+    end
+
+    Opennms::Helpers.write_xml_file(doc, "#{node['opennms']['conf']['home']}/etc/groups.xml")
+  end
+
+  def role(role)
+    file = ::File.new("#{node['opennms']['conf']['home']}/etc/groups.xml", 'r')
+    doc = REXML::Document.new file
+    file.close
+    doc.elements["/groupinfo/roles/role[@name = '#{role}']"]
+  end
+
+  def update_role_attributes(new_resource)
+    file = ::File.new("#{node['opennms']['conf']['home']}/etc/groups.xml", 'r')
+    doc = REXML::Document.new file
+    file.close
+
+    role_el = doc.elements["/groupinfo/roles/role[@name = '#{new_resource.role_name}']"]
+    role_el.add_attribute('membership-group', new_resource.membership_group) unless new_resource.membership_group.nil?
+    role_el.add_attribute('supervisor', new_resource.supervisor) unless new_resource.supervisor.nil?
+    role_el.add_attribute('description', new_resource.description) unless new_resource.description.nil?
+
+    Opennms::Helpers.write_xml_file(doc, "#{node['opennms']['conf']['home']}/etc/groups.xml")
+  end
+
+  def delete_role(role)
+    file = ::File.new("#{node['opennms']['conf']['home']}/etc/groups.xml", 'r')
+    doc = REXML::Document.new file
+    file.close
+    doc.elements.delete_all("/groupinfo/roles/role[@name = '#{role}']")
+    Opennms::Helpers.write_xml_file(doc, "#{node['opennms']['conf']['home']}/etc/groups.xml")
+  end
+
+  # assumes validity of arguments
+  def schedule_exists?(new_resource)
+    file = ::File.new("#{node['opennms']['conf']['home']}/etc/groups.xml", 'r')
+    doc = REXML::Document.new file
+    file.close
+    doc.root.each_element("/groupinfo/roles/role[@name = '#{new_resource.role_name}']/schedule[@type = '#{new_resource.type}' and @name = '#{new_resource.username}']") do |s|
+      Chef::Log.warn("parsing times for #{s}")
+      times = []
+      s.each_element('time') do |t|
+        times.push({ 'begins' => t.attributes['begins'], 'ends' => t.attributes['ends'], 'day' => t.attributes['day'] }.compact)
+      end
+      Chef::Log.warn("times is #{times}; new_resource.times is #{new_resource.times}")
+      return true if !times.difference(new_resource.times).any? && !new_resource.times.difference(times).any?
+    end
+    false
+  end
+
+  def add_schedule_to_role(new_resource)
+    file = ::File.new("#{node['opennms']['conf']['home']}/etc/groups.xml", 'r')
+    doc = REXML::Document.new file
+    file.close
+
+    role_el = doc.elements["/groupinfo/roles/role[@name = '#{new_resource.role_name}']"]
+    sched_el = role_el.add_element 'schedule', 'name' => new_resource.username, 'type' => new_resource.type
+    new_resource.times.each do |time|
+      time_el = sched_el.add_element 'time', 'begins' => time['begins'], 'ends' => time['ends']
+      time_el.attributes['day'] = time['day'] unless time['day'].nil?
+    end
+
+    Opennms::Helpers.write_xml_file(doc, "#{node['opennms']['conf']['home']}/etc/groups.xml")
+  end
+
+  def delete_role_schedule(new_resource)
+    file = ::File.new("#{node['opennms']['conf']['home']}/etc/groups.xml", 'r')
+    doc = REXML::Document.new file
+    file.close
+    to_delete = nil
+    preserve = []
+    doc.root.each_element("/groupinfo/roles/role[@name = '#{new_resource.role_name}']/schedule[@type = '#{new_resource.type}' and @name = '#{new_resource.username}']") do |s|
+      times = []
+      s.each_element('time') do |t|
+        times.push({ 'begins' => t.attributes['begins'], 'ends' => t.attributes['ends'], 'day' => t.attributes['day'] }.compact)
+      end
+      if !times.difference(new_resource.times).any? && !new_resource.times.difference(times).any?
+        Chef::Log.warn("found the right schedule because new_resource.times is #{new_resource.times} and times is #{times}")
+        to_delete = s
+      else
+        Chef::Log.warn("not the right schedule because new_resource.times is #{new_resource.times} and times is #{times}")
+        preserve.push s
+      end
+    end
+    doc.root.elements.delete_all("/groupinfo/roles/role[@name = '#{new_resource.role_name}']/schedule[@type = '#{new_resource.type}' and @name = '#{new_resource.username}']")
+    role = doc.root.elements["/groupinfo/roles/role[@name = '#{new_resource.role_name}']"]
+    preserve.each do |s|
+      role.add_element(s)
+    end
+    Opennms::Helpers.write_xml_file(doc, "#{node['opennms']['conf']['home']}/etc/groups.xml")
+  end
+
+  def times_valid?(times)
+    validity = true
+    if !times.nil? && !times.empty?
+      times.each do |time|
+        if time.key?('begins') && time.key?('ends')
+          # check format of begins and ends
+          unless time['begins'] =~ /^[0-9]{1,2}-(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)-[0-9]{4} [0-9]{1,2}:[0-9]{2}:[0-9]{2}$/ || time['begins'] =~ /^[0-9]{1,2}:[0-9]{2}:[0-9]{2}$/
+            validity = false
+          end
+          unless time['ends'] =~ /^[0-9]{1,2}-(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)-[0-9]{4} [0-9]{1,2}:[0-9]{2}:[0-9]{2}$/ || time['ends'] =~ /^[0-9]{1,2}:[0-9]{2}:[0-9]{2}$/
+            validity = false
+          end
+          # if has day, check that too
+          if time.key?('day')
+            validity = false unless time['day'] =~ /^(monday|tuesday|wednesday|thursday|friday|saturday|sunday|[1-3][0-9]|[1-9])$/
+          end
+        else
+          # because missing beings/ends keys
+          validity = false
+        end
+      end
+    else
+      # because times is nil or empty - need at least one
+      validity = false
+    end
+    validity
+  end
+
+  def baseurl(pw = nil)
+    if pw.nil? && @admin_password.nil?
+      @admin_password = admin_secret_from_vault('password')
+    end
+    "http://admin:#{pw || @admin_password || 'admin'}@localhost:#{node['opennms']['properties']['jetty']['port']}/opennms/rest"
+  end
+
+  def resturl
+    "http://localhost:#{node['opennms']['properties']['jetty']['port']}/opennms/rest"
+  end
 end
+
+::Chef::DSL::Recipe.send(:include, Opennms::Rbac)
+::Chef::Resource::RubyBlock.send(:include, Opennms::Rbac)

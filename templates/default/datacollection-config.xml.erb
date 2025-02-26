@@ -1,0 +1,26 @@
+<datacollection-config xmlns="http://xmlns.opennms.org/xsd/config/datacollection" rrdRepository="<%= @rrd_base_dir %><%= @rrd_dc_dir %>">
+<% @collections.each do |name, c| -%>
+   <snmp-collection name=<%= name.encode(:xml => :attr) %> snmpStorageFlag=<%= c.snmp_stor_flag.encode(:xml => :attr) %><%= c.max_vars_per_pdu.nil? ? '' : " maxVarsPerPdu=#{c.max_vars_per_pdu.to_s.encode(:xml => :attr)}" %>>
+      <rrd step=<%= c.rrd_step.to_s.encode(:xml => :attr) %>>
+  <% c.rras.each do |rra| -%>
+         <rra><%= rra.encode(:xml => :text) %></rra>
+  <% end -%>
+      </rrd>
+  <% c.include_collections.each do |ic| -%>
+      <include-collection dataCollectionGroup=<%= ic[:data_collection_group].encode(:xml => :attr) %><%= ic[:system_def].nil? ? '' : " systemDef=#{ic[:system_def].encode(:xml => :attr)}" %><%= (ic[:exclude_filters].nil? || ic[:exclude_filters].empty?) ? '/' : '' %>>
+    <% ic[:exclude_filters].each do |ef| -%>
+         <exclude-filter><%= ef.encode(:xml => :text) %></exclude-filter>
+    <% end unless ic[:exclude_filters].nil? -%>
+    <% if !(ic[:exclude_filters].nil? || ic[:exclude_filters].empty?) -%>
+      </include-collection>
+    <% end -%>
+  <% end -%>
+  <% c.resource_types.each do |rt| -%>
+  <% end -%>
+  <% c.groups.each do |g| -%>
+  <% end unless c.groups.nil? -%>
+  <% c.systems.each do |s| -%>
+  <% end unless c.systems.nil? -%>
+   </snmp-collection>
+<% end unless @collections.nil? -%>
+</datacollection-config>

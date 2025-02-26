@@ -45,4 +45,13 @@ EOL
   describe snmp_collection_group('Didactum-Monitoring-System-2', 'didactum-monitoring-system-2.xml', 'baz') do
     it { should_not exist }
   end
+
+  describe snmp_collection_group('create_if_missing', 'create-if-missing-snmp-collection-group.xml', 'createifmissing') do
+    it { should exist }
+    its('system_def') { should eq 'CreateIfMissing' }
+  end
+
+  describe snmp_collection_group('noop-create_if_missing', 'create-if-missing-snmp-collection-group.xml', 'createifmissing') do
+    it { should_not exist }
+  end
 end

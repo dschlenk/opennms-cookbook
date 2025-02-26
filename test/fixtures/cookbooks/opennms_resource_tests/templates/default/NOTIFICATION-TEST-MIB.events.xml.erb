@@ -1,0 +1,32 @@
+<events xmlns="http://xmlns.opennms.org/xsd/eventconf">
+   <event>
+      <mask>
+         <maskelement>
+            <mename>id</mename>
+            <mevalue>.1.3.6.1.4.1.2021.991</mevalue>
+         </maskelement>
+         <maskelement>
+            <mename>generic</mename>
+            <mevalue>6</mevalue>
+         </maskelement>
+         <maskelement>
+            <mename>specific</mename>
+            <mevalue>17</mevalue>
+         </maskelement>
+      </mask>
+      <uei>uei.opennms.org/traps/NOTIFICATION-TEST-MIB/demo-notif</uei>
+      <event-label>NOTIFICATION-TEST-MIB defined trap event: demo-notif</event-label>
+      <descr>
+&lt;p>Just a test notification&lt;/p>&lt;table>
+	&lt;tr>&lt;td>&lt;b>
+
+	sysLocation&lt;/b>&lt;/td>&lt;td>
+	%parm[#1]%;&lt;/td>&lt;td>&lt;p>&lt;/p>&lt;/td>&lt;/tr>&lt;/table>
+	</descr>
+      <logmsg dest="logndisplay">&lt;p>
+	demo-notif trap received
+	sysLocation=%parm[#1]%&lt;/p>
+	</logmsg>
+      <severity><%= @severity %></severity>
+   </event>
+</events>

@@ -22,11 +22,10 @@ class NotifdAutoack < Inspec.resource(1)
     if @exists
       @params = {}
       @params[:resolution_prefix] = aa_el.attributes['resolution-prefix'].to_s
-      @params[:notify] = false
-      @params[:notify] = true if aa_el.attributes['notify'].to_s == 'true'
+      @params[:notify] = aa_el.attributes['notify'].eql?('true') unless aa_el.attributes['notify'].nil?
       @params[:matches] = []
       aa_el.each_element('match') do |m_el|
-        @params[:matches].push m_el.texts.join("\n")
+        @params[:matches].push m_el.texts.collect(&:value).join("\n")
       end
     end
   end

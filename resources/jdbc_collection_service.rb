@@ -1,43 +1,61 @@
-# frozen_string_literal: true
-require 'rexml/document'
+include Opennms::XmlHelper
+include Opennms::Cookbook::Collection::CollectdTemplate
 
-# Use this LWRP to include a JDBC collection in the referenced collectd
-# package_name. This LWRP simply adds the service to the package in
-# $ONMS_HOME/etc/collectd-configuration.xml. You'll need to define the
-# collection elements using the jdbc_collection and jdbc_query LWRPs.
-# The package is created with the collection_package LWRP.
+unified_mode true
+use 'partial/_collection_service'
+use 'partial/_collection_service_j'
 
-actions :create, :create_if_missing, :delete
-default_action :create
+property :driver, String
+property :driver_file, String
+property :user, String
+property :class_name, String, default: 'org.opennms.netmgt.collectd.JdbcCollector'
 
-# Uniqueness/identity of this resource is determined by service_name,
-# package_name, and collection.
-# Update implied by create action.
-# name doesn't actually get used for anything in the config but exists to avoid
-# that dumb chef resource clone thing.
-attribute :name, name_attribute: true, kind_of: String
-attribute :service_name, kind_of: String, default: 'JDBC', required: true
-attribute :package_name, kind_of: String, default: 'example1', required: true
-attribute :collection, kind_of: String, default: 'default', required: true
-# defaults to 300000 during create
-attribute :interval, kind_of: Integer # , :default => 300000
-attribute :user_defined, kind_of: [FalseClass, TrueClass] # , :default => false
-# defaults to 'on' during create
-attribute :status, kind_of: String, equal_to: %w(on off) # , :default => 'on'
-# defaults to 3000 during create
-attribute :timeout, kind_of: Integer # , :default => 3000
-# defaults to 1 during create
-attribute :retry_count, kind_of: Integer # , :default => 1
-# defaults to false during create
-attribute :thresholding_enabled, kind_of: [FalseClass, TrueClass] # , :default => false
-# The rest of the attributes are generally required for create action, but not
-# enforced at the resource level. They have no implicit defaults during create.
-# This is done to allow updating without specifying the entire resource again.
-attribute :driver, kind_of: String
-attribute :driver_file, kind_of: String
-attribute :user, kind_of: String
-attribute :password, kind_of: String
-attribute :port, kind_of: Integer
-attribute :url, kind_of: String
+action :create do
+  declare_resource(:cookbook_file, "#{new_resource.driver_file}_#{new_resource.service_name}") do
+    source new_resource.driver_file
+    path "#{node['opennms']['conf']['home']}/lib/#{new_resource.driver_file}"
+    mode '0664'
+    owner node['opennms']['username']
+    group node['opennms']['groupname']
+    notifies :restart, 'service[opennms]'
+  end unless new_resource.driver_file.nil?
+  converge_if_changed do
+    collectd_resource_init
+    package = collectd_resource.variables[:collectd_config].packages[new_resource.package_name]
+    if package.nil?
+      raise "Package '#{new_resource.package_name}' not found in collectd config."
+    end
+    service = package.service(service_name: new_resource.service_name)
+    if service.nil?
+      resource_properties = %i(service_name interval user_defined status collection timeout retry_count port parameters thresholding_enabled).map { |p| [p, new_resource.send(p)] }.to_h.compact
+      resource_properties[:interval] = 300000 if new_resource.interval.nil?
+      resource_properties[:user_defined] = false if new_resource.user_defined.nil?
+      resource_properties[:status] = 'on' if new_resource.status.nil?
+      resource_properties[:thresholding_enabled] = false if new_resource.thresholding_enabled.nil?
+      resource_properties[:collection] = 'default' if !resource_properties.key?(:collection) && new_resource.collection.nil? && (new_resource.parameters.nil? || new_resource.parameters['collection'].nil?)
+      resource_properties[:parameters] = {} if !resource_properties.key?(:parameters) || resource_properties[:parameters].nil?
+      resource_properties[:parameters]['user'] = new_resource.user unless new_resource.user.nil?
+      resource_properties[:parameters]['password'] = new_resource.password unless new_resource.password.nil?
+      resource_properties[:parameters]['url'] = new_resource.url unless new_resource.url.nil?
+      resource_properties[:parameters]['driver'] = new_resource.driver unless new_resource.driver.nil?
+      resource_properties.compact!
+      service = Opennms::Cookbook::Package::CollectdService.new(**resource_properties)
+      # we need to set the type in case another resource updates us later in the run list
+      service.type = Opennms::Cookbook::Package::CollectdService.type_from_class_name(new_resource.class_name)
+      collectd_resource.variables[:collectd_config].packages[new_resource.package_name].services.push(service)
+      collectd_resource.variables[:collectd_config].collectors.push({ 'service' => new_resource.service_name, 'class_name' => new_resource.class_name, 'parameters' => new_resource.class_parameters })
+    else
+      run_action(:update)
+    end
+  end
+end
 
-attr_accessor :exists, :collection_exists, :changed
+action :create_if_missing do
+  collectd_resource_init
+  package = collectd_resource.variables[:collectd_config].packages[new_resource.package_name]
+  if package.nil?
+    raise "Package '#{new_resource.package_name}' not found in collectd config."
+  end
+  service = package.service(service_name: new_resource.service_name)
+  run_action(:create) if service.nil?
+end

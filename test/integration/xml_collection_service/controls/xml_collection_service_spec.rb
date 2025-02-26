@@ -1,6 +1,7 @@
-# frozen_string_literal: true
 control 'xml_collection_service' do
-  describe xml_collection_service('XMLFoo', 'foo', 'foo') do
+  describe collection_service('XMLFoo', 'foo') do
+    it { should exist }
+    its('collection') { should eq 'foo' }
     its('interval') { should eq 400_000 }
     its('user_defined') { should eq true }
     its('status') { should eq 'off' }
@@ -10,8 +11,15 @@ control 'xml_collection_service' do
     its('thresholding_enabled') { should eq true }
   end
 
-  describe xml_collection_service('XML', 'default', 'example1') do
+  describe collection_service('XML Service', 'example1') do
     it { should exist }
+    its('collection') { should eq 'default' }
     its('status') { should eq 'on' }
+  end
+
+  describe collection_service('create_if_missing XML Service', 'example1') do
+    it { should exist }
+    its('collection') { should eq 'default' }
+    its('status') { should eq 'off' }
   end
 end

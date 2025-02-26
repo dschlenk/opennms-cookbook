@@ -21,11 +21,15 @@ class WsManCollection < Inspec.resource(1)
     @exists = !c_el.nil?
     @params = {}
     if @exists
-      @params[:max_vars_per_pdu] = c_el.attributes['maxVarsPerPdu'].to_i
+      @params[:include_system_definitions] = !c_el.elements['include-all-system-definitions'].nil?
+      @params[:include_system_definition] = []
+      c_el.each_element('include-system-definition') do |isd|
+        @params[:include_system_definition].push isd.texts.collect(&:value).join('')
+      end
       @params[:rrd_step] = c_el.elements['rrd'].attributes['step'].to_i
       @params[:rras] = []
       c_el.each_element('rrd/rra') do |rra|
-        @params[:rras].push rra.texts.join('')
+        @params[:rras].push rra.texts.collect(&:value).join('')
       end
     end
   end

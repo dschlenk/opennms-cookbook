@@ -1,18 +1,60 @@
-# frozen_string_literal: true
-require 'rexml/document'
+unified_mode true
+use 'partial/_collection'
 
-# Defines a collection in $ONMS_HOME/etc/jdbc-datacollection-config.xml.
-# Will be used by any packages in $ONMS_HOME/etc/collectd-configuration.xml
-# that have a JDBC service with this collection name as the collection
-# parameter value. You can use the jdbc_collection_service LWRP to create
-# that service, the collection_package LWRP to define the package and the
-# jdbc_query LWRP to define the queries in this jdbc_collection.
+include Opennms::Cookbook::Collection::JdbcCollectionTemplate
 
-actions :create
-default_action :create
+load_current_value do |new_resource|
+  r = jdbc_resource
+  collection = r.variables[:collections][new_resource.collection] unless r.nil?
+  if r.nil? || collection.nil?
+    filename = "#{onms_etc}/jdbc-datacollection-config.xml"
+    current_value_does_not_exist! unless ::File.exist?(filename)
+    collection = Opennms::Cookbook::Collection::OpennmsCollectionConfigFile.read(filename, 'jdbc').collections[new_resource.collection]
+  end
+  current_value_does_not_exist! if collection.nil?
+  rrd_step collection.rrd_step
+  rras collection.rras
+end
 
-attribute :collection, name_attribute: true, kind_of: String, required: true
-attribute :rrd_step, kind_of: Integer, default: 300, required: true
-attribute :rras, kind_of: Array, default: ['RRA:AVERAGE:0.5:1:2016', 'RRA:AVERAGE:0.5:12:1488', 'RRA:AVERAGE:0.5:288:366', 'RRA:MAX:0.5:288:366', 'RRA:MIN:0.5:288:366'], required: true
+action_class do
+  include Opennms::Cookbook::Collection::JdbcCollectionTemplate
+end
 
-attr_accessor :exists
+action :create do
+  converge_if_changed do
+    jdbc_resource_init
+    collection = jdbc_resource.variables[:collections][new_resource.collection]
+    if collection.nil?
+      resource_properties = %i(name rrd_step rras).map { |p| [p, new_resource.send(p)] }.to_h.compact
+      collection = Opennms::Cookbook::Collection::JdbcCollection.new(**resource_properties)
+      jdbc_resource.variables[:collections][new_resource.collection] = collection
+    else
+      run_action(:update)
+    end
+  end
+end
+
+action :create_if_missing do
+  jdbc_resource_init
+  collection = jdbc_resource.variables[:collections][new_resource.collection]
+  run_action(:create) if collection.nil?
+end
+
+action :update do
+  converge_if_changed(:rrd_step, :rras) do
+    jdbc_resource_init
+    collection = jdbc_resource.variables[:collections][new_resource.collection]
+    raise Chef::Exceptions::CurrentValueDoesNotExist if collection.nil?
+    collection.update(rrd_step: new_resource.rrd_step, rras: new_resource.rras)
+  end
+end
+
+action :delete do
+  jdbc_resource_init
+  collection = jdbc_resource.variables[:collections][new_resource.collection]
+  unless collection.nil?
+    converge_by("Removing jdbc_collection #{new_resource.collection}") do
+      jdbc_resource.variables[:collections].delete(new_resource.collection)
+    end
+  end
+end

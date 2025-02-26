@@ -1,0 +1,30 @@
+<jmx-datacollection-config xmlns="http://xmlns.opennms.org/xsd/config/jmx-datacollection" rrdRepository="<%=@rrd_repository%>">
+<% @collections.each do |name, collection| -%>
+   <jmx-collection name=<%= name.encode(:xml => :attr) %>>
+      <rrd step=<%= collection.rrd_step.to_s.encode(:xml => :attr) %>>
+      <% collection.rras.each do |rra| -%>
+         <rra><%= rra.encode(:xml => :text) %></rra>
+      <% end -%>
+      </rrd>
+      <mbeans>
+      <% collection.mbeans.each do |mbean| -%>
+         <mbean name=<%= mbean.name.encode(:xml => :attr) %> objectname=<%= mbean.objectname.encode(:xml => :attr) %><%= mbean.keyfield.nil? ? '' : " keyfield=#{mbean.keyfield.encode(:xml => :attr)}" %><%= mbean.exclude.nil? ? '' : " exclude=#{mbean.exclude.encode(:xml => :attr)}" %><%= mbean.key_alias.nil? ? '' : " key-alias=#{mbean.key_alias.encode(:xml => :attr)}" %><%= mbean.resource_type.nil? ? '' : " resource-type=#{mbean.resource_type.encode(:xml => :attr)}" %>>
+    <% mbean.attribs.each do |aname, attrib| -%>
+            <attrib name=<%= aname.encode(:xml => :attr) %> alias=<%= attrib['alias'].encode(:xml => :attr) %> type=<%= attrib['type'].encode(:xml => :attr) %><%= attrib['maxval'].nil? ? '' : " maxval=#{attrib['maxval'].encode(:xml => :attr)}" %><% attrib['minval'].nil? ? '' : " minval=#{attrib['minval'].encode(:xml => :attr)}" %>/>
+    <% end unless mbean.attribs.nil? -%>
+    <% mbean.include_mbeans.each do |include_mbean| -%>
+            <includeMbean><%= include_mbean.encode(:xml => :text) %></includeMbean>
+    <% end unless mbean.include_mbeans.nil? -%>
+    <% mbean.comp_attribs.each do |cname, comp_attrib| -%>
+            <comp-attrib name=<%= cname.encode(:xml => :attr) %><%= comp_attrib['alias'].nil? ? '' : " alias=#{comp_attrib['alias'].encode(:xml => :attr)}" %> type=<%= comp_attrib['type'].encode(:xml => :attr) %>>
+      <% comp_attrib['comp_members'].each do |cmname, comp_member| -%>
+               <comp-member name=<%= cmname.encode(:xml => :attr) %><%= comp_member['alias'].nil? ? '' : " alias=#{comp_member['alias'].encode(:xml => :attr)}" %> type=<%= comp_member['type'].encode(:xml => :attr) %><%= comp_member['maxval'].nil? ? '' : " maxval=#{comp_member['maxval'].encode(:xml => :attr)}" %><% comp_member['minval'].nil? ? '' : " minval=#{comp_member['minval'].encode(:xml => :attr)}" %>/>
+      <% end if comp_attrib.key?('comp_members') -%>
+            </comp-attrib>
+    <% end unless mbean.comp_attribs.nil? -%>
+         </mbean>
+  <% end unless collection.mbeans.nil? -%>
+      </mbeans>
+   </jmx-collection>
+<% end unless @collections.nil? -%>
+</jmx-datacollection-config>
