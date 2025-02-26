@@ -10,13 +10,13 @@ class Import < Inspec.resource(1)
   '
 
   example '
-    describe import(\'group name\', \'foreign source name\') do
+    describe import(\'group name\', \'foreign source name\', 1240) do
       it { should exist }
     end
   '
 
-  def initialize(name, foreign_source)
-    parsed_url = Addressable::URI.parse("http://admin:admin@localhost:8980/opennms/rest/requisitions/#{name}").normalize.to_str
+  def initialize(name, foreign_source, port = 8980)
+    parsed_url = Addressable::URI.parse("http://admin:admin@localhost:#{port}/opennms/rest/requisitions/#{name}").normalize.to_str
     begin
       req = RestClient.get(parsed_url)
     rescue StandardError
