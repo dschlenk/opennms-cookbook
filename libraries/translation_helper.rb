@@ -41,14 +41,15 @@ module Opennms
       end
 
       class TranslationMapping
-        attr_reader :assignments
+        attr_reader :assignments, :preserve_snmp_data
 
-        def initialize(assignments: nil)
+        def initialize(assignments: nil, preserve_snmp_data: nil)
           if assignments.nil?
             @assignments = []
           else
             @assignments = assignments
           end
+          @preserve_snmp_data = preserve_snmp_data
         end
       end
 
@@ -58,7 +59,7 @@ module Opennms
         def initialize(name:, type:,default: nil, value:)
           @name = name
           @type = type
-          @default = default || "Unknown"
+          @default = default
           @value = value
         end
       end
@@ -66,7 +67,7 @@ module Opennms
       class TranslationValue
         attr_reader :type, :result, :values
 
-        def initialize(type: nil, result: nil, values: nil)
+        def initialize(type:, result:, values: nil)
           @type = type
           @result = result
           @values = values || []
@@ -76,7 +77,7 @@ module Opennms
       class TranslationValues
         attr_reader :type, :name, :matches, :result
 
-        def initialize(type:, name:, matches:, result:)
+        def initialize(type:, name: nil, matches: nil, result:)
           @type = type
           @name = name
           @matches = matches
