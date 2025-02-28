@@ -1,25 +1,52 @@
 module Opennms
   module Cookbook
     module Translations
-      class TranslationFile
+      class TranslatorConfiguratioFile
         include Opennms::XmlHelper
-        attr_reader :addl_specs
+        attr_reader :specs
 
-        def initialize(addl_specs)
-          @addl_specs = (addl_specs)
+        def initialize(specs)
+          @specs = (specs)
         end
+        require 'nokogiri'
 
         def read!(file = 'translator-configuration.xml')
-          @addl_specs.each do |uei, data|
-          check_mappings(uei, data)
+          raise ArgumentError, "File #{file} does not exist" unless ::File.exist?(file)
+        doc = Nokogiri::XML(translationfile)
+        doc.xpath('//Translation').each do |a|
+          @spec.push(Translation.new(translation_specs: a['translation_specs'] || [])
+          a.xpath('TranslationSpec').each do |b|
+            @spec.push(TranslationSpec.new(uei: b['uei'],
+                                           mappings: b['mappings'] || []) //or mappings: b[]
+            b.xpath('TranslationMapping').each do |c|
+              @spec.push(TranslationMapping.new(assignments: c['assignments'] || [], //or assignments: c[]
+                                                preserve_snmp_data: c['preserve_snmp_data'])
+              c.xpath('TranslationAssignment').each do |d|
+                @spec.push(TranslationAssignment.new(name: d['name'],
+                                                     type: d['type'],
+                                                     default: d['default'],
+                                                     value: d['value'])
+                d.xpath('TranslationValue').each do |e|
+                  @spec.push(TranslationValue.new(type: e['type'],
+                                                  result: e['result'],
+                                                  values: e['values'] || [])
+                  
+                  e.xpath('TranslationValues').each do |f|
+                    @spec.push(TranslationTranslationValues.new(type: e['type'],
+                                                                name: e['name'],
+                                                                matches: e['matches'],
+                                                                result: e['result'])
+                  end
+                end
+              end
+            end
+          end
         end
 
-        def check_mappings(uei, data)
-          if data[:mappings].nil?
-            puts "Mappings are nil for the UEI: #{uei}"
-          else
-            puts "Mappings are available for UEI: #{uei}"
-          end
+        def self.read(file = 'translator-configuration.xml')
+          translationfile = TranslatorConfiguratioFile.new
+          translationfile.read!(file)
+          translationfile
         end
       end
 
