@@ -1,57 +1,53 @@
 module Opennms
   module Cookbook
     module Translations
-      class TranslatorConfiguratioFile
+      class TranslatorConfigurationFile
         include Opennms::XmlHelper
         attr_reader :specs
 
-        def initialize(specs)
-          @specs = (specs)
+        def initialize(specs = nil)
+          @specs = specs || []
         end
 
         def read!(file = 'translator-configuration.xml')
           raise ArgumentError, "File #{file} does not exist" unless ::File.exist?(file)
-        doc.xpath('//TranslationValues').each do |a|
-          @spec.push(TranslationTranslationValues.new(type: a['type'],
-                                                      name: a['name'],
-                                                      matches: a['matches'],
-                                                      result: a['result'])
-          a.xpath('TranslationValue').each do |b|
-            @spec.push(TranslationValue.new(type: b['type'],
-                                            result: b['result'],
-                                            values: b['values'] || [])
-            b.xpath('TranslationAssignment').each do |c|
-              @spec.push(TranslationAssignment.new(name: c['name'],
-                                                   type: c['type'],
-                                                   default: c['default'],
-                                                   value: c['value'])
-              c.xpath('TranslationMapping').each do |d|
-                @spec.push(TranslationMapping.new(assignments: d['assignments'] || [], //or assignments: d[]
-                                                  preserve_snmp_data: d['preserve_snmp_data'])
-                d.xpath('TranslationSpec').each do |e|
-                  @spec.push(TranslationSpec.new(uei: e['uei'],
-                                                  mappings: e['mappings'] || []) //or mappings: e[]
-                  e.xpath(Translation'').each do |f|
-                    @spec.push(Translation.new(translation_specs: f['translation_specs'] || []
-                  end
+          doc = xmldoc_from_file(file)
+          doc.root.each_element('/event-translator-configuration/translation/event-translation-spec') do |spec|
+            spec_uei = spec.attributes['uei']
+            mappings = []
+            spec.each_element('mappings/mapping') do |mapping|
+              preserve_snmp_data = mapping.attributes['preserve-snmp-data']
+              assignments = []
+              mapping.each_element('assignment') do |assignment|
+                atype = assignment.attributes['type']
+                aname = assignment.attributes['name']
+                adefault = assignment.attributes['default']
+                assignment.each_element('value') do |v|
+                  avalue = parse_value(v)
+        #def initialize(name:, type:,default: nil, value:)
+                  assignments.push TranslationAssignment.new(name: aname, type: atype, default: adefault, value: avalue)
                 end
               end
+              mappings.push TranslationMapping.new(assignments: assignments, preserve_snmp_data: preserve_snmp_data)
             end
+            @specs.push TranslationSpec.new(uei: spec_uei, mappings: mappings)
           end
         end
 
         def self.read(file = 'translator-configuration.xml')
-          translationfile = TranslatorConfiguratioFile.new
+          translationfile = TranslatorConfigurationFile.new
           translationfile.read!(file)
           translationfile
         end
-      end
 
-      class Translation
-        attr_reader :translation_specs
+        private
 
-        def initialize
-          @translation_specs = []
+        def parse_value(v)
+          values = []
+          v.each_element('value') do |v2|
+            values.push parse_value(v2)
+          end
+          TranslationValue.new(type: v.attributes['type'], result: v.attributes['result'], matches: v.attributes['matches'], name: v.attributes['name'], values: values)
         end
       end
 
@@ -89,24 +85,15 @@ module Opennms
       end
 
       class TranslationValue
-        attr_reader :type, :result, :values
+        attr_reader :type, :result, :matches, :name, :values
 
-        def initialize(type:, result:, values: nil)
+        def initialize(type:, result:, matches: nil, name: nil, values: nil)
           @type = type
           @result = result
+          @matches = matches
+          @name = name
           @values = values || []
         end
-      end
-
-      class TranslationValues
-        attr_reader :type, :name, :matches, :result
-
-        def initialize(type:, name: nil, matches: nil, result:)
-          @type = type
-          @name = name
-          @matches = matches
-          @result = result
-          end
       end
     end
   end
