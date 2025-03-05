@@ -7,7 +7,7 @@ opennms_threshd_package 'create_if_missing cheftest2 with package_name' do
   include_ranges [{ 'begin' => '172.17.14.2', 'end' => '172.17.14.254' }, { 'begin' => '172.17.21.1', 'end' => '172.17.21.254' }]
   exclude_ranges [{ 'begin' => '10.1.0.3', 'end' => '10.254.254.254' }]
   include_urls ['file:/opt/opennms/etc/include3']
-  services [{ 'name' => 'SNMP', 'interval' => 300_001, 'status' => 'on', 'params' => { 'thresholding-group' => 'cheftest2' } }]
+  services [{ 'name' => 'SNMP', 'interval' => 300_001, 'status' => 'on', 'params' => [{ 'thresholding-group' => 'cheftest2' }] }]
   notifies :run, 'opennms_send_event[restart_Threshd]'
   action :create_if_missing
 end
@@ -20,7 +20,7 @@ opennms_threshd_package 'create_if_missing cheftest3 with package_name' do
   include_ranges [{ 'begin' => '172.17.14.2', 'end' => '172.17.14.254' }, { 'begin' => '172.17.21.1', 'end' => '172.17.21.254' }]
   exclude_ranges [{ 'begin' => '10.1.0.3', 'end' => '10.254.254.254' }]
   include_urls ['file:/opt/opennms/etc/include3']
-  services [{ 'name' => 'SNMP', 'interval' => 300_001, 'status' => 'on', 'params' => { 'thresholding-group' => 'cheftest2' } }]
+  services [{ 'name' => 'SNMP', 'interval' => 300_001, 'status' => 'on', 'params' => [{ 'thresholding-group' => 'cheftest2' }] }]
   notifies :run, 'opennms_send_event[restart_Threshd]'
   action :create_if_missing
 end
@@ -33,7 +33,7 @@ opennms_threshd_package 'create_if_missing cheftest3 with package_name change' d
   include_ranges [{ 'begin' => '172.17.14.2', 'end' => '172.17.14.254' }, { 'begin' => '172.17.21.1', 'end' => '172.17.21.254' }]
   exclude_ranges [{ 'begin' => '10.1.0.4', 'end' => '10.254.254.254' }]
   include_urls ['file:/opt/opennms/etc/include3']
-  services [{ 'name' => 'SNMP', 'interval' => 300_001, 'status' => 'on', 'params' => { 'thresholding-group' => 'cheftest2' } }]
+  services [{ 'name' => 'SNMP', 'interval' => 300_001, 'status' => 'on', 'params' => [{ 'thresholding-group' => 'cheftest2' }] }]
   notifies :run, 'opennms_send_event[restart_Threshd]'
   action :create_if_missing
 end

@@ -338,49 +338,52 @@ Remove one of the default event translations (http://www.opennms.org/wiki/Event_
 * cisco_config_man
 * juniper_cfg_change
 
-You can also add additional `event-translation-spec` elements by populating `node['opennms']['translator']['addl_specs']` with a hash where each key is a uei that has a hash value with key `'mappings'` (array of hashes each with key `'assignments'` (array of hashes that each contain keys `'name'` (string), `'type'` (string), `'default'` (string, optional), `'value'` (a hash that contains keys `'type'` (string), `'matches'` (string, optional), `'result'` (string), `'values'` (array of hashes that each contain keys `'type'` (string), `'matches'` (string, optional), `'result'` (string))))).
+You can also add additional `event-translation-spec` elements by populating `node['opennms']['translator']['addl_specs']` with an array of hashes where each has a key `uei` that has a string value and a key `'mappings'` (array of hashes each with key `'assignments'` (array of hashes that each contain keys `'name'` (string), `'type'` (string), `'default'` (string, optional), `'value'` (a hash that contains keys `'type'` (string), `'matches'` (string, optional), `'result'` (string), `'values'` (array of hashes that each contain keys `'type'` (string), `'matches'` (string, optional), `'result'` (string))))).
 
 An example:
 
 ```
-default['opennms']['translator']['addl_specs'] = {
-  'uei.opennms.org/internal/telemetry/clockSkewDetected' => {
+default['opennms']['translator']['addl_specs'] = [
+  { 
+    'uei ' => 'uei.opennms.org/internal/telemetry/clockSkewDetected',
     'mappings' => [
-      'assignments' => [
-        {
-          'name' => 'uei',
-          'type' => 'field',
-          'value' => {
-            'type' => 'constant',
-            'result' => 'uei.opennms.org/translator/telemetry/clockSkewDetected'
-          }
-        },
-        {
-          'name' => 'nodeid',
-          'type' => 'field',
-          'value' => {
-            'type' => 'sql',
-            'result' => 'SELECT n.nodeid FROM node n, ipinterface i WHERE n.nodeid = i.nodeid AND i.ipaddr = ? AND n.location = ?',
-            'values' => [
-              {
-                'type' => 'field',
-                'name' => 'interface',
-                'matches' => '.*',
-                'result' => '${0}'
-              },
-              {
-                'type' => 'parameter',
-                'name' => 'monitoringSystemLocation',
-                'matches' => '.*',
-                'result' => '${0}'
-              }
-            ]
-          }
-        }
-      ]
+      {
+        'assignments' => [
+          {
+            'name' => 'uei',
+            'type' => 'field',
+            'value' => {
+              'type' => 'constant',
+              'result' => 'uei.opennms.org/translator/telemetry/clockSkewDetected'
+            }
+          },
+          {
+            'name' => 'nodeid',
+            'type' => 'field',
+            'value' => {
+              'type' => 'sql',
+              'result' => 'SELECT n.nodeid FROM node n, ipinterface i WHERE n.nodeid = i.nodeid AND i.ipaddr = ? AND n.location = ?',
+              'values' => [
+                {
+                  'type' => 'field',
+                  'name' => 'interface',
+                  'matches' => '.*',
+                  'result' => '${0}'
+                },
+                {
+                  'type' => 'parameter',
+                  'name' => 'monitoringSystemLocation',
+                  'matches' => '.*',
+                  'result' => '${0}'
+                }
+              ]
+            }
+          },
+        ]
+      },
     ]
-  }
-}
+  },
+]
 ```
 
 would be how to express the following `event-translation-spec`:

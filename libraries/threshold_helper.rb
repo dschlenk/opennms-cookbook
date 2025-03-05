@@ -78,17 +78,19 @@ module Opennms
           @expressions = []
         end
 
-        def find_rule(type:, ds_type:, filter_operator: nil, resource_filters: nil, ds_name: nil, expression: nil)
+        def find_rule(type:, ds_type:, filter_operator: nil, resource_filters: nil, ds_name: nil, expression: nil, triggered_uei: nil, rearmed_uei: nil)
           raise Chef::Exceptions::Validation, 'Either `ds_name` or `expression` properties must be present in a threshold rule' if ds_name.nil? && expression.nil?
           if ds_name.nil?
             expression = @expressions.select do |e|
               e.type.eql?(type) &&
                 e.ds_type.eql?(ds_type) &&
                 (e.filter_operator.eql?(filter_operator) || (e.filter_operator.nil? && (filter_operator.eql?('or') || filter_operator.eql?('OR'))) || (filter_operator.nil? && (e.filter_operator.eql?('or') || e.filter_operator.eql?('OR')))) &&
-                e.expression.eql?(expression)
+                e.expression.eql?(expression) &&
+                e.triggered_uei.eql?(triggered_uei) &&
+                e.rearmed_uei.eql?(rearmed_uei)
             end
             return if expression.empty?
-            raise DuplicateThresholdRule, "More than one expression rule found with identical identity (type #{type}, ds_type #{ds_type}, filter_operator #{filter_operator}, resource_filters #{resource_filters}, expression #{expression}) found" unless expression.one?
+            raise DuplicateThresholdRule, "More than one expression rule found with identical identity (type #{type}, ds_type #{ds_type}, filter_operator #{filter_operator}, resource_filters #{resource_filters}, expression #{expression} triggered_uei #{triggered_uei}, rearmed_uei #{rearmed_uei}) found" unless expression.one?
             expression.pop
           else
             threshold = @thresholds.select do |e|
@@ -96,9 +98,11 @@ module Opennms
                 e.ds_type.eql?(ds_type) &&
                 (e.filter_operator.eql?(filter_operator) || (e.filter_operator.nil? && (filter_operator.eql?('or') || filter_operator.eql?('OR'))) || (filter_operator.nil? && (e.filter_operator.eql?('or') || e.filter_operator.eql?('OR')))) &&
                 e.ds_name.eql?(ds_name)
+                e.triggered_uei.eql?(triggered_uei) &&
+                e.rearmed_uei.eql?(rearmed_uei)
             end
             return if threshold.empty?
-            raise DuplicateThresholdRule, "More than one threshold rule found with identical identity (type #{type}, ds_type #{ds_type}, filter_operator #{filter_operator}, resource_filters #{resource_filters}, ds_name #{ds_name}) found" unless threshold.one?
+            raise DuplicateThresholdRule, "More than one threshold rule found with identical identity (type #{type}, ds_type #{ds_type}, filter_operator #{filter_operator}, resource_filters #{resource_filters}, ds_name #{ds_name}, triggered_uei #{triggered_uei}, rearmed_uei #{rearmed_uei}) found" unless threshold.one?
             threshold.pop
           end
         end
@@ -155,15 +159,13 @@ module Opennms
           end
         end
 
-        def update(relaxed: nil, description: nil, ds_label: nil, value: nil, rearm: nil, trigger: nil, triggered_uei: nil, rearmed_uei: nil)
+        def update(relaxed: nil, description: nil, ds_label: nil, value: nil, rearm: nil, trigger: nil)
           @relaxed = relaxed unless relaxed.nil?
           @description = description unless description.nil?
           @ds_label = ds_label unless ds_label.nil?
           @value = value unless value.nil?
           @rearm = rearm unless rearm.nil?
           @trigger = trigger unless trigger.nil?
-          @triggered_uei = triggered_uei unless triggered_uei.nil?
-          @rearmed_uei = rearmed_uei unless rearmed_uei.nil?
         end
       end
 

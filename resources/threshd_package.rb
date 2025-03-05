@@ -8,8 +8,8 @@ unified_mode true
 # array of hashes of the form
 # [{ 'name' => 'SNMP', 'interval' => Integer, 'status' => 'on|off', 'params' => {'key' => 'value', ... }}, ...]
 property :services, Array, callbacks: {
-  'should be an array of hashes with keys `name` (String, required), `interval` (Integer, required), `status` (`on` or `off`, required), `params` (Hash of Strings, optional)' => lambda { |p|
-    !p.any? { |h| !h.key?('name') || !h['name'].is_a?(String) || !h.key?('interval') || !h['interval'].is_a?(Integer) || !h.key?('status') || !(h['status'].eql?('on') || h['status'].eql?('off')) || (h.key?('params') && h['params'].any? { |k, v| !k.is_a?(String) || !v.is_a?(String) }) }
+  'should be an array of hashes with keys `name` (String, required), `interval` (Integer, required), `status` (`on` or `off`, required), `params` (Array of Hash of String key/values, optional)' => lambda { |p|
+    !p.any? { |h| !h.key?('name') || !h['name'].is_a?(String) || !h.key?('interval') || !h['interval'].is_a?(Integer) || !h.key?('status') || !(h['status'].eql?('on') || h['status'].eql?('off')) || (h.key?('params') && (!h['params'].is_a?(Array) || h['params'].any? { |h| !h.is_a?(Hash) || h.any? { |k, v| !k.is_a?(String) || !v.is_a?(String) }}))}
   },
 }
 
