@@ -8,34 +8,31 @@ module Opennms
         def initialize(specs)
           @specs = (specs)
         end
-        require 'nokogiri'
 
         def read!(file = 'translator-configuration.xml')
           raise ArgumentError, "File #{file} does not exist" unless ::File.exist?(file)
-        doc = Nokogiri::XML(translationfile)
-        doc.xpath('//Translation').each do |a|
-          @spec.push(Translation.new(translation_specs: a['translation_specs'] || [])
-          a.xpath('TranslationSpec').each do |b|
-            @spec.push(TranslationSpec.new(uei: b['uei'],
-                                           mappings: b['mappings'] || []) //or mappings: b[]
-            b.xpath('TranslationMapping').each do |c|
-              @spec.push(TranslationMapping.new(assignments: c['assignments'] || [], //or assignments: c[]
-                                                preserve_snmp_data: c['preserve_snmp_data'])
-              c.xpath('TranslationAssignment').each do |d|
-                @spec.push(TranslationAssignment.new(name: d['name'],
-                                                     type: d['type'],
-                                                     default: d['default'],
-                                                     value: d['value'])
-                d.xpath('TranslationValue').each do |e|
-                  @spec.push(TranslationValue.new(type: e['type'],
-                                                  result: e['result'],
-                                                  values: e['values'] || [])
-                  
-                  e.xpath('TranslationValues').each do |f|
-                    @spec.push(TranslationTranslationValues.new(type: e['type'],
-                                                                name: e['name'],
-                                                                matches: e['matches'],
-                                                                result: e['result'])
+        doc.xpath('//TranslationValues').each do |a|
+          @spec.push(TranslationTranslationValues.new(type: a['type'],
+                                                      name: a['name'],
+                                                      matches: a['matches'],
+                                                      result: a['result'])
+          a.xpath('TranslationValue').each do |b|
+            @spec.push(TranslationValue.new(type: b['type'],
+                                            result: b['result'],
+                                            values: b['values'] || [])
+            b.xpath('TranslationAssignment').each do |c|
+              @spec.push(TranslationAssignment.new(name: c['name'],
+                                                   type: c['type'],
+                                                   default: c['default'],
+                                                   value: c['value'])
+              c.xpath('TranslationMapping').each do |d|
+                @spec.push(TranslationMapping.new(assignments: d['assignments'] || [], //or assignments: d[]
+                                                  preserve_snmp_data: d['preserve_snmp_data'])
+                d.xpath('TranslationSpec').each do |e|
+                  @spec.push(TranslationSpec.new(uei: e['uei'],
+                                                  mappings: e['mappings'] || []) //or mappings: e[]
+                  e.xpath(Translation'').each do |f|
+                    @spec.push(Translation.new(translation_specs: f['translation_specs'] || []
                   end
                 end
               end
@@ -111,7 +108,6 @@ module Opennms
           @result = result
           end
       end
-
     end
   end
 end
