@@ -1,6 +1,41 @@
 module Opennms
   module Cookbook
     module Translations
+      module TranslationsTemplate
+        def translation_resource_init
+          translation_resource_create unless translation_resource_exist?
+        end
+        
+        def translation_resource
+          return unless translation_resource_exist?
+          find_resource!(:template, "#{onms_etc}/translator-configuration.xml")
+        end
+        
+        private
+
+        def translations_resource_exist?
+          !find_resource(:template, "#{onms_etc}/translator-configuration.xml").nil?
+        rescue Chef::Exceptions::ResourceNotFound
+          false
+        end
+
+        def translations_resource_create
+          file = Opennms::Cookbook::Translations::TranslatorConfigurationFile.read("#{onms_etc}/translator-configuration.xml")
+          with_run_context(:root) do
+            declare_resource(:template, "#{onms_etc}/translator-configuration.xml") do
+              cookbook 'opennms'
+              source 'translator-configuration.xml.erb'
+              owner node['opennms']['username']
+              group node['opennms']['groupname']
+              mode '0664'
+              variables(config: file)
+              action :nothing
+              delayed_action :create
+            end
+          end
+        end
+      end
+
       class TranslatorConfigurationFile
         include Opennms::XmlHelper
         attr_reader :specs
@@ -17,7 +52,7 @@ module Opennms
             mappings = []
             spec.each_element('mappings/mapping') do |mapping|
               preserve_snmp_data = mapping.attributes['preserve-snmp-data']
-              assignments ||= []
+              assignments = []
               mapping.each_element('assignment') do |assignment|
                 atype = assignment.attributes['type']
                 aname = assignment.attributes['name']
