@@ -24,7 +24,7 @@ module Opennms
                 adefault = assignment.attributes['default']
                 assignment.each_element('value') do |v|
                   avalue = parse_value(v)
-        #def initialize(name:, type:,default: nil, value:)
+        #def initialize(name:, type:, default: nil, value:)
                   assignments.push TranslationAssignment.new(name: aname, type: atype, default: adefault, value: avalue)
                 end
               end
