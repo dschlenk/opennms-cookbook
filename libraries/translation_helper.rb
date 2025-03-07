@@ -17,7 +17,7 @@ module Opennms
             mappings = []
             spec.each_element('mappings/mapping') do |mapping|
               preserve_snmp_data = mapping.attributes['preserve-snmp-data']
-              assignments = []
+              assignments ||= []
               mapping.each_element('assignment') do |assignment|
                 atype = assignment.attributes['type']
                 aname = assignment.attributes['name']
@@ -66,6 +66,8 @@ module Opennms
         def initialize(assignments: nil, preserve_snmp_data: nil)
           if assignments.nil?
             assignments = []
+          else
+            assignments = assignments
           end
           @preserve_snmp_data = preserve_snmp_data
         end
