@@ -30,7 +30,7 @@ property :event_label, String
 property :descr, String
 # this is required when creating a new event, but not when updating existing
 property :logmsg, String
-# this is required when creating a new event, but not when updating existing. 'logndisplay' when in doubt.
+# this is required when creating a new event, but not when updating existing. 'logndisplay' when not present.
 property :logmsg_dest, String, equal_to: %w(logndisplay displayonly logonly suppress donotpersist discardtraps)
 property :logmsg_notify, [true, false]
 # an example using at least one of everything is:
@@ -194,12 +194,13 @@ action :create do
       raise Chef::Exceptions::ValidationFailed, 'event_label is a required property for action :create when not updating' if new_resource.event_label.nil?
       raise Chef::Exceptions::ValidationFailed, 'descr is a required property for action :create when not updating' if new_resource.descr.nil?
       raise Chef::Exceptions::ValidationFailed, 'logmsg is a required property for action :create when not updating' if new_resource.logmsg.nil?
-      raise Chef::Exceptions::ValidationFailed, 'logmsg_dest is a required property for action :create when not updating' if new_resource.logmsg_dest.nil?
       raise Chef::Exceptions::ValidationFailed, 'severity is a required property for action :create when not updating' if new_resource.severity.nil?
+      
       eventconf_resource_init
       eventconf_resource.variables[:eventconf].event_files[new_resource.file[7..-1]] = { position: new_resource.eventconf_position }
       resource_properties = %i(uei mask priority event_label descr logmsg logmsg_dest logmsg_notify collection_group severity operinstruct autoaction varbindsdecode parameters operaction autoacknowledge loggroup tticket forward script mouseovertext alarm_data filters).map { |p| [p, new_resource.send(p)] }.to_h.compact
       resource_properties[:uei] = new_resource.name if new_resource.uei.nil?
+      resource_properties[:logmsg_dest] = 'logndisplay' if new_resource.logmsg_dest.nil?
       entry = Opennms::Cookbook::ConfigHelpers::Event::EventDefinition.create(**resource_properties)
       eventfile_resource(new_resource.file).variables[:eventfile].add(entry, new_resource.position)
     else

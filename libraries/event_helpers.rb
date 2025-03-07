@@ -174,7 +174,7 @@ module Opennms
                 event_label = element_text(event, 'event-label')
                 descr = element_multiline_text(event, 'descr')
                 logmsg = element_multiline_text(event, 'logmsg')
-                logmsg_notify = attr_value(event, 'logmsg/@notify').downcase == 'true'
+                logmsg_notify = attr_value(event, 'logmsg/@notify').downcase == 'true' unless attr_value(event, 'logmsg/@notify').nil?
                 logmsg_dest = attr_value(event, 'logmsg/@dest')
                 collection_group = collection_groups(event)
                 severity = event.elements['severity'].texts.collect(&:value).join('').strip

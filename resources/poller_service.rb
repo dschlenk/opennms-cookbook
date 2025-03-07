@@ -93,8 +93,8 @@ action :create do
       resource_properties[:user_defined] = false if new_resource.user_defined.nil?
       resource_properties[:status] = 'on' if new_resource.status.nil?
       resource_properties[:parameters] = {} if resource_properties[:parameters].nil?
-      resource_properties[:parameters]['timeout'] = { 'value' => new_resource.timeout.to_s } unless new_resource.timeout.nil?
-      resource_properties[:parameters]['port'] = { 'value' => new_resource.port.to_s } unless new_resource.port.nil?
+      resource_properties[:parameters]['timeout'] = { 'value' => new_resource.timeout.to_s } if !new_resource.timeout.nil? && resource_properties[:parameters]['timeout'].nil?
+      resource_properties[:parameters]['port'] = { 'value' => new_resource.port.to_s } if !new_resource.port.nil? && resource_properties[:parameters]['port'].nil?
       poller_resource.variables[:config].packages[new_resource.package_name].services.push(resource_properties)
       monitor = poller_resource.variables[:config].monitor(service_name: new_resource.service_name)
       poller_resource.variables[:config].monitors.push({ 'service' => new_resource.service_name, 'class_name' => new_resource.class_name, 'parameters' => new_resource.class_parameters }) if monitor.nil?

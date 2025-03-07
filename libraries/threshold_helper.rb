@@ -97,11 +97,12 @@ module Opennms
               e.type.eql?(type) &&
                 e.ds_type.eql?(ds_type) &&
                 (e.filter_operator.eql?(filter_operator) || (e.filter_operator.nil? && (filter_operator.eql?('or') || filter_operator.eql?('OR'))) || (filter_operator.nil? && (e.filter_operator.eql?('or') || e.filter_operator.eql?('OR')))) &&
-                e.ds_name.eql?(ds_name)
+                e.ds_name.eql?(ds_name) &&
                 e.triggered_uei.eql?(triggered_uei) &&
                 e.rearmed_uei.eql?(rearmed_uei)
             end
             return if threshold.empty?
+            Chef::Log.warn("duplicate thresholds found: #{threshold}") unless threshold.one?
             raise DuplicateThresholdRule, "More than one threshold rule found with identical identity (type #{type}, ds_type #{ds_type}, filter_operator #{filter_operator}, resource_filters #{resource_filters}, ds_name #{ds_name}, triggered_uei #{triggered_uei}, rearmed_uei #{rearmed_uei}) found" unless threshold.one?
             threshold.pop
           end
