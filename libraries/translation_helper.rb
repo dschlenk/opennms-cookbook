@@ -64,11 +64,7 @@ module Opennms
         attr_reader :assignments, :preserve_snmp_data
 
         def initialize(assignments: nil, preserve_snmp_data: nil)
-          if assignments.nil?
-            @assignments = []
-          else
-            @assignments = assignments
-          end
+          assignments ||= []
           @preserve_snmp_data = preserve_snmp_data
         end
       end
