@@ -10,16 +10,15 @@ property :parameters, Hash, callbacks: { 'should be a hash with key/value pairs 
 load_current_value do |new_resource|
   foreign_source = REXML::Document.new(fs_resource(new_resource.foreign_source_name).message) unless fs_resource(new_resource.foreign_source_name).nil?
   foreign_source = REXML::Document.new(Opennms::Cookbook::Provision::ForeignSource.new(new_resource.foreign_source_name, "#{baseurl}/foreignSources/#{new_resource.foreign_source_name}").message) if foreign_source.nil?
-  current_value_does_not_exist! if foreign_source.nil? || foreign_source.elements["policies/policy[@name = '#{new_resource.policy_name}']"].nil?
-  fs_policy = foreign_source.elements["policies/policy[@name = '#{new_resource.policy_name}']"]
+  current_value_does_not_exist! if foreign_source.nil? || foreign_source.elements["/foreign-source/policies/policy[@name = '#{new_resource.policy_name}']"].nil?
+  fs_policy = foreign_source.elements["/foreign-source/policies/policy[@name = '#{new_resource.policy_name}']"]
   current_value_does_not_exist! if fs_policy.nil?
-  fs_policy_param = {}
   fs_params = {}
-  class_name fs_policy.attributes['class'] if fs_policy.attributes['class'].nil?
+  class_name fs_policy.attributes['class'] unless fs_policy.attributes['class'].nil?
   fs_policy.each_element('parameter') do |parameter|
     fs_params[parameter.attributes['key']] = parameter.attributes['value']
   end
-  parameters fs_policy_param
+  parameters fs_params
 end
 
 action_class do
@@ -34,9 +33,9 @@ action :create do
     policy_name = new_resource.policy_name
     foreign_source = REXML::Document.new(fs_resource(new_resource.foreign_source_name).message).root
     raise Chef::Exceptions::ValidationFailed "No foreign source definition named #{new_resource.foreign_source_name} found. Create it with an opennms_foreign_source[#{new_resource.foreign_source_name}] resource." if foreign_source.nil?
-    policy = foreign_source.elements["policies/policy[@name = '#{policy_name}']"]
+    policy = foreign_source.elements["/foreign-source/policies/policy[@name = '#{policy_name}']"]
     if policy.nil?
-      policies_el = foreign_source.elements['policies'] unless foreign_source.nil?
+      policies_el = foreign_source.elements['/foreign-source/policies']
       policy_el = REXML::Element.new('policy')
       unless policy_name.nil?
         policy_el.add_attribute('name', policy_name)
@@ -61,7 +60,7 @@ action :create do
       # delete all parameters
       policy.elements.delete_all 'parameter'
       # Add all parameter back with new values
-      if new_resource.parameters.is_a?(Hash) && !new_resource.parameters.empty?
+      unless new_resource.parameters.nil?
         new_resource.parameters.each do |key, value|
           policy.add_element 'parameter', 'key' => key, 'value' => value
         end
@@ -77,7 +76,7 @@ action :create_if_missing do
     fs_resource_init(new_resource.foreign_source_name)
     policy_name = new_resource.policy_name
     foreign_source = REXML::Document.new(fs_resource(new_resource.foreign_source_name).message).root
-    policy = foreign_source.elements["policies/policy[@name = '#{policy_name}']"] unless foreign_source.nil?
+    policy = foreign_source.elements["/foreign-source/policies/policy[@name = '#{policy_name}']"] unless foreign_source.nil?
     if policy.nil?
       run_action(:create)
     end
@@ -92,8 +91,7 @@ action :delete do
   unless policy.nil?
     converge_by("Removing service detector #{policy_name} from foreign source #{new_resource.foreign_source_name}") do
       foreign_source.delete_element(policy) unless policy.nil?
+      fs_resource(new_resource.foreign_source_name).message foreign_source.to_s
     end
   end
-  # update fs_resource.message with foreign_source.to_s
-  fs_resource(new_resource.foreign_source_name).message foreign_source.to_s
 end
