@@ -926,14 +926,14 @@ default['opennms']['postgresql']['access']['host'] = [
   {
     'database' => 'all',
     'user' => 'all',
-    'addresses' => ['127.0.0.1', '::1/128'],
+    'addresses' => ['127.0.0.1/32', '::1/128'],
     'auth_method' => 'scram-sha-256',
     'action' => :create,
   },
   {
     'database' => 'replication',
     'user' => 'all',
-    'addresses' => ['127.0.0.1', '::1/128'],
+    'addresses' => ['127.0.0.1/32', '::1/128'],
     'auth_method' => 'trust',
     'action' => :delete,
   },
