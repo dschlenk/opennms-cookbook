@@ -3,7 +3,7 @@ include_recipe 'opennms_resource_tests::wallboard'
 opennms_dashlet 'summary2' do
   wallboard 'schlazorboard'
   dashlet_name 'Summary'
-  parameters 'timeslot' => '3600'
+  parameters 'timeslot' => '3600', 'param2' => 'twelve'
 end
 
 # no parameters
