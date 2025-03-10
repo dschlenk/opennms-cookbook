@@ -46,8 +46,11 @@ module Opennms
 
         def initialize(name, url)
           begin
+            Chef::Log.debug("getting foreign source at url #{url}")
             @message = RestClient.get(url, accept: :xml).to_s
+            Chef::Log.debug("response message:#{@message}")
           rescue RestClient::NotFound
+            Chef::Log.debug("foreign source #{name} not found, returning an empty one")
             @message = "<foreignSource name=#{name.encode(xml: :attr)}/>"
           end
         end

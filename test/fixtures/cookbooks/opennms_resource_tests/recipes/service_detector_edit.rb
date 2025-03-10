@@ -7,17 +7,17 @@ end
 opennms_service_detector 'change Router port' do
   service_name 'Router'
   foreign_source_name 'another-source'
-  port 80
+  parameters 'port' => '80'
 end
 opennms_service_detector 'change Router retry_count' do
   service_name 'Router'
   foreign_source_name 'another-source'
-  retry_count 5
+  parameters 'retries' => '5'
 end
 opennms_service_detector 'change Router timeout' do
   service_name 'Router'
   foreign_source_name 'another-source'
-  timeout 6000
+  parameters 'timeout' => '6000'
 end
 opennms_service_detector 'change Router params' do
   service_name 'Router'
@@ -28,5 +28,5 @@ end
 opennms_service_detector 'change spacey ICMP' do
   service_name 'I C M P'
   foreign_source_name 'another-source'
-  timeout 7000
+  parameters 'timeout' => 7000
 end

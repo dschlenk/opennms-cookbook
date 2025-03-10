@@ -751,6 +751,36 @@ suites:
       inspec_tests:
         - path: test/integration/default
         - path: test/integration/service_detector
+  - name: service_detector_delete
+    driver:
+      ports:
+        - 1238:8980/tcp
+    provisioner:
+      policyfile: policyfiles/service_detector_delete.rb
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/service_detector_delete
+  - name: service_detector_edit
+    driver:
+      ports:
+        - 1238:8980/tcp
+    provisioner:
+      policyfile: policyfiles/service_detector_edit.rb
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/service_detector_edit
+  - name: service_detector_noop
+    driver:
+      ports:
+        - 1238:8980/tcp
+    provisioner:
+      policyfile: policyfiles/service_detector_noop.rb
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/service_detector_noop
   - name: snmp_collection
     provisioner:
       policyfile: policyfiles/snmp_collection.rb
