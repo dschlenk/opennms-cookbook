@@ -195,7 +195,7 @@ action :create do
       raise Chef::Exceptions::ValidationFailed, 'descr is a required property for action :create when not updating' if new_resource.descr.nil?
       raise Chef::Exceptions::ValidationFailed, 'logmsg is a required property for action :create when not updating' if new_resource.logmsg.nil?
       raise Chef::Exceptions::ValidationFailed, 'severity is a required property for action :create when not updating' if new_resource.severity.nil?
-      
+
       eventconf_resource_init
       eventconf_resource.variables[:eventconf].event_files[new_resource.file[7..-1]] = { position: new_resource.eventconf_position }
       resource_properties = %i(uei mask priority event_label descr logmsg logmsg_dest logmsg_notify collection_group severity operinstruct autoaction varbindsdecode parameters operaction autoacknowledge loggroup tticket forward script mouseovertext alarm_data filters).map { |p| [p, new_resource.send(p)] }.to_h.compact

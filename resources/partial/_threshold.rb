@@ -54,7 +54,7 @@ load_current_value do |new_resource|
             thresholds_resource.variables[:config].groups[new_resource.group]
           end
   current_value_does_not_exist! if group.nil?
-  ip = %i(type ds_type filter_operator resource_filters).map { |p| [p, new_resource.send(p)] }.to_h.compact
+  ip = %i(type ds_type filter_operator resource_filters triggered_uei rearmed_uei).map { |p| [p, new_resource.send(p)] }.to_h.compact
   if new_resource.respond_to?(:ds_name)
     ip[:ds_name] = new_resource.ds_name
   else
@@ -80,7 +80,7 @@ action :create do
     end
     t = group.find_rule(**ip)
     if t.nil?
-      rp = %i(type ds_type filter_operator resource_filters relaxed description ds_label value rearm trigger).map { |p| [p, new_resource.send(p)] }.to_h.compact
+      rp = %i(type ds_type filter_operator resource_filters relaxed description ds_label value rearm trigger triggered_uei rearmed_uei).map { |p| [p, new_resource.send(p)] }.to_h.compact
       if new_resource.respond_to?(:ds_name)
         rp[:ds_name] = new_resource.ds_name
       else

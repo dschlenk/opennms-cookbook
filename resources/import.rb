@@ -12,7 +12,6 @@ load_current_value do |new_resource|
   mi = model_import(new_resource.import_name) unless model_import(new_resource.import_name).nil?
   mi = Opennms::Cookbook::Provision::ModelImport.existing_model_import(new_resource.import_name, "#{baseurl}/requisitions/#{new_resource.import_name}") if mi.nil?
   current_value_does_not_exist! if mi.nil?
-  model_import = REXML::Document.new(mi.message)
   foreign_source_name new_resource.foreign_source_name
 end
 

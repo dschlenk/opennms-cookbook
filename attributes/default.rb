@@ -922,6 +922,38 @@ default['opennms']['postgresql']['version'] = '15'
 # must contain objects named 'postgres' and 'opennms' each with string values named 'password'
 default['opennms']['postgresql']['user_vault'] = Chef::Config['node_name']
 default['opennms']['postgresql']['user_vault_item'] = 'postgres_users'
+default['opennms']['postgresql']['access']['host'] = [
+  {
+    'database' => 'all',
+    'user' => 'all',
+    'addresses' => ['127.0.0.1', '::1/128'],
+    'auth_method' => 'scram-sha-256',
+    'action' => :create,
+  },
+  {
+    'database' => 'replication',
+    'user' => 'all',
+    'addresses' => ['127.0.0.1', '::1/128'],
+    'auth_method' => 'trust',
+    'action' => :delete,
+  },
+]
+default['opennms']['postgresql']['access']['local'] = [
+  {
+    'database' => 'all',
+    'user' => 'all',
+    'auth_method' => 'scram-sha-256',
+    'action' => :create,
+  },
+  {
+    'database' => 'replication',
+    'user' => 'all',
+    'auth_method' => 'trust',
+    'action' => :create,
+  },
+]
+default['opennms']['postgresql']['local_auth_method'] = 'scram-sha-256'
+default['opennms']['postgresql']['local_repl_auth_method'] = 'trust'
 
 default['opennms']['bin']['cookbook'] = 'opennms'
 default['opennms']['bin']['return_code'] = false

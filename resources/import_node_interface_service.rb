@@ -2,7 +2,7 @@ use 'partial/_import_node'
 unified_mode true
 
 property :service_name, String, name_property: true
-property :foreign_id, String, required: true
+property :foreign_id, String, required: true, identity: true
 property :ip_addr, String, required: true, identity: true
 
 load_current_value do |new_resource|

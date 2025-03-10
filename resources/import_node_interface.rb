@@ -2,7 +2,7 @@ use 'partial/_import_node'
 unified_mode true
 
 property :ip_addr, String, identity: true
-property :foreign_id, String, required: true
+property :foreign_id, String, required: true, identity: true
 property :status, Integer
 property :managed, [true, false], default: false
 property :snmp_primary, String, equal_to: %w(P S N)

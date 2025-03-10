@@ -23,7 +23,7 @@ end
 action :create do
   converge_if_changed do
     statsd_resource_init
-    config = statsd_resource.variables[:config] unless statsd_resource.nil?
+    config = statsd_resource.variables[:config]
     package = config.package(name: new_resource.package_name)
     if package.nil?
       config.add_package(name: new_resource.package_name, filter: new_resource.filter)
@@ -35,14 +35,14 @@ end
 
 action :create_if_missing do
   statsd_resource_init
-  config = statsd_resource.variables[:config] unless statsd_resource.nil?
+  config = statsd_resource.variables[:config]
   package = config.package(name: new_resource.package_name)
   run_action(:create) if package.nil?
 end
 
 action :update do
   statsd_resource_init
-  config = statsd_resource.variables[:config] unless statsd_resource.nil?
+  config = statsd_resource.variables[:config]
   package = config.package(name: new_resource.package_name)
   raise Chef::Exceptions::ResourceNotFound, "No package named #{new_resource.package_name} found. Use action `:create` or `:create_if_missing` to create the package." if package.nil?
   run_action(:create)
@@ -50,7 +50,7 @@ end
 
 action :delete do
   statsd_resource_init
-  config = statsd_resource.variables[:config] unless statsd_resource.nil?
+  config = statsd_resource.variables[:config]
   package = config.package(name: new_resource.package_name)
   converge_by "Removing statsd package #{new_resource.package_name}" do
     config.delete_package(name: new_resource.package_name)

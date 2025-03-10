@@ -1,4 +1,3 @@
-# frozen_string_literal: true
 control 'expression' do
   expr = {
     'expression' => 'icmp / 1000',
@@ -7,6 +6,8 @@ control 'expression' do
     'ds_type' => 'if',
     'filter_operator' => 'and',
     'resource_filters' => [{ 'field' => 'ifHighSpeed', 'filter' => '^[1-9]+[0-9]*$' }],
+    'triggered_uei' => 'uei.opennms.org/thresholdTest/testThresholdExceeded',
+    'rearmed_uei' => 'uei.opennms.org/thresholdTest/testThresholdRearmed',
   }
   describe expression(expr) do
     it { should exist }
@@ -15,7 +16,5 @@ control 'expression' do
     its('value') { should eq 20.0 }
     its('rearm') { should eq 18.0 }
     its('trigger') { should eq 3 }
-    its('triggered_uei') { should eq 'uei.opennms.org/thresholdTest/testThresholdExceeded' }
-    its('rearmed_uei') { should eq 'uei.opennms.org/thresholdTest/testThresholdRearmed' }
   end
 end
