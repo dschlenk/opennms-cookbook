@@ -92,9 +92,8 @@ action :delete do
   detector = foreign_source.elements["/foreign-source/detectors/detector[@name = '#{service_name}']"] unless foreign_source.nil?
   unless detector.nil?
     converge_by("Removing service detector #{service_name} from foreign source #{new_resource.foreign_source_name}") do
-      foreign_source.delete_element(detector) unless detector.nil?
+      foreign_source.elements.delete("/foreign-source/detectors/detector[@name = '#{service_name}']")
+      fs_resource(new_resource.foreign_source_name).message foreign_source.to_s
     end
   end
-  # update fs_resource.message with foreign_source.to_s
-  fs_resource(new_resource.foreign_source_name).message foreign_source.to_s
 end

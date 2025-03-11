@@ -90,7 +90,7 @@ action :delete do
   policy = foreign_source.elements["policies/policy[@name = '#{policy_name}']"] unless foreign_source.nil?
   unless policy.nil?
     converge_by("Removing service detector #{policy_name} from foreign source #{new_resource.foreign_source_name}") do
-      foreign_source.delete_element(policy) unless policy.nil?
+      foreign_source.elements.delete("policies/policy[@name = '#{policy_name}']") unless policy.nil?
       fs_resource(new_resource.foreign_source_name).message foreign_source.to_s
     end
   end
