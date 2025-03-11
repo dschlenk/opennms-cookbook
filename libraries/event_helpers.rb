@@ -128,15 +128,13 @@ module Opennms
               event_file = ef.texts.collect(&:value).join('').strip[7..-1] if !ef.nil? && ef.respond_to?(:texts) && ef.texts.collect(&:value).join('').strip.length > 7
               if node['opennms']['opennms_event_files'].include?(event_file)
                 position = 'top' if position != 'top'
-                next
               end
               if node['opennms']['vendor_event_files'].include?(event_file)
                 position = 'bottom' if position != 'bottom'
-                next
               end
               break if event_file == node['opennms']['catch_all_event_file']
-              # @event_files = {} if @event_files.nil?
               @event_files[event_file] = { position: position }
+              # @event_files = {} if @event_files.nil?
             end
           end
 
@@ -512,7 +510,15 @@ module Opennms
           end
 
           def match_by_id?(uei, mask)
-            return true if @uei.eql?(uei) && ((mask.eql?('*') || @mask.eql?(mask)) || (mask.eql?('!') && @mask.nil?))
+            if @uei.eql?(uei)
+              if mask.eql?('*')
+                return true
+              elsif @mask.eql?(mask)
+                return true
+              elsif mask.eql?('!') && @mask.nil?
+                return true
+              end
+            end
             false
           end
 

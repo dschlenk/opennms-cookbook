@@ -2,7 +2,7 @@ unified_mode true
 
 property :event_file, String, name_property: true, identity: true
 property :source_type, String, equal_to: %w(cookbook_file template remote_file), default: 'cookbook_file', desired_state: false
-property :source, String
+property :source, String, desired_state: false
 property :source_properties, Hash, desired_state: false
 property :position, String, equal_to: %w(override top bottom), default: 'bottom', desired_state: false
 property :variables, Hash

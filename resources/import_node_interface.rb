@@ -31,8 +31,8 @@ load_current_value do |new_resource|
       status interface.attributes['status']
     end
   end
-  managed interface.attributes['managed'] if interface.attributes['managed'].nil?
-  snmp_primary interface.attributes['snmp-primary'] if interface.attributes['snmp-primary'].nil?
+  managed interface.attributes['managed'].eql?('true')
+  snmp_primary interface.attributes['snmp-primary'] unless interface.attributes['snmp-primary'].nil?
 
   unless interface.elements['category'].nil?
     node_category = []
