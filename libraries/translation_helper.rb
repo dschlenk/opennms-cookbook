@@ -75,6 +75,13 @@ module Opennms
           translationfile
         end
 
+        def event_translation_specs?(specs:)
+          specs.each do |spec|
+            return false unless @specs.include?(spec)
+          end
+          true
+        end
+
         private
 
         def parse_value(v)
@@ -93,6 +100,12 @@ module Opennms
           @uei = uei
           @mappings = []
         end
+
+        def eql?(spec)
+          self.class.eql?(spec.class) &&
+            @uei.eql?(spec.uei) &&
+            @mappings.eql?(spec.mappings)
+        end
       end
 
       class TranslationMapping
@@ -105,6 +118,12 @@ module Opennms
             assignments = assignments
           end
           @preserve_snmp_data = preserve_snmp_data
+        end
+
+        def eql?(mapping)
+          self.class.eql?(mapping.class) &&
+            @assignments.eql?(mapping.assignments) &&
+            @preserve_snmp_data.eql?(mapping.presere_snmp_data)
         end
       end
 
