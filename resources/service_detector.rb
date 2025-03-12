@@ -86,12 +86,13 @@ action :create_if_missing do
 end
 
 action :delete do
-  fs_resource_init(new_resource.foreign_source_name)
+  foreign_source = REXML::Document.new(Opennms::Cookbook::Provision::ForeignSource.new(new_resource.foreign_source_name, "#{baseurl}/foreignSources/#{new_resource.foreign_source_name}").message) if foreign_source.nil?
   service_name = new_resource.service_name
-  foreign_source = REXML::Document.new(fs_resource(new_resource.foreign_source_name).message).root
   detector = foreign_source.elements["/foreign-source/detectors/detector[@name = '#{service_name}']"] unless foreign_source.nil?
   unless detector.nil?
     converge_by("Removing service detector #{service_name} from foreign source #{new_resource.foreign_source_name}") do
+      fs_resource_init(new_resource.foreign_source_name)
+      foreign_source = REXML::Document.new(fs_resource(new_resource.foreign_source_name).message).root
       foreign_source.elements.delete("/foreign-source/detectors/detector[@name = '#{service_name}']")
       fs_resource(new_resource.foreign_source_name).message foreign_source.to_s
     end

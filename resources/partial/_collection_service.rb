@@ -119,7 +119,7 @@ action :create do
       resource_properties[:interval] = 300000 if new_resource.interval.nil?
       resource_properties[:user_defined] = false if new_resource.user_defined.nil?
       resource_properties[:status] = 'on' if new_resource.status.nil?
-      resource_properties[:thresholding_enabled] = false if new_resource.thresholding_enabled.nil?
+      resource_properties[:thresholding_enabled] = false if new_resource.thresholding_enabled.nil? && new_resource.parameters['thresholding-enabled'].nil?
       resource_properties[:collection] = 'default' if !resource_properties.key?(:collection) && new_resource.collection.nil? && (new_resource.parameters.nil? || new_resource.parameters['collection'].nil?)
       service = Opennms::Cookbook::Package::CollectdService.new(**resource_properties)
       # we need to set the type in case another resource updates us later in the run list

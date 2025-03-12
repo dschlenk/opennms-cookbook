@@ -122,7 +122,6 @@ action :create do
       end
     end
     model_import(new_resource.foreign_source_name).message model_import_root.to_s
-
     if !new_resource.sync_import.nil? && new_resource.sync_import
       model_import_sync(new_resource.foreign_source_name, true)
     end

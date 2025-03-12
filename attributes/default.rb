@@ -149,16 +149,22 @@ default['opennms']['users']['admin']['vault'] = Chef::Config[:node_name]
 # must contain a value named `password`.
 default['opennms']['users']['admin']['vault_item'] = 'opennms_admin_password'
 
-# non-default daemons
-default['opennms']['services']['dhcpd']       = false
-default['opennms']['services']['snmp_poller'] = false
-default['opennms']['services']['linkd']       = false
-default['opennms']['services']['correlator']  = false
-default['opennms']['services']['tl1d']        = false
-default['opennms']['services']['syslogd']     = false
-default['opennms']['services']['xmlrpcd']     = false
-default['opennms']['services']['asterisk_gw'] = false
-default['opennms']['services']['apm']         = false
+# daemons
+default['opennms']['services']['dhcpd']               = false
+default['opennms']['services']['snmp_poller']         = false
+default['opennms']['services']['linkd']               = false
+default['opennms']['services']['correlator']          = false
+default['opennms']['services']['tl1d']                = false
+default['opennms']['services']['syslogd']             = false
+default['opennms']['services']['xmlrpcd']             = false
+default['opennms']['services']['asterisk_gw']         = false
+default['opennms']['services']['apm']                 = false
+default['opennms']['services']['telemetryd']          = true
+default['opennms']['services']['perspective_poller']  = true
+default['opennms']['services']['bsmd']                = true
+default['opennms']['services']['discovery']           = true
+default['opennms']['services']['ticketer']            = true
+
 # opennms.properties
 default['opennms']['properties']['files'] = {
   #  Use to define properties overrides in `$OPENNMS_HOME/etc/opennms.properties.d`.

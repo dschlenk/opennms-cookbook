@@ -131,6 +131,7 @@ module Opennms
           doc.each_element('/wallboards/wallboard') do |w|
             wallboard = {}
             wallboard['title'] = w.attributes['title']
+            @default_wallboard = w.attributes['title'] if xml_element_text(w, 'default').eql?('true')
             dashlets = [] unless w.elements['dashlets/dashlet'].nil?
             w.each_element('dashlets/dashlet') do |d|
               dashlet = {}

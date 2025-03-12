@@ -37,14 +37,14 @@ load_current_value do |new_resource|
 end
 
 action :create do
-  converge_if_changed do
-    u = get_user(new_resource.user_id)
-    if u.nil?
-      raise Chef::Exceptions::Validation, 'Password is required for action :create' if new_resource.password.nil?
+  u = get_user(new_resource.user_id)
+  if u.nil?
+    raise Chef::Exceptions::Validation, 'Password is required for action :create' if new_resource.password.nil?
+    converge_if_changed do
       add_user(new_resource)
-    else
-      run_action(:update)
     end
+  else
+    run_action(:update)
   end
 end
 

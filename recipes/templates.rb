@@ -53,7 +53,12 @@ template "#{onms_home}/etc/service-configuration.xml" do
     correlator: node['opennms']['services']['correlator'],
     tl1d: node['opennms']['services']['tl1d'],
     syslogd: node['opennms']['services']['syslogd'],
-    asterisk_gw: node['opennms']['services']['asterisk_gw']
+    asterisk_gw: node['opennms']['services']['asterisk_gw'],
+    telemetryd: node['opennms']['services']['telemetryd'],
+    perspective_poller: node['opennms']['services']['perspective_poller'],
+    bsmd: node['opennms']['services']['bsmd'],
+    ticketer: node['opennms']['services']['ticketer'],
+    discovery: node['opennms']['services']['ticketer']
   )
   action node['opennms']['templates'] ? :create : :nothing
 end
