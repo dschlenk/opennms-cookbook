@@ -57,7 +57,7 @@ The easiest way to satisfy this dependency is to use the `postgres` recipe in th
 It can be added to the run list prior to the `default` recipe.
 When used, installation, configuration, and initialization of PostgreSQL 15 will occur via the PGDG repositories and the `postgres` password contained in the vault item described above will be applied to the `postgres` role.
 
-## Useful Features
+## Recommended Features
 
 Many of the following features are essential to the long term success of using this cookbook to manage your OpenNMS instance.
 
@@ -128,7 +128,7 @@ This results in file `$OPENNMS_HOME/etc/opennms.properties.d/scv.properties` cre
 
 To enable installation and configuration of RRDTool in place of the default time series engine JRobin, set `node['opennms']['rrdtool']['enabled']` to `true` or include the `rrdtool` recipe after the `default` recipe in your node's run list.
 
-### Other Recipes
+## Other Recipes
 
 The recipes you may wish to include in your node list directly are:
 
@@ -139,13 +139,9 @@ The recipes you may wish to include in your node list directly are:
 
 A few other recipes exist that aren't listed here. They are included by others when needed and are unlikely to be interesting for individual use.
 
-# Custom Resources
+## Custom Resources
 
-A number of [custom resources are available](documentation/README.md)
-
-## LWRPs Yet To Be Refactored
-
-Most of the custom resources began as LWRPs and have since been refactored into custom resources. A few remain that have not yet been refactored. Their functionality is not guaranteed.
+A number of [custom resources are documented separately](documentation/README.md) 
 
 ### Provisioning Requisitions
 
@@ -159,7 +155,7 @@ These custom resources use the OpenNMS REST interface. As such, OpenNMS has to b
 * `opennms_import_node_interface`: Add an interface to a node in a requisition.
 * `opennms_import_node_interface_service`: Add a service to an interface on a node in a requisition.
 
-## Desired Custom Resources
+### Custom Resources Wishlist
 
 The following custom resources don't exist yet, but they should!
 
@@ -170,9 +166,12 @@ The following custom resources don't exist yet, but they should!
 * `opennms_end2endmail`: Manage `end2end-mail-config` elements in `$OPENNMS_HOME/etc/javamail-configuration.xml`.
 * `opennms_jms_nb_destination`: Manage `destination` elements in `$OPENNMS_HOME/etc/jms-northbounder-configuration.xml`.
 * `opennms_site_status_view`: Manage `view` elements in `$OPENNMS_HOME/etc/site-status-views.xml`.
-* `opennms_translation`, `opennms_translation_spec`: Manage `translation` and `event-translation-spec` elements in `$OPENNMS_HOME/etc/translator-configuration.xml`.
+* `opennms_translation_specs`: Manage `event-translation-spec` elements in `$OPENNMS_HOME/etc/translator-configuration.xml`.
+* `opennms_correlation`: Manage a set of correlator rules
+* `opennms_scriptd_engine`: Manage scriptd engines
+* `opennms_scriptd_script`: Manage scriptd scripts
 
-### Template Overview
+## Template Overview
 
 Most configuration files that aren't managed with custom resources are templated and can be overridden with environment, role, or node attributes.  See the default attributes file for a list of configuration items that can be changed in this manner, or keep reading for a brief overview of each template available. Default attribute values set to `nil` mean that the file's default value is commented out in the original file and will remain so unless set to a non-nil value.
 
@@ -194,7 +193,7 @@ edit_resource(:template, '/opt/opennms/etc/service-configuration.xml') do {
 end
 ```
 
-#### etc/availability-reports.xml
+### etc/availability-reports.xml
 
 If you want to change the logo or default interval, count, hour or minute you can do so for either the calandar or classic report like so:
 ```
@@ -214,11 +213,11 @@ If you want to change the logo or default interval, count, hour or minute you ca
    }
 ```
 
-#### etc/chart-configuration.xml
+### etc/chart-configuration.xml
 
 Disable one of the three default charts by setting `severity_enabled`, `outages_enable` or `inventory_enable` to false in `node['opennms']['chart']`.
 
-#### etc/eventd-configuration.xml
+### etc/eventd-configuration.xml
 
 Attributes are available in `node['opennms']['eventd']` to change global settings:
 
@@ -230,7 +229,7 @@ Attributes are available in `node['opennms']['eventd']` to change global setting
 * socketSoTimeoutRequired (`sock_so_timeout_req` to true or false)
 * socketSoTimeoutPeriod (`socket_so_timeout_period`)
 
-#### etc/javamail-configuration.properties
+### etc/javamail-configuration.properties
 
 This file controls how OpenNMS sends email. This is not where you configure the mail monitor.
 Attributes available in `node['opennms']['javamail_props']`. They follow the config file but with ruby style because the kids hate camel case I guess.
@@ -239,7 +238,7 @@ Attributes available in `node['opennms']['javamail_props']`. They follow the con
 * org.opennms.core.utils.mailHost (`mail_host`)
 * ...and so on.
 
-#### etc/javamail-configuration.xml
+### etc/javamail-configuration.xml
 
 This is where you configure the mail monitor.
 Attributes available in `node['opennms']['javamail_config'`. Unlike most of the templates, you can change every attribute and element in the default sendmail and receivemail elements since the defaults are useful to no one. Here's a list of the defaults which you definitely need to override if you want a mail monitor to work: 
@@ -281,24 +280,24 @@ default['opennms']['javamail_config']['default_send']['user']               = "o
 default['opennms']['javamail_config']['default_send']['password']           = "opennms"
 ```
 
-#### jcifs.properties
+### jcifs.properties
 
 This is useful for something I'm sure, but I don't know what. See the template or default attributes file for hints.
 
-#### etc/jms-northbounder-configuration.xml
+### etc/jms-northbounder-configuration.xml
 
 Configures the JMS Northbounder introduced in version 17.0.0. See the default attributes under the `jms_nbi` key for configuration options. You may also need to set some JMS related attributes under the `properties` key.
 
-#### etc/enlinkd-configuration.xml
+### etc/enlinkd-configuration.xml
 
 Attributes available in `node['opennms']['enlinkd']` that allow you change global settings like:
 
 * threads
-* initial_sleep_time
-* snmp_poll_interval
-* discovery_link_interval
+* initial\_sleep\_time
+* snmp\_poll\_interval
+* discovery\_link\_interval
 
-#### etc/log4j2.xml
+### etc/log4j2.xml
 
 This one is a little different. If you want to turn up logging for collectd, for instance, you'd set these override attributes:
 
@@ -306,7 +305,7 @@ This one is a little different. If you want to turn up logging for collectd, for
 default['opennms']['log4j2']['collectd'] = 'DEBUG'
 ```
 
-#### etc/site-status-views.xml
+### etc/site-status-views.xml
 
 Do you actually populate the building column in assets or site field in provisioning reqs? Change the default site status view name and/or it's definition with these attributes: `node['opennms']['site_status_views']['default_view']['name']` and `node['opennms']['site_status_views']['default_view']['rows']` where `rows` is an array of single element hashes (to maintain order) like:
 
@@ -324,19 +323,19 @@ Do you actually populate the building column in assets or site field in provisio
 ]
 ```
 
-#### etc/snmp-adhoc-graph.properties
+### etc/snmp-adhoc-graph.properties
 
 Similar to other \*-graph.properties files, you can change the image format used in adhoc graphs by setting the attribute `node['opennms']['snmp_adhoc_graph']['image_format']` to `gif` or `jpg` rather than the default `png`. Note that the intersection of formats supported by both jrobin and rrdtool is `png`, though.
 
-#### etc/translator-configuration.xml
+### etc/translator-configuration.xml
 
 Remove one of the default event translations (http://www.opennms.org/wiki/Event_Translator) by setting an attribute in `node['opennms']['translator']` to false. They are:
 
-* snmp_link_down
-* snmp_link_up
+* snmp\_link\_down
+* snmp\_link\_up
 * hyperic
-* cisco_config_man
-* juniper_cfg_change
+* cisco\_config\_man
+* juniper\_cfg\_change
 
 You can also add additional `event-translation-spec` elements by populating `node['opennms']['translator']['addl_specs']` with an array of hashes where each has a key `uei` that has a string value and a key `'mappings'` (array of hashes each with key `'assignments'` (array of hashes that each contain keys `'name'` (string), `'type'` (string), `'default'` (string, optional), `'value'` (a hash that contains keys `'type'` (string), `'matches'` (string, optional), `'result'` (string), `'values'` (array of hashes that each contain keys `'type'` (string), `'matches'` (string, optional), `'result'` (string))))).
 
@@ -406,26 +405,26 @@ would be how to express the following `event-translation-spec`:
     </event-translation-spec>
 ```
 
-#### etc/trapd-configuration.xml
+### etc/trapd-configuration.xml
 
 Two attributes available: `port` and `new_suspect` in `node['opennms']['trapd']` that allow you to configure the port to listen for traps on (default 10162) and whether or not to create newSuspect events when a trap is received from an unmanaged host (default false).
 
-#### etc/xmpp-configuration.xml
+### etc/xmpp-configuration.xml
 
 Configure notifications to be sent via XMPP (aka Jabber, GTalk) with these attributes in `node['opennms']['xmpp']`:
 
 * server
-* service_name
+* service\_name
 * port
 * tls
 * sasl
-* self_signed_certs
-* truststore_password
+* self\_signed\_certs
+* truststore\_password
 * debug
 * user
 * pass
 
-#### Others
+### Others
 
 See the template and default attributes source for more details on using these templates:
 
@@ -440,25 +439,25 @@ See the template and default attributes source for more details on using these t
 * etc/vmware-cim-datacollection-config.xml.erb
 * etc/vmware-datacollection-config.xml.erb
 
-Copyright and License
-=======
+# Copyright and License
 
-Copyright 2014-2024 ConvergeOne Holding Corp.
+Copyright 2014-2025 ConvergeOne Holding Corp.
 
 Released under Apache 2.0 license. See LICENSE for details.
 
 OpenNMS and OpenNMS Horizon are &#8482; and &copy; The OpenNMS Group, Inc.
 
-Author
-======
+# Author
+
 David Schlenk (<dschlenk@onec1.com>)
 
-Development
-===========
+# Development
 
-So far, tests consist of:
+Tests consist of:
 
-* Style Checks using foodcritic and rubocop. 
+* Style Checks using cookstyle
 * InSpec tests for all the custom resources.
+
+CircleCI executes cookstyle and the default kitchen suite.
 
 Pull requests welcome!
