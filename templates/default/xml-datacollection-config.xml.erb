@@ -36,10 +36,10 @@
             <request method=<%= source.request['method'].encode(:xml => :attr) %>>
       <% source.request['parameters'].each do |k,v| -%>
                 <parameter name=<%= k.encode(:xml => :attr) %> value=<%= v.to_s.encode(:xml => :attr) %>/>
-      <% end -%>
+      <% end unless source.request['parameters'].nil? -%>
       <% source.request['headers'].each do |k,v| -%>
                 <header name=<%= k.encode(:xml => :attr) %> value=<%= v.to_s.encode(:xml => :attr) %>/>
-      <% end -%>
+      <% end unless source.request['headers'].nil? -%>
       <% unless source.request['content'].nil? -%>
                 <content type=<%= source.request['content_type'].nil? ? '"application/x-www-form-urlencoded"' : source.request['content_type'].encode(:xml => :attr) %>><%= source.request['content'].encode(:xml => :text) %></content>
       <% end -%>

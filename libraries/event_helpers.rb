@@ -135,8 +135,8 @@ module Opennms
                 next
               end
               break if event_file == node['opennms']['catch_all_event_file']
-              # @event_files = {} if @event_files.nil?
               @event_files[event_file] = { position: position }
+              # @event_files = {} if @event_files.nil?
             end
           end
 
@@ -174,7 +174,7 @@ module Opennms
                 event_label = element_text(event, 'event-label')
                 descr = element_multiline_text(event, 'descr')
                 logmsg = element_multiline_text(event, 'logmsg')
-                logmsg_notify = attr_value(event, 'logmsg/@notify').downcase == 'true'
+                logmsg_notify = attr_value(event, 'logmsg/@notify').downcase == 'true' unless attr_value(event, 'logmsg/@notify').nil?
                 logmsg_dest = attr_value(event, 'logmsg/@dest')
                 collection_group = collection_groups(event)
                 severity = event.elements['severity'].texts.collect(&:value).join('').strip
@@ -512,7 +512,15 @@ module Opennms
           end
 
           def match_by_id?(uei, mask)
-            return true if @uei.eql?(uei) && ((mask.eql?('*') || @mask.eql?(mask)) || (mask.eql?('!') && @mask.nil?))
+            if @uei.eql?(uei)
+              if mask.eql?('*')
+                return true
+              elsif @mask.eql?(mask)
+                return true
+              elsif mask.eql?('!') && @mask.nil?
+                return true
+              end
+            end
             false
           end
 

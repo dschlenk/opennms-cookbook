@@ -46,16 +46,7 @@ property :groups, [Array, false], default: [], callbacks: {
           (h.key?('resource_keys') &&
            (!h['resource_keys'].is_a?(Array) ||
             h['resource_keys'].any? { |rk| !rk.is_a?(String) })) ||
-          (h.key?('objects') &&
-           (!h['objects'].is_a?(Array) ||
-            h['objects'].any? do |o|
-              !o.key?('name') ||
-                                !o['name'].is_a?(String) ||
-                                !o.key?('type') ||
-                                !o['type'].is_a?(String) ||
-                                !o.key?('xpath') ||
-                                !o['xpath'].is_a?(String)
-            end))
+          (h.key?('objects') && (!h['objects'].is_a?(Array) || h['objects'].any? { |oa| !oa.is_a?(Hash) || !oa.key?('name') || !oa['name'].is_a?(String) || !oa.key?('type') || !oa['type'].is_a?(String) || !oa.key?('xpath') || !oa['xpath'].is_a?(String) }))
       end
   },
 }

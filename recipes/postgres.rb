@@ -54,42 +54,26 @@ postgresql_config 'postgresql-server' do
   action :create
 end
 
-%w(127.0.0.1/32 ::1/128).each do |h|
-  postgresql_access "postgresql #{h} host access" do
-    type 'host'
-    database 'all'
-    user 'all'
-    address h
-    auth_method 'scram-sha-256'
-  end
-  postgresql_access "remove host replication trust access from #{h}" do
-    type 'host'
-    database 'replication'
-    user 'all'
-    address h
-    auth_method 'trust'
-    action :delete
+node['opennms']['postgresql']['access']['host'].each do |ha|
+  ha['addresses'].each do |h|
+    postgresql_access "host access for #{h} #{ha['database']}" do
+      type 'host'
+      database ha['database']
+      user ha['user']
+      address h
+      auth_method ha['auth_method']
+      action ha['action']
+    end
   end
 end
-postgresql_access 'remove local all trust' do
-  type 'local'
-  database 'all'
-  user 'all'
-  auth_method 'trust'
-  action :delete
-end
-postgresql_access 'remove local replication trust' do
-  type 'local'
-  database 'replication'
-  user 'all'
-  auth_method 'trust'
-  action :delete
-end
-postgresql_access 'add local scram' do
-  type 'local'
-  database 'all'
-  user 'all'
-  auth_method 'scram-sha-256'
+node['opennms']['postgresql']['access']['local'].each do |ha|
+  postgresql_access "local access for #{ha['database']}" do
+    type 'local'
+    database ha['database']
+    user ha['user']
+    auth_method ha['auth_method']
+    action ha['action']
+  end
 end
 
 postgresql_service 'postgresql' do

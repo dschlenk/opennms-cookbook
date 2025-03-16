@@ -49,14 +49,16 @@ template "#{onms_home}/etc/service-configuration.xml" do
   group node['opennms']['groupname']
   notifies :restart, 'service[opennms]'
   variables(
-    dhcpd: node['opennms']['services']['dhcpd'],
     snmp_poller: node['opennms']['services']['snmp_poller'],
     correlator: node['opennms']['services']['correlator'],
     tl1d: node['opennms']['services']['tl1d'],
     syslogd: node['opennms']['services']['syslogd'],
-    xmlrpcd: node['opennms']['services']['xmlrpcd'],
     asterisk_gw: node['opennms']['services']['asterisk_gw'],
-    apm: node['opennms']['services']['apm']
+    telemetryd: node['opennms']['services']['telemetryd'],
+    perspective_poller: node['opennms']['services']['perspective_poller'],
+    bsmd: node['opennms']['services']['bsmd'],
+    ticketer: node['opennms']['services']['ticketer'],
+    discovery: node['opennms']['services']['ticketer']
   )
   action node['opennms']['templates'] ? :create : :nothing
 end
@@ -418,7 +420,7 @@ template "#{onms_home}/etc/translator-configuration.xml" do
     cisco_config_man: node['opennms']['translator']['cisco_config_man'],
     juniper_cfg_change: node['opennms']['translator']['juniper_cfg_change'],
     telemetry_clock_skew_detected: node['opennms']['translator']['telemetry_clock_skew_detected'],
-    # Should be a hash where each key is a uei that has a hash value with key `'mappings'` (array of hashes each with key `'assignments'` (array of hashes that each contain keys `'name'` (string), `'type'` (string), `'default'` (string, optional), `'value'` (a hash that contains keys `'type'` (string), `'matches'` (string, optional), `'result'` (string), `'values'` (array of hashes that each contain keys `'type'` (string), `'matches'` (string, optional), `'result'` (string)))))
+    # Should be a array of hashes where each hash has a key 'uei' that has a hash value and key `'mappings'` (array of hashes each with key `'assignments'` (array of hashes that each contain keys `'name'` (string), `'type'` (string), `'default'` (string, optional), `'value'` (a hash that contains keys `'type'` (string), `'matches'` (string, optional), `'result'` (string), `'values'` (array of hashes that each contain keys `'type'` (string), `'matches'` (string, optional), `'result'` (string)))))
     addl_specs: node['opennms']['translator']['addl_specs']
   )
   action node['opennms']['templates'] ? :create : :nothing

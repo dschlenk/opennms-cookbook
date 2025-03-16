@@ -17,7 +17,7 @@ include Opennms::Rbac
 include Opennms::XmlHelper
 load_current_value do |new_resource|
   current_value_does_not_exist! unless group_exists?(new_resource.group_name)
-  group_el = group(new_resource.group_name)
+  group_el = get_opennms_group(new_resource.group_name)
   default_svg_map new_resource.default_svg_map # ignore since deprecated
   comments xml_element_text(group_el, 'comments')
   users xml_text_array(group_el, 'user')
@@ -32,7 +32,7 @@ end
 action :create do
   run_action :validate
   converge_if_changed do
-    group_el = group(new_resource.group_name)
+    group_el = get_opennms_group(new_resource.group_name)
     if group_el.nil?
       add_group(new_resource)
     else
@@ -49,7 +49,7 @@ end
 
 action :create_if_missing do
   run_action :validate
-  group_el = group(new_resource.group_name)
+  group_el = get_opennms_group(new_resource.group_name)
   if group_el.nil?
     run_action :create
   end
@@ -58,7 +58,7 @@ end
 action :update do
   run_action :validate
   converge_if_changed do
-    group_el = group(new_resource.group_name)
+    group_el = opennms_group(new_resource.group_name)
     if group_el.nil?
       raise Chef::Exceptions::ResourceNotFound, "No group named #{new_resource.group_name} found to update. Use actions `:create` or `:create_if_missing` to create a group."
     else
@@ -68,7 +68,7 @@ action :update do
 end
 
 action :delete do
-  group_el = group(new_resource.group_name)
+  group_el = get_opennms_group(new_resource.group_name)
   converge_by "Removing group #{new_resource.group_name}" do
     delete_group(new_resource.group_name)
   end unless group_el.nil?

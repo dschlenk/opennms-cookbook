@@ -20,11 +20,10 @@ property :resource_keys, kind_of: Array, callbacks: {
     !p.any? { |s| !s.is_a?(String) }
   },
 }
-# like: { 'object_name' => {'type' => 'string|gauge|etc', 'xpath' => 'the/xpath'}, 'another_object_name' -> { ... }, ... }
 # or [{ 'name' => object_name', 'type' => 'string|gauge|etc', 'xpath' => 'the/xpath' }, { ... }, ... ]
-property :objects, kind_of: [Array, Hash], default: [], callbacks: {
-  'should be an array of hashes with keys `name`, `type`, and `xpath` (strings) or a hash where each key is a string representing `name` and which has a hash value with keys `type` and `xpath` (strings)' => lambda {
-    |p| (p.is_a?(Hash) && !p.any? { |h, v| !h.is_a?(String) || !v.is_a?(Hash) || !v.key?('type') || !v['type'].is_a?(String) || !v.key?('xpath') || !v['xpath'].is_a?(String) }) || (p.is_a?(Array) && !p.any? { |a| !a.is_a?(Hash) || !a.key?('name') || !a['name'].is_a?(String) || !a.key?('type') || !a['type'].is_a?(String) || !a.key?('xpath') || !a['xpath'].is_a?(String) })
+property :objects, kind_of: Array, default: [], callbacks: {
+  'should be an array of hashes with keys `name`, `type`, and `xpath` (strings)' => lambda { |p|
+    p.is_a?(Array) && !p.any? { |a| !a.is_a?(Hash) || !a.key?('name') || !a['name'].is_a?(String) || !a.key?('type') || !a['type'].is_a?(String) || !a.key?('xpath') || !a['xpath'].is_a?(String) }
   },
 }
 

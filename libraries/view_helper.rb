@@ -131,6 +131,7 @@ module Opennms
           doc.each_element('/wallboards/wallboard') do |w|
             wallboard = {}
             wallboard['title'] = w.attributes['title']
+            @default_wallboard = w.attributes['title'] if xml_element_text(w, 'default').eql?('true')
             dashlets = [] unless w.elements['dashlets/dashlet'].nil?
             w.each_element('dashlets/dashlet') do |d|
               dashlet = {}
@@ -140,9 +141,9 @@ module Opennms
               dashlet['dashlet_name'] = xml_element_text(d, 'dashletName')
               dashlet['duration'] = xml_element_text(d, 'duration').to_i
               dashlet['parameters'] = {} unless d.elements['parameters'].nil?
-              d.each_element('parameters') do |p|
-                dashlet['parameters'][xml_element_text(p, 'entry/key')] = xml_element_text(p, 'entry/value')
-              end
+              d.elements['parameters'].each_element('entry') do |p|
+                dashlet['parameters'][xml_element_text(p, 'key')] = xml_element_text(p, 'value')
+              end unless d.elements['parameters'].nil?
               dashlet['priority'] = xml_element_text(d, 'priority').to_i
               dashlets.push(dashlet.compact)
             end

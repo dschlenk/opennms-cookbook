@@ -193,7 +193,7 @@ module Opennms::Rbac
     !doc.elements["/groupinfo/groups/group/name[text() = '#{group}']"].nil?
   end
 
-  def group(group)
+  def get_opennms_group(group)
     file = ::File.new("#{node['opennms']['conf']['home']}/etc/groups.xml", 'r')
     doc = REXML::Document.new file
     file.close

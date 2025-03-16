@@ -12,7 +12,7 @@ control 'dashlet' do
     its('boost_priority') { should eq 0 }
     its('duration') { should eq 15 }
     its('priority') { should eq 5 }
-    its('parameters') { should eq 'timeslot' => '3600' }
+    its('parameters') { should eq 'timeslot' => '3600', 'param2' => 'twelve' }
   end
 
   describe dashlet('rtc', 'schlazorboard') do

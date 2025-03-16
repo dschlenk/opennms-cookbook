@@ -834,6 +834,18 @@ module Opennms
           end
         end
 
+        def service_from_element(s)
+          name = s.attributes['name']
+          interval = s.attributes['interval'].to_i
+          user_defined = s.attributes['user-defined'].eql?('true') unless s.elements['@user-defined'].nil?
+          status = s.attributes['status'] unless s.elements['@status'].nil?
+          parameters = [] unless s.elements['parameter'].nil?
+          s.each_element('parameter') do |p|
+            parameters.push({ p.attributes['key'] => p.attributes['value'] })
+          end
+          { type: @type, service_name: name, interval: interval, user_defined: user_defined, status: status, parameters: parameters }
+        end
+
         def set_service_types
           # not needed since we don't proxy parameters based on poller service type like we do for collectors
         end

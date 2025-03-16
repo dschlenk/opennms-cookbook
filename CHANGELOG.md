@@ -1,5 +1,32 @@
 # OpenNMS Cookbook Changes
 
+## 33.1.0
+
+* support disabling more daemons
+* make postgres access more flexible
+* add `opennms_send_event` resource for restarting SnmpPoller
+* make `logndisplay` the default for `logmsg_dest` in new events created with `opennms_event`
+* breaking: `opennms_poller_service` and `opennms_service_detector` no longer proxy common parameters
+* breaking: `triggered_uei` and `rearmed_uei` properties of `opennms_threshold` and `opennms_expression` are now part of identity
+* bug: fix `opennms_service_detector` and `opennms_policy` idempotence
+* bug: `opennms_service_detector` and `opennms_policy`: `:delete` action didn't work
+* bug: `opennms_xml_source` `include_groups` files not creating
+* bug: events in files included OOTB falsely marked as updated every converge
+* bug: default wallboard not correctly identified
+* bug: mark `opennms.conf` sensitive since scv password often present in it
+* bug: users marked for update when not needed
+* bug: thresholds and expressions without descriptions broke the derived template execution
+* bug: `opennms_xml_source` with `request` properties broke the derived template execution in some circumstances
+* bug/breaking: `opennms_threshd_package` validation of `services` property and `opennms_threshd_service` identity incorrect: parameters need to be an array of hashes to support multiple threshold groups for a single service
+* bug/breaking: `opennms_xml_group` and the `groups` property of `opennms_xml_source` now support only one syntax: Array of hashes
+
+## 33.0.0
+
+* drop support for older releases. Upgrading from 32 is supported.
+* refactor custom resources to mostly adapt initialized accumulator pattern
+* remove templates for config files that can be managed with custom resources
+* lots of other minor changes. See README.
+
 ## 28.1.0
 
 * add support for updating and deleteing threshd packages

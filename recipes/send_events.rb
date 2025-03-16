@@ -1,4 +1,3 @@
-# frozen_string_literal: true
 # verious scripts that tell OpenNMS to update
 # the in-memory representation of changed config
 # files without full restarts of OpenNMS
@@ -45,12 +44,13 @@ end
 
 specific_ueis = {
   'poll-outages.xml' => 'uei.opennms.org/internal/schedOutagesChanged',
+  'snmp-interface-poller-configuration.xml' => 'uei.opennms.org/internal/reloadSnmpPollerConfig',
 }
 specific_ueis.each do |file, u|
   Chef::Log.debug("Making send_event resource 'activate_#{file}'")
   tm = nil
   begin
-    tm = resources(template: file)
+    tm = resources(template: "#{onms_home}/etc/#{file}")
   rescue
     Chef::Log.info("No template for file #{file} found in run list.")
   end

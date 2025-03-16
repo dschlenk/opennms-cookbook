@@ -2,7 +2,7 @@ use 'partial/_import_node'
 unified_mode true
 
 property :ip_addr, String, identity: true
-property :foreign_id, String, required: true
+property :foreign_id, String, required: true, identity: true
 property :status, Integer
 property :managed, [true, false], default: false
 property :snmp_primary, String, equal_to: %w(P S N)
@@ -31,8 +31,8 @@ load_current_value do |new_resource|
       status interface.attributes['status']
     end
   end
-  managed interface.attributes['managed'] if interface.attributes['managed'].nil?
-  snmp_primary interface.attributes['snmp-primary'] if interface.attributes['snmp-primary'].nil?
+  managed interface.attributes['managed'].eql?('true')
+  snmp_primary interface.attributes['snmp-primary'] unless interface.attributes['snmp-primary'].nil?
 
   unless interface.elements['category'].nil?
     node_category = []
@@ -122,7 +122,6 @@ action :create do
       end
     end
     model_import(new_resource.foreign_source_name).message model_import_root.to_s
-
     if !new_resource.sync_import.nil? && new_resource.sync_import
       model_import_sync(new_resource.foreign_source_name, true)
     end

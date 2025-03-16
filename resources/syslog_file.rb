@@ -2,17 +2,6 @@ include Opennms::XmlHelper
 include Opennms::Cookbook::Syslog::ConfigurationTemplate
 
 property :filename, String, name_property: true
-# 'bottom' places it near the bottom before these files:
-# ncs-component.events.xml
-# asset-management.events.xml
-# Standard.events.xml
-# default.events.xml
-#
-# 'top' places it just after
-# Translator.events.xml
-#
-# TODO: 'alphabetical' places it in alphabetical order with the other vendor MIBs.
-# required for :create
 property :position, String, equal_to: %w(bottom top), desired_state: false
 
 load_current_value do |new_resource|

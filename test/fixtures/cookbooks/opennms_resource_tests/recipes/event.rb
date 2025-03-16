@@ -279,3 +279,32 @@ opennms_event 'noop_create_if_missing' do
   severity 'Minor'
   action :create_if_missing
 end
+
+[443, 8443].each do |port|
+  [60, 30].each do |days|
+    opennms_event "TLS-Cert-Expire-#{port}-#{days} - nodeLostService" do
+      uei 'uei.opennms.org/nodes/nodeLostService'
+      position 'top'
+      file 'events/opennms.pollerd.events.xml'
+      if days == 30
+        mask [{ 'mename' => 'uei', 'mevalue' => ['uei.opennms.org/nodes/nodeLostService'] },
+              { 'mename' => 'service', 'mevalue' => ["TLS-Cert-Expire-#{port}"] }]
+      else
+        mask [{ 'mename' => 'uei', 'mevalue' => ['uei.opennms.org/nodes/nodeLostService'] },
+              { 'mename' => 'service', 'mevalue' => ["TLS-Cert-Expire-#{port}-#{days}"] }]
+      end
+      event_label 'OpenNMS-defined node event: nodeLostService'
+      descr 'A %service% outage was identified on interface %interface% because of the following condition: %parm[eventReason]%. A new Outage record has been created and service level availability calculations will be impacted until this outage is resolved.'
+      logmsg '%service% outage identified on interface %interface% with reason code: %parm[eventReason]%.'
+      logmsg_dest 'logndisplay'
+      if days <= 30
+        severity 'Critical'
+      elsif days == 60
+        severity 'Major'
+      else
+        severity 'Minor'
+      end
+      alarm_data false
+    end
+  end
+end

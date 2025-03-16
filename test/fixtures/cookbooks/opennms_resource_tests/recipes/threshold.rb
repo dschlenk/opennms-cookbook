@@ -21,6 +21,8 @@ opennms_threshold 'espresso' do # name is ds-name, and is part of identity
   rearm 60.0
   trigger 3
   ds_label 'bloodEspressoContent'
+  triggered_uei 'uei.opennms.org/thresholdTrigger'
+  rearmed_uei 'uei.opennms.org/thresholdRearm'
   filter_operator 'and' # part of identity
   resource_filters [{ 'field' => 'ifHighSpeed', 'filter' => '^[1-9]+[0-9]*$' }] # part of identity
 end
