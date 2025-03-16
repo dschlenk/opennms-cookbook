@@ -22,8 +22,8 @@ property :resource_keys, kind_of: Array, callbacks: {
 }
 # or [{ 'name' => object_name', 'type' => 'string|gauge|etc', 'xpath' => 'the/xpath' }, { ... }, ... ]
 property :objects, kind_of: Array, default: [], callbacks: {
-  'should be an array of hashes with keys `name`, `type`, and `xpath` (strings)' => lambda {
-    |p| p.is_a?(Array) && !p.any? { |a| !a.is_a?(Hash) || !a.key?('name') || !a['name'].is_a?(String) || !a.key?('type') || !a['type'].is_a?(String) || !a.key?('xpath') || !a['xpath'].is_a?(String) }
+  'should be an array of hashes with keys `name`, `type`, and `xpath` (strings)' => lambda { |p|
+    p.is_a?(Array) && !p.any? { |a| !a.is_a?(Hash) || !a.key?('name') || !a['name'].is_a?(String) || !a.key?('type') || !a['type'].is_a?(String) || !a.key?('xpath') || !a['xpath'].is_a?(String) }
   },
 }
 

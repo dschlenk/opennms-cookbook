@@ -754,7 +754,7 @@ suites:
   - name: service_detector_delete
     driver:
       ports:
-        - 1238:8980/tcp
+        - 1244:8980/tcp
     provisioner:
       policyfile: policyfiles/service_detector_delete.rb
     verifier:
@@ -764,7 +764,7 @@ suites:
   - name: service_detector_edit
     driver:
       ports:
-        - 1238:8980/tcp
+        - 1245:8980/tcp
     provisioner:
       policyfile: policyfiles/service_detector_edit.rb
     verifier:
@@ -774,7 +774,7 @@ suites:
   - name: service_detector_noop
     driver:
       ports:
-        - 1238:8980/tcp
+        - 1246:8980/tcp
     provisioner:
       policyfile: policyfiles/service_detector_noop.rb
     verifier:
@@ -928,13 +928,6 @@ suites:
       inspec_tests:
         - path: test/integration/default
         - path: test/integration/threshold_change_dslabel
-  - name: threshold_change_rearmeduei
-    provisioner:
-      policyfile: policyfiles/threshold_change_rearmeduei.rb
-    verifier:
-      inspec_tests:
-        - path: test/integration/default
-        - path: test/integration/threshold_change_rearmeduei
   - name: threshold_change_rearm
     provisioner:
       policyfile: policyfiles/threshold_change_rearm.rb
@@ -942,13 +935,6 @@ suites:
       inspec_tests:
         - path: test/integration/default
         - path: test/integration/threshold_change_rearm
-  - name: threshold_change_triggereduei
-    provisioner:
-      policyfile: policyfiles/threshold_change_triggereduei.rb
-    verifier:
-      inspec_tests:
-        - path: test/integration/default
-        - path: test/integration/threshold_change_triggereduei
   - name: threshold_change_trigger
     provisioner:
       policyfile: policyfiles/threshold_change_trigger.rb

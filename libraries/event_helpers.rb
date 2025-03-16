@@ -128,9 +128,11 @@ module Opennms
               event_file = ef.texts.collect(&:value).join('').strip[7..-1] if !ef.nil? && ef.respond_to?(:texts) && ef.texts.collect(&:value).join('').strip.length > 7
               if node['opennms']['opennms_event_files'].include?(event_file)
                 position = 'top' if position != 'top'
+                next
               end
               if node['opennms']['vendor_event_files'].include?(event_file)
                 position = 'bottom' if position != 'bottom'
+                next
               end
               break if event_file == node['opennms']['catch_all_event_file']
               @event_files[event_file] = { position: position }

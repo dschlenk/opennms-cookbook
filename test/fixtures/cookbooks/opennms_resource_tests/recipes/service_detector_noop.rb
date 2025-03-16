@@ -1,4 +1,4 @@
-include_recipe 'opennms_resource_tests::service_detector'
+include_recipe 'opennms_resource_tests::service_detector_edit'
 opennms_service_detector 'nochange Router' do
   service_name 'Router'
   foreign_source_name 'another-source'

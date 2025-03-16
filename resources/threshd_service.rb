@@ -6,7 +6,7 @@ use 'partial/_base_service'
 
 property :parameters, Array, callbacks: {
   'should be an array of hashes with key/value pairs that are both strings' => lambda { |p|
-    !p.any? { |h| !h.is_a?(Hash) || !h.any? { |k, v| !k.is_a?(String) || !v.is_a?(String) } }
+    !p.any? { |h| !h.is_a?(Hash) || h.any? { |k, v| !k.is_a?(String) || !v.is_a?(String) } }
   },
 }
 

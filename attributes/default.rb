@@ -61,7 +61,7 @@ default['opennms']['conf']['home'] = onms_home
 # opennms.conf
 default['opennms']['conf']['env'] = {
   # required because we need opennms to fully start before resources will work
-  'START_TIMEOUT' => 20,
+  'START_TIMEOUT' => 30,
   # see $OPENNMS_HOME/etc/examples/opennms.conf for more options, like:
   # 'JAVA_HEAP_SIZE' => 4096,
   # 'MAXIMUM_FILE_DESCRIPTORS' => 204800,

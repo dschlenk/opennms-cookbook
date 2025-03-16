@@ -6,7 +6,8 @@ opennms_poller_service 'change class ICMPBar7' do
   user_defined true
   interval 600_000
   status 'off'
-  timeout 5000
-  parameters({})
+  parameters(
+    'timeout' => { 'value' => '5000' }
+  )
   class_name 'org.opennms.netmgt.poller.monitors.SnmpMonitor'
 end
