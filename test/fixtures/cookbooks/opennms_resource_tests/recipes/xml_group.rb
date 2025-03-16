@@ -17,7 +17,7 @@ opennms_xml_group 'fxa-sc' do
   resource_xpath "/measCollecFile/measData/measInfo[@measInfoId='dns|dns']/measValue"
   timestamp_xpath '/measCollecFile/fileFooter/measCollec/@endTime'
   timestamp_format "yyyy-MM-dd'T'HH:mm:ssZ"
-  objects 'nasdaq' => { 'type' => 'gauge', 'xpath' => "/blah/elmeentalaewflk[@attribute='avalue']" }
+  objects [{ 'name' => 'nasdaq', 'type' => 'gauge', 'xpath' => "/blah/elmeentalaewflk[@attribute='avalue']" }]
 end
 # all options with resource_keys
 opennms_xml_group 'fxa-sc-rk' do
@@ -28,7 +28,7 @@ opennms_xml_group 'fxa-sc-rk' do
   timestamp_xpath '/measCollecFile/fileFooter/measCollec/@endTime'
   timestamp_format "yyyy-MM-dd'T'HH:mm:ssZ"
   resource_keys ['@measObjLdn', '@measObjInstId']
-  objects 'nasdaq' => { 'type' => 'gauge', 'xpath' => "/blah/elmeentalaewflk[@attribute='avalue']" }
+  objects [ { 'name' => 'nasdaq', 'type' => 'gauge', 'xpath' => "/blah/elmeentalaewflk[@attribute='avalue']" }]
 end
 # minimal - adds to a source created with that LWRP
 opennms_xml_group 'minimal' do
@@ -43,11 +43,10 @@ opennms_xml_group 'file' do
   resource_xpath '/files/file'
   key_xpath '@path'
   objects(
-    'size' => { 'type' => 'gauge', 'xpath' => '@size' }
+    [{ 'name' => 'size', 'type' => 'gauge', 'xpath' => '@size' }]
   )
 end
 
-# add to the file using the alternate objects format
 opennms_xml_group 'file2' do
   file 'file-group.xml'
   resource_xpath '/filez/file'

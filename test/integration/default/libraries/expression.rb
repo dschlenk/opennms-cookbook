@@ -15,6 +15,8 @@ class Expression < Inspec.resource(1)
       \'ds_type\' => \'if\',
       \'filter_operator\' => \'and\',
       \'resource_filters\' => [{ \'field\' => \'ifHighSpeed\', \'filter\' => \'^[1-9]+[0-9]*$\' }],
+      \'triggered_uei\' => \'uei.opennms.org/thresholdTest/testThresholdExceeded\',
+      \'rearmed_uei\' => \'uei.opennms.org/thresholdTest/testThresholdRearmed\',
     }
     describe expression(expr) do
       it { should exist }
@@ -23,8 +25,6 @@ class Expression < Inspec.resource(1)
       its(\'value\') { should eq 20.0 }
       its(\'rearm\') { should eq 18.0 }
       its(\'trigger\') { should eq 3 }
-      its(\'triggered_uei\') { should eq \'uei.opennms.org/thresholdTest/testThresholdExceeded\' }
-      its(\'rearmed_uei\') { should eq \'uei.opennms.org/thresholdTest/testThresholdRearmed\' }
     end
   '
 
@@ -35,6 +35,8 @@ class Expression < Inspec.resource(1)
     @type = expr['type']
     @filter_operator = expr['filter_operator']
     @resource_filters = expr['resource_filters']
+    @triggered_uei = expr['triggered_uei']
+    @rearmed_uei = expr['rearmed_uei']
     doc = REXML::Document.new(inspec.file('/opt/opennms/etc/thresholds.xml').content)
     ex_el = expression_el(doc) unless doc.nil?
     @exists = !ex_el.nil?
@@ -47,8 +49,6 @@ class Expression < Inspec.resource(1)
       @params[:rearm] = ex_el.attributes['rearm'].to_f unless ex_el.attributes['rearm'].nil?
       @params[:trigger] = ex_el.attributes['trigger'].to_i unless ex_el.attributes['trigger'].nil?
       @params[:ds_label] = ex_el.attributes['ds-label'] unless ex_el.attributes['ds-label'].nil?
-      @params[:triggered_uei] = ex_el.attributes['triggeredUEI'] unless ex_el.attributes['triggeredUEI'].nil?
-      @params[:rearmed_uei] = ex_el.attributes['rearmedUEI'] unless ex_el.attributes['rearmedUEI'].nil?
     end
   end
 
@@ -65,6 +65,16 @@ class Expression < Inspec.resource(1)
   def expression_el(doc)
     attrs = "/thresholding-config/group[@name = '#{@group}']/expression[@expression = '#{@expression}' and @ds-type = '#{@ds_type}' and @type = '#{@type}'"
     attrs = "#{attrs} and @filterOperator = '#{@filter_operator}'" unless @filter_operator.nil? || @filter_operator == 'or'
+    attrs = if @triggered_uei.nil?
+              "#{attrs} and not(@triggeredUEI)"
+            else
+              "#{attrs} and @triggeredUEI = '#{@triggered_uei}'"
+            end
+    attrs = if @rearmed_uei.nil?
+              "#{attrs} and not(@rearmedUEI)"
+            else
+              "#{attrs} and @rearmedUEI = '#{@rearmed_uei}'"
+            end
     if @resource_filters.nil? || @resource_filters == []
       attrs = "#{attrs} and not(resource-filter)"
     else

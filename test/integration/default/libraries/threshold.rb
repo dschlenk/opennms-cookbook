@@ -1,4 +1,3 @@
-# frozen_string_literal: true
 require 'rexml/document'
 class Threshold < Inspec.resource(1)
   name 'threshold'
@@ -13,6 +12,8 @@ class Threshold < Inspec.resource(1)
       \'group\' => \'cheftest\',
       \'type\' => \'high\',
       \'ds_type\' => \'if\',
+      \'triggered_uei\' => \'uei\',
+      \'rearmed_uei\' => \'anotheruei\',
     }
     describe threshold(ping) do
       it { should exist }
@@ -30,6 +31,8 @@ class Threshold < Inspec.resource(1)
     @type = threshold['type']
     @filter_operator = threshold['filter_operator']
     @resource_filters = threshold['resource_filters']
+    @triggered_uei = threshold['triggered_uei']
+    @rearmed_uei = threshold['rearmed_uei']
     doc = REXML::Document.new(inspec.file('/opt/opennms/etc/thresholds.xml').content)
     t_el = threshold_el(doc) unless doc.nil?
     @exists = !t_el.nil?
@@ -40,8 +43,6 @@ class Threshold < Inspec.resource(1)
     @params[:rearm] = t_el.attributes['rearm'].to_f unless t_el.attributes['rearm'].nil?
     @params[:trigger] = t_el.attributes['trigger'].to_i unless t_el.attributes['trigger'].nil?
     @params[:ds_label] = t_el.attributes['ds-label'] unless t_el.attributes['ds-label'].nil?
-    @params[:triggered_uei] = t_el.attributes['triggeredUEI'] unless t_el.attributes['triggeredUEI'].nil?
-    @params[:rearmed_uei] = t_el.attributes['rearmedUEI'] unless t_el.attributes['rearmedUEI'].nil?
   end
 
   def exist?
@@ -57,6 +58,16 @@ class Threshold < Inspec.resource(1)
   def threshold_el(doc)
     attrs = "/thresholding-config/group[@name = '#{@group}']/threshold[@ds-name = '#{@ds_name}' and @ds-type = '#{@ds_type}' and @type = '#{@type}'"
     attrs = "#{attrs} and @filterOperator = '#{@filter_operator}'" unless @filter_operator.nil? || @filter_operator == 'or'
+    attrs = if @triggered_uei.nil?
+              "#{attrs} and not(@triggeredUEI)"
+            else
+              "#{attrs} and @triggeredUEI = '#{@triggered_uei}'"
+            end
+    attrs = if @rearmed_uei.nil?
+              "#{attrs} and not(@rearmedUEI)"
+            else
+              "#{attrs} and @rearmedUEI = '#{@rearmed_uei}'"
+            end
     if @resource_filters.nil? || @resource_filters == []
       attrs = "#{attrs} and not(resource-filter)"
     else

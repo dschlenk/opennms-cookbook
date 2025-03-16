@@ -37,14 +37,14 @@ load_current_value do |new_resource|
 end
 
 action :create do
-  converge_if_changed do
-    u = get_user(new_resource.user_id)
-    if u.nil?
-      raise Chef::Exceptions::Validation, 'Password is required for action :create' if new_resource.password.nil?
+  u = get_user(new_resource.user_id)
+  if u.nil?
+    raise Chef::Exceptions::Validation, 'Password is required for action :create' if new_resource.password.nil?
+    converge_if_changed do
       add_user(new_resource)
-    else
-      run_action(:update)
     end
+  else
+    run_action(:update)
   end
 end
 
@@ -54,25 +54,27 @@ action :create_if_missing do
 end
 
 action :update do
-  converge_if_changed do
-    u = get_xml_user(new_resource.user_id)
-    raise Chef::Exceptions::ResourceNotFound, "No user with ID #{new_resource.user_id} found to updated. Use the `:create` action to make a new user." if u.nil?
-    update_field(u.root, new_resource, :full_name, 'full-name') unless new_resource.full_name.nil?
-    update_field(u.root, new_resource, :email, 'email') unless new_resource.email.nil?
-    update_field(u.root, new_resource, :user_comments, 'user-comments') unless new_resource.user_comments.nil?
-    unless new_resource.roles.nil?
-      u.root.elements.delete_all('role')
-      new_resource.roles.each do |r|
-        u.root.add_element('role').text = r
+  u = get_xml_user(new_resource.user_id)
+  if !new_resource.full_name.nil? || !new_resource.email.nil? || !new_resource.user_comments.nil? || !new_resource.roles.nil? || !new_resource.duty_schedules.nil?
+    converge_if_changed do
+      raise Chef::Exceptions::ResourceNotFound, "No user with ID #{new_resource.user_id} found to updated. Use the `:create` action to make a new user." if u.nil?
+      update_field(u.root, new_resource, :full_name, 'full-name') unless new_resource.full_name.nil?
+      update_field(u.root, new_resource, :email, 'email') unless new_resource.email.nil?
+      update_field(u.root, new_resource, :user_comments, 'user-comments') unless new_resource.user_comments.nil?
+      unless new_resource.roles.nil?
+        u.root.elements.delete_all('role')
+        new_resource.roles.each do |r|
+          u.root.add_element('role').text = r
+        end
       end
-    end
-    unless new_resource.duty_schedules.nil?
-      u.root.elements.delete_all('duty-schedule')
-      new_resource.duty_schedules.each do |d|
-        u.root.add_element('duty-schedule').text = d
+      unless new_resource.duty_schedules.nil?
+        u.root.elements.delete_all('duty-schedule')
+        new_resource.duty_schedules.each do |d|
+          u.root.add_element('duty-schedule').text = d
+        end
       end
+      update_user(u)
     end
-    update_user(u)
   end
 end
 

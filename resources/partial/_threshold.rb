@@ -29,8 +29,8 @@ property :trigger, [Integer, String], callbacks: {
 }
 
 property :ds_label, String
-property :triggered_uei, String
-property :rearmed_uei, String
+property :triggered_uei, String, identity: true
+property :rearmed_uei, String, identity: true
 # only relevent if resource filters present
 property :filter_operator, String, identity: true, callbacks: {
   'should be a String matching regular expression `([Oo][Rr])|([Aa][Nn][Dd])`' => lambda { |p|
@@ -54,7 +54,7 @@ load_current_value do |new_resource|
             thresholds_resource.variables[:config].groups[new_resource.group]
           end
   current_value_does_not_exist! if group.nil?
-  ip = %i(type ds_type filter_operator resource_filters).map { |p| [p, new_resource.send(p)] }.to_h.compact
+  ip = %i(type ds_type filter_operator resource_filters triggered_uei rearmed_uei).map { |p| [p, new_resource.send(p)] }.to_h.compact
   if new_resource.respond_to?(:ds_name)
     ip[:ds_name] = new_resource.ds_name
   else
@@ -62,7 +62,7 @@ load_current_value do |new_resource|
   end
   t = group.find_rule(**ip)
   current_value_does_not_exist! if t.nil?
-  %i(relaxed description ds_label value rearm trigger triggered_uei rearmed_uei).each do |p|
+  %i(relaxed description ds_label value rearm trigger).each do |p|
     send(p, t.send(p))
   end
 end
@@ -72,7 +72,7 @@ action :create do
     thresholds_resource_init
     group = thresholds_resource.variables[:config].groups[new_resource.group]
     raise Chef::Exceptions::Validation, "Cannot add a rule to #{new_resource.group} because it does not exist" if group.nil?
-    ip = %i(type ds_type filter_operator resource_filters).map { |p| [p, new_resource.send(p)] }.to_h.compact
+    ip = %i(type ds_type filter_operator resource_filters triggered_uei rearmed_uei).map { |p| [p, new_resource.send(p)] }.to_h.compact
     if new_resource.respond_to?(:ds_name)
       ip[:ds_name] = new_resource.ds_name
     else
@@ -97,7 +97,7 @@ action :create_if_missing do
   thresholds_resource_init
   group = thresholds_resource.variables[:config].groups[new_resource.group]
   raise Chef::Exceptions::Validation, "Cannot add a rule to #{new_resource.group} because it does not exist" if group.nil?
-  ip = %i(type ds_type filter_operator resource_filters).map { |p| [p, new_resource.send(p)] }.to_h.compact
+  ip = %i(type ds_type filter_operator resource_filters triggered_uei rearmed_uei).map { |p| [p, new_resource.send(p)] }.to_h.compact
   if new_resource.respond_to?(:ds_name)
     ip[:ds_name] = new_resource.ds_name
   else
@@ -112,7 +112,7 @@ action :update do
     thresholds_resource_init
     group = thresholds_resource.variables[:config].groups[new_resource.group]
     raise Chef::Exceptions::Validation, "Cannot add a rule to #{new_resource.group} because it does not exist" if group.nil?
-    ip = %i(type ds_type filter_operator resource_filters).map { |p| [p, new_resource.send(p)] }.to_h.compact
+    ip = %i(type ds_type filter_operator resource_filters triggered_uei rearmed_uei).map { |p| [p, new_resource.send(p)] }.to_h.compact
     if new_resource.respond_to?(:ds_name)
       ip[:ds_name] = new_resource.ds_name
     else
@@ -120,7 +120,7 @@ action :update do
     end
     t = group.find_rule(**ip)
     raise Chef::Exceptions::ResourceNotFound, 'No existing rule found to update. Use `:create` action to create new rules.' if t.nil?
-    rp = %i(relaxed description ds_label value rearm trigger triggered_uei rearmed_uei).map { |p| [p, new_resource.send(p)] }.to_h.compact
+    rp = %i(relaxed description ds_label value rearm trigger).map { |p| [p, new_resource.send(p)] }.to_h.compact
     t.update(**rp)
   end
 end
@@ -129,7 +129,7 @@ action :delete do
   thresholds_resource_init
   group = thresholds_resource.variables[:config].groups[new_resource.group]
   unless group.nil?
-    ip = %i(type ds_type filter_operator resource_filters).map { |p| [p, new_resource.send(p)] }.to_h.compact
+    ip = %i(type ds_type filter_operator resource_filters triggered_uei rearmed_uei).map { |p| [p, new_resource.send(p)] }.to_h.compact
     if new_resource.respond_to?(:ds_name)
       ip[:ds_name] = new_resource.ds_name
     else

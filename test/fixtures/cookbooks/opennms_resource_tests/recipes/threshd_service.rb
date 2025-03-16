@@ -4,7 +4,7 @@ opennms_threshd_service 'WS-Man' do
   interval 300000
   status 'on'
   user_defined true
-  parameters('thresholding-group' => 'cheftest2')
+  parameters [{ 'thresholding-group' => 'cheftest2' }]
 end
 
 opennms_threshd_service 'SNMP' do

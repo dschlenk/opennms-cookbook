@@ -37,6 +37,7 @@ template "#{onms_home}/etc/opennms.conf" do
   owner node['opennms']['username']
   group node['opennms']['groupname']
   notifies :restart, 'service[opennms]'
+  sensitive true
   variables(
     env: node['opennms']['conf']['env']
   )

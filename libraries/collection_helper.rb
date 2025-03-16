@@ -179,18 +179,20 @@ module Opennms
             when 'cookbook_file'
               declare_resource(:cookbook_file, "#{onms_etc}/xml-datacollection/#{ig}") do
                 owner node['opennms']['username']
-                group node['opennms']['grouname']
+                group node['opennms']['groupname']
                 mode '0644'
                 source ig
+                action :create
               end
             when 'external'
               Chef::Log.debug("Not managing XML Group file #{ig} for #{new_resource.url} in collection #{new_resource.collection_name}")
             else
               declare_resource(:remote_file, "#{onms_etc}/xml-datacollection/#{ig}") do
                 owner node['opennms']['username']
-                group node['opennms']['grouname']
+                group node['opennms']['groupname']
                 mode '0644'
                 source "#{new_resource.import_groups_source}/#{ig}"
+                action :create
               end
             end
           end

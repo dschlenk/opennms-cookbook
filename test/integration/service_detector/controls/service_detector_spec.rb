@@ -6,10 +6,7 @@ control 'service_detector' do
   describe service_detector('Router', 'another-source', 1238) do
     it { should exist }
     its('class_name') { should eq 'org.opennms.netmgt.provision.detector.snmp.SnmpDetector' }
-    its('port') { should eq 161 }
-    its('retry_count') { should eq 3 }
-    its('time_out') { should eq 5000 }
-    its('parameters') { should eq 'vbname' => '.1.3.6.1.2.1.4.1.0', 'vbvalue' => '1' }
+    its('parameters') { should eq 'vbname' => '.1.3.6.1.2.1.4.1.0', 'vbvalue' => '1', 'port' => '161', 'retries' => '3', 'timeout' => '5000' }
   end
 
   describe service_detector('ICMP', 'another-source', 1238) do
@@ -19,13 +16,11 @@ control 'service_detector' do
 
   describe service_detector('ICMP', 'another-source', 1238) do
     it { should exist }
-    its('time_out') { should eq 12_000 }
-    its('parameters') { should eq 'ipMatch' => '127.0.0.1' }
+    its('parameters') { should eq 'ipMatch' => '127.0.0.1', 'timeout' => '12000' }
   end
 
   describe service_detector('I C M P', 'another-source', 1238) do
     it { should exist }
-    its('time_out') { should eq 12_000 }
-    its('parameters') { should eq 'ipMatch' => '127.0.0.1' }
+    its('parameters') { should eq 'ipMatch' => '127.0.0.1', 'timeout' => '12000' }
   end
 end

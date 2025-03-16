@@ -14,7 +14,20 @@ opennms_user 'jimmy' do
   action :set_password
 end
 
+opennms_user 'update nothing about johnny' do
+  user_id 'johnny'
+  action :update
+end
+
 # delete johnny
-opennms_user 'johnny' do
+opennms_user 'delete johnny' do
+  user_id 'johnny'
   action :delete
+end
+
+opennms_user 'update admin' do
+  user_id 'admin'
+  full_name nil
+  roles nil
+  password 'admin'
 end
