@@ -136,6 +136,14 @@ module Opennms
           @default = default
           @value = value
         end
+        
+        def eql?(assignment)
+          self.class.eql?(assignment.class) &&
+            @name.eql?(assignment.name) &&
+            @type.eql?(assignment.type) &&
+            @default.eql?(assignment.default) &&
+            @value.eql?(assignment.value)
+        end
       end
 
       class TranslationValue
@@ -147,6 +155,15 @@ module Opennms
           @matches = matches
           @name = name
           @values = values || []
+        end
+        
+        def eql?(value)
+          self.class.eql?(value.class) &&
+            @type.eql?(value.type) &&
+            @result.eql?(value.result) &&
+            @matches.eql?(value.matches) &&
+            @name.eql?(value.name) &&
+            @values.eql?(value.values)
         end
       end
     end
