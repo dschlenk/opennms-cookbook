@@ -28,7 +28,7 @@ default['opennms']['yum_gpg_keys'] = [
 default['opennms']['start_opts'] = ''
 # set to '' if you want to re-enable OOTB behavior (but you should not do this if using any of the opennms resources)
 default['opennms']['timeout_start_sec'] = '10min'
-default['opennms']['version'] = '33.1.3-1'
+default['opennms']['version'] = '33.1.4-1'
 default['java']['version'] = '17'
 default['opennms']['jre_path'] = nil
 default['opennms']['allow_downgrade'] = false
@@ -485,7 +485,7 @@ default['opennms']['jms_nbi']['batch_size']             = 100
 default['opennms']['jms_nbi']['queue_size']             = 300_000
 default['opennms']['jms_nbi']['message_format']         = 'ALARM ID:${alarmId} NODE:${nodeLabel}; ${logMsg}'
 default['opennms']['jms_nbi']['send_as_object_message'] = false
-default['opennms']['jms_nbi']['first_occurence_only']   = true
+default['opennms']['jms_nbi']['first_occurrence_only']   = true
 default['opennms']['jms_nbi']['jms_destination']        = 'SingleAlarmQueue'
 # log4j2.xml
 default['opennms']['log4j2']['default_route']['size'] = '100MB'
