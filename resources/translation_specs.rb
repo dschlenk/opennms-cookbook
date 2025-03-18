@@ -30,9 +30,9 @@ action :add do
   end
 end
 
-action :delete do
-  translation_resource_init
-  config = translation_resource.variables[:config]
+action :delete do   
+  config = translation_resource.variables[:config] unless translation_resource.nil?
+  config = Opennms::Cookbook::Translations::TranslatorConfigurationFile.read("#{onms_etc}/translator-configuration.xml") if config.nil?
   existing_specs = []
   new_resource.specs.each do |spec|
     existing_specs.push spec if config.specs.include?(spec)
