@@ -18,6 +18,10 @@ module Opennms
         rescue Chef::Exceptions::ResourceNotFound
           false
         end
+        
+        def delete_event_translation_specs?(specs:)
+          @specs.delete_if { |spec| specs.include?(spec) }
+        end
 
         def translations_resource_create
           file = Opennms::Cookbook::Translations::TranslatorConfigurationFile.read("#{onms_etc}/translator-configuration.xml")
