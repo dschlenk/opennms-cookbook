@@ -38,7 +38,13 @@ module Opennms
               group node['opennms']['groupname']
               mode '0664'
               variables(
-                config: c
+                config: c,
+                init_sleep_ms: node['opennms']['discovery']['init_sleep_ms'],
+                pps: node['opennms']['discovery']['pps'],
+                restart_sleep_ms: node['opennms']['discovery']['restart_sleep_ms'],
+                retries: node['opennms']['discovery']['retries'],
+                timeout: node['opennms']['discovery']['timeout'],
+                foreign_source: node['opennms']['discovery']['foreign_source']
               )
               action :nothing
               delayed_action :create
