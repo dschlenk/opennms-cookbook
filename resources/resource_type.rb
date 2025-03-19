@@ -57,19 +57,19 @@ load_current_value do |new_resource|
   current_value_does_not_exist! unless ::File.exist?(file)
   if !new_resource.group_name.nil?
     r = rtgroup_resource(file)
-    rt = if r.nil?
-           Opennms::Cookbook::Collection::CollectionGroupConfigFile.read(file).resource_type(name: new_resource.type_name)
-         else
-           rtgroup_resource(file).variables[:config].resource_type(name: new_resource.type_name)
-         end
+    if r.nil?
+      ro_rtgroup_resource_init(file)
+      r = ro_rtgroup_resource(file)
+    end
+    rt = r.variables[:config].resource_type(name: new_resource.type_name)
     current_value_does_not_exist! if rt.nil?
   else
     r = rt_resource(file)
-    rt = if r.nil?
-           Opennms::Cookbook::Collection::ResourceTypeConfigFile.read(file).resource_type(name: new_resource.type_name)
-         else
-           rt_resource(file).variables[:config].resource_type(name: new_resource.type_name)
-         end
+    if r.nil?
+      ro_rt_resource_init(file)
+      r = ro_rt_resource(file)
+    end
+    rt = r.variables[:config].resource_type(name: new_resource.type_name)
   end
   current_value_does_not_exist! if rt.nil?
   %i(label resource_label).each do |p|

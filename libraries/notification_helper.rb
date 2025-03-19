@@ -11,6 +11,15 @@ module Opennms
           find_resource!(:template, "#{onms_etc}/notificationCommands.xml")
         end
 
+        def ro_nc_resource_init
+          ro_nc_resource_create unless ro_nc_resource_exist?
+        end
+
+        def ro_nc_resource
+          return unless ro_nc_resource_exist?
+          find_resource!(:template, "RO #{onms_etc}/notificationCommands.xml")
+        end
+
         private
 
         def nc_resource_exist?
@@ -34,6 +43,29 @@ module Opennms
             end
           end
         end
+
+        def ro_nc_resource_exist?
+          !find_resource(:template, "RO #{onms_etc}/notificationCommands.xml").nil?
+        rescue Chef::Exceptions::ResourceNotFound
+          false
+        end
+
+        def ro_nc_resource_create
+          file = Opennms::Cookbook::Notification::CommandsConfigFile.read("#{onms_etc}/notificationCommands.xml")
+          with_run_context(:root) do
+            declare_resource(:template, "RO #{onms_etc}/notificationCommands.xml") do
+              path "#{Chef::Config[:file_cache_path]}/notificationCommands.xml"
+              cookbook 'opennms'
+              source 'notificationCommands.xml.erb'
+              owner node['opennms']['username']
+              group node['opennms']['groupname']
+              mode '0664'
+              variables(config: file)
+              action :nothing
+              delayed_action :nothing
+            end
+          end
+        end
       end
 
       module DestinationPathsTemplate
@@ -44,6 +76,15 @@ module Opennms
         def dp_resource
           return unless dp_resource_exist?
           find_resource!(:template, "#{onms_etc}/destinationPaths.xml")
+        end
+
+        def ro_dp_resource_init
+          ro_dp_resource_create unless ro_dp_resource_exist?
+        end
+
+        def ro_dp_resource
+          return unless ro_dp_resource_exist?
+          find_resource!(:template, "RO #{onms_etc}/destinationPaths.xml")
         end
 
         private
@@ -69,6 +110,29 @@ module Opennms
             end
           end
         end
+
+        def ro_dp_resource_exist?
+          !find_resource(:template, "RO #{onms_etc}/destinationPaths.xml").nil?
+        rescue Chef::Exceptions::ResourceNotFound
+          false
+        end
+
+        def ro_dp_resource_create
+          file = Opennms::Cookbook::Notification::DestinationPathConfigFile.read("#{onms_etc}/destinationPaths.xml")
+          with_run_context(:root) do
+            declare_resource(:template, "RO #{onms_etc}/destinationPaths.xml") do
+              path "#{Chef::Config[:file_cache_path]}/destinationPaths.xml"
+              cookbook 'opennms'
+              source 'destinationPaths.xml.erb'
+              owner node['opennms']['username']
+              group node['opennms']['groupname']
+              mode '0664'
+              variables(config: file)
+              action :nothing
+              delayed_action :nothing
+            end
+          end
+        end
       end
 
       module NotificationsTemplate
@@ -79,6 +143,15 @@ module Opennms
         def notifs_resource
           return unless notifs_resource_exist?
           find_resource!(:template, "#{onms_etc}/notifications.xml")
+        end
+
+        def ro_notifs_resource_init
+          ro_notifs_resource_create unless ro_notifs_resource_exist?
+        end
+
+        def ro_notifs_resource
+          return unless ro_notifs_resource_exist?
+          find_resource!(:template, "RO #{onms_etc}/notifications.xml")
         end
 
         private
@@ -104,6 +177,29 @@ module Opennms
             end
           end
         end
+
+        def ro_notifs_resource_exist?
+          !find_resource(:template, "RO #{onms_etc}/notifications.xml").nil?
+        rescue Chef::Exceptions::ResourceNotFound
+          false
+        end
+
+        def ro_notifs_resource_create
+          file = Opennms::Cookbook::Notification::NotificationsFile.read("#{onms_etc}/notifications.xml")
+          with_run_context(:root) do
+            declare_resource(:template, "RO #{onms_etc}/notifications.xml") do
+              path "#{Chef::Config[:file_cache_path]}/notifications.xml"
+              cookbook 'opennms'
+              source 'notifications.xml.erb'
+              owner node['opennms']['username']
+              group node['opennms']['groupname']
+              mode '0664'
+              variables(config: file)
+              action :nothing
+              delayed_action :nothing
+            end
+          end
+        end
       end
 
       module NotifdTemplate
@@ -114,6 +210,15 @@ module Opennms
         def notifd_resource
           return unless notifd_resource_exist?
           find_resource!(:template, "#{onms_etc}/notifd-configuration.xml")
+        end
+
+        def ro_notifd_resource_init
+          ro_notifd_resource_create unless ro_notifd_resource_exist?
+        end
+
+        def ro_notifd_resource
+          return unless ro_notifd_resource_exist?
+          find_resource!(:template, "RO #{onms_etc}/notifd-configuration.xml")
         end
 
         private
@@ -137,6 +242,29 @@ module Opennms
               action :nothing
               delayed_action :create
               notifies :run, 'opennms_send_event[restart_Notifd]'
+            end
+          end
+        end
+
+        def ro_notifd_resource_exist?
+          !find_resource(:template, "RO #{onms_etc}/notifd-configuration.xml").nil?
+        rescue Chef::Exceptions::ResourceNotFound
+          false
+        end
+
+        def ro_notifd_resource_create
+          file = Opennms::Cookbook::Notification::NotifdConfigFile.read("#{onms_etc}/notifd-configuration.xml")
+          with_run_context(:root) do
+            declare_resource(:template, "RO #{onms_etc}/notifd-configuration.xml") do
+              path "#{Chef::Config[:file_cache_path]}/notifd-configuration.xml"
+              cookbook 'opennms'
+              source 'notifd-configuration.xml.erb'
+              owner node['opennms']['username']
+              group node['opennms']['groupname']
+              mode '0664'
+              variables(config: file)
+              action :nothing
+              delayed_action :nothing
             end
           end
         end

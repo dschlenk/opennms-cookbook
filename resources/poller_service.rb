@@ -36,12 +36,10 @@ end
 load_current_value do |new_resource|
   r = poller_resource
   if r.nil?
-    filename = "#{onms_etc}/poller-configuration.xml"
-    current_value_does_not_exist! unless ::File.exist?(filename)
-    config = Opennms::Cookbook::Package::PollerConfigFile.read(filename)
-  else
-    config = r.variables[:config]
+    ro_poller_resource_init
+    r = ro_poller_resource
   end
+  config = r.variables[:config]
   package = config.packages[new_resource.package_name]
   current_value_does_not_exist! if package.nil?
   monitor = config.monitor(service_name: new_resource.service_name)

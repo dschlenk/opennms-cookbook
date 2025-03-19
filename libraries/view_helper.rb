@@ -11,6 +11,15 @@ module Opennms
           find_resource!(:template, "#{onms_etc}/dashboard-config.xml")
         end
 
+        def ro_wallboard_resource_init
+          ro_wallboard_resource_create unless ro_wallboard_resource_exist?
+        end
+
+        def ro_wallboard_resource
+          return unless ro_wallboard_resource_exist?
+          find_resource!(:template, "RO #{onms_etc}/dashboard-config.xml")
+        end
+
         private
 
         def wallboard_resource_exist?
@@ -36,6 +45,30 @@ module Opennms
             end
           end
         end
+
+        def ro_wallboard_resource_exist?
+          !find_resource(:template, "RO #{onms_etc}/dashboard-config.xml").nil?
+        rescue Chef::Exceptions::ResourceNotFound
+          false
+        end
+
+        def ro_wallboard_resource_create
+          file = Opennms::Cookbook::View::DashboardConfig.new
+          file.read!("#{onms_etc}/dashboard-config.xml")
+          with_run_context(:root) do
+            declare_resource(:template, "RO #{onms_etc}/dashboard-config.xml") do
+              path "#{Chef::Config[:file_cache_path]}/dashboard-config.xml"
+              cookbook 'opennms'
+              source 'dashboard-config.xml.erb'
+              owner node['opennms']['username']
+              group node['opennms']['groupname']
+              mode '0664'
+              variables(config: file)
+              action :nothing
+              delayed_action :nothing
+            end
+          end
+        end
       end
 
       module SurveillanceTemplate
@@ -46,6 +79,15 @@ module Opennms
         def view_resource
           return unless view_resource_exist?
           find_resource!(:template, "#{onms_etc}/surveillance-views.xml")
+        end
+
+        def ro_view_resource_init
+          ro_view_resource_create unless ro_view_resource_exist?
+        end
+
+        def ro_view_resource
+          return unless ro_view_resource_exist?
+          find_resource!(:template, "RO #{onms_etc}/surveillance-views.xml")
         end
 
         private
@@ -69,6 +111,30 @@ module Opennms
               variables(config: file)
               action :nothing
               delayed_action :create
+            end
+          end
+        end
+
+        def ro_view_resource_exist?
+          !find_resource(:template, "RO #{onms_etc}/surveillance-views.xml").nil?
+        rescue Chef::Exceptions::ResourceNotFound
+          false
+        end
+
+        def ro_view_resource_create
+          file = Opennms::Cookbook::View::SurveillanceConfig.new
+          file.read!("#{onms_etc}/surveillance-views.xml")
+          with_run_context(:root) do
+            declare_resource(:template, "RO #{onms_etc}/surveillance-views.xml") do
+              path "#{Chef::Config[:file_cache_path]}/surveillance-views.xml"
+              cookbook 'opennms'
+              source 'surveillance-views.xml.erb'
+              owner node['opennms']['username']
+              group node['opennms']['groupname']
+              mode '0664'
+              variables(config: file)
+              action :nothing
+              delayed_action :nothing
             end
           end
         end

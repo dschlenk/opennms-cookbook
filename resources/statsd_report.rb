@@ -23,7 +23,10 @@ property :class_name, String, equal_to: %w(org.opennms.netmgt.dao.support.TopNAt
 
 load_current_value do |new_resource|
   config = statsd_resource.variables[:config] unless statsd_resource.nil?
-  config = Opennms::Cookbook::Statsd::StatsdConfiguration.read("#{onms_etc}/statsd-configuration.xml") if config.nil?
+  if config.nil?
+    ro_statsd_resource_init
+    config = ro_statsd_resource.variables[:config]
+  end
   package = config.package(name: new_resource.package_name)
   current_value_does_not_exist! if package.nil?
   report = package.report(name: new_resource.report_name)

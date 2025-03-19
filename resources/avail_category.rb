@@ -20,14 +20,12 @@ include Opennms::Cookbook::ConfigHelpers::AvailCategory::AvailCategoryTemplate
 
 load_current_value do |new_resource|
   r = ac_resource
-  cg = r.variables[:category_groups].category_group(new_resource.category_group) unless r.nil?
-  if r.nil? || cg.nil?
-    current_value_does_not_exist! unless ::File.exist?("#{onms_etc}/categories.xml")
-    acf = Opennms::Cookbook::ConfigHelpers::AvailCategory::AvailCategoryFile.new
-    acf.read!("#{onms_etc}/categories.xml")
-    cg = acf.category_group(new_resource.category_group)
-    current_value_does_not_exist! if cg.nil?
+  if r.nil?
+    ro_ac_resource_init
+    r = ro_ac_resource
   end
+  cg = r.variables[:category_groups].category_group(new_resource.category_group)
+  current_value_does_not_exist! if cg.nil?
   c = cg.category(new_resource.label)
   current_value_does_not_exist! if c.nil?
   comment c.comment

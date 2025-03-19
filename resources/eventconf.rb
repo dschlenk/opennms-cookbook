@@ -16,10 +16,10 @@ load_current_value do |new_resource|
   r = eventconf_resource
   if r.nil?
     current_value_does_not_exist! unless ::File.exist?("#{node['opennms']['conf']['home']}/etc/events/#{new_resource.event_file}")
-    eventconf = Opennms::Cookbook::ConfigHelpers::Event::EventConf.read(node, "#{node['opennms']['conf']['home']}/etc/eventconf.xml")
-  else
-    eventconf = r.variables[:eventconf]
+    ro_eventconf_resource_init
+    r = ro_eventconf_resource
   end
+  eventconf = r.variables[:eventconf]
   current_value_does_not_exist! if eventconf.event_files[new_resource.event_file].nil?
   position eventconf.event_files[new_resource.event_file][:position]
 end

@@ -17,12 +17,10 @@ end
 load_current_value do |new_resource|
   r = collectd_resource
   if r.nil?
-    filename = "#{onms_etc}/collectd-configuration.xml"
-    current_value_does_not_exist! unless ::File.exist?(filename)
-    collectd_config = Opennms::Cookbook::Package::CollectdConfigFile.read(filename)
-  else
-    collectd_config = r.variables[:collectd_config]
+    ro_collectd_resource_init
+    r = ro_collectd_resource
   end
+  collectd_config = r.variables[:collectd_config]
   package = collectd_config.packages[new_resource.package_name]
   current_value_does_not_exist! if package.nil?
   collector = collectd_config.collector(service_name: new_resource.service_name)

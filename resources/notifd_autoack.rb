@@ -14,7 +14,10 @@ include Opennms::XmlHelper
 include Opennms::Cookbook::Notification::NotifdTemplate
 load_current_value do |new_resource|
   config = notifd_resource.variables[:config] unless notifd_resource.nil?
-  config = Opennms::Cookbook::Notification::NotifdConfigFile.read("#{onms_etc}/notifd-configuration.xml") if config.nil?
+  if config.nil?
+    ro_notifd_resource_init
+    config = ro_notifd_resource.variables[:config]
+  end
   autoack = config.autoack(uei: new_resource.uei, acknowledge: new_resource.acknowledge)
   current_value_does_not_exist! if autoack.nil?
   %i(resolution_prefix notify matches).each do |p|

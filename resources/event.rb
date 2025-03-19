@@ -157,18 +157,23 @@ action_class do
 end
 
 include Opennms::Cookbook::ConfigHelpers::Event::EventTemplate
+include Opennms::Cookbook::ConfigHelpers::Event::EventConfTemplate
 load_current_value do |new_resource|
   r = eventfile_resource(new_resource.file)
   if r.nil?
     # first we see if we exist
     current_value_does_not_exist! unless ::File.exist?("#{node['opennms']['conf']['home']}/etc/#{new_resource.file}")
-    eventfile = Opennms::Cookbook::ConfigHelpers::Event::EventDefinitionFile.read("#{node['opennms']['conf']['home']}/etc/#{file}")
-  else
-    eventfile = r.variables[:eventfile]
+    ro_eventfile_resource_init(new_resource.file)
+    r = ro_eventfile_resource(new_resource.file)
   end
+  eventfile = r.variables[:eventfile] unless r.nil?
   current_value_does_not_exist! if eventfile.nil?
   event = eventfile.entry(new_resource.uei, new_resource.mask)
-  eventconf = Opennms::Cookbook::ConfigHelpers::Event::EventConf.read(node, "#{node['opennms']['conf']['home']}/etc/eventconf.xml")
+  eventconf = eventconf_resource.variables[:eventconf] unless eventconf_resource.nil?
+  if eventconf.nil?
+    ro_eventconf_resource_init
+    eventconf = ro_eventconf_resource.variables[:eventconf]
+  end
   current_value_does_not_exist! if event.nil?
   if !node['opennms']['opennms_event_files'].include?(new_resource.file[7..-1]) && !node['opennms']['vendor_event_files'].include?(new_resource.file[7..-1])
     current_value_does_not_exist! if eventconf.event_files[new_resource.file[7..-1]].nil?

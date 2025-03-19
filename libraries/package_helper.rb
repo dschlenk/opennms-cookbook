@@ -11,6 +11,15 @@ module Opennms
           find_resource!(:template, "#{onms_etc}/collectd-configuration.xml")
         end
 
+        def ro_collectd_resource_init
+          ro_collectd_resource_create unless ro_collectd_resource_exist?
+        end
+
+        def ro_collectd_resource
+          return unless ro_collectd_resource_exist?
+          find_resource!(:template, "RO #{onms_etc}/collectd-configuration.xml")
+        end
+
         private
 
         def collectd_resource_exist?
@@ -36,6 +45,30 @@ module Opennms
             end
           end
         end
+
+        def ro_collectd_resource_exist?
+          !find_resource(:template, "RO #{onms_etc}/collectd-configuration.xml").nil?
+        rescue Chef::Exceptions::ResourceNotFound
+          false
+        end
+
+        def ro_collectd_resource_create
+          file = Opennms::Cookbook::Package::CollectdConfigFile.new
+          file.read!("#{onms_etc}/collectd-configuration.xml")
+          with_run_context(:root) do
+            declare_resource(:template, "RO #{onms_etc}/collectd-configuration.xml") do
+              path "#{Chef::Config[:file_cache_path]}/collectd-configuration.xml"
+              cookbook 'opennms'
+              source 'collectd-configuration.xml.erb'
+              owner node['opennms']['username']
+              group node['opennms']['groupname']
+              mode '0664'
+              variables(collectd_config: file)
+              action :nothing
+              delayed_action :nothing
+            end
+          end
+        end
       end
     end
 
@@ -48,6 +81,15 @@ module Opennms
         def poller_resource
           return unless poller_resource_exist?
           find_resource!(:template, "#{onms_etc}/poller-configuration.xml")
+        end
+
+        def ro_poller_resource_init
+          ro_poller_resource_create unless ro_poller_resource_exist?
+        end
+
+        def ro_poller_resource
+          return unless ro_poller_resource_exist?
+          find_resource!(:template, "RO #{onms_etc}/poller-configuration.xml")
         end
 
         private
@@ -75,6 +117,30 @@ module Opennms
             end
           end
         end
+
+        def ro_poller_resource_exist?
+          !find_resource(:template, "RO #{onms_etc}/poller-configuration.xml").nil?
+        rescue Chef::Exceptions::ResourceNotFound
+          false
+        end
+
+        def ro_poller_resource_create
+          file = Opennms::Cookbook::Package::PollerConfigFile.new
+          file.read!("#{onms_etc}/poller-configuration.xml")
+          with_run_context(:root) do
+            declare_resource(:template, "RO #{onms_etc}/poller-configuration.xml") do
+              path "#{Chef::Config[:file_cache_path]}/poller-configuration.xml"
+              cookbook 'opennms'
+              source 'poller-configuration.xml.erb'
+              owner node['opennms']['username']
+              group node['opennms']['groupname']
+              mode '0664'
+              variables(config: file)
+              action :nothing
+              delayed_action :nothing
+            end
+          end
+        end
       end
     end
 
@@ -87,6 +153,15 @@ module Opennms
         def threshd_resource
           return unless threshd_resource_exist?
           find_resource!(:template, "#{onms_etc}/threshd-configuration.xml")
+        end
+
+        def ro_threshd_resource_init
+          ro_threshd_resource_create unless ro_threshd_resource_exist?
+        end
+
+        def ro_threshd_resource
+          return unless ro_threshd_resource_exist?
+          find_resource!(:template, "RO #{onms_etc}/threshd-configuration.xml")
         end
 
         private
@@ -111,6 +186,30 @@ module Opennms
               action :nothing
               delayed_action :create
               notifies :run, 'opennms_send_event[restart_Threshd]'
+            end
+          end
+        end
+
+        def ro_threshd_resource_exist?
+          !find_resource(:template, "RO #{onms_etc}/threshd-configuration.xml").nil?
+        rescue Chef::Exceptions::ResourceNotFound
+          false
+        end
+
+        def ro_threshd_resource_create
+          file = Opennms::Cookbook::Package::ThreshdConfigFile.new
+          file.read!("#{onms_etc}/threshd-configuration.xml")
+          with_run_context(:root) do
+            declare_resource(:template, "RO #{onms_etc}/threshd-configuration.xml") do
+              path "#{Chef::Config[:file_cache_path]}/threshd-configuration.xml"
+              cookbook 'opennms'
+              source 'threshd-configuration.xml.erb'
+              owner node['opennms']['username']
+              group node['opennms']['groupname']
+              mode '0664'
+              variables(config: file)
+              action :nothing
+              delayed_action :nothing
             end
           end
         end

@@ -14,6 +14,15 @@ module Opennms
           find_resource!(:http_request, "opennms_foreign_source POST #{name}")
         end
 
+        def ro_fs_resource_init(name, port, adminpw)
+          ro_fs_resource_create(name, port, adminpw) unless ro_fs_resource_exist?(name)
+        end
+
+        def ro_fs_resource(name)
+          return unless ro_fs_resource_exist?(name)
+          find_resource!(:http_request, "RO opennms_foreign_source POST #{name}")
+        end
+
         private
 
         def fs_resource_exist?(name)
@@ -31,6 +40,27 @@ module Opennms
               headers({ 'Content-Type' => 'application/xml', 'Authorization' => "Basic #{Base64.strict_encode64("admin:#{admin_secret_from_vault('password')}")}" })
               action :nothing
               delayed_action :post
+              message foreign_source.message.to_s
+              sensitive true
+            end
+          end
+        end
+
+        def ro_fs_resource_exist?(name)
+          !find_resource(:http_request, "RO opennms_foreign_source POST #{name}").nil?
+        rescue Chef::Exceptions::ResourceNotFound
+          false
+        end
+
+        def ro_fs_resource_create(name, port = 8980, adminpw = 'admin')
+          url = "#{baseurl}/foreignSources/#{name}"
+          foreign_source = Opennms::Cookbook::Provision::ForeignSource.new(name, url)
+          with_run_context(:root) do
+            declare_resource(:http_request, "RO opennms_foreign_source POST #{name}") do
+              url "http://localhost:#{port}/opennms/rest}/foreignSources"
+              headers({ 'Content-Type' => 'application/xml', 'Authorization' => "Basic #{Base64.strict_encode64("admin:#{adminpw}")}" })
+              action :nothing
+              delayed_action :nothing
               message foreign_source.message.to_s
               sensitive true
             end
@@ -94,6 +124,15 @@ module Opennms
           find_resource!(:http_request, "opennms_import POST #{name}")
         end
 
+        def ro_model_import_init(name, port, adminpw)
+          ro_model_import_create(name, port, adminpw) unless ro_model_import_exist?(name)
+        end
+
+        def ro_model_import(name)
+          return unless ro_model_import_exist?(name)
+          find_resource!(:http_request, "RO opennms_import POST #{name}")
+        end
+
         private
 
         def model_import_exist?(name)
@@ -112,6 +151,28 @@ module Opennms
               headers({ 'Content-Type' => 'application/xml', 'Authorization' => "Basic #{Base64.strict_encode64("admin:#{admin_secret_from_vault('password')}")}" })
               action :nothing
               delayed_action :post
+              message model_import.message.to_s
+              sensitive true
+            end
+          end
+        end
+
+        def ro_model_import_exist?(name)
+          !find_resource(:http_request, "RO opennms_import POST #{name}").nil?
+        rescue Chef::Exceptions::ResourceNotFound
+          false
+        end
+
+        def ro_model_import_create(name, port = 8980, adminpw = 'admin')
+          url = "#{baseurl}/requisitions/#{name}"
+          Chef::Log.debug "model_import_create url: #{url}"
+          model_import = Opennms::Cookbook::Provision::ModelImport.new(name, url)
+          with_run_context(:root) do
+            declare_resource(:http_request, "RO opennms_import POST #{name}") do
+              url "http://localhost:#{port}/opennms/rest/requisitions"
+              headers({ 'Content-Type' => 'application/xml', 'Authorization' => "Basic #{Base64.strict_encode64("admin:#{adminpw}")}" })
+              action :nothing
+              delayed_action :nothing
               message model_import.message.to_s
               sensitive true
             end

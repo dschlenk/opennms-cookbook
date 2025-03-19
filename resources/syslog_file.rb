@@ -6,8 +6,11 @@ property :position, String, equal_to: %w(bottom top), desired_state: false
 
 load_current_value do |new_resource|
   current_value_does_not_exist! unless ::File.exist?("#{onms_etc}/syslog/#{new_resource.filename}")
-  syslog_conf = syslog_resource.variables[:conf] unless syslog_resource.nil?
-  syslog_conf = Opennms::Cookbook::Syslog::Configuration.read("#{onms_etc}/syslogd-configuration.xml", node) if syslog_conf.nil?
+  syslog_conf = syslog_resource.variables[:config] unless syslog_resource.nil?
+  if syslog_conf.nil?
+    ro_syslog_resource_init
+    syslog_conf = ro_syslog_resource.variables[:config]
+  end
   current_value_does_not_exist! unless syslog_conf.files.include?("syslog/#{new_resource.filename}")
 end
 

@@ -19,12 +19,11 @@ property :columns, Hash, default: {}, callbacks: {
 
 load_current_value do |new_resource|
   r = jdbc_resource
-  collection = r.variables[:collections][new_resource.collection_name] unless r.nil?
-  if r.nil? || collection.nil?
-    filename = "#{onms_etc}/jdbc-datacollection-config.xml"
-    current_value_does_not_exist! unless ::File.exist?(filename)
-    collection = Opennms::Cookbook::Collection::OpennmsCollectionConfigFile.read(filename, 'jdbc').collections[new_resource.collection_name]
+  if r.nil?
+    ro_jdbc_resource_init
+    r = ro_jdbc_resource
   end
+  collection = r.variables[:collections][new_resource.collection_name]
   current_value_does_not_exist! if collection.nil?
   query = collection.query(name: new_resource.query_name)
   current_value_does_not_exist! if query.nil?

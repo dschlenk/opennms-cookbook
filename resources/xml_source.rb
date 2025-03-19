@@ -55,15 +55,12 @@ include Opennms::Cookbook::Collection::XmlCollectionTemplate
 
 load_current_value do |new_resource|
   r = xml_resource
-  c = r.variables[:collections][new_resource.collection_name] unless r.nil?
-  source = c.source(url: new_resource.url) unless c.nil?
-  if r.nil? || c.nil? || source.nil?
-    filename = "#{onms_etc}/xml-datacollection-config.xml"
-    current_value_does_not_exist! unless ::File.exist?(filename)
-    collection = Opennms::Cookbook::Collection::OpennmsCollectionConfigFile.read(filename, 'xml').collections[new_resource.collection_name]
-    current_value_does_not_exist! if collection.nil?
-    source = collection.source(url: new_resource.url)
+  if r.nil?
+    ro_xml_resource_init
+    r = ro_xml_resource
   end
+  c = r.variables[:collections][new_resource.collection_name]
+  source = c.source(url: new_resource.url) unless c.nil?
   current_value_does_not_exist! if source.nil?
   request_method source.request['method'] unless source.request.nil? || source.request['method'].nil?
   request_headers source.request['headers'] unless source.request.nil? || source.request['headers'].nil?

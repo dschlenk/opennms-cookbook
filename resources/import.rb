@@ -10,7 +10,11 @@ property :sync_wait_secs, Integer, default: 10, desired_state: false
 
 load_current_value do |new_resource|
   mi = model_import(new_resource.import_name) unless model_import(new_resource.import_name).nil?
-  mi = Opennms::Cookbook::Provision::ModelImport.existing_model_import(new_resource.import_name, "#{baseurl}/requisitions/#{new_resource.import_name}") if mi.nil?
+  if mi.nil?
+    current_value_does_not_exist! if Opennms::Cookbook::Provision::ModelImport.existing_model_import(new_resource.import_name, "#{baseurl}/requisitions/#{new_resource.import_name}").nil?
+    ro_model_import_init(new_resource.foreign_source_name, node['opennms']['properties']['jetty']['port'], admin_secret_from_vault('password'))
+    mi = ro_model_import(new_resource.foreign_source_name)
+  end
   current_value_does_not_exist! if mi.nil?
   foreign_source_name new_resource.foreign_source_name
 end
