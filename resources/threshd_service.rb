@@ -17,7 +17,8 @@ end
 
 load_current_value do |new_resource|
   threshd_config = if threshd_resource.nil?
-                     Opennms::Cookbook::Package::ThreshdConfigFile.read("#{onms_etc}/threshd-configuration.xml")
+                     ro_threshd_resource_init
+                     ro_threshd_resource.variables[:config]
                    else
                      threshd_resource.variables[:config]
                    end

@@ -11,7 +11,10 @@ property :sync_existing, [true, false], default: false, desired_state: false
 load_current_value do |new_resource|
   model_import = REXML::Document.new(model_import(new_resource.foreign_source_name).message).root unless model_import(new_resource.foreign_source_name).nil?
   Chef::Log.debug "Missing requisition #{new_resource.foreign_source_name}." unless model_import.nil?
-  model_import = REXML::Document.new(Opennms::Cookbook::Provision::ModelImport.new("#{new_resource.foreign_source_name}", "#{baseurl}/requisitions/#{new_resource.foreign_source_name}/nodes/#{new_resource.foreign_id}").message) if model_import.nil?
+  if model_import.nil?
+    ro_model_import_init(new_resource.foreign_source_name, node['opennms']['properties']['jetty']['port'], admin_secret_from_vault('password'))
+    model_import = REXML::Document.new(ro_model_import(new_resource.foreign_source_name).message).root
+  end
   current_value_does_not_exist! if model_import.nil?
   node_el = model_import.elements["node[@foreign-id = '#{new_resource.foreign_id}']"] unless model_import.nil?
   interface = node_el.elements["interface[@ip-addr = '#{new_resource.name}']"] unless node_el.nil?

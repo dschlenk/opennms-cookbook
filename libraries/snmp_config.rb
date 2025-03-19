@@ -11,6 +11,15 @@ module Opennms
           find_resource!(:template, "#{node['opennms']['conf']['home']}/etc/snmp-config.xml")
         end
 
+        def ro_xml_resource_init
+          ro_xml_resource_create unless ro_xml_resource_exist?
+        end
+
+        def ro_xml_resource
+          return unless ro_xml_resource_exist?
+          find_resource!(:template, "RO #{node['opennms']['conf']['home']}/etc/snmp-config.xml")
+        end
+
         private
 
         def xml_resource_exist?
@@ -32,6 +41,30 @@ module Opennms
               variables(snmp_config: snmp_config)
               action :nothing
               delayed_action :create
+            end
+          end
+        end
+
+        def ro_xml_resource_exist?
+          !find_resource(:template, "RO #{node['opennms']['conf']['home']}/etc/snmp-config.xml").nil?
+        rescue Chef::Exceptions::ResourceNotFound
+          false
+        end
+
+        def ro_xml_resource_create
+          snmp_config = Opennms::Cookbook::ConfigHelpers::SnmpConfig::SnmpConfigFile.new
+          snmp_config.read!("#{node['opennms']['conf']['home']}/etc/snmp-config.xml") if ::File.exist?("#{node['opennms']['conf']['home']}/etc/snmp-config.xml")
+          with_run_context :root do
+            declare_resource(:template, "RO #{node['opennms']['conf']['home']}/etc/snmp-config.xml") do
+              path "#{Chef::Config[:file_cache_path]}/snmp-config.xml"
+              source 'snmp-config.xml.erb'
+              cookbook 'opennms'
+              owner node['opennms']['username']
+              group node['opennms']['groupname']
+              mode '0600'
+              variables(snmp_config: snmp_config)
+              action :nothing
+              delayed_action :nothing
             end
           end
         end

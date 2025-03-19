@@ -39,6 +39,15 @@ module Opennms
             find_resource!(:template, "#{node['opennms']['conf']['home']}/etc/eventconf.xml")
           end
 
+          def ro_eventconf_resource_init
+            ro_eventconf_resource_create unless ro_eventconf_resource_exist?
+          end
+
+          def ro_eventconf_resource
+            return unless ro_eventconf_resource_exist?
+            find_resource!(:template, "RO #{node['opennms']['conf']['home']}/etc/eventconf.xml")
+          end
+
           private
 
           def eventconf_resource_exist?
@@ -69,6 +78,35 @@ module Opennms
               end
             end
           end
+
+          def ro_eventconf_resource_exist?
+            !find_resource(:template, "RO #{node['opennms']['conf']['home']}/etc/eventconf.xml").nil?
+          rescue Chef::Exceptions::ResourceNotFound
+            false
+          end
+
+          def ro_eventconf_resource_create
+            eventconf = Opennms::Cookbook::ConfigHelpers::Event::EventConf.new
+            eventconf.read!(node, "#{node['opennms']['conf']['home']}/etc/eventconf.xml") if ::File.exist?("#{node['opennms']['conf']['home']}/etc/eventconf.xml")
+            with_run_context :root do
+              declare_resource(:template, "RO #{node['opennms']['conf']['home']}/etc/eventconf.xml") do
+                path "#{Chef::Config[:file_cache_path]}/eventconf.xml"
+                source 'eventconf.xml.erb'
+                cookbook 'opennms'
+                owner node['opennms']['username']
+                group node['opennms']['groupname']
+                mode '0664'
+                variables(eventconf: eventconf,
+                          opennms_event_files: node['opennms']['opennms_event_files'],
+                          vendor_event_files: node['opennms']['vendor_event_files'],
+                          catch_all_event_file: node['opennms']['catch_all_event_file'],
+                          secure_fields: node['opennms']['secure_fields']
+                         )
+                action :nothing
+                delayed_action :nothing
+              end
+            end
+          end
         end
 
         module EventTemplate
@@ -79,6 +117,15 @@ module Opennms
           def eventfile_resource(file)
             return unless eventfile_resource_exist?(file)
             find_resource!(:template, "#{node['opennms']['conf']['home']}/etc/#{file}")
+          end
+
+          def ro_eventfile_resource_init(file)
+            ro_eventfile_resource_create(file) unless ro_eventfile_resource_exist?(file)
+          end
+
+          def ro_eventfile_resource(file)
+            return unless ro_eventfile_resource_exist?(file)
+            find_resource!(:template, "RO #{node['opennms']['conf']['home']}/etc/#{file}")
           end
 
           private
@@ -103,6 +150,33 @@ module Opennms
                 action :nothing
                 delayed_action :create
                 notifies :run, 'opennms_send_event[restart_Eventd]'
+                not_if do
+                  eventfile.entries.empty?
+                end
+              end
+            end
+          end
+
+          def ro_eventfile_resource_exist?(file)
+            !find_resource(:template, "RO #{node['opennms']['conf']['home']}/etc/#{file}").nil?
+          rescue Chef::Exceptions::ResourceNotFound
+            false
+          end
+
+          def ro_eventfile_resource_create(file)
+            eventfile = Opennms::Cookbook::ConfigHelpers::Event::EventDefinitionFile.new
+            eventfile.read!("#{node['opennms']['conf']['home']}/etc/#{file}") if ::File.exist?("#{node['opennms']['conf']['home']}/etc/#{file}")
+            with_run_context :root do
+              declare_resource(:template, "RO #{node['opennms']['conf']['home']}/etc/#{file}") do
+                path "#{Chef::Config[:file_cache_path]}/#{file}"
+                source 'eventdef.xml.erb'
+                cookbook 'opennms'
+                owner node['opennms']['username']
+                group node['opennms']['groupname']
+                mode '0664'
+                variables(eventfile: eventfile)
+                action :nothing
+                delayed_action :nothing
                 not_if do
                   eventfile.entries.empty?
                 end

@@ -8,7 +8,10 @@ property :ip_addr, String, required: true, identity: true
 load_current_value do |new_resource|
   name = new_resource.service_name
   model_import_root = REXML::Document.new(model_import(new_resource.foreign_source_name).message).root unless model_import(new_resource.foreign_source_name).nil?
-  model_import_root = REXML::Document.new(Opennms::Cookbook::Provision::ModelImport.new("#{new_resource.foreign_source_name}", "#{baseurl}/requisitions/#{new_resource.foreign_source_name}/nodes/#{new_resource.foreign_id}").message) if model_import_root.nil?
+  if model_import_root.nil?
+    ro_model_import_init(new_resource.foreign_source_name, node['opennms']['properties']['jetty']['port'], admin_secret_from_vault('password'))
+    model_import_root = REXML::Document.new(ro_model_import(new_resource.foreign_source_name).message).root
+  end
   current_value_does_not_exist! if model_import_root.nil?
   node_el = model_import_root.elements["node[@foreign-id = '#{new_resource.foreign_id}']"] unless model_import_root.nil?
   interface_el = node_el.elements["interface[@ip-addr = '#{new_resource.ip_addr}']"] unless node_el.nil?

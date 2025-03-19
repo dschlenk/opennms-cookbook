@@ -49,7 +49,8 @@ end
 
 load_current_value do |new_resource|
   group = if thresholds_resource.nil?
-            Opennms::Cookbook::Threshold::ThresholdsFile.read("#{onms_etc}/thresholds.xml").groups[new_resource.group]
+            ro_thresholds_resource_init
+            ro_thresholds_resource.variables[:config].groups[new_resource.group]
           else
             thresholds_resource.variables[:config].groups[new_resource.group]
           end

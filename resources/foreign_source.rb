@@ -5,6 +5,10 @@ property :scan_interval, String, default: '1d'
 
 load_current_value do |new_resource|
   foreign_source = REXML::Document.new(fs_resource(new_resource.name).message) unless fs_resource(new_resource.name).nil?
+  if foreign_source.nil?
+    ro_fs_resource_init(new_resource.name, node['opennms']['properties']['jetty']['port'], admin_secret_from_vault('password'))
+    foreign_source = REXML::Document.new(ro_fs_resource(new_resource.name).message)
+  end
   foreign_source = REXML::Document.new(Opennms::Cookbook::Provision::ForeignSource.new(new_resource.name, "#{baseurl}/foreignSources/#{new_resource.name}").message) if foreign_source.nil?
   current_value_does_not_exist! if foreign_source.nil?
   scan_interval xml_element_text(foreign_source.elements['/foreign-source/scan-interval'])
