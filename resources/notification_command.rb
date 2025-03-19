@@ -18,7 +18,10 @@ property :service_registry, [true, false]
 
 load_current_value do |new_resource|
   config = nc_resource.variables[:config] unless nc_resource.nil?
-  config = Opennms::Cookbook::Notification::CommandsConfigFile.read("#{onms_etc}/notificationCommands.xml") if config.nil?
+  if config.nil?
+    ro_nc_resource_init
+    config = ro_nc_resource.variables[:config]
+  end
   command = config.command(command_name: new_resource.command_name)
   current_value_does_not_exist! if command.nil?
   %i(execute comment contact_type binary arguments service_registry).each do |p|

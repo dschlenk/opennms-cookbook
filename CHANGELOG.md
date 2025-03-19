@@ -1,5 +1,14 @@
 # OpenNMS Cookbook Changes
 
+## 33.2.0
+
+* default to installing OpenNMS Horizon 33.1.4-1
+* stop checking to see if the rtc and admin users exist and have roles during upgrades
+* significantly improve the performance of subsequent converges of run lists that use custom resources by caching config variables in derived resources with action `:nothing` in the resource collection to read from instead of having to read from the file system or make a REST call when loading the current value of every resource instance
+* bug: JMS NBI attribute `default['opennms']['jms_nbi']['first_occurrence_only']` was spelled incorrectly
+* bug: admin passwords with special characters were not URL encoded when used to make REST requests
+* bug: `wsman_system_definition` idempotence check was broken
+
 ## 33.1.0
 
 * support disabling more daemons

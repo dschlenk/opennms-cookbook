@@ -19,7 +19,10 @@ property :position, String, desired_state: false, equal_to: %w(top bottom), defa
 
 load_current_value do |new_resource|
   views = vd_resource.variables[:views] unless vd_resource.nil?
-  views = Opennms::Cookbook::Rtc::ViewsDisplay.read("#{onms_etc}/viewsdisplay.xml").views if views.nil?
+  if views.nil?
+    ro_vd_resource_init
+    views = ro_vd_resource.variables[:views]
+  end
   view = views[new_resource.view_name]
   current_value_does_not_exist! if view.nil?
   section = view.section(section: new_resource.section)

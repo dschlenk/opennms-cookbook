@@ -11,6 +11,15 @@ module Opennms
           find_resource!(:template, "#{onms_etc}/syslogd-configuration.xml")
         end
 
+        def ro_syslog_resource_init
+          ro_syslog_resource_create unless ro_syslog_resource_exist?
+        end
+
+        def ro_syslog_resource
+          return unless ro_syslog_resource_exist?
+          find_resource!(:template, "RO #{onms_etc}/syslogd-configuration.xml")
+        end
+
         private
 
         def syslog_resource_exist?
@@ -33,6 +42,30 @@ module Opennms
               action :nothing
               delayed_action :create
               notifies :restart, 'service[opennms]'
+            end
+          end
+        end
+
+        def ro_syslog_resource_exist?
+          !find_resource(:template, "RO #{onms_etc}/syslogd-configuration.xml").nil?
+        rescue Chef::Exceptions::ResourceNotFound
+          false
+        end
+
+        def ro_syslog_resource_create
+          file = Opennms::Cookbook::Syslog::Configuration.new(node)
+          file.read!("#{onms_etc}/syslogd-configuration.xml")
+          with_run_context(:root) do
+            declare_resource(:template, "RO #{onms_etc}/syslogd-configuration.xml") do
+              path "#{Chef::Config[:file_cache_path]}/syslogd-configuration.xml"
+              cookbook 'opennms'
+              source 'syslogd-configuration.xml.erb'
+              owner node['opennms']['username']
+              group node['opennms']['groupname']
+              mode '0664'
+              variables(config: file)
+              action :nothing
+              delayed_action :nothing
             end
           end
         end

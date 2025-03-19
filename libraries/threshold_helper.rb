@@ -11,6 +11,15 @@ module Opennms
           find_resource!(:template, "#{onms_etc}/thresholds.xml")
         end
 
+        def ro_thresholds_resource_init
+          ro_thresholds_resource_create unless ro_thresholds_resource_exist?
+        end
+
+        def ro_thresholds_resource
+          return unless ro_thresholds_resource_exist?
+          find_resource!(:template, "RO #{onms_etc}/thresholds.xml")
+        end
+
         private
 
         def thresholds_resource_exist?
@@ -32,6 +41,29 @@ module Opennms
               action :nothing
               delayed_action :create
               notifies :run, 'opennms_send_event[restart_Thresholds]'
+            end
+          end
+        end
+
+        def ro_thresholds_resource_exist?
+          !find_resource(:template, "RO #{onms_etc}/thresholds.xml").nil?
+        rescue Chef::Exceptions::ResourceNotFound
+          false
+        end
+
+        def ro_thresholds_resource_create
+          file = Opennms::Cookbook::Threshold::ThresholdsFile.read("#{onms_etc}/thresholds.xml")
+          with_run_context(:root) do
+            declare_resource(:template, "RO #{onms_etc}/thresholds.xml") do
+              path "#{Chef::Config[:file_cache_path]}/thresholds.xml"
+              cookbook 'opennms'
+              source 'thresholds.xml.erb'
+              owner node['opennms']['username']
+              group node['opennms']['groupname']
+              mode '0664'
+              variables(config: file)
+              action :nothing
+              delayed_action :nothing
             end
           end
         end

@@ -16,13 +16,11 @@ property :exclude_filters, Array, callbacks: {
 
 load_current_value do |new_resource|
   r = snmp_resource
-  collection = r.variables[:collections][new_resource.collection_name] unless r.nil?
-  if r.nil? || collection.nil?
-    filename = "#{onms_etc}/datacollection-config.xml"
-    current_value_does_not_exist! unless ::File.exist?(filename)
-    collections = Opennms::Cookbook::Collection::OpennmsCollectionConfigFile.read(filename, 'snmp').collections
-    collection = collections[new_resource.collection_name]
+  if r.nil?
+    ro_snmp_resource_init
+    r = ro_snmp_resource
   end
+  collection = r.variables[:collections][new_resource.collection_name] unless r.nil?
   current_value_does_not_exist! if collection.nil?
   gn = new_resource.group_name
   group = collection.include_collection(data_collection_group: gn)

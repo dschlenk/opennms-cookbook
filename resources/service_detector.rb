@@ -9,7 +9,10 @@ property :parameters, Hash, callbacks: { 'should be a hash with key/value pairs 
 
 load_current_value do |new_resource|
   foreign_source = REXML::Document.new(fs_resource(new_resource.foreign_source_name).message) unless fs_resource(new_resource.foreign_source_name).nil?
-  foreign_source = REXML::Document.new(Opennms::Cookbook::Provision::ForeignSource.new(new_resource.foreign_source_name, "#{baseurl}/foreignSources/#{new_resource.foreign_source_name}").message) if foreign_source.nil?
+  if foreign_source.nil?
+    ro_fs_resource_init(new_resource.foreign_source_name, node['opennms']['properties']['jetty']['port'], admin_secret_from_vault('password'))
+    foreign_source = REXML::Document.new(ro_fs_resource(new_resource.foreign_source_name).message)
+  end
   current_value_does_not_exist! if foreign_source.nil?
   sd_el = foreign_source.elements["/foreign-source/detectors/detector[@name = '#{new_resource.service_name}']"]
   current_value_does_not_exist! if sd_el.nil?

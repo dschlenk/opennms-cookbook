@@ -11,6 +11,15 @@ module Opennms
           find_resource!(:template, "#{onms_etc}/statsd-configuration.xml")
         end
 
+        def ro_statsd_resource_init
+          ro_statsd_resource_create unless ro_statsd_resource_exist?
+        end
+
+        def ro_statsd_resource
+          return unless ro_statsd_resource_exist?
+          find_resource!(:template, "RO #{onms_etc}/statsd-configuration.xml")
+        end
+
         private
 
         def statsd_resource_exist?
@@ -33,6 +42,30 @@ module Opennms
               action :nothing
               delayed_action :create
               notifies :run, 'opennms_send_event[restart_Statsd]'
+            end
+          end
+        end
+
+        def ro_statsd_resource_exist?
+          !find_resource(:template, "RO #{onms_etc}/statsd-configuration.xml").nil?
+        rescue Chef::Exceptions::ResourceNotFound
+          false
+        end
+
+        def ro_statsd_resource_create
+          file = Opennms::Cookbook::Statsd::StatsdConfiguration.new
+          file.read!("#{onms_etc}/statsd-configuration.xml")
+          with_run_context(:root) do
+            declare_resource(:template, "RO #{onms_etc}/statsd-configuration.xml") do
+              path "#{Chef::Config[:file_cache_path]}/statsd-configuration.xml"
+              cookbook 'opennms'
+              source 'statsd-configuration.xml.erb'
+              owner node['opennms']['username']
+              group node['opennms']['groupname']
+              mode '0664'
+              variables(config: file)
+              action :nothing
+              delayed_action :nothing
             end
           end
         end

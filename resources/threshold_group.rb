@@ -11,11 +11,12 @@ action_class do
 end
 
 load_current_value do |new_resource|
-  config = if thresholds_resource.nil?
-             Opennms::Cookbook::Threshold::ThresholdsFile.read("#{onms_etc}/thresholds.xml")
-           else
-             thresholds_resource.variables[:config]
-           end
+  r = thresholds_resource
+  if r.nil?
+    ro_thresholds_resource_init
+    r = ro_thresholds_resource
+  end
+  config = r.variables[:config]
   group = config.groups[new_resource.group_name]
   current_value_does_not_exist! if group.nil?
   rrd_repository group.rrd_repository

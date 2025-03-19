@@ -11,6 +11,15 @@ module Opennms
           find_resource!(:template, "#{onms_etc}/discovery-configuration.xml")
         end
 
+        def ro_disco_resource_init
+          ro_disco_resource_create unless ro_disco_resource_exist?
+        end
+
+        def ro_disco_resource
+          return unless ro_disco_resource_exist?
+          find_resource!(:template, "RO #{onms_etc}/discovery-configuration.xml")
+        end
+
         private
 
         def disco_resource_exist?
@@ -40,6 +49,31 @@ module Opennms
               action :nothing
               delayed_action :create
               notifies :run, 'opennms_send_event[restart_Discovery]'
+            end
+          end
+        end
+
+        def ro_disco_resource_exist?
+          !find_resource(:template, "RO #{onms_etc}/discovery-configuration.xml").nil?
+        rescue
+          false
+        end
+
+        def ro_disco_resource_create
+          c = Opennms::Cookbook::Discovery::Configuration.read("#{onms_etc}/discovery-configuration.xml")
+          with_run_context(:root) do
+            declare_resource(:template, "RO #{onms_etc}/discovery-configuration.xml") do
+              path "#{Chef::Config[:file_cache_path]}/discovery-configuration.xml"
+              cookbook 'opennms'
+              source 'discovery-configuration.xml.erb'
+              owner node['opennms']['username']
+              group node['opennms']['groupname']
+              mode '0664'
+              variables(
+                config: c
+              )
+              action :nothing
+              delayed_action :nothing
             end
           end
         end

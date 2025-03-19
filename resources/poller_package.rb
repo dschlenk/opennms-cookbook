@@ -24,7 +24,10 @@ end
 
 load_current_value do |new_resource|
   config = poller_resource.variables[:config] unless poller_resource.nil?
-  config = Opennms::Cookbook::Package::PollerConfigFile.read("#{onms_etc}/poller-configuration.xml") if config.nil?
+  if config.nil?
+    ro_poller_resource_init
+    config = ro_poller_resource.variables[:config]
+  end
   package = config.packages[new_resource.package_name] unless config.nil?
   current_value_does_not_exist! if package.nil?
   %i(filter specifics include_ranges exclude_ranges include_urls outage_calendars remote rrd_step rras downtimes).each do |p|

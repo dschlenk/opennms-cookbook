@@ -10,7 +10,10 @@ property :foreign_source, String
 
 load_current_value do |new_resource|
   config = disco_resource.variables[:config] unless disco_resource.nil?
-  config = Opennms::Cookbook::Discovery::Configuration.read("#{onms_etc}/discovery-configuration.xml") if config.nil?
+  if config.nil?
+    ro_disco_resource_init
+    config = ro_disco_resource.variables[:config]
+  end
   url = if new_resource.url_type.eql?('include')
           config.include_url(url: new_resource.url, location: new_resource.location)
         else

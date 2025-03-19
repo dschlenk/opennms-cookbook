@@ -1,5 +1,6 @@
 module Opennms
   module Cookbook
+    # NOTE: this is currently unused until there's a good way to manage properties files while preserving whitespace and comments
     module Graph
       module CollectionGraphTemplate
         def cgf_resource_init(file = 'graph.properties')
@@ -9,6 +10,15 @@ module Opennms
         def cgf_resource(file = 'graph.properties')
           return unless cgf_resource_exist?(file)
           find_resource!(:template, "#{onms_etc}/snmp-graph.properties.d/#{file}")
+        end
+
+        def ro_cgf_resource_init(file = 'graph.properties')
+          ro_cgf_resource_create(file) unless ro_cgf_resource_exist?(file)
+        end
+
+        def ro_cgf_resource(file = 'graph.properties')
+          return unless ro_cgf_resource_exist?(file)
+          find_resource!(:template, "RO #{onms_etc}/snmp-graph.properties.d/#{file}")
         end
 
         private
@@ -32,6 +42,30 @@ module Opennms
               variables(config: file)
               action :nothing
               delayed_action :create
+            end
+          end
+        end
+
+        def ro_cgf_resource_exist?(file)
+          !find_resource(:template, "RO #{onms_etc}/snmp-graph.properties.d/#{file}").nil?
+        rescue Chef::Exceptions::ResourceNotFound
+          false
+        end
+
+        def ro_cgf_resource_create(f)
+          file = Opennms::Cookbook::Graph::CollectionGraphTemplate.new
+          file.read!("#{onms_etc}/snmp-graph.properties.d/#{f}")
+          with_run_context(:root) do
+            declare_resource(:template, "RO #{onms_etc}/snmp-graph.properties.d/#{f}") do
+              path "#{Chef::Config[:file_cache_path]}/snmp-graph.properties.d_#{f}"
+              cookbook 'opennms'
+              source 'graph.properties.erb'
+              owner node['opennms']['username']
+              group node['opennms']['groupname']
+              mode '0664'
+              variables(config: file)
+              action :nothing
+              delayed_action :nothing
             end
           end
         end

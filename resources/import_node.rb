@@ -12,7 +12,10 @@ property :assets, Hash, callbacks: { 'should be a hash with key/value pairs that
 
 load_current_value do |new_resource|
   model_import = REXML::Document.new(model_import(new_resource.foreign_source_name).message).root unless model_import(new_resource.foreign_source_name).nil?
-  model_import = REXML::Document.new(Opennms::Cookbook::Provision::ModelImport.new("#{new_resource.foreign_source_name}", "#{baseurl}/requisitions/#{new_resource.foreign_source_name}/nodes/#{new_resource.foreign_id}").message) if model_import.nil?
+  if model_import.nil?
+    ro_model_import_init(new_resource.foreign_source_name, node['opennms']['properties']['jetty']['port'], admin_secret_from_vault('password'))
+    model_import = REXML::Document.new(ro_model_import(new_resource.foreign_source_name).message).root
+  end
   current_value_does_not_exist! if model_import.nil?
   import_node = model_import.elements["node[@foreign-id = '#{new_resource.foreign_id}']"]
   current_value_does_not_exist! if import_node.nil?

@@ -6,7 +6,10 @@ property :initial_delay, String
 
 load_current_value do |new_resource|
   config = dp_resource.variables[:config] unless dp_resource.nil?
-  config = Opennms::Cookbook::Notification::DestinationPathConfigFile.read("#{onms_etc}/destinationPaths.xml") if config.nil?
+  if config.nil?
+    ro_dp_resource_init
+    config = ro_dp_resource.variables[:config]
+  end
   path = config.path(path_name: new_resource.path_name)
   current_value_does_not_exist! if path.nil?
   initial_delay path.initial_delay

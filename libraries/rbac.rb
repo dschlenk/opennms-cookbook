@@ -436,10 +436,11 @@ module Opennms::Rbac
   end
 
   def baseurl(pw = nil)
+    require 'erb'
     if pw.nil? && @admin_password.nil?
       @admin_password = admin_secret_from_vault('password')
     end
-    "http://admin:#{pw || @admin_password || 'admin'}@localhost:#{node['opennms']['properties']['jetty']['port']}/opennms/rest"
+    "http://admin:#{ERB::Util.url_encode(pw || @admin_password || 'admin')}@localhost:#{node['opennms']['properties']['jetty']['port']}/opennms/rest"
   end
 
   def resturl

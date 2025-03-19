@@ -11,6 +11,16 @@ module Opennms
           find_resource!(:template, "#{onms_etc}/datacollection-config.xml")
         end
 
+        # avoid parsing the file every time when nothing changes
+        def ro_snmp_resource_init
+          ro_snmp_resource_create unless ro_snmp_resource_exist?
+        end
+
+        def ro_snmp_resource
+          return unless ro_snmp_resource_exist?
+          find_resource!(:template, "RO #{onms_etc}/datacollection-config.xml")
+        end
+
         private
 
         def snmp_resource_exist?
@@ -39,6 +49,34 @@ module Opennms
             end
           end
         end
+
+        def ro_snmp_resource_exist?
+          !find_resource(:template, "RO #{onms_etc}/datacollection-config.xml").nil?
+        rescue Chef::Exceptions::ResourceNotFound
+          false
+        end
+
+        def ro_snmp_resource_create
+          file = Opennms::Cookbook::Collection::OpennmsCollectionConfigFile.new
+          file.read!("#{onms_etc}/datacollection-config.xml", 'snmp')
+          with_run_context(:root) do
+            declare_resource(:template, "RO #{onms_etc}/datacollection-config.xml") do
+              path "#{Chef::Config[:file_cache_path]}/datacollection-config.xml"
+              cookbook 'opennms'
+              source 'datacollection-config.xml.erb'
+              owner node['opennms']['username']
+              group node['opennms']['groupname']
+              mode '0664'
+              variables(
+                collections: file.collections,
+                rrd_base_dir: node['opennms']['properties']['dc']['rrd_base_dir'],
+                rrd_dc_dir: node['opennms']['properties']['dc']['rrd_dc_dir']
+              )
+              action :nothing
+              delayed_action :nothing
+            end
+          end
+        end
       end
 
       module JdbcCollectionTemplate
@@ -49,6 +87,15 @@ module Opennms
         def jdbc_resource
           return unless jdbc_resource_exist?
           find_resource!(:template, "#{onms_etc}/jdbc-datacollection-config.xml")
+        end
+
+        def ro_jdbc_resource_init
+          ro_jdbc_resource_create unless ro_jdbc_resource_exist?
+        end
+
+        def ro_jdbc_resource
+          return unless ro_jdbc_resource_exist?
+          find_resource!(:template, "RO #{onms_etc}/jdbc-datacollection-config.xml")
         end
 
         private
@@ -79,6 +126,32 @@ module Opennms
             end
           end
         end
+
+        def ro_jdbc_resource_exist?
+          !find_resource(:template, "RO #{onms_etc}/jdbc-datacollection-config.xml").nil?
+        rescue Chef::Exceptions::ResourceNotFound
+          false
+        end
+
+        def ro_jdbc_resource_create
+          file = Opennms::Cookbook::Collection::OpennmsCollectionConfigFile.new
+          file.read!("#{onms_etc}/jdbc-datacollection-config.xml", 'jdbc')
+          with_run_context(:root) do
+            declare_resource(:template, "RO #{onms_etc}/jdbc-datacollection-config.xml") do
+              path "#{Chef::Config[:file_cache_path]}/jdbc-datacollection-config.xml"
+              cookbook 'opennms'
+              source 'jdbc-datacollection-config.xml.erb'
+              owner node['opennms']['username']
+              group node['opennms']['groupname']
+              mode '0664'
+              variables(
+                collections: file.collections
+              )
+              action :nothing
+              delayed_action :nothing
+            end
+          end
+        end
       end
 
       module JmxCollectionTemplate
@@ -89,6 +162,15 @@ module Opennms
         def jmx_resource
           return unless jmx_resource_exist?
           find_resource!(:template, "#{onms_etc}/jmx-datacollection-config.xml")
+        end
+
+        def ro_jmx_resource_init
+          ro_jmx_resource_create unless ro_jmx_resource_exist?
+        end
+
+        def ro_jmx_resource
+          return unless ro_jmx_resource_exist?
+          find_resource!(:template, "RO #{onms_etc}/jmx-datacollection-config.xml")
         end
 
         private
@@ -119,6 +201,32 @@ module Opennms
             end
           end
         end
+
+        def ro_jmx_resource_exist?
+          !find_resource(:template, "RO #{onms_etc}/jmx-datacollection-config.xml").nil?
+        rescue Chef::Exceptions::ResourceNotFound
+          false
+        end
+
+        def ro_jmx_resource_create
+          file = Opennms::Cookbook::Collection::OpennmsCollectionConfigFile.new
+          file.read!("#{onms_etc}/jmx-datacollection-config.xml", 'jmx')
+          with_run_context(:root) do
+            declare_resource(:template, "RO #{onms_etc}/jmx-datacollection-config.xml") do
+              path "#{Chef::Config[:file_cache_path]}/jmx-datacollection-config.xml"
+              cookbook 'opennms'
+              source 'jmx-datacollection-config.xml.erb'
+              owner node['opennms']['username']
+              group node['opennms']['groupname']
+              mode '0664'
+              variables(
+                collections: file.collections
+              )
+              action :nothing
+              delayed_action :nothing
+            end
+          end
+        end
       end
 
       module WsmanCollectionTemplate
@@ -129,6 +237,15 @@ module Opennms
         def wsman_resource(file)
           return unless wsman_resource_exist?(file)
           find_resource!(:template, file)
+        end
+
+        def ro_wsman_resource_init(file)
+          ro_wsman_resource_create(file) unless ro_wsman_resource_exist?(file)
+        end
+
+        def ro_wsman_resource(file)
+          return unless ro_wsman_resource_exist?(file)
+          find_resource!(:template, "RO #{file}")
         end
 
         private
@@ -161,6 +278,35 @@ module Opennms
             end
           end
         end
+
+        def ro_wsman_resource_exist?(file)
+          !find_resource(:template, "RO #{file}").nil?
+        rescue Chef::Exceptions::ResourceNotFound
+          false
+        end
+
+        def ro_wsman_resource_create(file)
+          f = Opennms::Cookbook::Collection::WsmanCollectionConfigFile.new
+          f.read!(file, 'wsman')
+          with_run_context(:root) do
+            declare_resource(:template, "RO #{file}") do
+              path "#{Chef::Config[:file_cache_path]}/#{file}"
+              cookbook 'opennms'
+              source 'wsman-datacollection-config.xml.erb'
+              owner node['opennms']['username']
+              group node['opennms']['groupname']
+              mode '0664'
+              variables(
+                collections: f.collections,
+                rrd_repository: node['opennms']['wsman_dc']['rrd_repository'],
+                groups: f.groups,
+                system_definitions: f.system_definitions
+              )
+              action :nothing
+              delayed_action :nothing
+            end
+          end
+        end
       end
 
       module XmlCollectionTemplate
@@ -171,6 +317,15 @@ module Opennms
         def xml_resource
           return unless xml_resource_exist?
           find_resource!(:template, "#{onms_etc}/xml-datacollection-config.xml")
+        end
+
+        def ro_xml_resource_init
+          ro_xml_resource_create unless ro_xml_resource_exist?
+        end
+
+        def ro_xml_resource
+          return unless ro_xml_resource_exist?
+          find_resource!(:template, "RO #{onms_etc}/xml-datacollection-config.xml")
         end
 
         def import_groups_resources
@@ -232,6 +387,30 @@ module Opennms
             end
           end
         end
+
+        def ro_xml_resource_exist?
+          !find_resource(:template, "RO #{onms_etc}/xml-datacollection-config.xml").nil?
+        rescue Chef::Exceptions::ResourceNotFound
+          false
+        end
+
+        def ro_xml_resource_create
+          file = Opennms::Cookbook::Collection::OpennmsCollectionConfigFile.new
+          file.read!("#{onms_etc}/xml-datacollection-config.xml", 'xml')
+          with_run_context(:root) do
+            declare_resource(:template, "RO #{onms_etc}/xml-datacollection-config.xml") do
+              path "#{Chef::Config[:file_cache_path]}/xml-datacollection-config.xml"
+              cookbook 'opennms'
+              source 'xml-datacollection-config.xml.erb'
+              owner node['opennms']['username']
+              group node['opennms']['groupname']
+              mode '0644'
+              variables(collections: file.collections)
+              action :nothing
+              delayed_action :nothing
+            end
+          end
+        end
       end
 
       module ResourceTypeTemplate
@@ -242,6 +421,15 @@ module Opennms
         def rt_resource(file)
           return unless rt_resource_exist?(file)
           find_resource!(:template, file)
+        end
+
+        def ro_rt_resource_init(file)
+          ro_rt_resource_create(file) unless ro_rt_resource_exist?(file)
+        end
+
+        def ro_rt_resource(file)
+          return unless ro_rt_resource_exist?(file)
+          find_resource!(:template, "RO #{file}")
         end
 
         private
@@ -269,6 +457,30 @@ module Opennms
             end
           end
         end
+
+        def ro_rt_resource_exist?(file)
+          !find_resource(:template, "RO #{file}").nil?
+        rescue Chef::Exceptions::ResourceNotFound
+          false
+        end
+
+        def ro_rt_resource_create(file)
+          f = Opennms::Cookbook::Collection::ResourceTypeConfigFile.new
+          f.read!(file)
+          with_run_context(:root) do
+            declare_resource(:template, "RO #{file}") do
+              path "#{Chef::Config[:file_cache_path]}/#{file}"
+              cookbook 'opennms'
+              source 'resource-types.xml.erb'
+              owner node['opennms']['username']
+              group node['opennms']['groupname']
+              mode '0644'
+              variables(config: f)
+              action :nothing
+              delayed_action :nothing
+            end
+          end
+        end
       end
 
       module GroupResourceTypeTemplate
@@ -279,6 +491,15 @@ module Opennms
         def rtgroup_resource(file)
           return unless rtgroup_resource_exist?(file)
           find_resource!(:template, file)
+        end
+
+        def ro_rtgroup_resource_init(file, group_name = nil)
+          ro_rtgroup_resource_create(file, group_name) unless ro_rtgroup_resource_exist?(file)
+        end
+
+        def ro_rtgroup_resource(file)
+          return unless ro_rtgroup_resource_exist?(file)
+          find_resource!(:template, "RO #{file}")
         end
 
         private
@@ -303,6 +524,30 @@ module Opennms
               action :nothing
               delayed_action :create
               notifies :restart, 'service[opennms]'
+            end
+          end
+        end
+
+        def ro_rtgroup_resource_exist?(file)
+          !find_resource(:template, "RO #{file}").nil?
+        rescue Chef::Exceptions::ResourceNotFound
+          false
+        end
+
+        def ro_rtgroup_resource_create(file, group_name)
+          f = Opennms::Cookbook::Collection::CollectionGroupConfigFile.new(group_name: group_name)
+          f.read!(file)
+          with_run_context(:root) do
+            declare_resource(:template, "RO #{file}") do
+              path "#{Chef::Config[:file_cache_path]}/#{file}"
+              cookbook 'opennms'
+              source 'datacollection-group.xml.erb'
+              owner node['opennms']['username']
+              group node['opennms']['groupname']
+              mode '0644'
+              variables(config: f)
+              action :nothing
+              delayed_action :nothing
             end
           end
         end
@@ -515,6 +760,15 @@ module Opennms
           find_resource!(:template, "#{onms_etc}/xml-datacollection/#{file}")
         end
 
+        def ro_groupsfile_resource_init(file)
+          ro_groupsfile_resource_create(file) unless ro_groupsfile_resource_exist?(file)
+        end
+
+        def ro_groupsfile_resource(file)
+          return unless ro_groupsfile_resource_exist?(file)
+          find_resource!(:template, "RO #{onms_etc}/xml-datacollection/#{file}")
+        end
+
         private
 
         def groupsfile_resource_exist?(file)
@@ -537,6 +791,30 @@ module Opennms
               action :nothing
               delayed_action :create
               notifies :restart, 'service[opennms]'
+            end
+          end
+        end
+
+        def ro_groupsfile_resource_exist?(file)
+          !find_resource(:template, "RO #{onms_etc}/xml-datacollection/#{file}").nil?
+        rescue Chef::Exceptions::ResourceNotFound
+          false
+        end
+
+        def ro_groupsfile_resource_create(file)
+          groupsfile = Opennms::Cookbook::Collection::OpennmsCollectionXmlGroupsFile.new
+          groupsfile.read!("#{onms_etc}/xml-datacollection/#{file}") if ::File.exist?("#{onms_etc}/xml-datacollection/#{file}")
+          with_run_context(:root) do
+            declare_resource(:template, "RO #{onms_etc}/xml-datacollection/#{file}") do
+              path "#{Chef::Config[:file_cache_path]}/xml-datacollection-#{file}"
+              cookbook 'opennms'
+              source 'xml-groups.xml.erb'
+              owner node['opennms']['username']
+              group node['opennms']['groupname']
+              mode '0644'
+              variables(groupsfile: groupsfile)
+              action :nothing
+              delayed_action :nothing
             end
           end
         end

@@ -32,24 +32,21 @@ include Opennms::Cookbook::Collection::XmlCollectionGroupsTemplate
 load_current_value do |new_resource|
   if new_resource.file
     r = groupsfile_resource(new_resource.file)
-    if !r.nil?
-      group = r.variables[:groupsfile].group(name: new_resource.group_name)
-    else
+    if r.nil?
       groupsfilename = "#{onms_etc}/xml-datacollection/#{new_resource.file}"
       current_value_does_not_exist! unless ::File.exist?(groupsfilename)
-      group = Opennms::Cookbook::Collection::OpennmsCollectionXmlGroupsFile.read(groupsfilename).group(name: new_resource.group_name)
+      ro_groupsfile_resource_init(new_resource.file)
+      r = ro_groupsfile_resource(new_resource.file)
     end
+    group = r.variables[:groupsfile].group(name: new_resource.group_name)
   else
     r = xml_resource
-    c = r.variables[:collections][new_resource.collection_name] unless r.nil?
-    source = c.source(url: new_resource.source_url) unless c.nil?
-    if r.nil? || c.nil? || source.nil?
-      filename = "#{onms_etc}/xml-datacollection-config.xml"
-      current_value_does_not_exist! unless ::File.exist?(filename)
-      collection = Opennms::Cookbook::Collection::OpennmsCollectionConfigFile.read(filename, 'xml').collections[new_resource.collection_name]
-      current_value_does_not_exist! if collection.nil?
-      source = collection.source(url: new_resource.url)
+    if r.nil?
+      ro_xml_resource_init
+      r = ro_xml_resource
     end
+    c = r.variables[:collections][new_resource.collection_name]
+    source = c.source(url: new_resource.source_url) unless c.nil?
     current_value_does_not_exist! if source.nil?
     group = source.group(name: new_resource.group_name)
   end

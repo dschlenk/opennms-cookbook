@@ -17,12 +17,10 @@ include Opennms::Cookbook::Collection::CollectdTemplate
 load_current_value do |new_resource|
   r = collectd_resource
   if r.nil?
-    filename = "#{onms_etc}/collectd-configuration.xml"
-    current_value_does_not_exist! unless ::File.exist?(filename)
-    collectd_config = Opennms::Cookbook::Package::CollectdConfigFile.read(filename)
-  else
-    collectd_config = r.variables[:collectd_config]
+    ro_collectd_resource_init
+    r = ro_collectd_resource
   end
+  collectd_config = r.variables[:collectd_config]
   package = collectd_config.packages[new_resource.package_name]
   current_value_does_not_exist! if package.nil?
   %i(filter specifics include_ranges exclude_ranges include_urls outage_calendars store_by_if_alias store_by_node_id if_alias_domain stor_flag_override if_alias_comment remote).each do |p|

@@ -23,12 +23,11 @@ property :include_system_definition, Array, callbacks: {
 
 load_current_value do |new_resource|
   r = wsman_resource("#{onms_etc}/wsman-datacollection-config.xml")
-  collection = r.variables[:collections][new_resource.collection] unless r.nil?
-  if r.nil? || collection.nil?
-    filename = "#{onms_etc}/wsman-datacollection-config.xml"
-    current_value_does_not_exist! unless ::File.exist?(filename)
-    collection = Opennms::Cookbook::Collection::WsmanCollectionConfigFile.read(filename, 'wsman').collections[new_resource.collection]
+  if r.nil?
+    ro_wsman_resource_init("#{onms_etc}/wsman-datacollection-config.xml")
+    r = ro_wsman_resource("#{onms_etc}/wsman-datacollection-config.xml")
   end
+  collection = r.variables[:collections][new_resource.collection]
   current_value_does_not_exist! if collection.nil?
   rrd_step collection.rrd_step
   rras collection.rras

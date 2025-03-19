@@ -13,6 +13,15 @@ module Opennms
           find_resource!(:template, "#{onms_etc}/viewsdisplay.xml")
         end
 
+        def ro_vd_resource_init
+          ro_vd_resource_create unless ro_vd_resource_exist?
+        end
+
+        def ro_vd_resource
+          return unless ro_vd_resource_exist?
+          find_resource!(:template, "RO #{onms_etc}/viewsdisplay.xml")
+        end
+
         private
 
         def vd_resource_exist?
@@ -35,6 +44,30 @@ module Opennms
               action :nothing
               delayed_action :create
               notifies :restart, 'service[opennms]'
+            end
+          end
+        end
+
+        def ro_vd_resource_exist?
+          !find_resource(:template, "RO #{onms_etc}/viewsdisplay.xml").nil?
+        rescue Chef::Exceptions::ResourceNotFound
+          false
+        end
+
+        def ro_vd_resource_create
+          vd = Opennms::Cookbook::Rtc::ViewsDisplay.new
+          vd.read!("#{onms_etc}/viewsdisplay.xml") if ::File.exist?("#{onms_etc}/viewsdisplay.xml")
+          with_run_context(:root) do
+            declare_resource(:template, "RO #{onms_etc}/viewsdisplay.xml") do
+              path "#{Chef::Config[:file_cache_path]}/viewsdisplay.xml"
+              cookbook 'opennms'
+              source 'viewsdisplay.xml.erb'
+              owner node['opennms']['username']
+              group node['opennms']['groupname']
+              mode '0664'
+              variables(views: vd.views)
+              action :nothing
+              delayed_action :nothing
             end
           end
         end
