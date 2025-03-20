@@ -1,5 +1,10 @@
 # OpenNMS Cookbook Changes
 
+## 33.2.1
+
+* bugfix: checking threshold idempotence didn't take resource filters into account
+* bugfix: incorrect exception class name used when when validating that the desired threshold group existed
+
 ## 33.2.0
 
 * default to installing OpenNMS Horizon 33.1.4-1
