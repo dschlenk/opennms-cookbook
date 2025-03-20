@@ -10,7 +10,7 @@ include Opennms::Cookbook::Translations::TranslationsTemplate
 load_current_value do |new_resource|
   config = translation_resource.variables[:config] unless translation_resource.nil?
   config = Opennms::Cookbook::Translations::TranslatorConfigurationFile.read("#{onms_etc}/translator-configuration.xml") if config.nil?
-  raise "Configuration not found!" if config.nil?
+  raise 'Configuration not found!' if config.nil?
   current_value_does_not_exist! unless config.event_translation_specs?(specs: new_resource.specs)
   specs new_resource.specs
 end
