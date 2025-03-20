@@ -5,12 +5,12 @@ module Opennms
         def translation_resource_init
           translation_resource_create unless translation_resource_exist?
         end
-        
+
         def translation_resource
           return unless translation_resource_exist?
           find_resource!(:template, "#{onms_etc}/translator-configuration.xml")
         end
-        
+
         private
 
         def translations_resource_exist?
@@ -18,7 +18,7 @@ module Opennms
         rescue Chef::Exceptions::ResourceNotFound
           false
         end
-        
+
         def delete_event_translation_specs?(specs:)
           @specs.delete_if { |spec| specs.include?(spec) }
         end
