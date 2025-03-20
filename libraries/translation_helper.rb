@@ -140,7 +140,7 @@ module Opennms
           @default = default
           @value = value
         end
-        
+
         def eql?(assignment)
           self.class.eql?(assignment.class) &&
             @name.eql?(assignment.name) &&
@@ -160,7 +160,7 @@ module Opennms
           @name = name
           @values = values || []
         end
-        
+
         def eql?(value)
           self.class.eql?(value.class) &&
             @type.eql?(value.type) &&
