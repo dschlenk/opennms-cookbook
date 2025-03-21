@@ -61,11 +61,8 @@ module Opennms
                 atype = assignment.attributes['type']
                 aname = assignment.attributes['name']
                 adefault = assignment.attributes['default']
-                assignment.each_element('value') do |v|
-                  avalue = parse_value(v)
-                  # def initialize(name:, type:, default: nil, value:)
-                  assignments.push TranslationAssignment.new(name: aname, type: atype, default: adefault, value: avalue)
-                end
+                avalue = parse_value(assignment.elements['value'])
+                assignments.push TranslationAssignment.new(name: aname, type: atype, default: adefault, value: avalue)
               end
               mappings.push TranslationMapping.new(assignments: assignments, preserve_snmp_data: preserve_snmp_data)
             end
@@ -117,10 +114,10 @@ module Opennms
 
         def initialize(assignments: nil, preserve_snmp_data: nil)
           @assignments = if assignments.nil?
-                          []
-                        else
-                          assignments
-                        end
+                           []
+                         else
+                           assignments
+                         end
           @preserve_snmp_data = preserve_snmp_data
         end
 

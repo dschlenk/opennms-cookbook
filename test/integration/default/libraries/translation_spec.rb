@@ -16,18 +16,17 @@ class TranslationSpec < Inspec.resource(1)
     doc = REXML::Document.new(inspec.file('/opt/opennms/etc/translator-configuration.xml').content)
     doc.root.each_element("/event-translator-configuration/translation/event-translation-spec/@uei = '#{uei}'") do |spec|
       imappings = []
-      spec.each_element("mappings/mapping") do |mapping|
+      spec.each_element('mappings/mapping') do |mapping|
         preserve_snmp_data = mapping.attributes['preserve-snmp-data']
         assignments = []
         mapping.each_element('assignment') do |assignment|
           atype = assignment.attributes['type']
           aname = assignment.attributes['name']
           adefault = assignment.attributes['default']
-          assignment.each_element('value') do |v|
-          avalue = parse_value(v)
-          assignments.push { name: aname, type: atype, default: adefault, value: avalue}.compact
+          avalue = parse_value(assignment.elements['value'])
+          assignments.push({ name: aname, type: atype, default: adefault, value: avalue }.compact)
         end
-        imappings.push { assignments: assignments, preserve_snmp_data: preserve_snmp_data }.compact
+        imappings.push({ assignments: assignments, preserve_snmp_data: preserve_snmp_data }.compact)
       end
       if mappings.eql?(imappings)
         @exists = true
@@ -47,7 +46,7 @@ class TranslationSpec < Inspec.resource(1)
     end
     { type: v.attributes['type'], result: v.attributes['result'], matches: v.attributes['matches'], name: v.attributes['name'], values: values }.compact
   end
-    
+
   def method_missing(param)
     @params[param]
   end
