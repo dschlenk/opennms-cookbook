@@ -39,7 +39,7 @@ module Opennms
                 hyperic: node['opennms']['translator']['hyperic'],
                 cisco_config_man: node['opennms']['translator']['cisco_config_man'],
                 juniper_cfg_change: node['opennms']['translator']['juniper_cfg_change'],
-                telemetry_clock_skew_detected: node['opennms']['translator']['telemetry_clock_skew_detected'],
+                telemetry_clock_skew_detected: node['opennms']['translator']['telemetry_clock_skew_detected']
               )
               action :nothing
               delayed_action :create
