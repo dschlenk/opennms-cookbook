@@ -13,7 +13,7 @@ module Opennms
 
         private
 
-        def translations_resource_exist?
+        def translation_resource_exist?
           !find_resource(:template, "#{onms_etc}/translator-configuration.xml").nil?
         rescue Chef::Exceptions::ResourceNotFound
           false
