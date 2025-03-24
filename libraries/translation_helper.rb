@@ -97,9 +97,9 @@ module Opennms
       class TranslationSpec
         attr_reader :uei, :mappings
 
-        def initialize(uei:)
+        def initialize(uei:, mappings: nil)
           @uei = uei
-          @mappings = []
+          @mappings = mappings || []
         end
 
         def eql?(spec)
