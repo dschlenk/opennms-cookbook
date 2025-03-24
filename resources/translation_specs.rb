@@ -1,5 +1,5 @@
-property :specs, Array, required: true, callback:  {
-  'should be a Hash with string keys and values' => lambda { |a|
+property :specs, Array, required: true, callbacks:  {
+  'should be an Array of TranslationSpec objects' => lambda { |a|
     !a.any? { |v| !v.is_a?(TranslationSpec) }
   },
 }
