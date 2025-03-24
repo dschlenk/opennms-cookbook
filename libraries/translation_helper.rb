@@ -23,7 +23,7 @@ module Opennms
           @specs.delete_if { |spec| specs.include?(spec) }
         end
 
-        def translations_resource_create
+        def translation_resource_create
           file = Opennms::Cookbook::Translations::TranslatorConfigurationFile.read("#{onms_etc}/translator-configuration.xml")
           with_run_context(:root) do
             declare_resource(:template, "#{onms_etc}/translator-configuration.xml") do
@@ -32,7 +32,15 @@ module Opennms
               owner node['opennms']['username']
               group node['opennms']['groupname']
               mode '0664'
-              variables(config: file)
+              variables(
+                config: file,
+                snmp_link_down: node['opennms']['translator']['snmp_link_down'],
+                snmp_link_up: node['opennms']['translator']['snmp_link_up'],
+                hyperic: node['opennms']['translator']['hyperic'],
+                cisco_config_man: node['opennms']['translator']['cisco_config_man'],
+                juniper_cfg_change: node['opennms']['translator']['juniper_cfg_change'],
+                telemetry_clock_skew_detected: node['opennms']['translator']['telemetry_clock_skew_detected'],
+              )
               action :nothing
               delayed_action :create
             end
