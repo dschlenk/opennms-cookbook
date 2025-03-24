@@ -1,6 +1,6 @@
 property :specs, Array, required: true, callbacks:  {
   'should be an Array of TranslationSpec objects' => lambda { |a|
-    !a.any? { |v| !v.is_a?(TranslationSpec) }
+    !a.any? { |v| !v.is_a?(Opennms::Cookbook::Translations::TranslationSpec) }
   },
 }
 
