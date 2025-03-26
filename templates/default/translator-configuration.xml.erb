@@ -4,6 +4,19 @@
 <%
 def value_to_xml_str(value, level)
   xml = ""
+  indent = "  " * level
+
+  if value.is_a?(Array)
+    value.each do |val|
+      xml += "#{indent}<value>\n"
+      xml += value_to_xml_str(val, level + 1)
+      xml += "#{indent}</value>\n"
+    end
+  else
+    xml += "#{indent}<value>#{value}</value>\n"
+  end
+
+  xml
 end
 %>  
   <translation>
