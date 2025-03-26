@@ -174,7 +174,6 @@ module Opennms
             @name.eql?(value.name) &&
             @values.eql?(value.values)
         end
-        
       end
     end
   end
