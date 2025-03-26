@@ -5,17 +5,11 @@
 def value_to_xml_str(value, level)
   xml = ""
   indent = "  " * level
-
-  if value.is_a?(Array)
-    value.each do |val|
-      xml += "#{indent}<value>\n"
-      xml += value_to_xml_str(val, level + 1)
-      xml += "#{indent}</value>\n"
-    end
-  else
-    xml += "#{indent}<value>#{value}</value>\n"
+  xml += "#{indent}<value type=#{value.type.encode(:xml => :attr)} result=#{value.result.encode(:xml => :attr)}#{value.name.nil? ? '' : " name=#{value.name.encode(:xml => :attr)}"}#{value.values.empty? ? '/>' : '>'}\n"
+  value.values.each do |v|
+    xml += value_to_xml_str(v, level+1)
   end
-
+  xml += "</value>\n" unless value.values.empty?
   xml
 end
 %>  
@@ -28,10 +22,7 @@ end
         <% mapping.assignments.each do |assignment| -%>
           <assignment name=<%= assignment.name.encode(:xml => :attr) %> type=<%= assignment.name.encode(:xml => attr) %><%= assignment.default.nil? ? '' : " default=#{assignment.default.encode(:xml => :attr)}" %>>
           <% unless assignment.value.nil? -%>
-            <value type="constant" result="uei.opennms.org/translator/traps/SNMP_Link_Down">
-              <value type="field" name="nodeid" matches=".*" result="${0}" />
-              <value type="parameter" name="~^\.1\.3\.6\.1\.2\.1\.2\.2\.1\.1\.([0-9]*)$" matches=".*" result="${0}" />
-            </value>
+            <%= value_to_xml_str(assignment.value, 1) %>
           <% end -%>
           </assignment>
         <% end unless mapping.assignments.nil? -%>
