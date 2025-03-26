@@ -14,7 +14,7 @@ def value_to_xml_str(value, level)
 end
 %>  
   <translation>
-    <% @config.each do |spec| -%>
+    <% @config.specs.each do |spec| -%>
     <event-translation-spec uei=<%= spec.uei.encode(:xml => :attr) %>>
       <mappings>
       <% spec.mappings.each do |mapping| -%>
