@@ -26,8 +26,9 @@ end
           <% end -%>
           </assignment>
         <% end unless mapping.assignments.nil? -%>
+        </mapping>
+      <% end unless spec.mappings.nil? -%>      
       </mappings>
-      <% end unless spec.mappings.nil? -%>
     </event-translation-spec>
     <% end unless @config.specs.nil? -%>
   </translation>
