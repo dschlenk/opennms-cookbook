@@ -20,7 +20,7 @@ end
       <% spec.mappings.each do |mapping| -%>
         <mapping>
         <% mapping.assignments.each do |assignment| -%>
-          <assignment name=<%= assignment.name.encode(:xml => :attr) %> type=<%= assignment.name.encode(:xml => :attr) %><%= assignment.default.nil? ? '' : " default=#{assignment.default.encode(:xml => :attr)}" %>>
+          <assignment name=<%= assignment.name.encode(:xml => :attr) %> type=<%= assignment.type.encode(:xml => :attr) %><%= assignment.default.nil? ? '' : " default=#{assignment.default.encode(:xml => :attr)}" %>>
           <% unless assignment.value.nil? -%>
             <%= value_to_xml_str(assignment.value, 1) %>
           <% end -%>
