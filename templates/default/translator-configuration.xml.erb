@@ -5,7 +5,7 @@
 def value_to_xml_str(value, level)
   xml = ""
   indent = "  " * level
-  xml += "#{indent}<value type=#{value.type.encode(:xml => :attr)} result=#{value.result.encode(:xml => :attr)}#{value.name.nil? ? '' : " name=#{value.name.encode(:xml => :attr)}"}#{value.values.empty? ? '/>' : '>'}\n"
+  xml += "#{indent}<value type=#{value.type.encode(:xml => :attr)} result=#{value.result.encode(:xml => :attr)}#{value.matches.nil? ? '' : " matches=#{value.matches.encode(:xml => :attr)}"}#{value.name.nil? ? '' : " name=#{value.name.encode(:xml => :attr)}"}#{value.values.empty? ? '/>' : '>'}\n"
   value.values.each do |v|
     xml += value_to_xml_str(v, level+1)
   end
