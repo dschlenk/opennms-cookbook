@@ -8,7 +8,9 @@ control 'translation_specs' do
         assignment: {
           name: 'uei', type: 'field', value: {
             type: 'constant', result: 'uei.opennms.org/translator/traps/SNMP_Link_Down' }
-        },
+        }
+      },
+      {
         assignment: {
           name: 'ifDescr', type: 'parameter', default: 'Unknown', value: {
             type: 'sql', 
@@ -18,7 +20,9 @@ control 'translation_specs' do
               { type: 'parameter', name: '~^\.1\.3\.6\.1\.2\.1\.2\.2\.1\.1\.([0-9]*)$', matches: '.*', result: '${0}' }
             ]
           }
-        },
+        }
+      },
+      {
         assignment: {
           name: 'ifName', type: 'parameter', default: 'Unknown', value: {
             type: 'sql',
@@ -28,7 +32,9 @@ control 'translation_specs' do
               { type: 'parameter', name: '~^\.1\.3\.6\.1\.2\.1\.2\.2\.1\.1\.([0-9]*)$', matches: '.*', result: '${0}' }
             ]
           }
-        },
+        }
+      },
+      {
         assignment: {
           name: 'ifAlias', type: 'parameter', default: 'Unknown', value: {
             type: 'sql',
