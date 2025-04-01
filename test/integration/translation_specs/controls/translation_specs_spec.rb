@@ -56,4 +56,5 @@ control 'translation_specs' do
       }
     ]) do
       it { should exist }
+  end
 end
