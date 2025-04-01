@@ -9,7 +9,7 @@ def value_to_xml_str(value, level)
   value.values.each do |v|
     xml += value_to_xml_str(v, level+1)
   end
-  xml += "</value>\n" unless value.values.empty?
+  xml += "#{indent}</value>\n" unless value.values.empty?
   xml
 end
 %>  
