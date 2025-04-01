@@ -5,7 +5,7 @@
 def value_to_xml_str(value, level)
   xml = ""
   indent = "          " + ("  " * level)
-  xml += "#{indent}<value type=#{value.type.encode(:xml => :attr)} result=#{value.result.encode(:xml => :attr)}#{value.matches.nil? ? '' : " matches=#{value.matches.encode(:xml => :attr)}"}#{value.name.nil? ? '' : " name=#{value.name.encode(:xml => :attr)}"}#{value.values.empty? ? '/>' : '>'}\n"
+  xml += "#{indent}<value type=#{value.type.encode(:xml => :attr)} result=#{value.result.encode(:xml => :attr)}#{value.matches.nil? ? '' : " matches=#{value.matches.encode(:xml => :attr)}"}#{value.name.nil? ? '' : " name=#{value.name.encode(:xml => :attr)}"}#{value.values.empty? ? '/>' : ">\n"}"
   value.values.each do |v|
     xml += value_to_xml_str(v, level+1)
   end
@@ -22,7 +22,7 @@ end
         <% mapping.assignments.each do |assignment| -%>
           <assignment name=<%= assignment.name.encode(:xml => :attr) %> type=<%= assignment.type.encode(:xml => :attr) %><%= assignment.default.nil? ? '' : " default=#{assignment.default.encode(:xml => :attr)}" %>>
           <% unless assignment.value.nil? -%>
-            <%= value_to_xml_str(assignment.value, 1) %>
+<%= value_to_xml_str(assignment.value, 1) %>
           <% end -%>
           </assignment>
         <% end unless mapping.assignments.nil? -%>
