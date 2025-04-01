@@ -15,7 +15,7 @@ control 'translation_specs' do
             result: 'SELECT snmp.snmpIfDescr FROM snmpInterface snmp WHERE snmp.nodeid = ?::integer AND snmp.snmpifindex = ?::integer',
             values: [
               { type: 'field', name: 'nodeid', matches: '.*', result: '${0}' },
-              { type: 'parameter', name: '~^\.1\.3\.6\.1\.2\.1\.2\.2\.1\.1\.([0-9]*)$', matches:  matches: '.*', result: '${0}' }
+              { type: 'parameter', name: '~^\.1\.3\.6\.1\.2\.1\.2\.2\.1\.1\.([0-9]*)$', matches: '.*', result: '${0}' }
             ]
           }
         },
@@ -25,7 +25,7 @@ control 'translation_specs' do
             result: 'SELECT snmp.snmpIfName FROM snmpInterface snmp WHERE snmp.nodeid = ?::integer AND snmp.snmpifindex = ?::integer',
             values: [
               { type: 'field', name: 'nodeid', matches: '.*', result: '${0}' },
-              { type: 'parameter', name: '~^\.1\.3\.6\.1\.2\.1\.2\.2\.1\.1\.([0-9]*)$', matches:  matches: '.*', result: '${0}' }
+              { type: 'parameter', name: '~^\.1\.3\.6\.1\.2\.1\.2\.2\.1\.1\.([0-9]*)$', matches: '.*', result: '${0}' }
             ]
           }
         },
@@ -35,7 +35,7 @@ control 'translation_specs' do
             result: 'SELECT snmp.snmpIfAlias FROM snmpInterface snmp WHERE snmp.nodeid = ?::integer AND snmp.snmpifindex = ?::integer',
             values: [
               { type: 'field', name: 'nodeid', matches: '.*', result: '${0}' },
-              { type: 'parameter', name: '~^\.1\.3\.6\.1\.2\.1\.2\.2\.1\.1\.([0-9]*)$', matches:  matches: '.*', result: '${0}' }
+              { type: 'parameter', name: '~^\.1\.3\.6\.1\.2\.1\.2\.2\.1\.1\.([0-9]*)$', matches: '.*', result: '${0}' }
             ]
           }
         }
@@ -48,6 +48,6 @@ control 'translation_specs' do
           }
         }
       }
-    ])do
+    ]) do
       it { should exist }
 end
