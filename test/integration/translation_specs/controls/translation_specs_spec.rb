@@ -284,4 +284,19 @@ control 'translation_specs' do
   ]) do
     it { should exist }
   end
+
+  describe translation_spec('uei.opennms.org/fakeUei', [
+    {
+      assignment: {
+        name: 'uei',
+        type: 'field',
+        value: {
+          type: 'constant',
+          result: 'uei.opennms.org/translatedUei',
+        },
+      },
+    },
+  ]) do
+    it { should exist }
+  end
 end
