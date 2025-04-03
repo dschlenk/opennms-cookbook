@@ -8,7 +8,7 @@ opennms_translation_specs 'adding spec' do
   specs [spec]
 end
 
-log 'calltranslationspecs'
+log 'calltranslationspecs2'
 value1 = Opennms::Cookbook::Translations::TranslationValue.new(
   type: 'constant', 
   result: 'uei.opennms.org/translatedUei'
@@ -57,6 +57,6 @@ spec = Opennms::Cookbook::Translations::TranslationSpec.new(
   uei: 'uei.opennms.org/fakeUei2'
 )
 spec.mappings.push mapping
-opennms_translation_specs 'adding spec' do
+opennms_translation_specs 'adding second spec' do
   specs [spec]
 end
