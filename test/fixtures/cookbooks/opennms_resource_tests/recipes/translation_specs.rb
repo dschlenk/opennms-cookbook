@@ -9,6 +9,7 @@ opennms_translation_specs 'adding spec' do
 end
 
 log 'calltranslationspecs2'
+
 value1 = Opennms::Cookbook::Translations::TranslationValue.new(
   type: 'constant',
   result: 'uei.opennms.org/translatedUei'
