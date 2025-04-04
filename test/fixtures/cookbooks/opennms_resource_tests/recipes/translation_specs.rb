@@ -27,7 +27,7 @@ value4 = Opennms::Cookbook::Translations::TranslationValue.new(
   result: 'SELECT snmpIfName FROM snmpInterface WHERE nodeid = ?::integer AND snmpifindex = ?::integer',
   values: [
     { type: 'field', name: 'nodeid', matches: '.*', result: '${0}' },
-    { type: 'parameter', name: '~^\\.1\\.3\\.6\\.1\\.2\\.1\\.2\\.2\\.1\\.1\\.([0-9]*)$', matches: '.*', result: '${0}' }
+    { type: 'parameter', name: '~^\\.1\\.3\\.6\\.1\\.2\\.1\\.2\\.2\\.1\\.1\\.([0-9]*)$', matches: '.*', result: '${0}' }, # Added comma here
   ]
 )
 
