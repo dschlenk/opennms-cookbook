@@ -14,14 +14,17 @@ value1 = Opennms::Cookbook::Translations::TranslationValue.new(
   type: 'constant',
   result: 'uei.opennms.org/translatedUei'
 )
+
 value2 = Opennms::Cookbook::Translations::TranslationValue.new(
   type: 'constant',
   result: 'Major'
 )
+
 value3 = Opennms::Cookbook::Translations::TranslationValue.new(
   type: 'expression',
   result: 'Issue detected on ${ifName}: ${alarmText}'
 )
+
 value4 = Opennms::Cookbook::Translations::TranslationValue.new(
   type: 'sql',
   result: 'SELECT snmpIfName FROM snmpInterface WHERE nodeid = ?::integer AND snmpifindex = ?::integer',
@@ -36,16 +39,19 @@ assignment1 = Opennms::Cookbook::Translations::TranslationAssignment.new(
   type: 'field',
   value: value1
 )
+
 assignment2 = Opennms::Cookbook::Translations::TranslationAssignment.new(
   name: 'severity',
   type: 'field',
   value: value2
 )
+
 assignment3 = Opennms::Cookbook::Translations::TranslationAssignment.new(
   name: 'description',
   type: 'field',
   value: value3
 )
+
 assignment4 = Opennms::Cookbook::Translations::TranslationAssignment.new(
   name: 'ifName',
   type: 'parameter',
@@ -60,6 +66,7 @@ mapping = Opennms::Cookbook::Translations::TranslationMapping.new(
 spec = Opennms::Cookbook::Translations::TranslationSpec.new(
   uei: 'uei.opennms.org/fakeUei2'
 )
+
 spec.mappings.push(mapping)
 
 opennms_translation_specs 'adding second spec' do
