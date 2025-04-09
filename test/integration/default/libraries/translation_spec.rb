@@ -1,4 +1,5 @@
 require 'rexml/document'
+
 class TranslationSpec < Inspec.resource(1)
   name 'translation_spec'
 
@@ -6,35 +7,23 @@ class TranslationSpec < Inspec.resource(1)
     OpenNMS translation_spec
   '
 
-  example '
-    describe translation_spec('uei.opennms.org/anUei', [{assignment: { name: 'name', type: 'field', value: { type: 'constant', result: 'uei.opennms.org/translatedUei', matches: nil, values: nil }, default: nil }, preserve_snmp_data: nil}]) do
-      it { should exist }
-    end
-  '
-  # example '
-    # describe translation_spec(\'uei.opennms.org/anUei\', [{assignment: { name: \'name\', type: \'field\', value: { type: \'constant\', result: \'uei.opennms.org/translatedUei\', matches: nil, values: nil }, default: nil }, preserve_snmp_data: nil}, ...]) do
-      # it { should exist }
-    # end
-  # '
+  example 'describe translation_spec("uei.opennms.org/anUei", [{assignment: {name: "name", type: "field", value: {type: "constant", result: "uei.opennms.org/translatedUei"}}}]) do
+    it { should exist } 
+  end'
 
   def initialize(uei, mappings)
     @exists = false
     doc = REXML::Document.new(inspec.file('/opt/opennms/etc/translator-configuration.xml').content)
-    # puts doc
     doc.root.each_element("/event-translator-configuration/translation/event-translation-spec[@uei = '#{uei}']") do |spec|
-      puts "got spec matching uei: #{spec}"
       imappings = []
       spec.each_element('mappings/mapping') do |mapping|
-        puts "checking mapping: #{mapping}"
         preserve_snmp_data = mapping.attributes['preserve-snmp-data']
         assignments = []
         mapping.each_element('assignment') do |assignment|
-          puts "checking assignment: #{assignment}"
           atype = assignment.attributes['type']
           aname = assignment.attributes['name']
           adefault = assignment.attributes['default']
           avalue = parse_value(assignment.elements['value'])
-          puts "avalue parsed is #{avalue}"
           assignments.push({ name: aname, type: atype, default: adefault, value: avalue }.compact)
         end
         imappings.push({ assignments: assignments, preserve_snmp_data: preserve_snmp_data }.compact)
@@ -48,7 +37,6 @@ class TranslationSpec < Inspec.resource(1)
 
   def exist?
     @exists
-    # true
   end
 
   def parse_value(v)
