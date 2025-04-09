@@ -15,8 +15,8 @@ class TranslationSpec < Inspec.resource(1)
   def initialize(uei, mappings)
     @exists = false
     doc = REXML::Document.new(inspec.file('/opt/opennms/etc/translator-configuration.xml').content)
-    puts doc
-    doc.root.each_element("/event-translator-configuration/translation/event-translation-spec/@uei = '#{uei}'") do |spec|
+    # puts doc
+    doc.root.each_element("/event-translator-configuration/translation/event-translation-spec[@uei = '#{uei}']") do |spec|
       puts "got spec matching uei: #{spec}"
       imappings = []
       spec.each_element('mappings/mapping') do |mapping|
