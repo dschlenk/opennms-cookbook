@@ -8,7 +8,7 @@ class TranslationSpec < Inspec.resource(1)
   '
 
   example 'describe translation_spec("uei.opennms.org/anUei", [{assignment: {name: "name", type: "field", value: {type: "constant", result: "uei.opennms.org/translatedUei"}}}]) do
-    it { should exist } 
+    it { should exist }
   end'
 
   def initialize(uei, mappings)
