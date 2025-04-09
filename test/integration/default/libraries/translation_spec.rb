@@ -7,10 +7,15 @@ class TranslationSpec < Inspec.resource(1)
   '
 
   example '
-    describe translation_spec(\'uei.opennms.org/anUei\', [{assignment: { name: \'name\', type: \'field\', value: { type: \'constant\', result: \'uei.opennms.org/translatedUei\', matches: nil, values: nil }, default: nil }, preserve_snmp_data: nil}, ...]) do
+    describe translation_spec('uei.opennms.org/anUei', [{assignment: { name: 'name', type: 'field', value: { type: 'constant', result: 'uei.opennms.org/translatedUei', matches: nil, values: nil }, default: nil }, preserve_snmp_data: nil}, ...]) do
       it { should exist }
     end
   '
+  # example '
+    # describe translation_spec(\'uei.opennms.org/anUei\', [{assignment: { name: \'name\', type: \'field\', value: { type: \'constant\', result: \'uei.opennms.org/translatedUei\', matches: nil, values: nil }, default: nil }, preserve_snmp_data: nil}, ...]) do
+      # it { should exist }
+    # end
+  # '
 
   def initialize(uei, mappings)
     @exists = false
