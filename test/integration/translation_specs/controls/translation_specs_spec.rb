@@ -1,14 +1,36 @@
 control 'translation_specs' do
+  #    <event-translation-spec uei='uei.opennms.org/internal/telemetry/clockSkewDetected'>
+  #      <mappings>
+  #        <mapping>
+  #          <assignment name='uei' type='field'>
+  #            <value result='uei.opennms.org/translator/telemetry/clockSkewDetected' type='constant'/>
+  #          </assignment>
+  #          <assignment name='nodeid' type='field'>
+  #            <value result='SELECT n.nodeid FROM node n, ipinterface i WHERE n.nodeid = i.nodeid AND i.ipaddr = ? AND n.location = ?' type='sql'>
+  #              <value matches='.*' name='interface' result='${0}' type='field'/>              <value matches='.*' name='monitoringSystemLocation' result='${0}' type='parameter'/>            </value>
+  #          </assignment>
+  #        </mapping>
+  #      </mappings>
+  #    </event-translation-spec>
   describe translation_spec('uei.opennms.org/internal/telemetry/clockSkewDetected', [
     {
-      assignment: {
+      assignments: [{
         name: 'uei',
         type: 'field',
         value: {
           type: 'constant',
-          result: 'uei.opennms.org/internal/telemetry/clockSkewDetected',
+          result: 'uei.opennms.org/translator/telemetry/clockSkewDetected',
         },
-      },
+      }, {
+        name: 'nodeid',
+        type: 'field',
+        value: {
+          type: 'sql',
+          result: 'SELECT n.nodeid FROM node n, ipinterface i WHERE n.nodeid = i.nodeid AND i.ipaddr = ? AND n.location = ?',
+          values: [{ type: 'field', name: 'interface', matches: '.*', result: '${0}' },
+                   { type: 'parameter', result: '${0}', name: 'monitoringSystemLocation', matches: '.*' }],
+        },
+      }],
     },
   ]) do
     it { should exist }

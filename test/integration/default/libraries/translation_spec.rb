@@ -35,8 +35,11 @@ class TranslationSpec < Inspec.resource(1)
         imappings.push({ assignments: assignments, preserve_snmp_data: preserve_snmp_data }.compact)
       end
       if mappings.eql?(imappings)
+        puts 'was eql'
         @exists = true
         break
+      else
+        puts "was not eql; mappings: #{mappings} vs imappings: #{imappings}"
       end
     end
   end
@@ -47,9 +50,11 @@ class TranslationSpec < Inspec.resource(1)
   end
 
   def parse_value(v)
-    values = []
-    v.each_element('value') do |v2|
-      values.push parse_value(v2)
+    unless v.elements['value'].nil?
+      values = []
+      v.each_element('value') do |v2|
+        values.push parse_value(v2)
+      end
     end
     { type: v.attributes['type'], result: v.attributes['result'], matches: v.attributes['matches'], name: v.attributes['name'], values: values }.compact
   end
