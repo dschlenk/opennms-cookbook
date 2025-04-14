@@ -7,7 +7,7 @@ control 'translation_specs' do
           type: 'field',
           value: {
             type: 'constant',
-            result: 'uei.opennms.org/translator/telemetry/clockSkewDetected'
+            result: 'uei.opennms.org/translator/telemetry/clockSkewDetected',
           },
         },
         {
@@ -18,7 +18,7 @@ control 'translation_specs' do
             result: 'SELECT n.nodeid FROM node n, ipinterface i WHERE n.nodeid = i.nodeid AND i.ipaddr = ? AND n.location = ?',
             values: [
               { type: 'field', name: 'interface', matches: '.*', result: '${0}' },
-              { type: 'parameter', name: 'monitoringSystemLocation', matches: '.*', result: '${0}' }
+              { type: 'parameter', name: 'monitoringSystemLocation', matches: '.*', result: '${0}' },
             ],
           },
         },
@@ -36,7 +36,7 @@ control 'translation_specs' do
           type: 'field',
           value: {
             type: 'constant',
-            result: 'uei.opennms.org/translator/traps/SNMP_Link_Down'
+            result: 'uei.opennms.org/translator/traps/SNMP_Link_Down',
           },
         },
         {
@@ -48,7 +48,7 @@ control 'translation_specs' do
             result: 'SELECT snmp.snmpIfDescr FROM snmpInterface snmp WHERE snmp.nodeid = ?::integer AND snmp.snmpifindex = ?::integer',
             values: [
               { type: 'field', name: 'nodeid', matches: '.*', result: '${0}' },
-              { type: 'parameter', name: '~^\\.1\\.3\\.6\\.1\\.2\\.1\\.2\\.2\\.1\\.1\\.([0-9]*)$', matches: '.*', result: '${0}' }
+              { type: 'parameter', name: '~^\\.1\\.3\\.6\\.1\\.2\\.1\\.2\\.2\\.1\\.1\\.([0-9]*)$', matches: '.*', result: '${0}' },
             ],
           },
         },
@@ -61,7 +61,7 @@ control 'translation_specs' do
             result: 'SELECT snmp.snmpIfName FROM snmpInterface snmp WHERE snmp.nodeid = ?::integer AND snmp.snmpifindex = ?::integer',
             values: [
               { type: 'field', name: 'nodeid', matches: '.*', result: '${0}' },
-              { type: 'parameter', name: '~^\\.1\\.3\\.6\\.1\\.2\\.1\\.2\\.2\\.1\\.1\\.([0-9]*)$', matches: '.*', result: '${0}' }
+              { type: 'parameter', name: '~^\\.1\\.3\\.6\\.1\\.2\\.1\\.2\\.2\\.1\\.1\\.([0-9]*)$', matches: '.*', result: '${0}' },
             ],
           },
         },
@@ -74,7 +74,7 @@ control 'translation_specs' do
             result: 'SELECT snmp.snmpIfAlias FROM snmpInterface snmp WHERE snmp.nodeid = ?::integer AND snmp.snmpifindex = ?::integer',
             values: [
               { type: 'field', name: 'nodeid', matches: '.*', result: '${0}' },
-              { type: 'parameter', name: '~^\\.1\\.3\\.6\\.1\\.2\\.1\\.2\\.2\\.1\\.1\\.([0-9]*)$', matches: '.*', result: '${0}' }
+              { type: 'parameter', name: '~^\\.1\\.3\\.6\\.1\\.2\\.1\\.2\\.2\\.1\\.1\\.([0-9]*)$', matches: '.*', result: '${0}' },
             ],
           },
         },
@@ -87,7 +87,7 @@ control 'translation_specs' do
           type: 'field',
           value: {
             type: 'constant',
-            result: 'uei.opennms.org/internal/topology/linkDown'
+            result: 'uei.opennms.org/internal/topology/linkDown',
           },
         },
       ],
@@ -104,7 +104,7 @@ control 'translation_specs' do
           type: 'field',
           value: {
             type: 'constant',
-            result: 'uei.opennms.org/translator/traps/SNMP_Link_Up'
+            result: 'uei.opennms.org/translator/traps/SNMP_Link_Up',
           },
         },
         {
@@ -116,7 +116,7 @@ control 'translation_specs' do
             result: 'SELECT snmp.snmpIfDescr FROM snmpInterface snmp WHERE snmp.nodeid = ?::integer AND snmp.snmpifindex = ?::integer',
             values: [
               { type: 'field', name: 'nodeid', matches: '.*', result: '${0}' },
-              { type: 'parameter', name: '~^\\.1\\.3\\.6\\.1\\.2\\.1\\.2\\.2\\.1\\.1\\.([0-9]*)$', matches: '.*', result: '${0}' }
+              { type: 'parameter', name: '~^\\.1\\.3\\.6\\.1\\.2\\.1\\.2\\.2\\.1\\.1\\.([0-9]*)$', matches: '.*', result: '${0}' },
             ],
           },
         },
@@ -129,7 +129,7 @@ control 'translation_specs' do
             result: 'SELECT snmp.snmpIfName FROM snmpInterface snmp WHERE snmp.nodeid = ?::integer AND snmp.snmpifindex = ?::integer',
             values: [
               { type: 'field', name: 'nodeid', matches: '.*', result: '${0}' },
-              { type: 'parameter', name: '~^\\.1\\.3\\.6\\.1\\.2\\.1\\.2\\.2\\.1\\.1\\.([0-9]*)$', matches: '.*', result: '${0}' }
+              { type: 'parameter', name: '~^\\.1\\.3\\.6\\.1\\.2\\.1\\.2\\.2\\.1\\.1\\.([0-9]*)$', matches: '.*', result: '${0}' },
             ],
           },
         },
@@ -142,7 +142,7 @@ control 'translation_specs' do
             result: 'SELECT snmp.snmpIfAlias FROM snmpInterface snmp WHERE snmp.nodeid = ?::integer AND snmp.snmpifindex = ?::integer',
             values: [
               { type: 'field', name: 'nodeid', matches: '.*', result: '${0}' },
-              { type: 'parameter', name: '~^\\.1\\.3\\.6\\.1\\.2\\.1\\.2\\.2\\.1\\.1\\.([0-9]*)$', matches: '.*', result: '${0}' }
+              { type: 'parameter', name: '~^\\.1\\.3\\.6\\.1\\.2\\.1\\.2\\.2\\.1\\.1\\.([0-9]*)$', matches: '.*', result: '${0}' },
             ],
           },
         },
@@ -155,7 +155,7 @@ control 'translation_specs' do
           type: 'field',
           value: {
             type: 'constant',
-            result: 'uei.opennms.org/internal/topology/linkUp'
+            result: 'uei.opennms.org/internal/topology/linkUp',
           },
         },
       ],
@@ -172,7 +172,7 @@ control 'translation_specs' do
           type: 'field',
           value: {
             type: 'constant',
-            result: 'uei.opennms.org/internal/translator/hypericAlert'
+            result: 'uei.opennms.org/internal/translator/hypericAlert',
           },
         },
         {
@@ -183,7 +183,7 @@ control 'translation_specs' do
             result: 'SELECT n.nodeid FROM node n WHERE n.foreignid = ? AND n.foreignsource = ?',
             values: [
               { type: 'parameter', name: 'platform.id', matches: '.*', result: '${0}' },
-              { type: 'parameter', name: 'alert.source', matches: '.*', result: '${0}' }
+              { type: 'parameter', name: 'alert.source', matches: '.*', result: '${0}' },
             ],
           },
         },
@@ -201,7 +201,7 @@ control 'translation_specs' do
           type: 'field',
           value: {
             type: 'constant',
-            result: 'uei.opennms.org/internal/translator/entityConfigChanged'
+            result: 'uei.opennms.org/internal/translator/entityConfigChanged',
           }
         },
         {
@@ -209,7 +209,7 @@ control 'translation_specs' do
           type: 'parameter',
           value: {
             values: [
-              { type: 'parameter', name: '~^\.1\.3\.6\.1\.4\.1\.9\.9\.43\.1\.1\.6\.1\.3\..*', matches: '.*', result: '${0}' }
+              { type: 'parameter', name: '~^\.1\.3\.6\.1\.4\.1\.9\.9\.43\.1\.1\.6\.1\.3\..*', matches: '.*', result: '${0}' },
             ],
           },
         },
@@ -218,7 +218,7 @@ control 'translation_specs' do
           type: 'parameter',
           value: {
             type: 'constant',
-            result: 'Unknown'
+            result: 'Unknown',
           },
         },
       ],
@@ -235,7 +235,7 @@ control 'translation_specs' do
           type: 'field',
           value: {
             type: 'constant',
-            result: 'uei.opennms.org/internal/translator/entityConfigChanged'
+            result: 'uei.opennms.org/internal/translator/entityConfigChanged',
           },
         },
         {
@@ -243,7 +243,7 @@ control 'translation_specs' do
           type: 'parameter',
           value: {
             values: [
-              { type: 'parameter', name: '~^\.1\.3\.6\.1\.4\.1\.2636\.3\.18\.1\.7\.1\.4\..*', matches: '.*', result: '${0}' }
+              { type: 'parameter', name: '~^\.1\.3\.6\.1\.4\.1\.2636\.3\.18\.1\.7\.1\.4\..*', matches: '.*', result: '${0}' },
             ],
           },
         },
@@ -252,7 +252,7 @@ control 'translation_specs' do
           type: 'parameter',
           value: {
             values: [
-              { type: 'parameter', name: '~^\.1\.3\.6\.1\.4\.1\.2636\.3\.18\.1\.7\.1\.5\..*', matches: '.*', result: '${0}' }
+              { type: 'parameter', name: '~^\.1\.3\.6\.1\.4\.1\.2636\.3\.18\.1\.7\.1\.5\..*', matches: '.*', result: '${0}' },
             ],
           },
         },
@@ -270,7 +270,7 @@ control 'translation_specs' do
           type: 'field',
           value: {
             type: 'constant',
-            result: 'uei.opennms.org/translatedUei'
+            result: 'uei.opennms.org/translatedUei',
           },
         },
       ],
