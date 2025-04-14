@@ -208,9 +208,10 @@ control 'translation_specs' do
           name: 'configSource',
           type: 'parameter',
           value: {
-            values: [
-              { type: 'parameter', name: '~^\.1\.3\.6\.1\.4\.1\.9\.9\.43\.1\.1\.6\.1\.3\..*', matches: '.*', result: '${0}' },
-            ],
+            type: 'parameter',
+            name: '~^\.1\.3\.6\.1\.4\.1\.9\.9\.43\.1\.1\.6\.1\.3\..*',
+            matches: '.*',
+            result: '${0}',
           },
         },
         {
@@ -242,18 +243,20 @@ control 'translation_specs' do
           name: 'configSource',
           type: 'parameter',
           value: {
-            values: [
-              { type: 'parameter', name: '~^\.1\.3\.6\.1\.4\.1\.2636\.3\.18\.1\.7\.1\.4\..*', matches: '.*', result: '${0}' },
-            ],
+            type: 'parameter',
+            name: '~^\.1\.3\.6\.1\.4\.1\.2636\.3\.18\.1\.7\.1\.4\..*',
+            matches: '.*',
+            result: '${0}',
           },
         },
         {
           name: 'configUser',
           type: 'parameter',
           value: {
-            values: [
-              { type: 'parameter', name: '~^\.1\.3\.6\.1\.4\.1\.2636\.3\.18\.1\.7\.1\.5\..*', matches: '.*', result: '${0}' },
-            ],
+            type: 'parameter',
+            name: '~^\.1\.3\.6\.1\.4\.1\.2636\.3\.18\.1\.7\.1\.5\..*',
+            matches: '.*',
+            result: '${0}',
           },
         },
       ],
