@@ -202,7 +202,7 @@ control 'translation_specs' do
           value: {
             type: 'constant',
             result: 'uei.opennms.org/internal/translator/entityConfigChanged',
-          }
+          },
         },
         {
           name: 'configSource',
