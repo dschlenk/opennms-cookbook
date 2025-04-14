@@ -176,7 +176,7 @@ control 'translation_specs' do
 
   describe translation_spec('uei.opennms.org/external/hyperic/alert', [
     {
-      assignment: {
+      assignments: {
         name: 'uei',
         type: 'field',
         value: {
@@ -184,9 +184,7 @@ control 'translation_specs' do
           result: 'uei.opennms.org/internal/translator/hypericAlert',
         },
       },
-    },
-    {
-      assignment: {
+      {
         name: 'nodeid',
         type: 'field',
         value: {
@@ -205,7 +203,7 @@ control 'translation_specs' do
 
   describe translation_spec('uei.opennms.org/vendor/Cisco/traps/ciscoConfigManEvent', [
     {
-      assignment: {
+      assignments: {
         name: 'uei',
         type: 'field',
         value: {
@@ -213,9 +211,7 @@ control 'translation_specs' do
           result: 'uei.opennms.org/internal/translator/entityConfigChanged',
         },
       },
-    },
-    {
-      assignment: {
+      {
         name: 'configSource',
         type: 'parameter',
         value: {
@@ -224,9 +220,7 @@ control 'translation_specs' do
           ],
         },
       },
-    },
-    {
-      assignment: {
+      {
         name: 'configUser',
         type: 'parameter',
         value: {
@@ -241,7 +235,7 @@ control 'translation_specs' do
 
   describe translation_spec('uei.opennms.org/vendor/Juniper/traps/jnxCmCfgChange', [
     {
-      assignment: {
+      assignments: {
         name: 'uei',
         type: 'field',
         value: {
@@ -249,9 +243,7 @@ control 'translation_specs' do
           result: 'uei.opennms.org/internal/translator/entityConfigChanged',
         },
       },
-    },
-    {
-      assignment: {
+      {
         name: 'configSource',
         type: 'parameter',
         value: {
@@ -260,9 +252,7 @@ control 'translation_specs' do
           ],
         },
       },
-    },
-    {
-      assignment: {
+      {
         name: 'configUser',
         type: 'parameter',
         value: {
@@ -278,7 +268,7 @@ control 'translation_specs' do
 
   describe translation_spec('uei.opennms.org/internal/telemetry/clockSkewDetected', [
     {
-      assignment: {
+      assignments: {
         name: 'uei',
         type: 'field',
         value: {
@@ -286,9 +276,7 @@ control 'translation_specs' do
           result: 'uei.opennms.org/translator/telemetry/clockSkewDetected',
         },
       },
-    },
-    {
-      assignment: {
+      {
         name: 'nodeid',
         type: 'field',
         value: {
@@ -307,7 +295,7 @@ control 'translation_specs' do
 
   describe translation_spec('uei.opennms.org/fakeUei', [
     {
-      assignment: {
+      assignments: {
         name: 'uei',
         type: 'field',
         value: {
