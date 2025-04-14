@@ -92,16 +92,6 @@ control 'translation_specs' do
         },
       },
     },
-    {
-      assignment: {
-        name: 'uei',
-        type: 'field',
-        value: {
-          type: 'constant',
-          result: 'uei.opennms.org/translator/traps/SNMP_Link_Down',
-        },
-      },
-    },
   ]) do
     it { should exist }
   end
@@ -159,16 +149,6 @@ control 'translation_specs' do
             { type: 'field', name: 'nodeid', matches: '.*', result: '${0}' },
             { type: 'parameter', name: '~^\\.1\\.3\\.6\\.1\\.2\\.1\\.2\\.2\\.1\\.1\\.([0-9]*)$', matches: '.*', result: '${0}' },
           ],
-        },
-      },
-    },
-    {
-      assignment: {
-        name: 'uei',
-        type: 'field',
-        value: {
-          type: 'constant',
-          result: 'uei.opennms.org/internal/topology/linkUp',
         },
       },
     },
