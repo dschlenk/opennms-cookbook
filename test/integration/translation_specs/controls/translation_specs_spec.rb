@@ -98,7 +98,7 @@ control 'translation_specs' do
         type: 'field',
         value: {
           type: 'constant',
-          result: 'uei.opennms.org/internal/topology/linkDown',
+          result: 'uei.opennms.org/translator/traps/SNMP_Link_Down',
         },
       },
     },
