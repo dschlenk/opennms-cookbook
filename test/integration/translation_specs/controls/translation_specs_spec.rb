@@ -37,7 +37,7 @@ control 'translation_specs' do
   ]) do
     it { should exist }
   end
-  
+
   describe translation_spec('uei.opennms.org/generic/traps/SNMP_Link_Down', [
     {
       assignments: [
@@ -106,7 +106,6 @@ control 'translation_specs' do
     it { should exist }
   end
 
-  
   describe translation_spec('uei.opennms.org/generic/traps/SNMP_Link_Up', [
     {
       assignments: [
