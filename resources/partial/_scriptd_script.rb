@@ -33,7 +33,7 @@ action :add do
       Chef::Log.info("Script '#{new_resource.script_name}' added.")
     end
   else
-    Chef::Log.info("Script already exists. Skipping add.")
+    Chef::Log.info("Script already exists.")
   end
 end
 
@@ -48,6 +48,6 @@ action :delete do
       Chef::Log.info("Script '#{new_resource.script_name}' deleted.")
     end
   else
-    Chef::Log.info("Script not found. Skipping delete.")
+    Chef::Log.info("Script not found.")
   end
 end
