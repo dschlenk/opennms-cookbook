@@ -47,10 +47,10 @@ action :create do
         detectors_el = foreign_source.add_child('<detectors/>')[0]
       end
       # Create detector element and add the name attributes and class attribute
-      detector_el = detectors_el.add_child("<detector name=#{service_name.encode(:xml => :attr)}#{new_resource.class_name.nil? ? '' : " class=#{new_resource.class_name.encode(:xml => :attr)}"}/>")[0]
+      detector_el = detectors_el.add_child("<detector name=#{service_name.encode(xml: :attr)}#{new_resource.class_name.nil? ? '' : " class=#{new_resource.class_name.encode(xml: :attr)}"}/>")[0]
       unless new_resource.parameters.nil?
         new_resource.parameters.each do |key, value|
-          detector_el.add_child("<parameter key=#{key.encode(:xml => :attr)} value=#{value.encode(:xml => :attr)}/>")
+          detector_el.add_child("<parameter key=#{key.encode(xml: :attr)} value=#{value.encode(xml: :attr)}/>")
         end
       end
       # then add the element to foreign_source.elements["/detectors"]
@@ -59,12 +59,10 @@ action :create do
         detector.attribute('class').value = new_resource.class_name
       end
       # delete all parameters
-      detector.xpath('parameter').each do |p|
-        p.remove
-      end
+      detector.xpath('parameter').each(&:remove)
       # Add all parameter back with new values
       new_resource.parameters.each do |key, value|
-        detector.add_child("<parameter key=#{key.encode(:xml => :attr)} value=#{value.encode(:xml => :attr)}/>")
+        detector.add_child("<parameter key=#{key.encode(xml: :attr)} value=#{value.encode(xml: :attr)}/>")
       end unless new_resource.parameters.nil?
     end
     # update fs_resource.message with foreign_source.to_s

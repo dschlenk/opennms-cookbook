@@ -925,14 +925,14 @@ module Opennms
             name = rt.attributes['name']
             label = rt.attributes['label']
             resource_label = rt.attributes['resourceLabel']
-            pss_params = {}
+            pss_params = []
             rt.each_element('persistenceSelectorStrategy/parameter') do |rtp|
-              pss_params[rtp.attributes['key']] = rtp.attributes['value']
+              pss_params.push({ rtp.attributes['key'] => rtp.attributes['value'] })
             end
             pss_class = rt.elements['persistenceSelectorStrategy/@class'].value
-            ss_params = {}
+            ss_params = []
             rt.each_element('storageStrategy/parameter') do |rtp|
-              ss_params[rtp.attributes['key']] = rtp.attributes['value']
+              ss_params.push({ rtp.attributes['key'] => rtp.attributes['value'] })
             end
             ss_class = rt.elements['storageStrategy/@class'].value
             resource_types.push({ name: name, label: label, resource_label: resource_label, persistence_selector_strategy: { class: pss_class, parameters: pss_params }, storage_strategy: { class: ss_class, parameters: ss_params } }.compact)

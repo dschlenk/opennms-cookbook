@@ -93,3 +93,5 @@ opennms_resource_type 'noop_create_if_missing' do
   resource_label '${resource} (index:${indexs})'
   action :create_if_missing
 end
+
+include_recipe 'opennms_resource_tests::rt_params'
