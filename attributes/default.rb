@@ -174,7 +174,7 @@ default['opennms']['properties']['files'] = {
   #  }
 }
 # if you change one of the following via the mechanism above, you also need to update it here:
-default['opennms']['properties']['dc']['rrd_base_dir']              = "#{onms_home}/share/rrd"
+default['opennms']['properties']['dc']['rrd_base_dir']              = "#{onms_home}/share/rrd/snmp"
 default['opennms']['properties']['jetty']['port']                   = 8980
 # we no longer manage the main opennms.proeprties file; these legacy attributes no longer used
 # default['opennms']['properties']['misc']['bin_dir']                 = "#{onms_home}/bin"
