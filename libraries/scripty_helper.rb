@@ -58,7 +58,7 @@ module Opennms
 
 
       class ScriptdConfig
-        attr_reader :engine, :start_script, :stop_script, :reload_script, :event_script"
+        attr_reader :engine, :start_script, :stop_script, :reload_script, :event_script, :transactional
 
         def initialize(engine: nil, start_script: nil, stop_script: nil, reload_script: nil, event_script: nil, transactional: nil)
           @engine = if engine.nil?
