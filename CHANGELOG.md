@@ -3,10 +3,11 @@
 ## 33.3.0
 
 * update to 33.1.5-1
-* replace REXML with Nokogiri in opennms\_service\_detector for performance reasons (likely more to follow)
+* replace REXML with Nokogiri in `opennms_service_detector` as a performance improvement test
 * allow use of array of hashes for resource type selector parameters to allow for multiple instances of parameters with the same key
 * bugfix: new foreign source documents had the wrong root element
 * bugfix: wrong RRD directory in datacollection-config.xml
+* bugfix: cache adminpw from vault in `run_state` to fix performance issue
 
 ## 33.2.1
 
