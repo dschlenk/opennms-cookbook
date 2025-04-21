@@ -1,26 +1,35 @@
 module Opennms
   module Cookbook
-    module Scripty
-      module ScriptTemplate
-        def scripty_resource_init
-          scripty_resource_create unless scripty_resource_exist?
+    module Scriptd
+      module ScriptdTemplate
+        def scriptd_resource_init
+          scriptd_resource_create unless scriptd_resource_exist?
         end
 
-        def scripty_resource
-          return unless scripty_resource_exist?
+        def scriptd_resource
+          return unless scriptd_resource_exist?
           find_resource!(:template, "#{onms_etc}/scriptd-configuration.xml")
         end
-
+        
+        def ro_scriptd_resource_init
+          ro_scriptd_resource_create unless ro_scriptd_resource_exist?
+        end
+        
+        def ro_scriptd_resource
+          return unless ro_scriptd_resource_exist?
+          find_resource!(:template, "RO #{onms_etc}/scriptd-configuration.xml")
+        end
+        
         private
 
-        def scripty_resource_exist?
+        def scriptd_resource_exist?
           !find_resource(:template, "#{onms_etc}/scriptd-configuration.xml").nil?
         rescue Chef::Exceptions::ResourceNotFound
           false
         end
 
-        def scripty_resource_create
-          file = Opennms::Cookbook::Scripty::ScriptyConfigurationFile.read("#{onms_etc}/scriptd-configuration.xml")
+        def scriptd_resource_create
+          file = Opennms::Cookbook::Scriptd::ScriptdConfigurationFile.read("#{onms_etc}/scriptd-configuration.xml")
           with_run_context(:root) do
             declare_resource(:template, "#{onms_etc}/scriptd-configuration.xml") do
               cookbook 'opennms'
@@ -34,9 +43,31 @@ module Opennms
             end
           end
         end
+        
+        def ro_scriptd_resource_exist?
+          !find_resource(:template, "RO #{onms_etc}/scriptd-configuration.xml").nil?
+        rescue Chef::Exceptions::ResourceNotFound
+          false
+        end
+
+        def ro_scriptd_resource_create
+          file = Opennms::Cookbook::Scriptd::ScriptdConfigurationFile.read("#{onms_etc}/scriptd-configuration.xml")
+          with_run_context(:root) do
+            declare_resource(:template, "RO #{onms_etc}/scriptd-configuration.xml") do
+              cookbook 'opennms'
+              source 'scriptd-configuration.xml.erb'
+              owner node['opennms']['username']
+              group node['opennms']['groupname']
+              mode '0664'
+              variables(config: file)
+              action :nothing
+              delayed_action :nothing
+            end
+          end
+        end
       end
       
-      class ScriptyConfigurationFile
+      class ScriptdConfigurationFile
         include Opennms::XmlHelper
         attr_reader :scripts
 
@@ -51,7 +82,7 @@ module Opennms
         end
 
         def self.read(file = 'scriptd-configuration.xml')
-          scriptedfile = ScriptyConfigurationFile.new
+          scriptedfile = ScriptdConfigurationFile.new
           scriptedfile.read!(file)
           scriptedfile
         end
