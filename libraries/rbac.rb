@@ -7,11 +7,28 @@ module Opennms::Rbac
   @admin_password = nil
 
   def admin_secret_from_vault(secret)
-    adminpw = 'admin' if secret == 'password' # default
-    begin
-      adminpw = chef_vault_item(node['opennms']['users']['admin']['vault'], node['opennms']['users']['admin']['vault_item'])[secret]
-    rescue => e
-      Chef::Log.warn("Unable to retrieve admin password from vault #{node['opennms']['users']['admin']['vault']} item #{node['opennms']['users']['admin']['vault_item']} due to #{e.message}. The default password will continue to be used. This is not recommended!")
+    adminpw = nil
+    if secret.eql?('password')
+      # cache adminpw in run_state since it's oft-used
+      node.run_state['opennms'] = Mash.new if node.run_state['opennms'].nil?
+      adminpw = node.run_state['opennms']['admin_password'] || 'admin'
+      # if you're finding this comment it's probably because things involving the admin password are really slow
+      # and that's because you didn't set a non-default password in a Chef vault, so every time Chef
+      # needs to use the admin password, it's desperately checking the vault for one. You should set one.
+      if adminpw.eql?('admin') # if default password, try to get non-default
+        begin
+          adminpw = chef_vault_item(node['opennms']['users']['admin']['vault'], node['opennms']['users']['admin']['vault_item'])[secret]
+          node.run_state['opennms']['admin_password'] = adminpw
+        rescue => e
+          Chef::Log.warn("Unable to retrieve admin password from vault #{node['opennms']['users']['admin']['vault']} item #{node['opennms']['users']['admin']['vault_item']} due to #{e.message}. The default password will continue to be used. This is not recommended!")
+        end
+      end
+    else
+      begin
+        adminpw = chef_vault_item(node['opennms']['users']['admin']['vault'], node['opennms']['users']['admin']['vault_item'])[secret]
+      rescue => e
+        Chef::Log.warn("Unable to retrieve admin secret #{secret} from vault #{node['opennms']['users']['admin']['vault']} item #{node['opennms']['users']['admin']['vault_item']} due to #{e.message}. A default value may be used. This is not recommended!")
+      end
     end
     adminpw
   end
