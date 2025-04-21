@@ -1,5 +1,13 @@
 # OpenNMS Cookbook Changes
 
+## 33.3.0
+
+* update to 33.1.5-1
+* replace REXML with Nokogiri in opennms\_service\_detector for performance reasons (likely more to follow)
+* allow use of array of hashes for resource type selector parameters to allow for multiple instances of parameters with the same key
+* bugfix: new foreign source documents had the wrong root element
+* bugfix: wrong RRD directory in datacollection-config.xml
+
 ## 33.2.1
 
 * bugfix: checking threshold idempotence didn't take resource filters into account
