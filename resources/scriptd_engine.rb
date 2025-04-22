@@ -23,13 +23,46 @@ load_current_value do |new_resource|
 end
 
 action :create do
+  converge_if_changed do
+    scriptd_resource_init
+    config = scriptd_resource.variables[:config]
+    engines = config.engine.find { |e| e.language == new_resource.language }
+    if engines.empty?
+      raise "Engine for language '#{new_resource.language}' already exists"
+      new_engine = Opennms::Cookbook::Scriptd::ScriptEngine.new(
+        language: new_resource.language,
+        className: new_resource.class_name,
+        extensions: new_resource.extensions
+      )
+    end
+  end
 end
 
 action :create_if_missing do
+  scriptd_resource_init
+  config = scriptd_resource.variables[:config]
+  engines = config.engine.find { |e| e.language == new_resource.language }
+  if engines.empty?
+    run_action(:create)
+  end
 end
 
 action :update do
+  scriptd_resource_init
+  config = scriptd_resource.variables[:config]
+  engines = config.engine.find { |e| e.language == new_resource.language }
+  if engines.empty?
+    raise Chef::Exceptions::ResourceNotFound, "No engine named #{new_resource.language} found to update. Use the `:create` or `:create_if_missing` actions to create a new engine."
+  end
+  else
+    engines.update(className: new_resource.className, extensions: new_resource.extensions)
 end
 
 action :delete do
+  scriptd_resource_init
+  config = scriptd_resource.variables[:config]
+  engines = config.engine.find { |e| e.language == new_resource.language }
+  converge_by "Removing engine #{engine}." do
+    config.delete_engine(engine)
+  end unless engines.empty?
 end
