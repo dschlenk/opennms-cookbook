@@ -132,12 +132,27 @@ module Opennms
         end
       end
 
-      class ScriptEngine
-        attr_reader :language, :className, :extensions
+      class Script
+        attr_read :language, :script
 
-        def initialize(language:, className:, extensions: nil)
+        def initialize(language:,script:)
           @language = language
-          @className = className
+          @script = script
+        end
+
+        def eql?(start_script)
+          self.class.eql?(start_script.class) &&
+            @language.eql?(start_script.language) &&
+            @script.eql?(start_script.script)
+        end
+      end
+
+      class ScriptEngine
+        attr_reader :language, :class_name, :extensions
+
+        def initialize(language:, class_name:, extensions: nil)
+          @language = language
+          @class_name = class_name
           @extensions = extensions
         end
 
@@ -149,62 +164,35 @@ module Opennms
         end
       end
 
-      class StartScript
-        attr_reader :language
-
-        def initialize(language: )
-          @language = language
-        end
-
-        def eql?(start_script)
-          self.class.eql?(start_script.class) &&
-            @language.eql?(start_script.language)
-        end
+      class StartScript < Script
       end
 
-      class StopScript
-        attr_reader :language
-
-        def initialize(language: )
-          @language = language
-        end
-
-        def eql?(stop_script)
-          self.class.eql?(stop_script.class) &&
-            @language.eql?(stop_script.language)
-        end
+      class StopScript < Script
       end
 
-      class ReloadScript
-        attr_reader :language
-
-        def initialize(language: )
-          @language = language
-        end
-
-        def eql?(reload_script)
-          self.class.eql?(reload_script.class) &&
-            @language.eql?(reload_script.language)
-        end
+      class ReloadScript < Script
       end
 
-      class EventScript
-        attr_reader :uei, :name, :language
+      class EventScript < Script
+        attr_reader :uei
 
-        def initialize(uei: nil, name: ,language: )
+        def initialize(uei: nil, language:, script:)
           @uei = if uei.nil?
                            []
                          else
                            uei
                          end
-          @name = name
           @language = language
+          @script = script
         end
 
         def eql?(event_script)
           self.class.eql?(event_script.class) &&
             @uei.eql?(event_script.uei) &&
-            @name.eql?(event_script.name) &&
+            @script.eql?(event_script.script) &&
             @language.eql?(event_script.language)
         end
       end
+    end
+  end
+end
