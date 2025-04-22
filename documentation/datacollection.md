@@ -165,9 +165,9 @@ Manages `resourceType` elements in either a `datacollection-group` file in `$OPE
 | `label`                                |       | String  | Required for `:create` action                                                                       |
 | `resource_label`                       |       | String  | Defaults to `${resource} (index:${index})` for action `:create`                                     |
 | `persistence_selector_strategy`        |       | String  | Defaults to `org.opennms.netmgt.collection.support.PersistAllSelectorStrategy` for action `:create` |
-| `persistence_selector_strategy_params` |       | Hash    | Must be a Hash of String key value pairs                                                            |
+| `persistence_selector_strategy_params` |       | Hash, Array    | Must be a Hash of String key value pairs or an Array of hashes (when multiple params with the same key are needed)                                                            |
 | `storage_strategy`                     |       | String  | Defaults to `org.opennms.netmgt.collection.support.IndexStorageStrategy` for action `:create`       |
-| `storage_strategy_params`              |       | Hash    | Must be a Hash of String key value pairs                                                            |
+| `storage_strategy_params`              |       | Hash, Array    | Must be a Hash of String key value pairs or an Array of hashes (when multiple params with the same key are needed)                                                           |
 
 You must specify either `group_name` or `file_name`. If both are specified, `group_name` is used.
 
