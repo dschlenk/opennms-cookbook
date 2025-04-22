@@ -74,7 +74,6 @@ load_current_value do |new_resource|
     end
     rt = r.variables[:config].resource_type(name: new_resource.type_name)
   end
-  Chef::Log.warn("rt is #{rt}")
   current_value_does_not_exist! if rt.nil?
   %i(label resource_label).each do |p|
     send(p, rt[p])
