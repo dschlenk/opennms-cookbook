@@ -5,6 +5,7 @@ property :script_name, String, name_property: true
 property :language, String, required: true
 property :script, String
 property :type, String, equal_to: ['start', 'stop', 'reload', 'event'], default: 'event'
+property :uei, [String, Array]
 
 action_class do
   include Opennms::XmlHelper
