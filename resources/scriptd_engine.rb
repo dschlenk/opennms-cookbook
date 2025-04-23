@@ -55,7 +55,7 @@ action :update do
     raise Chef::Exceptions::ResourceNotFound, "No engine named #{new_resource.language} found to update. Use the `:create` or `:create_if_missing` actions to create a new engine."
   end
   else
-    engines.update(className: new_resource.className, extensions: new_resource.extensions)
+    engines.update(language: new_resource.language, className: new_resource.className, extensions: new_resource.extensions)
 end
 
 action :delete do
