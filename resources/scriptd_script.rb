@@ -14,9 +14,13 @@ end
 load_current_value do |new_resource|
   config = new_resource.script unless new_resource.script.nil?
   if config.nil?
+    ro_scriptd_resource_init
     config = Opennms::Cookbook::Scripty::ScriptyConfigurationFile.read("#{onms_etc}/scriptd-configuration.xml")
   end
-  current_value_does_not_exist! unless config&.script_exists?(language: new_resource.language, script: new_resource.script)
+  current_value_does_not_exist! unless config&.script_exists?(
+    language: new_resource.language,
+    script: new_resource.script
+  )
   script new_resource.script
   language new_resource.language
 end
