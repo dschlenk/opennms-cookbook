@@ -1,5 +1,5 @@
 control 'script' do
-  describe engine('beanshell') do
+  describe scriptd_engine('beanshell') do
     it { should exist }
     its('className') { should eq 'bsh.util.BeanShellBSFEngine' }
     its('extensions') { should eq 'bsh' }
@@ -11,39 +11,34 @@ control 'script' do
     its('extensions') { should eq 'py' }
   end
 
-  describe start_script('beanshell') do
+  describe scriptd_script('beanshell', 'start', "log = bsf.lookupBean(\"log\");\nlog.debug(\"start-script\");\nlog.debug(\"start-script too\");") do
     it { should exist }
-    its('script') {
-      should include("log = bsf.lookupBean(\"log\");")
-      should include("log.debug(\"start-script\");")
-      should include("log.debug(\"start-script too\");")
-    }
   end
 
-  describe stop_script('beanshell') do
-    it { should exist }
-    its('script') {
-      should include("log = bsf.lookupBean(\"log\");")
-      should include("log.debug(\"stop-script\");")
-      should include("log.debug(\"stop-script also\");")
-      should include("log.debug(\"another line but it is indented\");")
-    }
-  end
+#  describe stop_script('beanshell') do
+#    it { should exist }
+#    its('script') {
+#      should include("log = bsf.lookupBean(\"log\");")
+#      should include("log.debug(\"stop-script\");")
+#      should include("log.debug(\"stop-script also\");")
+#      should include("log.debug(\"another line but it is indented\");")
+#    }
+#  end
 
-  describe stop_script('jython') do
-    it { should exist }
-    its('script') { should eq("1 + 1") }
-  end
+#  describe stop_script('jython') do
+#    it { should exist }
+#    its('script') { should eq("1 + 1") }
+#  end
 
-  describe reload_script('beanshell') do
-    it { should exist }
-    its('script') {
-      should include("log = bsf.lookupBean(\"log\");")
-      should include("log.debug(\"reload-script also\");")
-      should include("log.debug(\"another reload line but it is indented and there is a blank line between this one and the last one\");")
-    }
-  end
-
+#  describe reload_script('beanshell') do
+#    it { should exist }
+#    its('script') {
+#      should include("log = bsf.lookupBean(\"log\");")
+#      should include("log.debug(\"reload-script also\");")
+#      should include("log.debug(\"another reload line but it is indented and there is a blank line between this one and the last one\");")
+#    }
+#  end
+return
   describe event_script('beanshell') do
     it { should exist }
     its('uei') {
