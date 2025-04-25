@@ -78,7 +78,48 @@ module Opennms
         def read!(file = 'scriptd-configuration.xml')
           raise ArgumentError, "File #{file} does not exist" unless ::File.exist?(file)
           doc = xmldoc_from_file(file)
-          doc.root.each_element('/scriptd-configuration') do |scriptd_configuration|
+          config = ScriptdConfig.new
+
+          doc.elements.each('scriptd-configuration/engine') do |e|
+            config.engine << ScriptEngine.new(
+              language: e.attributes['language'],
+              class_name: e.attributes['class-name'],
+              extensions: e.attributes['extensions']
+            )
+          end
+
+          doc.elements.each('scriptd-configuration/start-script') do |s|
+            config.start_script << StartScript.new(
+              language: s.attributes['language'],
+              script: s.text.strip
+            )
+          end
+
+          doc.elements.each('scriptd-configuration/stop-script') do |s|
+            config.stop_script << StopScript.new(
+              language: s.attributes['language'],
+              script: s.text.strip
+            )
+          end
+
+          doc.elements.each('scriptd-configuration/reload-script') do |s|
+            config.reload_script << ReloadScript.new(
+              language: s.attributes['language'],
+              script: s.text.strip
+            )
+          end
+
+          doc.elements.each('scriptd-configuration/event-script') do |e|
+            ueis = []
+            e.elements.each('uei') { |u| ueis << u.text.strip }
+            config.event_script << EventScript.new(
+              uei: ueis,
+              language: e.attributes['language'],
+              script: e.elements['script']&.text&.strip
+            )
+          end
+
+          @scripts = config
         end
 
         def self.read(file = 'scriptd-configuration.xml')
@@ -86,38 +127,17 @@ module Opennms
           scriptedfile.read!(file)
           scriptedfile
         end
-
+      end
 
       class ScriptdConfig
         attr_reader :engine, :start_script, :stop_script, :reload_script, :event_script, :transactional
 
         def initialize(engine: nil, start_script: nil, stop_script: nil, reload_script: nil, event_script: nil, transactional: nil)
-          @engine = if engine.nil?
-                           []
-                         else
-                           engine
-                         end
-          @start_script = if start_script.nil?
-                           []
-                         else
-                           start_script
-                         end
-          @stop_script = if stop_script.nil?
-                           []
-                         else
-                           stop_script
-                         end
-                        
-          @reload_script = if reload_script.nil?
-                           []
-                         else
-                           reload_script
-                         end
-          @event_script = if event_script.nil?
-                           []
-                         else
-                           event_script
-                         end
+          @engine = engine || []
+          @start_script = start_script || []
+          @stop_script = stop_script || []
+          @reload_script = reload_script || []
+          @event_script = event_script || []
           @transactional = transactional
         end
 
@@ -133,7 +153,7 @@ module Opennms
       end
 
       class Script
-        attr_read :language, :script
+        attr_reader :language, :script
 
         def initialize(language:,script:)
           @language = language
@@ -159,7 +179,7 @@ module Opennms
         def eql?(engine)
           self.class.eql?(engine.class) &&
             @language.eql?(engine.language) &&
-            @className.eql?(engine.className) &&
+            @class_name.eql?(engine.class_name) &&
             @extensions.eql?(engine.extensions)
         end
       end
@@ -177,11 +197,7 @@ module Opennms
         attr_reader :uei
 
         def initialize(uei: nil, language:, script:)
-          @uei = if uei.nil?
-                           []
-                         else
-                           uei
-                         end
+          @uei = uei || []
           @language = language
           @script = script
         end
