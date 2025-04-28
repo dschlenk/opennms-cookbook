@@ -56,6 +56,7 @@ action :update do
   end
   else
     engines.update(language: new_resource.language, className: new_resource.className, extensions: new_resource.extensions)
+  end
 end
 
 action :delete do
