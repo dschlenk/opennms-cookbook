@@ -51,11 +51,14 @@ action :update do
   scriptd_resource_init
   config = scriptd_resource.variables[:config]
   engines = config.engine.find { |e| e.language == new_resource.language }
+
   if engines.empty?
-    raise Chef::Exceptions::ResourceNotFound, "No engine named #{new_resource.language} found to update. Use the `:create` or `:create_if_missing` actions to create a new engine."
-  end
+    raise Chef::Exceptions::ResourceNotFound,
+          "No engine named #{new_resource.language} found to update. Use the `:create` or `:create_if_missing` actions to create a new engine."
   else
-    engines.update(language: new_resource.language, className: new_resource.className, extensions: new_resource.extensions)
+    engines.update(language: new_resource.language,
+                   className: new_resource.class_name,
+                   extensions: new_resource.extensions)
   end
 end
 
