@@ -10,16 +10,16 @@ module Opennms
           return unless scriptd_resource_exist?
           find_resource!(:template, "#{onms_etc}/scriptd-configuration.xml")
         end
-        
+
         def ro_scriptd_resource_init
           ro_scriptd_resource_create unless ro_scriptd_resource_exist?
         end
-        
+
         def ro_scriptd_resource
           return unless ro_scriptd_resource_exist?
           find_resource!(:template, "RO #{onms_etc}/scriptd-configuration.xml")
         end
-        
+
         private
 
         def scriptd_resource_exist?
@@ -43,7 +43,7 @@ module Opennms
             end
           end
         end
-        
+
         def ro_scriptd_resource_exist?
           !find_resource(:template, "RO #{onms_etc}/scriptd-configuration.xml").nil?
         rescue Chef::Exceptions::ResourceNotFound
@@ -66,7 +66,7 @@ module Opennms
           end
         end
       end
-      
+
       class ScriptdConfigurationFile
         include Opennms::XmlHelper
         attr_reader :scripts
