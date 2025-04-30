@@ -4,7 +4,7 @@ unified_mode true
 property :script_name, String, name_property: true
 property :language, String, required: true
 property :script, String
-property :type, String, equal_to: ['start', 'stop', 'reload', 'event'], default: 'event'
+property :type, String, equal_to: %w[start stop reload event], default: 'event'
 
 action_class do
   include Opennms::XmlHelper
@@ -26,7 +26,7 @@ action :add do
     config = Opennms::Cookbook::Scripty::ScriptyConfigurationFile.read("#{onms_etc}/scriptd-configuration.xml")
     return if config.nil?
   end
-  unless config.script_exists?(language: new_resource.language, script: new_resource.script)
+  if config.script_exists?(language: new_resource.language, script: new_resource.script)
     converge_by("Adding script '#{new_resource.script_name}'") do
       config.add_script(
         name: new_resource.script_name,
