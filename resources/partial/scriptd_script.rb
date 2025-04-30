@@ -4,7 +4,7 @@ unified_mode true
 property :script_name, String, name_property: true
 property :language, String, required: true
 property :script, String
-property :type, String, equal_to: %w[start stop reload event], default: 'event'
+property :type, String, equal_to: %w(start stop reload event), default: 'event'
 
 action_class do
   include Opennms::XmlHelper
@@ -27,6 +27,8 @@ action :add do
     return if config.nil?
   end
   if config.script_exists?(language: new_resource.language, script: new_resource.script)
+    Chef::Log.info("Script '#{new_resource.script_name}' already exists.")
+  else
     converge_by("Adding script '#{new_resource.script_name}'") do
       config.add_script(
         name: new_resource.script_name,
@@ -35,8 +37,6 @@ action :add do
       )
       Chef::Log.info("Script '#{new_resource.script_name}' added.")
     end
-  else
-    Chef::Log.info("Script '#{new_resource.script_name}' already exists.")
   end
 end
 
