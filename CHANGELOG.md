@@ -1,5 +1,9 @@
 # OpenNMS Cookbook Changes
 
+## 33.3.1
+
+* bug: re-run `runjava -s` every time to account for JDK updates during/since last run
+
 ## 33.3.0
 
 * update to 33.1.5-1

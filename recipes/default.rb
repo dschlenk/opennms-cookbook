@@ -36,7 +36,6 @@ if node['opennms']['jre_path'].nil?
   execute 'runjava' do
     user node['opennms']['username']
     cwd onms_home
-    creates "#{onms_home}/etc/java.conf"
     command "#{onms_home}/bin/runjava -s"
   end
 else
