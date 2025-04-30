@@ -27,14 +27,13 @@ action :create do
     scriptd_resource_init
     config = scriptd_resource.variables[:config]
     engines = config.engine.find { |e| e.language == new_resource.language }
-    if engines.empty?
-      raise "Engine for language '#{new_resource.language}' already exists"
-      new_engine = Opennms::Cookbook::Scriptd::ScriptEngine.new(
-        language: new_resource.language,
-        className: new_resource.class_name,
-        extensions: new_resource.extensions
-      )
-    end
+    raise "Engine for language '#{new_resource.language}' already exists" unless engines.nil? || engines.empty?
+
+    config.add_engine(
+      language: new_resource.language,
+      className: new_resource.class_name,
+      extensions: new_resource.extensions
+    )
   end
 end
 
@@ -42,9 +41,7 @@ action :create_if_missing do
   scriptd_resource_init
   config = scriptd_resource.variables[:config]
   engines = config.engine.find { |e| e.language == new_resource.language }
-  if engines.empty?
-    run_action(:create)
-  end
+  run_action(:create) if engines.nil? || engines.empty?
 end
 
 action :update do
@@ -52,13 +49,15 @@ action :update do
   config = scriptd_resource.variables[:config]
   engines = config.engine.find { |e| e.language == new_resource.language }
 
-  if engines.empty?
+  if engines.nil? || engines.empty?
     raise Chef::Exceptions::ResourceNotFound,
           "No engine named #{new_resource.language} found to update. Use the `:create` or `:create_if_missing` actions to create a new engine."
   else
-    engines.update(language: new_resource.language,
-                   className: new_resource.class_name,
-                   extensions: new_resource.extensions)
+    engines.update(
+      language: new_resource.language,
+      className: new_resource.class_name,
+      extensions: new_resource.extensions
+    )
   end
 end
 
@@ -66,7 +65,10 @@ action :delete do
   scriptd_resource_init
   config = scriptd_resource.variables[:config]
   engines = config.engine.find { |e| e.language == new_resource.language }
-  converge_by "Removing engine #{engine}." do
-    config.delete_engine(engine)
-  end unless engines.empty?
+
+  unless engines.nil? || engines.empty?
+    converge_by "Removing engine #{engines}." do
+      config.delete_engine(engines)
+    end
+  end
 end
