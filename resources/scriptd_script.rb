@@ -4,7 +4,7 @@ unified_mode true
 property :script_name, String, name_property: true
 property :language, String, required: true
 property :script, String
-property :type, String, equal_to: ['start', 'stop', 'reload', 'event'], default: 'event'
+property :type, String, equal_to: %w[start stop reload event], default: 'event'
 property :uei, [String, Array]
 
 action_class do
@@ -17,10 +17,14 @@ load_current_value do |new_resource|
     ro_scriptd_resource_init
     config = Opennms::Cookbook::Scripty::ScriptyConfigurationFile.read("#{onms_etc}/scriptd-configuration.xml")
   end
-  current_value_does_not_exist! unless config&.script_exists?(
+
+  unless config&.script_exists?(
     language: new_resource.language,
     script: new_resource.script
   )
+    current_value_does_not_exist!
+  end
+
   script new_resource.script
   language new_resource.language
 end
@@ -31,7 +35,10 @@ action :add do
     config = Opennms::Cookbook::Scripty::ScriptyConfigurationFile.read("#{onms_etc}/scriptd-configuration.xml")
     return if config.nil?
   end
-  unless config.script_exists?(language: new_resource.language, script: new_resource.script)
+
+  if config.script_exists?(language: new_resource.language, script: new_resource.script)
+    Chef::Log.info("Script '#{new_resource.script_name}' already exists.")
+  else
     converge_by("Adding script '#{new_resource.script_name}'") do
       config.add_script(
         name: new_resource.script_name,
@@ -40,8 +47,6 @@ action :add do
       )
       Chef::Log.info("Script '#{new_resource.script_name}' added.")
     end
-  else
-    Chef::Log.info("Script '#{new_resource.script_name}' already exists.")
   end
 end
 
@@ -51,6 +56,7 @@ action :delete do
     config = Opennms::Cookbook::Scripty::ScriptyConfigurationFile.read("#{onms_etc}/scriptd-configuration.xml")
     return if config.nil?
   end
+
   if config.script_exists?(language: new_resource.language, script: new_resource.script)
     converge_by("Deleting script '#{new_resource.script_name}'") do
       config.delete_script(language: new_resource.language, script: new_resource.script)
