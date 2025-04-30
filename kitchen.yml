@@ -3,7 +3,7 @@ driver:
   name: dokken
   privileged: true
   chef_image: cincproject/cinc
-  chef_version: 18.7.5
+  chef_version: 18.7.3
 
 transport:
   name: dokken
@@ -39,8 +39,6 @@ platforms:
     driver:
       image: c1og/opennms-33-oraclelinux-9
       pid_one_command: /usr/lib/systemd/systemd
-      chef_image: cincproject/cinc
-      chef_version: 18.7.5
 
 suites:
   - name: recommended
