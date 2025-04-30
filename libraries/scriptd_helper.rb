@@ -155,7 +155,7 @@ module Opennms
       class Script
         attr_reader :language, :script
 
-        def initialize(language:,script:)
+        def initialize(language:, script:)
           @language = language
           @script = script
         end
