@@ -3,7 +3,7 @@ driver:
   name: dokken
   privileged: true
   chef_image: cincproject/cinc
-  chef_version: 18
+  chef_version: 18.7.5
 
 transport:
   name: dokken
@@ -15,6 +15,7 @@ provisioner:
   chef_binary: /opt/cinc/bin/cinc-client
   chef_license: accept-no-persist # until https://github.com/test-kitchen/test-kitchen/pull/1984
   log_level: <%= ENV['KITCHEN_LOG_LEVEL'] || 'info' %>
+  chef_log_level: debug
   clean_dokken_sandbox: <%= ENV['CLEAN_DOCKEN_SANDBOX'] || 'true' %>
   attributes:
     opennms:
@@ -38,6 +39,8 @@ platforms:
     driver:
       image: c1og/opennms-33-oraclelinux-9
       pid_one_command: /usr/lib/systemd/systemd
+      chef_image: cincproject/cinc
+      chef_version: 18.7.5
 
 suites:
   - name: recommended
