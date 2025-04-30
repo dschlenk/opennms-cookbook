@@ -26,7 +26,7 @@ jobs:
           command: cookstyle
       - run:
           name: kitchen
-          command: kitchen test scriptd-engine --destroy always
+          command: cinc exec kitchen test scriptd-engine --destroy always
 workflows:
   version: 2
   untagged-build:
