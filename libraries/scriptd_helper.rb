@@ -22,6 +22,10 @@ module Opennms
 
         private
 
+        def onms_etc
+          '/opt/opennms/etc'
+        end
+
         def scriptd_resource_exist?
           !find_resource(:template, '/opt/opennms/etc/scriptd-configuration.xml').nil?
         rescue Chef::Exceptions::ResourceNotFound
