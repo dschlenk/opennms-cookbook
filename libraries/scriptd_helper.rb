@@ -8,7 +8,7 @@ module Opennms
 
         def scriptd_resource
           return unless scriptd_resource_exist?
-          find_resource!(:template, "/opt/opennms/etc/scriptd-configuration.xml")
+          find_resource!(:template, '/opt/opennms/etc/scriptd-configuration.xml')
         end
 
         def ro_scriptd_resource_init
@@ -17,7 +17,7 @@ module Opennms
 
         def ro_scriptd_resource
           return unless ro_scriptd_resource_exist?
-          find_resource!(:template, "RO /opt/opennms/etc/scriptd-configuration.xml")
+          find_resource!(:template, 'RO /opt/opennms/etc/scriptd-configuration.xml')
         end
 
         private
@@ -29,9 +29,9 @@ module Opennms
         end
 
         def scriptd_resource_create
-          file = Opennms::Cookbook::Scriptd::ScriptdConfigurationFile.read("/opt/opennms/etc/scriptd-configuration.xml")
+          file = Opennms::Cookbook::Scriptd::ScriptdConfigurationFile.read('/opt/opennms/etc/scriptd-configuration.xml')
           with_run_context(:root) do
-            declare_resource(:template, "/opt/opennms/etc/scriptd-configuration.xml") do
+            declare_resource(:template, '/opt/opennms/etc/scriptd-configuration.xml') do
               cookbook 'opennms'
               source 'scriptd-configuration.xml.erb'
               owner node['opennms']['username']
@@ -45,15 +45,15 @@ module Opennms
         end
 
         def ro_scriptd_resource_exist?
-          !find_resource(:template, "RO /opt/opennms/etc/scriptd-configuration.xml").nil?
+          !find_resource(:template, 'RO /opt/opennms/etc/scriptd-configuration.xml').nil?
         rescue Chef::Exceptions::ResourceNotFound
           false
         end
 
         def ro_scriptd_resource_create
-          file = Opennms::Cookbook::Scriptd::ScriptdConfigurationFile.read("/opt/opennms/etc/scriptd-configuration.xml")
+          file = Opennms::Cookbook::Scriptd::ScriptdConfigurationFile.read('/opt/opennms/etc/scriptd-configuration.xml')
           with_run_context(:root) do
-            declare_resource(:template, "RO /opt/opennms/etc/scriptd-configuration.xml") do
+            declare_resource(:template, 'RO /opt/opennms/etc/scriptd-configuration.xml') do
               cookbook 'opennms'
               source 'scriptd-configuration.xml.erb'
               owner node['opennms']['username']
