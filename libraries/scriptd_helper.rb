@@ -81,42 +81,42 @@ module Opennms
           config = ScriptdConfig.new
 
           doc.elements.each('scriptd-configuration/engine') do |e|
-            config.engine << ScriptEngine.new(
+            config.add_engine(ScriptEngine.new(
               language: e.attributes['language'],
               className: e.attributes['className'],
               extensions: e.attributes['extensions']
-            )
+            ))
           end
 
           doc.elements.each('scriptd-configuration/start-script') do |s|
-            config.start_script << StartScript.new(
+            config.add_start_script(StartScript.new(
               language: s.attributes['language'],
               script: s.text.strip
-            )
+            ))
           end
 
           doc.elements.each('scriptd-configuration/stop-script') do |s|
-            config.stop_script << StopScript.new(
+            config.add_stop_script(StopScript.new(
               language: s.attributes['language'],
               script: s.text.strip
-            )
+            ))
           end
 
           doc.elements.each('scriptd-configuration/reload-script') do |s|
-            config.reload_script << ReloadScript.new(
+            config.add_reload_script(ReloadScript.new(
               language: s.attributes['language'],
               script: s.text.strip
-            )
+            ))
           end
 
           doc.elements.each('scriptd-configuration/event-script') do |e|
             ueis = []
             e.elements.each('uei') { |u| ueis << u.text.strip }
-            config.event_script << EventScript.new(
+            config.add_event_script(EventScript.new(
               uei: ueis,
               language: e.attributes['language'],
               script: e.elements['script']&.text&.strip
-            )
+            ))
           end
 
           @scripts = config
@@ -128,7 +128,6 @@ module Opennms
           scriptedfile
         end
 
-        # Here, define the 'engine' method to return the engine data
         def engine
           @scripts.engine
         end
@@ -144,6 +143,26 @@ module Opennms
           @reload_script = reload_script || []
           @event_script = event_script || []
           @transactional = transactional
+        end
+
+        def add_engine(engine)
+          @engine << engine
+        end
+
+        def add_start_script(script)
+          @start_script << script
+        end
+
+        def add_stop_script(script)
+          @stop_script << script
+        end
+
+        def add_reload_script(script)
+          @reload_script << script
+        end
+
+        def add_event_script(script)
+          @event_script << script
         end
 
         def eql?(scriptd_configuration)
