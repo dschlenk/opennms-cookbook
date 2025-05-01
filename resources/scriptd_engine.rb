@@ -53,7 +53,8 @@ action :update do
     raise Chef::Exceptions::ResourceNotFound,
           "No engine named #{new_resource.language} found to update. Use the `:create` or `:create_if_missing` actions to create a new engine."
   else
-    engines.update(
+    # If engines is an array of one engine, update that engine directly.
+    engines.first.update(
       language: new_resource.language,
       className: new_resource.class_name,
       extensions: new_resource.extensions
