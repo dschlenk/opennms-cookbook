@@ -37,7 +37,7 @@ module Opennms
               owner node['opennms']['username']
               group node['opennms']['groupname']
               mode '0664'
-              variables(config: file)
+              variables(config: file.config)
               action :nothing
               delayed_action :create
             end
@@ -59,7 +59,7 @@ module Opennms
               owner node['opennms']['username']
               group node['opennms']['groupname']
               mode '0664'
-              variables(config: file)
+              variables(config: file.config)
               action :nothing
               delayed_action :nothing
             end
@@ -69,19 +69,17 @@ module Opennms
 
       class ScriptdConfigurationFile
         include Opennms::XmlHelper
-        attr_reader :scripts
+        attr_reader :config
 
-        def initialize(scripts = nil)
-          @scripts = scripts
+        def initialize
+          @config = ScriptdConfig.new
         end
 
         def read!(file = 'scriptd-configuration.xml')
           raise ArgumentError, "File #{file} does not exist" unless ::File.exist?(file)
           doc = xmldoc_from_file(file)
-          config = ScriptdConfig.new
-
           doc.elements.each('scriptd-configuration/engine') do |e|
-            config.add_engine(ScriptEngine.new(
+            @config.add_engine(ScriptEngine.new(
               language: e.attributes['language'],
               className: e.attributes['className'],
               extensions: e.attributes['extensions']
@@ -89,21 +87,21 @@ module Opennms
           end
 
           doc.elements.each('scriptd-configuration/start-script') do |s|
-            config.add_start_script(StartScript.new(
+            @config.add_start_script(StartScript.new(
               language: s.attributes['language'],
               script: s.text.strip
             ))
           end
 
           doc.elements.each('scriptd-configuration/stop-script') do |s|
-            config.add_stop_script(StopScript.new(
+            @config.add_stop_script(StopScript.new(
               language: s.attributes['language'],
               script: s.text.strip
             ))
           end
 
           doc.elements.each('scriptd-configuration/reload-script') do |s|
-            config.add_reload_script(ReloadScript.new(
+            @config.add_reload_script(ReloadScript.new(
               language: s.attributes['language'],
               script: s.text.strip
             ))
@@ -112,24 +110,18 @@ module Opennms
           doc.elements.each('scriptd-configuration/event-script') do |e|
             ueis = []
             e.elements.each('uei') { |u| ueis << u.text.strip }
-            config.add_event_script(EventScript.new(
+            @config.add_event_script(EventScript.new(
               uei: ueis,
               language: e.attributes['language'],
               script: e.elements['script']&.text&.strip
             ))
           end
-
-          @scripts = config
         end
 
         def self.read(file = 'scriptd-configuration.xml')
           scriptedfile = ScriptdConfigurationFile.new
           scriptedfile.read!(file)
           scriptedfile
-        end
-
-        def engine
-          @scripts.engine
         end
       end
 
