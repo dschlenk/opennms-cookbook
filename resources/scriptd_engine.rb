@@ -29,7 +29,7 @@ action :create do
     engine = config.engine.find { |e| e.language == new_resource.language }
     raise DuplicateEngines unless engine.one? || engine.empty?
     if engine.one?
-      run_action :update 
+      run_action :update
     else
       config.add_engine(
         language: new_resource.language,
