@@ -127,6 +127,11 @@ module Opennms
           scriptedfile.read!(file)
           scriptedfile
         end
+
+        # Here, define the 'engine' method to return the engine data
+        def engine
+          @scripts.engine
+        end
       end
 
       class ScriptdConfig
