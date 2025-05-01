@@ -29,7 +29,7 @@ action :create do
     engine = config.engine.find { |e| e.language == new_resource.language }
     raise "Engine for language '#{new_resource.language}' already exists" unless engine.nil?
 
-    config.add_engine(
+    config.scripts.add_engine(
       language: new_resource.language,
       className: new_resource.class_name,
       extensions: new_resource.extensions
@@ -66,7 +66,7 @@ action :delete do
 
   unless engine.nil?
     converge_by "Removing engine #{engine.language}." do
-      config.delete_engine(engine)
+      config.scripts.delete_engine(engine)
     end
   end
 end
