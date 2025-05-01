@@ -27,13 +27,16 @@ action :create do
     scriptd_resource_init
     config = scriptd_resource.variables[:config]
     engine = config.engine.find { |e| e.language == new_resource.language }
-    raise "Engine for language '#{new_resource.language}' already exists" unless engine.nil?
-
-    config.scripts.add_engine(
-      language: new_resource.language,
-      className: new_resource.class_name,
-      extensions: new_resource.extensions
-    )
+    raise DuplicateEngines unless engine.one? || engine.empty?
+    if engine.one?
+      run_action :update 
+    else
+      config.add_engine(
+        language: new_resource.language,
+        className: new_resource.class_name,
+        extensions: new_resource.extensions
+      )
+    end
   end
 end
 
@@ -41,21 +44,22 @@ action :create_if_missing do
   scriptd_resource_init
   config = scriptd_resource.variables[:config]
   engine = config.engine.find { |e| e.language == new_resource.language }
-  run_action(:create) if engine.nil?
+  run_action(:create) if engine.empty?
 end
 
 action :update do
   scriptd_resource_init
   config = scriptd_resource.variables[:config]
   engine = config.engine.find { |e| e.language == new_resource.language }
-
-  if engine.nil?
+  if engine.empty?
     raise Chef::Exceptions::ResourceNotFound,
           "No engine named #{new_resource.language} found to update. Use the `:create` or `:create_if_missing` actions to create a new engine."
   else
-    engine.language = new_resource.language
-    engine.class_name = new_resource.class_name
-    engine.extensions = new_resource.extensions
+    raise DuplicateEngines unless engine.one?
+    e = engine.pop
+    e.language = new_resource.language
+    e.class_name = new_resource.class_name
+    e.extensions = new_resource.extensions
   end
 end
 
@@ -64,9 +68,10 @@ action :delete do
   config = scriptd_resource.variables[:config]
   engine = config.engine.find { |e| e.language == new_resource.language }
 
-  unless engine.nil?
+  unless engine.empty?
     converge_by "Removing engine #{engine.language}." do
-      config.scripts.delete_engine(engine)
+      eng = engine.pop
+      config.engine.delete_if { |e| e.language.eql?(eng.language) }
     end
   end
 end
