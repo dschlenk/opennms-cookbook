@@ -1,7 +1,7 @@
 include Opennms::Cookbook::Scriptd::ScriptdTemplate
 
 property :language, String, name_property: true
-property :className, String, required: true
+property :class_name, String, required: true
 property :extensions, String
 
 action_class do
@@ -18,7 +18,7 @@ load_current_value do |new_resource|
   current_value_does_not_exist! if engines.empty?
   raise DuplicateEngines unless engines.one?
   engine = engines.first
-  className engine.className
+  class_name engine.class_name
   extensions engine.extensions
 end
 
@@ -33,7 +33,7 @@ action :create do
     else
       config.add_engine(
         language: new_resource.language,
-        className: new_resource.className,
+        class_name: new_resource.class_name,
         extensions: new_resource.extensions
       )
     end
@@ -58,7 +58,7 @@ action :update do
     raise DuplicateEngines unless engines.one?
     e = engines.pop
     e.language = new_resource.language
-    e.className = new_resource.className
+    e.class_name = new_resource.class_name
     e.extensions = new_resource.extensions
   end
 end
