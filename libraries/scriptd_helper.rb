@@ -138,6 +138,13 @@ module Opennms
         end
 
         def add_engine(engine)
+          if engine.is_a?(Hash)
+            engine = ScriptEngine.new(
+              language: engine[:language],
+              className: engine[:className],
+              extensions: engine[:extensions]
+            )
+          end
           @engine << engine
         end
 
@@ -200,14 +207,9 @@ module Opennms
         end
       end
 
-      class StartScript < Script
-      end
-
-      class StopScript < Script
-      end
-
-      class ReloadScript < Script
-      end
+      class StartScript < Script; end
+      class StopScript < Script; end
+      class ReloadScript < Script; end
 
       class EventScript < Script
         attr_reader :uei
