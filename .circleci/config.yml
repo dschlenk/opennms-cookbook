@@ -28,8 +28,11 @@ jobs:
           name: kitchen create
           command: kitchen create default
       - run:
-          name: kitchen exec
-          command: kitchen exec default -c 'head /opt/cinc/bin/cinc-client'
+          name: kitchen exec file
+          command: kitchen exec default -c 'file /opt/cinc/bin/cinc-client'
+      - run:
+          name: kitchen exec head
+          command: kitchen exec default -c 'head -n 25 /opt/cinc/bin/cinc-client'
       - run:
           name: kitchen
           command: kitchen verify default
