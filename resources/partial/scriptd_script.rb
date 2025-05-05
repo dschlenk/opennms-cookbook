@@ -11,21 +11,16 @@ action_class do
 end
 
 load_current_value do |new_resource|
-  config = new_resource.script unless new_resource.script.nil?
-  if config.nil?
-    config = Opennms::Cookbook::Scripty::ScriptyConfigurationFile.read("#{onms_etc}/scriptd-configuration.xml")
-  end
+  config = Opennms::Cookbook::Scripty::ScriptyConfigurationFile.read("#{onms_etc}/scriptd-configuration.xml")
   current_value_does_not_exist! unless config&.script_exists?(language: new_resource.language, script: new_resource.script)
   script new_resource.script
   language new_resource.language
 end
 
 action :add do
-  config = new_resource.script unless new_resource.script.nil?
-  if config.nil?
-    config = Opennms::Cookbook::Scripty::ScriptyConfigurationFile.read("#{onms_etc}/scriptd-configuration.xml")
-    return if config.nil?
-  end
+  config = Opennms::Cookbook::Scripty::ScriptyConfigurationFile.read("#{onms_etc}/scriptd-configuration.xml")
+  return if config.nil?
+
   if config.script_exists?(language: new_resource.language, script: new_resource.script)
     Chef::Log.info("Script '#{new_resource.script_name}' already exists.")
   else
@@ -41,11 +36,9 @@ action :add do
 end
 
 action :delete do
-  config = new_resource.script unless new_resource.script.nil?
-  if config.nil?
-    config = Opennms::Cookbook::Scripty::ScriptyConfigurationFile.read("#{onms_etc}/scriptd-configuration.xml")
-    return if config.nil?
-  end
+  config = Opennms::Cookbook::Scripty::ScriptyConfigurationFile.read("#{onms_etc}/scriptd-configuration.xml")
+  return if config.nil?
+
   if config.script_exists?(language: new_resource.language, script: new_resource.script)
     converge_by("Deleting script '#{new_resource.script_name}'") do
       config.delete_script(language: new_resource.language, script: new_resource.script)
