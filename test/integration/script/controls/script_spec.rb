@@ -15,7 +15,7 @@ control 'script' do
     it { should exist }
   end
 
-  describe scriptd_script('jython', 'stop', "1 + 1") do
+  describe scriptd_script('jython', 'stop', '1 + 1') do  # Corrected string to use single quotes
     it { should exist }
   end
 
