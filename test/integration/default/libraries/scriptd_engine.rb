@@ -8,20 +8,20 @@ class ScriptdEngine < Inspec.resource(1)
   example '
       describe scriptd_engine(\'beanshell\') do
         it { should_exist }
-        its(\'className\') { should eq \'bsh.util.BeanShellBSFEngine\' }
+        its(\'class_name\') { should eq \'bsh.util.BeanShellBSFEngine\' }
         its(\'extensions\') { should eq \'bsh\' }
       end
   '
   def initialize(language)
     @exists = false
-    @className = nil
+    @class_name = nil
     @extensions = nil
     doc = REXML::Document.new(inspec.file('/opt/opennms/etc/scriptd-configuration.xml').content)
     puts doc # TODO: remove once working
     lang = doc.root.elements["/scriptd-configuration/engine[@language = '#{language}']"]
     unless lang.nil?
       @exists = true
-      @className = lang.attributes['className']
+      @class_name = lang.attributes['class_name']
       @extensions = lang.attributes['extensions']
     end
   end
