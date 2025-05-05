@@ -81,7 +81,7 @@ module Opennms
           doc.elements.each('scriptd-configuration/engine') do |e|
             @config.add_engine(ScriptEngine.new(
               language: e.attributes['language'],
-              class_name: e.attributes['class_name'],
+              className: e.attributes['className'],
               extensions: e.attributes['extensions']
             ))
           end
@@ -141,7 +141,7 @@ module Opennms
           if engine.is_a?(Hash)
             engine = ScriptEngine.new(
               language: engine[:language],
-              class_name: engine[:class_name],
+              className: engine[:className],
               extensions: engine[:extensions]
             )
           end
@@ -191,18 +191,18 @@ module Opennms
       end
 
       class ScriptEngine
-        attr_reader :language, :class_name, :extensions
+        attr_reader :language, :className, :extensions
 
-        def initialize(language:, class_name:, extensions: nil)
+        def initialize(language:, className:, extensions: nil)
           @language = language
-          @class_name = class_name
+          @className = className
           @extensions = extensions
         end
 
         def eql?(engine)
           self.class.eql?(engine.class) &&
             @language.eql?(engine.language) &&
-            @class_name.eql?(engine.class_name) &&
+            @className.eql?(engine.className) &&
             @extensions.eql?(engine.extensions)
         end
       end
