@@ -25,8 +25,14 @@ jobs:
           name: cookstyle
           command: cookstyle
       - run:
+          name: kitchen create
+          command: kitchen create default
+      - run:
+          name: kitchen exec
+          command: kitchen exec default -c 'head /opt/cinc/bin/cinc-client'
+      - run:
           name: kitchen
-          command: kitchen test default --destroy always
+          command: kitchen verify default
 workflows:
   version: 2
   untagged-build:
