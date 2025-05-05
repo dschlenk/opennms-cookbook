@@ -31,8 +31,14 @@ jobs:
           name: kitchen exec file
           command: kitchen exec default -c 'file /opt/cinc/bin/cinc-client'
       - run:
+          name: kitchen exec file ruby
+          command: kitchen exec default -c 'file /opt/cinc/embedded/bin/ruby'
+      - run:
           name: kitchen exec head
           command: kitchen exec default -c 'head -n 25 /opt/cinc/bin/cinc-client'
+      - run:
+          name: kitchen exec ruby
+          command: kitchen exec default -c '/opt/cinc/embedded/bin/ruby --disable-gems'
       - run:
           name: kitchen
           command: kitchen verify default
