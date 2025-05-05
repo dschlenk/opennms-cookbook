@@ -1,9 +1,9 @@
 opennms_scriptd_engine 'groovy' do
-  className 'org.gradle.tasks.build.CompileTaskHandler'
+  class_name 'org.gradle.tasks.build.CompileTaskHandler'
   extensions 'groovy'
 end
 
 opennms_scriptd_engine 'java' do
-  className 'com.game.core.physics.CollisionManagerr'
+  class_name 'com.game.core.physics.CollisionManagerr'
   extensions 'java'
 end
