@@ -12,15 +12,17 @@ action_class do
 end
 
 load_current_value do |new_resource|
-  ro_scriptd_resource_init
-  config = Opennms::Cookbook::Scripty::ScriptyConfigurationFile.read("#{onms_etc}/scriptd-configuration.xml")
-  return if config.nil?
-
-  unless config.respond_to?(:script_exists?)
-    raise "ERROR: config does not support script_exists? (was: #{config.class})"
+  config = new_resource.script unless new_resource.script.nil?
+  if config.nil?
+    # Initialize ro_scriptd_resource and load the configuration
+    ro_scriptd_resource_init
+    config = ro_scriptd_resource.variables[:config]
   end
 
-  unless config.script_exists?(language: new_resource.language, script: new_resource.script)
+  unless config&.script_exists?(
+    language: new_resource.language,
+    script: new_resource.script
+  )
     current_value_does_not_exist!
   end
 
@@ -29,11 +31,10 @@ load_current_value do |new_resource|
 end
 
 action :add do
-  config = Opennms::Cookbook::Scripty::ScriptyConfigurationFile.read("#{onms_etc}/scriptd-configuration.xml")
-  return if config.nil?
-
-  unless config.respond_to?(:script_exists?)
-    raise "ERROR: config does not support script_exists? (was: #{config.class})"
+  config = new_resource.script unless new_resource.script.nil?
+  if config.nil?
+    config = Opennms::Cookbook::Scripty::ScriptyConfigurationFile.read("#{onms_etc}/scriptd-configuration.xml")
+    return if config.nil?
   end
 
   if config.script_exists?(language: new_resource.language, script: new_resource.script)
@@ -51,11 +52,10 @@ action :add do
 end
 
 action :delete do
-  config = Opennms::Cookbook::Scripty::ScriptyConfigurationFile.read("#{onms_etc}/scriptd-configuration.xml")
-  return if config.nil?
-
-  unless config.respond_to?(:script_exists?)
-    raise "ERROR: config does not support script_exists? (was: #{config.class})"
+  config = new_resource.script unless new_resource.script.nil?
+  if config.nil?
+    config = Opennms::Cookbook::Scripty::ScriptyConfigurationFile.read("#{onms_etc}/scriptd-configuration.xml")
+    return if config.nil?
   end
 
   if config.script_exists?(language: new_resource.language, script: new_resource.script)
