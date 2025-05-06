@@ -1,10 +1,10 @@
 opennms_scriptd_script 'beanshell' do
   language 'beanshell'
-  script ''
+  script 'bsf.lookupBean("log")'
 end
 
 opennms_scriptd_script 'groovy' do
   language 'groovy'
   uei 'uei.opennms.org/cheftest/thresholdExceeded'
-  script ''
+  script 'bsf.lookupBean("log")'
 end
