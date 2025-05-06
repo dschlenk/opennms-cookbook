@@ -9,12 +9,10 @@ property :uei, [String, Array]
 
 action_class do
   include Opennms::XmlHelper
-  include Opennms::Cookbook::Scriptd::ScriptdTemplate
 end
 
 load_current_value do |new_resource|
-  ro_scriptd_resource_init
-  config = ro_scriptd_resource.variables[:config]
+  config = ::Opennms::Cookbook::Scriptd::ScriptdConfigurationFile.read("#{onms_etc}/scriptd-configuration.xml")
 
   unless config&.script_exists?(
     name: new_resource.script_name,
@@ -23,13 +21,13 @@ load_current_value do |new_resource|
     current_value_does_not_exist!
   end
 
-  script new_resource.script
+  script config.get_script_body(name: new_resource.script_name, language: new_resource.language)
   language new_resource.language
 end
 
 action :add do
-  scriptd_resource_init
-  config = scriptd_resource.variables[:config]
+  config = ::Opennms::Cookbook::Scriptd::ScriptdConfigurationFile.read("#{onms_etc}/scriptd-configuration.xml")
+  return if config.nil?
 
   if config.script_exists?(name: new_resource.script_name, language: new_resource.language)
     Chef::Log.info("Script '#{new_resource.script_name}' already exists.")
@@ -42,14 +40,15 @@ action :add do
         type: new_resource.type,
         uei: new_resource.uei
       )
+      config.write("#{onms_etc}/scriptd-configuration.xml")
       Chef::Log.info("Script '#{new_resource.script_name}' added.")
     end
   end
 end
 
 action :delete do
-  scriptd_resource_init
-  config = scriptd_resource.variables[:config]
+  config = ::Opennms::Cookbook::Scriptd::ScriptdConfigurationFile.read("#{onms_etc}/scriptd-configuration.xml")
+  return if config.nil?
 
   if config.script_exists?(name: new_resource.script_name, language: new_resource.language)
     converge_by("Deleting script '#{new_resource.script_name}'") do
@@ -57,6 +56,7 @@ action :delete do
         name: new_resource.script_name,
         language: new_resource.language
       )
+      config.write("#{onms_etc}/scriptd-configuration.xml")
       Chef::Log.info("Script '#{new_resource.script_name}' deleted.")
     end
   else
