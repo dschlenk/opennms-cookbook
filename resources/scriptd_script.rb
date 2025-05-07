@@ -14,11 +14,13 @@ end
 load_current_value do |new_resource|
   config = ::Opennms::Cookbook::Scriptd::ScriptdConfigurationFile.read("#{onms_etc}/scriptd-configuration.xml")
 
-  unless config.event_script.any? { |script| script.language == new_resource.language && script.script.include?(new_resource.script_name) }
+  unless [config.start_script, config.stop_script, config.reload_script, config.event_script].any? do |script_list|
+    script_list.any? { |script| script.language == new_resource.language && script.script.include?(new_resource.script_name) }
+  end
     current_value_does_not_exist!
   end
 
-  script config.get_script_body(name: new_resource.script_name, language: new_resource.language)
+  script config.event_script.find { |script| script.language == new_resource.language }&.script
   language new_resource.language
 end
 
@@ -26,7 +28,9 @@ action :add do
   config = ::Opennms::Cookbook::Scriptd::ScriptdConfigurationFile.read("#{onms_etc}/scriptd-configuration.xml")
   return if config.nil?
 
-  if config.event_script.any? { |script| script.language == new_resource.language && script.script.include?(new_resource.script_name) }
+  if [config.start_script, config.stop_script, config.reload_script, config.event_script].any? do |script_list|
+    script_list.any? { |script| script.language == new_resource.language && script.script.include?(new_resource.script_name) }
+  end
     Chef::Log.info("Script '#{new_resource.script_name}' already exists.")
   else
     converge_by("Adding script '#{new_resource.script_name}'") do
@@ -47,7 +51,9 @@ action :delete do
   config = ::Opennms::Cookbook::Scriptd::ScriptdConfigurationFile.read("#{onms_etc}/scriptd-configuration.xml")
   return if config.nil?
 
-  if config.event_script.any? { |script| script.language == new_resource.language && script.script.include?(new_resource.script_name) }
+  if [config.start_script, config.stop_script, config.reload_script, config.event_script].any? do |script_list|
+    script_list.any? { |script| script.language == new_resource.language && script.script.include?(new_resource.script_name) }
+  end
     converge_by("Deleting script '#{new_resource.script_name}'") do
       config.delete_script(
         name: new_resource.script_name,
