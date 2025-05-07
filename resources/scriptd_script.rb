@@ -14,13 +14,13 @@ end
 load_current_value do |new_resource|
   config = ::Opennms::Cookbook::Scriptd::ScriptdConfigurationFile.read("#{onms_etc}/scriptd-configuration.xml")
 
-  unless [config.start_script, config.stop_script, config.reload_script, config.event_script].any? do |script_list|
+  unless [config.config.start_script, config.config.stop_script, config.config.reload_script, config.config.event_script].any? do |script_list|
     script_list.any? { |script| script.language == new_resource.language && script.script.include?(new_resource.script_name) }
   end
     current_value_does_not_exist!
   end
 
-  script config.event_script.find { |script| script.language == new_resource.language }&.script
+  script config.config.event_script.find { |script| script.language == new_resource.language }&.script
   language new_resource.language
 end
 
@@ -28,20 +28,20 @@ action :add do
   config = ::Opennms::Cookbook::Scriptd::ScriptdConfigurationFile.read("#{onms_etc}/scriptd-configuration.xml")
   return if config.nil?
 
-  if [config.start_script, config.stop_script, config.reload_script, config.event_script].any? do |script_list|
+  if [config.config.start_script, config.config.stop_script, config.config.reload_script, config.config.event_script].any? do |script_list|
     script_list.any? { |script| script.language == new_resource.language && script.script.include?(new_resource.script_name) }
   end
     Chef::Log.info("Script '#{new_resource.script_name}' already exists.")
   else
     converge_by("Adding script '#{new_resource.script_name}'") do
-      config.add_script(
+      config.config.add_script(
         name: new_resource.script_name,
         language: new_resource.language,
         script: new_resource.script,
         type: new_resource.type,
         uei: new_resource.uei
       )
-      config.write("#{onms_etc}/scriptd-configuration.xml")
+      config.config.write("#{onms_etc}/scriptd-configuration.xml")
       Chef::Log.info("Script '#{new_resource.script_name}' added.")
     end
   end
@@ -51,15 +51,15 @@ action :delete do
   config = ::Opennms::Cookbook::Scriptd::ScriptdConfigurationFile.read("#{onms_etc}/scriptd-configuration.xml")
   return if config.nil?
 
-  if [config.start_script, config.stop_script, config.reload_script, config.event_script].any? do |script_list|
+  if [config.config.start_script, config.config.stop_script, config.config.reload_script, config.config.event_script].any? do |script_list|
     script_list.any? { |script| script.language == new_resource.language && script.script.include?(new_resource.script_name) }
   end
     converge_by("Deleting script '#{new_resource.script_name}'") do
-      config.delete_script(
+      config.config.delete_script(
         name: new_resource.script_name,
         language: new_resource.language
       )
-      config.write("#{onms_etc}/scriptd-configuration.xml")
+      config.config.write("#{onms_etc}/scriptd-configuration.xml")
       Chef::Log.info("Script '#{new_resource.script_name}' deleted.")
     end
   else
