@@ -14,10 +14,7 @@ end
 load_current_value do |new_resource|
   config = ::Opennms::Cookbook::Scriptd::ScriptdConfigurationFile.read("#{onms_etc}/scriptd-configuration.xml")
 
-  unless config&.script_exists?(
-    name: new_resource.script_name,
-    language: new_resource.language
-  )
+  unless config.get_script_body(name: new_resource.script_name, language: new_resource.language)
     current_value_does_not_exist!
   end
 
@@ -29,7 +26,7 @@ action :add do
   config = ::Opennms::Cookbook::Scriptd::ScriptdConfigurationFile.read("#{onms_etc}/scriptd-configuration.xml")
   return if config.nil?
 
-  if config.script_exists?(name: new_resource.script_name, language: new_resource.language)
+  if config.get_script_body(name: new_resource.script_name, language: new_resource.language)
     Chef::Log.info("Script '#{new_resource.script_name}' already exists.")
   else
     converge_by("Adding script '#{new_resource.script_name}'") do
@@ -50,7 +47,7 @@ action :delete do
   config = ::Opennms::Cookbook::Scriptd::ScriptdConfigurationFile.read("#{onms_etc}/scriptd-configuration.xml")
   return if config.nil?
 
-  if config.script_exists?(name: new_resource.script_name, language: new_resource.language)
+  if config.get_script_body(name: new_resource.script_name, language: new_resource.language)
     converge_by("Deleting script '#{new_resource.script_name}'") do
       config.delete_script(
         name: new_resource.script_name,
