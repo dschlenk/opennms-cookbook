@@ -1,56 +1,65 @@
 include Opennms::XmlHelper
+unified_mode true
 
-module Opennms
-  module Cookbook
-    module Scriptd
-      class ScriptdConfigurationFile
-        attr_reader :config
+property :script_name, String, name_property: true
+property :language, String, required: true
+property :script, String
+property :type, String, equal_to: %w(start stop reload event), default: 'event'
+property :uei, [String, Array]
 
-        def initialize(config)
-          @config = config
-        end
+action_class do
+  include Opennms::XmlHelper
+end
 
-        def self.read(file_path)
-          return nil unless File.exist?(file_path)
+load_current_value do |new_resource|
+  config = ::Opennms::Cookbook::Scriptd::ScriptdConfigurationFile.read("#{onms_etc}/scriptd-configuration.xml")
 
-          config = load_xml_file(file_path, 'scriptd-configuration', ScriptdConfig)
-          new(config)
-        end
+  unless config&.script_exists?(
+    name: new_resource.script_name,
+    language: new_resource.language
+  )
+    current_value_does_not_exist!
+  end
 
-        def write(file_path)
-          save_xml_file(@config, file_path)
-        end
+  script config.get_script_body(name: new_resource.script_name, language: new_resource.language)
+  language new_resource.language
+end
 
-        def add_script(name:, language:, script:, type:, uei:)
-          @config.add_script(
-            name: name,
-            language: language,
-            script: script,
-            type: type,
-            uei: uei
-          )
-        end
+action :add do
+  config = ::Opennms::Cookbook::Scriptd::ScriptdConfigurationFile.read("#{onms_etc}/scriptd-configuration.xml")
+  return if config.nil?
 
-        def delete_script(name:, language:)
-          @config.delete_script(
-            name: name,
-            language: language
-          )
-        end
+  if config.script_exists?(name: new_resource.script_name, language: new_resource.language)
+    Chef::Log.info("Script '#{new_resource.script_name}' already exists.")
+  else
+    converge_by("Adding script '#{new_resource.script_name}'") do
+      config.add_script(
+        name: new_resource.script_name,
+        language: new_resource.language,
+        script: new_resource.script,
+        type: new_resource.type,
+        uei: new_resource.uei
+      )
+      config.write("#{onms_etc}/scriptd-configuration.xml")
+      Chef::Log.info("Script '#{new_resource.script_name}' added.")
+    end
+  end
+end
 
-        def get_script_body(name:, language:)
-          script = @config.scripts.find do |s|
-            s.name == name && s.language == language
-          end
-          script&.script
-        end
+action :delete do
+  config = ::Opennms::Cookbook::Scriptd::ScriptdConfigurationFile.read("#{onms_etc}/scriptd-configuration.xml")
+  return if config.nil?
 
-        def script_exists?(name:, language:)
-          @config.scripts.any? do |script|
-            script.name == name && script.language == language
-          end
-        end
-      end
-    end
-  end
+  if config.script_exists?(name: new_resource.script_name, language: new_resource.language)
+    converge_by("Deleting script '#{new_resource.script_name}'") do
+      config.delete_script(
+        name: new_resource.script_name,
+        language: new_resource.language
+      )
+      config.write("#{onms_etc}/scriptd-configuration.xml")
+      Chef::Log.info("Script '#{new_resource.script_name}' deleted.")
+    end
+  else
+    Chef::Log.info("Script '#{new_resource.script_name}' not found.")
+  end
 end
