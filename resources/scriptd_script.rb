@@ -35,7 +35,6 @@ action :add do
   else
     converge_by("Adding script '#{new_resource.script_name}'") do
       config.config.add_script(
-        name: new_resource.script_name,
         language: new_resource.language,
         script: new_resource.script,
         type: new_resource.type,
