@@ -28,32 +28,10 @@ module Opennms
           false
         end
 
-        def ro_scriptd_resource_exist?
-          !find_resource(:template, 'RO /opt/opennms/etc/scriptd-configuration.xml').nil?
-        rescue Chef::Exceptions::ResourceNotFound
-          false
-        end
-
         def scriptd_resource_create
-          create_scriptd_template(
-            path: '/opt/opennms/etc/scriptd-configuration.xml',
-            delayed: :create
-          )
-        end
-
-        def ro_scriptd_resource_create
-          create_scriptd_template(
-            path: 'RO /opt/opennms/etc/scriptd-configuration.xml',
-            delayed: :nothing
-          )
-        end
-
-        def create_scriptd_template(path:, delayed:)
           file = Opennms::Cookbook::Scriptd::ScriptdConfigurationFile.read('/opt/opennms/etc/scriptd-configuration.xml')
-          file.config.write!
-
           with_run_context(:root) do
-            declare_resource(:template, path) do
+            declare_resource(:template, '/opt/opennms/etc/scriptd-configuration.xml') do
               cookbook 'opennms'
               source 'scriptd-configuration.xml.erb'
               owner node['opennms']['username']
@@ -61,7 +39,29 @@ module Opennms
               mode '0664'
               variables(config: file.config)
               action :nothing
-              delayed_action delayed
+              delayed_action :create
+            end
+          end
+        end
+
+        def ro_scriptd_resource_exist?
+          !find_resource(:template, 'RO /opt/opennms/etc/scriptd-configuration.xml').nil?
+        rescue Chef::Exceptions::ResourceNotFound
+          false
+        end
+
+        def ro_scriptd_resource_create
+          file = Opennms::Cookbook::Scriptd::ScriptdConfigurationFile.read('/opt/opennms/etc/scriptd-configuration.xml')
+          with_run_context(:root) do
+            declare_resource(:template, 'RO /opt/opennms/etc/scriptd-configuration.xml') do
+              cookbook 'opennms'
+              source 'scriptd-configuration.xml.erb'
+              owner node['opennms']['username']
+              group node['opennms']['groupname']
+              mode '0664'
+              variables(config: file.config)
+              action :nothing
+              delayed_action :nothing
             end
           end
         end
@@ -78,7 +78,6 @@ module Opennms
         def read!(file = 'scriptd-configuration.xml')
           raise ArgumentError, "File #{file} does not exist" unless ::File.exist?(file)
           doc = xmldoc_from_file(file)
-
           doc.elements.each('scriptd-configuration/engine') do |e|
             @config.add_engine(ScriptEngine.new(
               language: e.attributes['language'],
@@ -178,39 +177,36 @@ module Opennms
           @event_script << script
         end
 
-        def eql?(other)
-          self.class.eql?(other.class) &&
-            @engine.eql?(other.engine) &&
-            @start_script.eql?(other.start_script) &&
-            @stop_script.eql?(other.stop_script) &&
-            @reload_script.eql?(other.reload_script) &&
-            @event_script.eql?(other.event_script) &&
-            @transactional.eql?(other.transactional)
-        end
+        def write(file_path)
+          doc = REXML::Document.new
+          root = doc.add_element('scriptd-configuration')
 
-        def write!(file = '/opt/opennms/etc/scriptd-configuration.xml')
-          xml = Builder::XmlMarkup.new(indent: 2)
-          xml.instruct! :xml, version: '1.0', encoding: 'UTF-8'
-          xml.scriptd_configuration do |scriptd_config|
-            @engine.each do |e|
-              scriptd_config.engine(language: e.language, class_name: e.class_name, extensions: e.extensions)
-            end
-            @start_script.each do |s|
-              scriptd_config.start_script(language: s.language, script: s.script)
-            end
-            @stop_script.each do |s|
-              scriptd_config.stop_script(language: s.language, script: s.script)
-            end
-            @reload_script.each do |s|
-              scriptd_config.reload_script(language: s.language, script: s.script)
-            end
-            @event_script.each do |e|
-              scriptd_config.event_script(language: e.language, script: e.script) do |event|
-                e.uei.each { |uei| event.uei(uei) }
-              end
+          @engine.each do |engine|
+            engine_elem = root.add_element('engine')
+            engine_elem.attributes['language'] = engine.language
+            engine_elem.attributes['class_name'] = engine.class_name
+            engine_elem.attributes['extensions'] = engine.extensions
+          end
+
+          [@start_script, @stop_script, @reload_script, @event_script].each do |script_list|
+            script_list.each do |script|
+              script_elem = root.add_element("#{script.class.name.downcase}-script")
+              script_elem.attributes['language'] = script.language
+              script_elem.text = script.script
             end
           end
-          File.write(file, xml.target!)
+
+          File.open(file_path, 'w') { |file| doc.write(file) }
+        end
+
+        def eql?(scriptd_configuration)
+          self.class.eql?(scriptd_configuration.class) &&
+            @engine.eql?(scriptd_configuration.engine) &&
+            @start_script.eql?(scriptd_configuration.start_script) &&
+            @stop_script.eql?(scriptd_configuration.stop_script) &&
+            @reload_script.eql?(scriptd_configuration.reload_script) &&
+            @event_script.eql?(scriptd_configuration.event_script) &&
+            @transactional.eql?(scriptd_configuration.transactional)
         end
       end
 
@@ -222,10 +218,10 @@ module Opennms
           @script = script
         end
 
-        def eql?(other)
-          self.class.eql?(other.class) &&
-            @language.eql?(other.language) &&
-            @script.eql?(other.script)
+        def eql?(start_script)
+          self.class.eql?(start_script.class) &&
+            @language.eql?(start_script.language) &&
+            @script.eql?(start_script.script)
         end
       end
 
@@ -238,11 +234,11 @@ module Opennms
           @extensions = extensions
         end
 
-        def eql?(other)
-          self.class.eql?(other.class) &&
-            @language.eql?(other.language) &&
-            @class_name.eql?(other.class_name) &&
-            @extensions.eql?(other.extensions)
+        def eql?(engine)
+          self.class.eql?(engine.class) &&
+            @language.eql?(engine.language) &&
+            @class_name.eql?(engine.class_name) &&
+            @extensions.eql?(engine.extensions)
         end
       end
 
@@ -254,15 +250,16 @@ module Opennms
         attr_reader :uei
 
         def initialize(language:, script:, uei: nil)
-          super(language: language, script: script)
           @uei = uei || []
+          @language = language
+          @script = script
         end
 
-        def eql?(other)
-          self.class.eql?(other.class) &&
-            @uei.eql?(other.uei) &&
-            @script.eql?(other.script) &&
-            @language.eql?(other.language)
+        def eql?(event_script)
+          self.class.eql?(event_script.class) &&
+            @uei.eql?(event_script.uei) &&
+            @script.eql?(event_script.script) &&
+            @language.eql?(event_script.language)
         end
       end
     end
