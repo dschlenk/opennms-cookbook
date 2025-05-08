@@ -149,17 +149,17 @@ module Opennms
         end
         def add_script(language:, script:, type:, uei: nil)
           case type
-            when start
-              add_start_script(StartScript.new(language: language, script: script)
-            when stop
-              add_stop_script(StopScript.new(language: language, script: script)
-            when reload
-              add_reload_script(ReloadScript.new(language: language, script: script)
-            when event
-              add_event_script(EventScript.new(language: language, script: script, uei: uei)
+            when :start
+              add_start_script(StartScript.new(language: language, script: script))
+            when :stop
+              add_stop_script(StopScript.new(language: language, script: script))
+            when :reload
+              add_reload_script(ReloadScript.new(language: language, script: script))
+            when :event
+              add_event_script(EventScript.new(language: language, script: script, uei: uei))
           end
         end
-        
+
         def add_start_script(script)
           @start_script << script
         end
