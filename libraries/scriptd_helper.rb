@@ -30,6 +30,10 @@ module Opennms
 
         def scriptd_resource_create
           file = Opennms::Cookbook::Scriptd::ScriptdConfigurationFile.read('/opt/opennms/etc/scriptd-configuration.xml')
+          
+          # Call the write method after changes are made
+          file.config.write!
+
           with_run_context(:root) do
             declare_resource(:template, '/opt/opennms/etc/scriptd-configuration.xml') do
               cookbook 'opennms'
@@ -52,6 +56,10 @@ module Opennms
 
         def ro_scriptd_resource_create
           file = Opennms::Cookbook::Scriptd::ScriptdConfigurationFile.read('/opt/opennms/etc/scriptd-configuration.xml')
+          
+          # Call the write method after changes are made
+          file.config.write!
+
           with_run_context(:root) do
             declare_resource(:template, 'RO /opt/opennms/etc/scriptd-configuration.xml') do
               cookbook 'opennms'
@@ -185,6 +193,34 @@ module Opennms
             @reload_script.eql?(scriptd_configuration.reload_script) &&
             @event_script.eql?(scriptd_configuration.event_script) &&
             @transactional.eql?(scriptd_configuration.transactional)
+        end
+
+        def write!(file = '/opt/opennms/etc/scriptd-configuration.xml')
+          # Create an XML structure from @engine, @start_script, @stop_script, etc.
+          xml = Builder::XmlMarkup.new(indent: 2)
+          xml.instruct! :xml, version: "1.0", encoding: "UTF-8"
+          xml.scriptd_configuration do |scriptd_config|
+            @engine.each do |e|
+              scriptd_config.engine(language: e.language, class_name: e.class_name, extensions: e.extensions)
+            end
+            @start_script.each do |s|
+              scriptd_config.start_script(language: s.language, script: s.script)
+            end
+            @stop_script.each do |s|
+              scriptd_config.stop_script(language: s.language, script: s.script)
+            end
+            @reload_script.each do |s|
+              scriptd_config.reload_script(language: s.language, script: s.script)
+            end
+            @event_script.each do |e|
+              scriptd_config.event_script(language: e.language, script: e.script) do |event|
+                e.uei.each { |uei| event.uei(uei) }
+              end
+            end
+          end
+
+          # Save the XML to the file
+          File.write(file, xml.target!)
         end
       end
 
