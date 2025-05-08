@@ -732,20 +732,13 @@ suites:
       inspec_tests:
         - path: test/integration/default
         - path: test/integration/role
-  - name: scriptd_engine
+  - name: scriptd
     provisioner:
-      policyfile: policyfiles/scriptd_engine.rb
+      policyfile: policyfiles/scriptd.rb
     verifier:
       inspec_tests:
         - path: test/integration/default
-        - path: test/integration/scriptd_engine
-  - name: scriptd_script
-    provisioner:
-      policyfile: policyfiles/scriptd_script.rb
-    verifier:
-      inspec_tests:
-        - path: test/integration/default
-        - path: test/integration/scriptd_script
+        - path: test/integration/script
   - name: send_event
     driver:
       ports:
