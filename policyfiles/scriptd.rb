@@ -1,4 +1,4 @@
-name 'opennms_scriptd_engine'
+name 'opennms_scriptd'
 default_source :supermarket
 run_list 'opennms::postgres', 'openjdk17', 'opennms', 'opennms_resource_tests::scriptd_engine', 'opennms_resource_tests::scriptd_script'
 cookbook 'opennms', path: '../'
