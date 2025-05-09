@@ -15,6 +15,8 @@ class ScriptdEngine < Inspec.resource(1)
       end
   '
 
+  attr_reader :class_name, :extensions
+
   def initialize(language)
     @exists = false
     @class_name = nil
@@ -30,13 +32,5 @@ class ScriptdEngine < Inspec.resource(1)
 
   def exist?
     @exists
-  end
-
-  def class_name
-    @class_name
-  end
-
-  def extensions
-    @extensions
   end
 end
