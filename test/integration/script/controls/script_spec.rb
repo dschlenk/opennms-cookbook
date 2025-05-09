@@ -1,10 +1,14 @@
 control 'script' do
-  describe scriptd_engine('beanshell', 'bsh.util.BeanShellBSFEngine', 'bsh') do
+  describe scriptd_engine('beanshell') do
     it { should exist }
+    its('class_name') { should eq 'bsh.util.BeanShellBSFEngine' }
+    its('extensions') { should eq 'bsh' }
   end
 
-  describe scriptd_engine('jython', 'org.apache.bsf.engines.JythonEngine', 'py') do
+  describe scriptd_engine('jython') do
     it { should exist }
+    its('class_name') { should eq 'org.apache.bsf.engines.JythonEngine' }
+    its('extensions') { should eq 'py' }
   end
 
   describe scriptd_script('beanshell', 'start', "log = bsf.lookupBean(\"log\");\nlog.debug(\"start-script\");\nlog.debug(\"start-script too\");") do
