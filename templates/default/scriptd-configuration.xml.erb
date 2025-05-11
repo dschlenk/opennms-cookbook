@@ -3,7 +3,7 @@
     <engine
       language="<%= e.language.to_s.encode(xml: :attr) %>"
       <%= e.class_name ? "class_name=\"#{e.class_name.to_s.encode(xml: :attr)}\"" : '' %>
-      <% if e.extensions && !e.extensions.empty? %>
+      <% if e.extensions && !e.extensions.to_s.strip.empty? %>
         extensions="<%= e.extensions.to_s.encode(xml: :attr) %>"
       <% end %> />
   <% end -%>
