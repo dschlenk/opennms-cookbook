@@ -1,37 +1,36 @@
 <scriptd-configuration xmlns="http://xmlns.opennms.org/xsd/config/scriptd">
   <% @config.engine.each do |e| -%>
-    <engine
-      language="<%= e.language.to_s.encode(xml: :attr) %>"
-      <%= e.class_name ? "class_name=\"#{e.class_name.to_s.encode(xml: :attr)}\"" : '' %>
-      <% if e.extensions && !e.extensions.to_s.strip.empty? %>
-        extensions="<%= e.extensions.to_s.encode(xml: :attr) %>"
-      <% end %> />
+    <engine language="<%= e.language.encode(xml: :attr) %>"<%= e.class_name ? " class_name=\"#{e.class_name.encode(xml: :attr)}\"" : '' %>
+    <% if e.extensions && !e.extensions.strip.empty? %>
+      <%= " extensions=\"#{e.extensions.encode(xml: :attr)}\"" %>
+    <% end %>
+    />
   <% end -%>
 
   <% @config.start_script.each do |ss| -%>
-    <start-script language="<%= ss.language.to_s.encode(xml: :attr) %>">
-      <%= ss.script.to_s.encode(xml: :text) %>
+    <start-script language="<%= ss.language.encode(:xml => :attr) %>">
+      <%= ss.script.encode(:xml => :text) %>
     </start-script>
   <% end -%>
 
   <% @config.stop_script.each do |s| -%>
-    <stop-script language="<%= s.language.to_s.encode(xml: :attr) %>">
-      <%= s.script.to_s.encode(xml: :text) %>
+    <stop-script language="<%= s.language.encode(:xml => :attr) %>">
+      <%= s.script.encode(:xml => :text) %>
     </stop-script>
   <% end -%>
 
   <% @config.reload_script.each do |rs| -%>
-    <reload-script language="<%= rs.language.to_s.encode(xml: :attr) %>">
-      <%= rs.script.to_s.encode(xml: :text) %>
+    <reload-script language="<%= rs.language.encode(:xml => :attr) %>">
+      <%= rs.script.encode(:xml => :text) %>
     </reload-script>
   <% end -%>
 
   <% @config.event_script.each do |es| -%>
-    <event-script language="<%= es.language.to_s.encode(xml: :attr) %>">
-      <%= es.script.to_s.encode(xml: :text) %>
+    <event-script language="<%= es.language.encode(:xml => :attr) %>">
+      <%= es.script.encode(:xml => :text) %>
     </event-script>
     <% Array(es.uei).each do |uei_value| -%>
-      <uei name="<%= uei_value.to_s.encode(xml: :attr) %>" />
+      <uei name="<%= uei_value.encode(:xml => :attr) %>" />
     <% end -%>
   <% end -%>
 </scriptd-configuration>
