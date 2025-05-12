@@ -1,6 +1,7 @@
 control 'script' do
   describe scriptd_engine('beanshell') do
     it { should exist }
+    its('language') { should eq 'beanshell' }
     its('class_name') { should eq 'bsh.util.BeanShellBSFEngine' }
     its('extensions') { should eq 'bsh' }
   end
