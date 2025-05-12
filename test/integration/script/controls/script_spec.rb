@@ -10,7 +10,7 @@ control 'script' do
     it { should exist }
     its('language') { should eq 'jython' }
     its('class_name') { should eq 'org.apache.bsf.engines.JythonEngine' }
-    its('extensions') { should eq 'py' } # Optional, ensure it's there if it exists
+    its('extensions') { should eq 'py' }
   end
 
   describe scriptd_script('beanshell', 'start', "log = bsf.lookupBean(\"log\");\nlog.debug(\"start-script\");\nlog.debug(\"start-script too\");") do
