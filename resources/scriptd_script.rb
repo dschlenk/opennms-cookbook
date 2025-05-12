@@ -74,10 +74,49 @@ action :delete do
       end
     end
   when 'stop'
+    if config.stop_script.select { |s| s.language.eql?(new_resource.language) && s.script.eql?(new_resource.script) }.one?
+      converge_by("Deleting script '#{new_resource.script_name}'") do
+        scriptd_resource_init
+        template = scriptd_resource
+        config = template.variables[:config]
+        config.delete_script( # TODO: implement this method in the library file
+          language: new_resource.language,
+          script: new_resource.script,
+          type: new_resource.type,
+          uei: new_resource.type
+        )
+      end
+    end
     # TODO: implement similar to 'start'
   when 'reload'
+    if config.reload_script.select { |rs| rs.language.eql?(new_resource.language) && rs.script.eql?(new_resource.script) }.one?
+      converge_by("Deleting script '#{new_resource.script_name}'") do
+        scriptd_resource_init
+        template = scriptd_resource
+        config = template.variables[:config]
+        config.delete_script( # TODO: implement this method in the library file
+          language: new_resource.language,
+          script: new_resource.script,
+          type: new_resource.type,
+          uei: new_resource.type
+        )
+      end
+    end
     # TODO: implement similar to 'start'
   when 'event'
+    if config.event_script.select { |es| es.language.eql?(new_resource.language) && es.script.eql?(new_resource.script) && es.uei.eql?(new_resource.uei) }.one?
+      converge_by("Deleting script '#{new_resource.script_name}'") do
+        scriptd_resource_init
+        template = scriptd_resource
+        config = template.variables[:config]
+        config.delete_script( # TODO: implement this method in the library file
+          language: new_resource.language,
+          script: new_resource.script,
+          type: new_resource.type,
+          uei: new_resource.type
+        )
+      end
+    end
     # TODO: implement similar to 'start' but also taking into account the `uei` field, which can be an array or a string (easiest to coerce it to a single value array if it is a string)
   end
 end
