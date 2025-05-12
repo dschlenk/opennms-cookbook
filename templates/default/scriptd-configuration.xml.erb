@@ -1,6 +1,8 @@
 <scriptd-configuration xmlns="http://xmlns.opennms.org/xsd/config/scriptd">
   <% @config.engine.each do |e| -%>
-    <engine language="<%= e.language.encode(xml: :attr) %>"<%= e.class_name && !e.class_name.empty? ? " class_name=\"#{e.class_name.encode(xml: :attr)}\"" : '' %><%= e.extensions && !e.extensions.empty? ? " extensions=\"#{e.extensions.encode(xml: :attr)}\"" : '' %> />
+    <engine language="<%= e.language.encode(xml: :attr) %>"
+            <% if e.class_name && !e.class_name.empty? %> class_name="<%= e.class_name.encode(xml: :attr) %>" <% end %>
+            <% if e.extensions && !e.extensions.empty? %> extensions="<%= e.extensions.encode(xml: :attr) %>" <% end %> />
   <% end -%>
 
   <% @config.start_script.each do |ss| -%>
