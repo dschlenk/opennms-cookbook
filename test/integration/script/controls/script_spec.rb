@@ -1,12 +1,15 @@
-control 'script' do
+control 'script' do 
   describe scriptd_engine('beanshell') do
     it { should exist }
+    its('language') { should eq 'beanshell' }
+    its('class_name') { should eq 'bsh.util.BeanShellBSFEngine' } # Optional, ensure it's there if it exists
+    its('extensions') { should eq 'bsh' } # Optional, ensure it's there if it exists
   end
 
   describe scriptd_engine('jython') do
     it { should exist }
-    its('class_name') { should eq 'org.apache.bsf.engines.JythonEngine' }
-    its('extensions') { should eq 'py' }
+    its('class_name') { should eq 'org.apache.bsf.engines.JythonEngine' } # Optional, ensure it's there if it exists
+    its('extensions') { should eq 'py' } # Optional, ensure it's there if it exists
   end
 
   describe scriptd_script('beanshell', 'start', "log = bsf.lookupBean(\"log\");\nlog.debug(\"start-script\");\nlog.debug(\"start-script too\");") do
