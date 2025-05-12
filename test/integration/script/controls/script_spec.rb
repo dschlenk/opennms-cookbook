@@ -1,4 +1,4 @@
-control 'script' do 
+control 'script' do
   describe scriptd_engine('beanshell') do
     it { should exist }
     its('language') { should eq 'beanshell' }
