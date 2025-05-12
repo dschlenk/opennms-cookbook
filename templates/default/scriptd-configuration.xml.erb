@@ -1,32 +1,34 @@
 <scriptd-configuration xmlns="http://xmlns.opennms.org/xsd/config/scriptd">
+  <% require 'cgi' -%>
+
   <% @config.engine.each do |e| -%>
-    <engine language="<%= e.language.encode(xml: :attr) %>"<%= e.class_name ? " class_name=\"#{e.class_name.encode(xml: :attr)}\"" : '' %><%= e.extensions && !e.extensions.empty? ? " extensions=\"#{e.extensions.encode(xml: :attr)}\"" : '' %> />
+    <engine language="<%= CGI.escapeHTML(e.language) %>"<%= e.class_name ? " class_name=\"#{CGI.escapeHTML(e.class_name)}\"" : '' %><%= e.extensions && !e.extensions.empty? ? " extensions=\"#{CGI.escapeHTML(e.extensions)}\"" : '' %> />
   <% end -%>
 
   <% @config.start_script.each do |ss| -%>
-    <start-script language="<%= ss.language.encode(:xml => :attr) %>">
-      <%= ss.script.encode(:xml => :text) %>
+    <start-script language="<%= CGI.escapeHTML(ss.language) %>">
+      <%= ss.script.encode(xml: :text) %>
     </start-script>
   <% end -%>
 
   <% @config.stop_script.each do |s| -%>
-    <stop-script language="<%= s.language.encode(:xml => :attr) %>">
-      <%= s.script.encode(:xml => :text) %>
+    <stop-script language="<%= CGI.escapeHTML(s.language) %>">
+      <%= s.script.encode(xml: :text) %>
     </stop-script>
   <% end -%>
 
   <% @config.reload_script.each do |rs| -%>
-    <reload-script language="<%= rs.language.encode(:xml => :attr) %>">
-      <%= rs.script.encode(:xml => :text) %>
+    <reload-script language="<%= CGI.escapeHTML(rs.language) %>">
+      <%= rs.script.encode(xml: :text) %>
     </reload-script>
   <% end -%>
 
   <% @config.event_script.each do |es| -%>
-    <event-script language="<%= es.language.encode(:xml => :attr) %>">
-      <%= es.script.encode(:xml => :text) %>
+    <event-script language="<%= CGI.escapeHTML(es.language) %>">
+      <%= es.script.encode(xml: :text) %>
     </event-script>
     <% Array(es.uei).each do |uei_value| -%>
-      <uei name="<%= uei_value.encode(:xml => :attr) %>" />
+      <uei name="<%= CGI.escapeHTML(uei_value) %>" />
     <% end -%>
   <% end -%>
 </scriptd-configuration>
