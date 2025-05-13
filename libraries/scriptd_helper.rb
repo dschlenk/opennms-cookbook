@@ -82,7 +82,7 @@ module Opennms
           doc.elements.each('scriptd-configuration/engine') do |e|
             @config.add_engine(ScriptEngine.new(
               language: e.attributes['language'],
-              class_name: e.attributes['class_name'],
+              class_name: e.attributes['className'],
               extensions: e.attributes['extensions']
             ))
           end
