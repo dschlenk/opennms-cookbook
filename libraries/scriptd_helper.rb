@@ -1,6 +1,3 @@
-.helper 
-
-
 module Opennms
   module Cookbook
     module Scriptd
