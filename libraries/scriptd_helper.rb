@@ -177,6 +177,25 @@ module Opennms
           @event_script << script
         end
 
+        def delete_script(language:, script:, type:, uei: nil)
+          case type.to_sym
+          when :start
+            @start_script.delete_if { |s| s.language == language && s.script == script }
+          when :stop
+            @stop_script.delete_if { |s| s.language == language && s.script == script }
+          when :reload
+            @reload_script.delete_if { |s| s.language == language && s.script == script }
+          when :event
+            @event_script.delete_if do |s|
+              s.language == language &&
+              s.script == script &&
+              Array(s.uei).sort == Array(uei).sort
+            end
+          else
+            raise ArgumentError, "Unsupported script type: #{type}"
+          end
+        end
+
         def write(file_path)
           doc = REXML::Document.new
           root = doc.add_element('scriptd-configuration')
@@ -218,10 +237,10 @@ module Opennms
           @script = script
         end
 
-        def eql?(start_script)
-          self.class.eql?(start_script.class) &&
-            @language.eql?(start_script.language) &&
-            @script.eql?(start_script.script)
+        def eql?(other)
+          self.class.eql?(other.class) &&
+            @language.eql?(other.language) &&
+            @script.eql?(other.script)
         end
       end
 
