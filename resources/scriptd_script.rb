@@ -1,4 +1,5 @@
 include Opennms::XmlHelper
+include Opennms::Cookbook::Scriptd::ScriptdTemplate
 unified_mode true
 
 property :script_name, String, name_property: true
@@ -9,6 +10,7 @@ property :uei, [String, Array]
 
 action_class do
   include Opennms::XmlHelper
+  include Opennms::Cookbook::Scriptd::ScriptdTemplate
 end
 
 load_current_value do |new_resource|
