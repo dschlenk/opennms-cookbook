@@ -78,6 +78,7 @@ module Opennms
         def read!(file = 'scriptd-configuration.xml')
           raise ArgumentError, "File #{file} does not exist" unless ::File.exist?(file)
           doc = xmldoc_from_file(file)
+
           doc.elements.each('scriptd-configuration/engine') do |e|
             @config.add_engine(ScriptEngine.new(
               language: e.attributes['language'],
@@ -161,6 +162,25 @@ module Opennms
           end
         end
 
+        def delete_script(language:, script:, type:, uei: nil)
+          case type.to_sym
+          when :start
+            @start_script.delete_if { |s| s.language == language && s.script == script }
+          when :stop
+            @stop_script.delete_if { |s| s.language == language && s.script == script }
+          when :reload
+            @reload_script.delete_if { |s| s.language == language && s.script == script }
+          when :event
+            @event_script.delete_if do |s|
+              s.language == language &&
+                s.script == script &&
+                Array(s.uei).sort == Array(uei).sort
+            end
+          else
+            raise ArgumentError, "Unsupported script type: #{type}"
+          end
+        end
+
         def add_start_script(script)
           @start_script << script
         end
@@ -177,25 +197,6 @@ module Opennms
           @event_script << script
         end
 
-        def delete_script(language:, script:, type:, uei: nil)
-          case type.to_sym
-          when :start
-            @start_script.delete_if { |s| s.language == language && s.script == script }
-          when :stop
-            @stop_script.delete_if { |s| s.language == language && s.script == script }
-          when :reload
-            @reload_script.delete_if { |s| s.language == language && s.script == script }
-          when :event
-            @event_script.delete_if do |s|
-              s.language == language &&
-              s.script == script &&
-              Array(s.uei).sort == Array(uei).sort
-            end
-          else
-            raise ArgumentError, "Unsupported script type: #{type}"
-          end
-        end
-
         def write(file_path)
           doc = REXML::Document.new
           root = doc.add_element('scriptd-configuration')
@@ -207,25 +208,42 @@ module Opennms
             engine_elem.attributes['extensions'] = engine.extensions
           end
 
-          [@start_script, @stop_script, @reload_script, @event_script].each do |script_list|
-            script_list.each do |script|
-              script_elem = root.add_element("#{script.class.name.downcase}-script")
-              script_elem.attributes['language'] = script.language
-              script_elem.text = script.script
-            end
+          @start_script.each do |script|
+            script_elem = root.add_element('start-script')
+            script_elem.attributes['language'] = script.language
+            script_elem.text = script.script
           end
 
-          File.open(file_path, 'w') { |file| doc.write(file) }
+          @stop_script.each do |script|
+            script_elem = root.add_element('stop-script')
+            script_elem.attributes['language'] = script.language
+            script_elem.text = script.script
+          end
+
+          @reload_script.each do |script|
+            script_elem = root.add_element('reload-script')
+            script_elem.attributes['language'] = script.language
+            script_elem.text = script.script
+          end
+
+          @event_script.each do |script|
+            event_elem = root.add_element('event-script')
+            event_elem.attributes['language'] = script.language
+            script.uei.each { |uei| event_elem.add_element('uei').text = uei }
+            event_elem.add_element('script').text = script.script
+          end
+
+          File.open(file_path, 'w') { |file| doc.write(file, 2) }
         end
 
-        def eql?(scriptd_configuration)
-          self.class.eql?(scriptd_configuration.class) &&
-            @engine.eql?(scriptd_configuration.engine) &&
-            @start_script.eql?(scriptd_configuration.start_script) &&
-            @stop_script.eql?(scriptd_configuration.stop_script) &&
-            @reload_script.eql?(scriptd_configuration.reload_script) &&
-            @event_script.eql?(scriptd_configuration.event_script) &&
-            @transactional.eql?(scriptd_configuration.transactional)
+        def eql?(other)
+          self.class.eql?(other.class) &&
+            @engine.eql?(other.engine) &&
+            @start_script.eql?(other.start_script) &&
+            @stop_script.eql?(other.stop_script) &&
+            @reload_script.eql?(other.reload_script) &&
+            @event_script.eql?(other.event_script) &&
+            @transactional.eql?(other.transactional)
         end
       end
 
@@ -253,11 +271,11 @@ module Opennms
           @extensions = extensions
         end
 
-        def eql?(engine)
-          self.class.eql?(engine.class) &&
-            @language.eql?(engine.language) &&
-            @class_name.eql?(engine.class_name) &&
-            @extensions.eql?(engine.extensions)
+        def eql?(other)
+          self.class.eql?(other.class) &&
+            @language.eql?(other.language) &&
+            @class_name.eql?(other.class_name) &&
+            @extensions.eql?(other.extensions)
         end
       end
 
@@ -269,16 +287,15 @@ module Opennms
         attr_reader :uei
 
         def initialize(language:, script:, uei: nil)
+          super(language: language, script: script)
           @uei = uei || []
-          @language = language
-          @script = script
         end
 
-        def eql?(event_script)
-          self.class.eql?(event_script.class) &&
-            @uei.eql?(event_script.uei) &&
-            @script.eql?(event_script.script) &&
-            @language.eql?(event_script.language)
+        def eql?(other)
+          self.class.eql?(other.class) &&
+            @uei.eql?(other.uei) &&
+            @script.eql?(other.script) &&
+            @language.eql?(other.language)
         end
       end
     end
