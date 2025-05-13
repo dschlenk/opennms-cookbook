@@ -22,13 +22,13 @@ load_current_value do |new_resource|
   config = template.variables[:config]
   case new_resource.type
   when 'start'
-    current_value_does_not_exist? unless config.start_script.select { |ss| ss.language.eql?(new_resource.language) && ss.script.eql?(new_resource.script) }.one?
+    current_value_does_not_exist! unless config.start_script.select { |ss| ss.language.eql?(new_resource.language) && ss.script.eql?(new_resource.script) }.one?
   when 'stop'
-    current_value_does_not_exist? unless config.stop_script.select { |s| s.language.eql?(new_resource.language) && s.script.eql?(new_resource.script) }.one?
+    current_value_does_not_exist! unless config.stop_script.select { |s| s.language.eql?(new_resource.language) && s.script.eql?(new_resource.script) }.one?
   when 'reload'
-    current_value_does_not_exist? unless config.reload_script.select { |rs| rs.language.eql?(new_resource.language) && rs.script.eql?(new_resource.script) }.one?
+    current_value_does_not_exist! unless config.reload_script.select { |rs| rs.language.eql?(new_resource.language) && rs.script.eql?(new_resource.script) }.one?
   when 'event'
-    current_value_does_not_exist? unless config.event_script.select { |es| es.language.eql?(new_resource.language) && es.script.eql?(new_resource.script) && Array(es.uei) == Array(new_resource.uei) }.one?
+    current_value_does_not_exist! unless config.event_script.select { |es| es.language.eql?(new_resource.language) && es.script.eql?(new_resource.script) && Array(es.uei) == Array(new_resource.uei) }.one?
   end
   # since changing isn't supported, we either didn't find it above and already exited, or we did, and now we make the current value match the new value (since it does)
   language new_resource.language
