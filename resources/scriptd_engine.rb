@@ -1,6 +1,3 @@
-resources/scriptd_engine.rb
-
-
 include Opennms::Cookbook::Scriptd::ScriptdTemplate
 
 property :language, String, name_property: true
