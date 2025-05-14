@@ -151,26 +151,26 @@ module Opennms
 
         def add_script(language:, script:, type:, uei: nil)
           case type
-          when :start
+          when 'start'
             add_start_script(StartScript.new(language: language, script: script))
-          when :stop
+          when 'stop'
             add_stop_script(StopScript.new(language: language, script: script))
-          when :reload
+          when 'reload'
             add_reload_script(ReloadScript.new(language: language, script: script))
-          when :event
+          when 'event'
             add_event_script(EventScript.new(language: language, script: script, uei: uei))
           end
         end
 
         def delete_script(language:, script:, type:, uei: nil)
           case type.to_sym
-          when :start
+          when 'start'
             @start_script.delete_if { |s| s.language == language && s.script == script }
-          when :stop
+          when 'stop'
             @stop_script.delete_if { |s| s.language == language && s.script == script }
-          when :reload
+          when 'reload'
             @reload_script.delete_if { |s| s.language == language && s.script == script }
-          when :event
+          when 'event'
             @event_script.delete_if do |s|
               s.language == language &&
                 s.script == script &&
@@ -195,6 +195,7 @@ module Opennms
 
         def add_event_script(script)
           @event_script << script
+          Chef::Log.warn("Added #{script} to @event_script which is now #{@event_script}")
         end
 
         def write(file_path)
