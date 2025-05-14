@@ -25,7 +25,7 @@ class ScriptdEngine < Inspec.resource(1)
     lang = doc.root.elements["/scriptd-configuration/engine[@language = '#{language}']"]
     unless lang.nil?
       @exists = true
-      @class_name = lang.attributes['class_name']
+      @class_name = lang.attributes['className']
       @extensions = lang.attributes['extensions']
     end
   end
