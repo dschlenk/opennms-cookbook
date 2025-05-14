@@ -1,8 +1,8 @@
 control 'script' do
   describe scriptd_engine('beanshell') do
     it { should exist }
-    #its('class_name') { should eq 'bsh.util.BeanShellBSFEngine' }
-    #its('extensions') { should eq 'bsh' }
+    # its('class_name') { should eq 'bsh.util.BeanShellBSFEngine' }
+    # its('extensions') { should eq 'bsh' }
   end
 
   describe scriptd_engine('jython') do
