@@ -6,31 +6,29 @@ class ScriptdScript < Inspec.resource(1)
   desc '
     Custom InSpec resource to validate OpenNMS scriptd scripts in config file
   '
+
   example '
-      describe scriptd_script(\'beanshell\', \'event\', \'script\', [\'uei.opennms.org/anUei\']) do
-        it { should exist }
-      end
+    describe scriptd_script("beanshell", "event", "log = bsf.lookupBean(\"log\")", ["uei.opennms.org/anUei"]) do
+      it { should exist }
+    end
   '
 
+  def initialize(language, type, script, ueis = nil)
+    @exists = false
+    @type = type
+    @uei = ueis&.first
+    @script = nil
 
-  def initialize(language, type, script, ueis = nil)
-    @exists = false
-    @type = type
-    @uei = ueis&.first
-    @script = nil
     doc = REXML::Document.new(inspec.file('/opt/opennms/etc/scriptd-configuration.xml').content)
-    puts doc # TODO: remove once working
 
     script_el = doc.root.elements["/scriptd-configuration/#{type}-script[@language = '#{language}']"]
     unless script_el.nil?
-      s = script_el.texts.join("\n")
-      if s.eql?(script)
-        if type.eql?('event') && !ueis.nil?
+      @script = script_el.texts.join("\n").strip
+      if @script == script.strip
+        if type == 'event' && ueis
           ul = []
-          script_el.each_element('uei') do |u|
-            ul.push u.attributes['name']
-          end
-          @exists = ul.sort.eql?(ueis.sort)
+          script_el.each_element('uei') { |u| ul << u.attributes['name'] }
+          @exists = ul.sort == ueis.sort
         else
           @exists = true
         end
@@ -40,5 +38,17 @@ class ScriptdScript < Inspec.resource(1)
 
   def exist?
     @exists
+  end
+
+  def type
+    @type
+  end
+
+  def uei
+    @uei
+  end
+
+  def script
+    @script
   end
 end
