@@ -12,8 +12,12 @@ class ScriptdScript < Inspec.resource(1)
       end
   '
 
-  def initialize(language, type, script, ueis = nil)
-    @exists = false
+
+  def initialize(language, type, script, ueis = nil)
+    @exists = false
+    @type = type
+    @uei = ueis&.first
+    @script = nil
     doc = REXML::Document.new(inspec.file('/opt/opennms/etc/scriptd-configuration.xml').content)
     puts doc # TODO: remove once working
 
