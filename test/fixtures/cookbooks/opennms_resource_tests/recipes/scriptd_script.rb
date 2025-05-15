@@ -9,7 +9,7 @@ opennms_scriptd_script 'beanshell' do
 end
 
 opennms_scriptd_script 'jython' do
-  type 'stop-jython'
+  type 'stop'
   script '1 + 1'
 end
 
