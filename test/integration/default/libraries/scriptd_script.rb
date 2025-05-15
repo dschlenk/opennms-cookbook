@@ -13,6 +13,8 @@ class ScriptdScript < Inspec.resource(1)
     end
   '
 
+  attr_reader :type, :uei, :script
+
   def initialize(language, type, script, ueis = nil)
     @exists = false
     @type = type
@@ -38,17 +40,5 @@ class ScriptdScript < Inspec.resource(1)
 
   def exist?
     @exists
-  end
-
-  def type
-    @type
-  end
-
-  def uei
-    @uei
-  end
-
-  def script
-    @script
   end
 end
