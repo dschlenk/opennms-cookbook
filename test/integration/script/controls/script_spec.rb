@@ -19,12 +19,14 @@ control 'script' do
 
   describe scriptd_script('beanshell') do
     it { should exist }
+    its('language') { should eq 'beanshell' }
     its('type') { should eq 'start' }
     its('script') { should eq 'bsf.lookupBean("log")' }
   end
 
   describe scriptd_script('groovy') do
     it { should exist }
+    its('language') { should eq 'groovy' }
     its('type') { should eq 'stop' }
     its('uei') { should eq 'uei.opennms.org/cheftest/thresholdExceeded' }
     its('script') { should eq 'bsf.lookupBean("log")' }
@@ -32,13 +34,15 @@ control 'script' do
 
   describe scriptd_script('jython') do
     it { should exist }
+    its('language') { should eq 'jython' }
     its('type') { should eq 'reload' }
     its('uei') { should eq 'uei.opennms.org/cheftest/thresholdExceeded' }
     its('script') { should eq 'bsf.lookupBean("log")' }
   end
 
-  describe scriptd_script('eventbeanshell') do
+  describe scriptd_script('beanshell') do
     it { should exist }
+    its('language') { should eq 'beanshell' }
     its('type') { should eq 'event' }
     its('script') { should eq 'bsf.lookupBean("log")' }
   end
