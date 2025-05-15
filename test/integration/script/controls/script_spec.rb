@@ -42,3 +42,4 @@ control 'script' do
     its('type') { should eq 'event' }
     its('script') { should eq 'bsf.lookupBean("log")' }
   end
+end
