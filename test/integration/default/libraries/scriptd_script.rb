@@ -18,10 +18,8 @@ class ScriptdScript < Inspec.resource(1)
   def initialize(language, type, script, ueis = nil)
     @exists = false
     @type = type
-    @uei = uei
     @script = nil
-
-    ueis = [ueis] if ueis.is_a?(String)
+    @uei = ueis.is_a?(String) ? [ueis] : ueis
 
     doc = REXML::Document.new(inspec.file('/opt/opennms/etc/scriptd-configuration.xml').content)
     xpath = "/scriptd-configuration/#{type}-script[@language = '#{language}']"
@@ -34,15 +32,15 @@ class ScriptdScript < Inspec.resource(1)
         next unless @script == script.strip
         puts "#{@script} matches"
 
-        if type == 'event' && ueis
+        if type == 'event' && @uei
           puts 'type is event, checking if ueis match'
           ul = []
           script_el.each_element('uei') do |u|
             puts "Found uei: #{u.attributes['name']}"
             ul << u.attributes['name']
           end
-          puts "ul.sort == ueis.sort ? #{ul.sort} == #{ueis.sort}"
-          @exists = ul.sort == ueis.sort
+          puts "ul.sort == @uei.sort ? #{ul.sort} == #{@uei.sort}"
+          @exists = ul.sort == @uei.sort
         else
           @exists = true
         end
