@@ -28,18 +28,17 @@ class ScriptdScript < Inspec.resource(1)
     unless se.nil?
       doc.each_element(xpath) do |script_el|
         @script = script_el.texts.join("\n").strip
-        puts "checking @script for a match"
-        if @script == script.strip
-          puts "@script matches"
-          if type == 'event' && ueis
-            puts "is event, checking if ueis match"
-            ul = []
-            script_el.each_element('uei') { |u| ul << u.attributes['name'] }
-            puts "ul.sort == ueis.sort ? #{ul.sort} == #{ueis.sort}"
-            @exists = ul.sort == ueis.sort
-          else
-            @exists = true
-          end
+        puts "checking #{@script} for a match"
+        next unless @script == script.strip
+        puts "#{@script} matches"
+        if type == 'event' && ueis
+          puts 'type is event, checking if ueis match'
+          ul = []
+          script_el.each_element('uei') { |u| ul << u.attributes['name'] }
+          puts "ul.sort == ueis.sort ? #{ul.sort} == #{ueis.sort}"
+          @exists = ul.sort == ueis.sort
+        else
+          @exists = true
         end
       end
     end
