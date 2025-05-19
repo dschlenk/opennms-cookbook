@@ -17,25 +17,19 @@ control 'script' do
     its('extensions') { should eq 'java' }
   end
 
-  describe scriptd_script('beanshell', 'beanshell', 'start') do
+  describe scriptd_script('beanshell', 'start', 'bsf.lookupBean("log")') do
     it { should exist }
-    its('script') { should eq 'bsf.lookupBean("log")' }
   end
 
-  describe scriptd_script('groovy', 'groovy', 'stop', 'uei.opennms.org/cheftest/thresholdExceeded') do
+  describe scriptd_script('groovy', 'stop', 'bsf.lookupBean("log")') do
     it { should exist }
-    its('uei') { should eq 'uei.opennms.org/cheftest/thresholdExceeded' }
-    its('script') { should eq 'bsf.lookupBean("log")' }
   end
 
-  describe scriptd_script('jython', 'jython', 'reload', 'uei.opennms.org/cheftest/thresholdExceeded') do
+  describe scriptd_script('jython', 'reload', 'bsf.lookupBean("log")') do
     it { should exist }
-    its('uei') { should eq 'uei.opennms.org/cheftest/thresholdExceeded' }
-    its('script') { should eq 'bsf.lookupBean("log")' }
   end
 
-  describe scriptd_script('beanshell', 'beanshell', 'event') do
+  describe scriptd_script('beanshell', 'event', 'bsf.lookupBean("log")', 'uei.opennms.org/cheftest/thresholdExceeded') do
     it { should exist }
-    its('script') { should eq 'bsf.lookupBean("log")' }
   end
 end
