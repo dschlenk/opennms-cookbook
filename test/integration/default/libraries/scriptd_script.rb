@@ -21,6 +21,8 @@ class ScriptdScript < Inspec.resource(1)
     @uei = uei
     @script = nil
 
+    ueis = [ueis] if ueis.is_a?(String)
+
     doc = REXML::Document.new(inspec.file('/opt/opennms/etc/scriptd-configuration.xml').content)
     xpath = "/scriptd-configuration/#{type}-script[@language = '#{language}']"
     puts "script xpath: #{xpath}"
