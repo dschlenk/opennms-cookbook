@@ -1,28 +1,31 @@
+# Original scripts
 opennms_scriptd_script 'beanshell-start' do
   language 'beanshell'
   type 'start'
   script 'bsf.lookupBean("log")'
 end
- 
+
 opennms_scriptd_script 'groovy-stop' do
   language 'groovy'
   type 'stop'
   script 'bsf.lookupBean("log")'
 end
- 
+
 opennms_scriptd_script 'jython-reload' do
   language 'jython'
   type 'reload'
   script 'bsf.lookupBean("log")'
 end
- 
+
 opennms_scriptd_script 'beanshell-event' do
   language 'beanshell'
   type 'event'
   uei 'uei.opennms.org/cheftest/thresholdExceeded'
   script 'bsf.lookupBean("log")'
 end
- 
+
+# Extended and more complex scripts
+
 opennms_scriptd_script 'beanshell-start-extended' do
   language 'beanshell'
   type 'start'
@@ -33,7 +36,7 @@ opennms_scriptd_script 'beanshell-start-extended' do
     log.info("Running as user: " + user);
   EOS
 end
- 
+
 opennms_scriptd_script 'groovy-stop-extended' do
   language 'groovy'
   type 'stop'
@@ -46,7 +49,7 @@ opennms_scriptd_script 'groovy-stop-extended' do
     }
   EOS
 end
- 
+
 opennms_scriptd_script 'jython-reload-extended' do
   language 'jython'
   type 'reload'
@@ -60,7 +63,7 @@ opennms_scriptd_script 'jython-reload-extended' do
         log.error("Error during reload: " + str(e))
   EOS
 end
- 
+
 opennms_scriptd_script 'beanshell-event-threshold' do
   language 'beanshell'
   type 'event'
@@ -74,7 +77,7 @@ opennms_scriptd_script 'beanshell-event-threshold' do
     }
   EOS
 end
- 
+
 opennms_scriptd_script 'groovy-event-multiuei' do
   language 'groovy'
   type 'event'
@@ -91,7 +94,7 @@ opennms_scriptd_script 'groovy-event-multiuei' do
     }
   EOS
 end
- 
+
 opennms_scriptd_script 'beanshell-event-multiuei' do
   language 'beanshell'
   type 'event'
@@ -101,7 +104,7 @@ opennms_scriptd_script 'beanshell-event-multiuei' do
     String uei = event.getUei();
     String node = event.getParm("nodeLabel").getValue();
     log.info("Received UEI: " + uei + " for node: " + node);
- 
+
     if (uei.contains("nodeDown")) {
       log.warn("ALERT: Node " + node + " is DOWN!");
     } else if (uei.contains("nodeUp")) {
@@ -109,7 +112,7 @@ opennms_scriptd_script 'beanshell-event-multiuei' do
     }
   EOS
 end
- 
+
 opennms_scriptd_script 'groovy-event-interface' do
   language 'groovy'
   type 'event'
@@ -119,15 +122,15 @@ opennms_scriptd_script 'groovy-event-interface' do
     def uei = event.getUei()
     def iface = event.getParm("interface")?.value ?: "unknown"
     log.info("Event received: ${uei} for interface: ${iface}")
- 
+
     if (uei.contains("interfaceDown")) {
-      log.error("Interface ${iface} is DOWN! ⚠️")
+      log.error("Interface ${iface} is DOWN!")
     } else if (uei.contains("interfaceUp")) {
-      log.info("Interface ${iface} is UP ✅")
+      log.info("Interface ${iface} is UP")
     }
   EOS
 end
- 
+
 opennms_scriptd_script 'jython-event-service' do
   language 'jython'
   type 'event'
@@ -139,7 +142,7 @@ opennms_scriptd_script 'jython-event-service' do
         svc = event.getParm("service").getValue()
         node = event.getParm("nodeLabel").getValue()
         log.info("UEI: " + uei + " | Service: " + svc + " | Node: " + node)
- 
+
         if "serviceDown" in uei:
             log.error("Service " + svc + " is DOWN on " + node)
         elif "serviceUp" in uei:
