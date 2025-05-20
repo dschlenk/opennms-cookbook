@@ -25,10 +25,9 @@
 
   <% @config.event_script.each do |es| -%>
     <event-script language=<%= es.language.encode(:xml => :attr) %>>
+      <% Array(es.uei).each do |uei_value| -%>
+        <uei name=<%= uei_value.encode(:xml => :attr) %> />
+      <% end -%>
       <%= es.script.encode(:xml => :text) %>
     </event-script>
-    <% Array(es.uei).each do |uei_value| -%>
-      <uei name=<%= uei_value.encode(:xml => :attr) %> />
-    <% end -%>
   <% end -%>
-</scriptd-configuration>
