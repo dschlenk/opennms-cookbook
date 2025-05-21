@@ -1,5 +1,4 @@
 control 'script' do
-  # Script Engines
   describe scriptd_engine('beanshell') do
     it { should exist }
     its('class_name') { should eq 'bsh.util.BeanShellBSFEngine' }
@@ -18,7 +17,6 @@ control 'script' do
     its('extensions') { should eq 'java' }
   end
 
-  # Extended Engines (for alternate language names)
   describe scriptd_engine('beanshell2') do
     it { should exist }
   end
@@ -31,7 +29,6 @@ control 'script' do
     it { should exist }
   end
 
-  # Basic Scripts
   describe scriptd_script('beanshell', 'start', 'bsf.lookupBean("log");') do
     it { should exist }
   end
@@ -48,7 +45,6 @@ control 'script' do
     it { should exist }
   end
 
-  # Extended Scripts
   describe scriptd_script('beanshell2', 'start', 'log = bsf.lookupBean("log"); log.info("Beanshell start script initialized."); String user = System.getProperty("user.name"); log.info("Running as user: " + user);') do
     it { should exist }
   end
@@ -61,7 +57,6 @@ control 'script' do
     it { should exist }
   end
 
-  # Event Scripts
   describe scriptd_script('beanshell', 'event', 'log = bsf.lookupBean("log"); String uei = event.getUei(); String node = event.getParm("nodeLabel").getValue(); log.info("Received UEI: " + uei + " for node: " + node); if (uei.contains("nodeDown")) { log.warn("ALERT: Node " + node + " is DOWN"); } else if (uei.contains("nodeUp")) { log.info("INFO: Node " + node + " is UP"); }', 'uei.opennms.org/cheftest/nodeDown,uei.opennms.org/cheftest/nodeUp') do
     it { should exist }
   end
