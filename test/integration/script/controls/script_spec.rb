@@ -13,7 +13,7 @@ control 'script' do
 
   describe scriptd_engine('java') do
     it { should exist }
-    its('class_name') { should eq 'com.game.core.physics.CollisionManagerr' } # Matches current config
+    its('class_name') { should eq 'com.game.core.physics.CollisionManagerr' }
     its('extensions') { should eq 'java' }
   end
 
