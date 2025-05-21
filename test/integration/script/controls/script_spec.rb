@@ -17,18 +17,6 @@ control 'script' do
     its('extensions') { should eq 'java' }
   end
 
-  describe scriptd_engine('beanshell2') do
-    it { should exist }
-  end
-
-  describe scriptd_engine('groovy2') do
-    it { should exist }
-  end
-
-  describe scriptd_engine('java2') do
-    it { should exist }
-  end
-
   describe scriptd_script('beanshell', 'start', 'bsf.lookupBean("log");') do
     it { should exist }
   end
@@ -45,15 +33,15 @@ control 'script' do
     it { should exist }
   end
 
-  describe scriptd_script('beanshell2', 'start', 'log = bsf.lookupBean("log"); log.info("Beanshell start script initialized."); String user = System.getProperty("user.name"); log.info("Running as user: " + user);') do
+  describe scriptd_script('beanshell', 'start', 'log = bsf.lookupBean("log"); log.info("Beanshell start script initialized."); String user = System.getProperty("user.name"); log.info("Running as user: " + user);') do
     it { should exist }
   end
 
-  describe scriptd_script('groovy2', 'stop', 'def log = bsf.lookupBean("log"); def now = new Date(); log.info("Groovy stop script executed at: ${now}"); if (now.hours > 18) { log.warn("Script stopped after hours."); }') do
+  describe scriptd_script('groovy', 'stop', 'def log = bsf.lookupBean("log"); def now = new Date(); log.info("Groovy stop script executed at: ${now}"); if (now.hours > 18) { log.warn("Script stopped after hours."); }') do
     it { should exist }
   end
 
-  describe scriptd_script('java2', 'reload', 'log = bsf.lookupBean("log"); try { log.info("Reloading Java script."); String version = System.getProperty("java.version"); log.info("Java version: " + version); } catch (Exception e) { log.error("Error during reload: " + e.getMessage()); }') do
+  describe scriptd_script('java', 'reload', 'log = bsf.lookupBean("log"); try { log.info("Reloading Java script."); String version = System.getProperty("java.version"); log.info("Java version: " + version); } catch (Exception e) { log.error("Error during reload: " + e.getMessage()); }') do
     it { should exist }
   end
 
