@@ -27,7 +27,13 @@ class ScriptdScript < Inspec.resource(1)
 
     unless doc.root.elements[xpath].nil?
       doc.root.elements.each(xpath) do |script_el|
-        @script = script_el.texts.join("\n").strip
+        # this gives us valid XML text, but we want the value instead
+        # @script = script_el.texts.join("\n").strip
+        @script = ''
+        script_el.texts.each do |t|
+          @script += t.value
+        end
+        @script = @script.strip
         puts "checking #{@script} for a match"
         next unless @script == script.strip
         puts "#{@script} matches"
