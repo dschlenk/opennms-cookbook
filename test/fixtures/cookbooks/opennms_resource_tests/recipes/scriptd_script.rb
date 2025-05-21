@@ -10,6 +10,12 @@ opennms_scriptd_script 'groovy-stop' do
   script 'bsf.lookupBean("log")'
 end
 
+opennms_scriptd_script 'java-reload' do
+  language 'java'
+  type 'reload'
+  script 'bsf.lookupBean("log")'
+end
+
 opennms_scriptd_script 'beanshell-event' do
   language 'beanshell'
   type 'event'
@@ -37,6 +43,21 @@ opennms_scriptd_script 'groovy-stop-extended' do
     log.info("Groovy stop script executed at: ${now}")
     if (now.hours > 18) {
       log.warn("Script stopped after hours.")
+    }
+  EOS
+end
+
+opennms_scriptd_script 'java-reload-extended' do
+  language 'java'
+  type 'reload'
+  script <<-EOS
+    log = bsf.lookupBean("log");
+    try {
+        log.info("Reloading Java script.");
+        String version = System.getProperty("java.version");
+        log.info("Java version: " + version);
+    } catch (Exception e) {
+        log.error("Error during reload: " + e.getMessage());
     }
   EOS
 end
