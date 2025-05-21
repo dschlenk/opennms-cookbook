@@ -1,3 +1,4 @@
+# Basic Scripts
 opennms_scriptd_script 'beanshell-start' do
   language 'beanshell'
   type 'start'
@@ -23,22 +24,22 @@ opennms_scriptd_script 'beanshell-event' do
   script 'bsf.lookupBean("log");'
 end
 
-# Extended Scripts (with unique types)
-opennms_scriptd_script 'beanshell-start-extended' do
-  language 'beanshell'
-  type 'start-extended'
+# Extended Scripts using alternate languages
+opennms_scriptd_script 'beanshell2-start-extended' do
+  language 'beanshell2'
+  type 'start'
   script 'log = bsf.lookupBean("log"); log.info("Beanshell start script initialized."); String user = System.getProperty("user.name"); log.info("Running as user: " + user);'
 end
 
-opennms_scriptd_script 'groovy-stop-extended' do
-  language 'groovy'
-  type 'stop-extended'
+opennms_scriptd_script 'groovy2-stop-extended' do
+  language 'groovy2'
+  type 'stop'
   script 'def log = bsf.lookupBean("log"); def now = new Date(); log.info("Groovy stop script executed at: ${now}"); if (now.hours > 18) { log.warn("Script stopped after hours."); }'
 end
 
-opennms_scriptd_script 'java-reload-extended' do
-  language 'java'
-  type 'reload-extended'
+opennms_scriptd_script 'java2-reload-extended' do
+  language 'java2'
+  type 'reload'
   script 'log = bsf.lookupBean("log"); try { log.info("Reloading Java script."); String version = System.getProperty("java.version"); log.info("Java version: " + version); } catch (Exception e) { log.error("Error during reload: " + e.getMessage()); }'
 end
 
