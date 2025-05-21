@@ -1,7 +1,7 @@
 opennms_scriptd_script 'beanshell-start' do
   language 'beanshell'
   type 'start'
-  script 'bsf.lookupBean("log")'
+  script 'bsf.lookupBean("log");'
 end
 
 opennms_scriptd_script 'groovy-stop' do
@@ -38,11 +38,11 @@ opennms_scriptd_script 'groovy-stop-extended' do
   language 'groovy'
   type 'stop'
   script <<-EOS
-    def log = bsf.lookupBean("log")
-    def now = new Date()
-    log.info("Groovy stop script executed at: ${now}")
+    def log = bsf.lookupBean("log");
+    def now = new Date();
+    log.info("Groovy stop script executed at: ${now}");
     if (now.hours > 18) {
-      log.warn("Script stopped after hours.")
+      log.warn("Script stopped after hours.");
     }
   EOS
 end
@@ -72,9 +72,9 @@ opennms_scriptd_script 'beanshell-event-multiuei' do
     String node = event.getParm("nodeLabel").getValue();
     log.info("Received UEI: " + uei + " for node: " + node);
     if (uei.contains("nodeDown")) {
-      log.warn("ALERT: Node " + node + " is DOWN!");
+      log.warn("ALERT: Node " + node + " is DOWN");
     } else if (uei.contains("nodeUp")) {
-      log.info("INFO: Node " + node + " is UP.");
+      log.info("INFO: Node " + node + " is UP");
     }
   EOS
 end
@@ -84,14 +84,14 @@ opennms_scriptd_script 'groovy-event-interface' do
   type 'event'
   uei 'uei.opennms.org/cheftest/interfaceDown,uei.opennms.org/cheftest/interfaceUp'
   script <<-EOS
-    def log = bsf.lookupBean("log")
-    def uei = event.getUei()
-    def iface = event.getParm("interface")?.value ?: "unknown"
-    log.info("Event received: ${uei} for interface: ${iface}")
+    def log = bsf.lookupBean("log");
+    def uei = event.getUei();
+    def iface = event.getParm("interface")?.value ?: "unknown";
+    log.info("Event received: ${uei} for interface: ${iface}");
     if (uei.contains("interfaceDown")) {
-      log.error("Interface ${iface} is DOWN!")
+      log.error("Interface ${iface} is DOWN");
     } else if (uei.contains("interfaceUp")) {
-      log.info("Interface ${iface} is UP")
+      log.info("Interface ${iface} is UP");
     }
   EOS
 end
