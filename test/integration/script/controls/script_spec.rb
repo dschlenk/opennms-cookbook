@@ -36,6 +36,7 @@ control 'script' do
   describe scriptd_script('beanshell', 'start', "log = bsf.lookupBean(\"log\");\n  log.info(\"Beanshell start script initialized.\");\n  String user = System.getProperty(\"user.name\");\n  log.info(\"Running as user: \" + user);") do
     it { should exist }
   end
+
   describe scriptd_script('groovy', 'stop', "def log = bsf.lookupBean(\"log\"); def now = new Date(); log.info(\"Groovy stop script executed at: ${now}\"); if (now.hours > 18) { log.warn(\"Script stopped after hours.\"); }") do
     it { should exist }
   end
