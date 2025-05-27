@@ -33,7 +33,7 @@ control 'script' do
     it { should exist }
   end
 
-  describe scriptd_script('beanshell', 'start', 'log = bsf.lookupBean("log");  log.info("Beanshell start script initialized.");  String user = System.getProperty("user.name");  log.info("Running as user: " + user);') do
+  describe scriptd_script('beanshell', 'start', 'log = bsf.lookupBean("log"); log.info("Beanshell start script initialized."); String user = System.getProperty("user.name"); log.info("Running as user: " + user);') do
     it { should exist }
   end
 
@@ -41,7 +41,7 @@ control 'script' do
     it { should exist }
   end
 
-  describe scriptd_script('java', 'reload', 'log = bsf.lookupBean("log");try { log.info("Reloading Java script.");String version = System.getProperty("java.version");log.info("Java version: " + version);}catch (Exception e) {log.error("Error during reload: " + e.getMessage());}') do
+  describe scriptd_script('java', 'reload', 'log = bsf.lookupBean("log"); try { log.info("Reloading Java script."); String version = System.getProperty("java.version"); log.info("Java version: " + version); } catch (Exception e) { log.error("Error during reload: " + e.getMessage()); }') do
     it { should exist }
   end
 
