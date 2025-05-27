@@ -27,16 +27,16 @@ class ScriptdScript < Inspec.resource(1)
 
     unless doc.root.elements[xpath].nil?
       doc.root.elements.each(xpath) do |script_el|
-        # this gives us valid XML text, but we want the value instead
-        # @script = script_el.texts.join("\n").strip
         @script = ''
         script_el.texts.each do |t|
           @script += t.value
         end
         @script = @script.strip
-        puts "checking #{@script} for a match"
-        next unless @script == script.strip
-        puts "#{@script} matches"
+        puts "checking normalized script for a match"
+
+        next unless normalize_script(@script) == normalize_script(script)
+
+        puts "Script matches after normalization"
 
         if type == 'event' && @uei
           puts 'type is event, checking if ueis match'
@@ -56,5 +56,11 @@ class ScriptdScript < Inspec.resource(1)
 
   def exist?
     @exists
+  end
+
+  private
+
+  def normalize_script(text)
+    text.lines.map(&:strip).reject(&:empty?).join("\n")
   end
 end
