@@ -23,7 +23,7 @@ class ScriptdScript < Inspec.resource(1)
 
     doc = REXML::Document.new(inspec.file('/opt/opennms/etc/scriptd-configuration.xml').content)
     xpath = "/scriptd-configuration/#{type}-script[@language = '#{language}']"
-    puts "script xpath: #{xpath}"
+    puts 'script xpath: ' + xpath
 
     unless doc.root.elements[xpath].nil?
       doc.root.elements.each(xpath) do |script_el|
@@ -32,17 +32,17 @@ class ScriptdScript < Inspec.resource(1)
           @script += t.value
         end
         @script = @script.strip
-        puts "checking normalized script for a match"
+        puts 'checking normalized script for a match'
 
         next unless normalize_script(@script) == normalize_script(script)
 
-        puts "Script matches after normalization"
+        puts 'Script matches after normalization'
 
         if type == 'event' && @uei
           puts 'type is event, checking if ueis match'
           ul = []
           script_el.each_element('uei') do |u|
-            puts "Found uei: #{u.attributes['name']}"
+            puts 'Found uei: ' + u.attributes['name']
             ul << u.attributes['name']
           end
           puts "ul.sort == @uei.sort ? #{ul.sort} == #{@uei.sort}"
