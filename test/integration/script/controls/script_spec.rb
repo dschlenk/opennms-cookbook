@@ -37,7 +37,7 @@ control 'script' do
     it { should exist }
   end
 
-  describe scriptd_script('groovy', 'stop', "def log = bsf.lookupBean(\"log\"); def now = new Date(); log.info(\"Groovy stop script executed at: ${now}\"); if (now.hours > 18) { log.warn(\"Script stopped after hours.\"); }") do
+  describe scriptd_script('groovy', 'stop', 'def log = bsf.lookupBean("log"); def now = new Date(); log.info("Groovy stop script executed at: ${now}"); if (now.hours > 18) { log.warn("Script stopped after hours."); }') do
     it { should exist }
   end
 
