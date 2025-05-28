@@ -33,7 +33,7 @@ control 'script' do
     it { should exist }
   end
 
-  describe scriptd_script('beanshell', 'start', "log = bsf.lookupBean(\"log\");\n  log.info(\"Beanshell start script initialized.\");\n  String user = System.getProperty(\"user.name\");\n  log.info(\"Running as user: \" + user);") do
+  describe scriptd_script('beanshell', 'start', "log = bsf.lookupBean(\"log\");\nlog.info(\"Beanshell start script initialized.\");\nString user = System.getProperty(\"user.name\");\nlog.info(\"Running as user: \" + user);") do
     it { should exist }
   end
 
