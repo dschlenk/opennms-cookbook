@@ -31,6 +31,7 @@ load_current_value do |new_resource|
     current_value_does_not_exist! unless config.event_script.select { |es| es.language.eql?(new_resource.language) && es.script.eql?(new_resource.script) && Array(es.uei) == Array(new_resource.uei) }.one?
   end
   # since changing isn't supported, we either didn't find it above and already exited, or we did, and now we make the current value match the new value (since it does)
+  type new_resource.type
   language new_resource.language
   script new_resource.script
   uei new_resource.uei

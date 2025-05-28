@@ -90,31 +90,31 @@ module Opennms
           doc.elements.each('scriptd-configuration/start-script') do |s|
             @config.add_start_script(StartScript.new(
               language: s.attributes['language'],
-              script: s.text.strip
+              script: script_text(s)
             ))
           end
 
           doc.elements.each('scriptd-configuration/stop-script') do |s|
             @config.add_stop_script(StopScript.new(
               language: s.attributes['language'],
-              script: s.text.strip
+              script: script_text(s)
             ))
           end
 
           doc.elements.each('scriptd-configuration/reload-script') do |s|
             @config.add_reload_script(ReloadScript.new(
               language: s.attributes['language'],
-              script: s.text.strip
+              script: script_text(s)
             ))
           end
 
           doc.elements.each('scriptd-configuration/event-script') do |e|
             ueis = []
-            e.elements.each('uei') { |u| ueis << u.text.strip }
+            e.elements.each('uei') { |u| ueis << u.attributes['name'] }
             @config.add_event_script(EventScript.new(
               uei: ueis,
               language: e.attributes['language'],
-              script: e.elements['script']&.text&.strip
+              script: script_text(e)
             ))
           end
         end
@@ -123,6 +123,16 @@ module Opennms
           scriptedfile = ScriptdConfigurationFile.new
           scriptedfile.read!(file)
           scriptedfile
+        end
+
+        private
+
+        def script_text(script_el)
+          s_str = ''
+          script_el.texts.each do |t|
+            s_str += t.value
+          end
+          s_str.strip
         end
       end
 

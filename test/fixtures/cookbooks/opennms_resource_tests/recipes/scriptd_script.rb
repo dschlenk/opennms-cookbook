@@ -26,7 +26,7 @@ end
 opennms_scriptd_script 'beanshell-start-extended' do
   language 'beanshell'
   type 'start'
-  script 'log = bsf.lookupBean("log"); log.info("Beanshell start script initialized."); String user = System.getProperty("user.name"); log.info("Running as user: " + user);'
+  script "log = bsf.lookupBean(\"log\");\nlog.info(\"Beanshell start script initialized.\");\nString user = System.getProperty(\"user.name\");\nlog.info(\"Running as user: \" + user);"
 end
 
 opennms_scriptd_script 'groovy-stop-extended' do
@@ -38,7 +38,7 @@ end
 opennms_scriptd_script 'java-reload-extended' do
   language 'java'
   type 'reload'
-  script 'log = bsf.lookupBean("log"); try { log.info("Reloading Java script."); String version = System.getProperty("java.version"); log.info("Java version: " + version); } catch (Exception e) { log.error("Error during reload: " + e.getMessage()); }'
+  script "log = bsf.lookupBean(\"log\");\ntry { log.info(\"Reloading Java script.\");\nString version = System.getProperty(\"java.version\");\nlog.info(\"Java version: \" + version);\n} catch (Exception e) {\nlog.error(\"Error during reload: \" + e.getMessage());\n}"
 end
 
 opennms_scriptd_script 'beanshell-event-multiuei' do
