@@ -17,6 +17,10 @@ control 'script' do
     its('extensions') { should eq 'java' }
   end
 
+  describe scriptd_script('beanshell', 'start', 'bsf.lookupBean("log");') do
+    it { should exist }
+  end
+
   describe scriptd_script('groovy', 'stop', 'bsf.lookupBean("log")') do
     it { should exist }
   end
