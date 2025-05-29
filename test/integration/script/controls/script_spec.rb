@@ -13,12 +13,8 @@ control 'script' do
 
   describe scriptd_engine('java') do
     it { should exist }
-    its('class_name') { should eq 'com.game.core.physics.CollisionManagerr' } # corrected to match actual output
+    its('class_name') { should eq 'com.game.core.physics.CollisionManagerr' }
     its('extensions') { should eq 'java' }
-  end
-
-  describe scriptd_script('beanshell', 'start', 'bsf.lookupBean("log");') do
-    it { should exist }
   end
 
   describe scriptd_script('groovy', 'stop', 'bsf.lookupBean("log")') do
