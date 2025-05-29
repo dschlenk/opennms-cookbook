@@ -65,10 +65,10 @@ class ScriptdConfig
     @reload_script << script
   end
 
-  # def add_event_script(script)
-  #   @event_script << script
+  def add_event_script(script)
+    @event_script << script
   #   Chef::Log.warn("Added #{script} to @event_script which is now #{@event_script}")
-  # end
+  end
 
   def write(file_path)
     doc = REXML::Document.new
