@@ -37,7 +37,15 @@ control 'script' do
     it { should exist }
   end
 
-  describe scriptd_script('java', 'reload', "log = bsf.lookupBean(\"log\");\ntry { log.info(\"Reloading Java script.\");\nString version = System.getProperty(\"java.version\");\nlog.info(\"Java version: \" + version);\n}\ncatch (Exception e) {\nlog.error(\"Error during reload: \" + e.getMessage());\n}") do
+  describe scriptd_script('java', 'reload', <<~JAVA.strip) do
+    log = bsf.lookupBean("log");
+    try { log.info("Reloading Java script.");
+    String version = System.getProperty("java.version");
+    log.info("Java version: " + version);
+    } catch (Exception e) {
+    log.error("Error during reload: " + e.getMessage());
+    }
+  JAVA
     it { should exist }
   end
 end
