@@ -5,12 +5,11 @@ include Opennms::Cookbook::Collection::JdbcCollectionTemplate
 
 load_current_value do |new_resource|
   r = jdbc_resource
-  collection = r.variables[:collections][new_resource.collection] unless r.nil?
-  if r.nil? || collection.nil?
-    filename = "#{onms_etc}/jdbc-datacollection-config.xml"
-    current_value_does_not_exist! unless ::File.exist?(filename)
-    collection = Opennms::Cookbook::Collection::OpennmsCollectionConfigFile.read(filename, 'jdbc').collections[new_resource.collection]
+  if r.nil?
+    ro_jdbc_resource_init
+    r = ro_jdbc_resource
   end
+  collection = r.variables[:collections][new_resource.collection]
   current_value_does_not_exist! if collection.nil?
   rrd_step collection.rrd_step
   rras collection.rras
@@ -32,6 +31,12 @@ action :create do
       run_action(:update)
     end
   end
+end
+
+action :create_if_missing do
+  jdbc_resource_init
+  collection = jdbc_resource.variables[:collections][new_resource.collection]
+  run_action(:create) if collection.nil?
 end
 
 action :update do

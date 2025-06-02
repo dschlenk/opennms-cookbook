@@ -70,7 +70,7 @@ module Opennms
     def objects_fixup(objects)
       obj = []
       objects.each do |k, v|
-        Chef::Log.warn("iterating over objects #{k} / #{v}")
+        Chef::Log.debug("iterating over objects #{k} / #{v}")
         if k.is_a?(Hash) && v.nil?
           obj.push k
         else

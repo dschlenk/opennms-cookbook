@@ -20,11 +20,10 @@ property :resource_keys, kind_of: Array, callbacks: {
     !p.any? { |s| !s.is_a?(String) }
   },
 }
-# like: { 'object_name' => {'type' => 'string|gauge|etc', 'xpath' => 'the/xpath'}, 'another_object_name' -> { ... }, ... }
 # or [{ 'name' => object_name', 'type' => 'string|gauge|etc', 'xpath' => 'the/xpath' }, { ... }, ... ]
-property :objects, kind_of: [Array, Hash], default: [], callbacks: {
-  'should be an array of hashes with keys `name`, `type`, and `xpath` (strings) or a hash where each key is a string representing `name` and which has a hash value with keys `type` and `xpath` (strings)' => lambda {
-    |p| (p.is_a?(Hash) && !p.any? { |h, v| !h.is_a?(String) || !v.is_a?(Hash) || !v.key?('type') || !v['type'].is_a?(String) || !v.key?('xpath') || !v['xpath'].is_a?(String) }) || (p.is_a?(Array) && !p.any? { |a| !a.is_a?(Hash) || !a.key?('name') || !a['name'].is_a?(String) || !a.key?('type') || !a['type'].is_a?(String) || !a.key?('xpath') || !a['xpath'].is_a?(String) })
+property :objects, kind_of: Array, default: [], callbacks: {
+  'should be an array of hashes with keys `name`, `type`, and `xpath` (strings)' => lambda { |p|
+    p.is_a?(Array) && !p.any? { |a| !a.is_a?(Hash) || !a.key?('name') || !a['name'].is_a?(String) || !a.key?('type') || !a['type'].is_a?(String) || !a.key?('xpath') || !a['xpath'].is_a?(String) }
   },
 }
 
@@ -33,24 +32,21 @@ include Opennms::Cookbook::Collection::XmlCollectionGroupsTemplate
 load_current_value do |new_resource|
   if new_resource.file
     r = groupsfile_resource(new_resource.file)
-    if !r.nil?
-      group = r.variables[:groupsfile].group(name: new_resource.group_name)
-    else
+    if r.nil?
       groupsfilename = "#{onms_etc}/xml-datacollection/#{new_resource.file}"
       current_value_does_not_exist! unless ::File.exist?(groupsfilename)
-      group = Opennms::Cookbook::Collection::OpennmsCollectionXmlGroupsFile.read(groupsfilename).group(name: new_resource.group_name)
+      ro_groupsfile_resource_init(new_resource.file)
+      r = ro_groupsfile_resource(new_resource.file)
     end
+    group = r.variables[:groupsfile].group(name: new_resource.group_name)
   else
     r = xml_resource
-    c = r.variables[:collections][new_resource.collection_name] unless r.nil?
-    source = c.source(url: new_resource.source_url) unless c.nil?
-    if r.nil? || c.nil? || source.nil?
-      filename = "#{onms_etc}/xml-datacollection-config.xml"
-      current_value_does_not_exist! unless ::File.exist?(filename)
-      collection = Opennms::Cookbook::Collection::OpennmsCollectionConfigFile.read(filename, 'xml').collections[new_resource.collection_name]
-      current_value_does_not_exist! if collection.nil?
-      source = collection.source(url: new_resource.url)
+    if r.nil?
+      ro_xml_resource_init
+      r = ro_xml_resource
     end
+    c = r.variables[:collections][new_resource.collection_name]
+    source = c.source(url: new_resource.source_url) unless c.nil?
     current_value_does_not_exist! if source.nil?
     group = source.group(name: new_resource.group_name)
   end
@@ -96,6 +92,21 @@ action :create do
       run_action(:update)
     end
   end
+end
+
+action :create_if_missing do
+  if !property_is_set?(:file)
+    xml_resource_init
+    collection = xml_resource.variables[:collections][new_resource.collection_name]
+    raise Opennms::Cookbook::Collection::XmlCollectionDoesNotExist, "No xml-collection named #{new_resource.collection_name} found. Cannot add xml-source." if collection.nil?
+    parent = collection.source(url: new_resource.source_url)
+    raise Opennms::Cookbook::Collection::XmlSourceDoesNotExist, "No xml-source for url #{new_resource.source_url} in collection #{new_resource.collection_name} found. Cannot add xml-group #{new_resource.group_name}." if parent.nil?
+  else
+    groupsfile_resource_init(new_resource.file)
+    parent = groupsfile_resource(new_resource.file).variables[:groupsfile]
+  end
+  group = parent.group(name: new_resource.group_name) unless parent.nil?
+  run_action(:create) if group.nil?
 end
 
 action :update do

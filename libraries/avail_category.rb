@@ -14,6 +14,15 @@ module Opennms
             find_resource!(:template, "#{onms_etc}/categories.xml")
           end
 
+          def ro_ac_resource_init
+            ro_ac_resource_create unless ro_ac_resource_exist?
+          end
+
+          def ro_ac_resource
+            return unless ro_ac_resource_exist?
+            find_resource!(:template, "RO #{onms_etc}/categories.xml")
+          end
+
           private
 
           def ac_resource_exist?
@@ -35,6 +44,30 @@ module Opennms
                 variables(category_groups: ac)
                 action :nothing
                 delayed_action :create
+              end
+            end
+          end
+
+          def ro_ac_resource_exist?
+            !find_resource(:template, "RO #{onms_etc}/categories.xml").nil?
+          rescue Chef::Exceptions::ResourceNotFound
+            false
+          end
+
+          def ro_ac_resource_create
+            ac = Opennms::Cookbook::ConfigHelpers::AvailCategory::AvailCategoryFile.new
+            ac.read!("#{onms_etc}/categories.xml") if ::File.exist?("#{onms_etc}/categories.xml")
+            with_run_context :root do
+              declare_resource(:template, "RO #{onms_etc}/categories.xml") do
+                path "#{Chef::Config[:file_cache_path]}/categories.xml"
+                source 'categories.xml.erb'
+                cookbook 'opennms'
+                owner node['opennms']['username']
+                group node['opennms']['groupname']
+                mode '0664'
+                variables(category_groups: ac)
+                action :nothing
+                delayed_action :nothing
               end
             end
           end

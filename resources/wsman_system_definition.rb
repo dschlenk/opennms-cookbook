@@ -25,11 +25,11 @@ load_current_value do |new_resource|
   file = new_resource.file_name.nil? ? "#{onms_etc}/wsman-datacollection-config.xml" : "#{onms_etc}/#{new_resource.file_name}"
   current_value_does_not_exist! unless ::File.exist?(file)
   r = wsman_resource(file)
-  all = if r.nil?
-          Opennms::Cookbook::Collection::WsmanCollectionConfigFile.read(file, 'wsman').system_definitions
-        else
-          r.variables[:system_definitions]
-        end
+  if r.nil?
+    ro_wsman_resource_init(file)
+    r = ro_wsman_resource(file)
+  end
+  all = r.variables[:system_definitions]
   current_value_does_not_exist! if all.empty?
   definitions = all.select { |sd| sd.name.eql?(new_resource.system_name) }
   current_value_does_not_exist! if definitions.nil? || definitions.empty?
@@ -125,6 +125,23 @@ action :create do
       run_action(:update)
     end
   end
+end
+
+action :create_if_missing do
+  file = new_resource.file_name.nil? ? "#{onms_etc}/wsman-datacollection-config.xml" : "#{onms_etc}/#{new_resource.file_name}"
+  wsman_resource_init(file)
+  r = wsman_resource(file)
+  all = if r.nil?
+          Opennms::Cookbook::Collection::WsmanCollectionConfigFile.read(file, 'wsman').system_definitions
+        else
+          r.variables[:system_definitions]
+        end
+  definitions = all.select { |sd| sd.name.eql?(new_resource.system_name) }
+  unless definitions.empty?
+    raise Opennms::Cookbook::Collection::DuplicateSystemDefinition, "More than one system definition with name #{new_resource.system_name} found in #{file}!" unless definitions.one?
+    definition = definitions.pop
+  end
+  run_action(:create) if definition.nil?
 end
 
 # makes definition named `system_name` in `file` match this resource

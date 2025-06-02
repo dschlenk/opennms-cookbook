@@ -2,7 +2,7 @@ unified_mode true
 
 property :event_file, String, name_property: true, identity: true
 property :source_type, String, equal_to: %w(cookbook_file template remote_file), default: 'cookbook_file', desired_state: false
-property :source, String
+property :source, String, desired_state: false
 property :source_properties, Hash, desired_state: false
 property :position, String, equal_to: %w(override top bottom), default: 'bottom', desired_state: false
 property :variables, Hash
@@ -16,10 +16,10 @@ load_current_value do |new_resource|
   r = eventconf_resource
   if r.nil?
     current_value_does_not_exist! unless ::File.exist?("#{node['opennms']['conf']['home']}/etc/events/#{new_resource.event_file}")
-    eventconf = Opennms::Cookbook::ConfigHelpers::Event::EventConf.read(node, "#{node['opennms']['conf']['home']}/etc/eventconf.xml")
-  else
-    eventconf = r.variables[:eventconf]
+    ro_eventconf_resource_init
+    r = ro_eventconf_resource
   end
+  eventconf = r.variables[:eventconf]
   current_value_does_not_exist! if eventconf.event_files[new_resource.event_file].nil?
   position eventconf.event_files[new_resource.event_file][:position]
 end
@@ -64,6 +64,10 @@ action :create do
     eventconf_resource_init
     eventconf_resource.variables[:eventconf].event_files[new_resource.event_file] = { position: new_resource.position }
   end
+end
+
+action :create_if_missing do
+  run_action(:create) unless ::File.exist?("#{node['opennms']['conf']['home']}/etc/events/#{new_resource.event_file}")
 end
 
 action :delete do

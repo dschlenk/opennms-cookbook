@@ -220,4 +220,17 @@ control 'event' do
     its('position') { should eq 4 }
     its('event_filters') { should eq [{ 'eventparm' => 'one', 'pattern' => '/^one&two{;t|hree😇$/', 'replacement' => '💩' }] }
   end
+  describe event('create_if_missing', 'events/chef.events.xml') do
+    it { should exist }
+    its('event_label') { should eq 'Chef defined event: createifmissing' }
+    its('descr') { should eq '<p>Trying to create a file if its missing.</p>' }
+    its('logmsg') { should eq 'creating file if its missing.' }
+    its('logmsg_dest') { should eq 'logndisplay' }
+    its('logmsg_notify') { should eq true }
+    its('severity') { should eq 'Minor' }
+  end
+
+  describe event('noop_create_if_missing', 'events/chef.events.xml') do
+    it { should_not exist }
+  end
 end

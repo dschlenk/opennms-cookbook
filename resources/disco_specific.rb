@@ -8,7 +8,10 @@ property :foreign_source, String
 
 load_current_value do |new_resource|
   config = disco_resource.variables[:config] unless disco_resource.nil?
-  config = Opennms::Cookbook::Discovery::Configuration.read("#{onms_etc}/discovery-configuration.xml") if config.nil?
+  if config.nil?
+    ro_disco_resource_init
+    config = ro_disco_resource.variables[:config]
+  end
   specific = config.specific(ipaddr: new_resource.ipaddr, location: new_resource.location)
   current_value_does_not_exist! if specific.nil?
   %i(retry_count timeout foreign_source).each do |p|

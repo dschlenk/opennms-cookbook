@@ -12,12 +12,13 @@ include Opennms::Cookbook::Collection::XmlCollectionTemplate
 
 load_current_value do |new_resource|
   r = xml_resource
-  collection = r.variables[:collections][new_resource.collection] unless r.nil?
   if r.nil? || collection.nil?
     filename = "#{onms_etc}/xml-datacollection-config.xml"
     current_value_does_not_exist! unless ::File.exist?(filename)
-    collection = Opennms::Cookbook::Collection::OpennmsCollectionConfigFile.read(filename, 'xml').collections[new_resource.collection]
+    ro_xml_resource_init
+    r = ro_xml_resource
   end
+  collection = r.variables[:collections][new_resource.collection]
   current_value_does_not_exist! if collection.nil?
   rrd_step collection.rrd_step
   rras collection.rras
@@ -39,6 +40,12 @@ action :create do
       run_action(:update)
     end
   end
+end
+
+action :create_if_missing do
+  xml_resource_init
+  collection = xml_resource.variables[:collections][new_resource.collection]
+  run_action(:create) if collection.nil?
 end
 
 action :update do

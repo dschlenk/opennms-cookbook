@@ -15,6 +15,7 @@ provisioner:
   chef_binary: /opt/cinc/bin/cinc-client
   chef_license: accept-no-persist # until https://github.com/test-kitchen/test-kitchen/pull/1984
   log_level: <%= ENV['KITCHEN_LOG_LEVEL'] || 'info' %>
+  chef_log_level: debug
   clean_dokken_sandbox: <%= ENV['CLEAN_DOCKEN_SANDBOX'] || 'true' %>
   attributes:
     opennms:
@@ -84,6 +85,10 @@ suites:
       opennms:
         upgrade: false
   - name: default
+    driver:
+      image: dokken/oraclelinux-9
+      ports:
+        - 8980:8980/tcp
   - name: plugins
     attributes:
       opennms:
@@ -513,6 +518,16 @@ suites:
       inspec_tests:
         - path: test/integration/default
         - path: test/integration/expression_delete
+  - name: foreign_source
+    driver:
+      ports:
+        - 1237:8980/tcp
+    provisioner:
+      policyfile: policyfiles/foreign_source.rb
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/foreign_source
   - name: group
     provisioner:
       policyfile: policyfiles/group.rb
@@ -520,6 +535,46 @@ suites:
       inspec_tests:
         - path: test/integration/default
         - path: test/integration/group
+  - name: opennms_import
+    driver:
+      ports:
+        - 1240:8980/tcp
+    provisioner:
+      policyfile: policyfiles/import.rb
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/import
+  - name: opennms_import_node
+    driver:
+      ports:
+        - 1241:8980/tcp
+    provisioner:
+      policyfile: policyfiles/import_node.rb
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/import_node
+  - name: opennms_import_node_interface
+    driver:
+      ports:
+        - 1242:8980/tcp
+    provisioner:
+      policyfile: policyfiles/import_node_interface.rb
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/import_node_interface
+  - name: opennms_import_node_interface_service
+    driver:
+      ports:
+        - 1243:8980/tcp
+    provisioner:
+      policyfile: policyfiles/import_node_interface_service.rb
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/import_node_interface_service
   - name: jdbc_collection
     provisioner:
       policyfile: policyfiles/jdbc_collection.rb
@@ -646,6 +701,16 @@ suites:
       inspec_tests:
         - path: test/integration/default
         - path: test/integration/poller_remove_parms
+  - name: policy
+    driver:
+      ports:
+        - 1239:8980/tcp
+    provisioner:
+      policyfile: policyfiles/policy.rb
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/policy
   - name: resource_type
     provisioner:
       policyfile: policyfiles/resource_type.rb
@@ -667,6 +732,13 @@ suites:
       inspec_tests:
         - path: test/integration/default
         - path: test/integration/role
+  - name: scriptd
+    provisioner:
+      policyfile: policyfiles/scriptd.rb
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/script
   - name: send_event
     driver:
       ports:
@@ -677,6 +749,46 @@ suites:
       inspec_tests:
         - path: test/integration/default
         - path: test/integration/send_event
+  - name: service_detector
+    driver:
+      ports:
+        - 1238:8980/tcp
+    provisioner:
+      policyfile: policyfiles/service_detector.rb
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/service_detector
+  - name: service_detector_delete
+    driver:
+      ports:
+        - 1244:8980/tcp
+    provisioner:
+      policyfile: policyfiles/service_detector_delete.rb
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/service_detector_delete
+  - name: service_detector_edit
+    driver:
+      ports:
+        - 1245:8980/tcp
+    provisioner:
+      policyfile: policyfiles/service_detector_edit.rb
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/service_detector_edit
+  - name: service_detector_noop
+    driver:
+      ports:
+        - 1246:8980/tcp
+    provisioner:
+      policyfile: policyfiles/service_detector_noop.rb
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/service_detector_noop
   - name: snmp_collection
     provisioner:
       policyfile: policyfiles/snmp_collection.rb
@@ -824,13 +936,6 @@ suites:
       inspec_tests:
         - path: test/integration/default
         - path: test/integration/threshold_change_dslabel
-  - name: threshold_change_rearmeduei
-    provisioner:
-      policyfile: policyfiles/threshold_change_rearmeduei.rb
-    verifier:
-      inspec_tests:
-        - path: test/integration/default
-        - path: test/integration/threshold_change_rearmeduei
   - name: threshold_change_rearm
     provisioner:
       policyfile: policyfiles/threshold_change_rearm.rb
@@ -838,13 +943,6 @@ suites:
       inspec_tests:
         - path: test/integration/default
         - path: test/integration/threshold_change_rearm
-  - name: threshold_change_triggereduei
-    provisioner:
-      policyfile: policyfiles/threshold_change_triggereduei.rb
-    verifier:
-      inspec_tests:
-        - path: test/integration/default
-        - path: test/integration/threshold_change_triggereduei
   - name: threshold_change_trigger
     provisioner:
       policyfile: policyfiles/threshold_change_trigger.rb

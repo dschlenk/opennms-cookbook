@@ -70,3 +70,25 @@ opennms_jmx_collection_service 'jmx_url_ignore_path' do
   username 'bart'
   password 'simpson'
 end
+
+opennms_jmx_mbean 'create if missing' do
+  mbean_name 'create.if.missing'
+  collection_name 'jmxcollection'
+  objectname 'create.if.missing:BrokerName=broker.example.com,Type=Queue,Destination=anQueue'
+  attribs(
+    'ConsumerCount' => { 'alias' => 'anQConsumerCnt', 'type' => 'gauge' },
+    'InFlightCount' => { 'alias' => 'anQFlightCnt', 'type' => 'gauge' }
+  )
+  action :create_if_missing
+end
+
+opennms_jmx_mbean 'noop create if missing' do
+  mbean_name 'create.if.missing'
+  collection_name 'jmxcollection'
+  objectname 'create.if.missing:BrokerName=broker.example.com,Type=Queue,Destination=anQueue'
+  attribs(
+    'ConsumerCount2' => { 'alias' => 'anRConsumerCnt', 'type' => 'Counter' },
+    'InFlightCount3' => { 'alias' => 'anRFlightCnt', 'type' => 'gauge' }
+  )
+  action :create_if_missing
+end

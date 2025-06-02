@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<syslogd-configuration-group>
+    <ueiList>
+        <ueiMatch>
+            <uei>uei.opennms.org/vendor/posix/syslog/su/authenFailure</uei>
+        </ueiMatch>
+    </ueiList>
+</syslogd-configuration-group>

@@ -12,6 +12,18 @@ control 'poller' do
     its('rras') { should eq ['RRA:AVERAGE:0.5:2:4032', 'RRA:AVERAGE:0.5:24:2976', 'RRA:AVERAGE:0.5:576:732', 'RRA:MAX:0.5:576:732', 'RRA:MIN:0.5:576:732'] }
   end
 
+  describe poller_package('createifmissing') do
+    it { should exist }
+    its('filter') { should eq "(IPADDR != '0.0.0.0') & (categoryName == 'create_if_missing')" }
+    its('specifics') { should eq ['10.0.0.1'] }
+    its('include_ranges') { should eq [{ 'begin' => '10.0.1.1', 'end' => '10.0.1.254' }] }
+    its('exclude_ranges') { should eq [{ 'begin' => '10.0.2.1', 'end' => '10.0.2.254' }] }
+    its('rrd_step') { should eq 600 }
+    its('remote') { should eq true }
+    its('outage_calendars') { should eq ['ignore localhost on mondays'] }
+    its('rras') { should eq ['RRA:AVERAGE:0.5:2:4032', 'RRA:AVERAGE:0.5:24:2976', 'RRA:AVERAGE:0.5:576:732', 'RRA:MAX:0.5:576:732', 'RRA:MIN:0.5:576:732'] }
+  end
+
   describe poller_service('SNMP', 'foo') do
     it { should exist }
     its('interval') { should eq 600_000 }

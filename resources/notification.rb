@@ -30,7 +30,10 @@ include Opennms::XmlHelper
 include Opennms::Cookbook::Notification::NotificationsTemplate
 load_current_value do |new_resource|
   config = notifs_resource.variables[:config] unless notifs_resource.nil?
-  config = Opennms::Cookbook::Notification::NotificationsFile.read("#{onms_etc}/notifications.xml") if config.nil?
+  if config.nil?
+    ro_notifs_resource_init
+    config = ro_notifs_resource.variables[:config]
+  end
   notif = config.notification(name: new_resource.notification_name)
   current_value_does_not_exist! if notif.nil?
   %i(status writeable uei description rule strict_rule text_message subject numeric_message event_severity parameters vbname vbvalue).each do |p|

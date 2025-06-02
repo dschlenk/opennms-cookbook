@@ -28,7 +28,7 @@ default['opennms']['yum_gpg_keys'] = [
 default['opennms']['start_opts'] = ''
 # set to '' if you want to re-enable OOTB behavior (but you should not do this if using any of the opennms resources)
 default['opennms']['timeout_start_sec'] = '10min'
-default['opennms']['version'] = '33.1.2-1'
+default['opennms']['version'] = '33.1.6-1'
 default['java']['version'] = '17'
 default['opennms']['jre_path'] = nil
 default['opennms']['allow_downgrade'] = false
@@ -61,7 +61,7 @@ default['opennms']['conf']['home'] = onms_home
 # opennms.conf
 default['opennms']['conf']['env'] = {
   # required because we need opennms to fully start before resources will work
-  'START_TIMEOUT' => 20,
+  'START_TIMEOUT' => 30,
   # see $OPENNMS_HOME/etc/examples/opennms.conf for more options, like:
   # 'JAVA_HEAP_SIZE' => 4096,
   # 'MAXIMUM_FILE_DESCRIPTORS' => 204800,
@@ -149,16 +149,22 @@ default['opennms']['users']['admin']['vault'] = Chef::Config[:node_name]
 # must contain a value named `password`.
 default['opennms']['users']['admin']['vault_item'] = 'opennms_admin_password'
 
-# non-default daemons
-default['opennms']['services']['dhcpd']       = false
-default['opennms']['services']['snmp_poller'] = false
-default['opennms']['services']['linkd']       = false
-default['opennms']['services']['correlator']  = false
-default['opennms']['services']['tl1d']        = false
-default['opennms']['services']['syslogd']     = false
-default['opennms']['services']['xmlrpcd']     = false
-default['opennms']['services']['asterisk_gw'] = false
-default['opennms']['services']['apm']         = false
+# daemons
+default['opennms']['services']['dhcpd']               = false
+default['opennms']['services']['snmp_poller']         = false
+default['opennms']['services']['linkd']               = false
+default['opennms']['services']['correlator']          = false
+default['opennms']['services']['tl1d']                = false
+default['opennms']['services']['syslogd']             = false
+default['opennms']['services']['xmlrpcd']             = false
+default['opennms']['services']['asterisk_gw']         = false
+default['opennms']['services']['apm']                 = false
+default['opennms']['services']['telemetryd']          = true
+default['opennms']['services']['perspective_poller']  = true
+default['opennms']['services']['bsmd']                = true
+default['opennms']['services']['discovery']           = true
+default['opennms']['services']['ticketer']            = true
+
 # opennms.properties
 default['opennms']['properties']['files'] = {
   #  Use to define properties overrides in `$OPENNMS_HOME/etc/opennms.properties.d`.
@@ -168,7 +174,7 @@ default['opennms']['properties']['files'] = {
   #  }
 }
 # if you change one of the following via the mechanism above, you also need to update it here:
-default['opennms']['properties']['dc']['rrd_base_dir']              = "#{onms_home}/share/rrd"
+default['opennms']['properties']['dc']['rrd_base_dir']              = "#{onms_home}/share/rrd/snmp"
 default['opennms']['properties']['jetty']['port']                   = 8980
 # we no longer manage the main opennms.proeprties file; these legacy attributes no longer used
 # default['opennms']['properties']['misc']['bin_dir']                 = "#{onms_home}/bin"
@@ -479,8 +485,8 @@ default['opennms']['jms_nbi']['batch_size']             = 100
 default['opennms']['jms_nbi']['queue_size']             = 300_000
 default['opennms']['jms_nbi']['message_format']         = 'ALARM ID:${alarmId} NODE:${nodeLabel}; ${logMsg}'
 default['opennms']['jms_nbi']['send_as_object_message'] = false
-default['opennms']['jms_nbi']['first_occurence_only']   = true
-default['opennms']['jms_nbi']['jms_destination']        = 'SingleAlarmQueue'
+default['opennms']['jms_nbi']['first_occurrence_only'] = true
+default['opennms']['jms_nbi']['jms_destination'] = 'SingleAlarmQueue'
 # log4j2.xml
 default['opennms']['log4j2']['default_route']['size'] = '100MB'
 default['opennms']['log4j2']['default_route']['rollover'] = 4
@@ -922,6 +928,38 @@ default['opennms']['postgresql']['version'] = '15'
 # must contain objects named 'postgres' and 'opennms' each with string values named 'password'
 default['opennms']['postgresql']['user_vault'] = Chef::Config['node_name']
 default['opennms']['postgresql']['user_vault_item'] = 'postgres_users'
+default['opennms']['postgresql']['access']['host'] = [
+  {
+    'database' => 'all',
+    'user' => 'all',
+    'addresses' => ['127.0.0.1/32', '::1/128'],
+    'auth_method' => 'scram-sha-256',
+    'action' => :create,
+  },
+  {
+    'database' => 'replication',
+    'user' => 'all',
+    'addresses' => ['127.0.0.1/32', '::1/128'],
+    'auth_method' => 'trust',
+    'action' => :delete,
+  },
+]
+default['opennms']['postgresql']['access']['local'] = [
+  {
+    'database' => 'all',
+    'user' => 'all',
+    'auth_method' => 'scram-sha-256',
+    'action' => :create,
+  },
+  {
+    'database' => 'replication',
+    'user' => 'all',
+    'auth_method' => 'trust',
+    'action' => :create,
+  },
+]
+default['opennms']['postgresql']['local_auth_method'] = 'scram-sha-256'
+default['opennms']['postgresql']['local_repl_auth_method'] = 'trust'
 
 default['opennms']['bin']['cookbook'] = 'opennms'
 default['opennms']['bin']['return_code'] = false

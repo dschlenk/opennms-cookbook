@@ -29,3 +29,17 @@ opennms_wsman_collection 'the same as the one before but nothing happens even th
   include_system_definition ['Microsoft Windows (All Versions)', 'Dell iDRAC (All Version)', 'Dell iDRAC 8']
   action :create
 end
+
+opennms_wsman_collection 'create_if_missing' do
+  rrd_step 600
+  rras ['RRA:AVERAGE:0.5:2:4032', 'RRA:AVERAGE:0.5:24:2976', 'RRA:AVERAGE:0.5:576:732', 'RRA:MAX:0.5:576:732', 'RRA:MIN:0.5:576:732']
+  include_system_definitions true
+  action :create_if_missing
+end
+
+opennms_wsman_collection 'noop_create_if_missing' do
+  collection 'create_if_missing'
+  rrd_step 700
+  rras ['RRA:AVERAGE:0.5:2:4033', 'RRA:AVERAGE:0.5:24:2977', 'RRA:AVERAGE:0.5:576:733', 'RRA:MAX:0.5:576:733', 'RRA:MIN:0.5:576:733']
+  action :create_if_missing
+end

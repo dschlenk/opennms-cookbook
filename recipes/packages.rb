@@ -21,12 +21,14 @@ if !node['opennms']['upgrade'] && upgrade.upgrade?
   return
 end
 
+onms_home = node['opennms']['conf']['home']
+onms_home ||= '/opt/opennms'
+
 include_recipe 'opennms::repositories'
 
 onms_packages = %w(opennms-core opennms-webapp-jetty)
 onms_versions = [node['opennms']['version'], node['opennms']['version']]
 node['opennms']['plugin']['addl'].each do |plugin|
-  Chef::Log.warn "adding plugin #{plugin}"
   onms_packages.push plugin
   onms_versions.push node['opennms']['version']
 end
@@ -41,6 +43,11 @@ end
 # the former is needed for dnf_package action `:lock` and the latter for `$OPENNMS_HOME/bin/send-event.pl
 dnf_package %w(python3-dnf-plugin-versionlock perl-Sys-Hostname)
 
+execute 'fix-permissions' do
+  cwd onms_home
+  command "#{onms_home}/bin/fix-permissions"
+  action :nothing
+end
 dnf_package onms_packages do
   action :unlock
   only_if { node['opennms']['upgrade'] && upgrade.upgrade? }
@@ -50,6 +57,7 @@ dnf_package onms_packages do
   timeout node['yum_timeout']
   flush_cache :before
   action [:install, :lock]
+  notifies :run, 'execute[fix-permissions]', :immediately
 end
 
 ruby_block 'do post-upgrade cleanup' do

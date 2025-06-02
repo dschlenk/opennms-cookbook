@@ -7,6 +7,8 @@ control 'expression_change_rearm' do
     'ds_type' => 'if',
     'filter_operator' => 'and',
     'resource_filters' => [{ 'field' => 'ifHighSpeed', 'filter' => '^[1-9]+[0-9]*$' }],
+    'triggered_uei' => 'uei.opennms.org/thresholdTest/testThresholdExceeded',
+    'rearmed_uei' => 'uei.opennms.org/thresholdTest/testThresholdRearmed',
   }
   describe expression(expr) do
     it { should exist }

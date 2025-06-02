@@ -50,4 +50,13 @@ control 'threshold_common' do
   describe threshold_group('hrstorage') do
     it { should_not exist }
   end
+
+  describe threshold_group('noop-create-if-missing') do
+    it { should_not exist }
+  end
+
+  describe threshold_group('create-if-missing') do
+    it { should exist }
+    its('rrd_repository') { should eq '/opt/opennms/share/rrd/snmp' }
+  end
 end

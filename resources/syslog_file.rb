@@ -2,23 +2,15 @@ include Opennms::XmlHelper
 include Opennms::Cookbook::Syslog::ConfigurationTemplate
 
 property :filename, String, name_property: true
-# 'bottom' places it near the bottom before these files:
-# ncs-component.events.xml
-# asset-management.events.xml
-# Standard.events.xml
-# default.events.xml
-#
-# 'top' places it just after
-# Translator.events.xml
-#
-# TODO: 'alphabetical' places it in alphabetical order with the other vendor MIBs.
-# required for :create
 property :position, String, equal_to: %w(bottom top), desired_state: false
 
 load_current_value do |new_resource|
   current_value_does_not_exist! unless ::File.exist?("#{onms_etc}/syslog/#{new_resource.filename}")
-  syslog_conf = syslog_resource.variables[:conf] unless syslog_resource.nil?
-  syslog_conf = Opennms::Cookbook::Syslog::Configuration.read("#{onms_etc}/syslogd-configuration.xml", node) if syslog_conf.nil?
+  syslog_conf = syslog_resource.variables[:config] unless syslog_resource.nil?
+  if syslog_conf.nil?
+    ro_syslog_resource_init
+    syslog_conf = ro_syslog_resource.variables[:config]
+  end
   current_value_does_not_exist! unless syslog_conf.files.include?("syslog/#{new_resource.filename}")
 end
 
@@ -42,6 +34,10 @@ action :create do
       syslog_resource.variables[:config].files.push("syslog/#{new_resource.filename}")
     end
   end
+end
+
+action :create_if_missing do
+  run_action(:create) unless ::File.exist?("#{onms_etc}/syslog/#{new_resource.filename}")
 end
 
 action :delete do

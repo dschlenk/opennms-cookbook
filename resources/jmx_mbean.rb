@@ -33,12 +33,11 @@ property :comp_attribs, Hash, default: {}, callbacks: {
 
 load_current_value do |new_resource|
   r = jmx_resource
-  collection = r.variables[:collections][new_resource.collection_name] unless r.nil?
-  if r.nil? || collection.nil?
-    filename = "#{onms_etc}/jmx-datacollection-config.xml"
-    current_value_does_not_exist! unless ::File.exist?(filename)
-    collection = Opennms::Cookbook::Collection::OpennmsCollectionConfigFile.read(filename, 'jmx').collections[new_resource.collection_name]
+  if r.nil?
+    ro_jmx_resource_init
+    r = ro_jmx_resource
   end
+  collection = r.variables[:collections][new_resource.collection_name]
   current_value_does_not_exist! if collection.nil?
   mbean = collection.mbean(name: new_resource.mbean_name, objectname: new_resource.objectname)
   current_value_does_not_exist! if mbean.nil?
@@ -66,6 +65,14 @@ action :create do
       run_action(:update)
     end
   end
+end
+
+action :create_if_missing do
+  jmx_resource_init
+  collection = jmx_resource.variables[:collections][new_resource.collection_name]
+  raise Opennms::Cookbook::Collection::NoSuchCollection, "No JMX collection named #{new_resource.collection_name}, cannot add jmx_mbean to it." if collection.nil?
+  mbean = collection.mbean(name: new_resource.mbean_name, objectname: new_resource.objectname)
+  run_action(:create) if mbean.nil?
 end
 
 action :update do

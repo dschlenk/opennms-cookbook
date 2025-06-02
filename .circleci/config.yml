@@ -11,7 +11,7 @@ jobs:
           command: docker login -u $DOCKER_USER -p $DOCKER_PASSWORD
       - run:
           name: install cinc workstation
-          command: curl -L https://omnitruck.cinc.sh/install.sh | sudo bash -s -- -P cinc-workstation -v 24
+          command: curl -L https://omnitruck.cinc.sh/install.sh | sudo bash -s -- -P cinc-workstation -v 25
       - run:
           name: cinc
           command: cinc shell-init bash
@@ -26,7 +26,7 @@ jobs:
           command: cookstyle
       - run:
           name: kitchen
-          command: kitchen test translation-specs --destroy always
+          command: kitchen verify default
 workflows:
   version: 2
   untagged-build:

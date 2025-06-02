@@ -40,14 +40,18 @@ load_current_value do |new_resource|
   file = "#{onms_etc}/datacollection/#{new_resource.file_name}"
   current_value_does_not_exist! unless ::File.exist?(file)
   r = rtgroup_resource(file)
-  sd = if r.nil?
-         Opennms::Cookbook::Collection::CollectionGroupConfigFile.read(file).system_def(name: new_resource.system_name)
-       else
-         rtgroup_resource(file).variables[:config].system_def(name: new_resource.system_name)
-       end
+  if r.nil?
+    ro_rtgroup_resource_init(file)
+    r = ro_rtgroup_resource(file)
+  end
+  sd = r.variables[:config].system_def(name: new_resource.system_name)
   current_value_does_not_exist! if sd.nil?
   %i(sysoid sysoid_mask ip_addrs ip_addr_masks).each do |p|
-    send(p, sd[p])
+    if sd[p].nil?
+      Chef::Log.debug("No property #{p} for system_def #{new_resource.system_name}")
+    else
+      send(p, sd[p])
+    end
   end
   groups sd[:include_groups]
 end
@@ -115,6 +119,14 @@ action :create do
       run_action(:update)
     end
   end
+end
+
+action :create_if_missing do
+  file = "#{onms_etc}/datacollection/#{new_resource.file_name}"
+  rtgroup_resource_init(file, new_resource.file_name[0..new_resource.file_name.rindex('.xml') - 1])
+  config = rtgroup_resource(file).variables[:config]
+  sd = config.system_def(name: new_resource.system_name)
+  run_action(:create) if sd.nil?
 end
 
 action :update do

@@ -17,12 +17,10 @@ end
 load_current_value do |new_resource|
   r = collectd_resource
   if r.nil?
-    filename = "#{onms_etc}/collectd-configuration.xml"
-    current_value_does_not_exist! unless ::File.exist?(filename)
-    collectd_config = Opennms::Cookbook::Package::CollectdConfigFile.read(filename)
-  else
-    collectd_config = r.variables[:collectd_config]
+    ro_collectd_resource_init
+    r = ro_collectd_resource
   end
+  collectd_config = r.variables[:collectd_config]
   package = collectd_config.packages[new_resource.package_name]
   current_value_does_not_exist! if package.nil?
   collector = collectd_config.collector(service_name: new_resource.service_name)
@@ -119,14 +117,16 @@ action :create do
       resource_properties[:interval] = 300000 if new_resource.interval.nil?
       resource_properties[:user_defined] = false if new_resource.user_defined.nil?
       resource_properties[:status] = 'on' if new_resource.status.nil?
-      resource_properties[:thresholding_enabled] = false if new_resource.thresholding_enabled.nil?
+      resource_properties[:thresholding_enabled] = false if new_resource.thresholding_enabled.nil? && (new_resource.parameters.nil? || new_resource.parameters['thresholding-enabled'].nil?)
       resource_properties[:collection] = 'default' if !resource_properties.key?(:collection) && new_resource.collection.nil? && (new_resource.parameters.nil? || new_resource.parameters['collection'].nil?)
       service = Opennms::Cookbook::Package::CollectdService.new(**resource_properties)
       # we need to set the type in case another resource updates us later in the run list
       service.type = Opennms::Cookbook::Package::CollectdService.type_from_class_name(new_resource.class_name)
       collectd_resource.variables[:collectd_config].packages[new_resource.package_name].services.push(service)
       collector = collectd_resource.variables[:collectd_config].collector(service_name: new_resource.service_name)
-      collectd_resource.variables[:collectd_config].collectors.push({ 'service' => new_resource.service_name, 'class_name' => new_resource.class_name, 'parameters' => new_resource.class_parameters }) if collector.nil?
+      if collector.nil?
+        collectd_resource.variables[:collectd_config].collectors.push({ 'service' => new_resource.service_name, 'class_name' => new_resource.class_name, 'parameters' => new_resource.class_parameters })
+      end
     else
       run_action(:update)
     end

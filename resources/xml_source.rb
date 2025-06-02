@@ -46,16 +46,7 @@ property :groups, [Array, false], default: [], callbacks: {
           (h.key?('resource_keys') &&
            (!h['resource_keys'].is_a?(Array) ||
             h['resource_keys'].any? { |rk| !rk.is_a?(String) })) ||
-          (h.key?('objects') &&
-           (!h['objects'].is_a?(Array) ||
-            h['objects'].any? do |o|
-              !o.key?('name') ||
-                                !o['name'].is_a?(String) ||
-                                !o.key?('type') ||
-                                !o['type'].is_a?(String) ||
-                                !o.key?('xpath') ||
-                                !o['xpath'].is_a?(String)
-            end))
+          (h.key?('objects') && (!h['objects'].is_a?(Array) || h['objects'].any? { |oa| !oa.is_a?(Hash) || !oa.key?('name') || !oa['name'].is_a?(String) || !oa.key?('type') || !oa['type'].is_a?(String) || !oa.key?('xpath') || !oa['xpath'].is_a?(String) }))
       end
   },
 }
@@ -64,15 +55,12 @@ include Opennms::Cookbook::Collection::XmlCollectionTemplate
 
 load_current_value do |new_resource|
   r = xml_resource
-  c = r.variables[:collections][new_resource.collection_name] unless r.nil?
-  source = c.source(url: new_resource.url) unless c.nil?
-  if r.nil? || c.nil? || source.nil?
-    filename = "#{onms_etc}/xml-datacollection-config.xml"
-    current_value_does_not_exist! unless ::File.exist?(filename)
-    collection = Opennms::Cookbook::Collection::OpennmsCollectionConfigFile.read(filename, 'xml').collections[new_resource.collection_name]
-    current_value_does_not_exist! if collection.nil?
-    source = collection.source(url: new_resource.url)
+  if r.nil?
+    ro_xml_resource_init
+    r = ro_xml_resource
   end
+  c = r.variables[:collections][new_resource.collection_name]
+  source = c.source(url: new_resource.url) unless c.nil?
   current_value_does_not_exist! if source.nil?
   request_method source.request['method'] unless source.request.nil? || source.request['method'].nil?
   request_headers source.request['headers'] unless source.request.nil? || source.request['headers'].nil?
@@ -100,6 +88,15 @@ action :create do
       run_action(:update)
     end
   end
+end
+
+action :create_if_missing do
+  xml_resource_init
+  collection = xml_resource.variables[:collections][new_resource.collection_name]
+  raise Opennms::Cookbook::Collection::XmlCollectionDoesNotExist, "No xml-collection named #{new_resource.collection_name} found. Cannot add xml-source." if collection.nil?
+  import_groups_resources
+  source = collection.source(url: new_resource.url)
+  run_action(:create) if source.nil?
 end
 
 action :update do

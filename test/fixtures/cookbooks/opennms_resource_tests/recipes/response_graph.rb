@@ -1,8 +1,7 @@
 # create a poller service in the default package
 opennms_poller_service 'ONMS' do
   class_name 'org.opennms.netmgt.poller.monitors.HttpMonitor'
-  port 8980
-  parameters 'url' => { 'value' => '/opennms/login.jsp' }, 'rrd-repository' => { 'value' => '/opt/opennms/share/rrd/response' }, 'rrd-base-name' => { 'value' => 'onms' }, 'ds-name' => { 'value' => 'onms' }
+  parameters 'url' => { 'value' => '/opennms/login.jsp' }, 'rrd-repository' => { 'value' => '/opt/opennms/share/rrd/response' }, 'rrd-base-name' => { 'value' => 'onms' }, 'ds-name' => { 'value' => 'onms' }, 'port' => { 'value' => '8980' }
   notifies :restart, 'service[opennms]'
 end
 # opennms_foreign_source 'dry-source'

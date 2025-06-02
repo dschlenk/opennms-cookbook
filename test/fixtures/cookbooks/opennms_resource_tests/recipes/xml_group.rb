@@ -17,7 +17,7 @@ opennms_xml_group 'fxa-sc' do
   resource_xpath "/measCollecFile/measData/measInfo[@measInfoId='dns|dns']/measValue"
   timestamp_xpath '/measCollecFile/fileFooter/measCollec/@endTime'
   timestamp_format "yyyy-MM-dd'T'HH:mm:ssZ"
-  objects 'nasdaq' => { 'type' => 'gauge', 'xpath' => "/blah/elmeentalaewflk[@attribute='avalue']" }
+  objects [{ 'name' => 'nasdaq', 'type' => 'gauge', 'xpath' => "/blah/elmeentalaewflk[@attribute='avalue']" }]
 end
 # all options with resource_keys
 opennms_xml_group 'fxa-sc-rk' do
@@ -28,7 +28,7 @@ opennms_xml_group 'fxa-sc-rk' do
   timestamp_xpath '/measCollecFile/fileFooter/measCollec/@endTime'
   timestamp_format "yyyy-MM-dd'T'HH:mm:ssZ"
   resource_keys ['@measObjLdn', '@measObjInstId']
-  objects 'nasdaq' => { 'type' => 'gauge', 'xpath' => "/blah/elmeentalaewflk[@attribute='avalue']" }
+  objects [ { 'name' => 'nasdaq', 'type' => 'gauge', 'xpath' => "/blah/elmeentalaewflk[@attribute='avalue']" }]
 end
 # minimal - adds to a source created with that LWRP
 opennms_xml_group 'minimal' do
@@ -43,14 +43,29 @@ opennms_xml_group 'file' do
   resource_xpath '/files/file'
   key_xpath '@path'
   objects(
-    'size' => { 'type' => 'gauge', 'xpath' => '@size' }
+    [{ 'name' => 'size', 'type' => 'gauge', 'xpath' => '@size' }]
   )
 end
 
-# add to the file using the alternate objects format
 opennms_xml_group 'file2' do
   file 'file-group.xml'
   resource_xpath '/filez/file'
   key_xpath '@inode'
   objects [{ 'name' => 'atime', 'type' => 'string', 'xpath' => '@atime' }, { 'name' => 'mtime', 'type' => 'string', 'xpath' => '@mtime' }]
+end
+
+opennms_xml_group 'create-if-missing' do
+  source_url 'http://{ipaddr}/group-example'
+  collection_name 'foo'
+  resource_type 'dnsDns'
+  resource_xpath "/measCollecFile/measData/measInfo[@measInfoId='dns|dns']/measValue"
+  action :create_if_missing
+end
+
+opennms_xml_group 'noop-create-if-missing' do
+  source_url 'http://{ipaddr}/group-example'
+  collection_name 'foo'
+  resource_type 'dnsDnss'
+  resource_xpath "/measCollecFile/measData/measInfo[@measInfoId='dns|dnss']/measValue"
+  action :create_if_missing
 end

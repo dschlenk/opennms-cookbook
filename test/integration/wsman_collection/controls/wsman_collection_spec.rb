@@ -20,4 +20,10 @@ control 'wsman_collection' do
     its('include_system_definitions') { should eq false }
     its('include_system_definition') { should eq ['Microsoft Windows (All Versions)', 'Dell iDRAC (All Version)', 'Dell iDRAC 8'] }
   end
+
+  describe wsman_collection('create_if_missing') do
+    its('rrd_step') { should eq 600 }
+    its('rras') { should eq ['RRA:AVERAGE:0.5:2:4032', 'RRA:AVERAGE:0.5:24:2976', 'RRA:AVERAGE:0.5:576:732', 'RRA:MAX:0.5:576:732', 'RRA:MIN:0.5:576:732'] }
+    its('include_system_definitions') { should eq true }
+  end
 end

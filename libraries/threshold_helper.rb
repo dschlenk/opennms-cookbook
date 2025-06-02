@@ -11,6 +11,15 @@ module Opennms
           find_resource!(:template, "#{onms_etc}/thresholds.xml")
         end
 
+        def ro_thresholds_resource_init
+          ro_thresholds_resource_create unless ro_thresholds_resource_exist?
+        end
+
+        def ro_thresholds_resource
+          return unless ro_thresholds_resource_exist?
+          find_resource!(:template, "RO #{onms_etc}/thresholds.xml")
+        end
+
         private
 
         def thresholds_resource_exist?
@@ -32,6 +41,29 @@ module Opennms
               action :nothing
               delayed_action :create
               notifies :run, 'opennms_send_event[restart_Thresholds]'
+            end
+          end
+        end
+
+        def ro_thresholds_resource_exist?
+          !find_resource(:template, "RO #{onms_etc}/thresholds.xml").nil?
+        rescue Chef::Exceptions::ResourceNotFound
+          false
+        end
+
+        def ro_thresholds_resource_create
+          file = Opennms::Cookbook::Threshold::ThresholdsFile.read("#{onms_etc}/thresholds.xml")
+          with_run_context(:root) do
+            declare_resource(:template, "RO #{onms_etc}/thresholds.xml") do
+              path "#{Chef::Config[:file_cache_path]}/thresholds.xml"
+              cookbook 'opennms'
+              source 'thresholds.xml.erb'
+              owner node['opennms']['username']
+              group node['opennms']['groupname']
+              mode '0664'
+              variables(config: file)
+              action :nothing
+              delayed_action :nothing
             end
           end
         end
@@ -78,27 +110,33 @@ module Opennms
           @expressions = []
         end
 
-        def find_rule(type:, ds_type:, filter_operator: nil, resource_filters: nil, ds_name: nil, expression: nil)
+        def find_rule(type:, ds_type:, filter_operator: nil, resource_filters: nil, ds_name: nil, expression: nil, triggered_uei: nil, rearmed_uei: nil)
           raise Chef::Exceptions::Validation, 'Either `ds_name` or `expression` properties must be present in a threshold rule' if ds_name.nil? && expression.nil?
           if ds_name.nil?
             expression = @expressions.select do |e|
               e.type.eql?(type) &&
                 e.ds_type.eql?(ds_type) &&
                 (e.filter_operator.eql?(filter_operator) || (e.filter_operator.nil? && (filter_operator.eql?('or') || filter_operator.eql?('OR'))) || (filter_operator.nil? && (e.filter_operator.eql?('or') || e.filter_operator.eql?('OR')))) &&
-                e.expression.eql?(expression)
+                e.expression.eql?(expression) &&
+                e.triggered_uei.eql?(triggered_uei) &&
+                e.rearmed_uei.eql?(rearmed_uei) &&
+                e.resource_filters.eql?(resource_filters)
             end
             return if expression.empty?
-            raise DuplicateThresholdRule, "More than one expression rule found with identical identity (type #{type}, ds_type #{ds_type}, filter_operator #{filter_operator}, resource_filters #{resource_filters}, expression #{expression}) found" unless expression.one?
+            raise DuplicateThresholdRule, "More than one expression rule found with identical identity (type #{type}, ds_type #{ds_type}, filter_operator #{filter_operator}, resource_filters #{resource_filters}, expression #{expression} triggered_uei #{triggered_uei}, rearmed_uei #{rearmed_uei}) found" unless expression.one?
             expression.pop
           else
             threshold = @thresholds.select do |e|
               e.type.eql?(type) &&
                 e.ds_type.eql?(ds_type) &&
                 (e.filter_operator.eql?(filter_operator) || (e.filter_operator.nil? && (filter_operator.eql?('or') || filter_operator.eql?('OR'))) || (filter_operator.nil? && (e.filter_operator.eql?('or') || e.filter_operator.eql?('OR')))) &&
-                e.ds_name.eql?(ds_name)
+                e.ds_name.eql?(ds_name) &&
+                e.triggered_uei.eql?(triggered_uei) &&
+                e.rearmed_uei.eql?(rearmed_uei) &&
+                e.resource_filters.eql?(resource_filters)
             end
             return if threshold.empty?
-            raise DuplicateThresholdRule, "More than one threshold rule found with identical identity (type #{type}, ds_type #{ds_type}, filter_operator #{filter_operator}, resource_filters #{resource_filters}, ds_name #{ds_name}) found" unless threshold.one?
+            raise DuplicateThresholdRule, "More than one threshold rule found with identical identity (type #{type}, ds_type #{ds_type}, filter_operator #{filter_operator}, resource_filters #{resource_filters}, ds_name #{ds_name}, triggered_uei #{triggered_uei}, rearmed_uei #{rearmed_uei}) found" unless threshold.one?
             threshold.pop
           end
         end
@@ -113,12 +151,36 @@ module Opennms
           end
         end
 
-        def delete_rule(type:, ds_type:, filter_operator: nil, resource_filters: nil, ds_name: nil, expression: nil)
+        def delete_rule(type:, ds_type:, filter_operator: nil, resource_filters: nil, ds_name: nil, expression: nil, triggered_uei: nil, rearmed_uei: nil)
           raise Chef::Exceptions::Validation, 'Either `ds_name` or `expression` properties must be present in a threshold rule' if ds_name.nil? && expression.nil?
           if !ds_name.nil?
-            @thresholds.delete_if { |t| t.type.eql?(type) && t.ds_type.eql?(ds_type) && (t.filter_operator.eql?(filter_operator) || (t.filter_operator.nil? && (filter_operator.eql?('or') || filter_operator.eql?('OR'))) || (filter_operator.nil? && (g.filter_operator.eql?('or') || g.filter_operator.eql?('OR')))) && t.resource_filters.eql?(resource_filters) && t.ds_name.eql?(ds_name) }
+            @thresholds.delete_if do |t|
+              t.type.eql?(type) &&
+                t.ds_type.eql?(ds_type) &&
+                (
+                  t.filter_operator.eql?(filter_operator) ||
+                  (t.filter_operator.nil? && filter_operator.downcase.eql?('or')) ||
+                  (filter_operator.nil? && t.filter_operator.downcase.eql?('or'))
+                ) &&
+                t.resource_filters.eql?(resource_filters) &&
+                t.ds_name.eql?(ds_name) &&
+                t.triggered_uei.eql?(triggered_uei) &&
+                t.rearmed_uei.eql?(rearmed_uei)
+            end
           else
-            @expressions.delete_if { |e| e.type.eql?(type) && e.ds_type.eql?(ds_type) && (e.filter_operator.eql?(filter_operator) || (e.filter_operator.nil? && (filter_operator.eql?('or') || filter_operator.eql?('OR'))) || (filter_operator.nil? && (g.filter_operator.eql?('or') || g.filter_operator.eql?('OR')))) && e.resource_filters.eql?(resource_filters) && e.expression.eql?(expression) }
+            @expressions.delete_if do |e|
+              e.type.eql?(type) &&
+                e.ds_type.eql?(ds_type) &&
+                (
+                  e.filter_operator.eql?(filter_operator) ||
+                  (e.filter_operator.nil? && filter_operator.downcase.eql?('or')) ||
+                  (filter_operator.nil? && e.filter_operator.downcase.eql?('or'))
+                ) &&
+                e.resource_filters.eql?(resource_filters) &&
+                e.expression.eql?(expression) &&
+                e.triggered_uei.eql?(triggered_uei) &&
+                e.rearmed_uei.eql?(rearmed_uei)
+            end
           end
         end
       end
@@ -155,15 +217,17 @@ module Opennms
           end
         end
 
-        def update(relaxed: nil, description: nil, ds_label: nil, value: nil, rearm: nil, trigger: nil, triggered_uei: nil, rearmed_uei: nil)
+        def update(relaxed: nil, description: nil, ds_label: nil, value: nil, rearm: nil, trigger: nil)
           @relaxed = relaxed unless relaxed.nil?
           @description = description unless description.nil?
           @ds_label = ds_label unless ds_label.nil?
           @value = value unless value.nil?
           @rearm = rearm unless rearm.nil?
           @trigger = trigger unless trigger.nil?
-          @triggered_uei = triggered_uei unless triggered_uei.nil?
-          @rearmed_uei = rearmed_uei unless rearmed_uei.nil?
+        end
+
+        def to_s
+          "(type: #{@type}, ds_type: #{@ds_type}, value: #{@value}, rearm: #{@rearm}, trigger: #{@trigger}, relaxed: #{@relaxed}, description: #{@description}, ds_label: #{@ds_label}, triggered_uei: #{@triggered_uei}, rearmed_uei: #{@rearmed_uei}, filter_operator: #{@filter_operator}, resource_filters: #{@resource_filters}"
         end
       end
 
@@ -174,6 +238,10 @@ module Opennms
           super(type: type, ds_type: ds_type, value: value, rearm: rearm, trigger: trigger, relaxed: relaxed, description: description, ds_label: ds_label, triggered_uei: triggered_uei, rearmed_uei: rearmed_uei, filter_operator: filter_operator, resource_filters: resource_filters)
           @ds_name = ds_name
         end
+
+        def to_s
+          "#{super.to_s}, ds_name: #{@ds_name}"
+        end
       end
 
       class Expression < BaseThreshold
@@ -183,6 +251,10 @@ module Opennms
           super(type: type, ds_type: ds_type, value: value, rearm: rearm, trigger: trigger, relaxed: relaxed, description: description, ds_label: ds_label, triggered_uei: triggered_uei, rearmed_uei: rearmed_uei, filter_operator: filter_operator, resource_filters: resource_filters)
           @expression = expression
         end
+
+        def to_s
+          "#{super.to_s}, expression: #{@expression}"
+        end
       end
 
       class ResourceFilter
@@ -191,6 +263,10 @@ module Opennms
         def initialize(field:, filter:)
           @field = field
           @filter = filter
+        end
+
+        def to_s
+          "field: #{@field}, filter: #{@filter}"
         end
       end
 

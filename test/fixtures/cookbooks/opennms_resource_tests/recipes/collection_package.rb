@@ -16,3 +16,32 @@ end
 opennms_collection_package 'bar' do
   filter "IPADDR != '0.0.0.0'"
 end
+
+# functional :create_if_missing
+opennms_collection_package 'create_if_missing' do
+  filter "IPADDR != '0.0.0.0' & categoryName == 'foo'"
+  package_name 'createifmissing'
+  specifics ['10.0.0.1']
+  include_ranges [{ 'begin' => '10.0.1.1', 'end' => '10.0.1.254' }]
+  exclude_ranges [{ 'begin' => '10.0.2.1', 'end' => '10.0.2.254' }]
+  include_urls ['file:/opt/opennms/etc/foo']
+  store_by_if_alias true
+  if_alias_domain 'foo.com'
+  remote true
+  outage_calendars ['ignore localhost on mondays']
+  action :create_if_missing
+end
+
+opennms_collection_package 'noop_create_if_missing' do
+  filter "IPADDR != '0.0.0.0'"
+  package_name 'createifmissing'
+  specifics ['10.0.0.5']
+  include_ranges [{ 'begin' => '10.0.1.1', 'end' => '10.0.1.254' }]
+  exclude_ranges [{ 'begin' => '10.0.2.1', 'end' => '10.0.2.254' }]
+  include_urls ['file:/opt/opennms/etc/fooo']
+  store_by_if_alias true
+  if_alias_domain 'foo.com'
+  remote true
+  outage_calendars ['ignore localhost on mondays']
+  action :create_if_missing
+end

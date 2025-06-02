@@ -10,14 +10,14 @@ class ForeignSource < Inspec.resource(1)
   '
 
   example '
-    describe foreign_source(\'name\') do
+    describe foreign_source(\'name\', 1237) do
       it { should exist }
       its(\'scan_interval\') { should eq \'1w\' }
     end
   '
 
-  def initialize(name)
-    parsed_url = Addressable::URI.parse("http://admin:admin@localhost:8980/opennms/rest/foreignSources/#{name}").normalize.to_str
+  def initialize(name, port = 8980)
+    parsed_url = Addressable::URI.parse("http://admin:admin@localhost:#{port}/opennms/rest/foreignSources/#{name}").normalize.to_str
     fs = RestClient.get(parsed_url)
     doc = REXML::Document.new(fs)
     fs_el = doc.elements["/foreign-source[@name = '#{name}']"]

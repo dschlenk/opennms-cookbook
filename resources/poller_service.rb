@@ -2,7 +2,7 @@ include Opennms::XmlHelper
 include Opennms::Cookbook::Poller::PollerTemplate
 
 unified_mode true
-use 'partial/_service'
+use 'partial/_class_service'
 
 property :pattern, String
 property :parameters, Hash, callbacks: {
@@ -36,41 +36,19 @@ end
 load_current_value do |new_resource|
   r = poller_resource
   if r.nil?
-    filename = "#{onms_etc}/poller-configuration.xml"
-    current_value_does_not_exist! unless ::File.exist?(filename)
-    config = Opennms::Cookbook::Package::PollerConfigFile.read(filename)
-  else
-    config = r.variables[:config]
+    ro_poller_resource_init
+    r = ro_poller_resource
   end
+  config = r.variables[:config]
   package = config.packages[new_resource.package_name]
   current_value_does_not_exist! if package.nil?
   monitor = config.monitor(service_name: new_resource.service_name)
   current_value_does_not_exist! if monitor.nil?
   service = package.service(service_name: new_resource.service_name)
   current_value_does_not_exist! if service.nil?
-  # The proxied parameters are a bit tricky since the service loaded from the file
-  # will always contain the parameters and the proxied property, but new_resource
-  # will almost never have both.
-  # Additionally, data types can be diverse, so we attempt to compare with what
-  # new_resource has and fall back to the String value if it fails.
   sp = {}
   service[:parameters].each do |k, v|
-    case k
-    when 'timeout', 'port'
-      sym = k.to_sym
-      if new_resource.send(sym).is_a?(Integer)
-        value = begin
-                  Integer(v['value'])
-                rescue
-                  v['value']
-                end
-        send(sym, value)
-      else
-        sp[k] = v
-      end
-    else
-      sp[k] = v
-    end
+    sp[k] = v
   end unless service[:parameters].nil?
   %i(interval user_defined status).each do |p|
     send(p, service[p])
@@ -93,8 +71,6 @@ action :create do
       resource_properties[:user_defined] = false if new_resource.user_defined.nil?
       resource_properties[:status] = 'on' if new_resource.status.nil?
       resource_properties[:parameters] = {} if resource_properties[:parameters].nil?
-      resource_properties[:parameters]['timeout'] = { 'value' => new_resource.timeout.to_s } unless new_resource.timeout.nil?
-      resource_properties[:parameters]['port'] = { 'value' => new_resource.port.to_s } unless new_resource.port.nil?
       poller_resource.variables[:config].packages[new_resource.package_name].services.push(resource_properties)
       monitor = poller_resource.variables[:config].monitor(service_name: new_resource.service_name)
       poller_resource.variables[:config].monitors.push({ 'service' => new_resource.service_name, 'class_name' => new_resource.class_name, 'parameters' => new_resource.class_parameters }) if monitor.nil?
@@ -127,8 +103,6 @@ action :update do
     service[:status] = new_resource.status unless new_resource.status.nil?
     service[:pattern] = new_resource.pattern unless new_resource.pattern.nil?
     service[:parameters] = new_resource.parameters unless new_resource.parameters.nil?
-    service[:parameters]['timeout'] = { 'value' => new_resource.timeout } unless new_resource.timeout.nil?
-    service[:parameters]['port'] = { 'value' => new_resource.port } unless new_resource.port.nil?
     monitor = poller_resource.variables[:config].monitor(service_name: new_resource.service_name)
     raise Chef::Exceptions::CurrentValueDoesNotExist if monitor.nil?
     monitor['class_name'] = new_resource.class_name

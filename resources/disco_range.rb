@@ -10,7 +10,10 @@ property :foreign_source, String
 
 load_current_value do |new_resource|
   config = disco_resource.variables[:config] unless disco_resource.nil?
-  config = Opennms::Cookbook::Discovery::Configuration.read("#{onms_etc}/discovery-configuration.xml") if config.nil?
+  if config.nil?
+    ro_disco_resource_init
+    config = ro_disco_resource.variables[:config]
+  end
   range = if new_resource.range_type.eql?('include')
             config.include_range(begin_ip: new_resource.range_begin, end_ip: new_resource.range_end, location: new_resource.location)
           else

@@ -25,7 +25,10 @@ end
 
 load_current_value do |new_resource|
   config = view_resource.variables[:config] unless view_resource.nil?
-  config = Opennms::Cookbook::View::SurveillanceConfig.read("#{onms_etc}/surveillance-views.xml") if config.nil?
+  if config.nil?
+    ro_view_resource_init
+    config = ro_view_resource.variables[:config]
+  end
   current_value_does_not_exist! if config.nil?
   view = config.views[new_resource.name]
   current_value_does_not_exist! if view.nil?

@@ -9,3 +9,7 @@ end
 opennms_syslog_file 'NetgearProsafeSmartSwitch.syslog.xml' do
   action :delete
 end
+
+opennms_syslog_file 'create-if-missing-syslog-file.xml' do
+  action :create_if_missing
+end
