@@ -2,14 +2,30 @@
 <% @config.resource_types.each do |rt| -%>
    <resourceType name=<%= rt[:name].encode(:xml => :attr) %> label=<%= rt[:label].encode(:xml => :attr) %><%= rt[:resource_label].nil? ? '' : " resourceLabel=#{rt[:resource_label].encode(:xml => :attr)}" %>>
       <persistenceSelectorStrategy class=<%= rt[:persistence_selector_strategy][:class].encode(:xml => :attr) %>>
-  <% rt[:persistence_selector_strategy][:parameters].each do |k,v| -%>
+  <% if rt[:persistence_selector_strategy][:parameters].is_a?(Hash) -%>
+    <% rt[:persistence_selector_strategy][:parameters].each do |k, v| -%>
          <parameter key=<%= k.encode(:xml => :attr) %> value=<%= v.encode(:xml => :attr) %>/>
-  <% end unless rt[:persistence_selector_strategy][:parameters].nil? -%>
+    <% end -%>
+  <% elsif rt[:persistence_selector_strategy][:parameters].is_a?(Array) -%>
+    <% rt[:persistence_selector_strategy][:parameters].each do |h| -%>
+      <% h.each do |k, v| -%>
+         <parameter key=<%= k.encode(:xml => :attr) %> value=<%= v.encode(:xml => :attr) %>/>
+      <% end -%>
+    <% end -%>
+  <% end -%>
       </persistenceSelectorStrategy>
       <storageStrategy class=<%= rt[:storage_strategy][:class].encode(:xml => :attr) %>>
-  <% rt[:storage_strategy][:parameters].each do |k,v| -%>
+  <% if rt[:storage_strategy][:parameters].is_a?(Hash) -%>
+    <% rt[:storage_strategy][:parameters].each do |k,v| -%>
          <parameter key=<%= k.encode(:xml => :attr) %> value=<%= v.encode(:xml => :attr) %>/>
-  <% end unless rt[:storage_strategy][:parameters].nil? -%>
+    <% end -%>
+  <% elsif rt[:storage_strategy][:parameters].is_a?(Array) -%>
+    <% rt[:storage_strategy][:parameters].each do |h| -%>
+      <% h.each do |k, v| -%>
+         <parameter key=<%= k.encode(:xml => :attr) %> value=<%= v.encode(:xml => :attr) %>/>
+      <% end -%>
+    <% end -%>
+  <% end -%>
       </storageStrategy>
    </resourceType>
 <% end -%>

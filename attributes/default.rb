@@ -28,7 +28,7 @@ default['opennms']['yum_gpg_keys'] = [
 default['opennms']['start_opts'] = ''
 # set to '' if you want to re-enable OOTB behavior (but you should not do this if using any of the opennms resources)
 default['opennms']['timeout_start_sec'] = '10min'
-default['opennms']['version'] = '33.1.4-1'
+default['opennms']['version'] = '33.1.6-1'
 default['java']['version'] = '17'
 default['opennms']['jre_path'] = nil
 default['opennms']['allow_downgrade'] = false
@@ -174,7 +174,7 @@ default['opennms']['properties']['files'] = {
   #  }
 }
 # if you change one of the following via the mechanism above, you also need to update it here:
-default['opennms']['properties']['dc']['rrd_base_dir']              = "#{onms_home}/share/rrd"
+default['opennms']['properties']['dc']['rrd_base_dir']              = "#{onms_home}/share/rrd/snmp"
 default['opennms']['properties']['jetty']['port']                   = 8980
 # we no longer manage the main opennms.proeprties file; these legacy attributes no longer used
 # default['opennms']['properties']['misc']['bin_dir']                 = "#{onms_home}/bin"

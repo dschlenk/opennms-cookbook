@@ -15,7 +15,12 @@ module Opennms
         end
 
         def ro_fs_resource_init(name, port, adminpw)
-          ro_fs_resource_create(name, port, adminpw) unless ro_fs_resource_exist?(name)
+          if ro_fs_resource_exist?(name)
+            Chef::Log.debug('ro resource existed already')
+          else
+            Chef::Log.debug('ro resource did not exist already - creating')
+            ro_fs_resource_create(name, port, adminpw)
+          end
         end
 
         def ro_fs_resource(name)
@@ -81,7 +86,7 @@ module Opennms
             Chef::Log.debug("response message:#{@message}")
           rescue RestClient::NotFound
             Chef::Log.debug("foreign source #{name} not found, returning an empty one")
-            @message = "<foreignSource name=#{name.encode(xml: :attr)}/>"
+            @message = "<foreign-source name=#{name.encode(xml: :attr)}/>"
           end
         end
       end

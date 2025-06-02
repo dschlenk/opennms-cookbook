@@ -1,5 +1,22 @@
 # OpenNMS Cookbook Changes
 
+## 33.4.0
+
+* minor: default to 33.1.6-1
+
+## 33.3.1
+
+* bug: re-run `runjava -s` every time to account for JDK updates during/since last run
+
+## 33.3.0
+
+* update to 33.1.5-1
+* replace REXML with Nokogiri in `opennms_service_detector` as a performance improvement test
+* allow use of array of hashes for resource type selector parameters to allow for multiple instances of parameters with the same key
+* bugfix: new foreign source documents had the wrong root element
+* bugfix: wrong RRD directory in datacollection-config.xml
+* bugfix: cache adminpw from vault in `run_state` to fix performance issue
+
 ## 33.2.1
 
 * bugfix: checking threshold idempotence didn't take resource filters into account
