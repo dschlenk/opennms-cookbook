@@ -168,8 +168,6 @@ The following custom resources don't exist yet, but they should!
 * `opennms_site_status_view`: Manage `view` elements in `$OPENNMS_HOME/etc/site-status-views.xml`.
 * `opennms_translation_specs`: Manage `event-translation-spec` elements in `$OPENNMS_HOME/etc/translator-configuration.xml`.
 * `opennms_correlation`: Manage a set of correlator rules
-* `opennms_scriptd_engine`: Manage scriptd engines
-* `opennms_scriptd_script`: Manage scriptd scripts
 
 ## Template Overview
 
