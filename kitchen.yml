@@ -15,6 +15,7 @@ provisioner:
   chef_binary: /opt/cinc/bin/cinc-client
   chef_license: accept-no-persist # until https://github.com/test-kitchen/test-kitchen/pull/1984
   log_level: <%= ENV['KITCHEN_LOG_LEVEL'] || 'info' %>
+  chef_log_level: debug
   clean_dokken_sandbox: <%= ENV['CLEAN_DOCKEN_SANDBOX'] || 'true' %>
   attributes:
     opennms:
@@ -731,6 +732,13 @@ suites:
       inspec_tests:
         - path: test/integration/default
         - path: test/integration/role
+  - name: scriptd
+    provisioner:
+      policyfile: policyfiles/scriptd.rb
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/script
   - name: send_event
     driver:
       ports:
