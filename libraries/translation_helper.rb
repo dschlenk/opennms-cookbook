@@ -6,9 +6,18 @@ module Opennms
           translation_resource_create unless translation_resource_exist?
         end
 
+        def ro_translation_resource_init
+          ro_translation_resource_create unless ro_translation_resource_exist?
+        end
+
         def translation_resource
           return unless translation_resource_exist?
           find_resource!(:template, "#{onms_etc}/translator-configuration.xml")
+        end
+
+        def ro_translation_resource
+          return unless ro_translation_resource_exist?
+          find_resource!(:template, "RO #{onms_etc}/translator-configuration.xml")
         end
 
         private
@@ -19,8 +28,10 @@ module Opennms
           false
         end
 
-        def delete_event_translation_specs?(specs:)
-          @specs.delete_if { |spec| specs.include?(spec) }
+        def ro_translation_resource_exist?
+          !find_resource(:template, "RO #{onms_etc}/translator-configuration.xml").nil?
+        rescue Chef::Exceptions::ResourceNotFound
+          false
         end
 
         def translation_resource_create
@@ -43,6 +54,31 @@ module Opennms
               )
               action :nothing
               delayed_action :create
+            end
+          end
+        end
+
+        def ro_translation_resource_create
+          file = Opennms::Cookbook::Translations::TranslatorConfigurationFile.read("#{onms_etc}/translator-configuration.xml")
+          with_run_context(:root) do
+            declare_resource(:template, "RO #{onms_etc}/translator-configuration.xml") do
+              cookbook 'opennms'
+              source 'translator-configuration.xml.erb'
+              path "#{Chef::Config[:file_cache_path]}/translator-configuration.xml"
+              owner node['opennms']['username']
+              group node['opennms']['groupname']
+              mode '0664'
+              variables(
+                config: file,
+                snmp_link_down: node['opennms']['translator']['snmp_link_down'],
+                snmp_link_up: node['opennms']['translator']['snmp_link_up'],
+                hyperic: node['opennms']['translator']['hyperic'],
+                cisco_config_man: node['opennms']['translator']['cisco_config_man'],
+                juniper_cfg_change: node['opennms']['translator']['juniper_cfg_change'],
+                telemetry_clock_skew_detected: node['opennms']['translator']['telemetry_clock_skew_detected']
+              )
+              action :nothing
+              delayed_action :nothing
             end
           end
         end
@@ -86,9 +122,15 @@ module Opennms
 
         def event_translation_specs?(specs:)
           specs.each do |spec|
-            return false unless @specs.include?(spec)
+            return false unless @specs.any? { |s| s.eql?(spec) }
           end
           true
+        end
+
+        def delete_specs(specs:)
+          @specs.delete_if do |s|
+            specs.include?(s)
+          end
         end
 
         private
@@ -115,6 +157,18 @@ module Opennms
             @uei.eql?(spec.uei) &&
             @mappings.eql?(spec.mappings)
         end
+
+        def ==(spec)
+          eql?(spec)
+        end
+
+        def to_s
+          "Spec for UEI #{@uei} with mappings #{@mappings}."
+        end
+
+        def inspect
+          to_s
+        end
       end
 
       class TranslationMapping
@@ -132,7 +186,15 @@ module Opennms
         def eql?(mapping)
           self.class.eql?(mapping.class) &&
             @assignments.eql?(mapping.assignments) &&
-            @preserve_snmp_data.eql?(mapping.presere_snmp_data)
+            @preserve_snmp_data.eql?(mapping.preserve_snmp_data)
+        end
+
+        def to_s
+          "Mapping assignments #{@assignments}; preserve_snmp_data #{@preserve_snmp_data}"
+        end
+
+        def inspect
+          to_s
         end
       end
 
@@ -152,6 +214,14 @@ module Opennms
             @type.eql?(assignment.type) &&
             @default.eql?(assignment.default) &&
             @value.eql?(assignment.value)
+        end
+
+        def to_s
+          "Assignment name #{@name}; type #{@type}; default #{@default}; value #{@value}"
+        end
+
+        def inspect
+          to_s
         end
       end
 
@@ -173,6 +243,14 @@ module Opennms
             @matches.eql?(value.matches) &&
             @name.eql?(value.name) &&
             @values.eql?(value.values)
+        end
+
+        def to_s
+          "Value name #{@name}; type #{@type}; result #{@result}; matches #{@matches}; values #{@values}"
+        end
+
+        def inspect
+          to_s
         end
       end
     end

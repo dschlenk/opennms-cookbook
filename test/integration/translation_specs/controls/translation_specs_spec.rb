@@ -190,7 +190,7 @@ control 'translation_specs' do
       ],
     },
   ]) do
-    it { should exist }
+    it { should_not exist }
   end
 
   describe translation_spec('uei.opennms.org/vendor/Cisco/traps/ciscoConfigManEvent', [

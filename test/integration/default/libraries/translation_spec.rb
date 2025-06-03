@@ -15,31 +15,23 @@ class TranslationSpec < Inspec.resource(1)
   def initialize(uei, mappings)
     @exists = false
     doc = REXML::Document.new(inspec.file('/opt/opennms/etc/translator-configuration.xml').content)
-    # puts doc
     doc.root.each_element("/event-translator-configuration/translation/event-translation-spec[@uei = '#{uei}']") do |spec|
-      puts "got spec matching uei: #{spec}"
       imappings = []
       spec.each_element('mappings/mapping') do |mapping|
-        puts "checking mapping: #{mapping}"
         preserve_snmp_data = mapping.attributes['preserve-snmp-data']
         assignments = []
         mapping.each_element('assignment') do |assignment|
-          puts "checking assignment: #{assignment}"
           atype = assignment.attributes['type']
           aname = assignment.attributes['name']
           adefault = assignment.attributes['default']
           avalue = parse_value(assignment.elements['value'])
-          puts "avalue parsed is #{avalue}"
           assignments.push({ name: aname, type: atype, default: adefault, value: avalue }.compact)
         end
         imappings.push({ assignments: assignments, preserve_snmp_data: preserve_snmp_data }.compact)
       end
       if mappings.eql?(imappings)
-        puts 'was eql'
         @exists = true
         break
-      else
-        puts "was not eql; mappings: #{mappings} vs imappings: #{imappings}"
       end
     end
   end
