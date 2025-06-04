@@ -1,6 +1,6 @@
 # opennms\_translation\_specs
 
-Resource that manages `event-traslation-spec` elements in `translator-configuration.xml`. 
+Resource that manages `event-traslation-spec` elements in `translator-configuration.xml`.
 
 ## Actions for opennms\_translation\_specs
 
