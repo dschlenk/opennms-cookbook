@@ -1,5 +1,9 @@
 # OpenNMS Cookbook Changes
 
+## 33.5.0
+
+* minor: new custom resources `opennms_translation_specs`, `opennms_scriptd_engine`, `opennms_scriptd_script`
+
 ## 33.4.0
 
 * minor: default to 33.1.6-1

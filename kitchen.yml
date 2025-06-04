@@ -971,6 +971,13 @@ suites:
       inspec_tests:
         - path: test/integration/default
         - path: test/integration/threshold_delete
+  - name: translation_specs
+    provisioner:
+      policyfile: policyfiles/translation_specs.rb
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/translation_specs
   - name: user
     provisioner:
       policyfile: policyfiles/user.rb
