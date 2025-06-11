@@ -1,20 +1,20 @@
 control 'correlation' do
-  describe correlation_rule('remote-engine-rule') do
+  describe file('/opt/opennms/etc/drools-engine.d/remote-engine-rule/drools-engine.xml') do
     it { should exist }
   end
 
-  describe correlation_rule('override-template-rule') do
+  describe file('/opt/opennms/etc/drools-engine.d/override-template-rule/drools-engine.xml') do
     it { should exist }
     its('content') { should match /OverriddenRule/ }
   end
 
-  describe correlation_rule('template-rule') do
+  describe file('/opt/opennms/etc/drools-engine.d/template-rule/drools-engine.xml') do
     it { should exist }
     its('content') { should match /TemplateEngine/ }
     its('content') { should match /TemplateRule/ }
   end
 
-  describe correlation_rule('cookbook-drl-rule') do
+  describe file('/opt/opennms/etc/drools-engine.d/cookbook-drl-rule/drools-engine.xml') do
     it { should exist }
   end
 
@@ -24,11 +24,11 @@ control 'correlation' do
     its('group') { should eq 'opennms' }
   end
 
-  describe correlation_rule('create-if-missing-rule') do
+  describe file('/opt/opennms/etc/drools-engine.d/create-if-missing-rule/drools-engine.xml') do
     it { should exist }
   end
 
-  describe correlation_rule('nonexistent-rule') do
+  describe file('/opt/opennms/etc/drools-engine.d/nonexistent-rule') do
     it { should_not exist }
   end
 end
