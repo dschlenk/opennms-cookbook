@@ -3,15 +3,15 @@ unified_mode true
 property :rule_name, String, name_property: true, identity: true
 property :engine_source, String
 property :engine_source_type, String, default: 'template', equal_to: %w(template remote_file cookbook_file)
-property :engine_source_variables, Hash, default: nil
-property :engine_source_properties, Hash, default: nil
+property :engine_source_variables, Hash
+property :engine_source_properties, Hash
 
-property :drl_source, [String, Array], default: nil
+property :drl_source, [String, Array]
 property :drl_source_type, String, default: 'cookbook_file', equal_to: %w(template remote_file cookbook_file)
-property :drl_source_variables, Hash, default: nil
-property :drl_source_properties, Hash, default: nil
+property :drl_source_variables, Hash
+property :drl_source_properties, Hash
 
-property :notify, [true, false], default: false
+property :notify, [true, false]
 property :notify_type, String, default: 'soft', equal_to: %w(soft hard)
 
 action_class do
