@@ -26,7 +26,7 @@ action :create do
     recursive true
   end
 
-  declare_resource(new_resource.engine_source_type.to_sym, :File.join(base_path(new_resource.rule_name), 'drools-engine.xml')) do
+  declare_resource(new_resource.engine_source_type.to_sym, ::File.join(base_path(new_resource.rule_name), 'drools-engine.xml')) do
     source new_resource.engine_source
     owner node['opennms']['username']
     group node['opennms']['groupname']
@@ -38,8 +38,7 @@ action :create do
   Array(new_resource.drl_source).each do |drl_file|
     filename = resolve_drl_filename(drl_file, new_resource.drl_source_type)
 
-    # TODO: change to declare_resource as above
-    send(new_resource.drl_source_type, ::File.join(base_path(new_resource.rule_name), filename)) do
+    declare_resource(new_resource.drl_source_type.to_sym, ::File.join(base_path(new_resource.rule_name), filename)) do
       source drl_file
       owner node['opennms']['username']
       group node['opennms']['groupname']
