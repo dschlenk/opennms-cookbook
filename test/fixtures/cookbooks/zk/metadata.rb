@@ -1,0 +1,5 @@
+name 'zk'
+license 'Apache-2.0'
+description 'Installs/Configures zk'
+version '0.1.0'
+depends 'zookeeper'
