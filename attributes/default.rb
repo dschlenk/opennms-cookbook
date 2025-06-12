@@ -28,7 +28,7 @@ default['opennms']['yum_gpg_keys'] = [
 default['opennms']['start_opts'] = ''
 # set to '' if you want to re-enable OOTB behavior (but you should not do this if using any of the opennms resources)
 default['opennms']['timeout_start_sec'] = '10min'
-default['opennms']['version'] = '33.1.6-1'
+default['opennms']['version'] = '33.1.7-1'
 default['java']['version'] = '17'
 default['opennms']['jre_path'] = nil
 default['opennms']['allow_downgrade'] = false
@@ -1284,3 +1284,20 @@ default['opennms']['manage_jdbc_collections'] = false
 default['opennms']['manage_jmx_collections'] = false
 default['opennms']['manage_snmp_collections'] = false
 default['opennms']['manage_xml_collections'] = false
+
+# Kafka
+default['opennms']['kafka']['producer']['enabled'] = false
+default['opennms']['kafka']['producer']['config'] = {
+  'eventTopic' => 'events', 'alarmTopic' => 'alarms', 'alarmFeedbackTopic' => 'alarmFeedback', 'nodeTopic' => 'nodes', 'topologyVertexTopic' => 'vertices',
+  'topologyEdgeTopic' => 'edges', 'metricTopic' => 'metrics', 'eventFilter' => '', 'alarmFilter' => '', 'forward.metrics' => false,
+  'nodeRefreshTimeoutMs' => 300000, 'alarmSyncIntervalMs' => 300000, 'suppressIncrementalAlarms' => true, 'kafkaSendQueueCapacity' => 1000,
+  'startAlarmSyncWithCleanState' => false
+}
+default['opennms']['kafka']['producer_client'] = { 'bootstrap.servers' => '127.0.0.1:9092' }
+
+# featuresBoot.d files
+#  Use to install extra karaf features by creating a file in `$OPENNMS_HOME/etc/featuresBoot.d`.
+#  For example, to install feature `opennms-kafka-producer`, set this attribute:
+#  default['opennms']['features_boot']['files']['kafka_producer'] = 'opennms-kafka-producer'
+#  This will create a file named `$OPENNMS_HOME/etc/featuresBoot.d/kafka_producer.boot` with contents `opennms-kafka-producer`.
+default['opennms']['features_boot']['files'] = {}

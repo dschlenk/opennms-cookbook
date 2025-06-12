@@ -3,14 +3,14 @@
 A Chef cookbook to manage the installation and configuration of OpenNMS Horizon.
 Current version supports Horizon release 33 on EL (redhat, rocky, oracle, etc) 9.
 
-# Versions
+## Versions
 
 Starting with OpenNMS Horizon 16, the MSB of the version of the cookbook matches the latest MSB of the version of OpenNMS Horizon it supports.
 Starting with cookbook version 33.0.0 and OpenNMS Horizon 33.x.x, each cookbook version only officially supports the major Horizon release for which it is named.
 The version of OpenNMS Horizon is selected via node attribute, defaulting to the latest release at the time the cookbook was released.
 The balance of the version follows semantic versioning - minor version bumps for backwards-compatible new features, third level bumps for bugfix only releases.
 
-# Requirements
+## Requirements
 
 * Chef or Cinc version 18.5.0 or later
 * EL 9
@@ -18,28 +18,28 @@ The balance of the version follows semantic versioning - minor version bumps for
 * a compatible java runtime
 * A Chef vault item that contains `postgres` credentials for the PostgreSQL server that will be used by OpenNMS Horizon
 
-# Usage
+## Usage
 
 Running the `default` recipe will install OpenNMS Horizon from the official repo with a mostly default configuration.
 It will also execute `'$ONMS_HOME/bin/runjava -s` if `$ONMS_HOME/etc/java.conf` is not present and `$ONMS_HOME/bin/install -dis` if `$ONMS_HOME/etc/configured` is not present.
 
 There are also a plethora of custom resources that you can use to do more in depth configuration management.
 
-## Required Dependencies
+### Required Dependencies
 
 The following dependencies must be satisfied for the `default` recipe to successfully converge.
 
-### Java
+#### Java
 
 You'll need to install a compatible Java runtime. Take a look at the fixture cookbook `openjdk17` in `test/fixtures/cookbooks` for an example.
 Set `node['opennms']['jre_path']` to the home directory of a specific runtime if you cannot rely on the algorithm used by the `run_java -s` command to find the correct runtime.
 
-### Postgres
+#### Postgres
 
-An OpenNMS Horizon instance needs a PostgreSQL server to function. 
+An OpenNMS Horizon instance needs a PostgreSQL server to function.
 You must provide the node with a Chef vault named `node['opennms']['postgresql']['user_vault']` (defaults to `Chef::Config['node_name']`) that contains an item named `node['opennms']['postgresql']['user_vault_item']` (defaults to `postgres_users`) with objects named `postgres` and `opennms`, each with string values named `password`, like this:
 
-```
+```js
 {
   "id": "postgres_users",
   "postgres": {
@@ -81,9 +81,9 @@ This means that you need to have this configured before you perform the initial 
 Note: If everything needed in the SCV is added via the custom resource `opennms_secret` provided by this cookbook, you could delete file `/opt/opennms/etc/scv.jce` and re-run Chef after changing the password in the appropriate vault item, although some temporary issues may occur during the time between when the SCV gets recreated and the secrets get added back to the SCV. The safest approach would be to:
 
 1. Stop `opennms`
-2. Change the password in the vault item
-3. Run chef with a temporary run list that includes `opennms::base_templates` and your `opennms_secret` resources
-4. Start `opennms`
+1. Change the password in the vault item
+1. Run chef with a temporary run list that includes `opennms::base_templates` and your `opennms_secret` resources
+1. Start `opennms`
 
 ### Upgrades
 
@@ -93,12 +93,12 @@ If this sounds like something you want to do, review the `upgrade` helper librar
 It roughly translates to:
 
 1. New RPMs are installed.
-2. Are there any files named `*.rpmnew` in `$ONMS_HOME`? If so, overwrite the existing files with them.
-3. Are there any files named `*.rpmsave` in `$ONMS_HOME`? If so, remove them.
+1. Are there any files named `*.rpmnew` in `$ONMS_HOME`? If so, overwrite the existing files with them.
+1. Are there any files named `*.rpmsave` in `$ONMS_HOME`? If so, remove them.
 
 `rpmnew` files are created when a newer version of a file exists, but it doesn't contain breaking changes.
 OpenNMS won't start with these files present, and the rest of the converge should re-make the changes we want anyway, so we just remove the old file by replacing it with the new file.
- 
+
 `rpmsave` files happen when there's a config file that you have changed that was replaced with the new version, because not replacing it would prevent OpenNMS from working properly.
 But since we're using Chef, we don't care about the old version as any changes we made to it previously will be redone with the appropriate custom resources and templates later in the converge.
 Since OpenNMS won't start with these files in place we just remove them.
@@ -107,7 +107,7 @@ Since OpenNMS won't start with these files in place we just remove them.
 
 You can add environment variables in `opennms.conf` by populating `node['opennms']['conf']['env']`. By default, we do so to set `START_TIMEOUT` to 20, like so:
 
-```
+```ruby
 default['opennms']['conf']['env'] = {
   'START_TIMEOUT' => 20,
 }
@@ -116,7 +116,7 @@ default['opennms']['conf']['env'] = {
 Similarly, you can override Java system properties by populating `node['opennms']['properties']['files']`.
 For instance, if you provide the vault item required to change the SCV password, the following object is added to this attribute:
 
-```
+```ruby
 'scv' => {
   'org.opennms.features.scv.jceks.key' => '<the password>'
 }
@@ -124,16 +124,50 @@ For instance, if you provide the vault item required to change the SCV password,
 
 This results in file `$OPENNMS_HOME/etc/opennms.properties.d/scv.properties` created with the contents `org.opennms.features.scv.jceks.key=the password`.
 
+### Additional Boot Features
+
+Similar to setting system properties, include additional boot features by populating `node['opennms']['features_boot']['files']` with a string keypair where the key + `.boot` will be used as the name of a file in `$OPENNMS_HOME/etc/featuresBoot.d/` and the value is used as the content of the file. For example, the `kafka_producer` recipe adds the `opennms-kafka-producer` karaf feature thusly:
+
+```ruby
+node.default['opennms']['features_boot']['files']['kafka_producer'] = 'opennms-kafka-producer'
+```
+
+This results in file `$OPENNMS_HOME/etc/featuresBoot.d/kafka_producer.boot` with contents `opennms-kafka-producer`.
+
 ### RRDTool
 
 To enable installation and configuration of RRDTool in place of the default time series engine JRobin, set `node['opennms']['rrdtool']['enabled']` to `true` or include the `rrdtool` recipe after the `default` recipe in your node's run list.
+
+### Kafka Producer
+
+To enable installation and configuration of the optional Kafka producer feature, set `node['opennms']['kafka']['producer']['enabled']` to `true` (defaults to `false`).
+Topic names and other configuration items are set in `node['opennms']['kafka']['producer']['config']` and match the default config.
+You are unlikely to find the default client configuration useful, as it sets `bootstrap.servers` to `127.0.0.1:9092`.
+If your client configuration includes secrets, you are encouraged to retrieve the secrets in a wrapper cookbook (from a Chef Vault item or similar) and use them to set all client properties in the `run_state` variable `['opennms']['kafka']['producer_client']`.
+For example, if you're connecting with SASL/SCRAM, you might do something like:
+
+```ruby
+node.run_state['opennms']['kafka'] = {
+  'producer_client' => {
+    'bootstrap.servers' => 'kafka-broker-001:9096,kafka-broker-002:9096',
+    'security.protocol' => 'SASL_SSL',
+    'sasl.mechanism' => 'SCRAM-SHA-512',
+    'sasl.jaas.config' => "org.apache.kafka.common.security.scram.ScramLoginModule required username=\"#{username}\" password=\"#{password}\"
+  }
+}
+```
+
+assuming `username` and `password` are variables that contain the secrets they are named for and which were retrived from their secure locations elsewhere in this recipe of your wrapper cookbook.
+
+**Note**: the `default` recipe of the `opennms` cookbook creates the `node.run_state['opennms']` **Hashie::Mash** and therefore needs to be earlier in the run list than the recipe that contains this snippet.
+
+If your Kafka client configuration does not include secrets, you can simply set the client config in attribute `node['opennms']['kafka']['producer_client']` instead.
 
 ## Other Recipes
 
 The recipes you may wish to include in your node list directly are:
 
-* `opennms::default` Installs and configures OpenNMS Horizon with the standard configuration modified with any node attribute values changed from their defaults. 
-  * Set `node['opennms']['plugin']['addl']` to an array of strings representing the names of the packages of the plugins you'd like installed.
+* `opennms::default` Installs and configures OpenNMS Horizon with the standard configuration modified with any node attribute values changed from their defaults. Set `node['opennms']['plugin']['addl']` to an array of strings representing the names of the packages of the plugins you'd like installed.
 * `opennms::rrdtool` Installs rrdtool and configures OpenNMS to use it instead of JRobin for performance metric storage.
 * `opennms::postgres` Installs postgresql in a somewhat tuned manner (from PGDG). See `postres_install` recipe to figure out how the version is selected and override with node attributes if desired.
 
@@ -141,7 +175,7 @@ A few other recipes exist that aren't listed here. They are included by others w
 
 ## Custom Resources
 
-A number of [custom resources are documented separately](documentation/README.md) 
+A number of [custom resources are documented separately](documentation/README.md)
 
 ### Provisioning Requisitions
 
@@ -166,10 +200,7 @@ The following custom resources don't exist yet, but they should!
 * `opennms_end2endmail`: Manage `end2end-mail-config` elements in `$OPENNMS_HOME/etc/javamail-configuration.xml`.
 * `opennms_jms_nb_destination`: Manage `destination` elements in `$OPENNMS_HOME/etc/jms-northbounder-configuration.xml`.
 * `opennms_site_status_view`: Manage `view` elements in `$OPENNMS_HOME/etc/site-status-views.xml`.
-* `opennms_translation_specs`: Manage `event-translation-spec` elements in `$OPENNMS_HOME/etc/translator-configuration.xml`.
 * `opennms_correlation`: Manage a set of correlator rules
-* `opennms_scriptd_engine`: Manage scriptd engines
-* `opennms_scriptd_script`: Manage scriptd scripts
 
 ## Template Overview
 
@@ -179,7 +210,7 @@ Each template can also be overridden in a wrapper cookbook by manipulating the a
 
 If you want to skip some of the templates you can use `edit_resource` to set the action to :nothing. Example:
 
-```
+```ruby
 edit_resource(:template, '/opt/opennms/etc/service-configuration.xml') do {
   action :nothing
 end
@@ -187,7 +218,7 @@ end
 
 A similar technique can be done to selectively enable a specific template, even when you are running with non-base templates disabled:
 
-```
+```ruby
 edit_resource(:template, '/opt/opennms/etc/service-configuration.xml') do {
   action :create
 end
@@ -196,7 +227,8 @@ end
 ### etc/availability-reports.xml
 
 If you want to change the logo or default interval, count, hour or minute you can do so for either the calandar or classic report like so:
-```
+
+```js
    {
      "opennms": {
        "db_reports": {
@@ -234,16 +266,16 @@ Attributes are available in `node['opennms']['eventd']` to change global setting
 This file controls how OpenNMS sends email. This is not where you configure the mail monitor.
 Attributes available in `node['opennms']['javamail_props']`. They follow the config file but with ruby style because the kids hate camel case I guess.
 
-* org.opennms.core.utils.fromAddress (`from_address`) 
+* org.opennms.core.utils.fromAddress (`from_address`)
 * org.opennms.core.utils.mailHost (`mail_host`)
 * ...and so on.
 
 ### etc/javamail-configuration.xml
 
 This is where you configure the mail monitor.
-Attributes available in `node['opennms']['javamail_config'`. Unlike most of the templates, you can change every attribute and element in the default sendmail and receivemail elements since the defaults are useful to no one. Here's a list of the defaults which you definitely need to override if you want a mail monitor to work: 
+Attributes available in `node['opennms']['javamail_config'`. Unlike most of the templates, you can change every attribute and element in the default sendmail and receivemail elements since the defaults are useful to no one. Here's a list of the defaults which you definitely need to override if you want a mail monitor to work:
 
-```
+```ruby
 default['opennms']['javamail_config']['default_read_config_name'] = "localhost"
 default['opennms']['javamail_config']['default_send_config_name'] = "localhost"
 default['opennms']['javamail_config']['default_read']['attempt_interval'] = 1000
@@ -301,7 +333,7 @@ Attributes available in `node['opennms']['enlinkd']` that allow you change globa
 
 This one is a little different. If you want to turn up logging for collectd, for instance, you'd set these override attributes:
 
-```
+```ruby
 default['opennms']['log4j2']['collectd'] = 'DEBUG'
 ```
 
@@ -309,7 +341,7 @@ default['opennms']['log4j2']['collectd'] = 'DEBUG'
 
 Do you actually populate the building column in assets or site field in provisioning reqs? Change the default site status view name and/or it's definition with these attributes: `node['opennms']['site_status_views']['default_view']['name']` and `node['opennms']['site_status_views']['default_view']['rows']` where `rows` is an array of single element hashes (to maintain order) like:
 
-```
+```js
 [
   {
     "Routers": "Routers"
@@ -326,84 +358,6 @@ Do you actually populate the building column in assets or site field in provisio
 ### etc/snmp-adhoc-graph.properties
 
 Similar to other \*-graph.properties files, you can change the image format used in adhoc graphs by setting the attribute `node['opennms']['snmp_adhoc_graph']['image_format']` to `gif` or `jpg` rather than the default `png`. Note that the intersection of formats supported by both jrobin and rrdtool is `png`, though.
-
-### etc/translator-configuration.xml
-
-Remove one of the default event translations (http://www.opennms.org/wiki/Event_Translator) by setting an attribute in `node['opennms']['translator']` to false. They are:
-
-* snmp\_link\_down
-* snmp\_link\_up
-* hyperic
-* cisco\_config\_man
-* juniper\_cfg\_change
-
-You can also add additional `event-translation-spec` elements by populating `node['opennms']['translator']['addl_specs']` with an array of hashes where each has a key `uei` that has a string value and a key `'mappings'` (array of hashes each with key `'assignments'` (array of hashes that each contain keys `'name'` (string), `'type'` (string), `'default'` (string, optional), `'value'` (a hash that contains keys `'type'` (string), `'matches'` (string, optional), `'result'` (string), `'values'` (array of hashes that each contain keys `'type'` (string), `'matches'` (string, optional), `'result'` (string))))).
-
-An example:
-
-```
-default['opennms']['translator']['addl_specs'] = [
-  { 
-    'uei ' => 'uei.opennms.org/internal/telemetry/clockSkewDetected',
-    'mappings' => [
-      {
-        'assignments' => [
-          {
-            'name' => 'uei',
-            'type' => 'field',
-            'value' => {
-              'type' => 'constant',
-              'result' => 'uei.opennms.org/translator/telemetry/clockSkewDetected'
-            }
-          },
-          {
-            'name' => 'nodeid',
-            'type' => 'field',
-            'value' => {
-              'type' => 'sql',
-              'result' => 'SELECT n.nodeid FROM node n, ipinterface i WHERE n.nodeid = i.nodeid AND i.ipaddr = ? AND n.location = ?',
-              'values' => [
-                {
-                  'type' => 'field',
-                  'name' => 'interface',
-                  'matches' => '.*',
-                  'result' => '${0}'
-                },
-                {
-                  'type' => 'parameter',
-                  'name' => 'monitoringSystemLocation',
-                  'matches' => '.*',
-                  'result' => '${0}'
-                }
-              ]
-            }
-          },
-        ]
-      },
-    ]
-  },
-]
-```
-
-would be how to express the following `event-translation-spec`:
-
-```
-    <event-translation-spec uei="uei.opennms.org/internal/telemetry/clockSkewDetected" >
-      <mappings>
-        <mapping>
-          <assignment name="uei" type="field" >
-            <value type="constant" result="uei.opennms.org/translator/telemetry/clockSkewDetected" />
-          </assignment>
-          <assignment name="nodeid" type="field" >
-            <value type="sql" result="SELECT n.nodeid FROM node n, ipinterface i WHERE n.nodeid = i.nodeid AND i.ipaddr = ? AND n.location = ?" >
-              <value type="field" name="interface"  matches=".*" result="${0}" />
-              <value type="parameter" name="monitoringSystemLocation" matches=".*" result="${0}" />
-            </value>
-          </assignment>
-        </mapping>
-      </mappings>
-    </event-translation-spec>
-```
 
 ### etc/trapd-configuration.xml
 
@@ -439,7 +393,7 @@ See the template and default attributes source for more details on using these t
 * etc/vmware-cim-datacollection-config.xml.erb
 * etc/vmware-datacollection-config.xml.erb
 
-# Copyright and License
+## Copyright and License
 
 Copyright 2014-2025 ConvergeOne Holding Corp.
 
@@ -447,11 +401,11 @@ Released under Apache 2.0 license. See LICENSE for details.
 
 OpenNMS and OpenNMS Horizon are &#8482; and &copy; The OpenNMS Group, Inc.
 
-# Author
+## Author
 
 David Schlenk (<dschlenk@onec1.com>)
 
-# Development
+## Development
 
 Tests consist of:
 

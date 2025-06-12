@@ -21,6 +21,8 @@
   chef_gem g
 end
 
+node.run_state['opennms'] = Mash.new
+
 fqdn = node['fqdn']
 fqdn ||= node['hostname']
 
@@ -63,6 +65,7 @@ end
 
 # configure base templates before we get started
 include_recipe 'opennms::rrdtool' if node['opennms']['rrdtool']['enabled']
+include_recipe 'opennms::kafka_producer' if node['opennms']['kafka']['producer']['enabled']
 include_recipe 'opennms::base_templates'
 execute 'install' do
   cwd onms_home

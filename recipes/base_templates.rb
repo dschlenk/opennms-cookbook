@@ -52,6 +52,15 @@ node['opennms']['properties']['files'].each do |file, properties|
   end
 end
 
+node['opennms']['features_boot']['files'].each do |file, feature|
+  file "#{onms_home}/etc/featuresBoot.d/#{file}.boot" do
+    owner node['opennms']['username']
+    group node['opennms']['groupname']
+    mode '0644'
+    content "#{feature}\n"
+  end
+end
+
 opennms_secret 'opennms postgresql user' do
   secret_alias 'postgres'
   username node['opennms']['username']

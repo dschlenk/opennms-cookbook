@@ -14,6 +14,8 @@
 * [opennms\_event](event.md)
 * [opennms\_syslog\_file](syslog.md)
 * [notifications](notifications.md)
+* [scriptd](scriptd.md)
+* [translation\_specs](translation_specs.md)
 
 ### Service Assurance
 
