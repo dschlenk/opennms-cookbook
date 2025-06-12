@@ -4,6 +4,7 @@
 
 * minor: add mechanism to install optional karaf features
 * minor: convenience recipe `kafka_producer` for enabling and configuring the optional Kafka producer feature
+* minor: default to 33.1.7-1
 
 ## 33.5.0
 
