@@ -53,3 +53,21 @@ opennms_drools_correlation_rule 'create-if-missing-rule' do
   drl_source ['create-if-missing.drl']
   action :create_if_missing
 end
+
+opennms_drools_correlation_rule 'user-defined-rule' do
+  engine_source_type 'template'
+  engine_source 'drools-engine.xml.erb'
+  engine_source_variables(
+    engine_name: 'UserEngine',
+    rule_name: 'UserDefinedRule',
+    drl_files: ['user-defined-rule.drl', 'template-rule.drl', 'cookbook-rule.drl']
+  )
+  drl_source ['user-defined-rule.drl', 'template-rule.drl', 'cookbook-rule.drl']
+  drl_source_type 'template'
+  drl_source_variables(
+    rule_name: 'UserDefinedRule',
+    import_class: 'com.example.model.Alert',
+    condition: '$alert : Alert(severity == "CRITICAL")',
+    action: 'System.out.println("Critical alert: " + $alert.getMessage());'
+  )
+end
