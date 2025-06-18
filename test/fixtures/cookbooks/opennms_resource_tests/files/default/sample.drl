@@ -1,0 +1,10 @@
+package com.example.rules
+
+import com.example.model.Order
+
+rule "Sample Rule - High Value Order"
+    when
+        $order : Order(amount > 1000)
+    then
+        System.out.println("High value order detected: " + $order);
+end
