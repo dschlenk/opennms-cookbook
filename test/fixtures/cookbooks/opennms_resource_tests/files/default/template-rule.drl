@@ -1,0 +1,10 @@
+package com.example.rules
+
+import com.example.model.Customer
+
+rule "Template Rule - VIP Customer"
+    when
+        $customer : Customer(status == "VIP")
+    then
+        System.out.println("Welcome VIP customer: " + $customer.getName());
+end
