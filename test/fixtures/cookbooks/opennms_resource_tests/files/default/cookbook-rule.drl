@@ -1,0 +1,10 @@
+package com.example.rules
+
+import com.example.model.Inventory
+
+rule "Cookbook Rule - Low Stock Alert"
+    when
+        $item : Inventory(quantity < 10)
+    then
+        System.out.println("Low stock alert for item: " + $item.getName());
+end
