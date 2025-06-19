@@ -2,7 +2,7 @@ module Opennms
   module Cookbook
     module Correlation
       module DroolsRuleTemplate
-        require 'chef/util/xpath_helper'
+        require 'rexml/document'
 
         def base_path(rule_name)
           ::File.join(node['opennms']['conf']['home'], 'etc', 'drools-engine.d', rule_name)
@@ -18,8 +18,13 @@ module Opennms
           return [] unless ::File.exist?(xml_path)
 
           xml_content = ::File.read(xml_path)
-          doc = Chef::Util::XPathHelper.new(xml_content)
-          doc.xpath('/engine-configuration/rule-set/@name').map(&:value)
+          doc = REXML::Document.new(xml_content)
+
+          names = []
+          doc.elements.each('engine-configuration/rule-set') do |element|
+            names << element.attributes['name']
+          end
+          names
         rescue StandardError => e
           Chef::Log.warn("Failed to parse drools-engine.xml: #{e}")
           []
