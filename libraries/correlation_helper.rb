@@ -37,34 +37,34 @@ module Opennms
         end
 
         # def drools_engine_resource_init(rule_name)
-          # drools_engine_resource_create(rule_name) unless drools_engine_resource_exist?(rule_name)
+        #   drools_engine_resource_create(rule_name) unless drools_engine_resource_exist?(rule_name)
         # end
 
         # def drools_engine_resource(rule_name)
-          # return unless drools_engine_resource_exist?(rule_name)
-          # find_resource!(:template, ::File.join(base_path(rule_name), 'drools-engine.xml'))
+        #   return unless drools_engine_resource_exist?(rule_name)
+        #   find_resource!(:template, ::File.join(base_path(rule_name), 'drools-engine.xml'))
         # end
 
         # private
 
         # def drools_engine_resource_exist?(rule_name)
-          # !find_resource(:template, ::File.join(base_path(rule_name), 'drools-engine.xml')).nil?
+        #   !find_resource(:template, ::File.join(base_path(rule_name), 'drools-engine.xml')).nil?
         # rescue Chef::Exceptions::ResourceNotFound
-          # false
+        #   false
         # end
 
         # def drools_engine_resource_create(rule_name)
-          # with_run_context(:root) do
-            # declare_resource(:template, ::File.join(base_path(rule_name), 'drools-engine.xml')) do
-              # source 'drools-engine.xml.erb'
-              # cookbook 'opennms'
-              # owner node['opennms']['username']
-              # group node['opennms']['groupname']
-              # mode '0644'
-              # action :nothing
-              # delayed_action :create
-            # end
-          # end
+        #   with_run_context(:root) do
+        #     declare_resource(:template, ::File.join(base_path(rule_name), 'drools-engine.xml')) do
+        #       source 'drools-engine.xml.erb'
+        #       cookbook 'opennms'
+        #       owner node['opennms']['username']
+        #       group node['opennms']['groupname']
+        #       mode '0644'
+        #       action :nothing
+        #       delayed_action :create
+        #     end
+        #   end
         # end
       end
     end
