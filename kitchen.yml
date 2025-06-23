@@ -212,7 +212,7 @@ suites:
         - path: test/integration/collection_service
   - name: correlation
     provisioner:
-      policyfile: policyfiles/correlatione.rb
+      policyfile: policyfiles/correlation.rb
     verifier:
       inspec_tests:
         - path: test/integration/default
