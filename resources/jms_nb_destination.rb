@@ -1,0 +1,89 @@
+include Opennms::XmlHelper
+include Opennms::Cookbook::Jms::JmsNbTemplate
+
+property :destination, String, name_property: true
+property :first_occurence_only, [true, false], default: false
+property :send_as_object_message, [true, false], default: false
+property :destination_type, String, default: 'QUEUE', equal_to: %w[QUEUE TOPIC]
+property :message_format, String, required: false
+
+load_current_value do |new_resource|
+  config = jms_nb_resource.variables[:config] unless jms_nb_resource.nil?
+  if config.nil?
+    ro_jms_nb_resource_init
+    config = ro_jms_nb_resource.variables[:config]
+  end
+  dest = config.destination(destination: new_resource.destination)
+  current_value_does_not_exist! if dest.nil?
+  first_occurence_only dest.first_occurence_only
+  send_as_object_message dest.send_as_object_message
+  destination_type dest.destination_type
+  message_format dest.message_format
+end
+
+action_class do
+  include Opennms::XmlHelper
+  include Opennms::Cookbook::Jms::JmsNbTemplate
+end
+
+action :create do
+  converge_if_changed do
+    jms_nb_resource_init
+    config = jms_nb_resource.variables[:config]
+    dest = config.destination(destination: new_resource.destination)
+    if dest.nil?
+      config.destinations.push(
+        Opennms::Cookbook::Jms::JmsDestination.new(
+          destination: new_resource.destination,
+          first_occurence_only: new_resource.first_occurence_only,
+          send_as_object_message: new_resource.send_as_object_message,
+          destination_type: new_resource.destination_type,
+          message_format: new_resource.message_format
+        )
+      )
+    else
+      dest.update(
+        first_occurence_only: new_resource.first_occurence_only,
+        send_as_object_message: new_resource.send_as_object_message,
+        destination_type: new_resource.destination_type,
+        message_format: new_resource.message_format
+      )
+    end
+  end
+end
+
+action :create_if_missing do
+  jms_nb_resource_init
+  config = jms_nb_resource.variables[:config]
+  dest = config.destination(destination: new_resource.destination)
+  run_action(:create) if dest.nil?
+end
+
+action :update do
+  converge_if_changed do
+    jms_nb_resource_init
+    config = jms_nb_resource.variables[:config]
+    dest = config.destination(destination: new_resource.destination)
+    if dest.nil?
+      raise Chef::Exceptions::ResourceNotFound, "No JMS destination named #{new_resource.destination} found to update. Use action `:create` or `:create_if_missing` to create it."
+    else
+      dest.update(
+        first_occurence_only: new_resource.first_occurence_only,
+        send_as_object_message: new_resource.send_as_object_message,
+        destination_type: new_resource.destination_type,
+        message_format: new_resource.message_format
+      )
+    end
+  end
+end
+
+action :delete do
+  jms_nb_resource_init
+  config = jms_nb_resource.variables[:config]
+  dest = config.destination(destination: new_resource.destination)
+  unless dest.nil?
+    converge_by "Removing JMS destination #{new_resource.destination}" do
+      config.delete_destination(destination: new_resource.destination)
+    end
+  end
+end
