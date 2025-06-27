@@ -24,9 +24,17 @@ end
 action_class do
   include Opennms::XmlHelper
   include Opennms::Cookbook::Jms::JmsNbTemplate
+
+  def ensure_jms_plugin_installed!
+    unless node['opennms']['plugin']['addl'].include?('opennms-plugin-northbounder-jms')
+      raise "The 'opennms-plugin-northbounder-jms' plugin must be installed to use the jms_nb_destination resource."
+    end
+  end
 end
 
 action :create do
+  ensure_jms_plugin_installed!
+
   converge_if_changed do
     jms_nb_resource_init
     config = jms_nb_resource.variables[:config]
@@ -53,6 +61,8 @@ action :create do
 end
 
 action :create_if_missing do
+  ensure_jms_plugin_installed!
+
   jms_nb_resource_init
   config = jms_nb_resource.variables[:config]
   dest = config.destination(destination: new_resource.destination)
@@ -60,6 +70,8 @@ action :create_if_missing do
 end
 
 action :update do
+  ensure_jms_plugin_installed!
+
   converge_if_changed do
     jms_nb_resource_init
     config = jms_nb_resource.variables[:config]
@@ -78,6 +90,8 @@ action :update do
 end
 
 action :delete do
+  ensure_jms_plugin_installed!
+
   jms_nb_resource_init
   config = jms_nb_resource.variables[:config]
   dest = config.destination(destination: new_resource.destination)
