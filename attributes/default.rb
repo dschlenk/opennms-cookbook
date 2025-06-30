@@ -487,6 +487,8 @@ default['opennms']['jms_nbi']['message_format']         = 'ALARM ID:${alarmId} N
 default['opennms']['jms_nbi']['send_as_object_message'] = false
 default['opennms']['jms_nbi']['first_occurrence_only'] = true
 default['opennms']['jms_nbi']['jms_destination'] = 'SingleAlarmQueue'
+default['opennms']['jms_nbi']['jms_destination'] = nil
+default['opennms']['jms_nbi']['uei'] = []
 # log4j2.xml
 default['opennms']['log4j2']['default_route']['size'] = '100MB'
 default['opennms']['log4j2']['default_route']['rollover'] = 4
