@@ -263,7 +263,7 @@ template "#{onms_home}/etc/jms-northbounder-configuration.xml" do
       batch_size: node['opennms']['jms_nbi']['batch_size'],
       queue_size: node['opennms']['jms_nbi']['queue_size'],
       message_format: node['opennms']['jms_nbi']['message_format'],
-      destination: node['opennms']['jms_nbi']['destination'],
+      destination: node['opennms']['jms_nbi']['jms_destination'],
       uei: node['opennms']['jms_nbi']['uei']
     }
   )
