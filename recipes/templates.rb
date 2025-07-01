@@ -264,7 +264,7 @@ template "#{onms_home}/etc/jms-northbounder-configuration.xml" do
       queue_size: node['opennms']['jms_nbi']['queue_size'],
       message_format: node['opennms']['jms_nbi']['message_format'],
       destination: node['opennms']['jms_nbi']['jms_destination'],
-      uei: node['opennms']['jms_nbi']['uei']
+      uei: node['opennms']['jms_nbi']['uei'],
     }
   )
   notifies :restart, 'service[opennms]'
