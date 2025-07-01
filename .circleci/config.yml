@@ -26,7 +26,7 @@ jobs:
           command: cookstyle
       - run:
           name: kitchen
-          command: kitchen verify jms_nb_destination
+          command: kitchen verify jms-nb-destination
 workflows:
   version: 2
   untagged-build:
