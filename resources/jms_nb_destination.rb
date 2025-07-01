@@ -4,7 +4,7 @@ include Opennms::Cookbook::Jms::JmsNbTemplate
 property :destination, String, name_property: true
 property :first_occurence_only, [true, false], default: false
 property :send_as_object_message, [true, false], default: false
-property :destination_type, String, default: 'QUEUE', equal_to: %w[QUEUE TOPIC]
+property :destination_type, String, default: 'QUEUE', equal_to: %w(QUEUE TOPIC)
 property :message_format, String, required: false
 
 load_current_value do |new_resource|
