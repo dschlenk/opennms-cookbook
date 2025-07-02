@@ -1,7 +1,7 @@
 include Opennms::XmlHelper
 include Opennms::Cookbook::Jms::JmsNbTemplate
 
-property :destination, String, name_property: true
+property :destination, String, name_property: true, required: true
 property :first_occurence_only, [true, false], default: false
 property :send_as_object_message, [true, false], default: false
 property :destination_type, String, default: 'QUEUE', equal_to: %w(QUEUE TOPIC)
@@ -13,6 +13,9 @@ load_current_value do |new_resource|
     ro_jms_nb_resource_init
     config = ro_jms_nb_resource.variables[:config]
   end
+
+  raise Chef::Exceptions::ValidationFailed, "The 'destination' property must be set and not empty." if new_resource.destination.nil? || new_resource.destination.strip.empty?
+
   dest = config.destination(destination: new_resource.destination)
   current_value_does_not_exist! if dest.nil?
   first_occurence_only dest.first_occurence_only
@@ -34,6 +37,8 @@ end
 
 action :create do
   ensure_jms_plugin_installed!
+
+  raise Chef::Exceptions::ValidationFailed, "The 'destination' property must be set and not empty." if new_resource.destination.nil? || new_resource.destination.strip.empty?
 
   converge_if_changed do
     jms_nb_resource_init
@@ -63,6 +68,8 @@ end
 action :create_if_missing do
   ensure_jms_plugin_installed!
 
+  raise Chef::Exceptions::ValidationFailed, "The 'destination' property must be set and not empty." if new_resource.destination.nil? || new_resource.destination.strip.empty?
+
   jms_nb_resource_init
   config = jms_nb_resource.variables[:config]
   dest = config.destination(destination: new_resource.destination)
@@ -71,6 +78,8 @@ end
 
 action :update do
   ensure_jms_plugin_installed!
+
+  raise Chef::Exceptions::ValidationFailed, "The 'destination' property must be set and not empty." if new_resource.destination.nil? || new_resource.destination.strip.empty?
 
   converge_if_changed do
     jms_nb_resource_init
@@ -91,6 +100,8 @@ end
 
 action :delete do
   ensure_jms_plugin_installed!
+
+  raise Chef::Exceptions::ValidationFailed, "The 'destination' property must be set and not empty." if new_resource.destination.nil? || new_resource.destination.strip.empty?
 
   jms_nb_resource_init
   config = jms_nb_resource.variables[:config]
