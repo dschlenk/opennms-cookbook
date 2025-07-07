@@ -257,17 +257,15 @@ template "#{onms_home}/etc/jms-northbounder-configuration.xml" do
   owner node['opennms']['username']
   group node['opennms']['groupname']
   variables(
-    config: {
-      enabled: node['opennms']['jms_nbi']['enabled'],
-      nagles_delay: node['opennms']['jms_nbi']['nagles_delay'],
-      batch_size: node['opennms']['jms_nbi']['batch_size'],
-      queue_size: node['opennms']['jms_nbi']['queue_size'],
-      message_format: node['opennms']['jms_nbi']['message_format'],
-      destination: node['opennms']['jms_nbi']['jms_destination'],
-      uei: node['opennms']['jms_nbi']['uei'],
-      send_as_object_message: node['opennms']['jms_nbi']['send_as_object_message'],
-      first_occurrence_only: node['opennms']['jms_nbi']['first_occurrence_only']
-    }
+    enabled: node['opennms']['jms_nbi']['enabled'],
+    nagles_delay: node['opennms']['jms_nbi']['nagles_delay'],
+    batch_size: node['opennms']['jms_nbi']['batch_size'],
+    queue_size: node['opennms']['jms_nbi']['queue_size'],
+    message_format: node['opennms']['jms_nbi']['message_format'],
+    jms_destination: node['opennms']['jms_nbi']['jms_destination'],
+    uei: node['opennms']['jms_nbi']['uei'],
+    send_as_object_message: node['opennms']['jms_nbi']['send_as_object_message'],
+    first_occurrence_only: node['opennms']['jms_nbi']['first_occurrence_only']
   )
   notifies :restart, 'service[opennms]'
   only_if { node['opennms']['plugin']['addl'].include?('opennms-plugin-northbounder-jms') }
