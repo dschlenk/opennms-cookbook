@@ -8,7 +8,7 @@ property :destination_type, String, default: 'QUEUE', equal_to: %w(QUEUE TOPIC)
 property :message_format, String, required: false
 
 load_current_value do |new_resource|
-  config = jms_nb_resource.variables[:config] unless jms_nb_resource.nil?
+  config = jms_nb_resource&.variables[:config]
   if config.nil?
     ro_jms_nb_resource_init
     config = ro_jms_nb_resource.variables[:config]
