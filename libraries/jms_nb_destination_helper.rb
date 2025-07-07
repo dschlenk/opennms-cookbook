@@ -7,7 +7,7 @@ module Opennms
             @data = {}
           end
 
-          def read!(node, path)
+          def read!(node, _path)
             @data[:enabled] = node['opennms']['jms_nbi']['enabled']
             @data[:nagles_delay] = node['opennms']['jms_nbi']['nagles_delay']
             @data[:batch_size] = node['opennms']['jms_nbi']['batch_size']
