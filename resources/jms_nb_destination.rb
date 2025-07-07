@@ -10,6 +10,7 @@ property :message_format, String, required: false
 load_current_value do |new_resource|
   Chef::Log.debug("Loading current value for destination: #{new_resource.destination}")
 
+  jms_nb_resource_init
   config = jms_nb_resource&.variables[:config]
 
   if config.nil?
@@ -22,11 +23,6 @@ load_current_value do |new_resource|
     raise 'FATAL: JMS NB config is nil after both jms_nb_resource and ro_jms_nb_resource attempts'
   end
 
-  if new_resource.destination.nil? || new_resource.destination.strip.empty?
-    raise Chef::Exceptions::ValidationFailed, 'The destination property must be set and not empty.'
-  end
-
-  Chef::Log.debug("Looking for destination '#{new_resource.destination}' in config...")
   dest = config.destination(destination: new_resource.destination)
 
   if dest.nil?
@@ -55,11 +51,9 @@ end
 action :create do
   ensure_jms_plugin_installed!
 
-  raise Chef::Exceptions::ValidationFailed, 'The destination property must be set and not empty.' if new_resource.destination.strip.empty?
-
   converge_if_changed do
     jms_nb_resource_init
-    config = jms_nb_resource&.variables[:config]
+    config = jms_nb_resource.variables[:config]
     raise 'FATAL: JMS NB config is nil during :create' if config.nil?
 
     dest = config.destination(destination: new_resource.destination)
@@ -90,10 +84,8 @@ end
 action :create_if_missing do
   ensure_jms_plugin_installed!
 
-  raise Chef::Exceptions::ValidationFailed, 'The destination property must be set and not empty.' if new_resource.destination.strip.empty?
-
   jms_nb_resource_init
-  config = jms_nb_resource&.variables[:config]
+  config = jms_nb_resource.variables[:config]
   raise 'FATAL: JMS NB config is nil during :create_if_missing' if config.nil?
 
   dest = config.destination(destination: new_resource.destination)
@@ -103,11 +95,9 @@ end
 action :update do
   ensure_jms_plugin_installed!
 
-  raise Chef::Exceptions::ValidationFailed, 'The destination property must be set and not empty.' if new_resource.destination.strip.empty?
-
   converge_if_changed do
     jms_nb_resource_init
-    config = jms_nb_resource&.variables[:config]
+    config = jms_nb_resource.variables[:config]
     raise 'FATAL: JMS NB config is nil during :update' if config.nil?
 
     dest = config.destination(destination: new_resource.destination)
@@ -127,10 +117,8 @@ end
 action :delete do
   ensure_jms_plugin_installed!
 
-  raise Chef::Exceptions::ValidationFailed, 'The destination property must be set and not empty.' if new_resource.destination.strip.empty?
-
   jms_nb_resource_init
-  config = jms_nb_resource&.variables[:config]
+  config = jms_nb_resource.variables[:config]
   raise 'FATAL: JMS NB config is nil during :delete' if config.nil?
 
   dest = config.destination(destination: new_resource.destination)
