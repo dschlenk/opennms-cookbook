@@ -8,7 +8,7 @@ property :destination_type, String, default: 'QUEUE', equal_to: %w(QUEUE TOPIC)
 property :message_format, String, required: false
 
 load_current_value do |new_resource|
-  Chef::Log.debug('Loading current value for destination: #{new_resource.destination}')
+  Chef::Log.debug("Loading current value for destination: #{new_resource.destination}")
 
   config = jms_nb_resource&.variables[:config]
 
