@@ -1,5 +1,35 @@
 module Opennms
   module Cookbook
+    module ConfigHelpers
+      module Jms
+        class JmsNbConfig
+          def initialize
+            @data = {}
+          end
+
+          def read!(node, path)
+            @data[:enabled] = node['opennms']['jms_nbi']['enabled']
+            @data[:nagles_delay] = node['opennms']['jms_nbi']['nagles_delay']
+            @data[:batch_size] = node['opennms']['jms_nbi']['batch_size']
+            @data[:queue_size] = node['opennms']['jms_nbi']['queue_size']
+            @data[:message_format] = node['opennms']['jms_nbi']['message_format']
+            @data[:jms_destination] = node['opennms']['jms_nbi']['jms_destination']
+            @data[:uei] = node['opennms']['jms_nbi']['uei']
+            @data[:send_as_object_message] = node['opennms']['jms_nbi']['send_as_object_message']
+            @data[:first_occurrence_only] = node['opennms']['jms_nbi']['first_occurrence_only']
+          end
+
+          def to_hash
+            @data
+          end
+        end
+      end
+    end
+  end
+end
+
+module Opennms
+  module Cookbook
     module Jms
       module JmsNbTemplate
         def jms_nb_resource_init
@@ -38,7 +68,7 @@ module Opennms
               owner node['opennms']['username']
               group node['opennms']['groupname']
               mode '0664'
-              variables(config: config)
+              variables(config.to_hash)
               action :nothing
               delayed_action :create
               notifies :restart, 'service[opennms]'
@@ -63,7 +93,7 @@ module Opennms
               owner node['opennms']['username']
               group node['opennms']['groupname']
               mode '0664'
-              variables(config: config)
+              variables(config.to_hash)
               action :nothing
               delayed_action :nothing
             end
