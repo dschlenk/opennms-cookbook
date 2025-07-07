@@ -265,6 +265,8 @@ template "#{onms_home}/etc/jms-northbounder-configuration.xml" do
       message_format: node['opennms']['jms_nbi']['message_format'],
       destination: node['opennms']['jms_nbi']['jms_destination'],
       uei: node['opennms']['jms_nbi']['uei'],
+      send_as_object_message: node['opennms']['jms_nbi']['send_as_object_message'],
+      first_occurrence_only: node['opennms']['jms_nbi']['first_occurrence_only']
     }
   )
   notifies :restart, 'service[opennms]'
