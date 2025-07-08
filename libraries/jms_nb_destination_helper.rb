@@ -26,6 +26,15 @@ module Opennms
             @data[:first_occurrence_only] = text_at_xpath(root, '/jms-northbounder-configuration/first-occurrence-only') == 'true'
           end
 
+          def method_missing(method, *args, &block)
+            return @data[method] if @data.key?(method)
+            super
+          end
+
+          def respond_to_missing?(method, include_private = false)
+            @data.key?(method) || super
+          end
+
           def to_hash
             @data
           end
