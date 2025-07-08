@@ -7,6 +7,7 @@ module Opennms
 
           def initialize
             @data = {}
+            @data[:destinations] = [] # Ensure destinations array is initialized
           end
 
           def read!(file)
@@ -24,6 +25,8 @@ module Opennms
             @data[:uei] = text_at_xpath(root, '/jms-northbounder-configuration/uei')
             @data[:send_as_object_message] = text_at_xpath(root, '/jms-northbounder-configuration/send-as-object-message') == 'true'
             @data[:first_occurrence_only] = text_at_xpath(root, '/jms-northbounder-configuration/first-occurrence-only') == 'true'
+
+            # TODO: Parse destination elements from XML and populate @data[:destinations]
           end
 
           def method_missing(method, *args, &block)
@@ -45,6 +48,18 @@ module Opennms
 
           def destination_value
             jms_destination
+          end
+
+          def destinations
+            @data[:destinations]
+          end
+
+          def find_destination_by_name(name)
+            destinations.find { |d| d.destination == name }
+          end
+
+          def delete_destination(destination:)
+            @data[:destinations].reject! { |d| d.destination == destination }
           end
 
           private
