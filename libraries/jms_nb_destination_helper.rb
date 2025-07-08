@@ -43,6 +43,10 @@ module Opennms
             @data[:jms_destination]
           end
 
+          def destination
+            jms_destination
+          end
+
           def destination_value
             jms_destination
           end
