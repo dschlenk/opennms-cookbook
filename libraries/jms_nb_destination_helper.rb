@@ -20,10 +20,17 @@ module Opennms
             @data[:batch_size] = text_at_xpath(root, '/jms-northbounder-configuration/batch-size')
             @data[:queue_size] = text_at_xpath(root, '/jms-northbounder-configuration/queue-size')
             @data[:message_format] = text_at_xpath(root, '/jms-northbounder-configuration/message-format')
-            @data[:jms_destination] = text_at_xpath(root, '/jms-northbounder-configuration/jms-destination')
-            @data[:uei] = text_at_xpath(root, '/jms-northbounder-configuration/uei')
-            @data[:send_as_object_message] = text_at_xpath(root, '/jms-northbounder-configuration/send-as-object-message') == 'true'
-            @data[:first_occurrence_only] = text_at_xpath(root, '/jms-northbounder-configuration/first-occurrence-only') == 'true'
+
+            destination_el = root.elements['destination']
+            if destination_el
+              @data[:first_occurrence_only] = text_at_xpath(destination_el, 'first-occurence-only') == 'true'
+              @data[:send_as_object_message] = text_at_xpath(destination_el, 'send-as-object-message') == 'true'
+              @data[:destination_type] = text_at_xpath(destination_el, 'destination-type')
+              @data[:jms_destination] = text_at_xpath(destination_el, 'jms-destination')
+              @data[:destination_message_format] = text_at_xpath(destination_el, 'message-format')
+            end
+
+            @data[:ueis] = root.get_elements('uei').map(&:text)
           end
 
           def method_missing(method, *args, &block)
@@ -43,7 +50,7 @@ module Opennms
             @data[:jms_destination]
           end
 
-          def destination(*)
+          def destination
             jms_destination
           end
 
