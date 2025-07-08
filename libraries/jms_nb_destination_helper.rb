@@ -7,7 +7,7 @@ module Opennms
 
           def initialize
             @data = {}
-            @data[:destinations] = [] # Ensure destinations array is initialized
+            @data[:destinations] = []
           end
 
           def read!(file)
@@ -26,7 +26,15 @@ module Opennms
             @data[:send_as_object_message] = text_at_xpath(root, '/jms-northbounder-configuration/send-as-object-message') == 'true'
             @data[:first_occurrence_only] = text_at_xpath(root, '/jms-northbounder-configuration/first-occurrence-only') == 'true'
 
-            # TODO: Parse destination elements from XML and populate @data[:destinations]
+            root.elements.each('destination') do |dest_el|
+              @data[:destinations] << Opennms::Cookbook::Jms::JmsDestination.new(
+                destination: text_at_xpath(dest_el, 'jms-destination'),
+                first_occurence_only: text_at_xpath(dest_el, 'first-occurence-only') == 'true',
+                send_as_object_message: text_at_xpath(dest_el, 'send-as-object-message') == 'true',
+                destination_type: text_at_xpath(dest_el, 'destination-type') || 'QUEUE',
+                message_format: text_at_xpath(dest_el, 'message-format')
+              )
+            end
           end
 
           def method_missing(method, *args, &block)
