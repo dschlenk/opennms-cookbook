@@ -8,10 +8,12 @@ property :destination_type, String, default: 'QUEUE', equal_to: %w(QUEUE TOPIC)
 property :message_format, String, required: false
 
 load_current_value do |new_resource|
-  config = jms_nb_resource&.variables&.[](:configig.nil?
+  config = jms_nb_resource&.variables&.
+  if config.nil?
     ro_jms_nb_resource_init
     config = ro_jms_nb_resource&.variables&.
   end
+
   if config.nil?
     raise "Unable to load JMS configuration. Ensure jms_nb_resource or ro_jms_nb_resource is initialized correctly."
   end
@@ -49,7 +51,6 @@ action :create do
     if config.nil?
       raise "Unable to load JMS configuration. Ensure jms_nb_resource is initialized correctly."
     end
-
     dest = config.find_destination_by_name(new_resource.destination)
     if dest.nil?
       config.destinations.push(
