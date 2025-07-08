@@ -84,7 +84,7 @@ module Opennms
               owner node['opennms']['username']
               group node['opennms']['groupname']
               mode '0664'
-              variables(config.to_hash)
+              variables(config: config)
               action :nothing
               delayed_action :create
               notifies :restart, 'service[opennms]'
@@ -111,7 +111,7 @@ module Opennms
               owner node['opennms']['username']
               group node['opennms']['groupname']
               mode '0664'
-              variables(config.to_hash)
+              variables(config: config)
               action :nothing
               delayed_action :nothing
             end
