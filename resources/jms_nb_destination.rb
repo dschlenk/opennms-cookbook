@@ -11,10 +11,7 @@ load_current_value do |new_resource|
   config = jms_nb_resource&.variables&.
   if config.nil?
     ro_jms_nb_resource_init
-    config = ro_jms_nb_resource&.variables&.
-  end
-
-  if config.nil?
+    config = ro_jms_nb_resource&.variables&.[](:configif config.nil?
     raise "Unable to load JMS configuration. Ensure jms_nb_resource or ro_jms_nb_resource is initialized correctly."
   end
 
@@ -48,9 +45,8 @@ action :create do
     jms_nb_resource_init
     config = jms_nb_resource&.variables&.
 
-    if config.nil?
-      raise "Unable to load JMS configuration. Ensure jms_nb_resource is initialized correctly."
-    end
+    raise "Unable to load JMS configuration. Ensure jms_nb_resource is initialized correctly." if config.nil?
+
     dest = config.find_destination_by_name(new_resource.destination)
     if dest.nil?
       config.destinations.push(
@@ -81,9 +77,7 @@ action :create_if_missing do
   jms_nb_resource_init
   config = jms_nb_resource&.variables&.
 
-  if config.nil?
-    raise "Unable to load JMS configuration. Ensure jms_nb_resource is initialized correctly."
-  end
+  raise "Unable to load JMS configuration. Ensure jms_nb_resource is initialized correctly." if config.nil?
 
   dest = config.find_destination_by_name(new_resource.destination)
   run_action(:create) if dest.nil?
@@ -98,9 +92,7 @@ action :update do
     jms_nb_resource_init
     config = jms_nb_resource&.variables&.
 
-    if config.nil?
-      raise "Unable to load JMS configuration. Ensure jms_nb_resource is initialized correctly."
-    end
+    raise "Unable to load JMS configuration. Ensure jms_nb_resource is initialized correctly." if config.nil?
 
     dest = config.find_destination_by_name(new_resource.destination)
     if dest.nil?
@@ -124,9 +116,7 @@ action :delete do
   jms_nb_resource_init
   config = jms_nb_resource&.variables&.
 
-  if config.nil?
-    raise "Unable to load JMS configuration. Ensure jms_nb_resource is initialized correctly."
-  end
+  raise "Unable to load JMS configuration. Ensure jms_nb_resource is initialized correctly." if config.nil?
 
   dest = config.find_destination_by_name(new_resource.destination)
   unless dest.nil?
