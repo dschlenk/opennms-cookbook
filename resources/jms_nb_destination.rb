@@ -48,7 +48,7 @@ action :create do
 
   converge_if_changed do
     jms_nb_resource_init
-    config = jms_nb_resource&.variables&.[](:config)
+    config = jms_nb_resource.variables[:config]
 
     raise 'Unable to load JMS configuration. Ensure jms_nb_resource is initialized correctly.' if config.nil?
 
