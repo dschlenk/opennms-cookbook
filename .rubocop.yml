@@ -22,3 +22,4 @@ Metrics/BlockNesting:
 Layout/TrailingWhitespace:
   Exclude:
     - 'test/integration/collection_graph_file/controls/collection_graph_file_spec.rb'
+    - 'test/integration/correlation/controls/correlation_spec.rb'

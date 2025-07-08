@@ -1,24 +1,21 @@
-<engine-configuration xmlns="http://xmlns.opennms.org/xsd/drools-engine">
-  <rule-set name="<%= @rule_name || 'DefaultRule' %>">
-    <engine>
-      <name><%= @engine_name || 'DefaultEngine' %></name>
-      <rules-dir>rules</rules-dir>
-    </engine>
-
-<% if @drl_files -%>
-<% Array(@drl_files).each do |drl_file| -%>
-    <rule>
-      <name><%= File.basename(drl_file, '.drl') %></name>
-      <enabled>true</enabled>
-      <file><%= File.basename(drl_file) %></file>
-    </rule>
-<% end -%>
-<% else -%>
-    <rule>
-      <name><%= @rule_name || 'DefaultRule' %></name>
-      <enabled>true</enabled>
-      <file><%= @rule_name || 'default-rule' %>.drl</file>
-    </rule>
-<% end -%>
+<?xml version="1.0" encoding="UTF-8"?>
+<engine-configuration 
+        xmlns="http://xmlns.opennms.org/xsd/drools-engine"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<% @rule_sets.each do |rule_set| -%>
+  <rule-set name=<%= rule_set['name'].nil? ? '"DefaultRule"' : rule_set['name'].to_s.encode(:xml => :attr) %><%= rule_set['persist_state'].nil? ? '' : " persist-state=#{rule_set['persist_state'].to_s.encode(:xml => :attr)}" %><%= rule_set['assert_behaviour'].nil? ? '' : " assert-behaviour=#{rule_set['assert_behaviour'].to_s.encode(:xml => :attr)}" %><%= rule_set['event_processing_mode'].nil? ? '' : " event-processing-mode=#{rule_set['event_processing_mode'].to_s.encode(:xml => :attr)}" %>>
+  <% rule_set['rule_files'].each do |rf| -%>
+    <rule-file><%= rf.to_s.encode(:xml => :text) %></rule-file>
+  <% end -%>
+  <% rule_set['events'].each do |event| -%>
+    <event><%= event.to_s.encode(:xml => :text) %></event>
+  <% end -%>
+  <% unless rule_set['app_context'].nil? -%>
+    <app-context><%= rule_set['app_context'].to_s.encode(:xml => :text) %></app-context>
+  <% end -%>
+  <% rule_set['globals'].each do |global| -%>
+    <global name=<%= global['name'].to_s.encode(:xml => :attr) %><%= global['type'].nil? ? '' : " type=#{global['type'].to_s.encode(:xml => :attr)}" %><%= global['value'].nil? ? '' : " value=#{global['value'].to_s.encode(:xml => :attr)}" %><%= global['ref'].nil? ? '' : " ref=#{global['ref'].to_s.encode(:xml => :attr)}" %>/>
+  <% end unless rule_set['globals'].nil? -%>
   </rule-set>
+<% end -%>
 </engine-configuration>

@@ -1,10 +1,15 @@
 package com.example.rules
 
-import com.example.model.Order
+import org.opennms.netmgt.xml.event.Event;
+import org.opennms.netmgt.model.events.EventUtils;
 
-rule "Sample Rule - High Value Order"
+global org.slf4j.Logger LOG;
+global org.opennms.netmgt.correlation.drools.DroolsCorrelationEngine engine;
+
+rule "Event received"
     when
-        $order : Order(amount > 1000)
+        $e : Event( $uei : uei, $nodeid : nodeid, $ipAddr : interface, $svcName : service, $ifname : getParm("ifName"), $snmpifname : getParm("snmpifname") )
     then
-        System.out.println("High value order detected: " + $order);
+        LOG.info( "UEI: " + $uei + "; Node ID: " + $nodeid + "; IP Address: " + $ipAddr + "; Interface Name: " + $snmpifname + "/" + $ifname + "; Service: " + $svcName);
+        retract( $e );
 end

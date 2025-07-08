@@ -1,10 +1,12 @@
 package com.example.rules
 
-import com.example.model.Customer
+import org.opennms.netmgt.xml.event.Event;
+
+global org.opennms.netmgt.correlation.drools.DroolsCorrelationEngine engine;
 
 rule "Template Rule - VIP Customer"
     when
-        $customer : Customer(status == "VIP")
+        $e : Event( $uei : uei, $nodeid : nodeid, $ipAddr : interface, $svcName : service )
     then
-        System.out.println("Welcome VIP customer: " + $customer.getName());
+        System.out.println("Event: " + $e.toString());
 end
