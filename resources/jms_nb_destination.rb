@@ -8,10 +8,12 @@ property :destination_type, String, default: 'QUEUE', equal_to: %w(QUEUE TOPIC)
 property :message_format, String, required: false
 
 load_current_value do |new_resource|
-  config = jms_nb_resource.variables[:config] unless jms_nb_resource.nil?
-  if config.nil?
+  config = jms_nb_resource&.variables&.[](:configig.nil?
     ro_jms_nb_resource_init
-    config = ro_jms_nb_resource.variables[:config]
+    config = ro_jms_nb_resource&.variables&.
+  end
+  if config.nil?
+    raise "Unable to load JMS configuration. Ensure jms_nb_resource or ro_jms_nb_resource is initialized correctly."
   end
 
   raise Chef::Exceptions::ValidationFailed, "The 'destination' property must be set and not empty." if new_resource.destination.nil? || new_resource.destination.strip.empty?
@@ -42,7 +44,12 @@ action :create do
 
   converge_if_changed do
     jms_nb_resource_init
-    config = jms_nb_resource.variables[:config]
+    config = jms_nb_resource&.variables&.
+
+    if config.nil?
+      raise "Unable to load JMS configuration. Ensure jms_nb_resource is initialized correctly."
+    end
+
     dest = config.find_destination_by_name(new_resource.destination)
     if dest.nil?
       config.destinations.push(
@@ -71,7 +78,12 @@ action :create_if_missing do
   raise Chef::Exceptions::ValidationFailed, "The 'destination' property must be set and not empty." if new_resource.destination.nil? || new_resource.destination.strip.empty?
 
   jms_nb_resource_init
-  config = jms_nb_resource.variables[:config]
+  config = jms_nb_resource&.variables&.
+
+  if config.nil?
+    raise "Unable to load JMS configuration. Ensure jms_nb_resource is initialized correctly."
+  end
+
   dest = config.find_destination_by_name(new_resource.destination)
   run_action(:create) if dest.nil?
 end
@@ -83,7 +95,12 @@ action :update do
 
   converge_if_changed do
     jms_nb_resource_init
-    config = jms_nb_resource.variables[:config]
+    config = jms_nb_resource&.variables&.
+
+    if config.nil?
+      raise "Unable to load JMS configuration. Ensure jms_nb_resource is initialized correctly."
+    end
+
     dest = config.find_destination_by_name(new_resource.destination)
     if dest.nil?
       raise Chef::Exceptions::ResourceNotFound, "No JMS destination named #{new_resource.destination} found to update. Use action `:create` or `:create_if_missing` to create it."
@@ -104,7 +121,12 @@ action :delete do
   raise Chef::Exceptions::ValidationFailed, "The 'destination' property must be set and not empty." if new_resource.destination.nil? || new_resource.destination.strip.empty?
 
   jms_nb_resource_init
-  config = jms_nb_resource.variables[:config]
+  config = jms_nb_resource&.variables&.
+
+  if config.nil?
+    raise "Unable to load JMS configuration. Ensure jms_nb_resource is initialized correctly."
+  end
+
   dest = config.find_destination_by_name(new_resource.destination)
   unless dest.nil?
     converge_by "Removing JMS destination #{new_resource.destination}" do
