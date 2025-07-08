@@ -1,3 +1,5 @@
+require_relative 'jms_destination'
+
 module Opennms
   module Cookbook
     module ConfigHelpers
