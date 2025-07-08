@@ -11,7 +11,10 @@ load_current_value do |new_resource|
   config = jms_nb_resource&.variables&.
   if config.nil?
     ro_jms_nb_resource_init
-    config = ro_jms_nb_resource&.variables&.[](:configif config.nil?
+    config = ro_jms_nb_resource&.variables&.
+  end
+
+  if config.nil?
     raise "Unable to load JMS configuration. Ensure jms_nb_resource or ro_jms_nb_resource is initialized correctly."
   end
 
