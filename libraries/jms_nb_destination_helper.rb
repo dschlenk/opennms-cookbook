@@ -3,24 +3,40 @@ module Opennms
     module ConfigHelpers
       module Jms
         class JmsNbConfig
+          include Opennms::XmlHelper
+
           def initialize
             @data = {}
           end
 
-          def read!(node, _path)
-            @data[:enabled] = node['opennms']['jms_nbi']['enabled']
-            @data[:nagles_delay] = node['opennms']['jms_nbi']['nagles_delay']
-            @data[:batch_size] = node['opennms']['jms_nbi']['batch_size']
-            @data[:queue_size] = node['opennms']['jms_nbi']['queue_size']
-            @data[:message_format] = node['opennms']['jms_nbi']['message_format']
-            @data[:jms_destination] = node['opennms']['jms_nbi']['jms_destination']
-            @data[:uei] = node['opennms']['jms_nbi']['uei']
-            @data[:send_as_object_message] = node['opennms']['jms_nbi']['send_as_object_message']
-            @data[:first_occurrence_only] = node['opennms']['jms_nbi']['first_occurrence_only']
+          def read!(file = "#{Chef::Config[:file_cache_path]}/jms-northbounder-configuration.xml")
+            raise ArgumentError, "File #{file} does not exist" unless ::File.exist?(file)
+
+            doc = xmldoc_from_file(file)
+            root = doc.root
+
+            @data[:enabled] = text_to_bool(root.elements['enabled']&.text)
+            @data[:nagles_delay] = root.elements['nagles-delay']&.text.to_i
+            @data[:batch_size] = root.elements['batch-size']&.text.to_i
+            @data[:queue_size] = root.elements['queue-size']&.text.to_i
+            @data[:message_format] = root.elements['message-format']&.text
+
+            destination = root.elements['destination']
+            if destination
+              @data[:first_occurrence_only] = text_to_bool(destination.elements['first-occurence-only']&.text)
+              @data[:send_as_object_message] = text_to_bool(destination.elements['send-as-object-message']&.text)
+              @data[:jms_destination] = destination.elements['jms-destination']&.text
+            end
           end
 
           def to_hash
             @data
+          end
+
+          private
+
+          def text_to_bool(val)
+            val.to_s.strip.downcase == 'true'
           end
         end
       end
@@ -38,7 +54,7 @@ module Opennms
 
         def jms_nb_resource
           return unless jms_nb_resource_exist?
-          find_resource!(:template, "#{node['opennms']['conf']['home']}/etc/jms-northbounder-configuration.xml")
+          find_resource!(:template, jms_config_path)
         end
 
         def ro_jms_nb_resource_init
@@ -47,22 +63,28 @@ module Opennms
 
         def ro_jms_nb_resource
           return unless ro_jms_nb_resource_exist?
-          find_resource!(:template, "RO #{node['opennms']['conf']['home']}/etc/jms-northbounder-configuration.xml")
+          find_resource!(:template, "RO #{jms_config_path}")
         end
 
         private
 
+        def jms_config_path
+          "#{node['opennms']['conf']['home']}/etc/jms-northbounder-configuration.xml"
+        end
+
         def jms_nb_resource_exist?
-          !find_resource(:template, "#{node['opennms']['conf']['home']}/etc/jms-northbounder-configuration.xml").nil?
+          !find_resource(:template, jms_config_path).nil?
         rescue Chef::Exceptions::ResourceNotFound
           false
         end
 
         def jms_nb_resource_create
+          file_path = jms_config_path
           config = Opennms::Cookbook::ConfigHelpers::Jms::JmsNbConfig.new
-          config.read!(node, "#{node['opennms']['conf']['home']}/etc/jms-northbounder-configuration.xml") if ::File.exist?("#{node['opennms']['conf']['home']}/etc/jms-northbounder-configuration.xml")
+          config.read!(file_path) if ::File.exist?(file_path)
+
           with_run_context :root do
-            declare_resource(:template, "#{node['opennms']['conf']['home']}/etc/jms-northbounder-configuration.xml") do
+            declare_resource(:template, file_path) do
               source 'jms-northbounder-configuration.xml.erb'
               cookbook 'opennms'
               owner node['opennms']['username']
@@ -77,16 +99,18 @@ module Opennms
         end
 
         def ro_jms_nb_resource_exist?
-          !find_resource(:template, "RO #{node['opennms']['conf']['home']}/etc/jms-northbounder-configuration.xml").nil?
+          !find_resource(:template, "RO #{jms_config_path}").nil?
         rescue Chef::Exceptions::ResourceNotFound
           false
         end
 
         def ro_jms_nb_resource_create
+          file_path = jms_config_path
           config = Opennms::Cookbook::ConfigHelpers::Jms::JmsNbConfig.new
-          config.read!(node, "#{node['opennms']['conf']['home']}/etc/jms-northbounder-configuration.xml") if ::File.exist?("#{node['opennms']['conf']['home']}/etc/jms-northbounder-configuration.xml")
+          config.read!(file_path) if ::File.exist?(file_path)
+
           with_run_context :root do
-            declare_resource(:template, "RO #{node['opennms']['conf']['home']}/etc/jms-northbounder-configuration.xml") do
+            declare_resource(:template, "RO #{jms_config_path}") do
               path "#{Chef::Config[:file_cache_path]}/jms-northbounder-configuration.xml"
               source 'jms-northbounder-configuration.xml.erb'
               cookbook 'opennms'
