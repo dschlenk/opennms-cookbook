@@ -39,6 +39,10 @@ module Opennms
             @data
           end
 
+          def jms_destination
+            @data[:jms_destination]
+          end
+
           private
 
           def text_at_xpath(root, path)
