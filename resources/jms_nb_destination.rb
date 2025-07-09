@@ -10,7 +10,7 @@ property :message_format, String, required: false
 attr_reader :jms_nb_resource, :ro_jms_nb_resource
 
 load_current_value do |new_resource|
-  if jms_nb_resource.nil? 
+  if jms_nb_resource.nil?
     ro_jms_nb_resource_init
     config = ro_jms_nb_resource.variables[:config]
   else
