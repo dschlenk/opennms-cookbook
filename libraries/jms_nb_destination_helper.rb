@@ -37,6 +37,7 @@ module Opennms
               )
             end
           end
+
           def method_missing(method, *args, &block)
             return @data[method] if @data.key?(method)
 
@@ -70,7 +71,6 @@ module Opennms
           def delete_destination(destination:)
             @data[:destinations].reject! { |d| d.destination == destination }
           end
-
           private
 
           def text_at_xpath(root, path)
@@ -155,6 +155,7 @@ module Opennms
           else
             Chef::Log.warn("JMS config file #{config_path} does not exist. Initializing empty config.")
           end
+
           with_run_context :root do
             declare_resource(:template, config_path) do
               source 'jms-northbounder-configuration.xml.erb'
