@@ -97,7 +97,9 @@ action :create_if_missing do
   raise Chef::Exceptions::ValidationFailed, 'The destination property must be set and not empty.' if new_resource.destination.nil? || new_resource.destination.strip.empty?
 
   jms_nb_resource_init
-  config = jms_nb_resource&.variables&.[](:raise 'Unable to load JMS configuration. Ensure jms_nb_resource is initialized correctly.' if config.nil?
+  config = jms_nb_resource&.variables&.
+
+  raise 'Unable to load JMS configuration. Ensure jms_nb_resource is initialized correctly.' if config.nil?
 
   dest = config.find_destination_by_name(new_resource.destination)
   run_action(:create) if dest.nil?
