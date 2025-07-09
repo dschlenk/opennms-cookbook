@@ -11,15 +11,11 @@ attr_reader :jms_nb_resource, :ro_jms_nb_resource
 
 load_current_value do |new_resource|
   jms_nb_resource_init
-  config = jms_nb_resource
-           &.variables
-           &.
+  config = jms_nb_resource&.variables
 
   if config.nil?
     ro_jms_nb_resource_init
-    config = ro_jms_nb_resource
-             &.variables
-             &.
+    config = ro_jms_nb_resource&.variables
   end
 
   if config.nil?
@@ -71,9 +67,7 @@ action :create do
 
   converge_if_changed do
     jms_nb_resource_init
-    config = jms_nb_resource
-             &.variables
-             &.
+    config = jms_nb_resource&.variables
 
     raise 'Unable to load JMS configuration. Ensure jms_nb_resource is initialized correctly.' if config.nil?
 
@@ -105,9 +99,7 @@ action :create_if_missing do
   raise Chef::Exceptions::ValidationFailed, 'The destination property must be set and not empty.' if new_resource.destination.nil? || new_resource.destination.strip.empty?
 
   jms_nb_resource_init
-  config = jms_nb_resource
-           &.variables
-           &.
+  config = jms_nb_resource&.variables
 
   raise 'Unable to load JMS configuration. Ensure jms_nb_resource is initialized correctly.' if config.nil?
 
@@ -122,9 +114,7 @@ action :update do
 
   converge_if_changed do
     jms_nb_resource_init
-    config = jms_nb_resource
-             &.variables
-             &.
+    config = jms_nb_resource&.variables
 
     raise 'Unable to load JMS configuration. Ensure jms_nb_resource is initialized correctly.' if config.nil?
 
@@ -148,9 +138,7 @@ action :delete do
   raise Chef::Exceptions::ValidationFailed, 'The destination property must be set and not empty.' if new_resource.destination.nil? || new_resource.destination.strip.empty?
 
   jms_nb_resource_init
-  config = jms_nb_resource
-           &.variables
-           &.
+  config = jms_nb_resource&.variables
 
   raise 'Unable to load JMS configuration. Ensure jms_nb_resource is initialized correctly.' if config.nil?
 
