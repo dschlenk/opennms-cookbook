@@ -71,6 +71,7 @@ module Opennms
           def delete_destination(destination:)
             @data[:destinations].reject! { |d| d.destination == destination }
           end
+
           private
 
           def text_at_xpath(root, path)
