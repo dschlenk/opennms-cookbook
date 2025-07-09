@@ -45,18 +45,18 @@ action_class do
 
   def jms_nb_resource_init
     @jms_nb_resource ||= begin
-      find_resource(:template, '/opt/opennms/etc/jms-northbounder-configuration.xml')
-    rescue StandardError
-      nil
-    end
+                           find_resource(:template, '/opt/opennms/etc/jms-northbounder-configuration.xml')
+                         rescue StandardError
+                           nil
+                         end
   end
 
   def ro_jms_nb_resource_init
     @ro_jms_nb_resource ||= begin
-      find_resource(:template, 'RO /opt/opennms/etc/jms-northbounder-configuration.xml')
-    rescue StandardError
-      nil
-    end
+                              find_resource(:template, 'RO /opt/opennms/etc/jms-northbounder-configuration.xml')
+                            rescue StandardError
+                              nil
+                            end
   end
 end
 
