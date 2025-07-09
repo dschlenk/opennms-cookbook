@@ -13,7 +13,7 @@ load_current_value do |new_resource|
   jms_nb_resource_init
   config = jms_nb_resource
            &.variables
-           &.[](:config)
+           &.
 
   if config.nil?
     ro_jms_nb_resource_init
@@ -28,7 +28,7 @@ load_current_value do |new_resource|
 
   raise Chef::Exceptions::ValidationFailed, 'The destination property must be set and not empty.' if new_resource.destination.nil? || new_resource.destination.strip.empty?
 
-  dest = config.find_destination_by_namece.destination)
+  dest = config.find_destination_by_name(new_resource.destination)
   current_value_does_not_exist! if dest.nil?
 
   first_occurence_only dest.first_occurence_only
