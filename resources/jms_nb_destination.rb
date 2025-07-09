@@ -7,13 +7,19 @@ property :send_as_object_message, [true, false], default: false
 property :destination_type, String, default: 'QUEUE', equal_to: %w(QUEUE TOPIC)
 property :message_format, String, required: false
 
+attr_reader :jms_nb_resource, :ro_jms_nb_resource
+
 load_current_value do |new_resource|
   jms_nb_resource_init
-  config = jms_nb_resource&.variables&.
+  config = jms_nb_resource
+           &.variables
+           &.[](:config)
 
   if config.nil?
     ro_jms_nb_resource_init
-    config = ro_jms_nb_resource&.variables&.
+    config = ro_jms_nb_resource
+             &.variables
+             &.
   end
 
   if config.nil?
@@ -22,7 +28,7 @@ load_current_value do |new_resource|
 
   raise Chef::Exceptions::ValidationFailed, 'The destination property must be set and not empty.' if new_resource.destination.nil? || new_resource.destination.strip.empty?
 
-  dest = config.find_destination_by_name(new_resource.destination)
+  dest = config.find_destination_by_namece.destination)
   current_value_does_not_exist! if dest.nil?
 
   first_occurence_only dest.first_occurence_only
@@ -41,20 +47,20 @@ action_class do
     end
   end
 
-  def jms_nb_resource
-    @jms_nb_resource
-  end
-
   def jms_nb_resource_init
-    @jms_nb_resource ||= find_resource(:template, '/opt/opennms/etc/jms-northbounder-configuration.xml') rescue nil
-  end
-
-  def ro_jms_nb_resource
-    @ro_jms_nb_resource
+    @jms_nb_resource ||= begin
+      find_resource(:template, '/opt/opennms/etc/jms-northbounder-configuration.xml')
+    rescue StandardError
+      nil
+    end
   end
 
   def ro_jms_nb_resource_init
-    @ro_jms_nb_resource ||= find_resource(:template, 'RO /opt/opennms/etc/jms-northbounder-configuration.xml') rescue nil
+    @ro_jms_nb_resource ||= begin
+      find_resource(:template, 'RO /opt/opennms/etc/jms-northbounder-configuration.xml')
+    rescue StandardError
+      nil
+    end
   end
 end
 
@@ -65,7 +71,9 @@ action :create do
 
   converge_if_changed do
     jms_nb_resource_init
-    config = jms_nb_resource&.variables&.
+    config = jms_nb_resource
+             &.variables
+             &.
 
     raise 'Unable to load JMS configuration. Ensure jms_nb_resource is initialized correctly.' if config.nil?
 
@@ -97,7 +105,9 @@ action :create_if_missing do
   raise Chef::Exceptions::ValidationFailed, 'The destination property must be set and not empty.' if new_resource.destination.nil? || new_resource.destination.strip.empty?
 
   jms_nb_resource_init
-  config = jms_nb_resource&.variables&.
+  config = jms_nb_resource
+           &.variables
+           &.
 
   raise 'Unable to load JMS configuration. Ensure jms_nb_resource is initialized correctly.' if config.nil?
 
@@ -112,7 +122,9 @@ action :update do
 
   converge_if_changed do
     jms_nb_resource_init
-    config = jms_nb_resource&.variables&.
+    config = jms_nb_resource
+             &.variables
+             &.
 
     raise 'Unable to load JMS configuration. Ensure jms_nb_resource is initialized correctly.' if config.nil?
 
@@ -136,7 +148,9 @@ action :delete do
   raise Chef::Exceptions::ValidationFailed, 'The destination property must be set and not empty.' if new_resource.destination.nil? || new_resource.destination.strip.empty?
 
   jms_nb_resource_init
-  config = jms_nb_resource&.variables&.
+  config = jms_nb_resource
+           &.variables
+           &.
 
   raise 'Unable to load JMS configuration. Ensure jms_nb_resource is initialized correctly.' if config.nil?
 
