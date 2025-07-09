@@ -10,17 +10,13 @@ property :message_format, String, required: false
 attr_reader :jms_nb_resource, :ro_jms_nb_resource
 
 load_current_value do |new_resource|
-  jms_nb_resource_init
-  config = jms_nb_resource&.variables[:config]
-
-  if config.nil?
+  if jms_nb_resource.nil? 
     ro_jms_nb_resource_init
-    config = ro_jms_nb_resource&.variables[:config]
+    config = ro_jms_nb_resource.variables[:config]
+  else
+    config = jms_nb_resource.variables[:config]
   end
-
-  raise 'Unable to load JMS configuration. Ensure jms_nb_resource or ro_jms_nb_resource is initialized correctly and includes :config in its variables.' if config.nil?
-
-  raise Chef::Exceptions::ValidationFailed, 'The destination property must be set and not empty.' if new_resource.destination.nil? || new_resource.destination.strip.empty?
+  raise 'Unable to load JMS configuration. Is the plugin installed?' if config.nil?
 
   dest = config.find_destination_by_name(new_resource.destination)
   current_value_does_not_exist! if dest.nil?
