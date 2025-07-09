@@ -85,43 +85,6 @@ end
 module Opennms
   module Cookbook
     module Jms
-      class JmsDestination
-        attr_accessor :destination, :first_occurence_only, :send_as_object_message, :destination_type, :message_format
-
-        def initialize(destination:, first_occurence_only:, send_as_object_message:, destination_type:, message_format:)
-          @destination = destination
-          @first_occurence_only = first_occurence_only
-          @send_as_object_message = send_as_object_message
-          @destination_type = destination_type
-          @message_format = message_format
-        end
-
-        def update(first_occurence_only:, send_as_object_message:, destination_type:, message_format:)
-          @first_occurence_only = first_occurence_only
-          @send_as_object_message = send_as_object_message
-          @destination_type = destination_type
-          @message_format = message_format
-        end
-
-        def to_xml
-          <<~XML
-            <destination>
-              <first-occurence-only>#{@first_occurence_only}</first-occurence-only>
-              <send-as-object-message>#{@send_as_object_message}</send-as-object-message>
-              <destination-type>#{@destination_type}</destination-type>
-              <jms-destination>#{@destination}</jms-destination>
-              <message-format>#{@message_format}</message-format>
-            </destination>
-          XML
-        end
-      end
-    end
-  end
-end
-
-module Opennms
-  module Cookbook
-    module Jms
       module JmsNbTemplate
         def jms_nb_resource_init
           jms_nb_resource_create unless jms_nb_resource_exist?
@@ -129,6 +92,7 @@ module Opennms
 
         def jms_nb_resource
           return unless jms_nb_resource_exist?
+
           find_resource!(:template, "#{node['opennms']['conf']['home']}/etc/jms-northbounder-configuration.xml")
         end
 
@@ -138,6 +102,7 @@ module Opennms
 
         def ro_jms_nb_resource
           return unless ro_jms_nb_resource_exist?
+
           find_resource!(:template, "RO #{node['opennms']['conf']['home']}/etc/jms-northbounder-configuration.xml")
         end
 
@@ -152,7 +117,12 @@ module Opennms
         def jms_nb_resource_create
           config_path = "#{node['opennms']['conf']['home']}/etc/jms-northbounder-configuration.xml"
           config = Opennms::Cookbook::ConfigHelpers::Jms::JmsNbConfig.new
-          config.read!(config_path) if ::File.exist?(config_path)
+
+          if ::File.exist?(config_path)
+            config.read!(config_path)
+          else
+            Chef::Log.warn("JMS config file #{config_path} does not exist. Initializing empty config.")
+          end
 
           with_run_context :root do
             declare_resource(:template, config_path) do
@@ -164,7 +134,7 @@ module Opennms
               variables(config: config)
               action :nothing
               delayed_action :create
-              notifies :restart, 'service[opennms]'
+              notifies :restart, 'service[opennms]', :delayed
             end
           end
         end
@@ -178,7 +148,12 @@ module Opennms
         def ro_jms_nb_resource_create
           config_path = "#{node['opennms']['conf']['home']}/etc/jms-northbounder-configuration.xml"
           config = Opennms::Cookbook::ConfigHelpers::Jms::JmsNbConfig.new
-          config.read!(config_path) if ::File.exist?(config_path)
+
+          if ::File.exist?(config_path)
+            config.read!(config_path)
+          else
+            Chef::Log.warn("RO: JMS config file #{config_path} does not exist. Initializing empty config.")
+          end
 
           with_run_context :root do
             declare_resource(:template, "RO #{config_path}") do
