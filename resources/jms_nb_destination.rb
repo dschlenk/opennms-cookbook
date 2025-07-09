@@ -11,30 +11,14 @@ attr_reader :jms_nb_resource, :ro_jms_nb_resource
 
 load_current_value do |new_resource|
   jms_nb_resource_init
-  config = nil
-
-  if jms_nb_resource
-    begin
-      config = jms_nb_resource.variables[:config]
-    rescue NoMethodError => e
-      Chef::Log.warn("Could not load config from jms_nb_resource: #{e.message}")
-    end
-  end
+  config = jms_nb_resource&.variables[:config]
 
   if config.nil?
     ro_jms_nb_resource_init
-    if ro_jms_nb_resource
-      begin
-        config = ro_jms_nb_resource.variables[:config]
-      rescue NoMethodError => e
-        Chef::Log.warn("Could not load config from ro_jms_nb_resource: #{e.message}")
-      end
-    end
+    config = ro_jms_nb_resource&.variables[:config]
   end
 
-  if config.nil?
-    raise 'Unable to load JMS configuration. Ensure jms_nb_resource or ro_jms_nb_resource is initialized correctly and includes :config in its variables.'
-  end
+  raise 'Unable to load JMS configuration. Ensure jms_nb_resource or ro_jms_nb_resource is initialized correctly and includes :config in its variables.' if config.nil?
 
   raise Chef::Exceptions::ValidationFailed, 'The destination property must be set and not empty.' if new_resource.destination.nil? || new_resource.destination.strip.empty?
 
@@ -56,30 +40,23 @@ action_class do
       raise 'The opennms-plugin-northbounder-jms plugin must be installed to use the jms_nb_destination resource.'
     end
   end
+
+  def jms_config
+    ro_jms_nb_resource_init
+    res = ro_jms_nb_resource
+    raise 'Unable to load JMS configuration. Ensure jms_nb_resource or ro_jms_nb_resource is initialized correctly and includes :config in its variables.' unless res && res.variables[:config]
+    res.variables[:config]
+  end
 end
 
 action :create do
   ensure_jms_plugin_installed!
-
   raise Chef::Exceptions::ValidationFailed, 'The destination property must be set and not empty.' if new_resource.destination.nil? || new_resource.destination.strip.empty?
 
   converge_if_changed do
-    jms_nb_resource_init
-    config = nil
-
-    if jms_nb_resource
-      begin
-        config = jms_nb_resource.variables[:config]
-      rescue NoMethodError => e
-        Chef::Log.warn("Could not load config from jms_nb_resource: #{e.message}")
-      end
-    end
-
-    if config.nil?
-      raise 'Unable to load JMS configuration. Ensure jms_nb_resource is initialized correctly and includes :config in its variables.'
-    end
-
+    config = jms_config
     dest = config.find_destination_by_name(new_resource.destination)
+
     if dest.nil?
       config.destinations.push(
         Opennms::Cookbook::Jms::JmsDestination.new(
@@ -103,46 +80,21 @@ end
 
 action :create_if_missing do
   ensure_jms_plugin_installed!
-
   raise Chef::Exceptions::ValidationFailed, 'The destination property must be set and not empty.' if new_resource.destination.nil? || new_resource.destination.strip.empty?
 
-  jms_nb_resource_init
-  config = nil
-
-  if jms_nb_resource
-    begin
-      config = jms_nb_resource.variables[:config]
-    rescue NoMethodError => e
-      Chef::Log.warn("Could not load config from jms_nb_resource: #{e.message}")
-    end
-  end
-
-  raise 'Unable to load JMS configuration. Ensure jms_nb_resource is initialized correctly and includes :config in its variables.' if config.nil?
-
+  config = jms_config
   dest = config.find_destination_by_name(new_resource.destination)
   run_action(:create) if dest.nil?
 end
 
 action :update do
   ensure_jms_plugin_installed!
-
   raise Chef::Exceptions::ValidationFailed, 'The destination property must be set and not empty.' if new_resource.destination.nil? || new_resource.destination.strip.empty?
 
   converge_if_changed do
-    jms_nb_resource_init
-    config = nil
-
-    if jms_nb_resource
-      begin
-        config = jms_nb_resource.variables[:config]
-      rescue NoMethodError => e
-        Chef::Log.warn("Could not load config from jms_nb_resource: #{e.message}")
-      end
-    end
-
-    raise 'Unable to load JMS configuration. Ensure jms_nb_resource is initialized correctly and includes :config in its variables.' if config.nil?
-
+    config = jms_config
     dest = config.find_destination_by_name(new_resource.destination)
+
     if dest.nil?
       raise Chef::Exceptions::ResourceNotFound, "No JMS destination named #{new_resource.destination} found to update. Use action :create or :create_if_missing to create it."
     else
@@ -158,22 +110,9 @@ end
 
 action :delete do
   ensure_jms_plugin_installed!
-
   raise Chef::Exceptions::ValidationFailed, 'The destination property must be set and not empty.' if new_resource.destination.nil? || new_resource.destination.strip.empty?
 
-  jms_nb_resource_init
-  config = nil
-
-  if jms_nb_resource
-    begin
-      config = jms_nb_resource.variables[:config]
-    rescue NoMethodError => e
-      Chef::Log.warn("Could not load config from jms_nb_resource: #{e.message}")
-    end
-  end
-
-  raise 'Unable to load JMS configuration. Ensure jms_nb_resource is initialized correctly and includes :config in its variables.' if config.nil?
-
+  config = jms_config
   dest = config.find_destination_by_name(new_resource.destination)
   unless dest.nil?
     converge_by "Removing JMS destination #{new_resource.destination}" do
