@@ -125,7 +125,6 @@ module Opennms
 
         def jms_nb_resource
           return unless jms_nb_resource_exist?
-
           find_resource!(:template, "#{node['opennms']['conf']['home']}/etc/jms-northbounder-configuration.xml")
         end
 
@@ -135,7 +134,6 @@ module Opennms
 
         def ro_jms_nb_resource
           return unless ro_jms_nb_resource_exist?
-
           find_resource!(:template, "RO #{node['opennms']['conf']['home']}/etc/jms-northbounder-configuration.xml")
         end
 
