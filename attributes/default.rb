@@ -485,11 +485,11 @@ default['opennms']['jms_nbi']['batch_size']             = 100
 default['opennms']['jms_nbi']['queue_size']             = 300_000
 default['opennms']['jms_nbi']['message_format']         = 'ALARM ID:${alarmId} NODE:${nodeLabel}; ${logMsg}'
 default['opennms']['jms_nbi']['send_as_object_message'] = false
-default['opennms']['jms_nbi']['first_occurrence_only'] = true
-default['opennms']['jms_nbi']['jms_destination'] = 'SingleAlarmQueue'
-# default['opennms']['jms_nbi']['jms_destination'] = nil
-default['opennms']['jms_nbi']['uei'] = []
-default['opennms']['plugin']['addl'] = ['opennms-plugin-northbounder-jms']
+default['opennms']['jms_nbi']['first_occurrence_only']  = true
+default['opennms']['jms_nbi']['jms_destination']        = 'SingleAlarmQueue'
+default['opennms']['jms_nbi']['uei']                    = []
+default['opennms']['plugin']['addl']                    = ['opennms-plugin-northbounder-jms']
+default['opennms']['templates']                         = true
 # log4j2.xml
 default['opennms']['log4j2']['default_route']['size'] = '100MB'
 default['opennms']['log4j2']['default_route']['rollover'] = 4
