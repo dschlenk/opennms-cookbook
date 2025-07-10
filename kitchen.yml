@@ -219,11 +219,11 @@ suites:
         - path: test/integration/correlation
   - name: correlation_edit
     provisioner:
-      policyfile: policyfiles/correlation.rb
+      policyfile: policyfiles/correlation_edit.rb
     verifier:
       inspec_tests:
         - path: test/integration/default
-        - path: test/integration/correlation
+        - path: test/integration/correlation_edit
   - name: dashlet
     provisioner:
       policyfile: policyfiles/dashlet.rb

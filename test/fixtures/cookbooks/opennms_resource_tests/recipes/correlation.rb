@@ -1,4 +1,5 @@
 # simple rule that uses a template for drools-engine.xml that allows for every config option available by the schema
+node.override['opennms']['services']['correlator'] = true
 opennms_correlation 'basic-rule' do
   engine_source 'drools-engine.xml.erb'
   engine_source_variables(
