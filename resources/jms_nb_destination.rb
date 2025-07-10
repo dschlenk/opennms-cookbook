@@ -10,12 +10,20 @@ property :message_format, String, required: false
 attr_reader :jms_nb_resource, :ro_jms_nb_resource
 
 load_current_value do |new_resource|
+  config = nil
   if jms_nb_resource.nil?
     ro_jms_nb_resource_init
-    config = ro_jms_nb_resource.variables[:config]
+    res = ro_jms_nb_resource
+    if res && res.variables[:config]
+      config = res.variables[:config]
+    end
   else
-    config = jms_nb_resource.variables[:config]
+    res = jms_nb_resource
+    if res && res.variables[:config]
+      config = res.variables[:config]
+    end
   end
+
   raise 'Unable to load JMS configuration. Is the plugin installed?' if config.nil?
 
   dest = config.find_destination_by_name(new_resource.destination)
