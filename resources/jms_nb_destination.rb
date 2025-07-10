@@ -7,8 +7,6 @@ property :send_as_object_message, [true, false], default: false
 property :destination_type, String, default: 'QUEUE', equal_to: %w(QUEUE TOPIC)
 property :message_format, String, required: false
 
-attr_reader :jms_nb_resource, :ro_jms_nb_resource
-
 load_current_value do |new_resource|
   if jms_nb_resource.nil?
     ro_jms_nb_resource_init
