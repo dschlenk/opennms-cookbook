@@ -45,11 +45,18 @@ action_class do
   def jms_config
     ro_jms_nb_resource_init
     res = ro_jms_nb_resource
-    if res && res.variables[:config]
-      res.variables[:config]
-    else
-      raise 'Unable to load JMS configuration. Ensure jms_nb_resource or ro_jms_nb_resource is initialized correctly and includes :config in its variables.'
+
+    if res.nil?
+      Chef::Log.warn('RO JMS template resource is nil.')
+      raise 'Unable to load JMS configuration. Template resource not found.'
     end
+
+    unless res.variables.key?(:config)
+      Chef::Log.warn('RO JMS template resource does not include :config in variables.')
+      raise 'Unable to load JMS configuration. Is the plugin installed and template initialized with config?'
+    end
+
+    res.variables[:config]
   end
 end
 
