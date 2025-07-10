@@ -1,7 +1,19 @@
 # frozen_string_literal: true
 node.default['opennms']['plugin']['addl'] << 'opennms-plugin-northbounder-jms'
+
+template "#{node['opennms']['conf']['home']}/etc/jms-northbounder-configuration.xml" do
+  source 'jms-northbounder-configuration.xml.erb'
+  cookbook 'opennms'
+  owner node['opennms']['username']
+  group node['opennms']['groupname']
+  mode '0664'
+  variables(config: Opennms::Cookbook::ConfigHelpers::Jms::JmsNbConfig.new)
+  action :create
+end
+
 opennms_jms_nb_destination 'minimal-queue' do
   destination 'minimal-queue'
+  action :create
 end
 
 opennms_jms_nb_destination 'full-topic' do
@@ -10,6 +22,7 @@ opennms_jms_nb_destination 'full-topic' do
   send_as_object_message true
   destination_type 'TOPIC'
   message_format 'ALARM: ${logMsg}'
+  action :create
 end
 
 opennms_jms_nb_destination 'another-queue' do
@@ -18,6 +31,7 @@ opennms_jms_nb_destination 'another-queue' do
   send_as_object_message false
   destination_type 'QUEUE'
   message_format 'ALARM ID:${alarmId} - ${logMsg}'
+  action :create
 end
 
 opennms_jms_nb_destination 'create-if-missing-destination' do
