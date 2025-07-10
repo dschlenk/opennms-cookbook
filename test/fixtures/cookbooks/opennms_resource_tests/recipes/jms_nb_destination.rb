@@ -1,16 +1,6 @@
 # frozen_string_literal: true
 node.default['opennms']['plugin']['addl'] << 'opennms-plugin-northbounder-jms'
 
-template "#{node['opennms']['conf']['home']}/etc/jms-northbounder-configuration.xml" do
-  source 'jms-northbounder-configuration.xml.erb'
-  cookbook 'opennms'
-  owner node['opennms']['username']
-  group node['opennms']['groupname']
-  mode '0664'
-  variables(config: Opennms::Cookbook::ConfigHelpers::Jms::JmsNbConfig.new)
-  action :create
-end
-
 opennms_jms_nb_destination 'minimal-queue' do
   destination 'minimal-queue'
   action :create
