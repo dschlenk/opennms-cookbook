@@ -10,21 +10,18 @@ property :message_format, String, required: false
 attr_reader :jms_nb_resource, :ro_jms_nb_resource
 
 load_current_value do |new_resource|
-  config = nil
   if jms_nb_resource.nil?
     ro_jms_nb_resource_init
     res = ro_jms_nb_resource
-    if res && res.variables[:config]
-      config = res.variables[:config]
-    end
   else
     res = jms_nb_resource
-    if res && res.variables[:config]
-      config = res.variables[:config]
-    end
   end
 
-  raise 'Unable to load JMS configuration. Is the plugin installed?' if config.nil?
+  if res && res.variables[:config]
+    config = res.variables[:config]
+  else
+    raise 'Unable to load JMS configuration. Is the plugin installed?'
+  end
 
   dest = config.find_destination_by_name(new_resource.destination)
   current_value_does_not_exist! if dest.nil?
@@ -48,8 +45,11 @@ action_class do
   def jms_config
     ro_jms_nb_resource_init
     res = ro_jms_nb_resource
-    raise 'Unable to load JMS configuration. Ensure jms_nb_resource or ro_jms_nb_resource is initialized correctly and includes :config in its variables.' unless res && res.variables[:config]
-    res.variables[:config]
+    if res && res.variables[:config]
+      res.variables[:config]
+    else
+      raise 'Unable to load JMS configuration. Ensure jms_nb_resource or ro_jms_nb_resource is initialized correctly and includes :config in its variables.'
+    end
   end
 end
 
