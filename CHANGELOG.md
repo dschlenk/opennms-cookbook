@@ -1,5 +1,10 @@
 # OpenNMS Cookbook Changes
 
+## 33.6.0
+
+* minor: new custom resource `opennms_correlation` provides easier management of Drools correlation engine configurations
+* minor: default to 33.1.8-1
+
 ## 33.5.0
 
 * breaking: new custom resource `opennms_translation_specs` replaces previous template
