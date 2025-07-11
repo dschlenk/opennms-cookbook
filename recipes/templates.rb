@@ -409,25 +409,6 @@ template "#{onms_home}/etc/syslog-northbounder-configuration.xml" do
   action node['opennms']['templates'] ? :create : :nothing
 end
 
-template "#{onms_home}/etc/translator-configuration.xml" do
-  cookbook node['opennms']['translator']['cookbook']
-  source 'translator-configuration.xml.erb'
-  mode '0664'
-  owner node['opennms']['username']
-  group node['opennms']['groupname']
-  variables(
-    snmp_link_down: node['opennms']['translator']['snmp_link_down'],
-    snmp_link_up: node['opennms']['translator']['snmp_link_up'],
-    hyperic: node['opennms']['translator']['hyperic'],
-    cisco_config_man: node['opennms']['translator']['cisco_config_man'],
-    juniper_cfg_change: node['opennms']['translator']['juniper_cfg_change'],
-    telemetry_clock_skew_detected: node['opennms']['translator']['telemetry_clock_skew_detected'],
-    # Should be a array of hashes where each hash has a key 'uei' that has a hash value and key `'mappings'` (array of hashes each with key `'assignments'` (array of hashes that each contain keys `'name'` (string), `'type'` (string), `'default'` (string, optional), `'value'` (a hash that contains keys `'type'` (string), `'matches'` (string, optional), `'result'` (string), `'values'` (array of hashes that each contain keys `'type'` (string), `'matches'` (string, optional), `'result'` (string)))))
-    addl_specs: node['opennms']['translator']['addl_specs']
-  )
-  action node['opennms']['templates'] ? :create : :nothing
-end
-
 template "#{onms_home}/etc/trapd-configuration.xml" do
   cookbook node['opennms']['trapd']['cookbook']
   source 'trapd-configuration.xml.erb'

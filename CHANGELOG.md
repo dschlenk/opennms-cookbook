@@ -1,5 +1,13 @@
 # OpenNMS Cookbook Changes
 
+## 33.5.0
+
+* breaking: new custom resource `opennms_translation_specs` replaces previous template
+* minor: new custom resources `opennms_scriptd_engine`, `opennms_scriptd_script` for managing scriptd
+* minor: add mechanism to install optional karaf features
+* minor: convenience recipe `kafka_producer` for enabling and configuring the optional Kafka producer feature
+* minor: default to 33.1.7-1
+
 ## 33.4.0
 
 * minor: default to 33.1.6-1
