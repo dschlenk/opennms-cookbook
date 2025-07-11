@@ -1,0 +1,24 @@
+<engine-configuration xmlns="http://xmlns.opennms.org/xsd/drools-engine">
+  <rule-set name="<%= @rule_name || 'DefaultRule' %>">
+    <engine>
+      <name><%= @engine_name || 'DefaultEngine' %></name>
+      <rules-dir>rules</rules-dir>
+    </engine>
+
+<% if @drl_files -%>
+<% Array(@drl_files).each do |drl_file| -%>
+    <rule>
+      <name><%= File.basename(drl_file, '.drl') %></name>
+      <enabled>true</enabled>
+      <file><%= File.basename(drl_file) %></file>
+    </rule>
+<% end -%>
+<% else -%>
+    <rule>
+      <name><%= @rule_name || 'DefaultRule' %></name>
+      <enabled>true</enabled>
+      <file><%= @rule_name || 'default-rule' %>.drl</file>
+    </rule>
+<% end -%>
+  </rule-set>
+</engine-configuration>
