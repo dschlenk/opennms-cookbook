@@ -132,13 +132,7 @@ module Opennms
           XML
         end
       end
-    end
-  end
-end
 
-module Opennms
-  module Cookbook
-    module Jms
       module JmsNbTemplate
         def jms_nb_resource_init
           jms_nb_resource_create unless jms_nb_resource_exist?
@@ -171,9 +165,10 @@ module Opennms
           config = Opennms::Cookbook::ConfigHelpers::Jms::JmsNbConfig.new
 
           if ::File.exist?(config_path)
+            Chef::Log.info("[JmsNbTemplate] Reading config from: #{config_path}")
             config.read!(config_path)
           else
-            Chef::Log.warn("JMS config file #{config_path} does not exist. Initializing empty config.")
+            Chef::Log.warn("[JmsNbTemplate] JMS config file #{config_path} does not exist. Initializing empty config.")
           end
 
           with_run_context :root do
@@ -202,9 +197,10 @@ module Opennms
           config = Opennms::Cookbook::ConfigHelpers::Jms::JmsNbConfig.new
 
           if ::File.exist?(config_path)
+            Chef::Log.info("[JmsNbTemplate] Reading RO config from: #{config_path}")
             config.read!(config_path)
           else
-            Chef::Log.warn("RO: JMS config file #{config_path} does not exist. Initializing empty config.")
+            Chef::Log.warn("[JmsNbTemplate] RO: JMS config file #{config_path} does not exist. Initializing empty config.")
           end
 
           with_run_context :root do
