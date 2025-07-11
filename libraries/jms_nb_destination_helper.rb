@@ -8,9 +8,11 @@ module Opennms
           def initialize
             @data = {}
             @data[:destinations] = []
+            Chef::Log.debug('[JmsNbConfig] Initialized with empty data structure.')
           end
 
           def read!(file)
+            Chef::Log.info("[JmsNbConfig] Reading JMS configuration from: #{file}")
             raise ArgumentError, "File #{file} does not exist" unless ::File.exist?(file)
 
             doc = xmldoc_from_file(file)
@@ -26,15 +28,21 @@ module Opennms
             @data[:send_as_object_message] = text_at_xpath(root, '/jms-northbounder-configuration/send-as-object-message') == 'true'
             @data[:first_occurrence_only] = text_at_xpath(root, '/jms-northbounder-configuration/first-occurrence-only') == 'true'
 
+            Chef::Log.debug("[JmsNbConfig] Parsed global config: #{@data.except(:destinations)}")
+
             root.elements.each('destination') do |dest_el|
-              @data[:destinations] << Opennms::Cookbook::Jms::JmsDestination.new(
+              destination = Opennms::Cookbook::Jms::JmsDestination.new(
                 destination: text_at_xpath(dest_el, 'jms-destination'),
                 first_occurrence_only: text_at_xpath(dest_el, 'first-occurrence-only') == 'true',
                 send_as_object_message: text_at_xpath(dest_el, 'send-as-object-message') == 'true',
                 destination_type: text_at_xpath(dest_el, 'destination-type') || 'QUEUE',
                 message_format: text_at_xpath(dest_el, 'message-format')
               )
+              Chef::Log.debug("[JmsNbConfig] Loaded destination: #{destination.inspect}")
+              @data[:destinations] << destination
             end
+
+            Chef::Log.info("[JmsNbConfig] Finished reading JMS configuration. Total destinations: #{@data[:destinations].size}")
           end
 
           def method_missing(method, *args, &block)
@@ -63,18 +71,27 @@ module Opennms
           end
 
           def find_destination_by_name(name)
-            destinations.find { |d| d.destination == name }
+            Chef::Log.debug("[JmsNbConfig] Searching for destination: #{name}")
+            found = destinations.find { |d| d.destination == name }
+            Chef::Log.debug("[JmsNbConfig] Destination found: #{found.inspect}") if found
+            found
           end
 
           def delete_destination(destination:)
+            Chef::Log.info("[JmsNbConfig] Deleting destination: #{destination}")
+            before_count = @data[:destinations].size
             @data[:destinations].reject! { |d| d.destination == destination }
+            after_count = @data[:destinations].size
+            Chef::Log.info("[JmsNbConfig] Deleted #{before_count - after_count} destination(s).")
           end
 
           private
 
           def text_at_xpath(root, path)
             el = root.elements[path]
-            el&.text
+            value = el&.text
+            Chef::Log.debug("[JmsNbConfig] Extracted text at '#{path}': #{value.inspect}")
+            value
           end
         end
       end
