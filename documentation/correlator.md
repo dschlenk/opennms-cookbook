@@ -29,7 +29,7 @@ Manages drools correlation engine configs in `$OPENNMS_HOME/etc/drools-engine.d`
 See the following test recipes:
 
 * [correlator.rb](../test/fixtures/cookbooks/opennms_resource_tests/recipes/correlator.rb)
-* [correlator_\edit.rb](../test/fixtures/cookbooks/opennms_resource_tests/recipes/correlator_edit.rb)
+* [correlator\_edit.rb](../test/fixtures/cookbooks/opennms_resource_tests/recipes/correlator_edit.rb)
 
 ## Additional Notes
 
