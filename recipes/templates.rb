@@ -251,27 +251,6 @@ template "#{onms_home}/etc/jcifs.properties" do
   action node['opennms']['templates'] ? :create : :nothing
 end
 
-template "#{onms_home}/etc/jms-northbounder-configuration.xml" do
-  source 'jms-northbounder-configuration.xml.erb'
-  cookbook node['opennms']['jms_nbi']['cookbook']
-  owner node['opennms']['username']
-  group node['opennms']['groupname']
-  variables(
-    enabled: node['opennms']['jms_nbi']['enabled'],
-    nagles_delay: node['opennms']['jms_nbi']['nagles_delay'],
-    batch_size: node['opennms']['jms_nbi']['batch_size'],
-    queue_size: node['opennms']['jms_nbi']['queue_size'],
-    message_format: node['opennms']['jms_nbi']['message_format'],
-    jms_destination: node['opennms']['jms_nbi']['jms_destination'],
-    uei: node['opennms']['jms_nbi']['uei'],
-    send_as_object_message: node['opennms']['jms_nbi']['send_as_object_message'],
-    first_occurrence_only: node['opennms']['jms_nbi']['first_occurrence_only']
-  )
-  notifies :restart, 'service[opennms]'
-  only_if { node['opennms']['plugin']['addl'].include?('opennms-plugin-northbounder-jms') }
-  action node['opennms']['templates'] ? :create : :nothing
-end
-
 template "#{onms_home}/etc/microblog-configuration.xml" do
   cookbook node['opennms']['microblog']['cookbook']
   source 'microblog-configuration.xml.erb'

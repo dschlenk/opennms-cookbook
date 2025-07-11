@@ -105,7 +105,7 @@ module Opennms
       class JmsDestination
         attr_accessor :destination, :first_occurence_only, :send_as_object_message, :destination_type, :message_format
 
-        def initialize(destination:, first_occurence_only:, send_as_object_message:, destination_type:, message_format:)
+        def initialize(destination:, first_occurence_only: nil, send_as_object_message: nil, destination_type: nil, message_format: nil)
           @destination = destination
           @first_occurence_only = first_occurence_only
           @send_as_object_message = send_as_object_message
@@ -114,22 +114,10 @@ module Opennms
         end
 
         def update(first_occurence_only:, send_as_object_message:, destination_type:, message_format:)
-          @first_occurence_only = first_occurence_only
-          @send_as_object_message = send_as_object_message
-          @destination_type = destination_type
-          @message_format = message_format
-        end
-
-        def to_xml
-          <<~XML
-            <destination>
-              <first-occurrence-only>#{@first_occurence_only}</first-occurrence-only>
-              <send-as-object-message>#{@send_as_object_message}</send-as-object-message>
-              <destination-type>#{@destination_type}</destination-type>
-              <jms-destination>#{@destination}</jms-destination>
-              <message-format>#{@message_format}</message-format>
-            </destination>
-          XML
+          @first_occurence_only = first_occurence_only unless first_occurence_only.nil?
+          @send_as_object_message = send_as_object_message unless send_as_object_message.nil?
+          @destination_type = destination_type unless destination_type.nil?
+          @message_format = message_format unless message_format.nil?
         end
       end
     end
