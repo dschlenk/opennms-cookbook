@@ -8,14 +8,13 @@ property :destination_type, String, equal_to: %w(QUEUE TOPIC)
 property :message_format, String
 
 load_current_value do |new_resource|
-
   res = jms_nb_resource
   if res.nil?
-    Chef::Log.warn("no existing resource, creating RO")
+    Chef::Log.warn('no existing resource, creating RO')
     ro_jms_nb_resource_init
     res = ro_jms_nb_resource
   else
-    Chef::Log.warn("using RW resource")
+    Chef::Log.warn('using RW resource')
   end
 
   if res && res.variables[:config]
@@ -27,10 +26,10 @@ load_current_value do |new_resource|
   dest = config.find_destination_by_name(new_resource.destination)
   current_value_does_not_exist! if dest.nil?
   unless dest.first_occurence_only.nil?
-    first_occurence_only "true".eql?(dest.first_occurence_only)
+    first_occurence_only 'true'.eql?(dest.first_occurence_only)
   end
   unless dest.send_as_object_message.nil?
-    send_as_object_message "true".eql?(dest.send_as_object_message)
+    send_as_object_message 'true'.eql?(dest.send_as_object_message)
   end
   unless dest.destination_type.nil?
     destination_type dest.destination_type
@@ -39,7 +38,6 @@ load_current_value do |new_resource|
     message_format dest.message_format
   end
 end
-
 action_class do
   include Opennms::XmlHelper
   include Opennms::Cookbook::JmsNbTemplate
@@ -63,11 +61,11 @@ action :create do
 
   converge_if_changed do
     config = jms_config
-    Chef::Log.warn("before creating #{new_resource.name}, config is #{config.to_s}")
+    Chef::Log.warn("before creating #{new_resource.name}, config is #{config}")
     dest = config.find_destination_by_name(new_resource.destination)
 
     if dest.nil?
-      Chef::Log.warn("no dest found, adding")
+      Chef::Log.warn('no dest found, adding')
       config.destinations.push(
         Opennms::Cookbook::Jms::JmsDestination.new(
           destination: new_resource.destination,
@@ -78,7 +76,7 @@ action :create do
         )
       )
     else
-      Chef::Log.warn("dest found, updating")
+      Chef::Log.warn('dest found, updating')
       dest.update(
         first_occurence_only: new_resource.first_occurence_only,
         send_as_object_message: new_resource.send_as_object_message,
