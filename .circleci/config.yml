@@ -26,7 +26,7 @@ jobs:
           command: cookstyle
       - run:
           name: kitchen
-          command: kitchen verify correlation
+          command: kitchen verify default
 workflows:
   version: 2
   untagged-build:
