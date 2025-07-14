@@ -28,7 +28,7 @@ default['opennms']['yum_gpg_keys'] = [
 default['opennms']['start_opts'] = ''
 # set to '' if you want to re-enable OOTB behavior (but you should not do this if using any of the opennms resources)
 default['opennms']['timeout_start_sec'] = '10min'
-default['opennms']['version'] = '33.1.7-1'
+default['opennms']['version'] = '33.1.8-1'
 default['java']['version'] = '17'
 default['opennms']['jre_path'] = nil
 default['opennms']['allow_downgrade'] = false
