@@ -26,14 +26,14 @@ module Opennms
             @data[:jms_destination] = text_at_xpath(root, '/jms-northbounder-configuration/jms-destination')
             @data[:uei] = text_at_xpath(root, '/jms-northbounder-configuration/uei')
             @data[:send_as_object_message] = text_at_xpath(root, '/jms-northbounder-configuration/send-as-object-message') == 'true'
-            @data[:first_occurence_only] = text_at_xpath(root, '/jms-northbounder-configuration/first-occurrence-only') == 'true'
+            @data[:first_occurrence_only] = text_at_xpath(root, '/jms-northbounder-configuration/first-occurrence-only') == 'true'
 
             Chef::Log.debug("[JmsNbConfig] Parsed global config: #{@data.except(:destinations)}")
 
             root.elements.each('destination') do |dest_el|
               destination = Opennms::Cookbook::Jms::JmsDestination.new(
                 destination: text_at_xpath(dest_el, 'jms-destination'),
-                first_occurence_only: text_at_xpath(dest_el, 'first-occurrence-only') == 'true',
+                first_occurrence_only: text_at_xpath(dest_el, 'first-occurrence-only') == 'true',
                 send_as_object_message: text_at_xpath(dest_el, 'send-as-object-message') == 'true',
                 destination_type: text_at_xpath(dest_el, 'destination-type') || 'QUEUE',
                 message_format: text_at_xpath(dest_el, 'message-format')
@@ -103,18 +103,18 @@ module Opennms
   module Cookbook
     module Jms
       class JmsDestination
-        attr_accessor :destination, :first_occurence_only, :send_as_object_message, :destination_type, :message_format
+        attr_accessor :destination, :first_occurrence_only, :send_as_object_message, :destination_type, :message_format
 
-        def initialize(destination:, first_occurence_only: nil, send_as_object_message: nil, destination_type: nil, message_format: nil)
+        def initialize(destination:, first_occurrence_only: nil, send_as_object_message: nil, destination_type: nil, message_format: nil)
           @destination = destination
-          @first_occurence_only = first_occurence_only
+          @first_occurrence_only = first_occurence_only
           @send_as_object_message = send_as_object_message
           @destination_type = destination_type
           @message_format = message_format
         end
 
         def update(first_occurence_only:, send_as_object_message:, destination_type:, message_format:)
-          @first_occurence_only = first_occurence_only unless first_occurence_only.nil?
+          @first_occurrence_only = first_occurence_only unless first_occurence_only.nil?
           @send_as_object_message = send_as_object_message unless send_as_object_message.nil?
           @destination_type = destination_type unless destination_type.nil?
           @message_format = message_format unless message_format.nil?
