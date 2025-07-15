@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'rexml/document'
+require 'nokogiri'
 
 class JmsNbDestination < Inspec.resource(1)
   name 'jms_nb_destination'
@@ -46,20 +46,27 @@ class JmsNbDestination < Inspec.resource(1)
     @properties['message-format']
   end
 
+  def to_s
+    "JMS Destination #{@destination_name}"
+  end
+
   private
 
   def parse_config
     content = inspec.file(@file_path).content
-    doc = REXML::Document.new(content)
-    doc.elements.each('jms-northbounder-config/destination') do |dest|
-      name = dest.elements['jms-destination']&.text
+    puts "[DEBUG] Parsing JMS config from #{@file_path}"
+    puts content
+
+    doc = Nokogiri::XML(content)
+    doc.xpath('//destination').each do |dest|
+      name = dest.at_xpath('jms-destination')&.text
       next unless name == @destination_name
 
       @exists = true
-      @properties['first-occurrence-only'] = dest.elements['first-occurrence-only']&.text == 'true'
-      @properties['send-as-object-message'] = dest.elements['send-as-object-message']&.text == 'true'
-      @properties['destination-type'] = dest.elements['destination-type']&.text || 'QUEUE'
-      @properties['message-format'] = dest.elements['message-format']&.text
+      @properties['first-occurrence-only'] = dest.at_xpath('first-occurrence-only')&.text == 'true'
+      @properties['send-as-object-message'] = dest.at_xpath('send-as-object-message')&.text == 'true'
+      @properties['destination-type'] = dest.at_xpath('destination-type')&.text || 'QUEUE'
+      @properties['message-format'] = dest.at_xpath('message-format')&.text
     end
   end
 end
