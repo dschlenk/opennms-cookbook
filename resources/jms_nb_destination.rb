@@ -2,8 +2,8 @@ include Opennms::XmlHelper
 include Opennms::Cookbook::JmsNbTemplate
 
 property :destination, String, name_property: true
-property :first_occurrence_only, [true, false], default: false
-property :send_as_object_message, [true, false], default: false
+property :first_occurrence_only, [true, false]
+property :send_as_object_message, [true, false]
 property :destination_type, String, default: 'QUEUE', equal_to: %w(QUEUE TOPIC)
 property :message_format, String
 
