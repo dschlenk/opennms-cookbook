@@ -25,8 +25,8 @@ load_current_value do |new_resource|
 
   dest = config.find_destination_by_name(new_resource.destination)
   current_value_does_not_exist! if dest.nil?
-  unless dest.first_occurence_only.nil?
-    first_occurence_only 'true'.eql?(dest.first_occurence_only)
+  unless dest.first_occurrence_only.nil?
+    first_occurrence_only 'true'.eql?(dest.first_occurrence_only)
   end
   unless dest.send_as_object_message.nil?
     send_as_object_message 'true'.eql?(dest.send_as_object_message)
@@ -69,7 +69,7 @@ action :create do
       config.destinations.push(
         Opennms::Cookbook::Jms::JmsDestination.new(
           destination: new_resource.destination,
-          first_occurence_only: new_resource.first_occurence_only,
+          first_occurrence_only: new_resource.first_occurrence_only,
           send_as_object_message: new_resource.send_as_object_message,
           destination_type: new_resource.destination_type,
           message_format: new_resource.message_format
@@ -78,7 +78,7 @@ action :create do
     else
       Chef::Log.warn('dest found, updating')
       dest.update(
-        first_occurence_only: new_resource.first_occurence_only,
+        first_occurrence_only: new_resource.first_occurrence_only,
         send_as_object_message: new_resource.send_as_object_message,
         destination_type: new_resource.destination_type,
         message_format: new_resource.message_format
@@ -108,7 +108,7 @@ action :update do
       raise Chef::Exceptions::ResourceNotFound, "No JMS destination named #{new_resource.destination} found to update. Use action :create or :create_if_missing to create it."
     else
       dest.update(
-        first_occurence_only: new_resource.first_occurence_only,
+        first_occurrence_only: new_resource.first_occurrence_only,
         send_as_object_message: new_resource.send_as_object_message,
         destination_type: new_resource.destination_type,
         message_format: new_resource.message_format
