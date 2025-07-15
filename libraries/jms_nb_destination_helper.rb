@@ -107,14 +107,14 @@ module Opennms
 
         def initialize(destination:, first_occurrence_only: nil, send_as_object_message: nil, destination_type: nil, message_format: nil)
           @destination = destination
-          @first_occurrence_only = first_occurence_only
+          @first_occurrence_only = first_occurrence_only
           @send_as_object_message = send_as_object_message
           @destination_type = destination_type
           @message_format = message_format
         end
 
         def update(first_occurrence_only:, send_as_object_message:, destination_type:, message_format:)
-          @first_occurrence_only = first_occurence_only unless first_occurence_only.nil?
+          @first_occurrence_only = first_occurrence_only unless first_occurrence_only.nil?
           @send_as_object_message = send_as_object_message unless send_as_object_message.nil?
           @destination_type = destination_type unless destination_type.nil?
           @message_format = message_format unless message_format.nil?
