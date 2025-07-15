@@ -35,9 +35,10 @@ module Opennms
                 destination: text_at_xpath(dest_el, 'jms-destination'),
                 first_occurrence_only: text_at_xpath(dest_el, 'first-occurrence-only') == 'true',
                 send_as_object_message: text_at_xpath(dest_el, 'send-as-object-message') == 'true',
-                destination_type: text_at_xpath(dest_el, 'destination-type') || 'QUEUE',
+                destination_type: text_at_xpath(dest_el, 'destination-type'),  # Removed default
                 message_format: text_at_xpath(dest_el, 'message-format')
               )
+
               Chef::Log.debug("[JmsNbConfig] Loaded destination: #{destination.inspect}")
               @data[:destinations] << destination
             end
