@@ -17,8 +17,8 @@
 <% end -%>
 <% @config.destinations.each do |d| -%>
    <destination>
-  <% unless d.first_occurence_only.nil? -%>
-      <first-occurence-only><%= d.first_occurence_only.to_s.encode(:xml => :text) %></first-occurence-only>
+  <% unless d.first_occurrence_only.nil? -%>
+      <first-occurrence-only><%= d.first_occurrence_only.to_s.encode(:xml => :text) %></first-occurrence-only>
   <% end -%>
   <% unless d.send_as_object_message.nil? -%>
       <send-as-object-message><%= d.send_as_object_message.to_s.encode(:xml => :text) %></send-as-object-message>
@@ -34,7 +34,7 @@
 <% end -%>
    <!-- More than one destination can be specified 
    <destination>
-      <first-occurence-only>false</first-occurence-only>
+      <first-occurrence-only>false</first-occurrence-only>
       <send-as-object-message>false</send-as-object-message>
       <jms-destination>AllAlarmQueue</jms-destination>
    </destination> -->
