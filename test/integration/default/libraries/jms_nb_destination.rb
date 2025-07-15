@@ -10,7 +10,7 @@ class JmsNbDestination < Inspec.resource(1)
   example <<~EXAMPLE
     describe jms_nb_destination('SingleAlarmQueue') do
       it { should exist }
-      its('first_occurence_only') { should eq true }
+      its('first_occurrence_only') { should eq true }
       its('send_as_object_message') { should eq false }
       its('destination_type') { should eq 'QUEUE' }
       its('message_format') { should eq 'ALARM ID:${alarmId} NODE:${nodeLabel}; ${logMsg}' }
@@ -30,8 +30,8 @@ class JmsNbDestination < Inspec.resource(1)
     @exists
   end
 
-  def first_occurence_only
-    @properties['first-occurence-only']
+  def first_occurrence_only
+    @properties['first-occurrence-only']
   end
 
   def send_as_object_message
@@ -56,10 +56,10 @@ class JmsNbDestination < Inspec.resource(1)
       next unless name == @destination_name
 
       @exists = true
-      @properties['first-occurence-only'] = dest.elements['first-occurence-only']&.text == 'true'
+      @properties['first-occurrence-only'] = dest.elements['first-occurrence-only']&.text == 'true'
       @properties['send-as-object-message'] = dest.elements['send-as-object-message']&.text == 'true'
-      @properties['destination-type'] = dest.attributes['type'] || 'QUEUE'
-      @properties['message-format'] = dest.elements['jms-destination']&.text
+      @properties['destination-type'] = dest.elements['destination-type']&.text || 'QUEUE'
+      @properties['message-format'] = dest.elements['message-format']&.text
     end
   end
 end
