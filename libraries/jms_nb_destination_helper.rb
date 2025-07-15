@@ -18,15 +18,15 @@ module Opennms
             doc = xmldoc_from_file(file)
             root = doc.root
 
-            @data[:enabled] = text_at_xpath(root, '/jms-northbounder-configuration/enabled')
-            @data[:nagles_delay] = text_at_xpath(root, '/jms-northbounder-configuration/nagles-delay')
-            @data[:batch_size] = text_at_xpath(root, '/jms-northbounder-configuration/batch-size')
-            @data[:queue_size] = text_at_xpath(root, '/jms-northbounder-configuration/queue-size')
-            @data[:message_format] = text_at_xpath(root, '/jms-northbounder-configuration/message-format')
-            @data[:jms_destination] = text_at_xpath(root, '/jms-northbounder-configuration/jms-destination')
-            @data[:uei] = text_at_xpath(root, '/jms-northbounder-configuration/uei')
-            @data[:send_as_object_message] = text_at_xpath(root, '/jms-northbounder-configuration/send-as-object-message') == 'true'
-            @data[:first_occurrence_only] = text_at_xpath(root, '/jms-northbounder-configuration/first-occurrence-only') == 'true'
+            @data[:enabled] = text_at_xpath(root, '/jms-northbounder-config/enabled')
+            @data[:nagles_delay] = text_at_xpath(root, '/jms-northbounder-config/nagles-delay')
+            @data[:batch_size] = text_at_xpath(root, '/jms-northbounder-config/batch-size')
+            @data[:queue_size] = text_at_xpath(root, '/jms-northbounder-config/queue-size')
+            @data[:message_format] = text_at_xpath(root, '/jms-northbounder-config/message-format')
+            @data[:jms_destination] = text_at_xpath(root, '/jms-northbounder-config/jms-destination')
+            @data[:uei] = text_at_xpath(root, '/jms-northbounder-config/uei')
+            @data[:send_as_object_message] = text_at_xpath(root, '/jms-northbounder-config/send-as-object-message') == 'true'
+            @data[:first_occurrence_only] = text_at_xpath(root, '/jms-northbounder-config/first-occurrence-only') == 'true'
 
             Chef::Log.debug("[JmsNbConfig] Parsed global config: #{@data.except(:destinations)}")
 
