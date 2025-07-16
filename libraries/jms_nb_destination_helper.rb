@@ -207,7 +207,7 @@ module Opennms
             mode '0664'
             variables(config: config)
             action :nothing
-            delayed_action :nothing
+            delayed_action :create
           end
         end
       end
