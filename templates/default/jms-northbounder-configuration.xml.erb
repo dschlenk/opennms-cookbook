@@ -1,47 +1,46 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <jms-northbounder-config>
 <% unless @config.enabled.nil? -%>
-  <enabled><%= @config.enabled.to_s %></enabled>
+<enabled><%= @config.enabled.to_s.encode(:xml => :text) %></enabled>
 <% end -%>
-
+ 
 <% unless @config.nagles_delay.nil? -%>
-  <nagles-delay><%= @config.nagles_delay.to_s %></nagles-delay>
+<nagles-delay><%= @config.nagles_delay.to_s.encode(:xml => :text) %></nagles-delay>
 <% end -%>
-
+ 
 <% unless @config.batch_size.nil? -%>
-  <batch-size><%= @config.batch_size.to_s %></batch-size>
+<batch-size><%= @config.batch_size.to_s.encode(:xml => :text) %></batch-size>
 <% end -%>
-
+ 
 <% unless @config.queue_size.nil? -%>
-  <queue-size><%= @config.queue_size.to_s %></queue-size>
+<queue-size><%= @config.queue_size.to_s.encode(:xml => :text) %></queue-size>
 <% end -%>
-
+ 
 <% unless @config.message_format.nil? -%>
-  <message-format><%= @config.message_format %></message-format>
+<message-format><%= @config.message_format.encode(:xml => :text) %></message-format>
 <% end -%>
-
+ 
 <% @config.destinations.each do |d| -%>
-  <destination>
-    <% unless d.first_occurrence_only.nil? -%>
-      <first-occurrence-only><%= d.first_occurrence_only.to_s %></first-occurrence-only>
-    <% end -%>
-    <% unless d.send_as_object_message.nil? -%>
-      <send-as-object-message><%= d.send_as_object_message.to_s %></send-as-object-message>
-    <% end -%>
-    <% unless d.destination_type.nil? -%>
-      <destination-type><%= d.destination_type %></destination-type>
-    <% end -%>
-    <jms-destination><%= d.destination %></jms-destination>
-    <% unless d.message_format.nil? -%>
-      <message-format><%= d.message_format %></message-format>
-    <% end -%>
-  </destination>
+<destination>
+<% unless d.first_occurrence_only.nil? -%>
+<first-occurrence-only><%= d.first_occurrence_only.to_s.encode(:xml => :text) %></first-occurrence-only>
 <% end -%>
-
-  <!-- More than one destination can be specified
-  <destination>
-    <first-occurrence-only>false</first-occurrence-only>
-    <send-as-object-message>false</send-as-object-message>
-    <jms-destination>AllAlarmQueue</jms-destination>
-  </destination> -->
+<% unless d.send_as_object_message.nil? -%>
+<send-as-object-message><%= d.send_as_object_message.to_s.encode(:xml => :text) %></send-as-object-message>
+<% end -%>
+<% unless d.destination_type.nil? -%>
+<destination-type><%= d.destination_type.encode(:xml => :text) %></destination-type>
+<% end -%>
+<jms-destination><%= d.destination.encode(:xml => :text) %></jms-destination>
+<% unless d.message_format.nil? -%>
+<message-format><%= d.message_format.encode(:xml => :text) %></message-format>
+<% end -%>
+</destination>
+<% end -%>
+<!-- More than one destination can be specified 
+<destination>
+<first-occurrence-only>false</first-occurrence-only>
+<send-as-object-message>false</send-as-object-message>
+<jms-destination>AllAlarmQueue</jms-destination>
+</destination> -->
 </jms-northbounder-config>
