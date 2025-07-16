@@ -1,22 +1,26 @@
 # frozen_string_literal: true
 node.default['opennms']['plugin']['addl'] << 'opennms-plugin-northbounder-jms'
 
-opennms_jms_nb_destination 'minimal-queue' do
-  destination 'minimal-queue'
+opennms_jms_nb_destination 'foo' do
+  destination 'foo'
+  first_occurrence_only true
+  send_as_object_message false
+  destination_type 'QUEUE'
+  message_format 'ALARM ID:${alarmId} NODE:${nodeLabel}; ${logMsg}'
   action :create
 end
 
-opennms_jms_nb_destination 'full-topic' do
-  destination 'full-topic'
-  first_occurrence_only true
+opennms_jms_nb_destination 'bar' do
+  destination 'bar'
+  first_occurrence_only false
   send_as_object_message true
   destination_type 'TOPIC'
   message_format 'ALARM: ${logMsg}'
   action :create
 end
 
-opennms_jms_nb_destination 'another-queue' do
-  destination 'another-queue'
+opennms_jms_nb_destination 'baz' do
+  destination 'baz'
   first_occurrence_only false
   send_as_object_message false
   destination_type 'QUEUE'
@@ -24,16 +28,7 @@ opennms_jms_nb_destination 'another-queue' do
   action :create
 end
 
-opennms_jms_nb_destination 'create-if-missing-destination' do
-  destination 'create-if-missing-destination'
-  first_occurrence_only true
-  send_as_object_message false
-  destination_type 'QUEUE'
-  message_format 'ALARM: ${logMsg}'
-  action :create_if_missing
-end
-
-opennms_jms_nb_destination 'delete-this-destination' do
-  destination 'delete-this-destination'
+opennms_jms_nb_destination 'delete' do
+  destination 'delete'
   action :delete
 end
