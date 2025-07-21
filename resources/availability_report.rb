@@ -1,6 +1,8 @@
 include Opennms::XmlHelper
 include Opennms::Cookbook::ConfigHelpers::AvailabilityReportTemplate
 
+provides :opennms_availability_report
+
 property :report_id, String, name_property: true
 property :type, String, required: true, equal_to: %w(calendar classic)
 
@@ -33,14 +35,14 @@ property :parameters, Hash, default: {}
 default_action :create
 
 load_current_value do |desired|
-  edit_xml_file ::File.join(node['opennms']['conf']['home'], 'etc', 'availability-reports.xml') do
-    xpath '/opennms-reports'
-    action :edit
-    block do |doc|
-      report = doc.at_xpath("//report[@id='#{desired.report_id}']")
-      current_value_does_not_exist! if report.nil?
-      type report['type']
-    end
+  require 'rexml/document'
+  file_path = ::File.join(node['opennms']['conf']['home'], 'etc', 'availability-reports.xml')
+  if ::File.exist?(file_path)
+    file = ::File.read(file_path)
+    doc = REXML::Document.new(file)
+    report = REXML::XPath.first(doc, "//report[@id='#{desired.report_id}']")
+    current_value_does_not_exist! if report.nil?
+    type report.attributes['type']
   end
 end
 
@@ -83,58 +85,61 @@ action_class do
 
     Array(params['string_parms']).each do |sp|
       string_elem = doc.create_element('string-parm')
-      string_elem['name'] = sp['name']
-      string_elem['display-name'] = sp['display_name']
-      string_elem['input-type'] = sp['input_type']
-      string_elem['default'] = sp['default'] if sp['default']
-      param_elem.add_child(string_elem)
+      string_elem.add_attributes(sp.transform_keys(&:to_s))
+      param_elem.add_element(string_elem)
     end
 
     Array(params['date_parms']).each do |dp|
       date_elem = doc.create_element('date-parm')
-      date_elem['name'] = dp['name']
-      date_elem['display-name'] = dp['display_name']
-      date_elem['use-absolute-date'] = dp['use_absolute_date'].to_s if dp.key?('use_absolute_date')
-      date_elem.add_child(doc.create_element('default-interval', dp['default_interval']))
-      date_elem.add_child(doc.create_element('default-count', dp['default_count'].to_s))
+      date_elem.add_attributes(
+        'name' => dp['name'],
+        'display-name' => dp['display_name'],
+        'use-absolute-date' => dp['use_absolute_date'].to_s
+      )
+      date_elem.add_element(doc.create_element('default-interval', dp['default_interval']))
+      date_elem.add_element(doc.create_element('default-count', dp['default_count'].to_s))
       if dp['default_time']
         time_elem = doc.create_element('default-time')
-        time_elem.add_child(doc.create_element('hours', dp['default_time']['hour'].to_s))
-        time_elem.add_child(doc.create_element('minutes', dp['default_time']['minute'].to_s))
-        date_elem.add_child(time_elem)
+        time_elem.add_element(doc.create_element('hours', dp['default_time']['hour'].to_s))
+        time_elem.add_element(doc.create_element('minutes', dp['default_time']['minute'].to_s))
+        date_elem.add_element(time_elem)
       end
-      param_elem.add_child(date_elem)
+      param_elem.add_element(date_elem)
     end
 
     Array(params['int_parms']).each do |ip|
       int_elem = doc.create_element('int-parm')
-      int_elem['name'] = ip['name']
-      int_elem['display-name'] = ip['display_name']
-      int_elem['input-type'] = ip['input_type']
-      int_elem['default'] = ip['default'].to_s if ip.key?('default')
-      param_elem.add_child(int_elem)
+      int_elem.add_attributes(ip.transform_keys(&:to_s))
+      param_elem.add_element(int_elem)
     end
 
-    report_elem.add_child(param_elem)
+    report_elem.add_element(param_elem)
   end
 end
 
 action :create do
   converge_if_changed do
-    edit_xml_file config_file do
-      xpath '/opennms-reports'
-      action :edit
-      block do |doc|
-        doc.xpath("//report[@id='#{new_resource.report_id}']").each(&:remove)
+    require 'rexml/document'
 
-        report_elem = doc.create_element('report')
-        report_elem['id'] = new_resource.report_id
-        report_elem['type'] = new_resource.type
+    file_path = config_file
+    raise "File not found: #{file_path}" unless ::File.exist?(file_path)
 
-        build_parameters_xml(doc, report_elem)
+    file = ::File.read(file_path)
+    doc = REXML::Document.new(file)
 
-        doc.root.add_child(report_elem)
-      end
+    doc.elements.each("//report[@id='#{new_resource.report_id}']") { |el| el.parent.delete(el) }
+
+    report_elem = doc.create_element('report')
+    report_elem.add_attributes('id' => new_resource.report_id, 'type' => new_resource.type)
+
+    build_parameters_xml(doc, report_elem)
+
+    doc.root.add_element(report_elem)
+
+    File.open(file_path, 'w') do |f|
+      formatter = REXML::Formatters::Pretty.new
+      formatter.compact = true
+      formatter.write(doc, f)
     end
   end
 
@@ -144,24 +149,33 @@ action :create do
 end
 
 action :create_if_missing do
+  require 'rexml/document'
+
+  file_path = config_file
   found = false
-  edit_xml_file config_file do
-    xpath '/opennms-reports'
-    action :edit
-    block do |doc|
-      found = !doc.at_xpath("//report[@id='#{new_resource.report_id}']").nil?
-    end
+  if ::File.exist?(file_path)
+    file = ::File.read(file_path)
+    doc = REXML::Document.new(file)
+    found = !REXML::XPath.first(doc, "//report[@id='#{new_resource.report_id}']").nil?
   end
   run_action(:create) unless found
 end
 
 action :delete do
-  edit_xml_file config_file do
-    xpath '/opennms-reports'
-    action :edit
-    block do |doc|
-      node = doc.at_xpath("//report[@id='#{new_resource.report_id}']")
-      node.remove if node
-    end
+  require 'rexml/document'
+
+  file_path = config_file
+  raise "File not found: #{file_path}" unless ::File.exist?(file_path)
+
+  file = ::File.read(file_path)
+  doc = REXML::Document.new(file)
+
+  node = REXML::XPath.first(doc, "//report[@id='#{new_resource.report_id}']")
+  node.parent.delete(node) if node
+
+  File.open(file_path, 'w') do |f|
+    formatter = REXML::Formatters::Pretty.new
+    formatter.compact = true
+    formatter.write(doc, f)
   end
 end
