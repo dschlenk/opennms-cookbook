@@ -34,7 +34,7 @@ default_action :create
 
 load_current_value do |desired|
   edit_xml_file ::File.join(node['opennms']['conf']['home'], 'etc', 'availability-reports.xml') do
-    xpath '/reports'
+    xpath '/opennms-reports'
     action :edit
     block do |doc|
       report = doc.at_xpath("//report[@id='#{desired.report_id}']")
@@ -59,7 +59,9 @@ action_class do
     variables = new_resource.send("#{type}_template_source_variables")
     props = new_resource.send("#{type}_template_source_properties")
 
-    target_path = ::File.join(node['opennms']['conf']['home'], 'etc', template) if template
+    return if template.nil?
+
+    target_path = ::File.join(node['opennms']['conf']['home'], 'etc', template)
 
     if source
       send(source_type, target_path) do
@@ -67,21 +69,20 @@ action_class do
         variables variables if source_type == 'template'
         props.each { |k, v| send(k, v) }
       end
-    elsif template && !::File.exist?(target_path)
-      raise "#{type}_template file #{template} not found and no source provided"
+    elsif !::File.exist?(target_path)
+      raise "#{type}_template file '#{template}' not found in #{target_path} and no source provided"
     end
   end
 
   def build_parameters_xml(doc, report_elem)
     return unless new_resource.parameters
-
     params = new_resource.parameters
     return if params.empty?
 
     param_elem = doc.create_element('parameters')
 
     Array(params['string_parms']).each do |sp|
-      string_elem = doc.create_element('string-parameter')
+      string_elem = doc.create_element('string-parm')
       string_elem['name'] = sp['name']
       string_elem['display-name'] = sp['display_name']
       string_elem['input-type'] = sp['input_type']
@@ -90,23 +91,23 @@ action_class do
     end
 
     Array(params['date_parms']).each do |dp|
-      date_elem = doc.create_element('date-parameter')
+      date_elem = doc.create_element('date-parm')
       date_elem['name'] = dp['name']
       date_elem['display-name'] = dp['display_name']
       date_elem['use-absolute-date'] = dp['use_absolute_date'].to_s if dp.key?('use_absolute_date')
-      date_elem['default-interval'] = dp['default_interval']
-      date_elem['default-count'] = dp['default_count'].to_s
+      date_elem.add_child(doc.create_element('default-interval', dp['default_interval']))
+      date_elem.add_child(doc.create_element('default-count', dp['default_count'].to_s))
       if dp['default_time']
         time_elem = doc.create_element('default-time')
-        time_elem['hour'] = dp['default_time']['hour'].to_s
-        time_elem['minute'] = dp['default_time']['minute'].to_s
+        time_elem.add_child(doc.create_element('hours', dp['default_time']['hour'].to_s))
+        time_elem.add_child(doc.create_element('minutes', dp['default_time']['minute'].to_s))
         date_elem.add_child(time_elem)
       end
       param_elem.add_child(date_elem)
     end
 
     Array(params['int_parms']).each do |ip|
-      int_elem = doc.create_element('int-parameter')
+      int_elem = doc.create_element('int-parm')
       int_elem['name'] = ip['name']
       int_elem['display-name'] = ip['display_name']
       int_elem['input-type'] = ip['input_type']
@@ -121,7 +122,7 @@ end
 action :create do
   converge_if_changed do
     edit_xml_file config_file do
-      xpath '/reports'
+      xpath '/opennms-reports'
       action :edit
       block do |doc|
         doc.xpath("//report[@id='#{new_resource.report_id}']").each(&:remove)
@@ -145,7 +146,7 @@ end
 action :create_if_missing do
   found = false
   edit_xml_file config_file do
-    xpath '/reports'
+    xpath '/opennms-reports'
     action :edit
     block do |doc|
       found = !doc.at_xpath("//report[@id='#{new_resource.report_id}']").nil?
@@ -156,7 +157,7 @@ end
 
 action :delete do
   edit_xml_file config_file do
-    xpath '/reports'
+    xpath '/opennms-reports'
     action :edit
     block do |doc|
       node = doc.at_xpath("//report[@id='#{new_resource.report_id}']")
