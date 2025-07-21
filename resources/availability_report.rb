@@ -76,40 +76,40 @@ action_class do
     end
   end
 
-  def build_parameters_xml(doc, report_elem)
+  def build_parameters_xml(report_elem)
     return unless new_resource.parameters
     params = new_resource.parameters
     return if params.empty?
 
-    param_elem = doc.create_element('parameters')
+    param_elem = REXML::Element.new('parameters')
 
     Array(params['string_parms']).each do |sp|
-      string_elem = doc.create_element('string-parm')
-      string_elem.add_attributes(sp.transform_keys(&:to_s))
+      string_elem = REXML::Element.new('string-parameter')
+      sp.each { |k, v| string_elem.add_attribute(k.to_s.tr('_', '-'), v.to_s) }
       param_elem.add_element(string_elem)
     end
 
     Array(params['date_parms']).each do |dp|
-      date_elem = doc.create_element('date-parm')
-      date_elem.add_attributes(
-        'name' => dp['name'],
-        'display-name' => dp['display_name'],
-        'use-absolute-date' => dp['use_absolute_date'].to_s
-      )
-      date_elem.add_element(doc.create_element('default-interval', dp['default_interval']))
-      date_elem.add_element(doc.create_element('default-count', dp['default_count'].to_s))
+      date_elem = REXML::Element.new('date-parameter')
+      date_elem.add_attribute('name', dp['name'])
+      date_elem.add_attribute('display-name', dp['display_name'])
+      date_elem.add_attribute('use-absolute-date', dp['use_absolute_date'].to_s)
+      date_elem.add_attribute('default-interval', dp['default_interval'])
+      date_elem.add_attribute('default-count', dp['default_count'].to_s)
+
       if dp['default_time']
-        time_elem = doc.create_element('default-time')
-        time_elem.add_element(doc.create_element('hours', dp['default_time']['hour'].to_s))
-        time_elem.add_element(doc.create_element('minutes', dp['default_time']['minute'].to_s))
+        time_elem = REXML::Element.new('default-time')
+        time_elem.add_attribute('hour', dp['default_time']['hour'].to_s)
+        time_elem.add_attribute('minute', dp['default_time']['minute'].to_s)
         date_elem.add_element(time_elem)
       end
+
       param_elem.add_element(date_elem)
     end
 
     Array(params['int_parms']).each do |ip|
-      int_elem = doc.create_element('int-parm')
-      int_elem.add_attributes(ip.transform_keys(&:to_s))
+      int_elem = REXML::Element.new('int-parameter')
+      ip.each { |k, v| int_elem.add_attribute(k.to_s.tr('_', '-'), v.to_s) }
       param_elem.add_element(int_elem)
     end
 
@@ -129,12 +129,15 @@ action :create do
 
     doc.elements.each("//report[@id='#{new_resource.report_id}']") { |el| el.parent.delete(el) }
 
-    report_elem = doc.create_element('report')
-    report_elem.add_attributes('id' => new_resource.report_id, 'type' => new_resource.type)
+    report_elem = REXML::Element.new('report')
+    report_elem.add_attribute('id', new_resource.report_id)
+    report_elem.add_attribute('type', new_resource.type)
 
-    build_parameters_xml(doc, report_elem)
+    build_parameters_xml(report_elem)
 
-    doc.root.add_element(report_elem)
+    doc.root ||= REXML::Element.new('reports-configuration')
+    reports_el = doc.root.elements['reports'] || doc.root.add_element('reports')
+    reports_el.add_element(report_elem)
 
     File.open(file_path, 'w') do |f|
       formatter = REXML::Formatters::Pretty.new
