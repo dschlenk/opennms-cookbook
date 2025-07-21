@@ -11,8 +11,8 @@ opennms_availability_report 'foo' do
         'name' => 'category',
         'display_name' => 'Category',
         'input_type' => 'reportCategorySelector',
-        'default' => 'Network'
-      }
+        'default' => 'Network',
+      },
     ],
     'date_parms' => [
       {
@@ -23,18 +23,18 @@ opennms_availability_report 'foo' do
         'default_count' => 1,
         'default_time' => {
           'hour' => 0,
-          'minute' => 0
-        }
-      }
+          'minute' => 0,
+        },
+      },
     ],
     'int_parms' => [
       {
         'name' => 'retryCount',
         'display_name' => 'Retry Count',
         'input_type' => 'freeText',
-        'default' => 3
-      }
-    ]
+        'default' => 3,
+      },
+    ],
   )
 end
 
@@ -49,8 +49,8 @@ opennms_availability_report 'bar' do
         'name' => 'category',
         'display_name' => 'Category',
         'input_type' => 'freeText',
-        'default' => 'Core'
-      }
+        'default' => 'Core',
+      },
     ],
     'date_parms' => [
       {
@@ -61,18 +61,18 @@ opennms_availability_report 'bar' do
         'default_count' => 7,
         'default_time' => {
           'hour' => 6,
-          'minute' => 30
-        }
-      }
+          'minute' => 30,
+        },
+      },
     ],
     'int_parms' => [
       {
         'name' => 'retryCount',
         'display_name' => 'Retry Count',
         'input_type' => 'freeText',
-        'default' => 5
-      }
-    ]
+        'default' => 5,
+      },
+    ],
   )
 end
 
@@ -87,8 +87,8 @@ opennms_availability_report 'baz' do
         'name' => 'category',
         'display_name' => 'Category',
         'input_type' => 'reportCategorySelector',
-        'default' => 'WAN'
-      }
+        'default' => 'WAN',
+      },
     ],
     'date_parms' => [
       {
@@ -99,18 +99,18 @@ opennms_availability_report 'baz' do
         'default_count' => 2,
         'default_time' => {
           'hour' => 12,
-          'minute' => 15
-        }
-      }
+          'minute' => 15,
+        },
+      },
     ],
     'int_parms' => [
       {
         'name' => 'retryCount',
         'display_name' => 'Retry Count',
         'input_type' => 'freeText',
-        'default' => 10
-      }
-    ]
+        'default' => 10,
+      },
+    ],
   )
 end
 
