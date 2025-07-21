@@ -34,7 +34,7 @@ opennms_availability_report 'foo' do
         'input_type' => 'freeText',
         'default' => 3,
       },
-    ],
+    ]
   )
 end
 
@@ -72,7 +72,7 @@ opennms_availability_report 'bar' do
         'input_type' => 'freeText',
         'default' => 5,
       },
-    ],
+    ]
   )
 end
 
@@ -110,7 +110,7 @@ opennms_availability_report 'baz' do
         'input_type' => 'freeText',
         'default' => 10,
       },
-    ],
+    ]
   )
 end
 
