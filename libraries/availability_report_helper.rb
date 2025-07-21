@@ -2,7 +2,6 @@ module Opennms
   module Cookbook
     module ConfigHelpers
       module AvailabilityReportTemplate
-
         class Report
           attr_accessor :id, :type, :parameters
 
@@ -91,7 +90,7 @@ module Opennms
                   name: el['name'],
                   display_name: el['display-name'],
                   input_type: el['input-type'],
-                  default: el['default']
+                  default: el['default'],
                 }.compact
               end,
               date_parms: param_el.xpath('date-parameter').map do |el|
@@ -102,10 +101,14 @@ module Opennms
                   use_absolute_date: el['use-absolute-date'] == 'true',
                   default_interval: el['default-interval'],
                   default_count: el['default-count'].to_i,
-                  default_time: default_time ? {
-                    hour: default_time['hour'].to_i,
-                    minute: default_time['minute'].to_i
-                  } : nil
+                  default_time: if default_time
+                                  {
+                                    hour: default_time['hour'].to_i,
+                                    minute: default_time['minute'].to_i,
+                                  }
+                                else
+                                  nil
+                                end,
                 }.compact
               end,
               int_parms: param_el.xpath('int-parameter').map do |el|
@@ -113,9 +116,9 @@ module Opennms
                   name: el['name'],
                   display_name: el['display-name'],
                   input_type: el['input-type'],
-                  default: el['default']&.to_i
+                  default: el['default']&.to_i,
                 }.compact
-              end
+              end,
             }
           end
         end
