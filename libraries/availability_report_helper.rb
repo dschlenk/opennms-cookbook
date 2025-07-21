@@ -106,8 +106,6 @@ module Opennms
                                     hour: default_time['hour'].to_i,
                                     minute: default_time['minute'].to_i,
                                   }
-                                else
-                                  nil
                                 end,
                 }.compact
               end,
