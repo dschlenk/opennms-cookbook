@@ -27,12 +27,12 @@ module Inspec::Resources
     end
 
     def type
-      return nil unless exists?
+      return unless exists?
       @report_element.attributes['type']
     end
 
     def parameters
-      return nil unless exists?
+      return unless exists?
       params = {}
       param_elem = @report_element.elements['parameters']
       return params unless param_elem
