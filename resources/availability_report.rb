@@ -139,7 +139,7 @@ action :create do
     reports_el = doc.root.elements['reports'] || doc.root.add_element('reports')
     reports_el.add_element(report_elem)
 
-    File.open(file_path, 'w') do |f|
+    ::File.open(file_path, 'w') do |f|
       formatter = REXML::Formatters::Pretty.new
       formatter.compact = true
       formatter.write(doc, f)
@@ -176,7 +176,7 @@ action :delete do
   node = REXML::XPath.first(doc, "//report[@id='#{new_resource.report_id}']")
   node.parent.delete(node) if node
 
-  File.open(file_path, 'w') do |f|
+  ::File.open(file_path, 'w') do |f|
     formatter = REXML::Formatters::Pretty.new
     formatter.compact = true
     formatter.write(doc, f)
