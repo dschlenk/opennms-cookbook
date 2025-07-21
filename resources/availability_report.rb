@@ -138,7 +138,7 @@ action :create do
     end
   end
 
-  %w[pdf svg html logo].each do |type|
+  %w(pdf svg html logo).each do |type|
     validate_or_create_file(type)
   end
 end
