@@ -27,11 +27,13 @@ module Inspec::Resources
 
     def type
       return unless exists?
+
       @report_element.attributes['type']
     end
 
     def parameters
       return {} unless exists?
+
       params = {}
       param_elem = @report_element.elements['parameters']
       return params unless param_elem
@@ -39,39 +41,48 @@ module Inspec::Resources
       param_elem.elements.each('string-parm') do |el|
         name = el.attributes['name']
         next unless name
+
         params[name] = {
           'name' => name,
           'display-name' => el.attributes['display-name'],
           'input-type' => el.attributes['input-type'],
-          'default' => el.attributes['default']
+          'default' => el.attributes['default'],
         }.compact
       end
 
       param_elem.elements.each('date-parm') do |el|
         name = el.attributes['name']
         next unless name
+
         default_time = el.elements['default-time']
+        default_time_hash = nil
+
+        if default_time
+          default_time_hash = {
+            'hour' => default_time.attributes['hour'] || default_time.elements['hours']&.text,
+            'minute' => default_time.attributes['minute'] || default_time.elements['minutes']&.text,
+          }
+        end
+
         params[name] = {
           'name' => name,
           'display-name' => el.attributes['display-name'],
           'use-absolute-date' => el.attributes['use-absolute-date'],
           'default-interval' => el.elements['default-interval']&.text,
           'default-count' => el.elements['default-count']&.text,
-          'default-time' => default_time ? {
-            'hour' => default_time.attributes['hour'] || default_time.elements['hours']&.text,
-            'minute' => default_time.attributes['minute'] || default_time.elements['minutes']&.text,
-          } : nil
+          'default-time' => default_time_hash,
         }.compact
       end
 
       param_elem.elements.each('int-parm') do |el|
         name = el.attributes['name']
         next unless name
+
         params[name] = {
           'name' => name,
           'display-name' => el.attributes['display-name'],
           'input-type' => el.attributes['input-type'],
-          'default' => el.attributes['default']
+          'default' => el.attributes['default'],
         }.compact
       end
 
@@ -82,6 +93,7 @@ module Inspec::Resources
 
     def read_report
       return unless File.exist?(@file_path)
+
       file = File.read(@file_path)
       doc = REXML::Document.new(file)
       @report_element = REXML::XPath.first(doc, "//report[@id='#{@report_id}']")
