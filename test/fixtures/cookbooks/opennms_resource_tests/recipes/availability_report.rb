@@ -2,8 +2,17 @@
 
 opennms_availability_report 'foo' do
   type 'calendar'
-  pdf_template 'foo.pdf'
-  pdf_template_source 'foo.pdf'
+  pdf_template 'foo.xml'
+  pdf_template_source 'foo.xml.erb'
+  pdf_template_source_type 'template'
+  pdf_template_source_variables(
+    logo: 'logo.png',
+    onms_home: '/opt/opennms',
+    interval: 'month',
+    count: 1,
+    hour: 0,
+    minute: 0
+  )
 
   parameters(
     'string_parms' => [
@@ -40,8 +49,17 @@ end
 
 opennms_availability_report 'bar' do
   type 'classic'
-  pdf_template 'bar.pdf'
-  pdf_template_source 'bar.pdf'
+  pdf_template 'bar.xml'
+  pdf_template_source 'bar.xml.erb'
+  pdf_template_source_type 'template'
+  pdf_template_source_variables(
+    logo: 'logo.png',
+    onms_home: '/opt/opennms',
+    interval: 'day',
+    count: 7,
+    hour: 6,
+    minute: 30
+  )
 
   parameters(
     'string_parms' => [
@@ -78,8 +96,17 @@ end
 
 opennms_availability_report 'baz' do
   type 'calendar'
-  pdf_template 'baz.pdf'
-  pdf_template_source 'baz.pdf'
+  pdf_template 'baz.xml'
+  pdf_template_source 'baz.xml.erb'
+  pdf_template_source_type 'template'
+  pdf_template_source_variables(
+    logo: 'logo.png',
+    onms_home: '/opt/opennms',
+    interval: 'year',
+    count: 2,
+    hour: 12,
+    minute: 15
+  )
 
   parameters(
     'string_parms' => [
