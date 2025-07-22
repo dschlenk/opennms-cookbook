@@ -5,7 +5,7 @@ provides :opennms_availability_report
 
 property :report_id, String, name_property: true
 property :type, String, equal_to: %w(calendar classic), required: lazy { |r|
-  Array(r.action).any? { |a| [:create, :create_if_missing].include?(a) }
+  Array(r.desired_action).any? { |a| [:create, :create_if_missing].include?(a) }
 }
 
 property :pdf_template, String
@@ -157,9 +157,7 @@ action :create do
     if new_resource.logo_source
       send(new_resource.logo_source_type, target_path) do
         source new_resource.logo_source
-        if new_resource.logo_source_type == 'template'
-          variables new_resource.logo_source_variables
-        end
+        variables new_resource.logo_source_variables if new_resource.logo_source_type == 'template'
         new_resource.logo_source_properties.each { |k, v| send(k, v) }
       end
     elsif !::File.exist?(target_path)
