@@ -4,7 +4,7 @@ include Opennms::Cookbook::ConfigHelpers::AvailabilityReportTemplate
 provides :opennms_availability_report
 
 property :report_id, String, name_property: true
-property :type, String, required: true, equal_to: %w(calendar classic)
+property :type, String, required: lazy { |r| [:create, :create_if_missing].include?(r.action.first) }, equal_to: %w(calendar classic)
 
 property :pdf_template, String
 property :pdf_template_source, String
