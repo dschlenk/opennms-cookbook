@@ -146,8 +146,23 @@ action :create do
     end
   end
 
-  %w(pdf svg html logo).each do |type|
+  %w(pdf svg html).each do |type|
     validate_or_create_file(type)
+  end
+
+  if new_resource.logo
+    target_path = ::File.join(node['opennms']['conf']['home'], 'etc', new_resource.logo)
+    if new_resource.logo_source
+      send(new_resource.logo_source_type, target_path) do
+        source new_resource.logo_source
+        if new_resource.logo_source_type == 'template'
+          variables new_resource.logo_source_variables
+        end
+        new_resource.logo_source_properties.each { |k, v| send(k, v) }
+      end
+    elsif !::File.exist?(target_path)
+      raise "logo file '#{new_resource.logo}' not found in #{target_path} and no source provided"
+    end
   end
 end
 
