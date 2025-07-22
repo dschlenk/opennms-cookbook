@@ -8,7 +8,7 @@ module Inspec::Resources
     supports platform: 'linux'
     desc 'Use the availability_report InSpec resource to test OpenNMS availability reports'
     example <<~EXAMPLE
-      describe availability_report('my-report') do
+      describe availability_report('foo') do
         it { should exist }
         its('type') { should cmp 'calendar' }
       end
@@ -36,23 +36,43 @@ module Inspec::Resources
       param_elem = @report_element.elements['parameters']
       return params unless param_elem
 
-      param_elem.elements.each do |param|
-        name = param.attributes['name']
+      param_elem.elements.each('string-parm') do |el|
+        name = el.attributes['name']
         next unless name
+        params[name] = {
+          'name' => name,
+          'display-name' => el.attributes['display-name'],
+          'input-type' => el.attributes['input-type'],
+          'default' => el.attributes['default']
+        }.compact
+      end
 
-        param_data = param.attributes.transform_keys(&:to_s)
+      param_elem.elements.each('date-parm') do |el|
+        name = el.attributes['name']
+        next unless name
+        default_time = el.elements['default-time']
+        params[name] = {
+          'name' => name,
+          'display-name' => el.attributes['display-name'],
+          'use-absolute-date' => el.attributes['use-absolute-date'],
+          'default-interval' => el.elements['default-interval']&.text,
+          'default-count' => el.elements['default-count']&.text,
+          'default-time' => default_time ? {
+            'hour' => default_time.attributes['hour'] || default_time.elements['hours']&.text,
+            'minute' => default_time.attributes['minute'] || default_time.elements['minutes']&.text,
+          } : nil
+        }.compact
+      end
 
-        if param.name == 'date-parameter'
-          default_time = param.elements['default-time']
-          if default_time
-            param_data['default-time'] = {
-              'hour' => default_time.attributes['hour'] || default_time.elements['hours']&.text,
-              'minute' => default_time.attributes['minute'] || default_time.elements['minutes']&.text,
-            }.compact
-          end
-        end
-
-        params[name] = param_data
+      param_elem.elements.each('int-parm') do |el|
+        name = el.attributes['name']
+        next unless name
+        params[name] = {
+          'name' => name,
+          'display-name' => el.attributes['display-name'],
+          'input-type' => el.attributes['input-type'],
+          'default' => el.attributes['default']
+        }.compact
       end
 
       params
