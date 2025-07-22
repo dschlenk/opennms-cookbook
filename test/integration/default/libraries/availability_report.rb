@@ -17,7 +17,6 @@ module Inspec::Resources
     def initialize(report_id)
       @report_id = report_id
       @file_path = '/opt/opennms/etc/availability-reports.xml'
-      @content = nil
       @report_element = nil
       read_report
     end
@@ -32,15 +31,30 @@ module Inspec::Resources
     end
 
     def parameters
-      return unless exists?
+      return {} unless exists?
       params = {}
       param_elem = @report_element.elements['parameters']
       return params unless param_elem
 
       param_elem.elements.each do |param|
         name = param.attributes['name']
-        params[name] = param.attributes
+        next unless name
+
+        param_data = param.attributes.transform_keys(&:to_s)
+
+        if param.name == 'date-parameter'
+          default_time = param.elements['default-time']
+          if default_time
+            param_data['default-time'] = {
+              'hour' => default_time.attributes['hour'] || default_time.elements['hours']&.text,
+              'minute' => default_time.attributes['minute'] || default_time.elements['minutes']&.text
+            }.compact
+          end
+        end
+
+        params[name] = param_data
       end
+
       params
     end
 
