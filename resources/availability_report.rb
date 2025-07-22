@@ -54,12 +54,12 @@ action_class do
     ::File.join(node['opennms']['conf']['home'], 'etc', 'availability-reports.xml')
   end
 
-  def validate_or_create_file(type)
-    template = new_resource.send("#{type}_template")
-    source = new_resource.send("#{type}_template_source")
-    source_type = new_resource.send("#{type}_template_source_type")
-    variables = new_resource.send("#{type}_template_source_variables")
-    props = new_resource.send("#{type}_template_source_properties")
+  def validate_or_create_file(prefix)
+    template = new_resource.send("#{prefix}_template")
+    source = new_resource.send("#{prefix}_template_source")
+    source_type = new_resource.send("#{prefix}_template_source_type")
+    variables = new_resource.send("#{prefix}_template_source_variables")
+    props = new_resource.send("#{prefix}_template_source_properties")
 
     return if template.nil?
 
@@ -72,7 +72,7 @@ action_class do
         props.each { |k, v| send(k, v) }
       end
     elsif !::File.exist?(target_path)
-      raise "#{type}_template file '#{template}' not found in #{target_path} and no source provided"
+      raise "#{prefix}_template file '#{template}' not found in #{target_path} and no source provided"
     end
   end
 
@@ -146,8 +146,8 @@ action :create do
     end
   end
 
-  %w(pdf svg html).each do |type|
-    validate_or_create_file(type)
+  %w(pdf svg html).each do |prefix|
+    validate_or_create_file(prefix)
   end
 
   if new_resource.logo
