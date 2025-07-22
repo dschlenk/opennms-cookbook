@@ -47,7 +47,7 @@ module Inspec::Resources
           if default_time
             param_data['default-time'] = {
               'hour' => default_time.attributes['hour'] || default_time.elements['hours']&.text,
-              'minute' => default_time.attributes['minute'] || default_time.elements['minutes']&.text
+              'minute' => default_time.attributes['minute'] || default_time.elements['minutes']&.text,
             }.compact
           end
         end
