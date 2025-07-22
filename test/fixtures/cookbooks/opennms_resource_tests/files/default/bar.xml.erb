@@ -1,0 +1,18 @@
+<report id="bar" type="classic">
+  <logo><%= @logo %></logo>
+  <svg-template>file://<%= @onms_home %>/etc/reports/SVGAvailReport.xsl</svg-template>
+  <pdf-template>file://<%= @onms_home %>/etc/reports/PDFAvailReport.xsl</pdf-template>
+  <html-template>file://<%= @onms_home %>/etc/reports/HTMLAvailReport.xsl</html-template>
+  <parameters>
+    <string-parm name="category" display-name="Category" input-type="freeText" default="<%= @default %>" />
+    <date-parm name="endDate" display-name="End Date" use-absolute-date="true">
+      <default-interval><%= @interval %></default-interval>
+      <default-count><%= @count %></default-count>
+      <default-time>
+        <hours><%= @hour %></hours>
+        <minutes><%= @minute %></minutes>
+      </default-time>
+    </date-parm>
+    <int-parm name="retryCount" display-name="Retry Count" input-type="freeText" default="<%= @retry_count %>" />
+  </parameters>
+</report>
