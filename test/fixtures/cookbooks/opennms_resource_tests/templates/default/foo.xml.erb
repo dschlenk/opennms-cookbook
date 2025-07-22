@@ -8,10 +8,7 @@
     <date-parm name="endDate" display-name="End Date" use-absolute-date="false">
       <default-interval><%= @interval %></default-interval>
       <default-count><%= @count %></default-count>
-      <default-time>
-        <hours><%= @hour %></hours>
-        <minutes><%= @minute %></minutes>
-      </default-time>
+      <default-time hour="<%= @hour %>" minute="<%= @minute %>" />
     </date-parm>
     <int-parm name="retryCount" display-name="Retry Count" input-type="freeText" default="<%= @retry_count %>" />
   </parameters>
