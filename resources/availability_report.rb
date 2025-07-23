@@ -1,34 +1,39 @@
 include Opennms::XmlHelper
 include Opennms::Cookbook::ConfigHelpers::AvailabilityReportTemplate
 
+include Opennms::XmlHelper
+include Opennms::Cookbook::ConfigHelpers::AvailabilityReportTemplate
+ 
+provides :opennms_availability_report
+ 
 property :report_id, String, name_property: true
-property :type, String, required: true, equal_to: %w(calendar classic)
-
+property :type, String, equal_to: %w(calendar classic), default: 'calendar'
+ 
 property :pdf_template, String
 property :pdf_template_source, String
-property :pdf_template_source_type, String, default: 'cookbook_file', equal_to: %w(cookbook_file template remote_file)
+property :pdf_template_source_type, String, default: 'cookbook_file'
 property :pdf_template_source_variables, Hash, default: {}
 property :pdf_template_source_properties, Hash, default: {}
-
+ 
 property :svg_template, String
 property :svg_template_source, String
-property :svg_template_source_type, String, default: 'cookbook_file', equal_to: %w(cookbook_file template remote_file)
+property :svg_template_source_type, String, default: 'cookbook_file'
 property :svg_template_source_variables, Hash, default: {}
 property :svg_template_source_properties, Hash, default: {}
-
+ 
 property :html_template, String
 property :html_template_source, String
-property :html_template_source_type, String, default: 'cookbook_file', equal_to: %w(cookbook_file template remote_file)
+property :html_template_source_type, String, default: 'cookbook_file'
 property :html_template_source_variables, Hash, default: {}
 property :html_template_source_properties, Hash, default: {}
-
+ 
 property :logo, String
 property :logo_source, String
-property :logo_source_type, String, default: 'cookbook_file', equal_to: %w(cookbook_file template remote_file)
+property :logo_source_type, String, default: 'cookbook_file'
 property :logo_source_variables, Hash, default: {}
 property :logo_source_properties, Hash, default: {}
-
-property :parameters, [Hash, OpenNMS::Cookbook::AvailabilityReport::Parameters], default: {}
+ 
+property :parameters, Hash, default: {}
 
 default_action :create
 
