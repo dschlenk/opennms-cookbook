@@ -53,7 +53,7 @@ load_current_value do |desired|
   parameters_hash = {
     'string_parms' => [],
     'date_parms' => [],
-    'int_parms' => []
+    'int_parms' => [],
   }
 
   param_elem = report.elements['parameters']
@@ -68,12 +68,12 @@ load_current_value do |desired|
         'display_name' => el.attributes['display-name'],
         'use_absolute_date' => el.attributes['use-absolute-date'],
         'default_interval' => el.attributes['default-interval'],
-        'default_count' => el.attributes['default-count']
+        'default_count' => el.attributes['default-count'],
       }
       if (dt = el.elements['default-time'])
         dp['default_time'] = {
           'hour' => dt.attributes['hour'],
-          'minute' => dt.attributes['minute']
+          'minute' => dt.attributes['minute'],
         }
       end
       parameters_hash['date_parms'] << dp
