@@ -26,8 +26,8 @@ module Opennms
           end
 
           def read!(file)
-            Chef::Log.info("[ReportConfig] Reading availability reports from: #{file}")
-            raise ArgumentError, "File #{file} does not exist" unless ::File.exist?(file)
+            Chef::Log.info("[ReportConfig] Reading availability reports from: \#{file}")
+            raise ArgumentError, "File \#{file} does not exist" unless ::File.exist?(file)
 
             edit_xml_file(file) do |doc|
               doc.xpath('//report').each do |report_el|
@@ -36,12 +36,12 @@ module Opennms
                 parameters = parse_parameters(report_el)
 
                 report = Report.new(id: id, type: type, parameters: parameters)
-                Chef::Log.debug("[ReportConfig] Loaded report: #{id}")
+                Chef::Log.debug("[ReportConfig] Loaded report: \#{id}")
                 @data[:reports] << report
               end
             end
 
-            Chef::Log.info("[ReportConfig] Finished reading. Total reports: #{@data[:reports].size}")
+            Chef::Log.info("[ReportConfig] Finished reading. Total reports: \#{@data[:reports].size}")
           end
 
           def reports
@@ -49,27 +49,27 @@ module Opennms
           end
 
           def find_report_by_id(id)
-            Chef::Log.debug("[ReportConfig] Searching for report: #{id}")
+            Chef::Log.debug("[ReportConfig] Searching for report: \#{id}")
             found = reports.find { |r| r.id == id }
-            Chef::Log.debug("[ReportConfig] Found report: #{found.inspect}") if found
+            Chef::Log.debug("[ReportConfig] Found report: \#{found.inspect}") if found
             found
           end
 
           def delete_report(id)
-            Chef::Log.info("[ReportConfig] Deleting report: #{id}")
+            Chef::Log.info("[ReportConfig] Deleting report: \#{id}")
             before = @data[:reports].size
             @data[:reports].reject! { |r| r.id == id }
             after = @data[:reports].size
-            Chef::Log.info("[ReportConfig] Deleted #{before - after} report(s).")
+            Chef::Log.info("[ReportConfig] Deleted \#{before - after} report(s).")
           end
 
           def add_or_update_report(new_report)
             existing = find_report_by_id(new_report.id)
             if existing
-              Chef::Log.info("[ReportConfig] Updating existing report: #{new_report.id}")
+              Chef::Log.info("[ReportConfig] Updating existing report: \#{new_report.id}")
               existing.update(type: new_report.type, parameters: new_report.parameters)
             else
-              Chef::Log.info("[ReportConfig] Adding new report: #{new_report.id}")
+              Chef::Log.info("[ReportConfig] Adding new report: \#{new_report.id}")
               @data[:reports] << new_report
             end
           end
@@ -95,20 +95,20 @@ module Opennms
               end,
               date_parms: param_el.xpath('date-parameter').map do |el|
                 default_time = el.at_xpath('default-time')
+                default_time_hash = if default_time
+                  {
+                    hour: default_time['hour'].to_i,
+                    minute: default_time['minute'].to_i,
+                  }
+                end
+
                 {
                   name: el['name'],
                   display_name: el['display-name'],
                   use_absolute_date: el['use-absolute-date'] == 'true',
                   default_interval: el['default-interval'],
                   default_count: el['default-count'].to_i,
-                  default_time: if default_time
-                    {
-                      hour: default_time['hour'].to_i,
-                      minute: default_time['minute'].to_i,
-                    }
-                  else
-                    nil
-                  end,
+                  default_time: default_time_hash,
                 }
               end,
               int_parms: param_el.xpath('int-parameter').map do |el|
