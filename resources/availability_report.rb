@@ -1,5 +1,5 @@
 include Opennms::XmlHelper
-include Opennms::Cookbook::ConfigHelpers::AvailabilityReportTemplate
+include Opennms::Cookbook::AvailabilityReportHelper
 
 provides :opennms_availability_report
 
