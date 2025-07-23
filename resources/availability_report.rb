@@ -47,12 +47,12 @@ action_class do
     ::File.join(node['opennms']['conf']['home'], 'etc', 'availability-reports.xml')
   end
 
-  def create_template_file(prefix)
-    template = new_resource.send("\#{prefix}_template")
-    source = new_resource.send("\#{prefix}_template_source")
-    source_type = new_resource.send("\#{prefix}_template_source_type")
-    variables = new_resource.send("\#{prefix}_template_source_variables")
-    props = new_resource.send("\#{prefix}_template_source_properties")
+  def create_template_file(_prefix )
+    template = new_resource.send("\#{_prefix }_template")
+    source = new_resource.send("\#{_prefix }_template_source")
+    source_type = new_resource.send("\#{_prefix }_template_source_type")
+    variables = new_resource.send("\#{_prefix }_template_source_variables")
+    props = new_resource.send("\#{_prefix }_template_source_properties")
 
     return if template.nil?
 
@@ -65,7 +65,7 @@ action_class do
         props.each { |k, v| send(k, v) }
       end
     elsif !::File.exist?(target_path)
-      raise "\#{prefix}_template file '\#{template}' not found in \#{target_path} and no source provided"
+      raise "\#{_prefix }_template file '\#{template}' not found in \#{target_path} and no source provided"
     end
   end
 
