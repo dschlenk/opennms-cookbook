@@ -47,7 +47,7 @@ action_class do
     ::File.join(node['opennms']['conf']['home'], 'etc', 'availability-reports.xml')
   end
 
-  def create_template_file(_prefix )
+  def create_template_file(_prefix)
     template = new_resource.send("\#{_prefix }_template")
     source = new_resource.send("\#{_prefix }_template_source")
     source_type = new_resource.send("\#{_prefix }_template_source_type")
