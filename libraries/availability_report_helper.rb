@@ -18,7 +18,7 @@ module Opennms
                 svg_template: el.elements['svg-template']&.text,
                 html_template: el.elements['html-template']&.text,
                 logo: el.elements['logo']&.text,
-                parameters: {}
+                parameters: {},
               }
 
               el.elements.each('parameter') do |param|
