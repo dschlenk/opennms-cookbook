@@ -54,14 +54,17 @@ module Inspec::Resources
         name = el.attributes['name']
         next unless name
 
-        default_time = el.elements['default-time']
+        default_time_el = el.elements['default-time']
         default_time_hash = nil
 
-        if default_time
+        if default_time_el
+          hour = default_time_el.attributes['hour'] || default_time_el.elements['hours']&.text
+          minute = default_time_el.attributes['minute'] || default_time_el.elements['minutes']&.text
+
           default_time_hash = {
-            'hour' => default_time.attributes['hour'] || default_time.elements['hours']&.text,
-            'minute' => default_time.attributes['minute'] || default_time.elements['minutes']&.text,
-          }
+            'hour' => hour,
+            'minute' => minute,
+          }.compact
         end
 
         params[name] = {
