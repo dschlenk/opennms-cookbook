@@ -1,6 +1,7 @@
 include Opennms::XmlHelper
 include Opennms::Cookbook::AvailabilityReportHelper
 
+resource_name :opennms_availability_report
 provides :opennms_availability_report
 
 property :report_id, String, name_property: true
