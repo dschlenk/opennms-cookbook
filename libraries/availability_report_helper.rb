@@ -34,6 +34,10 @@ module Opennms
           @data[:reports].any? { |r| r[:id] == report_id }
         end
 
+        def find_report_by_id(report_id)
+          @data[:reports].find { |report| report[:id] == report_id }
+        end
+
         def create!(file_path, new_report)
           edit_xml_file(file_path) do |doc|
             root = doc.root
