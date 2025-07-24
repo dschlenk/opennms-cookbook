@@ -1,9 +1,6 @@
 include Opennms::XmlHelper
 include Opennms::Cookbook::AvailabilityReportHelper
 
-resource_name :opennms_availability_report
-provides :opennms_availability_report
-
 property :report_id, String, name_property: true
 property :type, String, equal_to: %w(calendar classic), default: 'calendar'
 
@@ -46,6 +43,8 @@ load_current_value do |desired|
 end
 
 action_class do
+  include Opennms::XmlHelper
+  include Opennms::Cookbook::AvailabilityReportHelper
   def config_file
     ::File.join(node['opennms']['conf']['home'], 'etc', 'availability-reports.xml')
   end
