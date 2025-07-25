@@ -33,28 +33,29 @@ property :parameters, Hash, default: {}
 default_action :create
 
 load_current_value do |desired|
-  config = ReportConfig.new
+  config = ::Opennms::Cookbook::AvailabilityReportHelper::ReportConfig.new
   config.read!(::File.join(node['opennms']['conf']['home'], 'etc', 'availability-reports.xml'))
   report = config.find_report_by_id(desired.report_id)
   current_value_does_not_exist! if report.nil?
 
-  type report.type
-  parameters report.parameters
+  type report[:type]
+  parameters report[:parameters]
 end
 
 action_class do
   include Opennms::XmlHelper
-  include Opennms::Cookbook::AvailabilityReportHelper
+  include ::Opennms::Cookbook::AvailabilityReportHelper
+
   def config_file
     ::File.join(node['opennms']['conf']['home'], 'etc', 'availability-reports.xml')
   end
 
-  def create_template_file(_prefix)
-    template = new_resource.send("\#{_prefix }_template")
-    source = new_resource.send("\#{_prefix }_template_source")
-    source_type = new_resource.send("\#{_prefix }_template_source_type")
-    variables = new_resource.send("\#{_prefix }_template_source_variables")
-    props = new_resource.send("\#{_prefix }_template_source_properties")
+  def create_template_file(prefix)
+    template = new_resource.send("#{prefix}_template")
+    source = new_resource.send("#{prefix}_template_source")
+    source_type = new_resource.send("#{prefix}_template_source_type")
+    variables = new_resource.send("#{prefix}_template_source_variables")
+    props = new_resource.send("#{prefix}_template_source_properties")
 
     return if template.nil?
 
@@ -67,7 +68,7 @@ action_class do
         props.each { |k, v| send(k, v) }
       end
     elsif !::File.exist?(target_path)
-      raise "\#{_prefix }_template file '\#{template}' not found in \#{target_path} and no source provided"
+      raise "#{prefix}_template file '#{template}' not found in #{target_path} and no source provided"
     end
   end
 
@@ -83,26 +84,28 @@ action_class do
         new_resource.logo_source_properties.each { |k, v| send(k, v) }
       end
     elsif !::File.exist?(target_path)
-      raise "logo file '\#{new_resource.logo}' not found in \#{target_path} and no source provided"
+      raise "logo file '#{new_resource.logo}' not found in #{target_path} and no source provided"
     end
   end
 end
 
 action :create do
-  config = ReportConfig.new
+  config = ::Opennms::Cookbook::AvailabilityReportHelper::ReportConfig.new
   config.read!(config_file)
 
-  report = Report.new(
+  report = {
     id: new_resource.report_id,
     type: new_resource.type,
-    parameters: new_resource.parameters
-  )
+    parameters: new_resource.parameters,
+    pdf_template: new_resource.pdf_template,
+    svg_template: new_resource.svg_template,
+    html_template: new_resource.html_template,
+    logo: new_resource.logo
+  }
 
-  config.add_or_update_report(report)
+  config.add_or_update_report(config_file, report)
 
-  converge_by("Saving availability report \#{new_resource.report_id} to \#{config_file}") do
-    config.write!(config_file)
-  end
+  converge_by("Saving availability report #{new_resource.report_id} to #{config_file}") {}
 
   create_template_file('pdf')
   create_template_file('svg')
@@ -111,21 +114,18 @@ action :create do
 end
 
 action :create_if_missing do
-  config = ReportConfig.new
+  config = ::Opennms::Cookbook::AvailabilityReportHelper::ReportConfig.new
   config.read!(config_file)
   report = config.find_report_by_id(new_resource.report_id)
   run_action(:create) if report.nil?
 end
 
 action :delete do
-  config = ReportConfig.new
+  config = ::Opennms::Cookbook::AvailabilityReportHelper::ReportConfig.new
   config.read!(config_file)
 
-  report = config.find_report_by_id(new_resource.report_id)
-  if report
-    config.delete_report(new_resource.report_id)
-    converge_by("Deleting availability report \#{new_resource.report_id} from \#{config_file}") do
-      config.write!(config_file)
-    end
+  if config.report_exists?(new_resource.report_id)
+    config.delete!(config_file, new_resource.report_id)
+    converge_by("Deleted availability report #{new_resource.report_id} from #{config_file}") {}
   end
 end
