@@ -18,7 +18,7 @@ module Opennms
                 svg_template: el.elements['svg-template']&.text,
                 html_template: el.elements['html-template']&.text,
                 logo: el.elements['logo']&.text,
-                parameters: {}
+                parameters: {},
               }
 
               @data[:reports] << report
@@ -41,7 +41,7 @@ module Opennms
             report_el = REXML::Element.new('report')
             report_el.add_attributes('id' => new_report[:id], 'type' => new_report[:type])
 
-            %i[pdf_template svg_template html_template logo].each do |field|
+            %i(pdf_template svg_template html_template logo).each do |field|
               next unless new_report[field]
 
               child = REXML::Element.new(field.to_s.tr('_', '-'))
@@ -61,7 +61,7 @@ module Opennms
 
               el.attributes['type'] = updated_report[:type]
 
-              %w[pdf-template svg-template html-template logo].each do |tag|
+              %w(pdf-template svg-template html-template logo).each do |tag|
                 child = el.elements[tag]
                 value = updated_report[tag.tr('-', '_').to_sym]
 
