@@ -25,8 +25,6 @@ module Inspec::Resources
       !@report_element.nil?
     end
 
-    alias_method :exists?, :exist?
-
     def type
       return unless exists?
 
