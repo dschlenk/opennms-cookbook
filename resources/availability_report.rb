@@ -100,7 +100,7 @@ action :create do
     pdf_template: new_resource.pdf_template,
     svg_template: new_resource.svg_template,
     html_template: new_resource.html_template,
-    logo: new_resource.logo
+    logo: new_resource.logo,
   }
 
   config.add_or_update_report(config_file, report)
