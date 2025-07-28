@@ -51,11 +51,11 @@ module Opennms
           edit_xml_file(file_path) do |doc|
             reports = doc.elements.to_a('opennms-reports/report')
             reports.each do |el|
-              if el.attributes['id'] == report_id
-                doc.root.delete_element(el)
-                @reports.delete_if { |r| r[:id] == report_id }
-                break
-              end
+              next unless el.attributes['id'] == report_id
+
+              doc.root.delete_element(el)
+              @reports.delete_if { |r| r[:id] == report_id }
+              break
             end
           end
         end
