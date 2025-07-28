@@ -6,7 +6,8 @@ module Inspec::Resources
   class AvailabilityReport < Inspec.resource(1)
     name 'availability_report'
     supports platform: 'linux'
-    desc 'Use the availability_report InSpec resource to test OpenNMS availability reports'
+    desc 'Resource to verify OpenNMS availability reports'
+
     example <<~EXAMPLE
       describe availability_report('foo') do
         it { should exist }
@@ -24,6 +25,7 @@ module Inspec::Resources
     def exists?
       !@report_element.nil?
     end
+    alias exist? exists?
 
     def type
       return unless exists?
@@ -38,55 +40,13 @@ module Inspec::Resources
       param_elem = @report_element.elements['parameters']
       return params unless param_elem
 
-      param_elem.elements.each('string-parm') do |el|
-        name = el.attributes['name']
-        next unless name
+      %w[string-parm date-parm int-parm].each do |parm_type|
+        param_elem.elements.each(parm_type) do |el|
+          name = el.attributes['name']
+          next unless name
 
-        params[name] = {
-          'name' => name,
-          'display-name' => el.attributes['display-name'],
-          'input-type' => el.attributes['input-type'],
-          'default' => el.attributes['default'],
-        }.compact
-      end
-
-      param_elem.elements.each('date-parm') do |el|
-        name = el.attributes['name']
-        next unless name
-
-        default_time_el = el.elements['default-time']
-        default_time_hash = nil
-
-        if default_time_el
-          hour = default_time_el.attributes['hour'] || default_time_el.elements['hours']&.text
-          minute = default_time_el.attributes['minute'] || default_time_el.elements['minutes']&.text
-
-          default_time_hash = {
-            'hour' => hour,
-            'minute' => minute,
-          }.compact
+          params[name] = extract_parameter_details(el, parm_type)
         end
-
-        params[name] = {
-          'name' => name,
-          'display-name' => el.attributes['display-name'],
-          'use-absolute-date' => el.attributes['use-absolute-date'],
-          'default-interval' => el.elements['default-interval']&.text,
-          'default-count' => el.elements['default-count']&.text,
-          'default-time' => default_time_hash,
-        }.compact
-      end
-
-      param_elem.elements.each('int-parm') do |el|
-        name = el.attributes['name']
-        next unless name
-
-        params[name] = {
-          'name' => name,
-          'display-name' => el.attributes['display-name'],
-          'input-type' => el.attributes['input-type'],
-          'default' => el.attributes['default'],
-        }.compact
       end
 
       params
@@ -102,6 +62,39 @@ module Inspec::Resources
       @report_element = REXML::XPath.first(doc, "//report[@id='#{@report_id}']")
     rescue REXML::ParseException => e
       skip_resource "Could not parse #{@file_path}: #{e.message}"
+    end
+
+    def extract_parameter_details(el, parm_type)
+      case parm_type
+      when 'string-parm', 'int-parm'
+        {
+          'name' => el.attributes['name'] || '',
+          'display-name' => el.attributes['display-name'] || '',
+          'input-type' => el.attributes['input-type'] || '',
+          'default' => el.attributes['default'] || ''
+        }
+      when 'date-parm'
+        default_time_el = el.elements['default-time']
+        default_time_hash = if default_time_el
+                              {
+                                'hour' => default_time_el.attributes['hour'] || default_time_el.elements['hours']&.text || '',
+                                'minute' => default_time_el.attributes['minute'] || default_time_el.elements['minutes']&.text || ''
+                              }
+                            else
+                              {}
+                            end
+
+        {
+          'name' => el.attributes['name'] || '',
+          'display-name' => el.attributes['display-name'] || '',
+          'use-absolute-date' => el.attributes['use-absolute-date'] || '',
+          'default-interval' => el.elements['default-interval']&.text || '',
+          'default-count' => el.elements['default-count']&.text || '',
+          'default-time' => default_time_hash
+        }
+      else
+        {}
+      end
     end
   end
 end
