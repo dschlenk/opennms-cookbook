@@ -1,6 +1,3 @@
-include Opennms::XmlHelper
-include Opennms::Cookbook::AvailabilityReportTemplate
-
 property :report_id, String, name_property: true
 property :type, String, equal_to: %w(calendar classic), default: 'calendar'
 
@@ -30,33 +27,19 @@ property :logo_source_properties, Hash, default: {}
 
 property :parameters, Hash, default: {}
 
-def etc_dir
-  ::File.join(node['opennms']['conf']['home'], 'etc')
-end
-
-def config_file
-  ::File.join(etc_dir, 'availability-reports.xml')
-end
-
 default_action :create
-
-load_current_value do |desired|
-  config = ::Opennms::Cookbook::AvailabilityReportHelper::ReportConfig.new
-  config.read!(config_file)
-  report = config.find_report_by_id(desired.report_id)
-  current_value_does_not_exist! if report.nil?
-
-  type report[:type]
-  parameters report[:parameters]
-  pdf_template report[:pdf_template]
-  svg_template report[:svg_template]
-  html_template report[:html_template]
-  logo report[:logo]
-end
 
 action_class do
   include Opennms::XmlHelper
-  include ::Opennms::Cookbook::AvailabilityReportTemplate
+  include ::Opennms::Cookbook::AvailabilityReportHelper::AvailabilityReportTemplate
+
+  def etc_dir
+    ::File.join(node['opennms']['conf']['home'], 'etc')
+  end
+
+  def config_file
+    ::File.join(etc_dir, 'availability-reports.xml')
+  end
 
   def create_template_file(prefix)
     template_name = new_resource.send("#{prefix}_template")
@@ -99,6 +82,20 @@ action_class do
   end
 end
 
+load_current_value do |desired|
+  config = ::Opennms::Cookbook::AvailabilityReportHelper::ReportConfig.new
+  config.read!(::File.join(node['opennms']['conf']['home'], 'etc', 'availability-reports.xml'))
+  report = config.find_report_by_id(desired.report_id)
+  current_value_does_not_exist! if report.nil?
+
+  type report[:type]
+  parameters report[:parameters]
+  pdf_template report[:pdf_template]
+  svg_template report[:svg_template]
+  html_template report[:html_template]
+  logo report[:logo]
+end
+
 action :create do
   config = ::Opennms::Cookbook::AvailabilityReportHelper::ReportConfig.new
   config.read!(config_file)
@@ -116,7 +113,7 @@ action :create do
   updated = config.add_or_update_report(config_file, report)
   converge_by("Saving availability report #{new_resource.report_id} to #{config_file}") if updated
 
-  availability_reports_template_resource(config.reports, config_file)
+  availability_reports_resource_create
 
   create_template_file('pdf')
   create_template_file('svg')
@@ -136,6 +133,6 @@ action :delete do
   if config.report_exists?(new_resource.report_id)
     config.delete!(config_file, new_resource.report_id)
     converge_by("Deleted availability report #{new_resource.report_id} from #{config_file}") {}
-    availability_reports_template_resource(config.reports, config_file)
+    availability_reports_resource_create
   end
 end
