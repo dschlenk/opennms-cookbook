@@ -266,7 +266,6 @@ module Opennms
             variables(reports: config.reports)
             action :nothing
             delayed_action :create
-            notifies :restart, 'service[opennms]', :delayed
           end
         end
       end
