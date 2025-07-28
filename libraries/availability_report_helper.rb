@@ -165,7 +165,7 @@ module Opennms
             el.add_attributes(
               'name' => sp['name'],
               'display-name' => sp['display_name'],
-              'input-type' => sp['input_type'],
+              'input-type' => sp['input_type']
             )
             el.add_attribute('default', sp['default']) if sp.key?('default')
             params_el.add_element(el)
@@ -175,7 +175,7 @@ module Opennms
             el = REXML::Element.new('date-parm')
             el.add_attributes(
               'name' => dp['name'],
-              'display-name' => dp['display_name'],
+              'display-name' => dp['display_name']
             )
             el.add_attribute('use-absolute-date', dp['use_absolute_date'].to_s) if dp.key?('use_absolute_date')
 
@@ -206,7 +206,7 @@ module Opennms
             el.add_attributes(
               'name' => ip['name'],
               'display-name' => ip['display_name'],
-              'input-type' => ip['input_type'],
+              'input-type' => ip['input_type']
             )
             el.add_attribute('default', ip['default'].to_s) if ip.key?('default')
             params_el.add_element(el)
