@@ -99,13 +99,8 @@ module Opennms
                 end
               end
 
-              if el.elements['parameters']
-                el.delete_element('parameters')
-              end
-
-              if updated_report[:parameters]
-                el.add_element(build_parameters(updated_report[:parameters]))
-              end
+              el.delete_element('parameters') if el.elements['parameters']
+              el.add_element(build_parameters(updated_report[:parameters])) if updated_report[:parameters]
 
               idx = @reports.find_index { |r| r[:id] == updated_report[:id] }
               @reports[idx] = updated_report if idx
@@ -122,9 +117,7 @@ module Opennms
             report_el.add_element(child)
           end
 
-          if report_hash[:parameters]
-            report_el.add_element(build_parameters(report_hash[:parameters]))
-          end
+          report_el.add_element(build_parameters(report_hash[:parameters])) if report_hash[:parameters]
         end
 
         def parse_parameters(params_elem)
@@ -144,16 +137,16 @@ module Opennms
             default_time_el = el.elements['default-time']
             if default_time_el
               h['default-time'] = if default_time_el.attributes['hour'] && default_time_el.attributes['minute']
-                                   {
-                                     'hour' => default_time_el.attributes['hour'],
-                                     'minute' => default_time_el.attributes['minute'],
-                                   }
-                                 else
-                                   {
-                                     'hour' => default_time_el.elements['hours']&.text,
-                                     'minute' => default_time_el.elements['minutes']&.text,
-                                   }
-                                 end
+                                    {
+                                      'hour' => default_time_el.attributes['hour'],
+                                      'minute' => default_time_el.attributes['minute'],
+                                    }
+                                  else
+                                    {
+                                      'hour' => default_time_el.elements['hours']&.text,
+                                      'minute' => default_time_el.elements['minutes']&.text,
+                                    }
+                                  end
             end
 
             params_hash[el.attributes['name']] = h
