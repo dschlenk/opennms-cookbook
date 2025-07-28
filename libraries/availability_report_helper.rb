@@ -17,7 +17,7 @@ module Opennms
           @reports.clear
 
           doc.elements.each('opennms-reports/report') do |el|
-            report = {
+            @reports << {
               id: el.attributes['id'],
               type: el.attributes['type'],
               pdf_template: el.elements['pdf-template']&.text,
@@ -26,7 +26,6 @@ module Opennms
               logo: el.elements['logo']&.text,
               parameters: parse_parameters(el.elements['parameters']),
             }
-            @reports << report
           end
         end
 
@@ -38,11 +37,11 @@ module Opennms
           @reports.find { |r| r[:id] == report_id }
         end
 
-        def add_or_update_report(file_path, new_report)
-          if report_exists?(new_report[:id])
-            update!(file_path, new_report)
+        def add_or_update_report(file_path, report)
+          if report_exists?(report[:id])
+            update!(file_path, report)
           else
-            create!(file_path, new_report)
+            create!(file_path, report)
           end
           true
         end
@@ -65,9 +64,12 @@ module Opennms
         def create!(file_path, new_report)
           edit_xml_file(file_path) do |doc|
             root = doc.root
+
             report_el = REXML::Element.new('report')
             report_el.add_attributes('id' => new_report[:id], 'type' => new_report[:type])
+
             add_optional_children(report_el, new_report)
+
             root.add_element(report_el)
             @reports << new_report
           end
@@ -133,17 +135,18 @@ module Opennms
             default_time_el = el.elements['default-time']
             if default_time_el
               h['default-time'] = if default_time_el.attributes['hour'] && default_time_el.attributes['minute']
-                                    {
-                                      'hour' => default_time_el.attributes['hour'],
-                                      'minute' => default_time_el.attributes['minute'],
-                                    }
-                                  else
-                                    {
-                                      'hour' => default_time_el.elements['hours']&.text,
-                                      'minute' => default_time_el.elements['minutes']&.text,
-                                    }
-                                  end
+                                   {
+                                     'hour' => default_time_el.attributes['hour'],
+                                     'minute' => default_time_el.attributes['minute'],
+                                   }
+                                 else
+                                   {
+                                     'hour' => default_time_el.elements['hours']&.text,
+                                     'minute' => default_time_el.elements['minutes']&.text,
+                                   }
+                                 end
             end
+
             params_hash[el.attributes['name']] = h
           end
 
@@ -231,11 +234,7 @@ module Opennms
 
     module AvailabilityReportTemplate
       def availability_reports_resource
-        begin
-          find_resource(:template, availability_reports_config_path)
-        rescue
-          nil
-        end
+        find_resource(:template, availability_reports_config_path) rescue nil
       end
 
       def availability_reports_resource_exist?
@@ -253,19 +252,20 @@ module Opennms
         if ::File.exist?(config_path)
           config.read!(config_path)
         else
-          Chef::Log.info("Config file #{config_path} does not exist; starting with an empty report config.")
+          Chef::Log.info("Config file #{config_path} does not exist; starting with empty report config.")
         end
 
         with_run_context :root do
           declare_resource(:template, config_path) do
             source 'availability-reports.xml.erb'
-            cookbook 'opennms'
+            cookbook 'opennms' # replace if your cookbook is named differently
             owner node['opennms']['username']
             group node['opennms']['groupname']
             mode '0644'
             variables(reports: config.reports)
             action :nothing
             delayed_action :create
+            notifies :restart, 'service[opennms]', :delayed
           end
         end
       end
