@@ -40,7 +40,7 @@ module Inspec::Resources
       param_elem = @report_element.elements['parameters']
       return params unless param_elem
 
-      %w[string-parm date-parm int-parm].each do |parm_type|
+      %w(string-parm date-parm int-parm).each do |parm_type|
         param_elem.elements.each(parm_type) do |el|
           name = el.attributes['name']
           next unless name
@@ -71,14 +71,14 @@ module Inspec::Resources
           'name' => el.attributes['name'] || '',
           'display-name' => el.attributes['display-name'] || '',
           'input-type' => el.attributes['input-type'] || '',
-          'default' => el.attributes['default'] || ''
+          'default' => el.attributes['default'] || '',
         }
       when 'date-parm'
         default_time_el = el.elements['default-time']
         default_time_hash = if default_time_el
                               {
                                 'hour' => default_time_el.attributes['hour'] || default_time_el.elements['hours']&.text || '',
-                                'minute' => default_time_el.attributes['minute'] || default_time_el.elements['minutes']&.text || ''
+                                'minute' => default_time_el.attributes['minute'] || default_time_el.elements['minutes']&.text || '',
                               }
                             else
                               {}
@@ -90,7 +90,7 @@ module Inspec::Resources
           'use-absolute-date' => el.attributes['use-absolute-date'] || '',
           'default-interval' => el.elements['default-interval']&.text || '',
           'default-count' => el.elements['default-count']&.text || '',
-          'default-time' => default_time_hash
+          'default-time' => default_time_hash,
         }
       else
         {}
