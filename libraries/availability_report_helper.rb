@@ -117,7 +117,7 @@ module Opennms
         end
 
         def parse_parameters(params_elem)
-          return {} if params_elem.nil?
+          return {} unless params_elem
 
           params_hash = {}
 
@@ -132,20 +132,18 @@ module Opennms
 
             default_time_el = el.elements['default-time']
             if default_time_el
-              h['default-time'] =
-                if default_time_el.attributes['hour'] && default_time_el.attributes['minute']
-                  {
-                    'hour' => default_time_el.attributes['hour'],
-                    'minute' => default_time_el.attributes['minute'],
-                  }
-                else
-                  {
-                    'hour' => default_time_el.elements['hours']&.text,
-                    'minute' => default_time_el.elements['minutes']&.text,
-                  }
-                end
+              h['default-time'] = if default_time_el.attributes['hour'] && default_time_el.attributes['minute']
+                                   {
+                                     'hour' => default_time_el.attributes['hour'],
+                                     'minute' => default_time_el.attributes['minute'],
+                                   }
+                                 else
+                                   {
+                                     'hour' => default_time_el.elements['hours']&.text,
+                                     'minute' => default_time_el.elements['minutes']&.text,
+                                   }
+                                 end
             end
-
             params_hash[el.attributes['name']] = h
           end
 
@@ -215,9 +213,11 @@ module Opennms
         end
 
         def edit_xml_file(path)
+          raise 'edit_xml_file requires a block' unless block_given?
+
           content = ::File.read(path)
           doc = REXML::Document.new(content)
-          yield(doc) if block_given?
+          yield(doc)
 
           formatter = REXML::Formatters::Pretty.new(2)
           formatter.compact = true
@@ -230,20 +230,12 @@ module Opennms
     end
 
     module AvailabilityReportTemplate
-      def availability_reports_resource_init
-        availability_reports_resource_create unless availability_reports_resource_exist?
-      end
-
       def availability_reports_resource
-        return unless availability_reports_resource_exist?
-
-        find_resource!(:template, availability_reports_config_path)
+        find_resource(:template, availability_reports_config_path) rescue nil
       end
 
       def availability_reports_resource_exist?
-        !find_resource(:template, availability_reports_config_path).nil?
-      rescue Chef::Exceptions::ResourceNotFound
-        false
+        !availability_reports_resource.nil?
       end
 
       def availability_reports_config_path
@@ -252,19 +244,18 @@ module Opennms
 
       def availability_reports_resource_create
         config_path = availability_reports_config_path
-        config = Opennms::Cookbook::AvailabilityReportHelper::ReportConfig.new
+        config = AvailabilityReportHelper::ReportConfig.new
 
         if ::File.exist?(config_path)
-          Chef::Log.info("[AvailabilityReportTemplate] Reading existing config from: #{config_path}")
           config.read!(config_path)
         else
-          Chef::Log.warn("[AvailabilityReportTemplate] Config file #{config_path} does not exist, initializing empty config.")
+          Chef::Log.info("Config file #{config_path} does not exist; starting with an empty report config.")
         end
 
         with_run_context :root do
           declare_resource(:template, config_path) do
             source 'availability-reports.xml.erb'
-            cookbook 'opennms'
+            cookbook 'opennms' # Adjust as needed to your cookbook name
             owner node['opennms']['username']
             group node['opennms']['groupname']
             mode '0644'
