@@ -24,7 +24,7 @@ module Opennms
               svg_template: el.elements['svg-template']&.text,
               html_template: el.elements['html-template']&.text,
               logo: el.elements['logo']&.text,
-              parameters: parse_parameters(el.elements['parameters']),
+              parameters: parse_parameters(el.elements['parameters'])
             }
             @reports << report
           end
@@ -133,16 +133,16 @@ module Opennms
             default_time_el = el.elements['default-time']
             if default_time_el
               h['default-time'] = if default_time_el.attributes['hour'] && default_time_el.attributes['minute']
-                                   {
-                                     'hour' => default_time_el.attributes['hour'],
-                                     'minute' => default_time_el.attributes['minute'],
-                                   }
-                                 else
-                                   {
-                                     'hour' => default_time_el.elements['hours']&.text,
-                                     'minute' => default_time_el.elements['minutes']&.text,
-                                   }
-                                 end
+                {
+                  'hour' => default_time_el.attributes['hour'],
+                  'minute' => default_time_el.attributes['minute']
+                }
+              else
+                {
+                  'hour' => default_time_el.elements['hours']&.text,
+                  'minute' => default_time_el.elements['minutes']&.text
+                }
+              end
             end
 
             params_hash[el.attributes['name']] = h
@@ -216,7 +216,7 @@ module Opennms
         def edit_xml_file(path)
           content = ::File.read(path)
           doc = REXML::Document.new(content)
-          yield(doc)
+          yield(doc) if block_given?
 
           formatter = REXML::Formatters::Pretty.new(2)
           formatter.compact = true
@@ -235,6 +235,7 @@ module Opennms
 
       def availability_reports_resource
         return unless availability_reports_resource_exist?
+
         find_resource!(:template, availability_reports_config_path)
       end
 
@@ -262,7 +263,7 @@ module Opennms
         with_run_context :root do
           declare_resource(:template, config_path) do
             source 'availability-reports.xml.erb'
-            cookbook 'opennms'  # Adjust if your cookbook has a different name
+            cookbook 'opennms'
             owner node['opennms']['username']
             group node['opennms']['groupname']
             mode '0644'
