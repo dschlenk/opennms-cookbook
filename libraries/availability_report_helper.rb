@@ -65,12 +65,9 @@ module Opennms
         def create!(file_path, new_report)
           edit_xml_file(file_path) do |doc|
             root = doc.root
-
             report_el = REXML::Element.new('report')
             report_el.add_attributes('id' => new_report[:id], 'type' => new_report[:type])
-
             add_optional_children(report_el, new_report)
-
             root.add_element(report_el)
             @reports << new_report
           end
@@ -116,7 +113,6 @@ module Opennms
             child.text = report_hash[key]
             report_el.add_element(child)
           end
-
           report_el.add_element(build_parameters(report_hash[:parameters])) if report_hash[:parameters]
         end
 
@@ -137,16 +133,16 @@ module Opennms
             default_time_el = el.elements['default-time']
             if default_time_el
               h['default-time'] = if default_time_el.attributes['hour'] && default_time_el.attributes['minute']
-                                    {
-                                      'hour' => default_time_el.attributes['hour'],
-                                      'minute' => default_time_el.attributes['minute'],
-                                    }
-                                  else
-                                    {
-                                      'hour' => default_time_el.elements['hours']&.text,
-                                      'minute' => default_time_el.elements['minutes']&.text,
-                                    }
-                                  end
+                                   {
+                                     'hour' => default_time_el.attributes['hour'],
+                                     'minute' => default_time_el.attributes['minute'],
+                                   }
+                                 else
+                                   {
+                                     'hour' => default_time_el.elements['hours']&.text,
+                                     'minute' => default_time_el.elements['minutes']&.text,
+                                   }
+                                 end
             end
 
             params_hash[el.attributes['name']] = h
