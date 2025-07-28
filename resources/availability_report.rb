@@ -47,7 +47,6 @@ load_current_value do |desired|
 end
 
 action_class do
-  include Chef::DSL::Recipe
   include Opennms::XmlHelper
   include ::Opennms::Cookbook::AvailabilityReportTemplate
 
