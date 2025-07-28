@@ -2,37 +2,65 @@ module Opennms
   module Cookbook
     module AvailabilityReportHelper
       class ReportConfig
-        attr_reader :data
+        attr_reader :reports
 
         def initialize
-          @data = { reports: [] }
+          @reports = []
         end
 
         def read!(file_path)
-          edit_xml_file(file_path) do |doc|
-            doc.elements.each('opennms-reports/report') do |el|
-              report = {
-                id: el.attributes['id'],
-                type: el.attributes['type'],
-                pdf_template: el.elements['pdf-template']&.text,
-                svg_template: el.elements['svg-template']&.text,
-                html_template: el.elements['html-template']&.text,
-                logo: el.elements['logo']&.text,
-                parameters: {},
-              }
+          raise "Config file '#{file_path}' does not exist" unless ::File.exist?(file_path)
 
-              @data[:reports] << report
-            end
+          content = ::File.read(file_path)
+          doc = REXML::Document.new(content)
+
+          @reports.clear
+
+          doc.elements.each('opennms-reports/report') do |el|
+            report = {
+              id: el.attributes['id'],
+              type: el.attributes['type'],
+              pdf_template: el.elements['pdf-template']&.text,
+              svg_template: el.elements['svg-template']&.text,
+              html_template: el.elements['html-template']&.text,
+              logo: el.elements['logo']&.text,
+              parameters: parse_parameters(el.elements['parameters']),
+            }
+            @reports << report
           end
         end
 
         def report_exists?(report_id)
-          @data[:reports].any? { |r| r[:id] == report_id }
+          @reports.any? { |r| r[:id] == report_id }
         end
 
         def find_report_by_id(report_id)
-          @data[:reports].find { |report| report[:id] == report_id }
+          @reports.find { |r| r[:id] == report_id }
         end
+
+        def add_or_update_report(file_path, new_report)
+          if report_exists?(new_report[:id])
+            update!(file_path, new_report)
+          else
+            create!(file_path, new_report)
+          end
+          true
+        end
+
+        def delete!(file_path, report_id)
+          edit_xml_file(file_path) do |doc|
+            reports = doc.elements.to_a('opennms-reports/report')
+            reports.each do |el|
+              if el.attributes['id'] == report_id
+                doc.root.delete_element(el)
+                @reports.delete_if { |r| r[:id] == report_id }
+                break
+              end
+            end
+          end
+        end
+
+        private
 
         def create!(file_path, new_report)
           edit_xml_file(file_path) do |doc|
@@ -41,16 +69,10 @@ module Opennms
             report_el = REXML::Element.new('report')
             report_el.add_attributes('id' => new_report[:id], 'type' => new_report[:type])
 
-            %i(pdf_template svg_template html_template logo).each do |field|
-              next unless new_report[field]
+            add_optional_children(report_el, new_report)
 
-              child = REXML::Element.new(field.to_s.tr('_', '-'))
-              child.text = new_report[field]
-              report_el.add_element(child)
-            end
-
-            report_el.add_element(build_parameters(new_report[:parameters])) if new_report[:parameters]
             root.add_element(report_el)
+            @reports << new_report
           end
         end
 
@@ -64,7 +86,6 @@ module Opennms
               %w(pdf-template svg-template html-template logo).each do |tag|
                 child = el.elements[tag]
                 value = updated_report[tag.tr('-', '_').to_sym]
-
                 if value
                   if child
                     child.text = value
@@ -78,32 +99,72 @@ module Opennms
                 end
               end
 
-              el.delete_element('parameters')
-              el.add_element(build_parameters(updated_report[:parameters])) if updated_report[:parameters]
-            end
-          end
-        end
-
-        def delete!(file_path, report_id)
-          edit_xml_file(file_path) do |doc|
-            doc.elements.each('opennms-reports/report') do |el|
-              if el.attributes['id'] == report_id
-                doc.root.delete_element(el)
-                break
+              if el.elements['parameters']
+                el.delete_element('parameters')
               end
+
+              if updated_report[:parameters]
+                el.add_element(build_parameters(updated_report[:parameters]))
+              end
+
+              idx = @reports.find_index { |r| r[:id] == updated_report[:id] }
+              @reports[idx] = updated_report if idx
             end
           end
         end
 
-        def add_or_update_report(file_path, report)
-          if report_exists?(report[:id])
-            update!(file_path, report)
-          else
-            create!(file_path, report)
+        def add_optional_children(report_el, report_hash)
+          %i(pdf_template svg_template html_template logo).each do |key|
+            next unless report_hash[key]
+
+            child = REXML::Element.new(key.to_s.tr('_', '-'))
+            child.text = report_hash[key]
+            report_el.add_element(child)
+          end
+
+          if report_hash[:parameters]
+            report_el.add_element(build_parameters(report_hash[:parameters]))
           end
         end
 
-        private
+        def parse_parameters(params_elem)
+          return {} if params_elem.nil?
+
+          params_hash = {}
+
+          params_elem.elements.each('string-parm') do |el|
+            params_hash[el.attributes['name']] = el.attributes.transform_keys(&:to_s)
+          end
+
+          params_elem.elements.each('date-parm') do |el|
+            h = el.attributes.transform_keys(&:to_s)
+            h['default-interval'] = el.elements['default-interval']&.text
+            h['default-count'] = el.elements['default-count']&.text
+
+            default_time_el = el.elements['default-time']
+            if default_time_el
+              h['default-time'] = if default_time_el.attributes['hour'] && default_time_el.attributes['minute']
+                                   {
+                                     'hour' => default_time_el.attributes['hour'],
+                                     'minute' => default_time_el.attributes['minute'],
+                                   }
+                                 else
+                                   {
+                                     'hour' => default_time_el.elements['hours']&.text,
+                                     'minute' => default_time_el.elements['minutes']&.text,
+                                   }
+                                 end
+            end
+
+            params_hash[el.attributes['name']] = h
+          end
+
+          params_elem.elements.each('int-parm') do |el|
+            params_hash[el.attributes['name']] = el.attributes.transform_keys(&:to_s)
+          end
+
+          params_hash
+        end
 
         def build_parameters(params)
           params_el = REXML::Element.new('parameters')
@@ -174,6 +235,53 @@ module Opennms
           formatter.write(doc, output)
           ::File.write(path, output)
           doc
+        end
+      end
+    end
+
+    module AvailabilityReportTemplate
+      def availability_reports_resource_init
+        availability_reports_resource_create unless availability_reports_resource_exist?
+      end
+
+      def availability_reports_resource
+        return unless availability_reports_resource_exist?
+        find_resource!(:template, availability_reports_config_path)
+      end
+
+      def availability_reports_resource_exist?
+        !find_resource(:template, availability_reports_config_path).nil?
+      rescue Chef::Exceptions::ResourceNotFound
+        false
+      end
+
+      def availability_reports_config_path
+        ::File.join(node['opennms']['conf']['home'], 'etc', 'availability-reports.xml')
+      end
+
+      def availability_reports_resource_create
+        config_path = availability_reports_config_path
+        config = Opennms::Cookbook::AvailabilityReportHelper::ReportConfig.new
+
+        if ::File.exist?(config_path)
+          Chef::Log.info("[AvailabilityReportTemplate] Reading existing config from: #{config_path}")
+          config.read!(config_path)
+        else
+          Chef::Log.warn("[AvailabilityReportTemplate] Config file #{config_path} does not exist, initializing empty config.")
+        end
+
+        with_run_context :root do
+          declare_resource(:template, config_path) do
+            source 'availability-reports.xml.erb'
+            cookbook 'opennms'
+            owner node['opennms']['username']
+            group node['opennms']['groupname']
+            mode '0644'
+            variables(reports: config.reports)
+            action :nothing
+            delayed_action :create
+            notifies :restart, 'service[opennms]', :delayed
+          end
         end
       end
     end
