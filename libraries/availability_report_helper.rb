@@ -133,16 +133,16 @@ module Opennms
             default_time_el = el.elements['default-time']
             if default_time_el
               h['default-time'] = if default_time_el.attributes['hour'] && default_time_el.attributes['minute']
-                                   {
-                                     'hour' => default_time_el.attributes['hour'],
-                                     'minute' => default_time_el.attributes['minute'],
-                                   }
-                                 else
-                                   {
-                                     'hour' => default_time_el.elements['hours']&.text,
-                                     'minute' => default_time_el.elements['minutes']&.text,
-                                   }
-                                 end
+                                    {
+                                      'hour' => default_time_el.attributes['hour'],
+                                      'minute' => default_time_el.attributes['minute'],
+                                    }
+                                  else
+                                    {
+                                      'hour' => default_time_el.elements['hours']&.text,
+                                      'minute' => default_time_el.elements['minutes']&.text,
+                                    }
+                                  end
             end
             params_hash[el.attributes['name']] = h
           end
@@ -231,7 +231,11 @@ module Opennms
 
     module AvailabilityReportTemplate
       def availability_reports_resource
-        find_resource(:template, availability_reports_config_path) rescue nil
+        begin
+          find_resource(:template, availability_reports_config_path)
+        rescue
+          nil
+        end
       end
 
       def availability_reports_resource_exist?
@@ -255,7 +259,7 @@ module Opennms
         with_run_context :root do
           declare_resource(:template, config_path) do
             source 'availability-reports.xml.erb'
-            cookbook 'opennms' # Adjust as needed to your cookbook name
+            cookbook 'opennms'
             owner node['opennms']['username']
             group node['opennms']['groupname']
             mode '0644'
