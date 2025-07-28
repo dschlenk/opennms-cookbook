@@ -31,7 +31,6 @@ property :logo_source_properties, Hash, default: {}
 property :parameters, Hash, default: {}
 
 default_action :create
-allowed_actions :create, :create_if_missing, :delete
 
 action_class do
   include Opennms::XmlHelper
