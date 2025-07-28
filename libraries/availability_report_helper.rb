@@ -273,7 +273,7 @@ module Opennms
         with_run_context :root do
           declare_resource(:template, config_path) do
             source 'availability-reports.xml.erb'
-            cookbook 'opennms'  # Change to your cookbook name if different
+            cookbook 'opennms'  # Adjust if your cookbook has a different name
             owner node['opennms']['username']
             group node['opennms']['groupname']
             mode '0644'
