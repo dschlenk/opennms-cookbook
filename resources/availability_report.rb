@@ -30,6 +30,14 @@ property :logo_source_properties, Hash, default: {}
 
 property :parameters, Hash, default: {}
 
+def etc_dir
+  ::File.join(node['opennms']['conf']['home'], 'etc')
+end
+
+def config_file
+  ::File.join(etc_dir, 'availability-reports.xml')
+end
+
 default_action :create
 
 load_current_value do |desired|
@@ -49,14 +57,6 @@ end
 action_class do
   include Opennms::XmlHelper
   include ::Opennms::Cookbook::AvailabilityReportTemplate
-
-  def etc_dir
-    ::File.join(node['opennms']['conf']['home'], 'etc')
-  end
-
-  def config_file
-    ::File.join(etc_dir, 'availability-reports.xml')
-  end
 
   def create_template_file(prefix)
     template_name = new_resource.send("#{prefix}_template")
