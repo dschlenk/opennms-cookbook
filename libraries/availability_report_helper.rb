@@ -24,7 +24,7 @@ module Opennms
               svg_template: el.elements['svg-template']&.text,
               html_template: el.elements['html-template']&.text,
               logo: el.elements['logo']&.text,
-              parameters: parse_parameters(el.elements['parameters']),
+              parameters: parse_parameters(el.elements['parameters'])
             }
           end
         end
@@ -82,7 +82,7 @@ module Opennms
 
               el.attributes['type'] = updated_report[:type]
 
-              %w(pdf-template svg-template html-template logo).each do |tag|
+              %w[pdf-template svg-template html-template logo].each do |tag|
                 child = el.elements[tag]
                 value = updated_report[tag.tr('-', '_').to_sym]
                 if value
@@ -108,7 +108,7 @@ module Opennms
         end
 
         def add_optional_children(report_el, report_hash)
-          %i(pdf_template svg_template html_template logo).each do |key|
+          %i[pdf_template svg_template html_template logo].each do |key|
             next unless report_hash[key]
 
             child = REXML::Element.new(key.to_s.tr('_', '-'))
@@ -135,16 +135,16 @@ module Opennms
             default_time_el = el.elements['default-time']
             if default_time_el
               h['default-time'] = if default_time_el.attributes['hour'] && default_time_el.attributes['minute']
-                                   {
-                                     'hour' => default_time_el.attributes['hour'],
-                                     'minute' => default_time_el.attributes['minute'],
-                                   }
-                                 else
-                                   {
-                                     'hour' => default_time_el.elements['hours']&.text,
-                                     'minute' => default_time_el.elements['minutes']&.text,
-                                   }
-                                 end
+                                    {
+                                      'hour' => default_time_el.attributes['hour'],
+                                      'minute' => default_time_el.attributes['minute']
+                                    }
+                                  else
+                                    {
+                                      'hour' => default_time_el.elements['hours']&.text,
+                                      'minute' => default_time_el.elements['minutes']&.text
+                                    }
+                                  end
             end
 
             params_hash[el.attributes['name']] = h
@@ -234,7 +234,11 @@ module Opennms
 
     module AvailabilityReportTemplate
       def availability_reports_resource
-        find_resource(:template, availability_reports_config_path) rescue nil
+        begin
+          find_resource(:template, availability_reports_config_path)
+        rescue
+          nil
+        end
       end
 
       def availability_reports_resource_exist?
