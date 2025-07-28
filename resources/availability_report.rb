@@ -31,6 +31,7 @@ property :logo_source_properties, Hash, default: {}
 property :parameters, Hash, default: {}
 
 default_action :create
+allowed_actions :create, :create_if_missing, :delete
 
 action_class do
   include Opennms::XmlHelper
@@ -63,7 +64,8 @@ action_class do
         action :create
       end
     elsif !::File.exist?(target_path)
-      raise Chef::Exceptions::FileNotFound, "#{prefix}_template file '#{template_name}' not found at #{target_path} and no source provided"
+      raise Chef::Exceptions::FileNotFound,
+            "#{prefix}_template file '#{template_name}' not found at #{target_path} and no source provided"
     end
   end
 
@@ -80,7 +82,8 @@ action_class do
         action :create
       end
     elsif !::File.exist?(target_path)
-      raise Chef::Exceptions::FileNotFound, "logo file '#{new_resource.logo}' not found at #{target_path} and no source provided"
+      raise Chef::Exceptions::FileNotFound,
+            "logo file '#{new_resource.logo}' not found at #{target_path} and no source provided"
     end
   end
 end
@@ -113,10 +116,11 @@ action :create do
     logo: new_resource.logo,
   }
 
-  updated = config.add_or_update_report(config_file, report)
-  converge_by("Saving availability report #{new_resource.report_id} to #{config_file}") if updated
+  converge_by("Saving availability report #{new_resource.report_id} to #{config_file}") do
+    config.add_or_update_report(config_file, report)
+  end
 
-  availability_reports_resource_create
+  availability_reports_resource_create  # declares the template resource with delayed action to write file
 
   create_template_file('pdf')
   create_template_file('svg')
@@ -134,8 +138,9 @@ action :delete do
   config = ::Opennms::Cookbook::AvailabilityReportHelper::ReportConfig.new
   config.read!(config_file)
   if config.report_exists?(new_resource.report_id)
-    config.delete!(config_file, new_resource.report_id)
-    converge_by("Deleted availability report #{new_resource.report_id} from #{config_file}") {}
+    converge_by("Deleted availability report #{new_resource.report_id} from #{config_file}") do
+      config.delete!(config_file, new_resource.report_id)
+    end
     availability_reports_resource_create
   end
 end
