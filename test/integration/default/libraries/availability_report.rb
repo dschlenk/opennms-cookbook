@@ -21,7 +21,7 @@ module Inspec::Resources
       read_report
     end
 
-    def exist?
+    def exists?
       !@report_element.nil?
     end
 
