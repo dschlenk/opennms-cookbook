@@ -24,7 +24,7 @@ module Opennms
               svg_template: el.elements['svg-template']&.text,
               html_template: el.elements['html-template']&.text,
               logo: el.elements['logo']&.text,
-              parameters: parse_parameters(el.elements['parameters']),
+              parameters: parse_parameters(el.elements['parameters'])
             }
             @reports << report
           end
@@ -136,12 +136,12 @@ module Opennms
                 if default_time_el.attributes['hour'] && default_time_el.attributes['minute']
                   {
                     'hour' => default_time_el.attributes['hour'],
-                    'minute' => default_time_el.attributes['minute'],
+                    'minute' => default_time_el.attributes['minute']
                   }
                 else
                   {
                     'hour' => default_time_el.elements['hours']&.text,
-                    'minute' => default_time_el.elements['minutes']&.text,
+                    'minute' => default_time_el.elements['minutes']&.text
                   }
                 end
             end
@@ -164,7 +164,7 @@ module Opennms
             el.add_attributes(
               'name' => sp['name'],
               'display-name' => sp['display_name'],
-              'input-type' => sp['input_type'],
+              'input-type' => sp['input_type']
             )
             el.add_attribute('default', sp['default']) if sp.key?('default')
             params_el.add_element(el)
@@ -174,7 +174,7 @@ module Opennms
             el = REXML::Element.new('date-parm')
             el.add_attributes(
               'name' => dp['name'],
-              'display-name' => dp['display_name'],
+              'display-name' => dp['display_name']
             )
             el.add_attribute('use-absolute-date', dp['use_absolute_date'].to_s) if dp.key?('use_absolute_date')
 
@@ -205,7 +205,7 @@ module Opennms
             el.add_attributes(
               'name' => ip['name'],
               'display-name' => ip['display_name'],
-              'input-type' => ip['input_type'],
+              'input-type' => ip['input_type']
             )
             el.add_attribute('default', ip['default'].to_s) if ip.key?('default')
             params_el.add_element(el)
