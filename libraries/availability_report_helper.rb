@@ -24,7 +24,7 @@ module Opennms
               svg_template: el.elements['svg-template']&.text,
               html_template: el.elements['html-template']&.text,
               logo: el.elements['logo']&.text,
-              parameters: parse_parameters(el.elements['parameters'])
+              parameters: parse_parameters(el.elements['parameters']),
             }
             @reports << report
           end
@@ -136,12 +136,12 @@ module Opennms
                 if default_time_el.attributes['hour'] && default_time_el.attributes['minute']
                   {
                     'hour' => default_time_el.attributes['hour'],
-                    'minute' => default_time_el.attributes['minute']
+                    'minute' => default_time_el.attributes['minute'],
                   }
                 else
                   {
                     'hour' => default_time_el.elements['hours']&.text,
-                    'minute' => default_time_el.elements['minutes']&.text
+                    'minute' => default_time_el.elements['minutes']&.text,
                   }
                 end
             end
