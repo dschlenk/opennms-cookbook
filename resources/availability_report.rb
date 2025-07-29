@@ -33,8 +33,12 @@ property :parameters, Hash, default: {}
 default_action :create
 
 load_current_value do
-  tpl_resource = availability_template_resource
-  config_reports = tpl_resource&.variables[:reports]
+  config_reports = if !availability_template_resource.nil?
+             availability_template_resource.variables(:config)
+           else
+             ro_availability_template_resource_init
+             ro_availability_template_resource.variables(:config)
+           end
   report = config_reports&.find { |r| r[:id] == report_id }
 
   current_value_does_not_exist! if report.nil?
