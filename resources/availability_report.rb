@@ -109,7 +109,7 @@ action_class do
     declare_resource(source_type.to_sym, target_path) do
       source source
       variables(variables) if source_type.to_s == 'template' && !variables.empty?
-      properties.each { |k, v| send(k, v) } if !properties.empty?
+      properties.each { |k, v| send(k, v) } unless !properties.empty?
       action :create
     end
   end
@@ -122,7 +122,7 @@ action_class do
     declare_resource(new_resource.logo_source_type.to_sym, target_path) do
       source new_resource.logo_source if new_resource.logo_source
       variables(new_resource.logo_source_variables) if new_resource.logo_source_type.to_s == 'template' && !new_resource.logo_source_variables.empty?
-      new_resource.logo_source_properties.each { |k, v| send(k, v) } if !new_resource.logo_source_properties.empty?
+      new_resource.logo_source_properties.each { |k, v| send(k, v) } unless !new_resource.logo_source_properties.empty?
       action :create
     end
   end
@@ -146,7 +146,7 @@ action :create do
     svg_template: new_resource.svg_template,
     html_template: new_resource.html_template,
     logo: new_resource.logo,
-    parameters: new_resource.parameters
+    parameters: new_resource.parameters,
   }
 
   update_template_resource(reports_collection)
