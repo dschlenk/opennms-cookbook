@@ -69,16 +69,16 @@ module Opennms
             default_time_el = el.elements['default-time']
             if default_time_el
               h['default-time'] = if default_time_el.attributes['hour'] && default_time_el.attributes['minute']
-                {
-                  'hour' => default_time_el.attributes['hour'],
-                  'minute' => default_time_el.attributes['minute'],
-                }
-              else
-                {
-                  'hour' => default_time_el.elements['hours']&.text,
-                  'minute' => default_time_el.elements['minutes']&.text,
-                }
-              end
+                                    {
+                                      'hour' => default_time_el.attributes['hour'],
+                                      'minute' => default_time_el.attributes['minute'],
+                                    }
+                                  else
+                                    {
+                                      'hour' => default_time_el.elements['hours']&.text,
+                                      'minute' => default_time_el.elements['minutes']&.text,
+                                    }
+                                  end
             end
 
             params_hash[el.attributes['name']] = h
