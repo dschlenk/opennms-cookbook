@@ -1,4 +1,4 @@
-include Opennms::XmlHelper
+include Opennms::XmlCookbookHelper
 include ::Opennms::Cookbook::AvailabilityReportTemplate
 
 property :report_id, String, name_property: true
@@ -33,7 +33,7 @@ property :parameters, Hash, default: {}
 default_action :create
 
 action_class do
-  include Opennms::XmlHelper
+  include Opennms::XmlCookbookHelper
   include ::Opennms::Cookbook::AvailabilityReportTemplate
 
   def etc_dir
@@ -44,53 +44,86 @@ action_class do
     ::File.join(etc_dir, 'availability-reports.xml')
   end
 
+  def reports_collection
+    node.run_state['availability_reports'] ||= []
+  end
+
+  def availability_reports_template_resource
+    begin
+      resources(template: config_file)
+    rescue Chef::Exceptions::ResourceNotFound
+      nil
+    end
+  end
+
+  def update_template_resource(reports)
+    tr = availability_reports_template_resource
+    if tr
+      tr.variables(reports: reports)
+    else
+      template config_file do
+        source 'availability-reports.xml.erb'
+        cookbook 'opennms'
+        owner node['opennms']['user'] || 'root'
+        group node['opennms']['group'] || 'root'
+        mode '0644'
+        variables(reports: reports)
+        action :nothing
+        notifies :restart, 'service[opennms]', :delayed
+      end
+    end
+  end
+
+  def create_auxiliary_files
+    create_template_file('pdf')
+    create_template_file('svg')
+    create_template_file('html')
+    create_logo_file
+  end
+
   def create_template_file(prefix)
     template_name = new_resource.send("#{prefix}_template")
-    source = new_resource.send("#{prefix}_template_source")
-    source_type = new_resource.send("#{prefix}_template_source_type").to_sym
-    variables = new_resource.send("#{prefix}_template_source_variables")
-    props = new_resource.send("#{prefix}_template_source_properties")
+    source = new_resource.send("#{prefix}_source") rescue nil
+    source ||= new_resource.send("#{prefix}_template_source") rescue nil
+    source_type = new_resource.send("#{prefix}_source_type")
+    variables = new_resource.send("#{prefix}_source_variables") || {}
+    properties = new_resource.send("#{prefix}_source_properties") || {}
 
-    return if template_name.nil?
+    return if template_name.nil? || template_name.empty? || source.nil?
 
     target_path = ::File.join(etc_dir, template_name)
 
-    if source
-      declare_resource(source_type, target_path) do
-        source source
-        variables variables if source_type == :template && !variables.empty?
-        props.each { |k, v| send(k, v) }
-        action :create
-      end
-    elsif !::File.exist?(target_path)
-      raise Chef::Exceptions::FileNotFound,
-            "#{prefix}_template file '#{template_name}' not found at #{target_path} and no source provided"
+    declare_resource(source_type.to_sym, target_path) do
+      source source
+      variables variables if source_type == 'template' && !variables.empty?
+      properties.each { |k, v| send(k, v) } unless properties.empty?
+      action :create
     end
   end
 
   def create_logo_file
-    return if new_resource.logo.nil?
+    return if new_resource.logo.nil? || new_resource.logo.empty?
 
     target_path = ::File.join(etc_dir, new_resource.logo)
+    source = new_resource.logo_source
+    source_type = new_resource.logo_source_type
+    variables = new_resource.logo_source_variables || {}
+    properties = new_resource.logo_source_properties || {}
 
-    if new_resource.logo_source
-      declare_resource(new_resource.logo_source_type.to_sym, target_path) do
-        source new_resource.logo_source
-        variables new_resource.logo_source_variables if new_resource.logo_source_type == 'template' && !new_resource.logo_source_variables.empty?
-        new_resource.logo_source_properties.each { |k, v| send(k, v) }
-        action :create
-      end
-    elsif !::File.exist?(target_path)
-      raise Chef::Exceptions::FileNotFound,
-            "logo file '#{new_resource.logo}' not found at #{target_path} and no source provided"
+    declare_resource(source_type.to_sym, target_path) do
+      source source if source
+      variables variables if source_type == 'template' && !variables.empty?
+      properties.each { |k, v| send(k, v) } unless properties.empty?
+      action :create
     end
   end
 end
 
-load_current_value do |desired|
+load_current_value do
   config = ::Opennms::Cookbook::AvailabilityReportHelper::ReportConfig.new
-  config.read!(::File.join(node['opennms']['conf']['home'], 'etc', 'availability-reports.xml'))
-  report = config.find_report_by_id(desired.report_id)
+  config.read!(config_file)
+
+  report = config.find_by_id(report_id)
   current_value_does_not_exist! if report.nil?
 
   type report[:type]
@@ -102,44 +135,34 @@ load_current_value do |desired|
 end
 
 action :create do
-  config = ::Opennms::Cookbook::AvailabilityReportHelper::ReportConfig.new
-  config.read!(config_file)
+  reports_collection.reject! { |r| r[:id] == new_resource.report_id }
 
-  report = {
+  reports_collection << {
     id: new_resource.report_id,
     type: new_resource.type,
-    parameters: new_resource.parameters,
     pdf_template: new_resource.pdf_template,
     svg_template: new_resource.svg_template,
     html_template: new_resource.html_template,
     logo: new_resource.logo,
+    parameters: new_resource.parameters
   }
 
-  converge_by("Saving availability report #{new_resource.report_id} to #{config_file}") do
-    config.add_or_update_report(config_file, report)
+  update_template_resource(reports_collection)
+
+  converge_if_changed do
+    create_auxiliary_files
   end
-
-  availability_reports_resource_create  # declares the template resource with delayed action to write file
-
-  create_template_file('pdf')
-  create_template_file('svg')
-  create_template_file('html')
-  create_logo_file
 end
 
 action :create_if_missing do
-  config = ::Opennms::Cookbook::AvailabilityReportHelper::ReportConfig.new
-  config.read!(config_file)
-  run_action(:create) unless config.report_exists?(new_resource.report_id)
+  unless reports_collection.any? { |r| r[:id] == new_resource.report_id }
+    action_create
+  end
 end
 
 action :delete do
-  config = ::Opennms::Cookbook::AvailabilityReportHelper::ReportConfig.new
-  config.read!(config_file)
-  if config.report_exists?(new_resource.report_id)
-    converge_by("Deleted availability report #{new_resource.report_id} from #{config_file}") do
-      config.delete!(config_file, new_resource.report_id)
-    end
-    availability_reports_resource_create
+  if reports_collection.any? { |r| r[:id] == new_resource.report_id }
+    reports_collection.reject! { |r| r[:id] == new_resource.report_id }
+    update_template_resource(reports_collection)
   end
 end
