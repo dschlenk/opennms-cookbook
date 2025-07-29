@@ -1,6 +1,3 @@
-# resources/availability_report.rb
-# frozen_string_literal: true
-
 include Opennms::XmlCookbookHelper
 include ::Opennms::Cookbook::AvailabilityReportTemplate
 
