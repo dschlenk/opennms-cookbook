@@ -1,5 +1,5 @@
 include Opennms::XmlHelper
-include Opennms::Cookbook::AvailabilityReportHelper
+include ::Opennms::Cookbook::AvailabilityReportTemplate
 
 property :report_id, String, name_property: true
 property :type, String, equal_to: %w(calendar classic), default: 'calendar'
