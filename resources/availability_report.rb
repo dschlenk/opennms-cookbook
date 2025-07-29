@@ -134,7 +134,7 @@ action :create do
     svg_template: new_resource.svg_template,
     html_template: new_resource.html_template,
     logo: new_resource.logo,
-    parameters: new_resource.parameters
+    parameters: new_resource.parameters,
   }
 
   update_template_resource(reports_collection)
