@@ -103,7 +103,8 @@ module Opennms
       end
 
       def availability_report_path
-        ::File.join(node['opennms']['home'], 'etc', 'availability-reports.xml')
+        ::File.join(node['opennms']['conf']['home'], 'etc', 'availability-reports.xml')
+        # ::File.join(node['opennms']['home'], 'etc', 'availability-reports.xml')
       end
 
       def availability_template_resource_create
