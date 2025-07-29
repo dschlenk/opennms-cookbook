@@ -24,7 +24,7 @@ module Opennms
               svg_template: el.elements['svg-template']&.text,
               html_template: el.elements['html-template']&.text,
               logo: el.elements['logo']&.text,
-              parameters: parse_parameters(el.elements['parameters'])
+              parameters: parse_parameters(el.elements['parameters']),
             }
           end
         end
