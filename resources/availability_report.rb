@@ -1,4 +1,4 @@
-include Opennms::XmlCookbookHelper
+iinclude Opennms::XmlHelper
 include ::Opennms::Cookbook::AvailabilityReportTemplate
 
 property :report_id, String, name_property: true
@@ -34,7 +34,7 @@ property :parameters, Hash, default: {}
 default_action :create
 
 action_class do
-  include Opennms::XmlCookbookHelper
+  include Opennms::XmlHelper
   include ::Opennms::Cookbook::AvailabilityReportTemplate
 
   def etc_dir
