@@ -1,4 +1,4 @@
-iinclude Opennms::XmlHelper
+include Opennms::XmlHelper
 include ::Opennms::Cookbook::AvailabilityReportTemplate
 
 property :report_id, String, name_property: true
