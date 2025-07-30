@@ -41,7 +41,7 @@ end
 def ro_init
   return if ro_resource
 
-  config_obj = ::Opennms::Cookbook::AvailabilityReport::Helper::ReportConfig.new
+  config_obj = ::Opennms::Cookbook::AvailabilityReportTemplate::Helper::ReportConfig.new
   config_obj.read!(availability_path) if ::File.exist?(availability_path)
   declare_resource(:template, availability_path) do
     source 'availability-reports.xml.erb'
