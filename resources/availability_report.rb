@@ -165,7 +165,7 @@ action :create do
       svg_template: svg_template,
       html_template: html_template,
       logo: logo,
-      parameters: parameters
+      parameters: parameters,
     }
     update_template(cur_reports)
     create_aux_files
