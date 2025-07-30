@@ -1,5 +1,5 @@
 include Opennms::XmlHelper
-include Opennms::Cookbook::AvailabilityReportHeler::AvailabilityReportTemplate
+include Opennms::Cookbook::AvailabilityReportHelper::AvailabilityReportTemplate
 
 property :report_id, String, name_property: true
 property :type, String, equal_to: %w(calendar classic), default: 'calendar'
@@ -53,6 +53,34 @@ end
 
 action :create do
   # TODO: create cookbook_file/template/remote_file resource for each of pdf_template, svg_template, html_template, logo when not nil
+  %w[pdf svg html logo].each do |kind|
+    template_value = new_resource.send("#{kind}_template")
+    source_type = new_resource.send("#{kind}_template_source_type")
+    source = new_resource.send("#{kind}_template_source")
+    variables = new_resource.send("#{kind}_template_source_variables")
+    properties = new_resource.send("#{kind}_template_source_properties")
+
+    next if template_value.nil?
+    path = ::File.join(new_resource.onms_home, 'etc', 'report-templates', template_value)
+    case source_type
+    when 'cookbook_file'
+      cookbook_file path do
+        source source
+        **properties
+      end
+    when 'template'
+      template path do
+        source source
+        variables variables
+        **properties
+      end
+    when 'remote_file'
+      remote_file path do
+        source source
+        **properties
+      end
+    end
+  end
   converge_if_changed do
     availability_template_resource_init
     config = availability_template_resource.variables(:config)
@@ -70,6 +98,11 @@ action :create do
     else
       report[:type] = new_resource.type unless new_resource.type.nil?
       # TODO: repeat for the other properties
+      report[:pdf_template] = new_resource.pdf_template unless new_resource.pdf_template.nil?
+      report[:svg_template] = new_resource.svg_template unless new_resource.svg_template.nil?
+      report[:html_template] = new_resource.html_template unless new_resource.html_template.nil?
+      report[:logo] = new_resource.logo unless new_resource.logo.nil?
+      report[:parameters] = new_resource.parameters unless new_resource.parameters.nil?
     end
   end
 end
@@ -80,11 +113,13 @@ action :create_if_missing do
 end
 
 action :delete do
-  cur_reports = reports
-  if cur_reports.any? { |r| r[:id] == report_id }
+  availability_template_resource_init
+  config = availability_template_resource.variables(:config)
+  report = config.find_by_id(new_resource.report_id)
+  unless report.nil?
     converge_by("Remove report #{report_id}") do
-      cur_reports.reject! { |r| r[:id] == report_id }
-      update_template(cur_reports)
+      config.reports.reject! { |r| r[:id] == report_id }
+      update_template(config.reports)
     end
   end
 end
