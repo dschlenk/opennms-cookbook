@@ -98,17 +98,43 @@ module Opennms
         availability_template_resource_create unless availability_template_resource_exist?
       end
 
+      def availability_template_resource_exist?
+        ::File.exist?(availability_report_path)
+      end
+
       def ro_availability_template_resource_init
         ro_availability_template_resource_create unless ro_availability_template_resource_exist?
       end
 
       def ro_availability_template_resource_exist?
-        ::File.exist?(::File.join(onms_etc, 'availability-reports.xml'))
+        ::File.exist?(availability_report_path)
+      end
+
+      def ro_availability_template_resource_create
+        config = AvailabilityReportHelper::ReportConfig.new
+        if ::File.exist?(availability_report_path)
+          config.read!(availability_report_path)
+        else
+          Chef::Log.info "No availability reports config found at #{availability_report_path}, starting fresh."
+        end
+
+        with_run_context :root do
+          declare_resource(:template, availability_report_path) do
+            source 'availability-reports.xml.erb'
+            cookbook 'opennms'
+            owner node['opennms']['user'] || 'root'
+            group node['opennms']['group'] || 'root'
+            mode '0644'
+            variables(reports: config.reports)
+            action :nothing
+            delayed_action :create
+          end
+        end
       end
 
       def ro_availability_template_resource
         return unless ro_availability_template_resource_exist?
-        find_resource!(:template, ::File.join(onms_etc, 'availability-reports.xml'))
+        run_context.resource_collection.find(template: availability_report_path)
       end
 
       def availability_template_resource
