@@ -94,6 +94,25 @@ module Opennms
     end
 
     module AvailabilityReportTemplate
+
+      def availability_template_resource_init
+        availability_template_resource_create unless availability_template_resource_exist?
+      end
+
+      def availability_template_resource
+        return unless availability_template_resource_exist?
+        find_resource!(:template, "#{onms_etc}/availability-reports.xml")
+      end
+
+      def ro_availability_template_resource_init
+        ro_availability_template_resource_create unless ro_availability_template_resource_exist?
+      end
+
+      def ro_availability_template_resource
+        return unless ro_availability_template_resource_exist?
+        find_resource!(:template, "RO #{onms_etc}/availability-reports.xml")
+      end
+
       def availability_template_resource
         begin
           run_context.resource_collection.find(template: availability_report_path)
