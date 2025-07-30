@@ -57,7 +57,7 @@ action :create do
     availability_template_resource_init
     config = availability_template_resource.variables(:config)
     report = config.find_by_id(new_resource.report_id)
-    if (report.nil?)
+    if report.nil?
       config.reports << {
         id: report_id,
         type: type,
