@@ -108,7 +108,7 @@ module Opennms
 
       def ro_availability_template_resource
         return unless ro_availability_template_resource_exist?
-        find_resource!(:template, "RO #{onms_etc}/availability-reports.xml")
+        find_resource!(:template, ::File.join(onms_etc, 'availability-reports.xml'))
       end
 
       def availability_template_resource
