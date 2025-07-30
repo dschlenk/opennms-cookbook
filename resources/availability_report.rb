@@ -1,5 +1,5 @@
 include ::Opennms::XmlHelper
-include ::Opennms::Cookbook::AvailabilityReport
+include ::Opennms::Cookbook::AvailabilityReportTemplate
 
 property :report_id, String, name_property: true
 property :type, String, equal_to: %w(calendar classic), default: 'calendar'
@@ -54,7 +54,7 @@ end
 
 action_class do
   include ::Opennms::XmlHelper
-  include ::Opennms::Cookbook::AvailabilityReport
+  include ::Opennms::Cookbook::AvailabilityReportTemplate
 
   def etc
     ::File.join(node['opennms']['home'], 'etc')
