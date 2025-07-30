@@ -99,11 +99,6 @@ module Opennms
         availability_template_resource_create unless availability_template_resource_exist?
       end
 
-      def availability_template_resource
-        return unless availability_template_resource_exist?
-        find_resource!(:template, "#{onms_etc}/availability-reports.xml")
-      end
-
       def ro_availability_template_resource_init
         ro_availability_template_resource_create unless ro_availability_template_resource_exist?
       end
@@ -123,7 +118,6 @@ module Opennms
 
       def availability_report_path
         ::File.join(node['opennms']['conf']['home'], 'etc', 'availability-reports.xml')
-        # ::File.join(node['opennms']['home'], 'etc', 'availability-reports.xml')
       end
 
       def availability_template_resource_create
@@ -137,7 +131,7 @@ module Opennms
         with_run_context :root do
           declare_resource(:template, availability_report_path) do
             source 'availability-reports.xml.erb'
-            cookbook 'opennms' # adjust to your cookbook name
+            cookbook 'opennms'
             owner node['opennms']['user'] || 'root'
             group node['opennms']['group'] || 'root'
             mode '0644'
