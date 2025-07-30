@@ -113,11 +113,11 @@ module Opennms
       end
 
       private
-      
+
       def config_file_path
         "#{node['opennms']['conf']['home']}/etc/availability-reports.xml"
       end
-      
+
       def availability_template_resource_exist?
         !find_resource(:template, config_file_path).nil?
       rescue Chef::Exceptions::ResourceNotFound
