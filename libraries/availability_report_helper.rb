@@ -94,7 +94,6 @@ module Opennms
     end
 
     module AvailabilityReportTemplate
-
       def availability_template_resource_init
         availability_template_resource_create unless availability_template_resource_exist?
       end
