@@ -98,73 +98,76 @@ module Opennms
         availability_template_resource_create unless availability_template_resource_exist?
       end
 
-      def availability_template_resource_exist?
-        ::File.exist?(availability_report_path)
-      end
-
       def ro_availability_template_resource_init
         ro_availability_template_resource_create unless ro_availability_template_resource_exist?
       end
 
+      def ro_availability_template_resource
+        return unless ro_availability_template_resource_exist?
+        find_resource(:template, "RO #{config_file_path}")
+      end
+
+      def availability_template_resource
+        return unless availability_template_resource_exist?
+        find_resource(:template, config_file_path)
+      end
+
+      private
+      
+      def config_file_path
+        "#{node['opennms']['conf']['home']}/etc/availability-reports.xml"
+      end
+      
+      def availability_template_resource_exist?
+        !find_resource(:template, config_file_path).nil?
+      rescue Chef::Exceptions::ResourceNotFound
+        false
+      end
+
       def ro_availability_template_resource_exist?
-        ::File.exist?(availability_report_path)
+        !find_resource(:template, "RO #{config_file_path}").nil?
+      rescue Chef::Exceptions::ResourceNotFound
+        false
       end
 
       def ro_availability_template_resource_create
         config = AvailabilityReportHelper::ReportConfig.new
-        if ::File.exist?(availability_report_path)
-          config.read!(availability_report_path)
+        if ::File.exist?(config_file_path)
+          config.read!(config_file_path)
         else
-          Chef::Log.info "No availability reports config found at #{availability_report_path}, starting fresh."
+          Chef::Log.info "No availability reports config found at #{config_file_path}, starting fresh."
         end
 
         with_run_context :root do
-          declare_resource(:template, availability_report_path) do
+          declare_resource(:template, "RO #{config_file_path}") do
             source 'availability-reports.xml.erb'
             cookbook 'opennms'
             owner node['opennms']['user'] || 'root'
             group node['opennms']['group'] || 'root'
             mode '0644'
-            variables(reports: config.reports)
+            variables(config: config)
             action :nothing
-            delayed_action :create
+            delayed_action :nothing
           end
         end
       end
 
-      def ro_availability_template_resource
-        return unless ro_availability_template_resource_exist?
-        run_context.resource_collection.find(template: availability_report_path)
-      end
-
-      def availability_template_resource
-        begin
-          run_context.resource_collection.find(template: availability_report_path)
-        rescue Chef::Exceptions::ResourceNotFound
-          nil
-        end
-      end
-
-      def availability_report_path
-        ::File.join(node['opennms']['conf']['home'], 'etc', 'availability-reports.xml')
-      end
-
       def availability_template_resource_create
         config = AvailabilityReportHelper::ReportConfig.new
-        if ::File.exist?(availability_report_path)
-          config.read!(availability_report_path)
+        if ::File.exist?(config_file_path)
+          config.read!(config_file_path)
         else
-          Chef::Log.info "No availability reports config found at #{availability_report_path}, starting fresh."
+          Chef::Log.info "No availability reports config found at #{config_file_path}, starting fresh."
         end
 
         with_run_context :root do
-          declare_resource(:template, availability_report_path) do
+          declare_resource(:template, config_file_path) do
             source 'availability-reports.xml.erb'
             cookbook 'opennms'
             owner node['opennms']['user'] || 'root'
             group node['opennms']['group'] || 'root'
             mode '0644'
-            variables(reports: config.reports)
+            variables(config: config)
             action :nothing
             delayed_action :create
           end
