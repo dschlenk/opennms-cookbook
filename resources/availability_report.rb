@@ -52,6 +52,10 @@ load_current_value do
   logo report[:logo]
 end
 
+def availability_path
+  ::File.join(node['opennms']['home'], 'etc', 'availability-reports.xml')
+end
+
 action_class do
   include ::Opennms::XmlHelper
   include ::Opennms::Cookbook::AvailabilityReportTemplate
