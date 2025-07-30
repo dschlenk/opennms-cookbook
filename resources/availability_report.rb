@@ -55,7 +55,7 @@ load_current_value do
 end
 
 def availability_path
-  ::File.join(node['opennms']['home'], 'etc', 'availability-reports.xml')
+  ::File.join(new_resource.onms_home, 'etc', 'availability-reports.xml')
 end
 
 action_class do
