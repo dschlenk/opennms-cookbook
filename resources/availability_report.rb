@@ -35,7 +35,7 @@ load_current_value do |new_resource|
              ro_availability_template_resource_init
              ro_availability_template_resource.variables(:config)
            end
-  report = config.find_by_id( new_resource.report_id)
+  report = config.find_by_id(new_resource.report_id)
   current_value_does_not_exist! if report.nil?
 
   type report[:type]
@@ -57,7 +57,7 @@ action :create do
     availability_template_resource_init
     config = availability_template_resource.variables(:config)
     report = config.find_by_id(new_resource.report_id)
-    if(report.nil?)
+    if (report.nil?)
       config.reports << {
         id: report_id,
         type: type,
