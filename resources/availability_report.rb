@@ -1,7 +1,8 @@
 include Opennms::XmlHelper
-include ::Opennms::Cookbook::AvailabilityReportTemplate
+include Opennms::Cookbook::AvailabilityReportTemplate
 
 property :report_id, String, name_property: true
+
 property :type, String, equal_to: %w(calendar classic), default: 'calendar'
 
 property :pdf_template, String
@@ -33,17 +34,11 @@ property :parameters, Hash, default: {}
 default_action :create
 
 load_current_value do
-  config_reports =
-    if !availability_template_resource.nil?
-      availability_template_resource.variables(:config)
-    else
-      ro_availability_template_resource_init
-      ro_availability_template_resource&.variables(:config)
-    end
+  config_obj = ::Opennms::Cookbook::AvailabilityReportHelper::ReportConfig.new
+  config_obj.read!(config_file)
 
-  report = config_reports&.find { |r| r[:id] == report_id }
-
-  current_value_does_not_exist! if report.nil?
+  report = config_obj.find_by_id(report_id)
+  current_value_does_not_exist! unless report
 
   type report[:type]
   parameters report[:parameters]
@@ -61,6 +56,45 @@ action_class do
     ::File.join(node['opennms']['home'], 'etc')
   end
 
+  def config_file
+    ::File.join(etc_dir, 'availability-reports.xml')
+  end
+
+  def reports_collection
+    node.run_state['availability_reports'] ||= []
+  end
+
+  def availability_template_resource
+    run_context.resource_collection.find(template: config_file)
+  rescue Chef::Exceptions::ResourceNotFound
+    nil
+  end
+
+  def update_template_resource(reports)
+    tr = availability_template_resource
+    if tr
+      tr.variables(reports: reports)
+    else
+      template config_file do
+        source 'availability-reports.xml.erb'
+        cookbook 'opennms'
+        owner node['opennms']['user'] || 'root'
+        group node['opennms']['group'] || 'root'
+        mode '0644'
+        variables(reports: reports)
+        action :nothing
+        notifies :restart, 'service[opennms]', :delayed
+      end
+    end
+  end
+
+  def create_auxiliary_files
+    create_template_file('pdf')
+    create_template_file('svg')
+    create_template_file('html')
+    create_logo_file
+  end
+
   def create_template_file(prefix)
     source = safe_send("#{prefix}_template_source")
     return unless source
@@ -68,74 +102,69 @@ action_class do
     source_type = safe_send("#{prefix}_template_source_type")
     variables = safe_send("#{prefix}_template_source_variables") || {}
     properties = safe_send("#{prefix}_template_source_properties") || {}
-    target = ::File.join(etc_dir, safe_send("#{prefix}_template"))
+    template_name = safe_send("#{prefix}_template")
 
-    declare_resource(source_type.to_sym, target) do
+    return if template_name.nil? || template_name.empty? || source.nil? || source_type.nil?
+
+    target_path = ::File.join(etc_dir, template_name)
+
+    declare_resource(source_type.to_sym, target_path) do
       source source
-      variables(variables) if source_type == 'template'
-      properties.each { |k, v| send(k, v) }
+      variables(variables) if source_type.to_s == 'template' && !variables.empty?
+      properties.each { |k, v| send(k, v) } if !properties.empty?
       action :create
     end
   end
 
   def create_logo_file
-    return unless logo
+    return if new_resource.logo.nil? || new_resource.logo.empty?
 
-    target = ::File.join(etc_dir, logo)
-    declare_resource(logo_source_type.to_sym, target) do
-      source logo_source
-      variables(logo_source_variables) if logo_source_type == 'template'
-      logo_source_properties.each { |k, v| send(k, v) }
+    target_path = ::File.join(etc_dir, new_resource.logo)
+
+    declare_resource(new_resource.logo_source_type.to_sym, target_path) do
+      source new_resource.logo_source if new_resource.logo_source
+      variables(new_resource.logo_source_variables) if new_resource.logo_source_type.to_s == 'template' && !new_resource.logo_source_variables.empty?
+      new_resource.logo_source_properties.each { |k, v| send(k, v) } if !new_resource.logo_source_properties.empty?
       action :create
     end
   end
 
-  def safe_send(prop)
-    new_resource.send(prop)
+  def safe_send(property)
+    new_resource.send(property)
   rescue NoMethodError
     nil
   end
 end
 
 action :create do
+  reports_collection.reject! { |r| r[:id] == new_resource.report_id }
+
+  reports_collection << {
+    id: new_resource.report_id,
+    type: new_resource.type,
+    pdf_template: new_resource.pdf_template,
+    svg_template: new_resource.svg_template,
+    html_template: new_resource.html_template,
+    logo: new_resource.logo,
+    parameters: new_resource.parameters
+  }
+
+  update_template_resource(reports_collection)
+
   converge_if_changed do
-    tpl = availability_template_resource
-    reports = tpl.variables[:reports] || []
-
-    reports.reject! { |r| r[:id] == report_id }
-    reports << {
-      id: report_id,
-      type: type,
-      pdf_template: pdf_template,
-      svg_template: svg_template,
-      html_template: html_template,
-      logo: logo,
-      parameters: parameters,
-    }
-
-    tpl.variables(reports: reports)
-
-    create_template_file('pdf')
-    create_template_file('svg')
-    create_template_file('html')
-    create_logo_file
+    create_auxiliary_files
   end
 end
 
 action :create_if_missing do
-  tpl = availability_template_resource
-  reports = tpl.variables[:reports] || []
-  unless reports.any? { |r| r[:id] == report_id }
+  unless reports_collection.any? { |r| r[:id] == new_resource.report_id }
     action_create
   end
 end
 
 action :delete do
-  tpl = availability_template_resource
-  reports = tpl.variables[:reports] || []
-
-  if reports.any? { |r| r[:id] == report_id }
-    reports.reject! { |r| r[:id] == report_id }
-    tpl.variables(reports: reports)
+  if reports_collection.any? { |r| r[:id] == new_resource.report_id }
+    reports_collection.reject! { |r| r[:id] == new_resource.report_id }
+    update_template_resource(reports_collection)
   end
 end
