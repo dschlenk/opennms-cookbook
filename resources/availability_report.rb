@@ -24,6 +24,8 @@ property :logo_source_type, String, default: 'cookbook_file', equal_to: %w(cookb
 property :logo_source_variables, Hash, default: {}
 property :logo_source_properties, Hash, default: {}
 property :parameters, Hash, default: {}
+property :onms_home, String, default: '/opt/opennms'
+
 default_action :create
 
 load_current_value do
