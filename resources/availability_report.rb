@@ -28,6 +28,31 @@ property :onms_home, String, default: '/opt/opennms'
 
 default_action :create
 
+def ro_resource
+  run_context.resource_collection.find(template: availability_path)
+rescue Chef::Exceptions::ResourceNotFound
+  nil
+end
+
+def ro_init
+  return if ro_resource
+  config_obj = ::Opennms::Cookbook::AvailabilityReport::Helper::ReportConfig.new
+  config_obj.read!(availability_path) if ::File.exist?(availability_path)
+  declare_resource(:template, availability_path) do
+  source 'availability-reports.xml.erb'
+    cookbook 'opennms'
+    owner node['opennms']['user'] || 'root'
+    group node['opennms']['group'] || 'root'
+    mode '0644'
+    variables config_obj
+    action :nothing
+  end
+end
+
+def availability_path
+  ::File.join(onms_home || '/opt/opennms', 'etc', 'availability-reports.xml')
+end
+
 load_current_value do
   availability_resource = nil
   begin
@@ -54,9 +79,6 @@ load_current_value do
   logo report[:logo]
 end
 
-def availability_path
-  ::File.join(onms_home || '/opt/opennms', 'etc', 'availability-reports.xml')
-end
 action_class do
   include ::Opennms::XmlHelper
   include ::Opennms::Cookbook::AvailabilityReportTemplate
