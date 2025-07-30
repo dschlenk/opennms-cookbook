@@ -37,9 +37,8 @@ load_current_value do
     if !availability_template_resource.nil?
       availability_template_resource.variables(:config)
     else
-      ro_availability_template_resource_create
-      tpl = run_context.resource_collection.find(template: availability_report_path)
-      tpl.variables[:config]
+      ro_availability_template_resource_init
+      ro_availability_template_resource&.variables(:config)
     end
 
   report = config_reports&.find { |r| r[:id] == report_id }
