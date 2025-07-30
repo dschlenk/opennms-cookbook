@@ -63,7 +63,7 @@ action_class do
   include ::Opennms::Cookbook::AvailabilityReportTemplate
 
   def availability_path
-    ::File.join(new_resource.onms_home, 'etc', 'availability-reports.xml')
+    ::File.join(node['opennms']['home'] || '/opt/opennms', 'etc', 'availability-reports.xml')
   end
 
   def etc
