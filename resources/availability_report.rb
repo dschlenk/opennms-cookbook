@@ -66,18 +66,18 @@ action :create do
     when 'cookbook_file'
       cookbook_file path do
         source source
-        **properties
+        properties.each { |k, v| send(k, v) }
       end
     when 'template'
       template path do
         source source
         variables variables
-        **properties
+        properties.each { |k, v| send(k, v) }
       end
     when 'remote_file'
       remote_file path do
         source source
-        **properties
+        properties.each { |k, v| send(k, v) }
       end
     end
   end
