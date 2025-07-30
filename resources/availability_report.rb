@@ -53,7 +53,7 @@ end
 
 action :create do
   # TODO: create cookbook_file/template/remote_file resource for each of pdf_template, svg_template, html_template, logo when not nil
-  %w[pdf svg html logo].each do |kind|
+  %w(pdf svg html logo).each do |kind|
     template_value = new_resource.send("#{kind}_template")
     source_type = new_resource.send("#{kind}_template_source_type")
     source = new_resource.send("#{kind}_template_source")
