@@ -19,7 +19,35 @@ module Inspec::Resources
       @report_id = report_id
       @file_path = '/opt/opennms/etc/availability-reports.xml'
       @report_element = nil
-      read_report
+      @position = nil
+      @contents = nil
+
+      file = inspec.file(@file_path)
+      if file.exist?
+        begin
+          @contents = file.content
+          doc = REXML::Document.new(@contents)
+
+          reports = doc.get_elements('//report')
+          Inspec::Log.info("DEBUG: Found reports: #{reports.map { |r| r.attributes['id'] }.join(', ')}")
+
+          reports.each_with_index do |el, idx|
+            if el.attributes['id'] == @report_id
+              @report_element = el
+              @position = idx
+              break
+            end
+          end
+
+          unless @report_element
+            Inspec::Log.warn("DEBUG: Report with id #{@report_id} not found in XML")
+          end
+        rescue REXML::ParseException => e
+          skip_resource "Could not parse #{@file_path}: #{e.message}"
+        end
+      else
+        Inspec::Log.warn("Availability report file #{@file_path} does not exist")
+      end
     end
 
     def exists?
@@ -29,10 +57,8 @@ module Inspec::Resources
 
     def type
       return unless exists?
-
       @report_element.attributes['type']
     end
-
     def parameters
       return {} unless exists?
 
@@ -44,7 +70,6 @@ module Inspec::Resources
         param_elem.elements.each(parm_type) do |el|
           name = el.attributes['name']
           next unless name
-
           params[name] = extract_parameter_details(el, parm_type)
         end
       end
@@ -52,41 +77,15 @@ module Inspec::Resources
       params
     end
 
-    private
-
-    def read_report
-      Inspec::Log.info("DEBUG: Listing /opt/opennms/etc/: #{`ls -la /opt/opennms/etc/`}")
-      Inspec::Log.info("DEBUG: Running user: #{`whoami`.strip}")
-      unless File.exist?(@file_path)
-        Inspec::Log.warn("Availability report file #{@file_path} does not exist")
-        return
-      end
-
-      file_content = File.read(@file_path)
-      doc = REXML::Document.new(file_content)
-
-      # Debug: list all report IDs found
-      ids = []
-      doc.elements.each('opennms-reports/report') do |r|
-        ids << r.attributes['id']
-      end
-      Inspec::Log.info("DEBUG: Found reports in XML: #{ids.join(', ')}")
-
-      # Attempt namespace-insensitive search to be more robust
-      @report_element = nil
-      doc.elements.each('//*[local-name()="report"]') do |el|
-        if el.attributes['id'] == @report_id
-          @report_element = el
-          break
-        end
-      end
-
-      unless @report_element
-        Inspec::Log.warn("DEBUG: Report with id #{@report_id} not found in XML")
-      end
-    rescue REXML::ParseException => e
-      skip_resource "Could not parse #{@file_path}: #{e.message}"
+    def position
+      @position
     end
+
+    def contents
+      @contents
+    end
+
+    private
 
     def extract_parameter_details(el, parm_type)
       case parm_type
