@@ -2,8 +2,8 @@
 
 directory '/opt/opennms/etc' do
   recursive true
-  owner 'root'
-  group 'root'
+  owner node['opennms']['username']
+  group node['opennms']['username']
   mode '0755'
   action :create
 end
