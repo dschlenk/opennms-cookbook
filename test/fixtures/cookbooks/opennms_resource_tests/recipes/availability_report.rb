@@ -1,5 +1,13 @@
 # frozen_string_literal: true
 
+directory '/opt/opennms/etc' do
+  recursive true
+  owner 'root'   # Adjust user/group if needed
+  group 'root'
+  mode '0755'
+  action :create
+end
+
 opennms_availability_report 'foo' do
   type 'calendar'
   pdf_template 'foo.xml'
