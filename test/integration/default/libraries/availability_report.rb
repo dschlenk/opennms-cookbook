@@ -55,6 +55,8 @@ module Inspec::Resources
     private
 
     def read_report
+      Inspec::Log.info("DEBUG: Listing /opt/opennms/etc/: #{`ls -la /opt/opennms/etc/`}")
+      Inspec::Log.info("DEBUG: Running user: #{`whoami`.strip}")
       unless File.exist?(@file_path)
         Inspec::Log.warn("Availability report file #{@file_path} does not exist")
         return
