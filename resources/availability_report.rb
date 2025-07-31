@@ -55,15 +55,7 @@ end
 
 action :create do
   # TODO: create cookbook_file/template/remote_file resource for each of pdf_template, svg_template, html_template, logo when not nil
-  %w(pdf svg html logo).each do |kind|
-    template_value = new_resource.send("#{kind}_template")
-    source_type = new_resource.send("#{kind}_template_source_type")
-    source = new_resource.send("#{kind}_template_source")
-    variables = new_resource.send("#{kind}_template_source_variables")
-    properties = new_resource.send("#{kind}_template_source_properties")
-
-    next if template_value.nil?
-    path = ::File.join(new_resource.onms_home, 'etc', 'report-templates', template_value)
+  def create_template_file(path, source_type, source, variables, properties)
     case source_type
     when 'cookbook_file'
       cookbook_file path do
@@ -82,6 +74,35 @@ action :create do
         properties.each { |k, v| send(k, v) }
       end
     end
+  end
+  %w(pdf svg html).each do |kind|
+    template_value = new_resource.send("#{kind}_template")
+    source_type = new_resource.send("#{kind}_template_source_type")
+    source = new_resource.send("#{kind}_template_source")
+    variables = new_resource.send("#{kind}_template_source_variables")
+    properties = new_resource.send("#{kind}_template_source_properties")
+
+    next if template_value.nil?
+    path = ::File.join(new_resource.onms_home, 'etc', 'report-templates', template_value)
+    if source.nil? && !::File.exist?(path)
+      raise "Template file #{path} does not exist and no source was provided."
+    end
+
+    create_template_file(path, source_type, source, variables, properties) unless source.nil?
+  end
+
+  unless new_resource.logo.nil?
+    path = ::File.join(new_resource.onms_home, 'etc', 'report-templates', new_resource.logo)
+    if new_resource.logo_source.nil? && !::File.exist?(path)
+      raise "Logo file #{path} does not exist and no source was provided."
+    end
+    create_template_file(
+      path,
+      new_resource.logo_source_type,
+      new_resource.logo_source,
+      new_resource.logo_source_variables,
+      new_resource.logo_source_properties
+    ) unless new_resource.logo_source.nil?
   end
   converge_if_changed do
     availability_template_resource_init
