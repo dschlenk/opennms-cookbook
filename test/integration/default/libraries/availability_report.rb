@@ -15,6 +15,8 @@ module Inspec::Resources
       end
     EXAMPLE
 
+    attr_reader :position, :contents
+
     def initialize(report_id)
       @report_id = report_id
       @file_path = '/opt/opennms/etc/availability-reports.xml'
@@ -32,16 +34,14 @@ module Inspec::Resources
           Inspec::Log.info("DEBUG: Found reports: #{reports.map { |r| r.attributes['id'] }.join(', ')}")
 
           reports.each_with_index do |el, idx|
-            if el.attributes['id'] == @report_id
-              @report_element = el
-              @position = idx
-              break
-            end
+            next unless el.attributes['id'] == @report_id
+
+            @report_element = el
+            @position = idx
+            break
           end
 
-          unless @report_element
-            Inspec::Log.warn("DEBUG: Report with id #{@report_id} not found in XML")
-          end
+          Inspec::Log.warn("DEBUG: Report with id #{@report_id} not found in XML") unless @report_element
         rescue REXML::ParseException => e
           skip_resource "Could not parse #{@file_path}: #{e.message}"
         end
@@ -57,8 +57,10 @@ module Inspec::Resources
 
     def type
       return unless exists?
+
       @report_element.attributes['type']
     end
+
     def parameters
       return {} unless exists?
 
@@ -70,19 +72,12 @@ module Inspec::Resources
         param_elem.elements.each(parm_type) do |el|
           name = el.attributes['name']
           next unless name
+
           params[name] = extract_parameter_details(el, parm_type)
         end
       end
 
       params
-    end
-
-    def position
-      @position
-    end
-
-    def contents
-      @contents
     end
 
     private
