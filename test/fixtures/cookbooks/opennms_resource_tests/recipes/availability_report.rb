@@ -2,7 +2,7 @@
 
 directory '/opt/opennms/etc' do
   recursive true
-  owner 'root'   # Adjust user/group if needed
+  owner 'root'
   group 'root'
   mode '0755'
   action :create
