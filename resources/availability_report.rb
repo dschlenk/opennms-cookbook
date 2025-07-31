@@ -136,6 +136,7 @@ action :create do
       report[:logo] = new_resource.logo unless new_resource.logo.nil?
       report[:parameters] = new_resource.parameters unless new_resource.parameters.nil?
     end
+    update_template(config.reports)
   end
 end
 
