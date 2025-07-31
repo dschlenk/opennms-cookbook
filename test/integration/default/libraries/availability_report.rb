@@ -55,11 +55,33 @@ module Inspec::Resources
     private
 
     def read_report
-      return unless File.exist?(@file_path)
+      unless File.exist?(@file_path)
+        Inspec::Log.warn("Availability report file #{@file_path} does not exist")
+        return
+      end
 
-      file = File.read(@file_path)
-      doc = REXML::Document.new(file)
-      @report_element = REXML::XPath.first(doc, "//report[@id='#{@report_id}']")
+      file_content = File.read(@file_path)
+      doc = REXML::Document.new(file_content)
+
+      # Debug: list all report IDs found
+      ids = []
+      doc.elements.each('opennms-reports/report') do |r|
+        ids << r.attributes['id']
+      end
+      Inspec::Log.info("DEBUG: Found reports in XML: #{ids.join(', ')}")
+
+      # Attempt namespace-insensitive search to be more robust
+      @report_element = nil
+      doc.elements.each('//*[local-name()="report"]') do |el|
+        if el.attributes['id'] == @report_id
+          @report_element = el
+          break
+        end
+      end
+
+      unless @report_element
+        Inspec::Log.warn("DEBUG: Report with id #{@report_id} not found in XML")
+      end
     rescue REXML::ParseException => e
       skip_resource "Could not parse #{@file_path}: #{e.message}"
     end
