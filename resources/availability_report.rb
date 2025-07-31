@@ -31,10 +31,10 @@ default_action :create
 
 load_current_value do |new_resource|
   config = if !availability_template_resource.nil?
-             availability_template_resource.variables(:config)
+             availability_template_resource.variables[:config]
            else
              ro_availability_template_resource_init
-             ro_availability_template_resource.variables(:config)
+             ro_availability_template_resource.variables[:config]
            end
   report = config.find_by_id(new_resource.report_id)
   current_value_does_not_exist! if report.nil?
@@ -85,7 +85,7 @@ action :create do
   end
   converge_if_changed do
     availability_template_resource_init
-    config = availability_template_resource.variables(:config)
+    config = availability_template_resource.variables[:config]
     report = config.find_by_id(new_resource.report_id)
     if report.nil?
       config.reports << {
@@ -116,7 +116,7 @@ end
 
 action :delete do
   availability_template_resource_init
-  config = availability_template_resource.variables(:config)
+  config = availability_template_resource.variables[:config]
   report = config.find_by_id(new_resource.report_id)
   unless report.nil?
     converge_by("Remove report #{report_id}") do
