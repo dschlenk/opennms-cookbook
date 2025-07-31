@@ -54,8 +54,8 @@ action_class do
 end
 
 action :create do
-  # TODO: create cookbook_file/template/remote_file resource for each of pdf_template, svg_template, html_template, logo when not nil
   def create_template_file(path, source_type, source, variables, properties)
+    Chef::Log.debug("Creating #{source_type} at #{path} with source #{source}")
     case source_type
     when 'cookbook_file'
       cookbook_file path do
@@ -75,20 +75,28 @@ action :create do
       end
     end
   end
+
   %w(pdf svg html).each do |kind|
-    template_value = new_resource.send("#{kind}_template")
-    source_type = new_resource.send("#{kind}_template_source_type")
-    source = new_resource.send("#{kind}_template_source")
-    variables = new_resource.send("#{kind}_template_source_variables")
-    properties = new_resource.send("#{kind}_template_source_properties")
+    begin
+      Chef::Log.debug("Processing template kind: #{kind}")
+      template_value = new_resource.send("#{kind}_template")
+      source = new_resource.send("#{kind}_template_source")
+      source_type = new_resource.send("#{kind}_template_source_type")
+      variables = new_resource.send("#{kind}_template_source_variables")
+      properties = new_resource.send("#{kind}_template_source_properties")
 
-    next if template_value.nil?
-    path = ::File.join(new_resource.onms_home, 'etc', 'report-templates', template_value)
-    if source.nil? && !::File.exist?(path)
-      raise "Template file #{path} does not exist and no source was provided."
+      next if template_value.nil?
+
+      path = ::File.join(new_resource.onms_home, 'etc', 'report-templates', template_value)
+
+      if source.nil? && !::File.exist?(path)
+        raise "Template file #{path} does not exist and no source was provided."
+      end
+
+      create_template_file(path, source_type, source, variables, properties) unless source.nil?
+    rescue NoMethodError => e
+      raise "Missing property for kind '#{kind}': #{e.message}"
     end
-
-    create_template_file(path, source_type, source, variables, properties) unless source.nil?
   end
 
   unless new_resource.logo.nil?
@@ -96,6 +104,7 @@ action :create do
     if new_resource.logo_source.nil? && !::File.exist?(path)
       raise "Logo file #{path} does not exist and no source was provided."
     end
+
     create_template_file(
       path,
       new_resource.logo_source_type,
@@ -104,23 +113,24 @@ action :create do
       new_resource.logo_source_properties
     ) unless new_resource.logo_source.nil?
   end
+
   converge_if_changed do
     availability_template_resource_init
     config = availability_template_resource.variables[:config]
     report = config.find_by_id(new_resource.report_id)
+
     if report.nil?
       config.reports << {
-        id: report_id,
-        type: type,
-        pdf_template: pdf_template,
-        svg_template: svg_template,
-        html_template: html_template,
-        logo: logo,
-        parameters: parameters,
+        id: new_resource.report_id,
+        type: new_resource.type,
+        pdf_template: new_resource.pdf_template,
+        svg_template: new_resource.svg_template,
+        html_template: new_resource.html_template,
+        logo: new_resource.logo,
+        parameters: new_resource.parameters,
       }
     else
       report[:type] = new_resource.type unless new_resource.type.nil?
-      # TODO: repeat for the other properties
       report[:pdf_template] = new_resource.pdf_template unless new_resource.pdf_template.nil?
       report[:svg_template] = new_resource.svg_template unless new_resource.svg_template.nil?
       report[:html_template] = new_resource.html_template unless new_resource.html_template.nil?
@@ -128,6 +138,8 @@ action :create do
       report[:parameters] = new_resource.parameters unless new_resource.parameters.nil?
     end
   end
+end
+
 end
 
 action :create_if_missing do
