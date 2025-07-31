@@ -51,9 +51,6 @@ action_class do
   include Opennms::XmlHelper
   include Opennms::Cookbook::AvailabilityReportHelper
   include Opennms::Cookbook::AvailabilityReportTemplate
-end
-
-action :create do
   def create_template_file(path, source_type, source, variables, properties)
     Chef::Log.debug("Creating #{source_type} at #{path} with source #{source}")
     case source_type
@@ -75,7 +72,9 @@ action :create do
       end
     end
   end
+end
 
+action :create do
   %w(pdf svg html).each do |kind|
     begin
       Chef::Log.debug("Processing template kind: #{kind}")
@@ -138,8 +137,6 @@ action :create do
       report[:parameters] = new_resource.parameters unless new_resource.parameters.nil?
     end
   end
-end
-
 end
 
 action :create_if_missing do
