@@ -83,7 +83,6 @@ module Inspec::Resources
       unless @report_element
         Inspec::Log.warn("Report with id #{@report_id} not found in XML")
       end
-
     rescue REXML::ParseException => e
       skip_resource "Could not parse #{@file_path}: #{e.message}"
     end
