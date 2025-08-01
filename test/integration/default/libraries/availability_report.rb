@@ -15,39 +15,11 @@ module Inspec::Resources
       end
     EXAMPLE
 
-    attr_reader :position, :contents
-
     def initialize(report_id)
       @report_id = report_id
       @file_path = '/opt/opennms/etc/availability-reports.xml'
       @report_element = nil
-      @position = nil
-      @contents = nil
-
-      file = inspec.file(@file_path)
-      if file.exist?
-        begin
-          @contents = file.content
-          doc = REXML::Document.new(@contents)
-
-          reports = doc.get_elements('//report')
-          Inspec::Log.info("DEBUG: Found reports: #{reports.map { |r| r.attributes['id'] }.join(', ')}")
-
-          reports.each_with_index do |el, idx|
-            next unless el.attributes['id'] == @report_id
-
-            @report_element = el
-            @position = idx
-            break
-          end
-
-          Inspec::Log.warn("DEBUG: Report with id #{@report_id} not found in XML") unless @report_element
-        rescue REXML::ParseException => e
-          skip_resource "Could not parse #{@file_path}: #{e.message}"
-        end
-      else
-        Inspec::Log.warn("Availability report file #{@file_path} does not exist")
-      end
+      read_report
     end
 
     def exists?
@@ -81,6 +53,40 @@ module Inspec::Resources
     end
 
     private
+
+    def read_report
+      Inspec::Log.info("DEBUG: Listing /opt/opennms/etc/: #{`ls -la /opt/opennms/etc/`}")
+      Inspec::Log.info("DEBUG: Running user: #{`whoami`.strip}")
+      file = inspec.file(@file_path)
+      unless file.exist?
+        Inspec::Log.warn("Availability report file #{@file_path} does not exist")
+        return
+      end
+
+      file_content = file.content
+      doc = REXML::Document.new(file_content)
+
+      ids = []
+      doc.elements.each('opennms-reports/report') do |r|
+        ids << r.attributes['id']
+      end
+      Inspec::Log.info("DEBUG: Found reports in XML: #{ids.join(', ')}")
+
+      @report_element = nil
+      doc.elements.each('//*[local-name()="report"]') do |el|
+        if el.attributes['id'] == @report_id
+          @report_element = el
+          break
+        end
+      end
+
+      unless @report_element
+        Inspec::Log.warn("Report with id #{@report_id} not found in XML")
+      end
+
+    rescue REXML::ParseException => e
+      skip_resource "Could not parse #{@file_path}: #{e.message}"
+    end
 
     def extract_parameter_details(el, parm_type)
       case parm_type
