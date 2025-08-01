@@ -1,29 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <opennms:reports
-  xmlns:opennms="http://xmlns.opennms.org/xsd/config"
-  xmlns="http://xmlns.opennms.org/xsd/config/reports"
+  xmlns:opennms="http://xmlns.opennms.org/xsd"
+  xmlns="http://xmlns.opennms.org/xsd/reports"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://xmlns.opennms.org/xsd/config http://xmlns.opennms.org/xsd/config/reports.xsd">
+  xsi:schemaLocation="http://xmlns.opennms.org/xsd http://xmlns.opennms.org/xsd/reports/reports.xsd">
 
 <% @config.reports.each do |report| %>
   <report id="<%= report[:id] %>" type="<%= report[:type] %>">
     <logo><%= report[:logo] || '' %></logo>
 
-    <%# Render the templates with full paths if necessary %>
     <% if report[:svg_template] %>
-      <svg-template>file://<%= (@config.onmshome || '/opt/opennms') %>/reports/<%= report[:svg_template] %></svg-template>
+      <svg-template>file://<%= @onshome %>/reports/<%= report[:svg_template] %></svg-template>
     <% else %>
       <svg-template></svg-template>
     <% end %>
 
     <% if report[:pdf_template] %>
-      <pdf-template>file://<%= (@config.onmshome || '/opt/opennms') %>/reports/<%= report[:pdf_template] %></pdf-template>
+      <pdf-template>file://<%= @onshome %>/reports/<%= report[:pdf_template] %></pdf-template>
     <% else %>
       <pdf-template></pdf-template>
     <% end %>
 
     <% if report[:html_template] %>
-      <html-template>file://<%= (@config.onmshome || '/opt/opennms') %>/reports/<%= report[:html_template] %></html-template>
+      <html-template>file://<%= @onshome %>/reports/<%= report[:html_template] %></html-template>
     <% else %>
       <html-template></html-template>
     <% end %>
@@ -32,18 +31,18 @@
       <% params = report[:parameters] || {} %>
 
       <% (params['string_parms'] || []).each do |parm| %>
-        <string-parm
-          name="<%= parm['name'] %>"
-          display-name="<%= parm['display_name'] %>"
-          input-type="<%= parm['input_type'] %>"
-          <%= parm['default'] && !parm['default'].to_s.empty? ? "default=\"#{parm['default']}\"" : '' %> />
+        <string-parm name="<%= parm['name'] %>"
+                     display-name="<%= parm['display_name'] %>"
+                     input-type="<%= parm['input_type'] %>"
+                     <% if parm['default'] && !parm['default'].to_s.empty? %> 
+                       default="<%= parm['default'] %>" 
+                     <% end %> />
       <% end %>
 
       <% (params['date_parms'] || []).each do |parm| %>
-        <date-parm
-          name="<%= parm['name'] %>"
-          display-name="<%= parm['display_name'] %>"
-          use-absolute-date="<%= parm['use_absolute_date'].to_s %>">
+        <date-parm name="<%= parm['name'] %>"
+                   display-name="<%= parm['display_name'] %>"
+                   use-absolute-date="<%= parm['use_absolute_date'] ? 'true' : 'false' %>">
           <default-interval><%= parm['default_interval'] %></default-interval>
           <default-count><%= parm['default_count'] %></default-count>
           <default-time>
@@ -54,13 +53,15 @@
       <% end %>
 
       <% (params['int_parms'] || []).each do |parm| %>
-        <int-parm
-          name="<%= parm['name'] %>"
-          display-name="<%= parm['display_name'] %>"
-          input-type="<%= parm['input_type'] || 'freeText' %>"
-          <%= parm['default'] && !parm['default'].to_s.empty? ? "default=\"#{parm['default']}\"" : '' %> />
+        <int-parm name="<%= parm['name'] %>"
+                  display-name="<%= parm['display_name'] %>"
+                  input-type="<%= parm['input_type'] || 'freeText' %>"
+                  <% if parm['default'] && !parm['default'].to_s.empty? %> 
+                    default="<%= parm['default'] %>" 
+                  <% end %> />
       <% end %>
     </parameters>
   </report>
 <% end %>
+
 </opennms:reports>
