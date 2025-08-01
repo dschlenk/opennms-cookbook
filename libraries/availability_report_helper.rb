@@ -167,7 +167,8 @@ module Opennms
             owner node['opennms']['user'] || 'root'
             group node['opennms']['group'] || 'root'
             mode '0644'
-            variables(config: config)
+            variables(config: config,
+                      onmshome: node['opennms']['home'] || '/opt/opennms')
             action :nothing
             delayed_action :create
           end
