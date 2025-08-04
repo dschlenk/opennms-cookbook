@@ -26,14 +26,14 @@ module Opennms
             @data[:jms_destination] = text_at_xpath(root, '/jms-northbounder-config/jms-destination')
             @data[:uei] = text_at_xpath(root, '/jms-northbounder-config/uei')
             @data[:send_as_object_message] = text_at_xpath(root, '/jms-northbounder-config/send-as-object-message') == 'true'
-            @data[:first_occurrence_only] = text_at_xpath(root, '/jms-northbounder-config/first-occurrence-only') == 'true'
+            @data[:first_occurrence_only] = text_at_xpath(root, '/jms-northbounder-config/first-occurence-only') == 'true'
 
             Chef::Log.debug("[JmsNbConfig] Parsed global config: #{@data.except(:destinations)}")
 
             root.elements.each('destination') do |dest_el|
               destination = Opennms::Cookbook::Jms::JmsDestination.new(
                 destination: text_at_xpath(dest_el, 'jms-destination'),
-                first_occurrence_only: text_at_xpath(dest_el, 'first-occurrence-only') == 'true',
+                first_occurrence_only: text_at_xpath(dest_el, 'first-occurence-only') == 'true',
                 send_as_object_message: text_at_xpath(dest_el, 'send-as-object-message') == 'true',
                 destination_type: text_at_xpath(dest_el, 'destination-type'),  # Removed default
                 message_format: text_at_xpath(dest_el, 'message-format')
@@ -43,7 +43,7 @@ module Opennms
               @data[:destinations] << destination
             end
 
-            Chef::Log.info("[JmsNbConfig] Finished reading JMS configuration. Total destinations: #{@data[:destinations].size}")
+            Chef::Log.debug("[JmsNbConfig] Finished reading JMS configuration. Total destinations: #{@data[:destinations].size}")
           end
 
           def method_missing(method, *args, &block)
@@ -171,7 +171,7 @@ module Opennms
             cookbook 'opennms'
             owner node['opennms']['username']
             group node['opennms']['groupname']
-            mode '0664'
+            mode '0644'
             variables(config: config)
             action :nothing
             delayed_action :create
@@ -204,10 +204,10 @@ module Opennms
             cookbook 'opennms'
             owner node['opennms']['username']
             group node['opennms']['groupname']
-            mode '0664'
+            mode '0644'
             variables(config: config)
             action :nothing
-            delayed_action :create
+            delayed_action :nothing
           end
         end
       end

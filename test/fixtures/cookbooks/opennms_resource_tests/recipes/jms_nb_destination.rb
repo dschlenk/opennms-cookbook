@@ -1,4 +1,3 @@
-# frozen_string_literal: true
 node.default['opennms']['plugin']['addl'] << 'opennms-plugin-northbounder-jms'
 
 opennms_jms_nb_destination 'foo' do

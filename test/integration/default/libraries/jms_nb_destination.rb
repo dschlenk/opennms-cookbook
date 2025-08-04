@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 require 'nokogiri'
 
 class JmsNbDestination < Inspec.resource(1)
@@ -54,8 +52,6 @@ class JmsNbDestination < Inspec.resource(1)
 
   def parse_config
     content = inspec.file(@file_path).content
-    puts "[DEBUG] Parsing JMS config from #{@file_path}"
-    puts content
 
     doc = Nokogiri::XML(content)
     doc.xpath('//destination').each do |dest|
@@ -63,7 +59,8 @@ class JmsNbDestination < Inspec.resource(1)
       next unless name == @destination_name
 
       @exists = true
-      @properties['first-occurrence-only'] = dest.at_xpath('first-occurrence-only')&.text == 'true'
+      puts "dest #{dest} first-occurence-only #{dest.at_xpath('first-occcurence-only')} is a #{dest.at_xpath('first-occurence-only').class}"
+      @properties['first-occurrence-only'] = dest.at_xpath('first-occurence-only')&.text == 'true'
       @properties['send-as-object-message'] = dest.at_xpath('send-as-object-message')&.text == 'true'
       @properties['destination-type'] = dest.at_xpath('destination-type')&.text || 'QUEUE'
       @properties['message-format'] = dest.at_xpath('message-format')&.text
