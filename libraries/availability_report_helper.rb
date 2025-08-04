@@ -58,7 +58,7 @@ module Opennms
           params_hash = {
             'string_parms' => [],
             'date_parms' => [],
-            'int_parms' => []
+            'int_parms' => [],
           }
 
           params_elem.elements.each('string-parm') do |el|
@@ -66,7 +66,7 @@ module Opennms
               'name' => el.attributes['name'],
               'display_name' => el.attributes['display-name'],
               'input_type' => el.attributes['input-type'],
-              'default' => el.attributes['default']
+              'default' => el.attributes['default'],
             }
           end
 
@@ -75,7 +75,7 @@ module Opennms
             default_time_hash = if default_time_el
               {
                 'hour' => default_time_el.attributes['hour'] || default_time_el.elements['hours']&.text,
-                'minute' => default_time_el.attributes['minute'] || default_time_el.elements['minutes']&.text
+                'minute' => default_time_el.attributes['minute'] || default_time_el.elements['minutes']&.text,
               }
             else
               {}
@@ -87,7 +87,7 @@ module Opennms
               'use_absolute_date' => el.attributes['use-absolute-date'],
               'default_interval' => el.elements['default-interval']&.text,
               'default_count' => el.elements['default-count']&.text,
-              'default_time' => default_time_hash
+              'default_time' => default_time_hash,
             }
           end
 
@@ -96,7 +96,7 @@ module Opennms
               'name' => el.attributes['name'],
               'display_name' => el.attributes['display-name'],
               'input_type' => el.attributes['input-type'],
-              'default' => el.attributes['default']
+              'default' => el.attributes['default'],
             }
           end
           params_hash
