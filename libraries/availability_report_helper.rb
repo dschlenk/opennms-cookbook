@@ -53,41 +53,52 @@ module Opennms
         private
 
         def parse_parameters(params_elem)
-          return {} unless params_elem
+          return { 'string_parms' => [], 'date_parms' => [], 'int_parms' => [] } unless params_elem
 
-          params_hash = {}
+          params_hash = {
+            'string_parms' => [],
+            'date_parms' => [],
+            'int_parms' => []
+          }
 
           params_elem.elements.each('string-parm') do |el|
-            params_hash[el.attributes['name']] = el.attributes.to_h.transform_keys(&:to_s)
+            params_hash['string_parms'] << {
+              'name' => el.attributes['name'],
+              'display_name' => el.attributes['display-name'],
+              'input_type' => el.attributes['input-type'],
+              'default' => el.attributes['default']
+            }
           end
 
           params_elem.elements.each('date-parm') do |el|
-            h = el.attributes.to_h.transform_keys(&:to_s)
-            h['default-interval'] = el.elements['default-interval']&.text
-            h['default-count'] = el.elements['default-count']&.text
-
             default_time_el = el.elements['default-time']
-            if default_time_el
-              h['default-time'] = if default_time_el.attributes['hour'] && default_time_el.attributes['minute']
-                                    {
-                                      'hour' => default_time_el.attributes['hour'],
-                                      'minute' => default_time_el.attributes['minute'],
-                                    }
-                                  else
-                                    {
-                                      'hour' => default_time_el.elements['hours']&.text,
-                                      'minute' => default_time_el.elements['minutes']&.text,
-                                    }
-                                  end
+            default_time_hash = if default_time_el
+              {
+                'hour' => default_time_el.attributes['hour'] || default_time_el.elements['hours']&.text,
+                'minute' => default_time_el.attributes['minute'] || default_time_el.elements['minutes']&.text
+              }
+            else
+              {}
             end
 
-            params_hash[el.attributes['name']] = h
+            params_hash['date_parms'] << {
+              'name' => el.attributes['name'],
+              'display_name' => el.attributes['display-name'],
+              'use_absolute_date' => el.attributes['use-absolute-date'],
+              'default_interval' => el.elements['default-interval']&.text,
+              'default_count' => el.elements['default-count']&.text,
+              'default_time' => default_time_hash
+            }
           end
 
           params_elem.elements.each('int-parm') do |el|
-            params_hash[el.attributes['name']] = el.attributes.to_h.transform_keys(&:to_s)
+            params_hash['int_parms'] << {
+              'name' => el.attributes['name'],
+              'display_name' => el.attributes['display-name'],
+              'input_type' => el.attributes['input-type'],
+              'default' => el.attributes['default']
+            }
           end
-
           params_hash
         end
       end
