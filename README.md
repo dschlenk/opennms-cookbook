@@ -200,7 +200,6 @@ The following custom resources don't exist yet, but they should!
 * `opennms_end2endmail`: Manage `end2end-mail-config` elements in `$OPENNMS_HOME/etc/javamail-configuration.xml`.
 * `opennms_jms_nb_destination`: Manage `destination` elements in `$OPENNMS_HOME/etc/jms-northbounder-configuration.xml`.
 * `opennms_site_status_view`: Manage `view` elements in `$OPENNMS_HOME/etc/site-status-views.xml`.
-* `opennms_correlation`: Manage a set of correlator rules
 
 ## Template Overview
 

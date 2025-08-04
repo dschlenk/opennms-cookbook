@@ -1,0 +1,12 @@
+package com.example.rules
+
+import org.opennms.netmgt.xml.event.Event;
+
+global org.opennms.netmgt.correlation.drools.DroolsCorrelationEngine engine;
+
+rule "Template Rule - Too"
+    when
+        $e : Event( $uei : uei, $nodeid : nodeid, $ipAddr : interface, $svcName : service )
+    then
+        System.out.println("Event: " + $e.toString());
+end

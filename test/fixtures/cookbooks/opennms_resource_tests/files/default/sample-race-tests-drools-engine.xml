@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<engine-configuration 
+	xmlns="http://xmlns.opennms.org/xsd/drools-engine" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xsi:schemaLocation="http://xmlns.opennms.org/xsd/drools-engine /opt/opennms/share/xsds/drools-engine.xsd ">
+  <rule-set name="connectionRateRules">
+    <rule-file>ConnectionRateRules.drl</rule-file>
+    <event>uei.opennms.org/vendor/Juniper/MFC/traps/connectionRateHigh</event>
+    <global name="CONN_RATE_HIGH_TRIGGER_COUNT" type="java.lang.Integer" value="10"/>
+    <global name="CONN_RATE_HIGH_TIME_WINDOW" type="java.lang.Integer" value="3600000"/>
+  </rule-set>
+  <rule-set name="transactionRateRules">
+    <rule-file>TransactionRateRules.drl</rule-file>
+    <event>uei.opennms.org/vendor/Juniper/MFC/traps/transactionRateHigh</event>
+    <global name="XACT_RATE_HIGH_TRIGGER_COUNT" type="java.lang.Integer" value="10"/>
+    <global name="XACT_RATE_HIGH_TIME_WINDOW" type="java.lang.Integer" value="3600000"/>
+  </rule-set>
+  <rule-set name="avgCacheBwUsageRules">
+    <rule-file>AvgCacheBwUsageRules.drl</rule-file>
+    <event>uei.opennms.org/vendor/Juniper/MFC/traps/avgcacheBWusageHigh</event>
+    <global name="CACHE_BW_HIGH_TRIGGER_COUNT" type="java.lang.Integer" value="10"/>
+    <global name="CACHE_BW_HIGH_TIME_WINDOW" type="java.lang.Integer" value="3600000"/>
+  </rule-set>
+  <rule-set name="avgOriginBwUsageRules">
+    <rule-file>AvgOriginBwUsageRules.drl</rule-file>
+    <event>uei.opennms.org/vendor/Juniper/MFC/traps/avgoriginBWusageHigh</event>
+    <global name="ORIGIN_BW_HIGH_TRIGGER_COUNT" type="java.lang.Integer" value="10"/>
+    <global name="ORIGIN_BW_HIGH_TIME_WINDOW" type="java.lang.Integer" value="3600000"/>
+  </rule-set>
+  <rule-set name="memUtilizationRules">
+    <rule-file>MemUtilizationRules.drl</rule-file>
+    <event>uei.opennms.org/vendor/TallMaple/TMS/traps/memUtilizationHigh</event>
+    <global name="MEM_UTIL_HIGH_TRIGGER_COUNT" type="java.lang.Integer" value="10"/>
+    <global name="MEM_UTIL_HIGH_TIME_WINDOW" type="java.lang.Integer" value="3600000"/>
+  </rule-set>
+  <rule-set name="netUtilizationRules">
+    <rule-file>NetUtilizationRules.drl</rule-file>
+    <event>uei.opennms.org/vendor/TallMaple/TMS/traps/netUtilizationHigh</event>
+    <global name="NET_UTIL_HIGH_TRIGGER_COUNT" type="java.lang.Integer" value="10"/>
+    <global name="NET_UTIL_HIGH_TIME_WINDOW" type="java.lang.Integer" value="3600000"/>
+  </rule-set>
+  <rule-set name="pagingActivityRules">
+    <rule-file>PagingActivityRules.drl</rule-file>
+    <event>uei.opennms.org/vendor/TallMaple/TMS/traps/pagingActivityHigh</event>
+    <global name="PAGING_HIGH_TRIGGER_COUNT" type="java.lang.Integer" value="10"/>
+    <global name="PAGING_HIGH_TIME_WINDOW" type="java.lang.Integer" value="3600000"/>
+  </rule-set>
+  <rule-set name="nodeDownHolddownRules">
+    <rule-file>NodeDownRules.drl</rule-file>
+    <event>uei.opennms.org/nodes/nodeDown</event>
+    <event>uei.opennms.org/nodes/nodeUp</event>
+    <global name="NODE_DOWN_HOLDDOWN_TIME" type="java.lang.Integer" value="30000"/>
+  </rule-set>
+  <rule-set name="interfaceDownHolddownRules">
+    <rule-file>InterfaceDownRules.drl</rule-file>
+    <event>uei.opennms.org/nodes/interfaceDown</event>
+    <event>uei.opennms.org/nodes/interfaceUp</event>
+    <global name="IFACE_DOWN_HOLDDOWN_TIME" type="java.lang.Integer" value="30000"/>
+  </rule-set>
+  <rule-set name="syslogWriteMemRateRules">
+    <rule-file>WriteMemRules.drl</rule-file>
+    <event>uei.opennms.org/syslogd/local7/Notice</event>
+    <global name="WRITE_MEM_TRIGGER_COUNT" type="java.lang.Integer" value="5"/>
+    <global name="WRITE_MEM_TIME_WINDOW" type="java.lang.Integer" value="30000"/>
+  </rule-set>
+  <rule-set name="deviceStateTrackingRaceConditionRules" event-processing-mode="stream">
+    <rule-file>CorrelationRaceConditionRules.drl</rule-file>
+    <event>DeviceOffline</event>
+    <event>DeviceAdopted</event>
+  </rule-set>
+  <!-- Disabled as it's not used, but useful as a reference
+  <rule-set name="resourcePoolUtilRules">
+    <rule-file>file:src/test/opennms-home/etc/ResourcePoolUtilRules.drl</rule-file>
+    <event>uei.opennms.org/vendor/Juniper/MFC/traps/resourcePoolUsageHigh</event>
+    <event>uei.opennms.org/vendor/Juniper/MFC/traps/resourcePoolUsageLow</event>
+    <global name="PAGING_HIGH_TRIGGER_COUNT" type="java.lang.Integer" value="10"/>
+    <global name="PAGING_HIGH_TIME_WINDOW" type="java.lang.Integer" value="3600000"/>
+  </rule-set>
+  -->
+</engine-configuration>

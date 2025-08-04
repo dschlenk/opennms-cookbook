@@ -10,6 +10,7 @@
 
 ### Events, Alarms, and Notifications
 
+* [opennms\_correlator](correlator.md)
 * [opennms\_eventconf](eventconf.md)
 * [opennms\_event](event.md)
 * [opennms\_syslog\_file](syslog.md)

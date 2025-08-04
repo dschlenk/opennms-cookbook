@@ -1,0 +1,10 @@
+package com.example.rules
+
+import com.example.model.Event
+
+rule "Remote Rule - External Event"
+    when
+        $event : Event(source == "external")
+    then
+        System.out.println("External event handled: " + $event.getId());
+end

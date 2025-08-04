@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<engine-configuration
+        xmlns="http://xmlns.opennms.org/xsd/drools-engine"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <rule-set name="basic-rool">
+    <rule-file>sample.drl</rule-file>
+    <event>uei.opennms.org/nodes/nodeLostService</event>
+    <app-context>sampleContext.xml</app-context>
+    <global name="LOG" ref="slf4jLogger"/>
+  </rule-set>
+</engine-configuration>
