@@ -73,13 +73,13 @@ module Opennms
           params_elem.elements.each('date-parm') do |el|
             default_time_el = el.elements['default-time']
             default_time_hash = if default_time_el
-              {
-                'hour' => default_time_el.attributes['hour'] || default_time_el.elements['hours']&.text,
-                'minute' => default_time_el.attributes['minute'] || default_time_el.elements['minutes']&.text,
-              }
-            else
-              {}
-            end
+                                  {
+                                    'hour' => default_time_el.attributes['hour'] || default_time_el.elements['hours']&.text,
+                                    'minute' => default_time_el.attributes['minute'] || default_time_el.elements['minutes']&.text,
+                                  }
+                                else
+                                  {}
+                                end
 
             params_hash['date_parms'] << {
               'name' => el.attributes['name'],
