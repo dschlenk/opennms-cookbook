@@ -31,3 +31,9 @@ opennms_jms_nb_destination 'delete' do
   destination 'delete'
   action :delete
 end
+
+opennms_jms_nb_destination 'SingleAlarmQueue' do
+  first_occurrence_only false
+  send_as_object_message true
+  message_format 'Alarm ID: ${alarmId} Node: ${nodeLabel}; $${logMsg}'
+end

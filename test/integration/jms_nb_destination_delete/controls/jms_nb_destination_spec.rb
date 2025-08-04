@@ -16,11 +16,7 @@ control 'jms_nb_destination' do
   end
 
   describe jms_nb_destination('baz') do
-    it { should exist }
-    its('first_occurrence_only') { should eq false }
-    its('send_as_object_message') { should eq false }
-    its('destination_type') { should eq 'QUEUE' }
-    its('message_format') { should eq 'ALARM ID:${alarmId} - ${logMsg}' }
+    it { should_not exist }
   end
 
   describe jms_nb_destination('delete') do
@@ -33,12 +29,5 @@ control 'jms_nb_destination' do
 
   describe jms_nb_destination('404') do
     it { should_not exist }
-  end
-
-  describe jms_nb_destination('SingleAlarmQueue') do
-    it { should exist }
-    its('first_occurrence_only') { should eq false }
-    its('send_as_object_message') { should eq true }
-    its('message_format') { should eq 'Alarm ID: ${alarmId} Node: ${nodeLabel}; $${logMsg}' }
   end
 end
