@@ -1301,3 +1301,4 @@ default['opennms']['kafka']['producer_client'] = { 'bootstrap.servers' => '127.0
 #  default['opennms']['features_boot']['files']['kafka_producer'] = 'opennms-kafka-producer'
 #  This will create a file named `$OPENNMS_HOME/etc/featuresBoot.d/kafka_producer.boot` with contents `opennms-kafka-producer`.
 default['opennms']['features_boot']['files'] = {}
+default['opennms']['manage_hostname'] = true

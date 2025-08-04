@@ -1,5 +1,9 @@
 # OpenNMS Cookbook Changes
 
+## 33.7.0
+
+* minor: allow disabling hostname management with node attribute `node['opennms']['manage_hostname']`.
+
 ## 33.6.0
 
 * minor: new custom resource `opennms_correlation` provides easier management of Drools correlation engine configurations
