@@ -153,8 +153,8 @@ module Opennms
           declare_resource(:template, "RO #{config_file_path}") do
             source 'availability-reports.xml.erb'
             cookbook 'opennms'
-            owner node['opennms']['user'] || 'root'
-            group node['opennms']['group'] || 'root'
+            owner node['opennms']['user'] || 'opennms'
+            group node['opennms']['group'] || 'opennms'
             mode '0644'
             variables(config: config)
             action :nothing
@@ -175,8 +175,8 @@ module Opennms
           declare_resource(:template, config_file_path) do
             source 'availability-reports.xml.erb'
             cookbook 'opennms'
-            owner node['opennms']['user'] || 'root'
-            group node['opennms']['group'] || 'root'
+            owner node['opennms']['user'] || 'opennms'
+            group node['opennms']['group'] || 'opennms'
             mode '0644'
             variables(config: config,
                       onmshome: node['opennms']['home'] || '/opt/opennms')
