@@ -3,6 +3,7 @@
 ## 33.7.0
 
 * minor: allow disabling hostname management with node attribute `node['opennms']['manage_hostname']`.
+* minor: turn on vault repo for 33.1.8 by default
 
 ## 33.6.0
 
