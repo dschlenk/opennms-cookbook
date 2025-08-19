@@ -1,5 +1,11 @@
 # OpenNMS Cookbook Changes
 
+## 33.7.0
+
+* breaking: new custom resource: `opennms_jms_nb_destination` replaces previous template
+* minor: allow disabling hostname management with node attribute `node['opennms']['manage_hostname']`.
+* minor: turn on vault repo for 33.1.8 by default
+
 ## 33.6.0
 
 * minor: new custom resource `opennms_correlation` provides easier management of Drools correlation engine configurations
