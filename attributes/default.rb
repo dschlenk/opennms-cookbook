@@ -34,7 +34,7 @@ default['opennms']['jre_path'] = nil
 default['opennms']['allow_downgrade'] = false
 default['opennms']['stable'] = true
 # whether or not to attempt to automatically upgrade opennms
-default['opennms']['upgrade'] = false
+default['opennms']['upgrade'] = true
 default['opennms']['upgrade_dirs'] = [
   'etc',
   'etc/datacollection',
@@ -870,7 +870,7 @@ default['opennms']['xmpp']['pass']                = nil
 default['opennms']['repos']['branches'] = %w(obsolete snapshot stable oldstable)
 default['opennms']['repos']['platforms'] = %w(common rhel9)
 # add a specific version vault repo like this:
-node['opennms']['repos']['vault'] = ['33.1.8']
+node['opennms']['repos']['vault'] = ['34.0.0']
 #default['opennms']['repos']['vault'] = []
 
 default['opennms']['telemetryd']['managed'] = false
