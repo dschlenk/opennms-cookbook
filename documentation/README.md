@@ -17,6 +17,7 @@
 * [notifications](notifications.md)
 * [scriptd](scriptd.md)
 * [translation\_specs](translation_specs.md)
+* [opennms\_jms_nb_destination](jms_nb_destination.md)
 
 ### Service Assurance
 
