@@ -870,8 +870,8 @@ default['opennms']['xmpp']['pass']                = nil
 default['opennms']['repos']['branches'] = %w(obsolete snapshot stable oldstable)
 default['opennms']['repos']['platforms'] = %w(common rhel9)
 # add a specific version vault repo like this:
-# node['opennms']['repos']['vault'] = ['32.0.6']
-default['opennms']['repos']['vault'] = []
+node['opennms']['repos']['vault'] = ['34.0.1']
+#default['opennms']['repos']['vault'] = []
 
 default['opennms']['telemetryd']['managed'] = false
 default['opennms']['telemetryd']['jti']['enabled'] = false
