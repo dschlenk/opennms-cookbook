@@ -485,8 +485,9 @@ default['opennms']['jms_nbi']['batch_size']             = 100
 default['opennms']['jms_nbi']['queue_size']             = 300_000
 default['opennms']['jms_nbi']['message_format']         = 'ALARM ID:${alarmId} NODE:${nodeLabel}; ${logMsg}'
 default['opennms']['jms_nbi']['send_as_object_message'] = false
-default['opennms']['jms_nbi']['first_occurrence_only'] = true
-default['opennms']['jms_nbi']['jms_destination'] = 'SingleAlarmQueue'
+default['opennms']['jms_nbi']['first_occurrence_only']  = true
+default['opennms']['jms_nbi']['jms_destination']        = 'SingleAlarmQueue'
+default['opennms']['jms_nbi']['uei']                    = []
 # log4j2.xml
 default['opennms']['log4j2']['default_route']['size'] = '100MB'
 default['opennms']['log4j2']['default_route']['rollover'] = 4
@@ -871,7 +872,7 @@ default['opennms']['repos']['branches'] = %w(obsolete snapshot stable oldstable)
 default['opennms']['repos']['platforms'] = %w(common rhel9)
 # add a specific version vault repo like this:
 # node['opennms']['repos']['vault'] = ['32.0.6']
-default['opennms']['repos']['vault'] = []
+default['opennms']['repos']['vault'] = ['33.1.8']
 
 default['opennms']['telemetryd']['managed'] = false
 default['opennms']['telemetryd']['jti']['enabled'] = false
@@ -1301,3 +1302,4 @@ default['opennms']['kafka']['producer_client'] = { 'bootstrap.servers' => '127.0
 #  default['opennms']['features_boot']['files']['kafka_producer'] = 'opennms-kafka-producer'
 #  This will create a file named `$OPENNMS_HOME/etc/featuresBoot.d/kafka_producer.boot` with contents `opennms-kafka-producer`.
 default['opennms']['features_boot']['files'] = {}
+default['opennms']['manage_hostname'] = true

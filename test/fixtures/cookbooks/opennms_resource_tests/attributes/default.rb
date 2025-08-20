@@ -4,3 +4,4 @@ default['opennms']['properties']['jetty']['keystore'] = "#{node['opennms']['conf
 default['opennms']['properties']['jetty']['ks_password'] = 'changeit'
 default['opennms']['properties']['jetty']['key_password'] = 'changeit'
 default['opennms']['properties']['jetty']['cert_alias'] = 'opennms-jetty-certificate'
+default['opennms']['plugin']['addl'] = ['opennms-plugin-northbounder-jms']

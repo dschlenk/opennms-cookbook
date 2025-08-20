@@ -702,6 +702,20 @@ suites:
       inspec_tests:
         - path: test/integration/default
         - path: test/integration/jdbc_collection_service_delete
+  - name: jms_nb_destination
+    provisioner:
+      policyfile: policyfiles/jms_nb_destination.rb
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/jms_nb_destination
+  - name: jms_nb_destination_delete
+    provisioner:
+      policyfile: policyfiles/jms_nb_destination_delete.rb
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - path: test/integration/jms_nb_destination_delete
   - name: jmx
     provisioner:
       policyfile: policyfiles/jmx.rb
