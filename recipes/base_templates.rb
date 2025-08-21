@@ -49,6 +49,7 @@ node['opennms']['properties']['files'].each do |file, properties|
     group node['opennms']['groupname']
     mode '0600'
     content properties.map { |k, v| "#{k}=#{v}" }.join("\n")
+    notifies :restart, 'service[opennms]'
   end
 end
 
@@ -58,6 +59,7 @@ node['opennms']['features_boot']['files'].each do |file, feature|
     group node['opennms']['groupname']
     mode '0644'
     content "#{feature}\n"
+    notifies :restart, 'service[opennms]'
   end
 end
 
@@ -82,4 +84,5 @@ template "#{onms_home}/etc/opennms-datasources.xml" do
   variables(
     datasources: node['opennms']['datasources']
   )
+  notifies :restart, 'service[opennms]'
 end

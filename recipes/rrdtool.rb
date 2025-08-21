@@ -22,9 +22,6 @@
 end
 
 node.default['opennms']['properties']['files']['store_by_group'] = { 'org.opennms.rrd.storeByGroup' => true }
-node.default['opennms']['rrd']['strategy_class'] = 'org.opennms.netmgt.rrd.rrdtool.MultithreadedJniRrdStrategy'
-node.default['opennms']['rrd']['interface_jar'] = '/usr/share/java/jrrd2.jar'
-node.default['opennms']['rrd']['jrrd'] = '/usr/lib64/libjrrd2.so'
 
 template "#{node['opennms']['conf']['home']}/etc/rrd-configuration.properties" do
   source 'rrd-configuration.properties.erb'
@@ -37,7 +34,6 @@ template "#{node['opennms']['conf']['home']}/etc/rrd-configuration.properties" d
     strategy_class: node['opennms']['rrd']['strategy_class'],
     interface_jar: node['opennms']['rrd']['interface_jar'],
     jrrd: node['opennms']['rrd']['jrrd'],
-    file_extension: node['opennms']['rrd']['file_extension'],
     queue: node['opennms']['rrd']['queue'],
     jrobin: node['opennms']['rrd']['jrobin'],
     usetcp: node['opennms']['rrd']['usetcp'],
