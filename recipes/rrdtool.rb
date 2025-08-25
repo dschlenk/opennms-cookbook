@@ -2,7 +2,7 @@
 # Cookbook:: opennms-cookbook
 # Recipe:: rrdtool
 #
-# Copyright:: (c) 2016-2024 ConvergeOne Holding Corp
+# Copyright:: (c) 2016-2025 ConvergeOne Holding Corp
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -17,26 +17,7 @@
 # limitations under the License.
 #
 
-%w(rrdtool jrrd2).each do |p|
-  package p
-end
-
+# As of 34.0.0, RRDTool is now the default time series engine so we don't need to explicitly turn it on or install it.
+# As such, those parts of this recipe have been removed, and the management of the rrd-configuration.properties template has been moved to the `base_templates` recipe.
+# However, this recipe also enabled storeByGroup and will continue to do so.
 node.default['opennms']['properties']['files']['store_by_group'] = { 'org.opennms.rrd.storeByGroup' => true }
-
-template "#{node['opennms']['conf']['home']}/etc/rrd-configuration.properties" do
-  source 'rrd-configuration.properties.erb'
-  cookbook 'opennms'
-  mode '0664'
-  owner node['opennms']['username']
-  group node['opennms']['groupname']
-  notifies :restart, 'service[opennms]'
-  variables(
-    strategy_class: node['opennms']['rrd']['strategy_class'],
-    interface_jar: node['opennms']['rrd']['interface_jar'],
-    jrrd: node['opennms']['rrd']['jrrd'],
-    queue: node['opennms']['rrd']['queue'],
-    jrobin: node['opennms']['rrd']['jrobin'],
-    usetcp: node['opennms']['rrd']['usetcp'],
-    tcp: node['opennms']['rrd']['tcp']
-  )
-end
