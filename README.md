@@ -1,7 +1,7 @@
 # Description
 
 A Chef cookbook to manage the installation and configuration of OpenNMS Horizon.
-Current version supports Horizon release 33 on EL (redhat, rocky, oracle, etc) 9.
+Current version supports Horizon release 34 on EL (redhat, rocky, oracle, etc) 9.
 
 ## Versions
 
@@ -23,7 +23,7 @@ The balance of the version follows semantic versioning - minor version bumps for
 Running the `default` recipe will install OpenNMS Horizon from the official repo with a mostly default configuration.
 It will also execute `'$ONMS_HOME/bin/runjava -s` if `$ONMS_HOME/etc/java.conf` is not present and `$ONMS_HOME/bin/install -dis` if `$ONMS_HOME/etc/configured` is not present.
 
-There are also a plethora of custom resources that you can use to do more in depth configuration management.
+There is also a plethora of custom resources that you can use to do more in depth configuration management.
 
 ### Required Dependencies
 
@@ -56,6 +56,8 @@ The `postgres` role on the PostgreSQL server should exist and have the password 
 The easiest way to satisfy this dependency is to use the `postgres` recipe in this cookbook.
 It can be added to the run list prior to the `default` recipe.
 When used, installation, configuration, and initialization of PostgreSQL 15 will occur via the PGDG repositories and the `postgres` password contained in the vault item described above will be applied to the `postgres` role.
+
+For more advanced setups, override the `node['opennms']['datasources']` attributes as needed to work according to your needs.
 
 ## Recommended Features
 
@@ -122,7 +124,7 @@ For instance, if you provide the vault item required to change the SCV password,
 }
 ```
 
-This results in file `$OPENNMS_HOME/etc/opennms.properties.d/scv.properties` created with the contents `org.opennms.features.scv.jceks.key=the password`.
+This results in file `$OPENNMS_HOME/etc/opennms.properties.d/scv.properties` created with the contents `org.opennms.features.scv.jceks.key=<the password>`.
 
 ### Additional Boot Features
 
@@ -136,7 +138,8 @@ This results in file `$OPENNMS_HOME/etc/featuresBoot.d/kafka_producer.boot` with
 
 ### RRDTool
 
-To enable installation and configuration of RRDTool in place of the default time series engine JRobin, set `node['opennms']['rrdtool']['enabled']` to `true` or include the `rrdtool` recipe after the `default` recipe in your node's run list.
+Starting with 34.0.0, OpenNMS uses RRDTool as the default time series engine over the previous default, JRobin, which is deprecated.
+An `rrdtool` recipe originally existed to make enabling RRDTool easy, which is no longer necessary, although the recipe also enabled `storeByGroup` and remains in the cookbook to continue doing so.
 
 ### Kafka Producer
 
@@ -312,15 +315,11 @@ default['opennms']['javamail_config']['default_send']['password']           = "o
 
 ### jcifs.properties
 
-This is useful for something I'm sure, but I don't know what. See the template or default attributes file for hints.
-
-### etc/jms-northbounder-configuration.xml
-
-Configures the JMS Northbounder introduced in version 17.0.0. See the default attributes under the `jms_nbi` key for configuration options. You may also need to set some JMS related attributes under the `properties` key.
+See the template or default attributes file for available options.
 
 ### etc/enlinkd-configuration.xml
 
-Attributes available in `node['opennms']['enlinkd']` that allow you change global settings like:
+Attributes available in `node['opennms']['enlinkd']` that allow you to change global settings like:
 
 * threads
 * initial\_sleep\_time
