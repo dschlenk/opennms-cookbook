@@ -1,7 +1,7 @@
 %w(opennms-core opennms-webapp-jetty).each do |p|
   describe package(p) do
     it { should be_installed }
-    its('version') { should eq '34.0.0-1' }
+    its('version') { should eq '34.0.1-1' }
   end
 end
 %w(rrdtool jrrd2).each do
