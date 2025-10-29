@@ -16,18 +16,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# until https://issues.redhat.com/browse/RHEL-59715
-cookbook_file "#{Chef::Config['file_cache_path']}/openldap-2.6.6-4.el9.x86_64.rpm" do
-  source 'openldap-2.6.6-4.el9.x86_64.rpm'
-  notifies :upgrade, 'dnf_package[openldap]', :immediately
-end
-
-dnf_package 'openldap' do
-  source "#{Chef::Config['file_cache_path']}/openldap-2.6.6-4.el9.x86_64.rpm"
-  allow_downgrade true
-  action :nothing
-end
-
 postgresql_install 'postgres' do
   version node['opennms']['postgresql']['version']
   source 'repo'
@@ -54,6 +42,10 @@ postgresql_config 'postgresql-server' do
   action :create
 end
 
+postgresql_service 'postgresql' do
+  action %i(enable start)
+end
+
 node['opennms']['postgresql']['access']['host'].each do |ha|
   ha['addresses'].each do |h|
     postgresql_access "host access for #{h} #{ha['database']}" do
@@ -66,6 +58,7 @@ node['opennms']['postgresql']['access']['host'].each do |ha|
     end
   end
 end
+
 node['opennms']['postgresql']['access']['local'].each do |ha|
   postgresql_access "local access for #{ha['database']}" do
     type 'local'
@@ -76,12 +69,8 @@ node['opennms']['postgresql']['access']['local'].each do |ha|
   end
 end
 
-postgresql_service 'postgresql' do
-  action %i(enable start)
-end
-
 postgresql_user 'postgres' do
-  ignore_failure true # this fails after the password gets set initially
+  ignore_failure true # fails after the first execution
   unencrypted_password chef_vault_item(node['opennms']['postgresql']['user_vault'], node['opennms']['postgresql']['user_vault_item'])['postgres']['password']
   action :set_password
 end
