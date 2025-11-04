@@ -59,5 +59,6 @@ node['opennms']['repos']['vault'].each do |k|
     baseurl "https://vault.opennms.com/horizon/#{k}/rpm"
     gpgkey node['opennms']['yum_gpg_keys']
     enabled true
+    only_if { node['opennms']['manage_repos'] }
   end
 end
