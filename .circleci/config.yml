@@ -10,6 +10,12 @@ jobs:
           name: docker login
           command: docker login -u $DOCKER_USER -p $DOCKER_PASSWORD
       - run:
+          name: docker ps
+          command: docker ps -a
+      - run:
+          name: docker image ls
+          command: docker image ls
+      - run:
           name: install cinc workstation
           command: curl -L https://omnitruck.cinc.sh/install.sh | sudo bash -s -- -P cinc-workstation -v 25
       - run:
