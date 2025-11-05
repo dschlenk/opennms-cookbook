@@ -41,7 +41,7 @@ platforms:
       pid_one_command: /usr/lib/systemd/systemd
     lifecycle:
       pre_converge:
-        - remote: dnf update -y libxcrypt-compat
+        - remote: dnf install -y libxcrypt-compat
 
 suites:
   - name: recommended
