@@ -4,9 +4,9 @@ jobs:
   style:
     docker:
       - image: cincproject/workstation:latest
-         auth:
-           username: $DOCKERHUB_USERNAME
-           password: $DOCKERHUB_PASSWORD
+        auth:
+          username: $DOCKERHUB_USERNAME
+          password: $DOCKERHUB_PASSWORD
     steps:
       - checkout
       - run:
