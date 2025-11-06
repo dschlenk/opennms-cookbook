@@ -5,8 +5,8 @@ jobs:
     docker:
       - image: cincproject/workstation:latest
         auth:
-          username: $DOCKERHUB_USERNAME
-          password: $DOCKERHUB_PASSWORD
+          username: $DOCKER_USER
+          password: $DOCKER_PASSWORD
     steps:
       - checkout
       - run:
@@ -24,6 +24,15 @@ jobs:
     parallelism: 1
     steps:
       - checkout
+      - run:
+          name: docker login
+          command: docker login -u $DOCKER_USER -p $DOCKER_PASSWORD
+      - run:
+          name: install cinc workstation
+          command: curl -L https://omnitruck.cinc.sh/install.sh | sudo bash -s -- -P cinc-workstation -v 25
+      - run:
+          name: cinc
+          command: cinc shell-init bash
       - run:
           name: kitchen
             # command: kitchen verify default
