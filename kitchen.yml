@@ -36,15 +36,9 @@ verifier:
 
 platforms:
   - name: oraclelinux-9
-    image: dokken/oraclelinux-9
-    # image: c1og/opennms-33-oraclelinux-9
     driver:
+      image: dokken/oraclelinux-9
       pid_one_command: /usr/lib/systemd/systemd
-    lifecycle:
-      pre_converge:
-      - remote: cat /etc/redhat-release
-      - remote: dnf history list
-      - remote: rpm -qa
 
 suites:
   - name: recommended
