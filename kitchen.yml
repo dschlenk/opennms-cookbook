@@ -36,12 +36,13 @@ verifier:
 
 platforms:
   - name: oraclelinux-9
-    image: c1og/opennms-33-oraclelinux-9
+    image: dokken/oraclelinux-9
+    # image: c1og/opennms-33-oraclelinux-9
     driver:
       pid_one_command: /usr/lib/systemd/systemd
-    lifecycle:
-      pre_converge:
-        - remote: dnf install -y libxcrypt-compat
+        # lifecycle:
+      # pre_converge:
+      # - remote: dnf install -y libxcrypt-compat
 
 suites:
   - name: recommended
