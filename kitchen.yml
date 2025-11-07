@@ -37,12 +37,13 @@ verifier:
 platforms:
   - name: oraclelinux-9
     driver:
-      image: dokken/oraclelinux-9
+      image: c1og/opennms-34-oraclelinux-9
       pid_one_command: /usr/lib/systemd/systemd
 
 suites:
   - name: recommended
     driver:
+      image: dokken/oraclelinux-9
       ports:
         - 1234:8980/tcp
     verifier:
@@ -97,6 +98,8 @@ suites:
             vault: creds
         templates: true
   - name: upgrade
+    driver:
+      image: c1og/opennms-33-oraclelinux-9
     provisioner:
       policyfile: policyfiles/upgrade.rb
       multiple_converge: 2
@@ -105,6 +108,8 @@ suites:
         - path: test/integration/default
         - path: test/integration/upgrade
   - name: no_upgrade
+    driver:
+      image: c1og/opennms-33-oraclelinux-9
     provisioner:
       policyfile: policyfiles/upgrade.rb
       multiple_converge: 2
@@ -116,6 +121,7 @@ suites:
         upgrade: false
   - name: default
     driver:
+      image: dokken/oraclelinux-9
       ports:
         - 8980:8980/tcp
   - name: plugins
