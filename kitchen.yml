@@ -66,6 +66,7 @@ suites:
     provisioner:
       policyfile: policyfiles/kafka.rb
     driver:
+      image: dokken/oraclelinux-9
       ports:
         - 1234:8980/tcp
     verifier:
