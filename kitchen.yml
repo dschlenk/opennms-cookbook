@@ -39,6 +39,9 @@ platforms:
     driver:
       # image: c1og/opennms-33-oraclelinux-9
       pid_one_command: /usr/lib/systemd/systemd
+    lifecycle:
+      pre_converge:
+        - remote: dnf -y install libxcrypt-compat hostname
 
 suites:
   - name: recommended
