@@ -1,6 +1,6 @@
 # OpenNMS Cookbook Changes
 
-## 33.7.1
+## 33.8.0
 
 * bugfix: order of postgres resources caused password setting failure
 * bugfix: vault repo resources ignored `node['opennms']['manage_repos']`
