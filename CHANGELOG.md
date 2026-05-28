@@ -1,6 +1,6 @@
 # OpenNMS Cookbook Changes
 
-## 33.8.1
+## 33.7.2
 
 * bugfix: remove postgresql monkey patch so libpq5 installs correctly again
 
