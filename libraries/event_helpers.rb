@@ -198,16 +198,20 @@ module Opennms
             doc = REXML::Document.new f
             f.close
             position = 'override'
+            seen_vendor = []
+            seen_onms = []
             doc.each_element('/events/event-file') do |ef|
               event_file = ef.texts.collect(&:value).join('').strip[7..-1] if !ef.nil? && ef.respond_to?(:texts) && ef.texts.collect(&:value).join('').strip.length > 7
               if node['opennms']['opennms_event_files'].include?(event_file)
-                position = 'top' if position != 'top'
+                seen_onms << event_file
                 next
               end
+              position = 'top' if node['opennms']['opennms_event_files'] == seen_onms
               if node['opennms']['vendor_event_files'].include?(event_file)
-                position = 'bottom' if position != 'bottom'
+                seen_vendor << event_file
                 next
               end
+              position = 'bottom' if node['opennms']['vendor_event_files'] == seen_vendor
               break if event_file == node['opennms']['catch_all_event_file']
               @event_files[event_file] = { position: position }
               # @event_files = {} if @event_files.nil?
