@@ -1,0 +1,190 @@
+module Opennms
+  module Cookbook
+    module AvailabilityReportHelper
+      class ReportConfig
+        attr_reader :reports
+
+        def initialize
+          @reports = []
+        end
+
+        def read!(file_path)
+          raise "Config file '#{file_path}' does not exist" unless ::File.exist?(file_path)
+
+          content = ::File.read(file_path)
+          doc = REXML::Document.new(content)
+
+          @reports.clear
+
+          doc.elements.each('opennms-reports/report') do |el|
+            @reports << {
+              id: el.attributes['id'],
+              type: el.attributes['type'],
+              pdf_template: el.elements['pdf-template']&.text,
+              svg_template: el.elements['svg-template']&.text,
+              html_template: el.elements['html-template']&.text,
+              logo: el.elements['logo']&.text,
+              parameters: parse_parameters(el.elements['parameters']),
+            }
+          end
+        end
+
+        def report_exists?(report_id)
+          @reports.any? { |r| r[:id] == report_id }
+        end
+
+        def find_by_id(report_id)
+          @reports.find { |r| r[:id] == report_id }
+        end
+
+        def add_or_update_report_in_memory(report)
+          idx = @reports.index { |r| r[:id] == report[:id] }
+          if idx
+            @reports[idx] = report
+          else
+            @reports << report
+          end
+        end
+
+        def delete_report_in_memory(report_id)
+          @reports.reject! { |r| r[:id] == report_id }
+        end
+
+        private
+
+        def parse_parameters(params_elem)
+          return { 'string_parms' => [], 'date_parms' => [], 'int_parms' => [] } unless params_elem
+
+          params_hash = {
+            'string_parms' => [],
+            'date_parms' => [],
+            'int_parms' => [],
+          }
+
+          params_elem.elements.each('string-parm') do |el|
+            params_hash['string_parms'] << {
+              'name' => el.attributes['name'],
+              'display_name' => el.attributes['display-name'],
+              'input_type' => el.attributes['input-type'],
+              'default' => el.attributes['default'],
+            }
+          end
+
+          params_elem.elements.each('date-parm') do |el|
+            default_time_el = el.elements['default-time']
+            default_time_hash = if default_time_el
+                                  {
+                                    'hour' => default_time_el.attributes['hour'] || default_time_el.elements['hours']&.text,
+                                    'minute' => default_time_el.attributes['minute'] || default_time_el.elements['minutes']&.text,
+                                  }
+                                else
+                                  {}
+                                end
+
+            params_hash['date_parms'] << {
+              'name' => el.attributes['name'],
+              'display_name' => el.attributes['display-name'],
+              'use_absolute_date' => el.attributes['use-absolute-date'],
+              'default_interval' => el.elements['default-interval']&.text,
+              'default_count' => el.elements['default-count']&.text,
+              'default_time' => default_time_hash,
+            }
+          end
+
+          params_elem.elements.each('int-parm') do |el|
+            params_hash['int_parms'] << {
+              'name' => el.attributes['name'],
+              'display_name' => el.attributes['display-name'],
+              'input_type' => el.attributes['input-type'],
+              'default' => el.attributes['default'],
+            }
+          end
+          params_hash
+        end
+      end
+    end
+
+    module AvailabilityReportTemplate
+      def availability_template_resource_init
+        availability_template_resource_create unless availability_template_resource_exist?
+      end
+
+      def ro_availability_template_resource_init
+        ro_availability_template_resource_create unless ro_availability_template_resource_exist?
+      end
+
+      def ro_availability_template_resource
+        return unless ro_availability_template_resource_exist?
+        find_resource(:template, "RO #{config_file_path}")
+      end
+
+      def availability_template_resource
+        return unless availability_template_resource_exist?
+        find_resource(:template, config_file_path)
+      end
+
+      private
+
+      def config_file_path
+        "#{node['opennms']['conf']['home']}/etc/availability-reports.xml"
+      end
+
+      def availability_template_resource_exist?
+        !find_resource(:template, config_file_path).nil?
+      rescue Chef::Exceptions::ResourceNotFound
+        false
+      end
+
+      def ro_availability_template_resource_exist?
+        !find_resource(:template, "RO #{config_file_path}").nil?
+      rescue Chef::Exceptions::ResourceNotFound
+        false
+      end
+
+      def ro_availability_template_resource_create
+        config = AvailabilityReportHelper::ReportConfig.new
+        if ::File.exist?(config_file_path)
+          config.read!(config_file_path)
+        else
+          Chef::Log.info "No availability reports config found at #{config_file_path}, starting fresh."
+        end
+
+        with_run_context :root do
+          declare_resource(:template, "RO #{config_file_path}") do
+            source 'availability-reports.xml.erb'
+            cookbook 'opennms'
+            owner node['opennms']['user'] || 'opennms'
+            group node['opennms']['group'] || 'opennms'
+            mode '0644'
+            variables(config: config)
+            action :nothing
+            delayed_action :nothing
+          end
+        end
+      end
+
+      def availability_template_resource_create
+        config = AvailabilityReportHelper::ReportConfig.new
+        if ::File.exist?(config_file_path)
+          config.read!(config_file_path)
+        else
+          Chef::Log.info "No availability reports config found at #{config_file_path}, starting fresh."
+        end
+
+        with_run_context :root do
+          declare_resource(:template, config_file_path) do
+            source 'availability-reports.xml.erb'
+            cookbook 'opennms'
+            owner node['opennms']['user'] || 'opennms'
+            group node['opennms']['group'] || 'opennms'
+            mode '0644'
+            variables(config: config,
+                      onmshome: node['opennms']['home'] || '/opt/opennms')
+            action :nothing
+            delayed_action :create
+          end
+        end
+      end
+    end
+  end
+end

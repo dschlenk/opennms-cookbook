@@ -19,28 +19,6 @@
 onms_home = node['opennms']['conf']['home']
 onms_home ||= '/opt/opennms'
 
-template "#{onms_home}/etc/availability-reports.xml" do
-  cookbook node['opennms']['db_reports']['avail']['cookbook']
-  source 'availability-reports.xml.erb'
-  mode '0664'
-  owner node['opennms']['username']
-  group node['opennms']['groupname']
-  variables(
-    cal_logo: node['opennms']['db_reports']['avail']['cal']['logo'],
-    cal_interval: node['opennms']['db_reports']['avail']['cal']['endDate']['interval'],
-    cal_count: node['opennms']['db_reports']['avail']['cal']['endDate']['count'],
-    cal_hours: node['opennms']['db_reports']['avail']['cal']['endDate']['hours'],
-    cal_minutes: node['opennms']['db_reports']['avail']['cal']['endDate']['minutes'],
-    classic_logo: node['opennms']['db_reports']['avail']['classic']['logo'],
-    classic_interval: node['opennms']['db_reports']['avail']['classic']['endDate']['interval'],
-    classic_count: node['opennms']['db_reports']['avail']['classic']['endDate']['count'],
-    classic_hours: node['opennms']['db_reports']['avail']['classic']['endDate']['hours'],
-    classic_minutes: node['opennms']['db_reports']['avail']['classic']['endDate']['minutes'],
-    onms_home: onms_home
-  )
-  action node['opennms']['templates'] ? :create : :nothing
-end
-
 template "#{onms_home}/etc/service-configuration.xml" do
   cookbook node['opennms']['services']['cookbook']
   source 'service-configuration.xml.erb'
