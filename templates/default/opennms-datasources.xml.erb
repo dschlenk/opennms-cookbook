@@ -4,9 +4,9 @@
   xsi:schemaLocation="http://xmlns.opennms.org/xsd/config/opennms-datasources
   http://www.opennms.org/xsd/config/opennms-datasources.xsd ">
 
-  <connection-pool factory="org.opennms.core.db.HikariCPConnectionFactory"
+  <connection-pool
 <% @datasources['connection_pool'].each do |k, v| -%>
-                   <%= Opennms::Helpers.snake_to_camel_lower(k) %>="<%= v %>"
+                    <%= Opennms::Helpers.snake_to_camel_lower(k) %>="<%= v %>"
 <% end -%>
   />
 
