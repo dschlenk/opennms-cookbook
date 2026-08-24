@@ -17,30 +17,6 @@
 # limitations under the License.
 #
 
-%w(rrdtool jrrd2).each do |p|
-  package p
-end
+# Packages rrdtool and jrrd2 are dependencies of the OpenNMS RPMs in Horizon 34+ and no longer need explicit installation.
+# rrd-configuration.properties is now managed by the base_templates recipe.
 
-node.default['opennms']['properties']['files']['store_by_group'] = { 'org.opennms.rrd.storeByGroup' => true }
-node.default['opennms']['rrd']['strategy_class'] = 'org.opennms.netmgt.rrd.rrdtool.MultithreadedJniRrdStrategy'
-node.default['opennms']['rrd']['interface_jar'] = '/usr/share/java/jrrd2.jar'
-node.default['opennms']['rrd']['jrrd'] = '/usr/lib64/libjrrd2.so'
-
-template "#{node['opennms']['conf']['home']}/etc/rrd-configuration.properties" do
-  source 'rrd-configuration.properties.erb'
-  cookbook 'opennms'
-  mode '0664'
-  owner node['opennms']['username']
-  group node['opennms']['groupname']
-  notifies :restart, 'service[opennms]'
-  variables(
-    strategy_class: node['opennms']['rrd']['strategy_class'],
-    interface_jar: node['opennms']['rrd']['interface_jar'],
-    jrrd: node['opennms']['rrd']['jrrd'],
-    file_extension: node['opennms']['rrd']['file_extension'],
-    queue: node['opennms']['rrd']['queue'],
-    jrobin: node['opennms']['rrd']['jrobin'],
-    usetcp: node['opennms']['rrd']['usetcp'],
-    tcp: node['opennms']['rrd']['tcp']
-  )
-end

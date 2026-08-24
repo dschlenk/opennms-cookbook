@@ -1,7 +1,7 @@
 %w(opennms-core opennms-webapp-jetty).each do |p|
   describe package(p) do
     it { should be_installed }
-    its('version') { should eq '33.1.8-1' }
+    its('version') { should eq '34.1.0-1' }
   end
 end
 %w(rrdtool jrrd2).each do
@@ -23,9 +23,9 @@ describe file('/opt/opennms/etc/rrd-configuration.properties') do
   its('owner') { should eq 'opennms' }
   its('group') { should eq 'opennms' }
   its('mode') { should cmp '0664' }
-  its('content') { should match(/^org\.opennms\.rrd\.strategyClass=org\.opennms\.netmgt\.rrd\.rrdtool\.MultithreadedJniRrdStrategy$/) }
-  its('content') { should match(%r{^org\.opennms\.rrd\.interfaceJar=/usr/share/java/jrrd2.jar$}) }
-  its('content') { should match(%r{^opennms\.library\.jrrd2=/usr/lib64/libjrrd2\.so$}) }
+  its('content') { should match(/^#org\.opennms\.rrd\.strategyClass=org\.opennms\.netmgt\.rrd\.rrdtool\.MultithreadedJniRrdStrategy$/) }
+  its('content') { should match(%r{^#org\.opennms\.rrd\.interfaceJar=/usr/share/java/jrrd2.jar$}) }
+  its('content') { should match(%r{^#opennms\.library\.jrrd2=/usr/lib64/libjrrd2\.so$}) }
 end
 
 describe command('/opt/opennms/bin/scvcli list') do

@@ -1,12 +1,12 @@
 # Description
 
 A Chef cookbook to manage the installation and configuration of OpenNMS Horizon.
-Current version supports Horizon release 33 on EL (redhat, rocky, oracle, etc) 9.
+Current version supports Horizon release 34 on EL (redhat, rocky, oracle, etc) 9.
 
 ## Versions
 
 Starting with OpenNMS Horizon 16, the MSB of the version of the cookbook matches the latest MSB of the version of OpenNMS Horizon it supports.
-Starting with cookbook version 33.0.0 and OpenNMS Horizon 33.x.x, each cookbook version only officially supports the major Horizon release for which it is named.
+Starting with cookbook version 34.0.0 and OpenNMS Horizon 34.x.x, each cookbook version only officially supports the major Horizon release for which it is named.
 The version of OpenNMS Horizon is selected via node attribute, defaulting to the latest release at the time the cookbook was released.
 The balance of the version follows semantic versioning - minor version bumps for backwards-compatible new features, third level bumps for bugfix only releases.
 
@@ -136,7 +136,7 @@ This results in file `$OPENNMS_HOME/etc/featuresBoot.d/kafka_producer.boot` with
 
 ### RRDTool
 
-To enable installation and configuration of RRDTool in place of the default time series engine JRobin, set `node['opennms']['rrdtool']['enabled']` to `true` or include the `rrdtool` recipe after the `default` recipe in your node's run list.
+RRDTool is the default time series engine in OpenNMS Horizon 34. JRobin is deprecated. The `rrdtool` recipe still exists to prevent breaking existing run lists, but it no longer contains any resources.
 
 ### Kafka Producer
 
@@ -169,7 +169,7 @@ The recipes you may wish to include in your node list directly are:
 
 * `opennms::default` Installs and configures OpenNMS Horizon with the standard configuration modified with any node attribute values changed from their defaults. Set `node['opennms']['plugin']['addl']` to an array of strings representing the names of the packages of the plugins you'd like installed.
 * `opennms::rrdtool` Installs rrdtool and configures OpenNMS to use it instead of JRobin for performance metric storage.
-* `opennms::postgres` Installs postgresql in a somewhat tuned manner (from PGDG). See `postres_install` recipe to figure out how the version is selected and override with node attributes if desired.
+* `opennms::postgres` Installs postgresql in a somewhat tuned manner (from PGDG). See the `postgresql_install` resource from the `postgresql` cookbook for how the version is selected and overridden with node attributes.
 
 A few other recipes exist that aren't listed here. They are included by others when needed and are unlikely to be interesting for individual use.
 
