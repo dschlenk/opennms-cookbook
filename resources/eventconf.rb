@@ -1,81 +1,78 @@
 unified_mode true
 
 property :event_file, String, name_property: true, identity: true
-property :source_type, String, equal_to: %w(cookbook_file template remote_file), default: 'cookbook_file', desired_state: false
-property :source, String, desired_state: false
-property :source_properties, Hash, desired_state: false
+property :source_name, String, alias: true
+property :vendor, String
+property :description, String
 property :position, String, equal_to: %w(override top bottom), default: 'bottom', desired_state: false
-property :variables, Hash
 
 action_class do
-  include Opennms::Cookbook::ConfigHelpers::Event::EventConfTemplate
+  include Opennms::Cookbook::EventConf::HttpRequest
+  include Opennms::Rbac
+
+  def source_name_from_event_file
+    name = new_resource.event_file.to_s
+    name = name.sub(%r{^events/}, '')
+    name = name.sub(/\.xml$/, '')
+    name
+  end
+
+  def vendor_from_name(name)
+    return new_resource.vendor if new_resource.vendor
+    if name.include?('-')
+      name.split('-').first
+    elsif name.include?('.')
+      name.split('.').first
+    else
+      name
+    end
+  end
 end
 
-include Opennms::Cookbook::ConfigHelpers::Event::EventConfTemplate
 load_current_value do |new_resource|
-  r = eventconf_resource
-  if r.nil?
-    current_value_does_not_exist! unless ::File.exist?("#{node['opennms']['conf']['home']}/etc/events/#{new_resource.event_file}")
-    ro_eventconf_resource_init
-    r = ro_eventconf_resource
-  end
-  eventconf = r.variables[:eventconf]
-  current_value_does_not_exist! if eventconf.event_files[new_resource.event_file].nil?
-  position eventconf.event_files[new_resource.event_file][:position]
+  src_name = source_name_from_event_file
+  eventconf_source_resource_init(src_name)
+  res = eventconf_source(src_name)
+  current_value_does_not_exist! if res.nil?
+  # Position is not stored in REST, keep as is
 end
 
 action :create do
-  # always declare the resource that manages the file
-  case new_resource.source_type
-  when 'cookbook_file'
-    cookbook_file "#{node['opennms']['conf']['home']}/etc/events/#{new_resource.event_file}" do
-      source new_resource.source || new_resource.event_file
-      owner node['opennms']['username']
-      group node['opennms']['groupname']
-      mode '664'
-      new_resource.source_properties.each do |k, v|
-        send(k, v)
-      end unless new_resource.source_properties.nil?
-    end
-  when 'template'
-    template "#{node['opennms']['conf']['home']}/etc/events/#{new_resource.event_file}" do
-      source new_resource.source || "#{new_resource.event_file}.erb"
-      owner node['opennms']['username']
-      group node['opennms']['groupname']
-      mode '664'
-      variables new_resource.variables
-      new_resource.source_properties.each do |k, v|
-        send(k, v)
-      end unless new_resource.source_properties.nil?
-    end
-  when 'remote_file'
-    remote_file "#{node['opennms']['conf']['home']}/etc/events/#{new_resource.event_file}" do
-      source new_resource.source || new_resource.event_file
-      owner node['opennms']['username']
-      group node['opennms']['groupname']
-      mode '664'
-      new_resource.source_properties.each do |k, v|
-        send(k, v)
-      end unless new_resource.source_properties.nil?
-    end
-  end
-  # maybe update eventconf.xml
+  src_name = source_name_from_event_file
+  eventconf_source_resource_init(src_name)
+  res = eventconf_source(src_name)
   converge_if_changed do
-    eventconf_resource_init
-    eventconf_resource.variables[:eventconf].event_files[new_resource.event_file] = { position: new_resource.position }
+    payload = {
+      name: src_name,
+      description: new_resource.description,
+      vendor: vendor_from_name(src_name)
+    }.compact
+    res.message payload.to_json
   end
 end
 
 action :create_if_missing do
-  run_action(:create) unless ::File.exist?("#{node['opennms']['conf']['home']}/etc/events/#{new_resource.event_file}")
+  # existence check via load_current_value
+  run_action(:create)
 end
 
 action :delete do
-  eventconf_resource_init
-  eventconf_resource.variables[:eventconf].event_files.delete(new_resource.event_file)
-  file "#{node['opennms']['conf']['home']}/etc/events/#{new_resource.event_file}" do
-    action :nothing
-    delayed_action :delete
-    notifies :create, "template[#{node['opennms']['conf']['home']}/etc/eventconf.xml]", :immediately
+  src_name = source_name_from_event_file
+  # Delete source via REST
+  require 'net/http'
+  require 'json'
+  uri = URI("http://localhost:8980/opennms/api/v2/eventconf/sources/names-and-ids")
+  req = Net::HTTP::Get.new(uri)
+  res_http = Net::HTTP.start(uri.host, uri.port) { |http| http.request(req) }
+  if res_http.is_a?(Net::HTTPSuccess)
+    data = JSON.parse(res_http.body)
+    entry = data.find { |s| s['name'] == src_name }
+    if entry
+      uri_del = URI("http://localhost:8980/opennms/api/v2/eventconf/sources")
+      http = Net::HTTP.new(uri_del.host, uri_del.port)
+      req_del = Net::HTTP::Delete.new(uri_del.path, 'Content-Type' => 'application/json')
+      req_del.body = { sourceIds: [entry['id']] }.to_json
+      http.request(req_del)
+    end
   end
 end
