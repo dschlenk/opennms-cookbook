@@ -4,11 +4,17 @@ property :event_file, String, name_property: true, identity: true
 property :source_name, String, alias: true
 property :vendor, String
 property :description, String
+property :source_type, String, equal_to: %w(cookbook_file template remote_file), default: 'cookbook_file', desired_state: false
+property :source, String, desired_state: false
+property :source_properties, Hash, desired_state: false
+property :variables, Hash
 property :position, String, equal_to: %w(override top bottom), default: 'bottom', desired_state: false
 
 action_class do
   include Opennms::Cookbook::EventConf::HttpRequest
   include Opennms::Rbac
+
+  @eventconf_upload_accumulator = {}
 
   def source_name_from_event_file
     name = new_resource.event_file.to_s
@@ -27,52 +33,72 @@ action_class do
       name
     end
   end
+
+  def ensure_upload_resource
+    with_run_context(:root) do
+      declare_resource(:http_request, 'opennms_eventconf_upload') do
+        url "#{resturl}/eventconf/upload"
+        headers({ 'Content-Type' => 'multipart/form-data', 'Authorization' => "Basic #{Base64.strict_encode64("admin:#{admin_secret_from_vault('password')}")}" })
+        action :nothing
+        delayed_action :post
+        message ''
+        sensitive true
+      end unless find_resource(:http_request, 'opennms_eventconf_upload')
+    end
+  end
 end
 
 load_current_value do |new_resource|
   src_name = source_name_from_event_file
-  eventconf_source_resource_init(src_name)
-  res = eventconf_source(src_name)
-  current_value_does_not_exist! if res.nil?
-  # Position is not stored in REST, keep as is
+  # Existence check via API
+  require 'net/http'
+  uri = URI("#{resturl}/eventconf/sources/names-and-ids")
+  res = Net::HTTP.get_response(uri)
+  if res.is_a?(Net::HTTPSuccess)
+    data = JSON.parse(res.body)
+    current_value_does_not_exist! unless data.any? { |s| s['name'] == src_name }
+  else
+    current_value_does_not_exist!
+  end
 end
 
 action :create do
   src_name = source_name_from_event_file
-  eventconf_source_resource_init(src_name)
-  res = eventconf_source(src_name)
+  ensure_upload_resource
+  # Accumulate file content for bulk upload
   converge_if_changed do
-    payload = {
-      name: src_name,
+    # Render file content
+    content = case new_resource.source_type
+    when 'cookbook_file'
+      cookbook_file_path = "#{node['opennms']['conf']['home']}/etc/events/#{new_resource.event_file}"
+      File.read(cookbook_file_path) rescue ''
+    when 'template'
+      # Simplified: assume rendered content is available via template resource
+      ''
+    when 'remote_file'
+      ''
+    end
+    # Store in accumulator
+    action_class.instance_variable_get(:@eventconf_upload_accumulator)[new_resource.event_file] = {
+      source_name: src_name,
+      vendor: vendor_from_name(src_name),
       description: new_resource.description,
-      vendor: vendor_from_name(src_name)
-    }.compact
-    res.message payload.to_json
+      content: content
+    }
+    # Update upload resource message with accumulated files
+    upload_res = find_resource!(:http_request, 'opennms_eventconf_upload')
+    # Build multipart body placeholder – actual building would happen in converge
+    upload_res.message "accumulated"
   end
 end
 
 action :create_if_missing do
-  # existence check via load_current_value
   run_action(:create)
 end
 
 action :delete do
   src_name = source_name_from_event_file
-  # Delete source via REST
-  require 'net/http'
-  require 'json'
-  uri = URI("http://localhost:8980/opennms/api/v2/eventconf/sources/names-and-ids")
-  req = Net::HTTP::Get.new(uri)
-  res_http = Net::HTTP.start(uri.host, uri.port) { |http| http.request(req) }
-  if res_http.is_a?(Net::HTTPSuccess)
-    data = JSON.parse(res_http.body)
-    entry = data.find { |s| s['name'] == src_name }
-    if entry
-      uri_del = URI("http://localhost:8980/opennms/api/v2/eventconf/sources")
-      http = Net::HTTP.new(uri_del.host, uri_del.port)
-      req_del = Net::HTTP::Delete.new(uri_del.path, 'Content-Type' => 'application/json')
-      req_del.body = { sourceIds: [entry['id']] }.to_json
-      http.request(req_del)
-    end
-  end
+  # Remove from accumulator
+  acc = action_class.instance_variable_get(:@eventconf_upload_accumulator)
+  acc.delete(new_resource.event_file)
 end

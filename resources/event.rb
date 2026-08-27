@@ -3,8 +3,6 @@ unified_mode true
 property :uei, String, name_property: true, identity: true
 # relative path to file from $ONMS_HOME/etc, typically starts with `events/`
 property :file, String, identity: true, required: true
-property :source_name, String, alias: true
-# ... existing properties remain unchanged ...
 # Array of hashes that contain key mename or vbnumber with a string value and mevalue or vbvalue with an array of string values. 'mename' indicates 'maskelement' while 'vbnumber' indicates 'varbind'. All vbnumber/vbvalue hashes must follow the mename/mevalue hashes.
 # ex: [
 #      {'mename' => 'id', 'mevalue' => ['.1.3.6.1.4.1.9.10.14']},
@@ -156,27 +154,6 @@ property :eventconf_position, String, equal_to: %w(override top bottom), default
 action_class do
   include Opennms::Cookbook::ConfigHelpers::Event::EventConfTemplate
   include Opennms::Cookbook::ConfigHelpers::Event::EventTemplate
-  include Opennms::Cookbook::EventConf::HttpRequest
-  include Opennms::Rbac
-
-  def source_name_from_file
-    name = new_resource.file.to_s
-    name = name.sub(%r{^events/}, '')
-    name = name.sub(/\.xml$/, '')
-    name
-  end
-
-  def find_source_id(source_name)
-    require 'net/http'
-    require 'json'
-    uri = URI("http://localhost:8980/opennms/api/v2/eventconf/sources/names-and-ids")
-    req = Net::HTTP::Get.new(uri)
-    res = Net::HTTP.start(uri.host, uri.port) { |http| http.request(req) }
-    return nil unless res.is_a?(Net::HTTPSuccess)
-    data = JSON.parse(res.body)
-    entry = data.find { |s| s['name'] == source_name }
-    entry ? entry['id'] : nil
-  end
 end
 
 include Opennms::Cookbook::ConfigHelpers::Event::EventTemplate
@@ -220,29 +197,6 @@ action :create do
 
       eventconf_resource_init
       eventconf_resource.variables[:eventconf].event_files[new_resource.file[7..-1]] = { position: new_resource.eventconf_position }
-
-      # Create event via REST
-      src_name = source_name_from_file
-      src_id = find_source_id(src_name)
-      raise "EventConf source #{src_name} not found" unless src_id
-
-      require 'net/http'
-      require 'json'
-      uri = URI("http://localhost:8980/opennms/api/v2/eventconf/sources/#{src_id}/events")
-      http = Net::HTTP.new(uri.host, uri.port)
-      req = Net::HTTP::Post.new(uri.path, 'Content-Type' => 'application/json')
-      payload = {
-        uei: new_resource.uei,
-        eventLabel: new_resource.event_label,
-        descr: new_resource.descr,
-        logmsg: { content: new_resource.logmsg, dest: new_resource.logmsg_dest || 'logndisplay', notify: new_resource.logmsg_notify },
-        severity: new_resource.severity
-      }.compact
-      req.body = payload.to_json
-      res = http.request(req)
-      raise "Failed to create event #{new_resource.uei}" unless res.is_a?(Net::HTTPSuccess) || res.code.to_i == 201
-
-      # Keep in-memory entry for compatibility
       resource_properties = %i(uei mask priority event_label descr logmsg logmsg_dest logmsg_notify collection_group severity operinstruct autoaction varbindsdecode parameters operaction autoacknowledge loggroup tticket forward script mouseovertext alarm_data filters).map { |p| [p, new_resource.send(p)] }.to_h.compact
       resource_properties[:logmsg_dest] = 'logndisplay' if new_resource.logmsg_dest.nil?
       entry = Opennms::Cookbook::ConfigHelpers::Event::EventDefinition.create(**resource_properties)
