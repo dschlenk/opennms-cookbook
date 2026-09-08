@@ -64,6 +64,7 @@ node['opennms']['postgresql']['access']['host'].each do |ha|
     end
   end
 end
+
 node['opennms']['postgresql']['access']['local'].each do |ha|
   postgresql_access "local access for #{ha['database']}" do
     type 'local'
@@ -73,3 +74,4 @@ node['opennms']['postgresql']['access']['local'].each do |ha|
     action ha['action']
   end
 end
+

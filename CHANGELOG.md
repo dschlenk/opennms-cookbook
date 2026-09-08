@@ -1,5 +1,14 @@
 # OpenNMS Cookbook Changes
 
+## 33.7.2
+
+* bugfix: remove postgresql monkey patch so libpq5 installs correctly again
+
+## 33.7.1
+
+* bugfix: order of postgres resources caused password setting failure
+* bugfix: vault repo resources ignored `node['opennms']['manage_repos']`
+
 ## 33.7.0
 
 * breaking: new custom resource: `opennms_jms_nb_destination` replaces previous template

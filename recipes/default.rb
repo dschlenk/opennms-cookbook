@@ -25,6 +25,7 @@ node.run_state['opennms'] = Mash.new
 
 fqdn = node['fqdn']
 fqdn ||= node['hostname']
+fqdn ||= 'localhost'
 
 hostname fqdn if node['opennms']['manage_hostname']
 
