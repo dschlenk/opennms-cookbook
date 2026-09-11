@@ -1,4 +1,4 @@
-# opennms\_correlator
+# opennms\_correlation
 
 Manages drools correlation engine configs in `$OPENNMS_HOME/etc/drools-engine.d`. Will restart the Correlator service automatically when needed. Creates sub-resources to accomplish its work and as such does not accumulate changes, potentially causing short periods of inconsistency during client execution when more than one resource operate on the same correlation configuration.
 
@@ -28,8 +28,8 @@ Manages drools correlation engine configs in `$OPENNMS_HOME/etc/drools-engine.d`
 
 See the following test recipes:
 
-* [correlator.rb](../test/fixtures/cookbooks/opennms_resource_tests/recipes/correlator.rb)
-* [correlator\_edit.rb](../test/fixtures/cookbooks/opennms_resource_tests/recipes/correlator_edit.rb)
+* [correlation.rb](../test/fixtures/cookbooks/opennms_resource_tests/recipes/correlation.rb)
+* [correlation\_edit.rb](../test/fixtures/cookbooks/opennms_resource_tests/recipes/correlation_edit.rb)
 
 ## Additional Notes
 

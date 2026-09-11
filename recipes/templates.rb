@@ -52,16 +52,26 @@ template "#{onms_home}/etc/service-configuration.xml" do
               {
                 snmp_poller: node['opennms']['services']['snmp_poller'],
                 correlator: node['opennms']['services']['correlator'],
-                tl1d: node['opennms']['services']['tl1d'],
                 syslogd: node['opennms']['services']['syslogd'],
-                asterisk_gw: node['opennms']['services']['asterisk_gw'],
                 telemetryd: node['opennms']['services']['telemetryd'],
                 perspective_poller: node['opennms']['services']['perspective_poller'],
                 bsmd: node['opennms']['services']['bsmd'],
                 ticketer: node['opennms']['services']['ticketer'],
-                discovery: node['opennms']['services']['ticketer'],
+                discovery: node['opennms']['services']['discovery'],
               }
             }
+  action node['opennms']['templates'] ? :create : :nothing
+end
+
+template "#{onms_home}/etc/log4j2.xml" do
+  cookbook node['opennms']['log4j2']['cookbook']
+  source 'log4j2.xml.erb'
+  mode '0664'
+  owner node['opennms']['username']
+  group node['opennms']['groupname']
+  variables(
+    log: node['opennms']['log4j2']
+  )
   action node['opennms']['templates'] ? :create : :nothing
 end
 
@@ -250,26 +260,6 @@ template "#{onms_home}/etc/jcifs.properties" do
     password: node['opennms']['jcifs']['password'],
     client_laddr: node['opennms']['jcifs']['client_laddr']
   )
-  action node['opennms']['templates'] ? :create : :nothing
-end
-
-template "#{onms_home}/etc/jms-northbounder-configuration.xml" do
-  source 'jms-northbounder-configuration.xml.erb'
-  cookbook node['opennms']['jms_nbi']['cookbook']
-  owner node['opennms']['username']
-  group node['opennms']['groupname']
-  variables(
-    enabled: node['opennms']['jms_nbi']['enabled'],
-    nagles_delay: node['opennms']['jms_nbi']['nagles_delay'],
-    batch_size: node['opennms']['jms_nbi']['batch_size'],
-    queue_size: node['opennms']['jms_nbi']['queue_size'],
-    message_format: node['opennms']['jms_nbi']['message_format'],
-    jms_destination: node['opennms']['jms_nbi']['jms_destination'],
-    send_as_object_message: node['opennms']['jms_nbi']['send_as_object_message'],
-    first_occurrence_only: node['opennms']['jms_nbi']['first_occurrence_only']
-  )
-  notifies :restart, 'service[opennms]'
-  only_if { node['opennms']['plugin']['addl'].include?('opennms-plugin-northbounder-jms') }
   action node['opennms']['templates'] ? :create : :nothing
 end
 

@@ -1,7 +1,7 @@
 # Description
 
 A Chef cookbook to manage the installation and configuration of OpenNMS Horizon.
-Current version supports Horizon release 33 on EL (redhat, rocky, oracle, etc) 9.
+Current version supports Horizon release 34 on EL (redhat, rocky, oracle, etc) 9.
 
 ## Versions
 
@@ -56,6 +56,8 @@ The `postgres` role on the PostgreSQL server should exist and have the password 
 The easiest way to satisfy this dependency is to use the `postgres` recipe in this cookbook.
 It can be added to the run list prior to the `default` recipe.
 When used, installation, configuration, and initialization of PostgreSQL 15 will occur via the PGDG repositories and the `postgres` password contained in the vault item described above will be applied to the `postgres` role.
+
+For more advanced setups, override the `node['opennms']['datasources']` attributes as needed to work according to your needs.
 
 ## Recommended Features
 
@@ -122,7 +124,7 @@ For instance, if you provide the vault item required to change the SCV password,
 }
 ```
 
-This results in file `$OPENNMS_HOME/etc/opennms.properties.d/scv.properties` created with the contents `org.opennms.features.scv.jceks.key=the password`.
+This results in file `$OPENNMS_HOME/etc/opennms.properties.d/scv.properties` created with the contents `org.opennms.features.scv.jceks.key=<the password>`.
 
 ### Additional Boot Features
 
@@ -136,7 +138,7 @@ This results in file `$OPENNMS_HOME/etc/featuresBoot.d/kafka_producer.boot` with
 
 ### RRDTool
 
-To enable installation and configuration of RRDTool in place of the default time series engine JRobin, set `node['opennms']['rrdtool']['enabled']` to `true` or include the `rrdtool` recipe after the `default` recipe in your node's run list.
+RRDTool is the default time series engine in OpenNMS Horizon 34. JRobin is deprecated. The `rrdtool` recipe still exists to prevent breaking existing run lists, but it no longer contains any resources. It does still enable `storeByGroup`, however.
 
 ### Kafka Producer
 
@@ -168,8 +170,8 @@ If your Kafka client configuration does not include secrets, you can simply set 
 The recipes you may wish to include in your node list directly are:
 
 * `opennms::default` Installs and configures OpenNMS Horizon with the standard configuration modified with any node attribute values changed from their defaults. Set `node['opennms']['plugin']['addl']` to an array of strings representing the names of the packages of the plugins you'd like installed.
-* `opennms::rrdtool` Installs rrdtool and configures OpenNMS to use it instead of JRobin for performance metric storage.
-* `opennms::postgres` Installs postgresql in a somewhat tuned manner (from PGDG). See `postres_install` recipe to figure out how the version is selected and override with node attributes if desired.
+* `opennms::rrdtool` Prior to v34 this recipe installed rrdtool and configured OpenNMS to use it instread of JRobin, with storeByGroup enabled. Since 34 makes rrdtool the default, this recipe merely turns on storeByGroup.
+* `opennms::postgres` Installs postgresql in a somewhat tuned manner (from PGDG). Uses the `postgresql_install` resource from the `postgresql` cookbook. Version selection and other behaviours can be changed with node attributes.
 
 A few other recipes exist that aren't listed here. They are included by others when needed and are unlikely to be interesting for individual use.
 
@@ -198,7 +200,6 @@ The following custom resources don't exist yet, but they should!
 * `opennms_sendmail`: Manage `sendmail-config` elements in `$OPENNMS_HOME/etc/javamail-configuration.xml`.
 * `opennms_readmail`: Manage `readmail-config` elements in `$OPENNMS_HOME/etc/javamail-configuration.xml`.
 * `opennms_end2endmail`: Manage `end2end-mail-config` elements in `$OPENNMS_HOME/etc/javamail-configuration.xml`.
-* `opennms_jms_nb_destination`: Manage `destination` elements in `$OPENNMS_HOME/etc/jms-northbounder-configuration.xml`.
 * `opennms_site_status_view`: Manage `view` elements in `$OPENNMS_HOME/etc/site-status-views.xml`.
 
 ## Template Overview
@@ -311,9 +312,9 @@ default['opennms']['javamail_config']['default_send']['user']               = "o
 default['opennms']['javamail_config']['default_send']['password']           = "opennms"
 ```
 
-### jcifs.properties
+### etc/jcifs.properties
 
-This is useful for something I'm sure, but I don't know what. See the template or default attributes file for hints.
+See the template or default attributes file for available options.
 
 ### etc/jms-northbounder-configuration.xml
 
@@ -321,7 +322,7 @@ Configures the JMS Northbounder introduced in version 17.0.0. See the default at
 
 ### etc/enlinkd-configuration.xml
 
-Attributes available in `node['opennms']['enlinkd']` that allow you change global settings like:
+Attributes available in `node['opennms']['enlinkd']` that allow you to change global settings like:
 
 * threads
 * initial\_sleep\_time

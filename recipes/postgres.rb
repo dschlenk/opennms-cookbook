@@ -16,18 +16,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# until https://issues.redhat.com/browse/RHEL-59715
-cookbook_file "#{Chef::Config['file_cache_path']}/openldap-2.6.6-4.el9.x86_64.rpm" do
-  source 'openldap-2.6.6-4.el9.x86_64.rpm'
-  notifies :upgrade, 'dnf_package[openldap]', :immediately
-end
-
-dnf_package 'openldap' do
-  source "#{Chef::Config['file_cache_path']}/openldap-2.6.6-4.el9.x86_64.rpm"
-  allow_downgrade true
-  action :nothing
-end
-
 postgresql_install 'postgres' do
   version node['opennms']['postgresql']['version']
   source 'repo'
@@ -39,7 +27,6 @@ end
 
 postgresql_config 'postgresql-server' do
   version '15'
-
   server_config({
     'autovacuum' => 'on',
     'checkpoint_timeout' => '15min',
@@ -49,9 +36,18 @@ postgresql_config 'postgresql-server' do
     'vacuum_cost_delay' => 50,
     'max_connections' => 160,
   })
-
   notifies :restart, 'postgresql_service[postgresql]', :delayed
   action :create
+end
+
+postgresql_service 'postgresql' do
+  action %i(enable start)
+end
+
+postgresql_user 'postgres' do
+  ignore_failure true # this fails after the password gets set initially
+  unencrypted_password chef_vault_item(node['opennms']['postgresql']['user_vault'], node['opennms']['postgresql']['user_vault_item'])['postgres']['password']
+  action :set_password
 end
 
 node['opennms']['postgresql']['access']['host'].each do |ha|
@@ -66,6 +62,7 @@ node['opennms']['postgresql']['access']['host'].each do |ha|
     end
   end
 end
+
 node['opennms']['postgresql']['access']['local'].each do |ha|
   postgresql_access "local access for #{ha['database']}" do
     type 'local'
@@ -74,14 +71,4 @@ node['opennms']['postgresql']['access']['local'].each do |ha|
     auth_method ha['auth_method']
     action ha['action']
   end
-end
-
-postgresql_service 'postgresql' do
-  action %i(enable start)
-end
-
-postgresql_user 'postgres' do
-  ignore_failure true # this fails after the password gets set initially
-  unencrypted_password chef_vault_item(node['opennms']['postgresql']['user_vault'], node['opennms']['postgresql']['user_vault_item'])['postgres']['password']
-  action :set_password
 end

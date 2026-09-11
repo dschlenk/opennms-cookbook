@@ -24,9 +24,8 @@ node.default['opennms']['datacollection']['default']['ref_mib2_pe'] = true
 
 pw = opennms_scv_password
 
-# this has to go in both `opennms.conf` the properties file because the installer includes this file but not `opennms.properties.*`.
+# In Horizon 34+ the installer reads opennms.properties.d, so the SCV key only needs to be set via properties file.
 unless pw.nil?
-  node.default['opennms']['conf']['env']['ADDITIONAL_MANAGER_OPTIONS'] = "${ADDITIONAL_MANAGER_OPTIONS} -Dorg.opennms.features.scv.jceks.key=#{pw}"
   node.default['opennms']['properties']['files']['scv'] = { 'org.opennms.features.scv.jceks.key' => pw }
 end
 
@@ -36,7 +35,7 @@ template "#{onms_home}/etc/opennms.conf" do
   mode '664'
   owner node['opennms']['username']
   group node['opennms']['groupname']
-  notifies :restart, 'service[opennms]'
+  notifies :restart, 'service[opennms]' if opennms_running?
   sensitive true
   variables(
     env: node['opennms']['conf']['env']
@@ -49,6 +48,7 @@ node['opennms']['properties']['files'].each do |file, properties|
     group node['opennms']['groupname']
     mode '0600'
     content properties.map { |k, v| "#{k}=#{v}" }.join("\n")
+    notifies :restart, 'service[opennms]' if opennms_running?
   end
 end
 
@@ -58,6 +58,7 @@ node['opennms']['features_boot']['files'].each do |file, feature|
     group node['opennms']['groupname']
     mode '0644'
     content "#{feature}\n"
+    notifies :restart, 'service[opennms]' if opennms_running?
   end
 end
 
@@ -79,7 +80,27 @@ template "#{onms_home}/etc/opennms-datasources.xml" do
   mode '664'
   owner node['opennms']['username']
   group node['opennms']['groupname']
+  notifies :restart, 'service[opennms]' if opennms_running?
   variables(
     datasources: node['opennms']['datasources']
+  )
+  notifies :restart, 'service[opennms]' if opennms_running?
+end
+
+template "#{onms_home}/etc/rrd-configuration.properties" do
+  cookbook 'opennms'
+  source 'rrd-configuration.properties.erb'
+  mode '0664'
+  owner node['opennms']['username']
+  group node['opennms']['groupname']
+  notifies :restart, 'service[opennms]' if opennms_running?
+  variables(
+    strategy_class: node['opennms']['rrd']['strategy_class'],
+    interface_jar: node['opennms']['rrd']['interface_jar'],
+    jrrd: node['opennms']['rrd']['jrrd'],
+    queue: node['opennms']['rrd']['queue'],
+    jrobin: node['opennms']['rrd']['jrobin'],
+    usetcp: node['opennms']['rrd']['usetcp'],
+    tcp: node['opennms']['rrd']['tcp']
   )
 end
