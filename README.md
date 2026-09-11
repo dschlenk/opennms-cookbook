@@ -6,7 +6,7 @@ Current version supports Horizon release 34 on EL (redhat, rocky, oracle, etc) 9
 ## Versions
 
 Starting with OpenNMS Horizon 16, the MSB of the version of the cookbook matches the latest MSB of the version of OpenNMS Horizon it supports.
-Starting with cookbook version 34.0.0 and OpenNMS Horizon 34.x.x, each cookbook version only officially supports the major Horizon release for which it is named.
+Starting with cookbook version 33.0.0 and OpenNMS Horizon 33.x.x, each cookbook version only officially supports the major Horizon release for which it is named.
 The version of OpenNMS Horizon is selected via node attribute, defaulting to the latest release at the time the cookbook was released.
 The balance of the version follows semantic versioning - minor version bumps for backwards-compatible new features, third level bumps for bugfix only releases.
 
