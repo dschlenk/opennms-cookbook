@@ -28,7 +28,7 @@ describe file('/opt/opennms/etc/rrd-configuration.properties') do
   its('content') { should match(%r{^#opennms\.library\.jrrd2=/usr/lib64/libjrrd2\.so$}) }
 end
 
-describe command('/opt/opennms/bin/scvcli list') do
+describe command('/opt/opennms/bin/scvcli --password=ulf list') do
   its('exit_status') { should_not eq 0 }
 end
 

@@ -74,4 +74,3 @@ node['opennms']['postgresql']['access']['local'].each do |ha|
     action ha['action']
   end
 end
-

@@ -19,3 +19,4 @@
 
 # Packages rrdtool and jrrd2 are dependencies of the OpenNMS RPMs in Horizon 34+ and no longer need explicit installation.
 # rrd-configuration.properties is now managed by the base_templates recipe.
+node.default['opennms']['properties']['files']['store_by_group']['org.opennms.rrd.storeByGroup'] = true

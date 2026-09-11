@@ -173,7 +173,7 @@ default['opennms']['properties']['files'] = {
   #    'org.opennms.features.scv.jceks.key' => 'pw'
   #  }
   'store_by_group' => {
-    'org.opennms.rrd.storeByGroup' => true,
+    'org.opennms.rrd.storeByGroup' => false,
   },
 }
 # if you change one of the following via the mechanism above, you also need to update it here:
