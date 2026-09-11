@@ -34,7 +34,7 @@ default['opennms']['jre_path'] = nil
 default['opennms']['allow_downgrade'] = false
 default['opennms']['stable'] = true
 # whether or not to attempt to automatically upgrade opennms
-default['opennms']['upgrade'] = true
+default['opennms']['upgrade'] = false
 default['opennms']['upgrade_dirs'] = [
   'etc',
   'etc/datacollection',
