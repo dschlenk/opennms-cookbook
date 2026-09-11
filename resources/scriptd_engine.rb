@@ -1,5 +1,7 @@
 include Opennms::Cookbook::Scriptd::ScriptdTemplate
 
+unified_mode true
+
 property :language, String, name_property: true
 property :class_name, String, required: true
 property :extensions, String

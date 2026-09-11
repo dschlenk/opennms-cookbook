@@ -80,11 +80,11 @@ suites:
           hostname: 127.0.0.1
         init_style: systemd
         version: 3.9.1
-        checksum: ''
+        checksum: ""
         sha512_checksum: 1ea204ba73411737a275429ca976d440f007ff0957b90b19be41dc5a4bae52617267769be9f0b5791714d0b3c4c760605bd426faea39edd90763585523fa2cfe
         scala_version: 2.13
-        jvm_performance_opts: ''
-        gc_log_opts: ''
+        jvm_performance_opts: ""
+        gc_log_opts: ""
         automatic_start: true
       opennms:
         kafka:
@@ -129,7 +129,7 @@ suites:
     attributes:
       opennms:
         plugin:
-          addl: 
+          addl:
             - opennms-plugin-protocol-nsclient
             - opennms-plugin-provisioning-snmp-hardware-inventory
             - opennms-plugin-provisioning-snmp-asset
@@ -1042,6 +1042,13 @@ suites:
       inspec_tests:
         - path: test/integration/default
         - path: test/integration/translation_specs
+  - name: trapd-api
+    provisioner:
+      policyfile: policyfiles/trapd.rb
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - test/integration/trapd
   - name: user
     provisioner:
       policyfile: policyfiles/user.rb

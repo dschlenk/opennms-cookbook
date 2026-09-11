@@ -1,5 +1,8 @@
 include Opennms::XmlHelper
 include Opennms::Cookbook::Discovery::ConfigurationTemplate
+
+unified_mode true
+
 property :url, String, name_property: true
 property :location, String, identity: true
 property :url_type, String, equal_to: %w(include exclude), default: 'include', identity: true

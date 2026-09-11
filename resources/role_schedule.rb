@@ -1,3 +1,5 @@
+unified_mode true
+
 # Identity is determined by all properties.
 property :role_name, kind_of: String, required: true, identity: true
 property :username, kind_of: String, required: true, identity: true

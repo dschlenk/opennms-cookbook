@@ -1,3 +1,5 @@
+unified_mode true
+
 # the user or group to notify
 property :target_name, String, name_property: true
 # the name of the destination path that this target belongs to

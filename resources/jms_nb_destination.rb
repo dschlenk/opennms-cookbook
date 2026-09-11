@@ -1,6 +1,8 @@
 include Opennms::XmlHelper
 include Opennms::Cookbook::JmsNbTemplate
 
+unified_mode true
+
 property :destination, String, name_property: true
 property :first_occurrence_only, [true, false]
 property :send_as_object_message, [true, false]

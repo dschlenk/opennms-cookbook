@@ -108,7 +108,7 @@ action :create do
     wsman_resource_init(file)
     r = wsman_resource(file)
     all = if r.nil?
-            Opennms::Cookbook::Collection::WsmanCollectionConfigFile.read(file, 'wsman').system_definitions
+            Opennms::Cookbook::Collection::WsmanCollectionConfigFile.read('wsman', file).system_definitions
           else
             r.variables[:system_definitions]
           end
@@ -132,7 +132,7 @@ action :create_if_missing do
   wsman_resource_init(file)
   r = wsman_resource(file)
   all = if r.nil?
-          Opennms::Cookbook::Collection::WsmanCollectionConfigFile.read(file, 'wsman').system_definitions
+          Opennms::Cookbook::Collection::WsmanCollectionConfigFile.read('wsman', file).system_definitions
         else
           r.variables[:system_definitions]
         end

@@ -1,5 +1,8 @@
 include Opennms::XmlHelper
 include Opennms::Cookbook::Discovery::ConfigurationTemplate
+
+unified_mode true
+
 property :ipaddr, String, name_property: true
 property :retry_count, Integer
 property :timeout, Integer

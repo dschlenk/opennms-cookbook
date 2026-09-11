@@ -2,6 +2,9 @@ source 'https://rubygems.org'
 
 gem 'java-properties'
 gem 'mdl'
+group :development do
+  gem 'cookstyle'
+end
 # gem 'rest-client'
 # gem 'rake', '~> 13.0'
 # gem 'kitchen-inspec', '~> 1.1'

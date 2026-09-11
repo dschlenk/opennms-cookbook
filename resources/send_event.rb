@@ -1,3 +1,5 @@
+unified_mode true
+
 # UEI of the event to send
 property :uei, String, default: 'uei.opennms.org/internal/reloadDaemonConfig'
 # array of strings that are passed as command line arguments to

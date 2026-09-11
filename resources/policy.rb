@@ -2,6 +2,8 @@ include Opennms::Cookbook::Provision::ForeignSourceHttpRequest
 include Opennms::XmlHelper
 include Opennms::Rbac
 
+unified_mode true
+
 property :policy_name, String, name_property: true
 property :class_name, String, required: true
 property :foreign_source_name, String, identity: true

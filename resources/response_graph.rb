@@ -1,6 +1,8 @@
 include Opennms::XmlHelper
 include Graph # fixed: missing module
 
+unified_mode true
+
 property :short_name, String, name_property: true
 property :long_name, String
 property :columns, Array, callbacks: {

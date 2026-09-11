@@ -1,3 +1,5 @@
+unified_mode true
+
 property :uei, String, name_property: true
 property :acknowledge, String, required: true, identity: true
 # default to 'RESOLVED: ' on new
