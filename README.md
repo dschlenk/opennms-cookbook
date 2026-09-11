@@ -23,7 +23,7 @@ The balance of the version follows semantic versioning - minor version bumps for
 Running the `default` recipe will install OpenNMS Horizon from the official repo with a mostly default configuration.
 It will also execute `'$ONMS_HOME/bin/runjava -s` if `$ONMS_HOME/etc/java.conf` is not present and `$ONMS_HOME/bin/install -dis` if `$ONMS_HOME/etc/configured` is not present.
 
-There is also a plethora of custom resources that you can use to do more in depth configuration management.
+There are also a plethora of custom resources that you can use to do more in depth configuration management.
 
 ### Required Dependencies
 
@@ -312,9 +312,13 @@ default['opennms']['javamail_config']['default_send']['user']               = "o
 default['opennms']['javamail_config']['default_send']['password']           = "opennms"
 ```
 
-### jcifs.properties
+### etc/jcifs.properties
 
 See the template or default attributes file for available options.
+
+### etc/jms-northbounder-configuration.xml
+
+Configures the JMS Northbounder introduced in version 17.0.0. See the default attributes under the `jms_nbi` key for configuration options. You may also need to set some JMS related attributes under the `properties` key.
 
 ### etc/enlinkd-configuration.xml
 
