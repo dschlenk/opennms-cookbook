@@ -84,6 +84,7 @@ template "#{onms_home}/etc/opennms-datasources.xml" do
   variables(
     datasources: node['opennms']['datasources']
   )
+  notifies :restart, 'service[opennms]' if opennms_running?
 end
 
 template "#{onms_home}/etc/rrd-configuration.properties" do

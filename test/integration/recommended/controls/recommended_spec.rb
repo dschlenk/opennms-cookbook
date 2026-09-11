@@ -36,6 +36,10 @@ describe command('/opt/opennms/bin/scvcli --password=ulfulfulfulf list') do
   its('exit_status') { should eq 0 }
 end
 
+describe command('/opt/opennms/bin/scvcli --password=ulfulfulfulfulf list') do
+  its('exit_status') { should_not eq 0 }
+end
+
 describe http('http://localhost:8980/opennms/rest/users/admin', 'auth': { 'user': 'admin', 'pass': 'admin' }) do
   its('status') { should eq 401 }
 end
