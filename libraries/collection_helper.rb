@@ -122,7 +122,7 @@ module Opennms
               )
               action :nothing
               delayed_action :create
-              notifies :restart, 'service[opennms]'
+              notifies :restart, 'service[opennms]' if opennms_running?
             end
           end
         end
@@ -197,7 +197,7 @@ module Opennms
               )
               action :nothing
               delayed_action :create
-              notifies :restart, 'service[opennms]'
+              notifies :restart, 'service[opennms]' if opennms_running?
             end
           end
         end
@@ -274,7 +274,7 @@ module Opennms
               )
               action :nothing
               delayed_action :create
-              notifies :restart, 'service[opennms]'
+              notifies :restart, 'service[opennms]' if opennms_running?
             end
           end
         end
@@ -383,7 +383,7 @@ module Opennms
               variables(collections: file.collections)
               action :nothing
               delayed_action :create
-              notifies :restart, 'service[opennms]'
+              notifies :restart, 'service[opennms]' if opennms_running?
             end
           end
         end
@@ -453,7 +453,7 @@ module Opennms
               variables(config: f)
               action :nothing
               delayed_action :create
-              notifies :restart, 'service[opennms]'
+              notifies :restart, 'service[opennms]' if opennms_running?
             end
           end
         end
@@ -523,7 +523,7 @@ module Opennms
               variables(config: f)
               action :nothing
               delayed_action :create
-              notifies :restart, 'service[opennms]'
+              notifies :restart, 'service[opennms]' if opennms_running?
             end
           end
         end
@@ -790,7 +790,7 @@ module Opennms
               variables(groupsfile: groupsfile)
               action :nothing
               delayed_action :create
-              notifies :restart, 'service[opennms]'
+              notifies :restart, 'service[opennms]' if opennms_running?
             end
           end
         end

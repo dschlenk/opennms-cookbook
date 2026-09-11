@@ -17,6 +17,15 @@
 # limitations under the License.
 #
 
+# refuse to do anything if version not supported by cookbook
+if !node['opennms']['upgrade'] && upgrade.upgrade?
+  Chef::Log.warn('The current version does not match the configured version, but upgrades are disabled.')
+  return
+elsif node['opennms']['version'].to_i != 34
+  Chef::Log.warn("OpenNMS version #{node['opennms']['version']} is not supported by this version of the opennms cookbook.")
+  return
+end
+
 %w(addressable).each do |g|
   chef_gem g
 end
@@ -25,8 +34,9 @@ node.run_state['opennms'] = Mash.new
 
 fqdn = node['fqdn']
 fqdn ||= node['hostname']
+fqdn ||= 'localhost'
 
-hostname fqdn if node['opennms']['manage_hostname']
+hostname fqdn if node['opennms']['manage_hostname'] && !fqdn.nil?
 
 onms_home = node['opennms']['conf']['home']
 onms_home ||= '/opt/opennms'

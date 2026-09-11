@@ -29,6 +29,8 @@ branches.each do |branch|
     if (branch == 'stable' && !node['opennms']['stable']) ||
        ((branch == 'snapshot' || branch == 'obsolete' || branch == 'oldstable') && node['opennms']['stable'])
       skip = true
+    elsif (branch == 'oldstable' && !node['opennms']['stable'])
+      skip = false
     end
     # next if skip
     bu = yum_attr(branch, platform, 'baseurl')
@@ -59,5 +61,6 @@ node['opennms']['repos']['vault'].each do |k|
     baseurl "https://vault.opennms.com/horizon/#{k}/rpm"
     gpgkey node['opennms']['yum_gpg_keys']
     enabled true
+    only_if { node['opennms']['manage_repos'] }
   end
 end

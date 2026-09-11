@@ -63,6 +63,18 @@ template "#{onms_home}/etc/service-configuration.xml" do
   action node['opennms']['templates'] ? :create : :nothing
 end
 
+template "#{onms_home}/etc/log4j2.xml" do
+  cookbook node['opennms']['log4j2']['cookbook']
+  source 'log4j2.xml.erb'
+  mode '0664'
+  owner node['opennms']['username']
+  group node['opennms']['groupname']
+  variables(
+    log: node['opennms']['log4j2']
+  )
+  action node['opennms']['templates'] ? :create : :nothing
+end
+
 template "#{onms_home}/etc/chart-configuration.xml" do
   cookbook node['opennms']['chart']['cookbook']
   source 'chart-configuration.xml.erb'

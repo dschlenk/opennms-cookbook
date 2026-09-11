@@ -175,7 +175,7 @@ module Opennms
             variables(config: config)
             action :nothing
             delayed_action :create
-            notifies :restart, 'service[opennms]', :delayed
+            notifies :restart, 'service[opennms]', :delayed if opennms_running?
           end
         end
       end
