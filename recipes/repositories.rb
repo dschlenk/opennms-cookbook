@@ -29,6 +29,8 @@ branches.each do |branch|
     if (branch == 'stable' && !node['opennms']['stable']) ||
        ((branch == 'snapshot' || branch == 'obsolete' || branch == 'oldstable') && node['opennms']['stable'])
       skip = true
+    elsif (branch == 'oldstable' && !node['opennms']['stable'])
+      skip = false
     end
     # next if skip
     bu = yum_attr(branch, platform, 'baseurl')
