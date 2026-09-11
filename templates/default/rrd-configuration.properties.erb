@@ -20,21 +20,21 @@
 # that paths may differ from one platform to the next, and a few platforms
 # use an extension other than ".so" on JNI shared objects; Mac OS X notably
 # uses ".jnilib":
-<% if !@strategy_class.nil? -%>
-org.opennms.rrd.strategyClass=<%=@strategy_class%>
-<% else -%>
+<% if @strategy_class %>
+org.opennms.rrd.strategyClass=<%= @strategy_class %>
+<% else %>
 #org.opennms.rrd.strategyClass=org.opennms.netmgt.rrd.rrdtool.MultithreadedJniRrdStrategy
-<% end -%>
-<% if !@interface_jar.nil? -%>
-org.opennms.rrd.interfaceJar=<%=@interface_jar%>
-<% else -%>
+<% end %>
+<% if @interface_jar %>
+org.opennms.rrd.interfaceJar=<%= @interface_jar %>
+<% else %>
 #org.opennms.rrd.interfaceJar=/usr/share/java/jrrd2.jar
-<% end -%>
-<% if !@jrrd.nil? -%>
-opennms.library.jrrd2=<%=@jrrd%>
-<% else -%>
+<% end %>
+<% if @jrrd %>
+opennms.library.jrrd2=<%= @jrrd %>
+<% else %>
 #opennms.library.jrrd2=/usr/lib64/libjrrd2.so
-<% end -%>
+<% end %>
 
 # To use the (pure-Java) JRobin strategy instead, comment the above and uncomment this:
 #org.opennms.rrd.strategyClass=org.opennms.netmgt.rrd.jrobin.JRobinRrdStrategy
@@ -52,11 +52,11 @@ opennms.library.jrrd2=<%=@jrrd%>
 # This leads to greater amortized performance of the I/O system.  
 #
 # The default setting is true (use the queuing system)
-<% if @queue[:use] == false -%>
+<% if @queue && @queue[:use] == false %>
 org.opennms.rrd.usequeue=false
-<% else -%>
+<% else %>
 #org.opennms.rrd.usequeue=false
-<% end -%>
+<% end %>
 
 #
 # The following properties are for the queuing system
@@ -67,11 +67,11 @@ org.opennms.rrd.usequeue=false
 # or so are needed here but there may be some # system where this is not true.
 # 
 # The default setting is 2
-<% if @queue[:writethreads] != 2 -%>
-org.opennms.rrd.queuing.writethreads=<%=@queue[:writethreads]%>
-<% else -%>
+<% if @queue && @queue[:writethreads] && @queue[:writethreads] != 2 %>
+org.opennms.rrd.queuing.writethreads=<%= @queue[:writethreads] %>
+<% else %>
 #org.opennms.rrd.queuing.writethreads=2
-<% end -%>
+<% end %>
 
 #
 # This property defines whether creates should be processed immediately or enqueued.
@@ -85,11 +85,11 @@ org.opennms.rrd.queuing.writethreads=<%=@queue[:writethreads]%>
 # recommended that this be changed until the bug is fixed!
 #
 # The default setting is false (don't enqueue the creates)
-<% if @queue[:queuecreates] == true -%>
+<% if @queue && @queue[:queuecreates] == true %>
 org.opennms.rrd.queuing.queuecreates=true
-<% else -%>
+<% else %>
 #org.opennms.rrd.queuing.queuecreates=false
-<% end -%>
+<% end %>
 
 #
 # The queuing system distinguishes between zero valued and non-zero valued updates.
@@ -107,11 +107,11 @@ org.opennms.rrd.queuing.queuecreates=true
 # Given this situation there is an inherent 'unfairness' which on busy systems will
 # cause the files with only insignificant updates to never get written.  
 # 
-<% if @queue[:prioritize_significant_updates] == true -%>
+<% if @queue && @queue[:prioritize_significant_updates] == true %>
 org.opennms.rrd.queuing.prioritizeSignificantUpdates=true
-<% else -%>
+<% else %>
 #org.opennms.rrd.queuing.prioritizeSignificantUpdates=false
-<% end -%>
+<% end %>
 
 # This property represents the number of seconds over which (on average) all
 # insignificant files will be promoted to the significant list.  This ensures that
@@ -123,11 +123,11 @@ org.opennms.rrd.queuing.prioritizeSignificantUpdates=true
 # Setting the value to 0 means don't promote insignificant files at all.
 # 
 # The default setting is 0 (don't promote insignificant files).
-<% if @queue[:max_insig_update_seconds] != 0 -%>
-org.opennms.rrd.queuing.maxInsigUpdateSeconds=<%=@queue[:max_insig_update_seconds]%>
-<% else -%>
+<% if @queue && @queue[:max_insig_update_seconds] && @queue[:max_insig_update_seconds] != 0 %>
+org.opennms.rrd.queuing.maxInsigUpdateSeconds=<%= @queue[:max_insig_update_seconds] %>
+<% else %>
 #org.opennms.rrd.queuing.maxInsigUpdateSeconds=0
-<% end -%>
+<% end %>
 
 #
 # This queuing system regularly prints statistics regarding queue size, pending 
@@ -138,11 +138,11 @@ org.opennms.rrd.queuing.maxInsigUpdateSeconds=<%=@queue[:max_insig_update_second
 # If (updateCount % modulus) == 0 then printStats;
 #
 # The default setting is 10000L
-<% if @queue[:modulus] != 10000 -%>
-org.opennms.rrd.queuing.modulus=<%=@queue[:modulus]%>
-<% else -%>
+<% if @queue && @queue[:modulus] && @queue[:modulus] != 10000 %>
+org.opennms.rrd.queuing.modulus=<%= @queue[:modulus] %>
+<% else %>
 #org.opennms.rrd.queuing.modulus=10000
-<% end -%>
+<% end %>
 
 # On some very large installations it is possible to overwhelm the I/O system of the
 # the NMS and continue queuing data until all of the JVM memory is used up.  The next
@@ -157,11 +157,11 @@ org.opennms.rrd.queuing.modulus=<%=@queue[:modulus]%>
 # sufficient to keep your system from becoming overwhelmed.
 #
 # The default value is 0L (don't discard insignificant operations)
-<% if @queue[:insig_hwmark] != 0 -%>
-org.opennms.rrd.queuing.inSigHighWaterMark=<%=@queue[:insig_hwmark]%>
-<% else -%>
+<% if @queue && @queue[:insig_hwmark] && @queue[:insig_hwmark] != 0 %>
+org.opennms.rrd.queuing.inSigHighWaterMark=<%= @queue[:insig_hwmark] %>
+<% else %>
 #org.opennms.rrd.queuing.inSigHighWaterMark=0
-<% end -%>
+<% end %>
 
 #
 # When the totalOpsPending value reaches or is higher than the value of the below
@@ -170,11 +170,11 @@ org.opennms.rrd.queuing.inSigHighWaterMark=<%=@queue[:insig_hwmark]%>
 # insignificant operations.
 #
 # The default value is 0L (don't discard significant operations
-<% if @queue[:sig_hwmark] != 0 -%>
-org.opennms.rrd.queuing.sigHighWaterMark=<%=@queue[:sig_hwmark]%>
-<% else -%>
+<% if @queue && @queue[:sig_hwmark] && @queue[:sig_hwmark] != 0 %>
+org.opennms.rrd.queuing.sigHighWaterMark=<%= @queue[:sig_hwmark] %>
+<% else %>
 #org.opennms.rrd.queuing.sigHighWaterMark=0
-<% end -%>
+<% end %>
 
 #
 # When the totalOpsPending value reaches or is higher than the value of the below
@@ -183,11 +183,11 @@ org.opennms.rrd.queuing.sigHighWaterMark=<%=@queue[:sig_hwmark]%>
 # crashing the JVM. 
 #
 # The default value is 0L (don't discard operations)
-<% if @queue[:queue_hwmark] != 0 -%>
-org.opennms.rrd.queuing.queueHighWaterMark=<%=@queue[:queue_hwmark]%>
-<% else -%>
+<% if @queue && @queue[:queue_hwmark] && @queue[:queue_hwmark] != 0 %>
+org.opennms.rrd.queuing.queueHighWaterMark=<%= @queue[:queue_hwmark] %>
+<% else %>
 #org.opennms.rrd.queuing.queueHighWaterMark=0
-<% end -%>
+<% end %>
 
 
 #
@@ -195,27 +195,27 @@ org.opennms.rrd.queuing.queueHighWaterMark=<%=@queue[:queue_hwmark]%>
 # statistics
 #
 # The default setting is for the queueing daemon
-<% if !@queue[:log_cat].nil? -%>
-org.opennms.rrd.queuing.category=<%=@queue[:log_cat]%>
-<% else -%>
+<% if @queue && @queue[:log_cat] %>
+org.opennms.rrd.queuing.category=<%= @queue[:log_cat] %>
+<% else %>
 #org.opennms.rrd.queuing.category=queued
-<% end -%>
+<% end %>
 
 #
 # The following constants are related to how long a write thread lingers before
 # it exits.  You probably don't need to change these.  Changing these values will 
 # void your warranty.  grins.
 # 
-<% if @queue[:write_thread][:sleep_time] != 50 -%>
-org.opennms.rrd.queuing.writethread.sleepTime=<%=@queue[:write_thread][:sleep_time]%>
-<% else -%>
+<% if @queue && @queue[:write_thread] && @queue[:write_thread][:sleep_time] && @queue[:write_thread][:sleep_time] != 50 %>
+org.opennms.rrd.queuing.writethread.sleepTime=<%= @queue[:write_thread][:sleep_time] %>
+<% else %>
 #org.opennms.rrd.queuing.writethread.sleepTime=50
-<% end -%>
-<% if @queue[:write_thread][:exit_delay] != 60000 -%>
-#org.opennms.rrd.queuing.writethread.exitDelay=<%=@queue[:write_thread][:exit_delay]%>
-<% else -%>
+<% end %>
+<% if @queue && @queue[:write_thread] && @queue[:write_thread][:exit_delay] && @queue[:write_thread][:exit_delay] != 60000 %>
+org.opennms.rrd.queuing.writethread.exitDelay=<%= @queue[:write_thread][:exit_delay] %>
+<% else %>
 #org.opennms.rrd.queuing.writethread.exitDelay=60000
-<% end -%>
+<% end %>
 
 #
 # The following property sets the default JRobin backend Factory.  Acceptable values are
@@ -234,36 +234,36 @@ org.opennms.rrd.queuing.writethread.sleepTime=<%=@queue[:write_thread][:sleep_ti
 # SAFE - Aggressive locking and low levels of caching.  Untested.
 # MEMORY - In-memory only.
 # NIO - MMAPped RRDs, using NIO.
-<% if !@jrobin[:backend_factory].nil? -%>
-org.jrobin.core.RrdBackendFactory=<%=@jrobin[:backend_factory]%>
-<% else -%>
+<% if @jrobin && @jrobin[:backend_factory] %>
+org.jrobin.core.RrdBackendFactory=<%= @jrobin[:backend_factory] %>
+<% else %>
 #org.jrobin.core.RrdBackendFactory=FILE
-<% end -%>
+<% end %>
 
 
 #
 # If you would like to export performance data to an external system
 # over a TCP port, please set org.opennms.rrd.usetcp to 'true' and fill
 # in your values for the external listener. 
-<% if @usetcp == true -%>
+<% if @usetcp %>
 org.opennms.rrd.usetcp=true
-<% else -%>
+<% else %>
 #org.opennms.rrd.usetcp=false
-<% end -%>
+<% end %>
 #
 # The IPv4 address or hostname of the target system
-<% if !@tcp[:host].nil? -%>
-org.opennms.rrd.tcp.host=<%=@tcp[:host]%>
-<% else -%>
+<% if @tcp && @tcp[:host] %>
+org.opennms.rrd.tcp.host=<%= @tcp[:host] %>
+<% else %>
 #org.opennms.rrd.tcp.host=
-<% end -%>
+<% end %>
 #
 # The TCP port where the target system is listening for performance data
-<% if !@tcp[:port].nil? -%>
-org.opennms.rrd.tcp.port=<%=@tcp[:port]%>
-<% else -%>
+<% if @tcp && @tcp[:port] %>
+org.opennms.rrd.tcp.port=<%= @tcp[:port] %>
+<% else %>
 #org.opennms.rrd.tcp.port=
-<% end -%>
+<% end %>
 #
 # The queue size for outgoing TCP metrics
 #org.opennms.rrd.queuing.queueSize=50000

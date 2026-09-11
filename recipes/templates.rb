@@ -57,7 +57,7 @@ template "#{onms_home}/etc/service-configuration.xml" do
                 perspective_poller: node['opennms']['services']['perspective_poller'],
                 bsmd: node['opennms']['services']['bsmd'],
                 ticketer: node['opennms']['services']['ticketer'],
-                discovery: node['opennms']['services']['ticketer'],
+                discovery: node['opennms']['services']['discovery'],
               }
             }
   action node['opennms']['templates'] ? :create : :nothing

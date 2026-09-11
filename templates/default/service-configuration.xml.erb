@@ -42,7 +42,7 @@ maintained
       <invoke method="status" pass="0" at="status"/>
       <invoke method="stop" pass="0" at="stop"/>
    </service>
-   <service<%= @bsmd ? '' : " enabled=\"false\""%>>
+   <service<%= @bsmd ? '' : ' enabled="false"' %>>
       <name>OpenNMS:Name=Bsmd</name>
       <class-name>org.opennms.netmgt.daemon.SimpleSpringContextJmxServiceDaemon</class-name>
       <attribute>
@@ -58,7 +58,7 @@ maintained
       <invoke method="status" pass="0" at="status"/>
       <invoke method="stop" pass="0" at="stop"/>
    </service>
-   <service<%= @ticketer ? '' : " enabled=\"false\""%>>
+   <service<%= @ticketer ? '' : ' enabled="false"' %>>
       <name>OpenNMS:Name=Ticketer</name>
       <class-name>org.opennms.netmgt.ticketd.jmx.TroubleTicketer</class-name>
       <invoke method="init" pass="0" at="start"/>
@@ -66,7 +66,7 @@ maintained
       <invoke method="status" pass="0" at="status"/>
       <invoke method="stop" pass="0" at="stop"/>
    </service>
-   <service enabled="<%=@correlator%>">
+   <service<%= @correlator ? '' : ' enabled="false"' %>>
       <name>OpenNMS:Name=Correlator</name>
       <class-name>org.opennms.netmgt.correlation.jmx.Correlator</class-name>
       <invoke method="init" pass="0" at="start"/>
@@ -122,7 +122,7 @@ maintained
       <invoke method="status" pass="0" at="status"/>
       <invoke method="stop" pass="0" at="stop"/>
    </service>
-   <service enabled="<%=@snmp_poller%>">
+   <service<%= @snmp_poller ? '' : ' enabled="false"' %>>
       <name>OpenNMS:Name=SnmpPoller</name>
       <class-name>org.opennms.netmgt.snmpinterfacepoller.jmx.SnmpPollerd</class-name>
       <invoke method="init" pass="0" at="start"/>
@@ -146,7 +146,7 @@ maintained
       <invoke method="status" pass="0" at="status"/>
       <invoke method="stop" pass="0" at="stop"/>
    </service>
-   <service<%= @discovery ? '' : " enabled=\"false\""%>>
+   <service<%= @discovery ? '' : ' enabled="false"' %>>
       <name>OpenNMS:Name=Discovery</name>
       <class-name>org.opennms.netmgt.discovery.jmx.Discovery</class-name>
       <invoke method="init" pass="0" at="start"/>
@@ -234,7 +234,7 @@ maintained
       <invoke method="status" pass="0" at="status"/>
       <invoke method="stop" pass="0" at="stop"/>
    </service>
-   <service enabled="<%=@syslogd%>">
+   <service<%= @syslogd ? '' : ' enabled="false"' %>>
       <name>OpenNMS:Name=Syslogd</name>
       <class-name>org.opennms.netmgt.syslogd.jmx.Syslogd</class-name>
       <invoke method="init" pass="0" at="start"/>
@@ -242,7 +242,7 @@ maintained
       <invoke method="status" pass="0" at="status"/>
       <invoke method="stop" pass="0" at="stop"/>
    </service>
-   <service<%= @telemetryd ? '' : " enabled=\"false\""%>>
+   <service<%= @telemetryd ? '' : ' enabled="false"' %>>
       <name>OpenNMS:Name=Telemetryd</name>
       <class-name>org.opennms.netmgt.daemon.SimpleSpringContextJmxServiceDaemon</class-name>
       <attribute>
@@ -266,7 +266,7 @@ maintained
       <invoke method="status" pass="0" at="status"/>
       <invoke method="stop" pass="0" at="stop"/>
    </service>
-   <service<%= @perspective_poller ? '' : " enabled=\"false\""%>>
+   <service<%= @perspective_poller ? '' : ' enabled="false"' %>>
       <name>OpenNMS:Name=PerspectivePoller</name>
       <class-name>org.opennms.netmgt.daemon.SimpleSpringContextJmxServiceDaemon</class-name>
       <attribute>

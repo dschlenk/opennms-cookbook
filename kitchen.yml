@@ -39,6 +39,23 @@ platforms:
     driver:
       image: c1og/opennms-34-oraclelinux-9
       pid_one_command: /usr/lib/systemd/systemd
+    lifecycle:
+      pre_converge:
+        - remote: |
+            bash -c 'declare i=0;
+              declare wait=5;
+              declare timeout=300;
+              while true; do
+                dnf -y install libxcrypt-compat hostname && break;
+                if [ ${i} -ge ${timeout} ]; then
+                  echo "Timed out after ${i}s waiting for dnf to complete";
+                  exit 1;
+                fi;
+                echo "Waited ${i}/${timeout}s for dnf to complete, retrying in ${wait} seconds"
+                sleep ${wait};
+                let i+=${wait};
+              done;
+            '
 
 suites:
   - name: recommended
@@ -68,7 +85,7 @@ suites:
     driver:
       image: dokken/oraclelinux-9
       ports:
-        - 1234:8980/tcp
+        - 1250:8980/tcp
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -101,9 +118,6 @@ suites:
   - name: upgrade
     driver:
       image: c1og/opennms-33-oraclelinux-9
-    provisioner:
-      policyfile: policyfiles/upgrade.rb
-      multiple_converge: 2
     verifier:
       inspec_tests:
         - path: test/integration/default
@@ -112,8 +126,7 @@ suites:
     driver:
       image: c1og/opennms-33-oraclelinux-9
     provisioner:
-      policyfile: policyfiles/upgrade.rb
-      multiple_converge: 2
+      policyfile: policyfiles/no_upgrade.rb
     verifier:
       inspec_tests:
         - path: test/integration/no_upgrade

@@ -17,7 +17,6 @@
 # limitations under the License.
 #
 
-# As of 34.0.0, RRDTool is now the default time series engine so we don't need to explicitly turn it on or install it.
-# As such, those parts of this recipe have been removed, and the management of the rrd-configuration.properties template has been moved to the `base_templates` recipe.
-# However, this recipe also enabled storeByGroup and will continue to do so.
-node.default['opennms']['properties']['files']['store_by_group'] = { 'org.opennms.rrd.storeByGroup' => true }
+# Packages rrdtool and jrrd2 are dependencies of the OpenNMS RPMs in Horizon 34+ and no longer need explicit installation.
+# rrd-configuration.properties is now managed by the base_templates recipe.
+node.default['opennms']['properties']['files']['store_by_group']['org.opennms.rrd.storeByGroup'] = true

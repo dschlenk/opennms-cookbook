@@ -1,5 +1,9 @@
 # OpenNMS Cookbook Changes
 
+## 33.7.2
+
+* bugfix: remove postgresql monkey patch so libpq5 installs correctly again
+
 ## 33.7.1
 
 * bugfix: order of postgres resources caused password setting failure

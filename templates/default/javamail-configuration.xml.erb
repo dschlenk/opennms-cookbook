@@ -49,11 +49,7 @@
                    attempt-interval="<%=@dr_attempt_interval%>" delete-all-mail="<%=@dr_delete_all_mail%>" mail-folder="<%=@dr_mail_folder%>" 
                    debug="<%=@dr_debug%>" >
 <% @dr_properties.each do |n,v| -%>
-  <% if n == 'mail.pop3.rsetbeforequit' -%>
-    <javamail-property name="<%=n%>" value="<%=v%>" />
-  <% else -%>
-    <javamail-property name="<%=n%>" value="<%=v%>"/>
-  <% end -%>
+    <javamail-property name="<%=n%>" value="<%=v%>"<%= n == 'mail.pop3.rsetbeforequit' ? ' ' : '' %>/>
 <% end -%>
     <readmail-host host="<%=@dr_host%>" port="<%=@dr_port%>">
       <readmail-protocol ssl-enable="<%=@dr_ssl_enable%>" start-tls="<%=@dr_start_tls%>"

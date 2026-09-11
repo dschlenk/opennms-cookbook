@@ -28,7 +28,7 @@ default['opennms']['yum_gpg_keys'] = [
 default['opennms']['start_opts'] = ''
 # set to '' if you want to re-enable OOTB behavior (but you should not do this if using any of the opennms resources)
 default['opennms']['timeout_start_sec'] = '10min'
-default['opennms']['version'] = '34.0.2-1'
+default['opennms']['version'] = '34.1.0-1'
 default['java']['version'] = '17'
 default['opennms']['jre_path'] = nil
 default['opennms']['allow_downgrade'] = false
@@ -172,6 +172,9 @@ default['opennms']['properties']['files'] = {
   #  'scv' => {
   #    'org.opennms.features.scv.jceks.key' => 'pw'
   #  }
+  'store_by_group' => {
+    'org.opennms.rrd.storeByGroup' => false,
+  },
 }
 # if you change one of the following via the mechanism above, you also need to update it here:
 default['opennms']['properties']['dc']['rrd_base_dir']              = "#{onms_home}/share/rrd/snmp"
@@ -872,7 +875,7 @@ default['opennms']['repos']['branches'] = %w(obsolete snapshot stable oldstable)
 default['opennms']['repos']['platforms'] = %w(common rhel9)
 # add a specific version vault repo like this:
 # node['opennms']['repos']['vault'] = ['32.0.6']
-default['opennms']['repos']['vault'] = []
+default['opennms']['repos']['vault'] = [node['opennms']['version'].split('-').first]
 
 default['opennms']['telemetryd']['managed'] = false
 default['opennms']['telemetryd']['jti']['enabled'] = false

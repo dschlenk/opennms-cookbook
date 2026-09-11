@@ -5,50 +5,26 @@
   http://www.opennms.org/xsd/config/opennms-datasources.xsd ">
 
   <connection-pool factory="org.opennms.core.db.HikariCPConnectionFactory"
-<% @datasources['connection_pool'].each_with_index do |(k, v), index| -%>
-  <% if index == @datasources['connection_pool'].size - 1 -%>
-    <%= Opennms::Helpers.snake_to_camel_lower(k) %>="<%= v %>" />
-  <% else -%>
-    <%= Opennms::Helpers.snake_to_camel_lower(k) %>="<%= v %>"
-  <% end -%>
+<% @datasources['connection_pool'].each_with_index do |(k, v), i| -%>
+    <%= Opennms::Helpers.snake_to_camel_lower(k) %>="<%= v %>"<%= i == @datasources['connection_pool'].size - 1 ? ' />' : '' %>
 <% end -%>
 
 <% @datasources.each_with_index do |(source, definition), index| -%>
-    <% next if source == 'connection_pool' -%>
+  <% next if source == 'connection_pool' -%>
   <jdbc-data-source name="<%= source %>" 
-    <% definition.except('connection_pool').each_with_index do |(k, v), i| -%>
-      <% if %w(database-name class-name).include?(Opennms::Helpers.snake_to_kebab(k)) -%>
-        <% if i == definition.except('connection_pool').size - 1 && definition['connection_pool'].nil? -%>
-                    <%= Opennms::Helpers.snake_to_kebab(k) %>="<%= v %>" />
-        <% else -%>
-                    <%= Opennms::Helpers.snake_to_kebab(k) %>="<%= v %>" 
-        <% end -%>
-      <% else -%>
-        <% if i == definition.except('connection_pool').size - 1 && definition['connection_pool'].nil? -%>
-                    <%= Opennms::Helpers.snake_to_kebab(k) %>="<%= v %>" />
-        <% elsif i == definition.except('connection_pool').size - 1 -%>
-                    <%= Opennms::Helpers.snake_to_kebab(k) %>="<%= v %>">
-        <% else -%>
-                    <%= Opennms::Helpers.snake_to_kebab(k) %>="<%= v %>"
-        <% end -%>
-      <% end -%>
+  <% definition.each_with_index do |(k, v), i| -%>
+    <% next if k == "connection_pool" -%>
+                    <%= Opennms::Helpers.snake_to_kebab(k) %>="<%= v %>"<%= %w(database_name class_name).include?(k) ? ' ' : '' %><%= i == definition.size - 1 && definition['connection_pool'].nil? ? ' />' : (!definition['connection_pool'].nil? && i == definition.size - 2 ? '>' : '') %>
+  <% end -%>
+  <% if !definition['connection_pool'].nil? -%>
+    <connection-pool <% definition['connection_pool'].each_with_index do |(k, v), i| -%><%= i == 0 ? Opennms::Helpers.snake_to_camel_lower(k) + '="' + v.to_s + '"' : (definition['connection_pool'].size == 1 ? ' />' : '') %><% next if i == 0 -%>
+                     <%= Opennms::Helpers.snake_to_camel_lower(k) %>="<%= v %>"<%= definition['connection_pool'].size - 1 == i ? " />" : '' -%>
     <% end -%>
-    <% if !definition['connection_pool'].nil? -%>
-      <% definition['connection_pool'].each_with_index do |(k, v), i| -%>
-        <% if i == 0 -%>
-    <connection-pool <%= Opennms::Helpers.snake_to_camel_lower(k) %>="<%= v %>"
-        <% else -%>
-          <% if i == definition['connection_pool'].size - 1 -%>
-                     <%= Opennms::Helpers.snake_to_camel_lower(k) %>="<%= v %>" />
-          <% else -%>
-                     <%= Opennms::Helpers.snake_to_camel_lower(k) %>="<%= v %>"
-          <% end -%>
-        <% end -%>
-      <% end -%>
+
   </jdbc-data-source>
-    <% end -%>
+  <% end -%>
   <% if index != @datasources.size - 1 -%>
-<%= index > 1 ? '  ' : '' %>
+<%= source == 'opennms-admin' ? '  ' : '' %>
   <% end -%>
 <% end -%>
 </datasource-configuration>
