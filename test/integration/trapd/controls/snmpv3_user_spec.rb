@@ -124,4 +124,3 @@ control 'trapd-authpriv-user-with-engine' do
     it { should eq 'engineprivsecret' }
   end
 end
-
