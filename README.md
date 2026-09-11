@@ -1,7 +1,7 @@
 # Description
 
 A Chef cookbook to manage the installation and configuration of OpenNMS Horizon.
-Current version supports Horizon release 33 on EL (redhat, rocky, oracle, etc) 9.
+Current version supports Horizon release 34 on EL (redhat, rocky, oracle, etc) 9.
 
 ## Versions
 
@@ -136,7 +136,7 @@ This results in file `$OPENNMS_HOME/etc/featuresBoot.d/kafka_producer.boot` with
 
 ### RRDTool
 
-To enable installation and configuration of RRDTool in place of the default time series engine JRobin, set `node['opennms']['rrdtool']['enabled']` to `true` or include the `rrdtool` recipe after the `default` recipe in your node's run list.
+RRDTool is the default time series engine in OpenNMS Horizon 34. JRobin is deprecated. The `rrdtool` recipe still exists to prevent breaking existing run lists, but it no longer contains any resources. It does still enable `storeByGroup`, however.
 
 ### Kafka Producer
 
@@ -168,8 +168,8 @@ If your Kafka client configuration does not include secrets, you can simply set 
 The recipes you may wish to include in your node list directly are:
 
 * `opennms::default` Installs and configures OpenNMS Horizon with the standard configuration modified with any node attribute values changed from their defaults. Set `node['opennms']['plugin']['addl']` to an array of strings representing the names of the packages of the plugins you'd like installed.
-* `opennms::rrdtool` Installs rrdtool and configures OpenNMS to use it instead of JRobin for performance metric storage.
-* `opennms::postgres` Installs postgresql in a somewhat tuned manner (from PGDG). See `postres_install` recipe to figure out how the version is selected and override with node attributes if desired.
+* `opennms::rrdtool` Prior to v34 this recipe installed rrdtool and configured OpenNMS to use it instread of JRobin, with storeByGroup enabled. Since 34 makes rrdtool the default, this recipe merely turns on storeByGroup.
+* `opennms::postgres` Installs postgresql in a somewhat tuned manner (from PGDG). Uses the `postgresql_install` resource from the `postgresql` cookbook. Version selection and other behaviours can be changed with node attributes.
 
 A few other recipes exist that aren't listed here. They are included by others when needed and are unlikely to be interesting for individual use.
 

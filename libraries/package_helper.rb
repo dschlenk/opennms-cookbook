@@ -41,7 +41,7 @@ module Opennms
               variables(collectd_config: file)
               action :nothing
               delayed_action :create
-              notifies :restart, 'service[opennms]'
+              notifies :restart, 'service[opennms]' if opennms_running?
             end
           end
         end
@@ -113,7 +113,7 @@ module Opennms
               variables(config: file)
               action :nothing
               delayed_action :create
-              notifies :restart, 'service[opennms]'
+              notifies :restart, 'service[opennms]' if opennms_running?
             end
           end
         end

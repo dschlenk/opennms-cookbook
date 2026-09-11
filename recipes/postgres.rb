@@ -46,6 +46,12 @@ postgresql_service 'postgresql' do
   action %i(enable start)
 end
 
+postgresql_user 'postgres' do
+  ignore_failure true # this fails after the password gets set initially
+  unencrypted_password chef_vault_item(node['opennms']['postgresql']['user_vault'], node['opennms']['postgresql']['user_vault_item'])['postgres']['password']
+  action :set_password
+end
+
 node['opennms']['postgresql']['access']['host'].each do |ha|
   ha['addresses'].each do |h|
     postgresql_access "host access for #{h} #{ha['database']}" do
@@ -67,10 +73,4 @@ node['opennms']['postgresql']['access']['local'].each do |ha|
     auth_method ha['auth_method']
     action ha['action']
   end
-end
-
-postgresql_user 'postgres' do
-  ignore_failure true # fails after the first execution
-  unencrypted_password chef_vault_item(node['opennms']['postgresql']['user_vault'], node['opennms']['postgresql']['user_vault_item'])['postgres']['password']
-  action :set_password
 end
