@@ -57,6 +57,8 @@ The easiest way to satisfy this dependency is to use the `postgres` recipe in th
 It can be added to the run list prior to the `default` recipe.
 When used, installation, configuration, and initialization of PostgreSQL 15 will occur via the PGDG repositories and the `postgres` password contained in the vault item described above will be applied to the `postgres` role.
 
+For more advanced setups, override the `node['opennms']['datasources']` attributes as needed to work according to your needs.
+
 ## Recommended Features
 
 Many of the following features are essential to the long term success of using this cookbook to manage your OpenNMS instance.
@@ -122,7 +124,7 @@ For instance, if you provide the vault item required to change the SCV password,
 }
 ```
 
-This results in file `$OPENNMS_HOME/etc/opennms.properties.d/scv.properties` created with the contents `org.opennms.features.scv.jceks.key=the password`.
+This results in file `$OPENNMS_HOME/etc/opennms.properties.d/scv.properties` created with the contents `org.opennms.features.scv.jceks.key=<the password>`.
 
 ### Additional Boot Features
 
@@ -310,9 +312,9 @@ default['opennms']['javamail_config']['default_send']['user']               = "o
 default['opennms']['javamail_config']['default_send']['password']           = "opennms"
 ```
 
-### jcifs.properties
+### etc/jcifs.properties
 
-This is useful for something I'm sure, but I don't know what. See the template or default attributes file for hints.
+See the template or default attributes file for available options.
 
 ### etc/jms-northbounder-configuration.xml
 
@@ -320,7 +322,7 @@ Configures the JMS Northbounder introduced in version 17.0.0. See the default at
 
 ### etc/enlinkd-configuration.xml
 
-Attributes available in `node['opennms']['enlinkd']` that allow you change global settings like:
+Attributes available in `node['opennms']['enlinkd']` that allow you to change global settings like:
 
 * threads
 * initial\_sleep\_time
