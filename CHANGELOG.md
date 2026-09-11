@@ -1,5 +1,14 @@
 # OpenNMS Cookbook Changes
 
+## 34.0.1
+
+* add back management of log4j2.xml
+* move more testing to CI
+
+## 34.0.0
+
+* initial support for OpenNMS Horizon 34
+
 ## 33.7.2
 
 * bugfix: remove postgresql monkey patch so libpq5 installs correctly again
