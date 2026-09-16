@@ -1,45 +1,46 @@
+include Opennms::Cookbook::Trapd::ConfigTemplate
 unified_mode true
 
 provides :opennms_trapd_config
 
-property :batch_interval, Integer
-property :batch_size, Integer
-property :include_raw_message, [true, false]
-property :new_suspect_on_trap, [true, false]
-property :queue_size, Integer
-property :snmp_trap_address, String
-property :snmp_trap_port, Integer
-property :threads, Integer
+property :batch_interval, Integer, default: 500
+property :batch_size, Integer, default: 1000
+property :include_raw_message, [true, false], default: false
+property :new_suspect_on_trap, [true, false], default: false
+property :queue_size, Integer, default: 10000
+property :snmp_trap_address, String, default: '*'
+property :snmp_trap_port, Integer, default: 10162
+property :threads, Integer, default: 0
 property :use_address_from_varbind, [true, false]
 
-load_current_value do
-  cfg = Opennms::Trapd::TrapdConfig.instance_for(node)
+action_class do
+  include Opennms::Cookbook::Trapd::ConfigTemplate
+end
 
-  batch_interval cfg.current['batchInterval']
-  batch_size cfg.current['batchSize']
-  include_raw_message cfg.current['includeRawMessage']
-  new_suspect_on_trap cfg.current['newSuspectOnTrap']
-  queue_size cfg.current['queueSize']
-  snmp_trap_address cfg.current['snmpTrapAddress']
-  snmp_trap_port cfg.current['snmpTrapPort']
-  threads cfg.current['threads']
-  use_address_from_varbind cfg.current['useAddressFromVarbind']
+load_current_value do
+  r = trapd_resource
+  if config.nil?
+    ro_trapd_resource_init
+    r = ro_trapd_resource
+  end
+  config = Opennms::Cookbook::Trapd::ConfigTemplate::Helper.config_from_resource(r)
+  %i(snmp_trap_address snmp_trap_port new_suspect_on_trap include_raw_message threads queue_size batch_size batch_interval use_address_from_varbind).each do |p|
+    send(p, config.send(p))
+  end
 end
 
 action :create do
   converge_if_changed do
-    cfg = Opennms::Trapd::TrapdConfig.instance_for(node)
-
-    cfg.batchInterval = new_resource.batch_interval unless new_resource.batch_interval.nil?
-    cfg.batchSize = new_resource.batch_size unless new_resource.batch_size.nil?
-    cfg.includeRawMessage = new_resource.include_raw_message unless new_resource.include_raw_message.nil?
-    cfg.newSuspectOnTrap = new_resource.new_suspect_on_trap unless new_resource.new_suspect_on_trap.nil?
-    cfg.queueSize = new_resource.queue_size unless new_resource.queue_size.nil?
-    cfg.snmpTrapAddress = new_resource.snmp_trap_address unless new_resource.snmp_trap_address.nil?
-    cfg.snmpTrapPort = new_resource.snmp_trap_port unless new_resource.snmp_trap_port.nil?
-    cfg.threads = new_resource.threads unless new_resource.threads.nil?
-    cfg.useAddressFromVarbind = new_resource.use_address_from_varbind unless new_resource.use_address_from_varbind.nil?
-
-    cfg.update(self)
+    trapd_resource_init
+    cfg = Opennms::Cookbook::Trapd::ConfigTemplate::Helper.config_from_resource(trapd_resource)
+    cfg.snmp_trap_address = new_resource.snmp_trap_address
+    cfg.snmp_trap_port = new_resource.snmp_trap_port
+    cfg.new_suspect_on_trap = new_resource.new_suspect_on_trap
+    cfg.include_raw_message = new_resource.include_raw_message
+    cfg.threads = new_resource.threads
+    cfg.queue_size = new_resource.queue_size
+    cfg.batch_size = new_resource.batch_size
+    cfg.batch_interval = new_resource.batch_interval
+    cfg.use_address_from_varbind = new_resource.use_address_from_varbind unless new_resource.use_address_from_varbind.nil?
   end
 end
