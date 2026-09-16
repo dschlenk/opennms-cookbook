@@ -1,8 +1,10 @@
-# opennms_trapd_config
+# Trapd Resources
+
+## opennms_trapd_config
 
 Manages the OpenNMS Trapd configuration.
 
-## Actions
+### Actions for `opennms_trapd_config`
 
 | Action | Description |
 | --- | --- |
@@ -14,7 +16,7 @@ Default action:
 :create
 ```
 
-## Properties
+### Properties for `opennms_trapd_config`
 
 | Property | Type | Description |
 | --- | --- | --- |
@@ -28,9 +30,9 @@ Default action:
 | `threads` | Integer | Number of Trapd worker threads. |
 | `use_address_from_varbind` | Boolean | Derive node identity from trap varbinds when possible. |
 
-## Examples
+### Examples for `opennms_trapd_config`
 
-### Basic Configuration
+#### Basic Configuration
 
 ```ruby
 opennms_trapd_config 'default' do
@@ -42,7 +44,7 @@ opennms_trapd_config 'default' do
 end
 ```
 
-### Configure Listener Address and Port
+#### Configure Listener Address and Port
 
 ```ruby
 opennms_trapd_config 'default' do
@@ -51,7 +53,7 @@ opennms_trapd_config 'default' do
 end
 ```
 
-### Enable Address Resolution From Varbinds
+#### Enable Address Resolution From Varbinds
 
 ```ruby
 opennms_trapd_config 'default' do
@@ -61,11 +63,11 @@ end
 
 ---
 
-# opennms_trapd_snmpv3_user
+## opennms_trapd_snmpv3_user
 
 Manages Trapd SNMPv3 users.
 
-## Actions
+### Actions for `opennms_trapd_snmpv3_user`
 
 | Action | Description |
 | --- | --- |
@@ -78,7 +80,7 @@ Default action:
 :create
 ```
 
-## Security Levels
+### Security Levels for `opennms_trapd_snmpv3_user`
 
 | Value | Description |
 | --- | --- |
@@ -86,7 +88,7 @@ Default action:
 | `AUTH_NOPRIV` | Authentication without privacy. |
 | `AUTH_PRIV` | Authentication with privacy. |
 
-## Properties
+### Properties for `opennms_trapd_snmpv3_user`
 
 | Property | Type | Required | Description |
 | --- | --- | --- | --- |
@@ -98,7 +100,7 @@ Default action:
 | `auth_passphrase` | String | Conditional | Required for `AUTH_NOPRIV` and `AUTH_PRIV`. |
 | `privacy_passphrase` | String | Conditional | Required for `AUTH_PRIV`. |
 
-### Property Rules
+#### Property Rules for `opennms_trapd_snmpv3_user`
 
 For `NOAUTH_NOPRIV`:
 
@@ -121,9 +123,9 @@ For `AUTH_PRIV`:
 - `privacy_protocol` is required
 - `privacy_passphrase` is required
 
-## Examples
+### Examples for `opennms_trapd_snmpv3_user`
 
-### NOAUTH_NOPRIV User
+#### NOAUTH_NOPRIV User
 
 ```ruby
 opennms_trapd_snmpv3_user 'readonly' do
@@ -132,7 +134,7 @@ opennms_trapd_snmpv3_user 'readonly' do
 end
 ```
 
-### AUTH_NOPRIV User
+#### AUTH_NOPRIV User
 
 ```ruby
 opennms_trapd_snmpv3_user 'monitor' do
@@ -143,7 +145,7 @@ opennms_trapd_snmpv3_user 'monitor' do
 end
 ```
 
-### AUTH_PRIV User
+#### AUTH_PRIV User
 
 ```ruby
 opennms_trapd_snmpv3_user 'trapuser' do
@@ -156,7 +158,7 @@ opennms_trapd_snmpv3_user 'trapuser' do
 end
 ```
 
-### AUTH_PRIV User With Engine ID
+#### AUTH_PRIV User With Engine ID
 
 ```ruby
 opennms_trapd_snmpv3_user 'remote-engine-user' do
@@ -170,7 +172,7 @@ opennms_trapd_snmpv3_user 'remote-engine-user' do
 end
 ```
 
-### Delete a User
+#### Delete a User
 
 ```ruby
 opennms_trapd_snmpv3_user 'trapuser' do

@@ -1055,7 +1055,7 @@ suites:
       inspec_tests:
         - path: test/integration/default
         - path: test/integration/translation_specs
-  - name: trapd-api
+  - name: trapd
     provisioner:
       policyfile: policyfiles/trapd.rb
     verifier:
