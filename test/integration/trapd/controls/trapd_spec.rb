@@ -1,70 +1,47 @@
-require 'json'
-
-opennms_user = input(
-  'opennms_username',
-  value: 'admin'
-)
-
-opennms_password = input(
-  'opennms_password',
-  value: 'admin'
-)
-
-response = http(
-  'http://localhost:8980/opennms/api/v2/trapd/config',
-  method: 'GET',
-  auth: {
-    user: opennms_user,
-    pass: opennms_password,
-  },
-  headers: {
-    'Accept' => 'application/json',
-  }
-)
-
-describe response do
-  its('status') { should cmp 200 }
+resp = inspec.http('http://localhost:8980/opennms/api/v2/trapd/download?format=xml', auth: { user: 'admin', pass: 'admin' }, headers: { 'Accept': 'application/xml' })
+if resp.status == 200
+  doc = REXML::Document.new(resp.body)
+elsif doc.nil?
+  doc = REXML::Document.new(inspec.file('/opt/opennms/etc/trapd-configuration.xml').content)
 end
-
-cfg = JSON.parse(response.body)
-
+cfg = doc.root unless doc.nil?
 control 'trapd-config' do
   impact 1.0
   title 'Trapd configuration is configured'
 
-  describe cfg['batchInterval'] do
-    it { should eq 200 }
+  describe cfg['batch-interval'] do
+    it { should eq '200' }
   end
 
-  describe cfg['batchSize'] do
-    it { should eq 500 }
+  describe cfg['batch-size'] do
+    it { should eq '500' }
   end
 
-  describe cfg['includeRawMessage'] do
-    it { should eq true }
+  describe cfg['include-raw-message'] do
+    it { should eq 'true' }
   end
 
-  describe cfg['newSuspectOnTrap'] do
-    it { should eq false }
+  describe cfg['new-suspect-on-trap'] do
+    it { should eq 'false' }
   end
 
-  describe cfg['queueSize'] do
-    it { should eq 5000 }
+  describe cfg['queue-size'] do
+    it { should eq '5000' }
   end
 
-  describe cfg['snmpTrapAddress'] do
+  describe cfg['snmp-trap-address'] do
     it { should eq '0.0.0.0' }
   end
 
-  describe cfg['snmpTrapPort'] do
-    it { should eq 1162 }
+  describe cfg['snmp-trap-port'] do
+    it { should eq '1162' }
   end
 
   describe cfg['threads'] do
-    it { should eq 8 }
+    it { should eq '8' }
   end
 
-  describe cfg['useAddressFromVarbind'] do
-    it { should eq true }
+  describe cfg['use-address-from-varbind'] do
+    it { should eq 'true' }
   end
 end

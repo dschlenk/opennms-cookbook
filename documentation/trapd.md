@@ -1,6 +1,6 @@
 # Trapd Resources
 
-## opennms_trapd_config
+## opennms\_trapd\_config
 
 Manages the OpenNMS Trapd configuration.
 
@@ -63,7 +63,7 @@ end
 
 ---
 
-## opennms_trapd_snmpv3_user
+## opennms\_trapd\_snmpv3\_user
 
 Manages Trapd SNMPv3 users.
 

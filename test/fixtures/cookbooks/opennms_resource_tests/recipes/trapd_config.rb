@@ -40,3 +40,14 @@ opennms_trapd_snmpv3_user 'priv user with engine id' do
   privacy_protocol 'AES'
   privacy_passphrase 'engineprivsecret'
 end
+
+opennms_trapd_snmpv3_user 'simple user to add and remove' do
+  security_name 'doomed'
+  security_level 'NOAUTH_NOPRIV'
+end
+
+opennms_trapd_snmpv3_user 'delete doomed user' do
+  security_name 'doomed'
+  security_level 'NOAUTH_NOPRIV'
+  action :delete
+end

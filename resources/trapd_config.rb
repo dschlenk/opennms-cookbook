@@ -19,20 +19,26 @@ end
 
 load_current_value do
   r = trapd_resource
-  if config.nil?
+  if r.nil?
     ro_trapd_resource_init
     r = ro_trapd_resource
   end
-  config = Opennms::Cookbook::Trapd::ConfigTemplate::Helper.config_from_resource(r)
+  config = config_from_resource(r)
   %i(snmp_trap_address snmp_trap_port new_suspect_on_trap include_raw_message threads queue_size batch_size batch_interval use_address_from_varbind).each do |p|
-    send(p, config.send(p))
+    if %i(snmp_trap_port threads queue_size batch_size batch_interval).include?(p)
+      send(p, config.send(p).to_i)
+    elsif %i(new_suspect_on_trap include_raw_message use_address_from_varbind).include?(p)
+      send(p, config.send(p) == 'true')
+    else
+      send(p, config.send(p))
+    end
   end
 end
 
 action :create do
   converge_if_changed do
     trapd_resource_init
-    cfg = Opennms::Cookbook::Trapd::ConfigTemplate::Helper.config_from_resource(trapd_resource)
+    cfg = config_from_resource(trapd_resource)
     cfg.snmp_trap_address = new_resource.snmp_trap_address
     cfg.snmp_trap_port = new_resource.snmp_trap_port
     cfg.new_suspect_on_trap = new_resource.new_suspect_on_trap

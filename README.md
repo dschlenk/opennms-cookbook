@@ -359,10 +359,6 @@ Do you actually populate the building column in assets or site field in provisio
 
 Similar to other \*-graph.properties files, you can change the image format used in adhoc graphs by setting the attribute `node['opennms']['snmp_adhoc_graph']['image_format']` to `gif` or `jpg` rather than the default `png`. Note that the intersection of formats supported by both jrobin and rrdtool is `png`, though.
 
-### etc/trapd-configuration.xml
-
-Two attributes available: `port` and `new_suspect` in `node['opennms']['trapd']` that allow you to configure the port to listen for traps on (default 10162) and whether or not to create newSuspect events when a trap is received from an unmanaged host (default false).
-
 ### etc/xmpp-configuration.xml
 
 Configure notifications to be sent via XMPP (aka Jabber, GTalk) with these attributes in `node['opennms']['xmpp']`:

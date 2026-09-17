@@ -1,13 +1,9 @@
 control 'trapd-download-unmasked' do
-  impact 1.0
-
-  title 'Trapd download endpoint returns unmasked secrets'
-
-  describe user['authPassphrase'] do
-    it { should_not match(/^\*+$/) }
-  end
-
-  describe user['privacyPassphrase'] do
-    it { should_not match(/^\*+$/) }
+  describe snmpv3user('trapuser', 3, 'SHA', 'AES') do
+    it { should exist }
+    its('auth_passphrase') { should_not match(/^\*+$/) }
+    its('auth_passphrase') { should eq 'authsecret' }
+    its('privacy_passphrase') { should_not match(/^\*+$/) }
+    its('privacy_passphrase') { should eq 'privsecret' }
   end
 end

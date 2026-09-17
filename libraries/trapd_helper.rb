@@ -95,7 +95,11 @@ module Opennms
 
         def ro_trapd_resource_create
           config = Opennms::Cookbook::Trapd::Config.new
-          config.read!("#{restv2url}/trapd/download?format=xml", { 'Authorization' => "Basic #{Base64.strict_encode64("admin:#{admin_secret_from_vault('password')}")}" }) if node['opennms']['version'].to_i >= 36
+          if node['opennms']['version'].to_i >= 36
+            config.read!("#{restv2url}/trapd/download?format=xml", { 'Authorization' => "Basic #{Base64.strict_encode64("admin:#{admin_secret_from_vault('password')}")}" })
+          else
+            config.read!("file://#{node['opennms']['conf']['home']}/etc/trapd-configuration.xml")
+          end
           with_run_context :root do
             if node['opennms']['version'].to_i >= 36
               declare_resource(:http_request, 'RO trapd config PUT') do
@@ -121,40 +125,46 @@ module Opennms
           end
         end
 
-        module Helper
-          def config_from_resource(resource)
+        def config_from_resource(resource)
+          if node['opennms']['version'].to_i >= 36
             config = Opennms::Cookbook::Trapd::Config.new
-            if node['opennms']['version'].to_i >= 36
-              config.snmp_trap_address = resource.message['snmp_trap_address']
-              config.snmp_trap_port = resource.message['snmp_trap_port']
-              config.new_suspect_on_trap = resource.message['new_suspect_on_trap']
-              config.include_raw_message = resource.message['include_raw_message']
-              config.threads = resource.message['threads']
-              config.queue_size = resource.message['queue_size']
-              config.batch_size = resource.message['batch_size']
-              config.batch_interval = resource.message['batch_interval']
-              config.use_address_from_varbind = resource.message['use_address_from_varbind']
-              config.snmpv3_users = resource.message['snmpv3_users'].map do |user|
-                Opennms::Cookbook::Trapd::ConfigTemplate::Snmpv3User.new(
-                  id: user['id'],
-                  engine_id: user['engine_id'],
-                  security_name: user['security_name'],
-                  security_level: user['security_level'],
-                  auth_protocol: user['auth_protocol'],
-                  auth_passphrase: user['auth_passphrase'],
-                  privacy_protocol: user['privacy_protocol'],
-                  privacy_passphrase: user['privacy_passphrase']
-                )
-              end
-            else
-              config = resource.variables[:config]
+            config.snmp_trap_address = resource.message['snmp_trap_address']
+            config.snmp_trap_port = resource.message['snmp_trap_port']
+            config.new_suspect_on_trap = resource.message['new_suspect_on_trap']
+            config.include_raw_message = resource.message['include_raw_message']
+            config.threads = resource.message['threads']
+            config.queue_size = resource.message['queue_size']
+            config.batch_size = resource.message['batch_size']
+            config.batch_interval = resource.message['batch_interval']
+            config.use_address_from_varbind = resource.message['use_address_from_varbind']
+            config.snmpv3_users = resource.message['snmpv3_users'].map do |user|
+              Opennms::Cookbook::Trapd::ConfigTemplate::Snmpv3User.new(
+                id: user['id'],
+                engine_id: user['engine_id'],
+                security_name: user['security_name'],
+                security_level: user['security_level'],
+                auth_protocol: user['auth_protocol'],
+                auth_passphrase: user['auth_passphrase'],
+                privacy_protocol: user['privacy_protocol'],
+                privacy_passphrase: user['privacy_passphrase']
+              )
             end
-            config
+          else
+            config = resource.variables[:config]
           end
+          config
         end
       end
 
       class Config
+        SECURITY_LEVELS = {
+          'NOAUTH_NOPRIV' => 1,
+          'AUTH_NOPRIV' => 2,
+          'AUTH_PRIV' => 3,
+        }.freeze
+
+        SECURITY_LEVEL_NAMES = SECURITY_LEVELS.invert.freeze
+
         attr_accessor :snmp_trap_address, :snmp_trap_port, :new_suspect_on_trap, :include_raw_message, :threads, :queue_size, :batch_size, :batch_interval, :use_address_from_varbind, :snmpv3_users
 
         def initialize
@@ -167,8 +177,11 @@ module Opennms
           raise ArgumentError, 'URL must be a string' unless url.is_a?(String)
           if url.start_with?('file://') && !url.start_with?('file:///opt/opennms/etc/')
             raise ArgumentError, 'file paths must start with /opt/opennms/etc/'
+          elsif url.start_with?('file://')
+            doc = Nokogiri::XML(File.read(url[7..-1]))
+          else
+            doc = Nokogiri::XML(URI.open(url, headers))
           end
-          doc = Nokogiri::XML(URI.open(url, headers))
           @snmp_trap_address = doc.at_xpath('/xmlns:trapd-configuration/@snmp-trap-address')&.value
           @snmp_trap_port = doc.at_xpath('/xmlns:trapd-configuration/@snmp-trap-port')&.value
           @new_suspect_on_trap = doc.at_xpath('/xmlns:trapd-configuration/@new-suspect-on-trap')&.value
@@ -179,16 +192,16 @@ module Opennms
           @batch_interval = doc.at_xpath('/xmlns:trapd-configuration/@batch-interval')&.value
           @use_address_from_varbind = doc.at_xpath('/xmlns:trapd-configuration/@use-address-from-varbind')&.value
 
-          doc.xpath('/xmlns:trapd-configuration/snmpv3-user').each do |user_node|
+          doc.xpath('/xmlns:trapd-configuration/xmlns:snmpv3-user').each do |user_node|
             user = {
               id: user_node.at_xpath('@id')&.value,
               engine_id: user_node.at_xpath('@engine-id')&.value,
               security_name: user_node.at_xpath('@security-name')&.value,
-              security_level: user_node.at_xpath('@security-level')&.value,
+              security_level: user_node.at_xpath('@security-level')&.value.to_i,
               auth_protocol: user_node.at_xpath('@auth-protocol')&.value,
               auth_passphrase: user_node.at_xpath('@auth-passphrase')&.value,
-              privacy_protocol: user_node.at_xpath('@priv-protocol')&.value,
-              privacy_passphrase: user_node.at_xpath('@priv-password')&.value,
+              privacy_protocol: user_node.at_xpath('@privacy-protocol')&.value,
+              privacy_passphrase: user_node.at_xpath('@privacy-passphrase')&.value,
             }
             @snmpv3_users << Snmpv3User.new(**user)
           end
@@ -208,12 +221,12 @@ module Opennms
           @snmpv3_users.reject! { |u| u.identity == user.identity }
         end
 
-        def user_for_identity(engine_id: nil, security_name: nil, security_level: nil, auth_protocol: nil, privacy_protocol: nil)
-          identity = "#{engine_id}:#{security_name}:#{security_level}:#{auth_protocol}:#{privacy_protocol}"
+        def user_for_identity(engine_id = nil, security_name = nil, security_level = nil, auth_protocol = nil, privacy_protocol = nil)
+          identity = "#{engine_id}:#{security_name}:#{SECURITY_LEVELS[security_level]}:#{auth_protocol}:#{privacy_protocol}"
           user = @snmpv3_users.select { |u| u.identity == identity }
           return if user.empty?
-          raise ArgumentError, "Multiple users found for identity ##{engine_id}:#{security_name}:#{security_level}:#{auth_protocol}:#{privacy_protocol}" if user.size > 1
-          user.first
+          raise ArgumentError, "Multiple users found for identity ##{engine_id}:#{security_name}:#{SECURITY_LEVELS[security_level]}:#{auth_protocol}:#{privacy_protocol}" unless user.one?
+          user.pop
         end
 
         def to_s
@@ -258,21 +271,13 @@ module Opennms
       end
 
       class Snmpv3User
-        SECURITY_LEVELS = {
-          'NOAUTH_NOPRIV' => 1,
-          'AUTH_NOPRIV' => 2,
-          'AUTH_PRIV' => 3,
-        }.freeze
-
-        SECURITY_LEVEL_NAMES = SECURITY_LEVELS.invert.freeze
-
         attr_accessor :id, :engine_id, :security_name, :security_level, :auth_protocol, :auth_passphrase, :privacy_protocol, :privacy_passphrase
 
         def initialize(id: nil, engine_id: nil, security_name: nil, security_level: nil, auth_protocol: nil, auth_passphrase: nil, privacy_protocol: nil, privacy_passphrase: nil)
           @id = id
           @engine_id = engine_id&.freeze
           @security_name = security_name&.freeze
-          @security_level = SECURITY_LEVEL_NAMES.fetch(security_level)&.freeze
+          @security_level = security_level&.freeze
           @auth_protocol = auth_protocol&.freeze
           @auth_passphrase = auth_passphrase
           @privacy_protocol = privacy_protocol&.freeze
