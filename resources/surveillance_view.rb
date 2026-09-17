@@ -1,5 +1,8 @@
 include Opennms::XmlHelper
 include Opennms::Cookbook::View::SurveillanceTemplate
+
+unified_mode true
+
 # rows and columns should be of the form
 # { 'Category Label' => ['categoryName', ...], ... }
 # at least one of each is required

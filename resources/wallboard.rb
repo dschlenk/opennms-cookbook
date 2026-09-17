@@ -1,5 +1,8 @@
 include Opennms::XmlHelper
 include Opennms::Cookbook::View::WallboardTemplate
+
+unified_mode true
+
 property :title, String, name_property: true
 property :set_default, [true, false]
 

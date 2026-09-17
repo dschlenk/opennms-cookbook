@@ -56,7 +56,7 @@ action :create do
     file = new_resource.file_name.nil? ? "#{onms_etc}/wsman-datacollection-config.xml" : "#{onms_etc}/#{new_resource.file_name}"
     r = wsman_resource(file)
     all = if r.nil?
-            Opennms::Cookbook::Collection::WsmanCollectionConfigFile.read(file, 'wsman').groups
+            Opennms::Cookbook::Collection::WsmanCollectionConfigFile.read('wsman', file).groups
           else
             r.variables[:groups]
           end
@@ -81,7 +81,7 @@ action :create_if_missing do
   file = new_resource.file_name.nil? ? "#{onms_etc}/wsman-datacollection-config.xml" : "#{onms_etc}/#{new_resource.file_name}"
   r = wsman_resource(file)
   all = if r.nil?
-          Opennms::Cookbook::Collection::WsmanCollectionConfigFile.read(file, 'wsman').groups
+          Opennms::Cookbook::Collection::WsmanCollectionConfigFile.read('wsman', file).groups
         else
           r.variables[:groups]
         end

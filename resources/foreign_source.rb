@@ -1,6 +1,9 @@
 include Opennms::Cookbook::Provision::ForeignSourceHttpRequest
 include Opennms::XmlHelper
 include Opennms::Rbac
+
+unified_mode true
+
 property :scan_interval, String, default: '1d'
 
 load_current_value do |new_resource|

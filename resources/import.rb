@@ -2,6 +2,8 @@ include Opennms::Cookbook::Provision::ModelImportHttpRequest
 include Opennms::XmlHelper
 include Opennms::Rbac
 
+unified_mode true
+
 property :import_name, String, name_property: true, identity: true
 property :foreign_source_name, String, default: 'imported:'
 property :sync_import, [true, false], default: false, desired_state: false

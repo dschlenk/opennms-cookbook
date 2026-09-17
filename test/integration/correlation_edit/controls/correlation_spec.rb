@@ -1,4 +1,6 @@
+
 control 'correlation_edit' do
+  # cookstyle: disable Layout/TrailingWhitespace
   describe file('/opt/opennms/etc/drools-engine.d/basic-rule/drools-engine.xml') do
     it { should exist }
     its('content') do
@@ -20,6 +22,7 @@ control 'correlation_edit' do
     its('owner') { should eq 'opennms' }
     its('group') { should eq 'opennms' }
   end
+  # cookstyle: enable Layout/TrailingWhitespace
 
   describe file('/opt/opennms/etc/drools-engine.d/basic-rule/sample.drl') do
     it { should exist }
@@ -67,6 +70,7 @@ end
     its('group') { should eq 'opennms' }
   end
 
+  # cookstyle: disable Layout/TrailingWhitespace
   describe file('/opt/opennms/etc/drools-engine.d/template-rule/drools-engine.xml') do
     it { should exist }
     its('content') do
@@ -86,6 +90,7 @@ end
     its('owner') { should eq 'opennms' }
     its('group') { should eq 'opennms' }
   end
+  # cookstyle: enable Layout/TrailingWhitespace
 
   describe file('/opt/opennms/etc/drools-engine.d/template-rule/template-rule.drl') do
     it { should exist }
@@ -109,6 +114,7 @@ end
     its('group') { should eq 'opennms' }
   end
 
+  # cookstyle: disable Layout/TrailingWhitespace
   describe file('/opt/opennms/etc/drools-engine.d/cookbook-drl-rule/drools-engine.xml') do
     it { should exist }
     its('content') do
@@ -133,6 +139,7 @@ end
     its('owner') { should eq 'opennms' }
     its('group') { should eq 'opennms' }
   end
+  # cookstyle: enable Layout/TrailingWhitespace
 
   describe file('/opt/opennms/etc/drools-engine.d/cookbook-drl-rule/sample.drl') do
     it { should exist }
@@ -180,6 +187,7 @@ end
     its('group') { should eq 'opennms' }
   end
 
+  # cookstyle: disable Layout/TrailingWhitespace
   describe file('/opt/opennms/etc/drools-engine.d/remote-engine-rule/drools-engine.xml') do
     it { should exist }
     its('content') do
@@ -269,6 +277,8 @@ end
     its('owner') { should eq 'opennms' }
     its('group') { should eq 'opennms' }
   end
+  # cookstyle: enable Layout/TrailingWhitespace
+
   %w(AvgCacheBwUsageRules AvgOriginBwUsageRules ConnectionRateRules CorrelationRaceConditionRules InterfaceDownRules MemUtilizationRules NetUtilizationRules NodeDownRules PagingActivityRules ResourcePoolUtilRules TransactionRateRules WriteMemRules).each do |drl|
     describe file("/opt/opennms/etc/drools-engine.d/remote-engine-rule/#{drl}.drl") do
       it { should exist }
@@ -283,6 +293,7 @@ end
     end
   end
 
+  # cookstyle: disable Layout/TrailingWhitespace
   describe file('/opt/opennms/etc/drools-engine.d/remote-everything/drools-engine.xml') do
     it { should exist }
     its('content') do
@@ -298,6 +309,7 @@ end
     its('owner') { should eq 'opennms' }
     its('group') { should eq 'opennms' }
   end
+  # cookstyle: enable Layout/TrailingWhitespace
 
   describe file('/opt/opennms/etc/drools-engine.d/remote-everything/PersistStateStreaming.drl') do
     it { should exist }

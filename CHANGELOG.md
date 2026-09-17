@@ -1,9 +1,14 @@
 # OpenNMS Cookbook Changes
 
+## 34.1.0
+
+* breaking: replace management of Trapd via template with custom resources
+* bugfix: lint
+
 ## 34.0.1
 
-* add back management of log4j2.xml
-* move more testing to CI
+* minor: add back management of log4j2.xml
+* minor: move more testing to CI
 
 ## 34.0.0
 

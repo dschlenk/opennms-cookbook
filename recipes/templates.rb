@@ -399,20 +399,6 @@ template "#{onms_home}/etc/syslog-northbounder-configuration.xml" do
   action node['opennms']['templates'] ? :create : :nothing
 end
 
-template "#{onms_home}/etc/trapd-configuration.xml" do
-  cookbook node['opennms']['trapd']['cookbook']
-  source 'trapd-configuration.xml.erb'
-  mode '0664'
-  owner node['opennms']['username']
-  group node['opennms']['groupname']
-  notifies :restart, 'service[opennms]'
-  variables(
-    port: node['opennms']['trapd']['port'],
-    new_suspect: node['opennms']['trapd']['new_suspect']
-  )
-  action node['opennms']['templates'] ? :create : :nothing
-end
-
 template "#{onms_home}/etc/vacuumd-configuration.xml" do
   cookbook node['opennms']['vacuumd']['cookbook']
   source 'vacuumd-configuration.xml.erb'

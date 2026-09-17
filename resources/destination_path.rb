@@ -1,5 +1,8 @@
 include Opennms::XmlHelper
 include Opennms::Cookbook::Notification::DestinationPathsTemplate
+
+unified_mode true
+
 property :path_name, String, name_property: true
 # defaults to '0s' on new
 property :initial_delay, String

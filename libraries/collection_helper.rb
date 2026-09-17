@@ -31,7 +31,7 @@ module Opennms
 
         def snmp_resource_create
           file = Opennms::Cookbook::Collection::OpennmsCollectionConfigFile.new
-          file.read!("#{onms_etc}/datacollection-config.xml", 'snmp')
+          file.read!('snmp', "#{onms_etc}/datacollection-config.xml")
           with_run_context(:root) do
             declare_resource(:template, "#{onms_etc}/datacollection-config.xml") do
               cookbook 'opennms'
@@ -58,7 +58,7 @@ module Opennms
 
         def ro_snmp_resource_create
           file = Opennms::Cookbook::Collection::OpennmsCollectionConfigFile.new
-          file.read!("#{onms_etc}/datacollection-config.xml", 'snmp')
+          file.read!('snmp', "#{onms_etc}/datacollection-config.xml")
           with_run_context(:root) do
             declare_resource(:template, "RO #{onms_etc}/datacollection-config.xml") do
               path "#{Chef::Config[:file_cache_path]}/datacollection-config.xml"
@@ -108,7 +108,7 @@ module Opennms
 
         def jdbc_resource_create
           file = Opennms::Cookbook::Collection::OpennmsCollectionConfigFile.new
-          file.read!("#{onms_etc}/jdbc-datacollection-config.xml", 'jdbc')
+          file.read!('jdbc', "#{onms_etc}/jdbc-datacollection-config.xml")
           with_run_context(:root) do
             declare_resource(:template, "#{onms_etc}/jdbc-datacollection-config.xml") do
               cookbook 'opennms'
@@ -135,7 +135,7 @@ module Opennms
 
         def ro_jdbc_resource_create
           file = Opennms::Cookbook::Collection::OpennmsCollectionConfigFile.new
-          file.read!("#{onms_etc}/jdbc-datacollection-config.xml", 'jdbc')
+          file.read!('jdbc', "#{onms_etc}/jdbc-datacollection-config.xml")
           with_run_context(:root) do
             declare_resource(:template, "RO #{onms_etc}/jdbc-datacollection-config.xml") do
               path "#{Chef::Config[:file_cache_path]}/jdbc-datacollection-config.xml"
@@ -183,7 +183,7 @@ module Opennms
 
         def jmx_resource_create
           file = Opennms::Cookbook::Collection::OpennmsCollectionConfigFile.new
-          file.read!("#{onms_etc}/jmx-datacollection-config.xml", 'jmx')
+          file.read!('jmx', "#{onms_etc}/jmx-datacollection-config.xml")
           with_run_context(:root) do
             declare_resource(:template, "#{onms_etc}/jmx-datacollection-config.xml") do
               cookbook 'opennms'
@@ -210,7 +210,7 @@ module Opennms
 
         def ro_jmx_resource_create
           file = Opennms::Cookbook::Collection::OpennmsCollectionConfigFile.new
-          file.read!("#{onms_etc}/jmx-datacollection-config.xml", 'jmx')
+          file.read!('jmx', "#{onms_etc}/jmx-datacollection-config.xml")
           with_run_context(:root) do
             declare_resource(:template, "RO #{onms_etc}/jmx-datacollection-config.xml") do
               path "#{Chef::Config[:file_cache_path]}/jmx-datacollection-config.xml"
@@ -258,7 +258,7 @@ module Opennms
 
         def wsman_resource_create(file)
           f = Opennms::Cookbook::Collection::WsmanCollectionConfigFile.new
-          f.read!(file, 'wsman')
+          f.read!('wsman', file)
           with_run_context(:root) do
             declare_resource(:template, file) do
               cookbook 'opennms'
@@ -287,7 +287,7 @@ module Opennms
 
         def ro_wsman_resource_create(file)
           f = Opennms::Cookbook::Collection::WsmanCollectionConfigFile.new
-          f.read!(file, 'wsman')
+          f.read!('wsman', file)
           with_run_context(:root) do
             declare_resource(:template, "RO #{file}") do
               path "#{Chef::Config[:file_cache_path]}/#{file}"
@@ -371,7 +371,7 @@ module Opennms
 
         def xml_resource_create
           file = Opennms::Cookbook::Collection::OpennmsCollectionConfigFile.new
-          file.read!("#{onms_etc}/xml-datacollection-config.xml", 'xml')
+          file.read!('xml', "#{onms_etc}/xml-datacollection-config.xml")
 
           with_run_context(:root) do
             declare_resource(:template, "#{onms_etc}/xml-datacollection-config.xml") do
@@ -396,7 +396,7 @@ module Opennms
 
         def ro_xml_resource_create
           file = Opennms::Cookbook::Collection::OpennmsCollectionConfigFile.new
-          file.read!("#{onms_etc}/xml-datacollection-config.xml", 'xml')
+          file.read!('xml', "#{onms_etc}/xml-datacollection-config.xml")
           with_run_context(:root) do
             declare_resource(:template, "RO #{onms_etc}/xml-datacollection-config.xml") do
               path "#{Chef::Config[:file_cache_path]}/xml-datacollection-config.xml"
@@ -666,7 +666,7 @@ module Opennms
           @collections = {}
         end
 
-        def read!(file = 'datacollection-config.xml', type)
+        def read!(type, file = 'datacollection-config.xml')
           raise ArgumentError, "File #{file} does not exist" unless ::File.exist?(file)
 
           doc = xmldoc_from_file(file)
@@ -706,9 +706,9 @@ module Opennms
           @collections.any? { |c2| c.eql?(c2) }
         end
 
-        def self.read(file = 'datacollection-config.xml', type)
+        def self.read(type, file = 'datacollection-config.xml')
           cf = OpennmsCollectionConfigFile.new
-          cf.read!(file, type)
+          cf.read!(type, file)
           cf
         end
       end
@@ -721,7 +721,7 @@ module Opennms
           @system_definitions = []
         end
 
-        def read!(file, type)
+        def read!(type, file)
           unless ::File.exist?(file)
             doc = REXML::Document.new
             doc << REXML::XMLDecl.new
@@ -743,9 +743,9 @@ module Opennms
           end
         end
 
-        def self.read(file, type)
+        def self.read(type, file)
           cf = WsmanCollectionConfigFile.new
-          cf.read!(file, type)
+          cf.read!(type, file)
           cf
         end
       end

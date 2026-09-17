@@ -1,5 +1,7 @@
 use 'partial/_snmp_config'
 
+unified_mode true
+
 property :label, String, name_property: true
 property :filter, String
 

@@ -1,3 +1,5 @@
+unified_mode true
+
 property :role_name, String, name_property: true
 # required for new
 property :membership_group, String
