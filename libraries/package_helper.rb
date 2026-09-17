@@ -41,7 +41,7 @@ module Opennms
               variables(collectd_config: file)
               action :nothing
               delayed_action :create
-              notifies :restart, 'service[opennms]'
+              notifies :restart, 'service[opennms]' if opennms_running?
             end
           end
         end
@@ -113,7 +113,7 @@ module Opennms
               variables(config: file)
               action :nothing
               delayed_action :create
-              notifies :restart, 'service[opennms]'
+              notifies :restart, 'service[opennms]' if opennms_running?
             end
           end
         end
@@ -862,7 +862,6 @@ module Opennms
             parameters = {} unless m.elements['parameter'].nil?
             m.each_element('parameter') do |p|
               unless p.elements[1].nil?
-                c = ''
                 c = p.elements[1].to_s
               end
               parameters[p.attributes['key']] = { 'value' => p.attributes['value'], 'configuration' => c }.compact
@@ -884,7 +883,6 @@ module Opennms
           parameters = {}
           s.each_element('parameter') do |p|
             unless p.elements[1].nil?
-              c = ''
               c = p.elements[1].to_s
             end
             parameters[p.attributes['key']] = { 'value' => p.attributes['value'], 'configuration' => c }.compact

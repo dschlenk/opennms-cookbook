@@ -6,6 +6,7 @@ control 'collection_graph_file' do
   ]
   notfiles = ['mailmarshal-graph.properties', 'apc.graph.properties']
   files.each do |f|
+    # cookstyle: disable Layout/TrailingWhitespace
     describe collection_graph_file f do
       it { should exist }
       if f == 'Synology-Storage-graph.properties'
@@ -41,6 +42,7 @@ EOL
         its('content') { should cmp sscontents }
       end
     end
+    # cookstyle: enable Layout/TrailingWhitespace
   end
   notfiles.each do |f|
     describe collection_graph_file f do

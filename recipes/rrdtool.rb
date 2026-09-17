@@ -2,7 +2,7 @@
 # Cookbook:: opennms-cookbook
 # Recipe:: rrdtool
 #
-# Copyright:: (c) 2016-2024 ConvergeOne Holding Corp
+# Copyright:: (c) 2016-2025 ConvergeOne Holding Corp
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -19,3 +19,4 @@
 
 # Packages rrdtool and jrrd2 are dependencies of the OpenNMS RPMs in Horizon 34+ and no longer need explicit installation.
 # rrd-configuration.properties is now managed by the base_templates recipe.
+node.default['opennms']['properties']['files']['store_by_group']['org.opennms.rrd.storeByGroup'] = true

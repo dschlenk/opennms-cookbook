@@ -64,7 +64,7 @@ org.opennms.rrd.usequeue=false
 # This property defines how many threads to use to process the queue and
 # write to the disk. You may get some performance benefit by increasing threads.
 # This of course depends on your I/O subsystem. It is unlikely that more than 10 threads
-# or so are needed here but there may be some # system that this is not true.
+# or so are needed here but there may be some # system where this is not true.
 # 
 # The default setting is 2
 <% if @queue && @queue[:writethreads] && @queue[:writethreads] != 2 %>
@@ -179,7 +179,7 @@ org.opennms.rrd.queuing.sigHighWaterMark=<%= @queue[:sig_hwmark] %>
 #
 # When the totalOpsPending value reaches or is higher than the value of the below
 # high water mark, any newly enqueued operations or any sort will be discarded, this
-# will prevent the queue from using up all of the memory of the system and eventually
+# will prevent the queue from using up all the memory of the system and eventually
 # crashing the JVM. 
 #
 # The default value is 0L (don't discard operations)

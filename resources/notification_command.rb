@@ -1,5 +1,8 @@
 include Opennms::XmlHelper
 include Opennms::Cookbook::Notification::CommandsTemplate
+
+unified_mode true
+
 property :command_name, String, name_property: true
 # required for new
 property :execute, String

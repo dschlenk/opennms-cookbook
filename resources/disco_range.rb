@@ -1,5 +1,8 @@
 include Opennms::XmlHelper
 include Opennms::Cookbook::Discovery::ConfigurationTemplate
+
+unified_mode true
+
 property :location, String, identity: true
 property :range_begin, String, required: true, identity: true
 property :range_end,   String, required: true, identity: true

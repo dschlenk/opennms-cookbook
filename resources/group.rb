@@ -1,3 +1,5 @@
+unified_mode true
+
 property :group_name, String, name_property: true
 property :default_svg_map, String, deprecated: 'the default-map option is deprecated and no longer used'
 property :comments, String

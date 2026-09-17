@@ -16,10 +16,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-if !node['opennms']['upgrade'] && upgrade.upgrade?
-  Chef::Log.warn('The current version does not match the configured version, but upgrades are disabled, so we\'re bailing out of the `packages` recipe early.')
-  return
-end
 
 onms_home = node['opennms']['conf']['home']
 onms_home ||= '/opt/opennms'

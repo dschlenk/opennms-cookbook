@@ -462,6 +462,10 @@ module Opennms::Rbac
   def resturl
     "http://localhost:#{node['opennms']['properties']['jetty']['port']}/opennms/rest"
   end
+
+  def restv2url
+    "http://localhost:#{node['opennms']['properties']['jetty']['port']}/opennms/api/v2"
+  end
 end
 
 ::Chef::DSL::Recipe.send(:include, Opennms::Rbac)

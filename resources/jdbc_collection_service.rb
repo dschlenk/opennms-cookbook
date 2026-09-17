@@ -17,7 +17,7 @@ action :create do
     mode '0664'
     owner node['opennms']['username']
     group node['opennms']['groupname']
-    notifies :restart, 'service[opennms]'
+    notifies :restart, 'service[opennms]' if opennms_running?
   end unless new_resource.driver_file.nil?
   converge_if_changed do
     collectd_resource_init

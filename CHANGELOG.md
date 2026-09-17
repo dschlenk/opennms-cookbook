@@ -1,5 +1,28 @@
 # OpenNMS Cookbook Changes
 
+## 34.1.0
+
+* breaking: replace management of Trapd via template with custom resources
+* bugfix: lint
+
+## 34.0.1
+
+* minor: add back management of log4j2.xml
+* minor: move more testing to CI
+
+## 34.0.0
+
+* initial support for OpenNMS Horizon 34
+
+## 33.7.2
+
+* bugfix: remove postgresql monkey patch so libpq5 installs correctly again
+
+## 33.7.1
+
+* bugfix: order of postgres resources caused password setting failure
+* bugfix: vault repo resources ignored `node['opennms']['manage_repos']`
+
 ## 33.7.0
 
 * breaking: new custom resource: `opennms_jms_nb_destination` replaces previous template

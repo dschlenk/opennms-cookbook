@@ -27,7 +27,6 @@ end
 
 postgresql_config 'postgresql-server' do
   version '15'
-
   server_config({
     'autovacuum' => 'on',
     'checkpoint_timeout' => '15min',
@@ -37,7 +36,6 @@ postgresql_config 'postgresql-server' do
     'vacuum_cost_delay' => 50,
     'max_connections' => 160,
   })
-
   notifies :restart, 'postgresql_service[postgresql]', :delayed
   action :create
 end
@@ -64,6 +62,7 @@ node['opennms']['postgresql']['access']['host'].each do |ha|
     end
   end
 end
+
 node['opennms']['postgresql']['access']['local'].each do |ha|
   postgresql_access "local access for #{ha['database']}" do
     type 'local'
