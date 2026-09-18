@@ -4,27 +4,37 @@
   xsi:schemaLocation="http://xmlns.opennms.org/xsd/config/opennms-datasources 
   http://www.opennms.org/xsd/config/opennms-datasources.xsd ">
 
-  <connection-pool factory="org.opennms.core.db.HikariCPConnectionFactory"
-<% @datasources['connection_pool'].each_with_index do |(k, v), i| -%>
-    <%= Opennms::Helpers.snake_to_camel_lower(k) %>="<%= v %>"<%= i == @datasources['connection_pool'].size - 1 ? ' />' : '' %>
-<% end -%>
+  <connection-pool idleTimeout="${env:OPENNMS_DATABASE_CONNECTION_IDLETIMEOUT|<%= @datasources['connection_pool']['idle_timeout'] %>}"
+    loginTimeout="${env:OPENNMS_DATABASE_CONNECTION_LOGINTIMEOUT|<%= @datasources['connection_pool']['login_timeout'] %>}"
+    minPool="${env:OPENNMS_DATABASE_CONNECTION_MINPOOL|<%= @datasources['connection_pool']['min_pool'] %>}"
+    maxPool="${env:OPENNMS_DATABASE_CONNECTION_MAXPOOL|<%= @datasources['connection_pool']['max_pool'] %>}"
+    maxSize="${env:OPENNMS_DATABASE_CONNECTION_MAXSIZE|<%= @datasources['connection_pool']['max_size'] %>}" />
 
-<% @datasources.each_with_index do |(source, definition), index| -%>
-  <% next if source == 'connection_pool' -%>
-  <jdbc-data-source name="<%= source %>" 
-  <% definition.each_with_index do |(k, v), i| -%>
-    <% next if k == "connection_pool" -%>
-                    <%= Opennms::Helpers.snake_to_kebab(k) %>="<%= v %>"<%= %w(database_name class_name).include?(k) ? ' ' : '' %><%= i == definition.size - 1 && definition['connection_pool'].nil? ? ' />' : (!definition['connection_pool'].nil? && i == definition.size - 2 ? '>' : '') %>
-  <% end -%>
-  <% if !definition['connection_pool'].nil? -%>
-    <connection-pool <% definition['connection_pool'].each_with_index do |(k, v), i| -%><%= i == 0 ? Opennms::Helpers.snake_to_camel_lower(k) + '="' + v.to_s + '"' : (definition['connection_pool'].size == 1 ? ' />' : '') %><% next if i == 0 -%>
-                     <%= Opennms::Helpers.snake_to_camel_lower(k) %>="<%= v %>"<%= definition['connection_pool'].size - 1 == i ? " />" : '' -%>
-    <% end -%>
+  <jdbc-data-source name="opennms"
+                    database-name="${env:OPENNMS_DBNAME|<%= @datasources['opennms']['database_name'] %>}"
+                    url=<%= @datasources['opennms']['url'].encode(:xml => :attr) %>
+                    user-name=<%= @datasources['opennms']['user_name'].encode(:xml => :attr) %>
+                    password=<%= @datasources['opennms']['password'].encode(:xml => :attr) %> />
 
+  <jdbc-data-source name="opennms-admin" 
+                    database-name=<%= @datasources['opennms-admin']['database_name'].encode(:xml => :attr) %>
+                    url=<%= @datasources['opennms-admin']['url'].encode(:xml => :attr) %>
+                    user-name=<%= @datasources['opennms-admin']['user_name'].encode(:xml => :attr) %>
+                    password=<%= @datasources['opennms-admin']['password'].encode(:xml => :attr) %>>
+    <connection-pool idleTimeout="<%= @datasources['opennms-admin']['connection_pool']['idle_timeout'] %>"
+                     minPool="<%= @datasources['opennms-admin']['connection_pool']['min_pool'] %>"
+                     maxPool="<%= @datasources['opennms-admin']['connection_pool']['max_pool'] %>"
+                     maxSize="<%= @datasources['opennms-admin']['connection_pool']['max_size'] %>" />
   </jdbc-data-source>
-  <% end -%>
-  <% if index != @datasources.size - 1 -%>
-<%= source == 'opennms-admin' ? '  ' : '' %>
-  <% end -%>
-<% end -%>
+  
+  <jdbc-data-source name="opennms-monitor" 
+                    database-name=<%= @datasources['opennms-monitor']['database_name'].encode(:xml => :attr) %>
+                    url=<%= @datasources['opennms-monitor']['url'].encode(:xml => :attr) %>
+                    user-name=<%= @datasources['opennms-monitor']['user_name'].encode(:xml => :attr) %>
+                    password=<%= @datasources['opennms-monitor']['password'].encode(:xml => :attr) %>>
+    <connection-pool idleTimeout="<%= @datasources['opennms-monitor']['connection_pool']['idle_timeout'] %>"
+                     minPool="<%= @datasources['opennms-monitor']['connection_pool']['min_pool'] %>"
+                     maxPool="<%= @datasources['opennms-monitor']['connection_pool']['max_pool'] %>"
+                     maxSize="<%= @datasources['opennms-monitor']['connection_pool']['max_size'] %>" />
+  </jdbc-data-source>
 </datasource-configuration>
