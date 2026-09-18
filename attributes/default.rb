@@ -28,7 +28,7 @@ default['opennms']['yum_gpg_keys'] = [
 default['opennms']['start_opts'] = ''
 # set to '' if you want to re-enable OOTB behavior (but you should not do this if using any of the opennms resources)
 default['opennms']['timeout_start_sec'] = '10min'
-default['opennms']['version'] = '34.1.0-1'
+default['opennms']['version'] = '35.0.5-1'
 default['java']['version'] = '17'
 default['opennms']['jre_path'] = nil
 default['opennms']['allow_downgrade'] = false
@@ -150,20 +150,35 @@ default['opennms']['users']['admin']['vault'] = Chef::Config[:node_name]
 default['opennms']['users']['admin']['vault_item'] = 'opennms_admin_password'
 
 # daemons
-default['opennms']['services']['dhcpd']               = false
 default['opennms']['services']['snmp_poller']         = false
-default['opennms']['services']['linkd']               = false
 default['opennms']['services']['correlator']          = false
-default['opennms']['services']['tl1d']                = false
 default['opennms']['services']['syslogd']             = false
-default['opennms']['services']['xmlrpcd']             = false
-default['opennms']['services']['asterisk_gw']         = false
-default['opennms']['services']['apm']                 = false
 default['opennms']['services']['telemetryd']          = true
 default['opennms']['services']['perspective_poller']  = true
 default['opennms']['services']['bsmd']                = true
-default['opennms']['services']['discovery']           = true
 default['opennms']['services']['ticketer']            = true
+default['opennms']['services']['discovery']           = true
+default['opennms']['services']['manager']             = true
+default['opennms']['services']['eventd']              = true
+default['opennms']['services']['alarmd']              = true
+default['opennms']['services']['alarmd']              = true
+default['opennms']['services']['queued']              = true
+default['opennms']['services']['actiond']             = true
+default['opennms']['services']['notifd']              = true
+default['opennms']['services']['scriptd']             = true
+default['opennms']['services']['rtcd']                = true
+default['opennms']['services']['pollerd']             = true
+default['opennms']['services']['enlinkd']             = true
+default['opennms']['services']['collectd']            = true
+default['opennms']['services']['vacuumd']             = true
+default['opennms']['services']['translator']          = true
+default['opennms']['services']['passive_statusd']     = true
+default['opennms']['services']['statsd']              = true
+default['opennms']['services']['provisiond']          = true
+default['opennms']['services']['ackd']                = true
+default['opennms']['services']['jetty']               = true
+default['opennms']['services']['ksm']                 = true
+default['opennms']['services']['trapd']               = true
 
 # opennms.properties
 default['opennms']['properties']['files'] = {
@@ -496,7 +511,8 @@ default['opennms']['log4j2']['default_route']['size'] = '100MB'
 default['opennms']['log4j2']['default_route']['rollover'] = 4
 default['opennms']['log4j2']['instrumentation']['size'] = '100MB'
 default['opennms']['log4j2']['instrumentation']['rollover'] = 4
-default['opennms']['log4j2']['size'] = '100MB'
+default['opennms']['log4j2']['web_audit']['size'] = '100MB'
+default['opennms']['log4j2']['web_audit']['rollover'] = 4
 default['opennms']['log4j2']['access_point_monitor'] = 'WARN'
 default['opennms']['log4j2']['ackd'] = 'WARN'
 default['opennms']['log4j2']['actiond'] = 'WARN'
@@ -624,7 +640,6 @@ default['opennms']['rrd']['queue']['queue_hwmark']                   = 0
 default['opennms']['rrd']['queue']['log_cat']                        = nil
 default['opennms']['rrd']['queue']['write_thread']['sleep_time']     = 50
 default['opennms']['rrd']['queue']['write_thread']['exit_delay']     = 60_000
-default['opennms']['rrd']['jrobin']['backend_factory']               = nil
 default['opennms']['rrd']['usetcp']                                  = false
 default['opennms']['rrd']['tcp']['host']                             = nil
 default['opennms']['rrd']['tcp']['port']                             = nil
@@ -980,17 +995,16 @@ default['opennms']['datasources']['connection_pool'] = {
 }
 default['opennms']['datasources']['opennms'] = {
   'database_name' => 'opennms',
-  'class_name' => 'org.postgresql.Driver',
-  'url' => 'jdbc:postgresql://localhost:5432/opennms',
-  'user_name' => '${scv:postgres:username|opennms}',
-  'password' => '${scv:postgres:password|opennms}',
+  'url' => 'jdbc:postgresql://${env:POSTGRES_HOST|localhost}:${env:POSTGRES_PORT|5432}/${env:OPENNMS_DBNAME|opennms}?sslmode=${env:POSTGRES_SSL_MODE|prefer}&sslfactory=${env:POSTGRES_SSL_FACTORY|org.postgresql.ssl.LibPQFactory}',
+  'user_name' => '${scv:postgres:username|env:OPENNMS_DBUSER|opennms}',
+  'password' => '${scv:postgres:password|env:OPENNMS_DBPASS|opennms}',
 }
 default['opennms']['datasources']['opennms-admin'] = {
   'database_name' => 'template1',
   'class_name' => 'org.postgresql.Driver',
-  'url' => 'jdbc:postgresql://localhost:5432/template1',
-  'user_name' => '${scv:postgres-admin:username|postgres}',
-  'password' => '${scv:postgres-admin:password|}',
+  'url' => 'jdbc:postgresql://${env:POSTGRES_HOST|localhost}:${env:POSTGRES_PORT|5432}/template1?sslmode=${env:POSTGRES_SSL_MODE|prefer}&sslfactory=${env:POSTGRES_SSL_FACTORY|org.postgresql.ssl.LibPQFactory}',
+  'user_name' => '${scv:postgres-admin:username|env:POSTGRES_USER|postgres}',
+  'password' => '${scv:postgres-admin:password|env:POSTGRES_PASSWORD|}',
   'connection_pool' => {
     'idle_timeout' => 600,
     'min_pool' => 0,
@@ -1001,9 +1015,9 @@ default['opennms']['datasources']['opennms-admin'] = {
 default['opennms']['datasources']['opennms-monitor'] = {
   'database_name' => 'postgres',
   'class_name' => 'org.postgresql.Driver',
-  'url' => 'jdbc:postgresql://localhost:5432/postgres',
-  'user_name' => '${scv:postgres-admin:username|postgres}',
-  'password' => '${scv:postgres-admin:password|}',
+  'url' => 'jdbc:postgresql://${env:POSTGRES_HOST|localhost}:${env:POSTGRES_PORT|5432}/postgres?sslmode=${env:POSTGRES_SSL_MODE|prefer}&sslfactory=${env:POSTGRES_SSL_FACTORY|org.postgresql.ssl.LibPQFactory}',
+  'user_name' => '${scv:postgres-admin:username|env:POSTGRES_USER|postgres}',
+  'password' => '${scv:postgres-admin:password|env:POSTGRES_PASSWORD|}',
   'connection_pool' => {
     'idle_timeout' => 600,
     'min_pool' => 0,

@@ -37,7 +37,7 @@ verifier:
 platforms:
   - name: oraclelinux-9
     driver:
-      image: c1og/opennms-34-oraclelinux-9
+      image: c1og/opennms-35-oraclelinux-9
       pid_one_command: /usr/lib/systemd/systemd
     lifecycle:
       pre_converge:
@@ -117,14 +117,14 @@ suites:
         templates: true
   - name: upgrade
     driver:
-      image: c1og/opennms-33-oraclelinux-9
+      image: c1og/opennms-34-oraclelinux-9
     verifier:
       inspec_tests:
         - path: test/integration/default
         - path: test/integration/upgrade
   - name: no_upgrade
     driver:
-      image: c1og/opennms-33-oraclelinux-9
+      image: c1og/opennms-34-oraclelinux-9
     provisioner:
       policyfile: policyfiles/no_upgrade.rb
     verifier:

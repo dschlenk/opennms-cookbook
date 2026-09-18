@@ -21,7 +21,7 @@
 if !node['opennms']['upgrade'] && upgrade.upgrade?
   Chef::Log.warn('The current version does not match the configured version, but upgrades are disabled.')
   return
-elsif node['opennms']['version'].to_i != 34
+elsif node['opennms']['version'].to_i != 35
   Chef::Log.warn("OpenNMS version #{node['opennms']['version']} is not supported by this version of the opennms cookbook.")
   return
 end
