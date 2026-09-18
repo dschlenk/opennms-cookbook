@@ -4,6 +4,7 @@ driver:
   privileged: true
   chef_image: cincproject/cinc
   chef_version: 18
+  pull_platform_image: true
 
 transport:
   name: dokken
@@ -60,9 +61,12 @@ platforms:
 suites:
   - name: recommended
     driver:
-      image: dokken/oraclelinux-9
+      #image: dokken/oraclelinux-9
       ports:
         - 1234:8980/tcp
+    lifecycle:
+      pre_converge:
+        - remote: rm -f /opt/opennms/etc/scv.jce
     verifier:
       inspec_tests:
         - path: test/integration/default
