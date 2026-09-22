@@ -18,7 +18,7 @@
 #
 
 def yum_attr(branch, platform, attr)
-  node['yum']["opennms-#{branch}-#{platform}"][attr]
+  node['yum']["opennms-#{branch}-#{platform}"][attr] unless node['yum']["opennms-#{branch}-#{platform}"].nil?
 end
 
 branches = node['opennms']['repos']['branches']
@@ -32,9 +32,9 @@ branches.each do |branch|
     elsif branch == 'oldstable' && !node['opennms']['stable']
       skip = false
     end
-    # next if skip
     bu = yum_attr(branch, platform, 'baseurl')
     ml = yum_attr(branch, platform, 'url')
+    next if bu.nil? && ml.nil?
     fom = yum_attr(branch, platform, 'failovermethod')
     inc_pkgs = yum_attr(branch, platform, 'includepkgs')
     repo_enabled = yum_attr(branch, platform, 'enabled')

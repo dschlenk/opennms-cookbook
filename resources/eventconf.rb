@@ -19,8 +19,7 @@ action_class do
   def source_name_from_event_file
     name = new_resource.event_file.to_s
     name = name.sub(%r{^events/}, '')
-    name = name.sub(/\.xml$/, '')
-    name
+    name.sub(/\.xml$/, '')
   end
 
   def vendor_from_name(name)
@@ -48,7 +47,7 @@ action_class do
   end
 end
 
-load_current_value do |new_resource|
+load_current_value do |_new_resource|
   src_name = source_name_from_event_file
   # Existence check via API
   require 'net/http'
@@ -69,26 +68,30 @@ action :create do
   converge_if_changed do
     # Render file content
     content = case new_resource.source_type
-    when 'cookbook_file'
-      cookbook_file_path = "#{node['opennms']['conf']['home']}/etc/events/#{new_resource.event_file}"
-      File.read(cookbook_file_path) rescue ''
-    when 'template'
-      # Simplified: assume rendered content is available via template resource
-      ''
-    when 'remote_file'
-      ''
-    end
+              when 'cookbook_file'
+                cookbook_file_path = "#{node['opennms']['conf']['home']}/etc/events/#{new_resource.event_file}"
+                begin
+                  File.read(cookbook_file_path)
+                rescue
+                  ''
+                end
+              when 'template'
+                # Simplified: assume rendered content is available via template resource
+                ''
+              when 'remote_file'
+                ''
+              end
     # Store in accumulator
     action_class.instance_variable_get(:@eventconf_upload_accumulator)[new_resource.event_file] = {
       source_name: src_name,
       vendor: vendor_from_name(src_name),
       description: new_resource.description,
-      content: content
+      content: content,
     }
     # Update upload resource message with accumulated files
     upload_res = find_resource!(:http_request, 'opennms_eventconf_upload')
     # Build multipart body placeholder – actual building would happen in converge
-    upload_res.message "accumulated"
+    upload_res.message 'accumulated'
   end
 end
 
