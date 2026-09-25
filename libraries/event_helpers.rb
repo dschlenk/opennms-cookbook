@@ -29,6 +29,204 @@ module Opennms
           end
         end
 
+        module EventconfSources
+          require_relative 'rbac'
+          include Opennms::Rbac
+          def eventconf_sources_init
+            eventconf_sources_create unless eventconf_sources_exist?
+          end
+
+          def source_name_from_file(file)
+            name = file.to_s
+            name = name.sub(%r{^events/}, '')
+            name.sub(/\.xml$/, '')
+          end
+
+          def content_changed?(id, source_name, source_type, source, source_properties, variables)
+            require 'nokogiri'
+            tempfile = render_content(source_name, source_type, source, source_properties, variables)
+            response = RestClient::Request.execute(
+              method: :get,
+              url: "#{restv2url}/eventconf/sources/#{id}/events/download",
+              user: 'admin',
+              password: admin_secret_from_vault('password')
+            )
+            desired_doc = Nokogiri::XML(File.read(tempfile), &:noblanks)
+            desired_doc.xpath('//comment()').remove
+
+            desired = xml_to_hash(desired_doc.root)
+            current = xml_to_hash(Nokogiri::XML(response.body).root)
+            !desired.eql?(current)
+          end
+
+          def update_content(source_name, source_type, source, source_properties, variables, position)
+            require 'securerandom'
+            require 'rest-client'
+            tempfile = render_content(source_name, source_type, source, source_properties, variables)
+            boundary = "----RubyMultipart#{SecureRandom.hex(16)}"
+            body = ''
+            content = ::File.read(tempfile)
+            body << "--#{boundary}\r\n"
+            body << %(Content-Disposition: form-data; name="upload"; filename="#{File.basename(tempfile)}"\r\n)
+            body << "Content-Type: application/xml\r\n"
+            body << "\r\n"
+            body << content
+            body << "\r\n"
+            if position == 'bottom'
+              body << "--#{boundary}\r\n"
+              body << %(Content-Disposition: form-data; name="upload"; filename=eventconf.xml\r\n)
+              body << "Content-Type: application/xml\r\n"
+              body << "\r\n"
+              body << "<events xmlns=\"http://xmlns.opennms.org/xsd/eventconf\"><event-file>#{File.basename(tempfile).encode(xml: :text)}</event-file></events>"
+              body << "\r\n"
+            end
+            body << "--#{boundary}--\r\n"
+            if position == 'override'
+              Chef::Log.warn("position is override, delaying upload for #{source_name}")
+              r = self
+              with_run_context :root do
+                declare_resource(:ruby_block, "upload #{source_name} delayed") do
+                  block do
+                    Chef::Log.warn("uploading #{source_name}")
+                    r.upload_eventconf(body, boundary, source_name)
+                  end
+                  action :nothing
+                  delayed_action :run
+                end
+              end
+            else
+              upload_eventconf(body, boundary, source_name)
+            end
+          end
+
+          def delete_source(id)
+            response = RestClient::Request.execute(
+              method: :delete,
+              url: "#{restv2url}/eventconf/sources",
+              user: 'admin',
+              password: admin_secret_from_vault('password'),
+              payload: "{ \"sourceIds\": [ #{id} ] }",
+              headers: {
+                content_type: :json,
+                accept: :json,
+              })
+            raise "Unable to delete source with id #{id} via API. Is OpenNMS running?" unless response.code == 200
+          end
+
+          def upload_eventconf(body, boundary, source_name)
+            response = RestClient::Request.execute(
+              method: :post,
+              url: "#{restv2url}/eventconf/upload",
+              user: 'admin',
+              password: admin_secret_from_vault('password'),
+              payload: body,
+              headers: {
+                content_type: "multipart/form-data; boundary=#{boundary}",
+                accept: :json,
+              })
+            raise "Unable to update content via API for eventconf source #{source_name}. Is OpenNMS running?" unless response.code == 200
+          end
+
+          private
+
+          def render_content(source_name, source_type, source, source_properties, variables)
+            tempfile = "#{Chef::Config[:file_cache_path]}/#{source_name}.xml"
+            case source_type
+            when 'cookbook_file'
+              cookbook_file tempfile do
+                sensitive true
+                source source
+                owner node['opennms']['username']
+                group node['opennms']['groupname']
+                mode '664'
+                source_properties.each do |k, v|
+                  send(k, v)
+                end unless source_properties.nil?
+              end
+            when 'template'
+              template tempfile do
+                sensitive true
+                source source
+                owner node['opennms']['username']
+                group node['opennms']['groupname']
+                mode '664'
+                variables variables
+                source_properties.each do |k, v|
+                  send(k, v)
+                end unless source_properties.nil?
+              end
+            when 'remote_file'
+              remote_file tempfile do
+                sensitive true
+                source source
+                owner node['opennms']['username']
+                group node['opennms']['groupname']
+                mode '664'
+                source_properties.each do |k, v|
+                  send(k, v)
+                end unless source_properties.nil?
+              end
+            end
+            tempfile
+          end
+
+          def eventconf_sources_exist?
+            !node.run_state['opennms']['eventconf_sources'].nil?
+          rescue
+            false
+          end
+
+          def eventconf_sources_create
+            sources = []
+            offset = 0
+            limit = 20
+            total_records = 0
+            begin
+              while sources.empty? || sources.size < total_records
+                resp = RestClient.get("#{restv2url}/eventconf/filter/sources?sortBy=fileOrder&limit=#{limit}&offset=#{offset}", { 'Authorization' => "Basic #{Base64.strict_encode64("admin:#{admin_secret_from_vault('password')}")}" })
+                ro = JSON.parse(resp.body)
+                total_records = ro['totalRecords']
+                s = ro['eventConfSourceList']
+                s.each do |source|
+                  sources << source
+                end
+                offset += limit
+              end
+              node.run_state['opennms']['eventconf_sources'] = sources
+            rescue => e
+              raise "Unable to retrieve eventconf sources from API. Is OpenNMS running? Error #{e}"
+            end
+            rbname = 'set eventconf_sources attributes'
+            begin
+              resources(ruby_block: rbname)
+            rescue
+              r = self
+              with_run_context :root do
+                declare_resource(:ruby_block, rbname) do
+                  block do
+                    r.eventconf_sources_init
+                    node.force_override['opennms']['eventconf_sources'] = node.run_state['opennms']['eventconf_sources']
+                  end
+                  action :nothing
+                  delayed_action :run
+                end
+              end
+            end
+          end
+
+          # node is a Nokogiri::XML node; useful for comparisons
+          def xml_to_hash(node)
+            {
+              name: node.name,
+              attributes: node.attribute_nodes
+                              .sort_by(&:name)
+                              .to_h { |a| [a.name, a.value] },
+              text: node.element_children.empty? ? node.text.strip : nil,
+              children: node.element_children.map { |c| xml_to_hash(c) },
+            }
+          end
+        end
+
         module EventConfTemplate
           def eventconf_resource_init
             eventconf_resource_create unless eventconf_resource_exist?

@@ -25,6 +25,7 @@ branches = node['opennms']['repos']['branches']
 platforms = node['opennms']['repos']['platforms']
 branches.each do |branch|
   platforms.each do |platform|
+    next if platform == 'rhel10' && node['platform_version'].to_i != 10
     skip = false
     if (branch == 'stable' && !node['opennms']['stable']) ||
        ((branch == 'snapshot' || branch == 'obsolete' || branch == 'oldstable') && node['opennms']['stable'])

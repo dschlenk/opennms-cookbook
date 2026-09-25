@@ -61,6 +61,10 @@ platforms:
                 let i+=${wait};
               done;
             '
+  - name: preinstalled-oraclelinux-10
+    driver:
+      image: c1og/opennms-35-oraclelinux-10
+      pid_one_command: /usr/lib/systemd/systemd
   - name: oraclelinux-10
     driver:
       image: 
@@ -97,6 +101,7 @@ suites:
         - path: test/integration/user
     excludes:
       - preinstalled-oraclelinux-9
+      - preinstalled-oraclelinux-10
     attributes:
       opennms:
         rrdtool:
@@ -120,6 +125,7 @@ suites:
         - path: test/integration/kafka
     excludes:
       - preinstalled-oraclelinux-9
+      - preinstalled-oraclelinux-10
     attributes:
       kafka:
         broker:
@@ -171,6 +177,7 @@ suites:
         - 8980:8980/tcp
     excludes:
       - preinstalled-oraclelinux-9
+      - preinstalled-oraclelinux-10
   - name: plugins
     excludes:
       - oraclelinux-9
