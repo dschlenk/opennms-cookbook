@@ -29,11 +29,23 @@ module Opennms
           end
         end
 
-        module EventconfSources
+        module EventconfSourceRubyBlock
           require_relative 'rbac'
           include Opennms::Rbac
-          def eventconf_sources_init
-            eventconf_sources_create unless eventconf_sources_exist?
+
+          def eventconf_source_resource_init(source_name, position)
+            unless eventconf_source_resource_exist?(source_name)
+              eventconf_source_resource_create(source_name, position)
+            end
+          end
+
+          def eventconf_source_resource(source_name)
+            return unless eventconf_source_resource_exist?
+            find_resource!(:ruby_block, block_name(source_name))
+          end
+
+          def eventconf_source_exist?(source_name)
+            !current_source(source_name).nil?
           end
 
           def source_name_from_file(file)
@@ -42,94 +54,7 @@ module Opennms
             name.sub(/\.xml$/, '')
           end
 
-          def content_changed?(id, source_name, source_type, source, source_properties, variables)
-            require 'nokogiri'
-            tempfile = render_content(source_name, source_type, source, source_properties, variables)
-            response = RestClient::Request.execute(
-              method: :get,
-              url: "#{restv2url}/eventconf/sources/#{id}/events/download",
-              user: 'admin',
-              password: admin_secret_from_vault('password')
-            )
-            desired_doc = Nokogiri::XML(File.read(tempfile), &:noblanks)
-            desired_doc.xpath('//comment()').remove
-
-            desired = xml_to_hash(desired_doc.root)
-            current = xml_to_hash(Nokogiri::XML(response.body).root)
-            !desired.eql?(current)
-          end
-
-          def update_content(source_name, source_type, source, source_properties, variables, position)
-            require 'securerandom'
-            require 'rest-client'
-            tempfile = render_content(source_name, source_type, source, source_properties, variables)
-            boundary = "----RubyMultipart#{SecureRandom.hex(16)}"
-            body = ''
-            content = ::File.read(tempfile)
-            body << "--#{boundary}\r\n"
-            body << %(Content-Disposition: form-data; name="upload"; filename="#{File.basename(tempfile)}"\r\n)
-            body << "Content-Type: application/xml\r\n"
-            body << "\r\n"
-            body << content
-            body << "\r\n"
-            if position == 'bottom'
-              body << "--#{boundary}\r\n"
-              body << %(Content-Disposition: form-data; name="upload"; filename=eventconf.xml\r\n)
-              body << "Content-Type: application/xml\r\n"
-              body << "\r\n"
-              body << "<events xmlns=\"http://xmlns.opennms.org/xsd/eventconf\"><event-file>#{File.basename(tempfile).encode(xml: :text)}</event-file></events>"
-              body << "\r\n"
-            end
-            body << "--#{boundary}--\r\n"
-            if position == 'override'
-              Chef::Log.warn("position is override, delaying upload for #{source_name}")
-              r = self
-              with_run_context :root do
-                declare_resource(:ruby_block, "upload #{source_name} delayed") do
-                  block do
-                    Chef::Log.warn("uploading #{source_name}")
-                    r.upload_eventconf(body, boundary, source_name)
-                  end
-                  action :nothing
-                  delayed_action :run
-                end
-              end
-            else
-              upload_eventconf(body, boundary, source_name)
-            end
-          end
-
-          def delete_source(id)
-            response = RestClient::Request.execute(
-              method: :delete,
-              url: "#{restv2url}/eventconf/sources",
-              user: 'admin',
-              password: admin_secret_from_vault('password'),
-              payload: "{ \"sourceIds\": [ #{id} ] }",
-              headers: {
-                content_type: :json,
-                accept: :json,
-              })
-            raise "Unable to delete source with id #{id} via API. Is OpenNMS running?" unless response.code == 200
-          end
-
-          def upload_eventconf(body, boundary, source_name)
-            response = RestClient::Request.execute(
-              method: :post,
-              url: "#{restv2url}/eventconf/upload",
-              user: 'admin',
-              password: admin_secret_from_vault('password'),
-              payload: body,
-              headers: {
-                content_type: "multipart/form-data; boundary=#{boundary}",
-                accept: :json,
-              })
-            raise "Unable to update content via API for eventconf source #{source_name}. Is OpenNMS running?" unless response.code == 200
-          end
-
-          private
-
-          def render_content(source_name, source_type, source, source_properties, variables)
+          def new_definition(source_name, source_type, source, source_properties, variables)
             tempfile = "#{Chef::Config[:file_cache_path]}/#{source_name}.xml"
             case source_type
             when 'cookbook_file'
@@ -167,52 +92,58 @@ module Opennms
                 end unless source_properties.nil?
               end
             end
-            tempfile
+            ::File.read(tempfile)
           end
 
-          def eventconf_sources_exist?
-            !node.run_state['opennms']['eventconf_sources'].nil?
-          rescue
-            false
+          def content_changed?(source_name, desired_content)
+            !xml_to_hash(Nokogiri::XML(node.run_state['opennms']['eventconf_sources'][source_name]['definition']).root).eql?(xml_to_hash(Nokogiri::XML(desired_content).root))
           end
 
-          def eventconf_sources_create
-            sources = []
-            offset = 0
-            limit = 20
-            total_records = 0
-            begin
-              while sources.empty? || sources.size < total_records
-                resp = RestClient.get("#{restv2url}/eventconf/filter/sources?sortBy=fileOrder&limit=#{limit}&offset=#{offset}", { 'Authorization' => "Basic #{Base64.strict_encode64("admin:#{admin_secret_from_vault('password')}")}" })
-                ro = JSON.parse(resp.body)
-                total_records = ro['totalRecords']
-                s = ro['eventConfSourceList']
-                s.each do |source|
-                  sources << source
-                end
-                offset += limit
-              end
-              node.run_state['opennms']['eventconf_sources'] = sources
-            rescue => e
-              raise "Unable to retrieve eventconf sources from API. Is OpenNMS running? Error #{e}"
+          def mark_changed(source_name)
+            edit_resource(:ruby_block, block_name(source_name)) do
+              delayed_action :run
             end
-            rbname = 'set eventconf_sources attributes'
-            begin
-              resources(ruby_block: rbname)
-            rescue
-              r = self
-              with_run_context :root do
-                declare_resource(:ruby_block, rbname) do
-                  block do
-                    r.eventconf_sources_init
-                    node.force_override['opennms']['eventconf_sources'] = node.run_state['opennms']['eventconf_sources']
-                  end
-                  action :nothing
-                  delayed_action :run
+          end
+
+          def delete_source(source_name)
+            source = current_source(source_name)
+            r = self
+            with_run_context :root do
+              declare_resource(:ruby_block, "DELETE #{source_name}") do
+                block do
+                  response = RestClient::Request.execute(
+                    method: :delete,
+                    url: "#{r.restv2url}/eventconf/sources",
+                    user: 'admin',
+                    password: r.admin_secret_from_vault('password'),
+                    payload: "{ \"sourceIds\": [ #{source['id']} ] }",
+                    headers: {
+                      content_type: :json,
+                      accept: :json,
+                    })
+                  raise "Unable to delete source #{source_name} with id #{source['id']} via API. Is OpenNMS running?" unless response.code == 200
                 end
+                action :nothing
+                delayed_action :run
               end
             end
           end
+
+          def upload_eventconf(body, boundary, source_name)
+            response = RestClient::Request.execute(
+              method: :post,
+              url: "#{restv2url}/eventconf/upload",
+              user: 'admin',
+              password: admin_secret_from_vault('password'),
+              payload: body,
+              headers: {
+                content_type: "multipart/form-data; boundary=#{boundary}",
+                accept: :json,
+              })
+            raise "Unable to update content via API for eventconf source #{source_name}. Is OpenNMS running?" unless response.code == 200
+          end
+
+          private
 
           # node is a Nokogiri::XML node; useful for comparisons
           def xml_to_hash(node)
@@ -224,6 +155,112 @@ module Opennms
               text: node.element_children.empty? ? node.text.strip : nil,
               children: node.element_children.map { |c| xml_to_hash(c) },
             }
+          end
+
+          def block_name(source_name)
+            "UPLOAD eventconf source #{source_name}"
+          end
+
+          def eventconf_source_resource_exist?(source_name)
+            !find_resource(:ruby_block, block_name(source_name)).nil?
+          rescue Chef::Exceptions::ResourceNotFound
+            false
+          end
+
+          def current_source(source_name)
+            sources = []
+            offset = 0
+            limit = 20
+            total_records = 0
+            source = nil
+            begin
+              while sources.empty? || sources.size < total_records
+                resp = RestClient.get("#{restv2url}/eventconf/filter/sources?filter=#{source_name}&sortBy=fileOrder&limit=#{limit}&offset=#{offset}", { 'Authorization' => "Basic #{Base64.strict_encode64("admin:#{admin_secret_from_vault('password')}")}" })
+                break if resp.code == 204
+                ro = JSON.parse(resp.body)
+                total_records = ro['totalRecords']
+                sources = ro['eventConfSourceList'].select { |s| s['name'] == source_name }
+                if sources&.one?
+                  source = sources.first
+                  break
+                end
+                offset += limit
+              end
+            rescue => e
+              raise "Unable to retrieve eventconf sources from API. Is OpenNMS running? Error: #{e}"
+            end
+            source
+          end
+
+          def eventconf_source_resource_create(source_name, position)
+            node.run_state['opennms']['eventconf_sources'] = {} if node.run_state['opennms']['eventconf_sources'].nil?
+            node.run_state['opennms']['eventconf_sources'][source_name] = current_source(source_name)
+            if node.run_state['opennms']['eventconf_sources'][source_name].nil?
+              require 'securerandom'
+              require 'rest-client'
+              boundary = "----RubyMultipart#{SecureRandom.hex(16)}"
+              body = ''
+              body << "--#{boundary}\r\n"
+              body << %(Content-Disposition: form-data; name="upload"; filename="#{source_name}.xml"\r\n)
+              body << "Content-Type: application/xml\r\n"
+              body << "\r\n"
+              body << '<events xmlns="http://xmlns.opennms.org/xsd/eventconf"/>'
+              body << "\r\n"
+              if position == 'bottom'
+                body << "--#{boundary}\r\n"
+                body << %(Content-Disposition: form-data; name="upload"; filename=eventconf.xml\r\n)
+                body << "Content-Type: application/xml\r\n"
+                body << "\r\n"
+                body << "<events xmlns=\"http://xmlns.opennms.org/xsd/eventconf\"><event-file>#{source_name.encode(xml: :text)}.xml</event-file></events>"
+                body << "\r\n"
+              end
+              body << "--#{boundary}--\r\n"
+              upload_eventconf(body, boundary, source_name)
+              eventconf_source_resource_create(source_name, position)
+            else
+              begin
+                response = RestClient::Request.execute(
+                  method: :get,
+                  url: "#{restv2url}/eventconf/sources/#{node.run_state['opennms']['eventconf_sources'][source_name]['id']}/events/download",
+                  user: 'admin',
+                  password: admin_secret_from_vault('password')
+                )
+                node.run_state['opennms']['eventconf_sources'][source_name]['definition'] = if response.code == 204
+                                                                                              '<events xmlns="http://xmlns.opennms.org/xsd/eventconf"/>'
+                                                                                            else
+                                                                                              response.body
+                                                                                            end
+              rescue => e
+                # At least as of 36.0.4 if the source exists but has no events, you still get a 404.
+                # I think they did this to work around the fact that technically it's invalid to have an eventconf file without at least one event
+                if "#{e}" == '404 Not Found'
+                  node.run_state['opennms']['eventconf_sources'][source_name]['definition'] = '<events xmlns="http://xmlns.opennms.org/xsd/eventconf"/>'
+                else
+                  raise "Unknown error retrieving source definition: #{e}"
+                end
+              end
+              r = self
+              with_run_context :root do
+                declare_resource(:ruby_block, block_name(source_name)) do
+                  block do
+                    require 'securerandom'
+                    require 'rest-client'
+                    boundary = "----RubyMultipart#{SecureRandom.hex(16)}"
+                    body = ''
+                    body << "--#{boundary}\r\n"
+                    body << %(Content-Disposition: form-data; name="upload"; filename="#{source_name}.xml"\r\n)
+                    body << "Content-Type: application/xml\r\n"
+                    body << "\r\n"
+                    body << node.run_state['opennms']['eventconf_sources'][source_name]['definition']
+                    body << "\r\n"
+                    body << "--#{boundary}--\r\n"
+                    r.upload_eventconf(body, boundary, source_name)
+                  end
+                  action :nothing
+                  delayed_action :nothing # set to :run in resource when create/update
+                end
+              end
+            end
           end
         end
 
@@ -431,13 +468,7 @@ module Opennms
             @entries = []
           end
 
-          def read!(file = 'definitions.events.xml')
-            raise ArgumentError, "File #{file} does not exist" unless ::File.exist?(file)
-
-            f = ::File.new(file, 'r')
-            doc = REXML::Document.new f
-            f.close
-
+          def parse(doc)
             events = doc.elements['events']
             unless events.nil?
               events.each_element('event') do |event|
@@ -472,6 +503,26 @@ module Opennms
             end
           end
 
+          def load!(content)
+            raise ArgumentError, 'Content empty or nil' if content.nil? || content.empty?
+            doc = REXML::Document.new content
+            parse(doc)
+          end
+
+          def read!(file = 'definitions.events.xml')
+            raise ArgumentError, "File #{file} does not exist" unless ::File.exist?(file)
+
+            f = ::File.new(file, 'r')
+            load!(f)
+            f.close
+          end
+
+          def self.load(content)
+            eventfile = new
+            eventfile.load!(content)
+            eventfile
+          end
+
           def self.read(file = 'definitions.events.xml')
             eventfile = new
             eventfile.read!(file)
@@ -480,6 +531,158 @@ module Opennms
 
           def to_s
             @entries.map(&:to_s).join("\n")
+          end
+
+          def to_xml
+            doc = REXML::Document.new
+            root = doc.add_element('events')
+            root.add_namespace('http://xmlns.opennms.org/xsd/eventconf')
+            @entries.each do |e|
+              event = root.add_element('event')
+              if !e.mask.nil? && e.mask.is_a?(Array)
+                mask = event.add_element('mask')
+                e.mask.each do |m|
+                  if !m['mename'].nil?
+                    maskelement = mask.add_element('maskelement')
+                    maskelement.add_element('mename').add_text(m['mename'])
+                    m['mevalue'].each do |mv|
+                      maskelement.add_element('mevalue').add_text(mv)
+                    end
+                  else
+                    varbind = mask.add_element('varbind')
+                    varbind.add_element('vbnumber').add_text(m['vbnumber'])
+                    m['vbvalue'].each do |vv|
+                      varbind.add_element('vbvalue').add_text(vv)
+                    end
+                  end
+                end
+              end
+              unless e.uei.nil?
+                uei = event.add_element('uei')
+                uei.add_text(e.uei)
+              end
+              unless e.priority.nil?
+                priority = event.add_element('priority')
+                priority.add_text(e.priority.to_s)
+              end
+              el = event.add_element('event-label')
+              el.add_text(e.event_label)
+              descr = event.add_element('descr')
+              descr.add_text(e.descr)
+              lm = event.add_element('logmsg')
+              lm.attributes['notify'] = e.logmsg_notify unless e.logmsg_notify.nil?
+              lm.attributes['dest'] = e.logmsg_dest
+              lm.add_text(e.logmsg)
+              e.collection_group.each do |cgroup|
+                cg = event.add_element('collectionGroup')
+                cg.attributes['name'] = cgroup['name']
+                cg.attributes['resourceType'] = cgroup['resource_type'] unless cgroup['resource_type'].nil?
+                cg.attributes['instance'] = cgroup['instance'] unless cgroup['instance'].nil?
+                rrd = cg.add_element('rrd')
+                rrd.attributes['step'] = cgroup['rrd']['step']
+                rrd.attributes['heartBeat'] = cgroup['rrd']['heartbeat'] unless cgroup['rrd']['heartbeat'].nil?
+                cgroup['rrd']['rra'].each do |a|
+                  rra = rrd.add_element('rra')
+                  rra.add_text(a)
+                end
+                cgroup['collections'].each do |c|
+                  collection = cg.add_element('collection')
+                  collection.attributes['name'] = c['name']
+                  collection.attributes['rename'] = c['rename'] unless c['rename'].nil?
+                  collection.attributes['type'] = c['type'] unless c['type'].nil?
+                  c['param_values'].each do |pvkey, pvvalue|
+                    param_value = collection.add_element('paramValue')
+                    param_value.attributes['key'] = pvkey
+                    param_value.attributes['value'] = pvvalue
+                  end unless c['param_values'].nil?
+                end unless cgroup['collections'].nil?
+              end unless e.collection_group.nil?
+              event.add_element('severity').add_text(e.severity)
+              event.add_element('operinstruct').add_text(e.operinstruct) unless e.operinstruct.nil?
+              e.autoaction.each do |aa|
+                aaction = event.add_element('autoaction')
+                aaction.attributes['state'] = aa['state'] unless aa['state'].nil?
+                aaction.add_text(aa['action'])
+              end unless e.autoaction.nil?
+              e.varbindsdecode.each do |vbd|
+                varbindsdecode = event.add_element('varbindsdecode')
+                varbindsdecode.add_element('parmid').add_text(vbd['parmid'])
+                vbd['decode'].each do |d|
+                  decode = varbindsdecode.add_element('decode')
+                  decode.attributes['varbindvalue'] = d['varbindvalue']
+                  decode.attributes['varbinddecodedstring'] = d['varbinddecodedstring']
+                end
+              end unless e.varbindsdecode.nil?
+              e.parameters.each do |p|
+                parameter = event.add_element('parameter')
+                parameter.attributes['name'] = p['name']
+                parameter.attributes['value'] = p['value']
+                parameter.attributes['expand'] = p['expand'] unless p['expand'].nil?
+              end unless e.parameters.nil?
+              e.operaction.each do |oa|
+                operaction = event.add_element('operaction')
+                operaction.attributes['state'] = oa['state'] unless oa['state'].nil?
+                operaction.attributes['menutext'] = oa['menutext']
+                operaction.add_text(oa['action'])
+              end unless e.operaction.nil?
+              unless e.autoacknowledge.nil?
+                autoack = event.add_element('autoacknowledge')
+                autoack.attributes['state'] = e.autoacknowledge['state'] unless e.autoacknowledge['state'].nil?
+                autoack.add_text(e.autoacknowledge['info'])
+              end
+              event.add_element('loggroup').add_text(e.loggroup) unless e.loggroup.nil? || e.loggroup.empty?
+              unless e.tticket.nil?
+                tticket = event.add_element('tticket')
+                tticket.attributes['state'] = e.tticket['state'] unless e.tticket['state'].nil?
+                tticket.add_text(e.tticket['info'])
+              end
+              e.forward.each do |f|
+                forward = event.add_element('forward')
+                forward.attributes['state'] = f['state'] unless f['state'].nil?
+                forward.attributes['mechanism'] = f['mechanism'] unless f['mechanism'].nil?
+                forward.add_text(f['info'])
+              end unless e.forward.nil?
+              e.script.each do |s|
+                script = event.add_element('script')
+                script.attributes['language'] = s['language']
+                script.add_text(s['name'])
+              end unless e.script.nil?
+              unless e.mouseovertext.nil?
+                event.add_element('mouseovertext').add_text(e.mouseovertext)
+              end
+              unless e.alarm_data.nil?
+                alarm_data = event.add_element('alarm-data')
+                alarm_data.attributes['reduction-key'] = e.alarm_data['reduction_key']
+                alarm_data.attributes['alarm-type'] = e.alarm_data['alarm_type']
+                alarm_data.attributes['clear-key'] = e.alarm_data['clear_key'] unless e.alarm_data['clear_key'].nil?
+                alarm_data.attributes['auto-clean'] = e.alarm_data['auto_clean'] unless e.alarm_data['auto_clean'].nil?
+                alarm_data.attributes['x733-alarm-type'] = e.alarm_data['x733_alarm_type'] unless e.alarm_data['x733_alarm_type'].nil?
+                alarm_data.attributes['x733-probable-cause'] = e.alarm_data['x733_probable_cause'] unless e.alarm_data['x733_probable_cause'].nil?
+                e.alarm_data['update_fields'].each do |uf|
+                  update_field = alarm_data.add_element('update-field')
+                  update_field.attributes['field-name'] = uf['field_name']
+                  update_field.attributes['update-on-reduction'] = uf['update_on_reduction'] unless uf['update_on_reduction'].nil?
+                  update_field.attriubtes['value-expression'] = uf['value_expression'] unless uf['value_expression'].nil?
+                end unless e.alarm_data['update_fields'].nil?
+                unless e.alarm_data['managed_object_type'].nil?
+                  alarm_data.add_element('managed-object').attributes['type'] = e.alarm_data['managed_object_type']
+                end
+              end
+              next unless !e.filters.nil? && !e.filters.empty?
+              filters = event.add_element('filters')
+              e.filters.each do |f|
+                filter = filters.add_element('filter')
+                filter.attributes['eventparm'] = f['eventparm']
+                filter.attributes['pattern'] = f['pattern']
+                filter.attributes['replacement'] = f['replacement']
+              end
+            end
+            xml = ''
+            formatter = REXML::Formatters::Pretty.new(2)
+            formatter.compact = true
+            formatter.width = 100_000
+            formatter.write(doc, xml)
+            xml
           end
 
           def add(entry, position)

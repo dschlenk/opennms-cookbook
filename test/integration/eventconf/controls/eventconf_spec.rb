@@ -4,7 +4,7 @@ control 'bogus-events.xml from file' do
   describe eventconf('bogus-events.xml') do
     it { should exist }
     # 20+ is position 3
-    its('position') { should be == 0 }
+    its('position') { should be == 30 } # since 35, position here means fileOrder of the source (higher has more priority)
     its('events') { should eq XmlHelpers.xml_to_hash(Nokogiri::XML(File.read('test/fixtures/cookbooks/opennms_resource_tests/files/default/bogus-events.xml')).root) }
   end
 end
@@ -12,7 +12,7 @@ end
 control 'tripp-lite.events from github' do
   describe eventconf('tripp-lite.events.xml') do
     it { should exist }
-    its('position') { should be <= 27 }
+    its('position') { should be == 32 }
     its('events') { should eq XmlHelpers.xml_to_hash(Nokogiri::XML(inspec.http('https://raw.githubusercontent.com/opennms-config-modules/tripp-lite/9da2da993a19efd237321491307b4b4fa515ac18/events/tripp-lite.events.xml').body).root) }
   end
 end
@@ -26,7 +26,7 @@ end
 control 'bogus-events3 from file' do
   describe eventconf('bogus-events3.xml') do
     it { should exist }
-    its('position') { should be == 2 }
+    its('position') { should be == 31 }
   end
 end
 

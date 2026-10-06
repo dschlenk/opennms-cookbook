@@ -25,7 +25,6 @@ EOL
 
   def initialize(file_name)
     resp = inspec.http('http://localhost:8980/opennms/api/v2/eventconf/filter/sources?sortBy=name&limit=1&offset=0', auth: { user: 'admin', pass: 'admin' })
-    overall_total_records = JSON.parse(resp.body)['totalRecords']
     source_name = file_name.sub(%r{^events/}, '').sub(/\.xml$/, '')
     match = nil
     sources = []
@@ -59,7 +58,7 @@ EOL
       if resp.status == 200
         @contents = resp.body
       end
-      @position = overall_total_records - match['fileOrder']
+      @position = match['fileOrder']
     end
   end
 

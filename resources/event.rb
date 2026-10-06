@@ -153,32 +153,19 @@ property :position, String, equal_to: %w(top bottom), default: 'bottom', desired
 property :eventconf_position, String, equal_to: %w(override top bottom), default: 'bottom', desired_state: false
 
 action_class do
-  include Opennms::Cookbook::ConfigHelpers::Event::EventConfTemplate
-  include Opennms::Cookbook::ConfigHelpers::Event::EventTemplate
+  include Opennms::Cookbook::ConfigHelpers::Event::EventconfSourceRubyBlock
 end
 
-include Opennms::Cookbook::ConfigHelpers::Event::EventTemplate
-include Opennms::Cookbook::ConfigHelpers::Event::EventConfTemplate
+include Opennms::Cookbook::ConfigHelpers::Event::EventconfSourceRubyBlock
 load_current_value do |new_resource|
-  r = eventfile_resource(new_resource.file)
-  if r.nil?
-    # first we see if we exist
-    current_value_does_not_exist! unless ::File.exist?("#{node['opennms']['conf']['home']}/etc/#{new_resource.file}")
-    ro_eventfile_resource_init(new_resource.file)
-    r = ro_eventfile_resource(new_resource.file)
-  end
-  eventfile = r.variables[:eventfile] unless r.nil?
-  current_value_does_not_exist! if eventfile.nil?
+  resources(service: 'opennms').run_action(:start) unless shell_out('systemctl is-active --quiet opennms').exitstatus == 0
+  source_name = source_name_from_file(new_resource.file)
+  current_value_does_not_exist! unless eventconf_source_exist?(source_name)
+  eventconf_source_resource_init(source_name, new_resource.eventconf_position)
+  eventfile = Opennms::Cookbook::ConfigHelpers::Event::EventDefinitionFile.new
+  eventfile.load!(node.run_state['opennms']['eventconf_sources'][source_name]['definition'])
   event = eventfile.entry(new_resource.uei, new_resource.mask)
-  eventconf = eventconf_resource.variables[:eventconf] unless eventconf_resource.nil?
-  if eventconf.nil?
-    ro_eventconf_resource_init
-    eventconf = ro_eventconf_resource.variables[:eventconf]
-  end
   current_value_does_not_exist! if event.nil?
-  if !node['opennms']['opennms_event_files'].include?(new_resource.file[7..-1]) && !node['opennms']['vendor_event_files'].include?(new_resource.file[7..-1])
-    current_value_does_not_exist! if eventconf.event_files[new_resource.file[7..-1]].nil?
-  end
   # Okay, we do exist. let's load up the current values
   %i(priority event_label descr logmsg logmsg_dest logmsg_notify collection_group severity operinstruct autoaction varbindsdecode parameters operaction autoacknowledge loggroup tticket forward script mouseovertext alarm_data filters).each do |p|
     send(p, event.send(p))
@@ -188,20 +175,25 @@ end
 
 action :create do
   converge_if_changed do
-    eventfile_resource_init(new_resource.file)
-    entry = eventfile_resource(new_resource.file).variables[:eventfile].entry(new_resource.uei, new_resource.mask)
+    source_name = source_name_from_file(new_resource.file)
+    if node.run_state['opennms']['eventconf_sources'].nil? || node.run_state['opennms']['eventconf_sources'][source_name].nil?
+      eventconf_source_resource_init(source_name, new_resource.eventconf_position)
+    end
+    eventfile = Opennms::Cookbook::ConfigHelpers::Event::EventDefinitionFile.new
+    eventfile.load!(node.run_state['opennms']['eventconf_sources'][source_name]['definition'])
+    entry = eventfile.entry(new_resource.uei, new_resource.mask)
     if entry.nil?
       raise Chef::Exceptions::ValidationFailed, 'event_label is a required property for action :create when not updating' if new_resource.event_label.nil?
       raise Chef::Exceptions::ValidationFailed, 'descr is a required property for action :create when not updating' if new_resource.descr.nil?
       raise Chef::Exceptions::ValidationFailed, 'logmsg is a required property for action :create when not updating' if new_resource.logmsg.nil?
       raise Chef::Exceptions::ValidationFailed, 'severity is a required property for action :create when not updating' if new_resource.severity.nil?
 
-      eventconf_resource_init
-      eventconf_resource.variables[:eventconf].event_files[new_resource.file[7..-1]] = { position: new_resource.eventconf_position }
       resource_properties = %i(uei mask priority event_label descr logmsg logmsg_dest logmsg_notify collection_group severity operinstruct autoaction varbindsdecode parameters operaction autoacknowledge loggroup tticket forward script mouseovertext alarm_data filters).map { |p| [p, new_resource.send(p)] }.to_h.compact
       resource_properties[:logmsg_dest] = 'logndisplay' if new_resource.logmsg_dest.nil?
       entry = Opennms::Cookbook::ConfigHelpers::Event::EventDefinition.create(**resource_properties)
-      eventfile_resource(new_resource.file).variables[:eventfile].add(entry, new_resource.position)
+      eventfile.add(entry, new_resource.position)
+      node.run_state['opennms']['eventconf_sources'][source_name]['definition'] = eventfile.to_xml
+      mark_changed(source_name)
     else
       run_action(:update)
     end
@@ -209,16 +201,27 @@ action :create do
 end
 
 action :create_if_missing do
-  eventfile_resource_init(new_resource.file)
-  entry = eventfile_resource(new_resource.file).variables[:eventfile].entry(new_resource.uei || new_resource.name, new_resource.mask)
-  run_action(:create) if entry.nil?
+  resources(service: 'opennms').run_action(:start) unless shell_out('systemctl is-active --quiet opennms').exitstatus == 0
+  source_name = source_name_from_file(new_resource.file)
+  if !eventconf_source_exist?(source_name)
+    run_action(:create)
+  else
+    eventconf_source_resource_init(source_name, new_resource.eventconf_position)
+    eventfile = Opennms::Cookbook::ConfigHelpers::Event::EventDefinitionFile.new
+    eventfile.load!(node.run_state['opennms']['eventconf_sources'][source_name]['definition'])
+    event = eventfile.entry(new_resource.uei, new_resource.mask)
+    run_action(:create) if event.nil?
+  end
 end
 
 action :update do
   converge_if_changed(:priority, :event_label, :descr, :logmsg, :logmsg_dest, :logmsg_notify, :collection_group, :severity, :operinstruct, :autoaction, :varbindsdecode, :parameters, :operaction, :autoacknowledge, :loggroup, :tticket, :forward, :script, :mouseovertext, :alarm_data, :filters) do
-    eventfile_resource_init(new_resource.file)
-    entry = eventfile_resource(new_resource.file).variables[:eventfile].entry(new_resource.uei, new_resource.mask)
-    raise Chef::Exceptions::CurrentValueDoesNotExist, "Cannot update event definition for '#{new_resource.name}' as it does not exist" if entry.nil?
+    source_name = source_name_from_file(new_resource.file)
+    raise Chef::Exceptions::CurrentValueDoesNotExist, 'action :update called for non-existent eventconf source' unless eventconf_source_exist?(source_name)
+    eventfile = Opennms::Cookbook::ConfigHelpers::Event::EventDefinitionFile.new
+    eventfile.load!(node.run_state['opennms']['eventconf_sources'][source_name]['definition'])
+    entry = eventfile.entry(new_resource.uei, new_resource.mask)
+    raise Chef::Exceptions::CurrentValueDoesNotExist, "cannot update event definition for '#{new_resource.name}' as it does not exist" if entry.nil?
     entry.update(priority: new_resource.priority,
                  event_label: new_resource.event_label,
                  descr: new_resource.descr,
@@ -241,23 +244,23 @@ action :update do
                  alarm_data: new_resource.alarm_data,
                  filters: new_resource.filters
                 )
+    node.run_state['opennms']['eventconf_sources'][source_name]['definition'] = eventfile.to_xml
+    mark_changed(source_name)
   end
 end
 
 action :delete do
-  # remove this event from file and if no more events delete the file, remove it from eventconf
-  eventfile_resource_init(new_resource.file)
-  entry = eventfile_resource(new_resource.file).variables[:eventfile].entry(new_resource.uei, new_resource.mask)
-  unless entry.nil?
-    eventfile_resource(new_resource.file).variables[:eventfile].remove(entry)
-    if eventfile_resource(new_resource.file).variables[:eventfile].entries.empty?
-      eventconf_resource_init
-      eventconf_resource.variables[:eventconf].event_files.delete(new_resource.file[7..-1])
-      file "#{node['opennms']['conf']['home']}/etc/#{new_resource.file}" do
-        action :nothing
-        delayed_action :delete
-        notifies :create, "template[#{node['opennms']['conf']['home']}/etc/eventconf.xml]", :immediately
-      end
+  resources(service: 'opennms').run_action(:start) unless shell_out('systemctl is-active --quiet opennms').exitstatus == 0
+  source_name = source_name_from_file(new_resource.file)
+  if eventconf_source_exist?(source_name)
+    eventconf_source_resource_init(source_name, new_resource.eventconf_position)
+    eventfile = Opennms::Cookbook::ConfigHelpers::Event::EventDefinitionFile.new
+    eventfile.load!(node.run_state['opennms']['eventconf_sources'][source_name]['definition'])
+    event = eventfile.entry(new_resource.uei, new_resource.mask)
+    unless event.nil?
+      eventfile.remove(event)
+      node.run_state['opennms']['eventconf_sources'][source_name]['definition'] = eventfile.to_xml
+      mark_changed(source_name)
     end
   end
 end

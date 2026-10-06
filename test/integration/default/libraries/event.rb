@@ -1,5 +1,9 @@
-require 'rexml/document'
+require 'nokogiri'
+require 'xml_helpers'
+
 class Event < Inspec.resource(1)
+  include XmlHelpers
+
   name 'event'
 
   desc '
@@ -30,38 +34,74 @@ class Event < Inspec.resource(1)
   '
 
   def initialize(uei, file, mask = nil)
-    doc = REXML::Document.new(inspec.file("/opt/opennms/etc/#{file}").content, ignore_whitespace_nodes: ['events'])
-    e_el = doc.elements[event_xpath(uei, mask)]
-    @exists = !e_el.nil?
-    @params = {}
-    if @exists
-      @params[:position] = e_el.parent.index(e_el)
-      @params[:event_label] = e_el.elements['event-label'].texts.collect(&:value).join("\n")
-      @params[:descr] = e_el.elements['descr'].texts.collect(&:value).join("\n")
-      @params[:logmsg] = e_el.elements['logmsg'].texts.collect(&:value).join("\n")
-      @params[:logmsg_dest] = e_el.elements['logmsg/@dest'].value unless e_el.elements['logmsg/@dest'].nil?
-      truthy = e_el.elements['logmsg/@notify'].value unless e_el.elements['logmsg/@notify'].nil?
-      unless truthy.nil?
-        if truthy == 'true'
-          @params[:logmsg_notify] = true
-        elsif truthy == 'false'
-          @params[:logmsg_notify] = false
+    resp = inspec.http('http://localhost:8980/opennms/api/v2/eventconf/filter/sources?sortBy=name&limit=1&offset=0', auth: { user: 'admin', pass: 'admin' })
+    source_name = file.sub(%r{^events/}, '').sub(/\.xml$/, '')
+    file_match = nil
+    sources = []
+    offset = 0
+    limit = 20
+    total_records = 1
+    begin
+      while file_match.nil? && sources.size < total_records
+        resp = inspec.http("http://localhost:8980/opennms/api/v2/eventconf/filter/sources?sortBy=name&filter=#{source_name}&limit=#{limit}&offset=#{offset}", auth: { user: 'admin', pass: 'admin' })
+        if resp.status == 204 # none found
+          break
+        end
+        ro = JSON.parse(resp.body)
+        total_records = ro['totalRecords']
+        s = ro['eventConfSourceList']
+        s.each do |source|
+          sources << source
+          if source['name'] == source_name
+            file_match = source
+            break
+          end
+        end
+        offset += limit
+      end
+    rescue => e
+      raise "Unable to retrieve eventconf sources from API. Is OpenNMS running? Error #{e}"
+    end
+    fileexists = !file_match.nil?
+    if fileexists
+      resp = inspec.http("http://localhost:8980/opennms/api/v2/eventconf/sources/#{file_match['id']}/events/download", auth: { user: 'admin', pass: 'admin' })
+      if resp.status == 200
+        file_contents = resp.body
+        @params = {}
+        @params[:file_position] = file_match['fileOrder']
+        doc = REXML::Document.new(file_contents, ignore_whitespace_nodes: ['events'])
+        e_el = doc.elements[event_xpath(uei, mask)]
+        @exists = !e_el.nil?
+        if @exists
+          @params[:position] = e_el.parent.index(e_el)
+          @params[:event_label] = e_el.elements['event-label'].texts.collect(&:value).join("\n")
+          @params[:descr] = e_el.elements['descr'].texts.collect(&:value).join("\n")
+          @params[:logmsg] = e_el.elements['logmsg'].texts.collect(&:value).join("\n")
+          @params[:logmsg_dest] = e_el.elements['logmsg/@dest'].value unless e_el.elements['logmsg/@dest'].nil?
+          truthy = e_el.elements['logmsg/@notify'].value unless e_el.elements['logmsg/@notify'].nil?
+          unless truthy.nil?
+            if truthy == 'true'
+              @params[:logmsg_notify] = true
+            elsif truthy == 'false'
+              @params[:logmsg_notify] = false
+            end
+          end
+          @params[:severity] = e_el.elements['severity'].text.to_s
+          @params[:operinstruct] = e_el.elements['operinstruct'].texts.collect(&:value).join("\n") unless e_el.elements['operinstruct'].nil?
+          @params[:autoaction] = autoactions(e_el)
+          @params[:varbindsdecode] = varbindsdecodes(e_el)
+          @params[:parameters] = get_parameters(e_el)
+          @params[:tticket] = get_tticket(e_el)
+          @params[:forward] = forwards(e_el)
+          @params[:script] = scripts(e_el)
+          @params[:mouseovertext] = e_el.elements['mouseovertext'].texts.collect(&:value).join("\n") unless e_el.elements['mouseovertext'].nil?
+          @params[:alarm_data] = get_alarm_data(e_el)
+          @params[:collection_group] = collection_groups(e_el)
+          @params[:operaction] = operactions(e_el)
+          @params[:autoacknowledge] = infohash(e_el, 'autoacknowledge')
+          @params[:event_filters] = filters(e_el)
         end
       end
-      @params[:severity] = e_el.elements['severity'].text.to_s
-      @params[:operinstruct] = e_el.elements['operinstruct'].texts.collect(&:value).join("\n") unless e_el.elements['operinstruct'].nil?
-      @params[:autoaction] = autoactions(e_el)
-      @params[:varbindsdecode] = varbindsdecodes(e_el)
-      @params[:parameters] = get_parameters(e_el)
-      @params[:tticket] = get_tticket(e_el)
-      @params[:forward] = forwards(e_el)
-      @params[:script] = scripts(e_el)
-      @params[:mouseovertext] = e_el.elements['mouseovertext'].texts.collect(&:value).join("\n") unless e_el.elements['mouseovertext'].nil?
-      @params[:alarm_data] = get_alarm_data(e_el)
-      @params[:collection_group] = collection_groups(e_el)
-      @params[:operaction] = operactions(e_el)
-      @params[:autoacknowledge] = infohash(e_el, 'autoacknowledge')
-      @params[:event_filters] = filters(e_el)
     end
   end
 
