@@ -18,7 +18,7 @@ class Policy < Inspec.resource(1)
   '
 
   def initialize(name, foreign_source)
-    doc = REXML::Document.new(inspec.http("http://localhost:8980/opennms/rest/foreighSources/#{foreign_source}", auth: { user: 'admin', pass: 'admin' }).body)
+    doc = REXML::Document.new(inspec.http("http://localhost:8980/opennms/rest/foreignSources/#{foreign_source}", auth: { user: 'admin', pass: 'admin' }).body)
     p_el = doc.elements["/foreign-source[@name = '#{foreign_source}']/policies/policy[@name = '#{name}']"]
     @exists = !p_el.nil?
     if @exists

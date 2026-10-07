@@ -19,27 +19,31 @@ class OpennmsUser < Inspec.resource(1)
   '
 
   def initialize(name, auth = 'admin:admin')
-    doc = REXML::Document.new(inspec.http("http://localhost:8980/opennms/rest/users/#{name}", auth: { user: (auth.split(':')[0] || 'admin'), pass: auth.split(':')[1] || 'admin' }).body)
-    u_el = doc.elements['/user']
-    @exists = !u_el.nil?
-    return unless @exists
-    @params = {}
-    @params[:full_name] = u_el.elements['full-name'].texts.collect(&:value).join('') unless u_el.elements['full-name'].nil?
-    @params[:email] = u_el.elements['email'].texts.collect(&:value).join('') unless u_el.elements['email'].nil?
-    @params[:user_comments] = u_el.elements['user-comments'].texts.collect(&:value).join('') unless u_el.elements['user-comments'].nil?
-    @params[:password] = u_el.elements['password'].texts.collect(&:value).join('') unless u_el.elements['password'].nil?
-    @params[:password_salt] = false
-    @params[:password_salt] = true unless u_el.elements['passwordSalt'].nil? || !(u_el.elements['passwordSalt'].texts.collect(&:value).join('') == 'true')
-    roles = []
-    u_el.elements.each('role') do |r_el|
-      roles.push r_el.texts[0].value
+    begin
+      doc = REXML::Document.new(inspec.http("http://localhost:8980/opennms/rest/users/#{name}", auth: { user: (auth.split(':')[0] || 'admin'), pass: auth.split(':')[1] || 'admin' }).body)
+      u_el = doc.elements['/user']
+      @exists = !u_el.nil?
+      return unless @exists
+      @params = {}
+      @params[:full_name] = u_el.elements['full-name'].texts.collect(&:value).join('') unless u_el.elements['full-name'].nil?
+      @params[:email] = u_el.elements['email'].texts.collect(&:value).join('') unless u_el.elements['email'].nil?
+      @params[:user_comments] = u_el.elements['user-comments'].texts.collect(&:value).join('') unless u_el.elements['user-comments'].nil?
+      @params[:password] = u_el.elements['password'].texts.collect(&:value).join('') unless u_el.elements['password'].nil?
+      @params[:password_salt] = false
+      @params[:password_salt] = true unless u_el.elements['passwordSalt'].nil? || !(u_el.elements['passwordSalt'].texts.collect(&:value).join('') == 'true')
+      roles = []
+      u_el.elements.each('role') do |r_el|
+        roles.push r_el.texts[0].value
+      end
+      @params[:roles] = roles
+      ds = []
+      u_el.elements.each('duty-schedule') do |ds_el|
+        ds.push ds_el.texts[0].value
+      end
+      @params[:duty_schedules] = ds
+    rescue
+      @exists = false
     end
-    @params[:roles] = roles
-    ds = []
-    u_el.elements.each('duty-schedule') do |ds_el|
-      ds.push ds_el.texts[0].value
-    end
-    @params[:duty_schedules] = ds
   end
 
   def exist?
