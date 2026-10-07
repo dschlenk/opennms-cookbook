@@ -886,9 +886,6 @@ suites:
       - oraclelinux-9
       - oraclelinux-10
       - preinstalled-34-oraclelinux-9
-    driver:
-      ports:
-        - 1237:8980/tcp
     provisioner:
       policyfile: policyfiles/foreign_source.rb
     verifier:
