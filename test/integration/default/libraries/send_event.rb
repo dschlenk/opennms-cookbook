@@ -16,16 +16,8 @@ class SendEvent < Inspec.resource(1)
     end
   '
 
-  def initialize(uei, port = 8980)
-    parsed_url = Addressable::URI.parse("http://admin:admin@localhost:#{port}/opennms/rest/events?eventUei=#{uei}&orderBy=id&order=desc&limit=1").normalize.to_str
-    begin
-      e = RestClient.get(parsed_url)
-    rescue StandardError => ee
-      puts ee
-      @exists = false
-      return
-    end
-    doc = REXML::Document.new(e)
+  def initialize(uei)
+    doc = REXML::Document.new(inspec.http("http://localhost:8980/opennms/rest/events?eventUei=#{uei}&orderBy=id&order=desc&limit=1", auth: { user: 'admin', pass: 'admin' }).body)
     s_el = doc.elements['/events/event']
     @exists = !s_el.nil?
     if @exists

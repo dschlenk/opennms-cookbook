@@ -9,7 +9,7 @@ class OpennmsUser < Inspec.resource(1)
   '
 
   example '
-    describe opennms_user(\'jimmy\', 1234) do
+    describe opennms_user(\'jimmy\') do
       it { should exist }
       its(\'full_name\') { should eq \'Jimmy John\' }
       its(\'user_comments\') { should eq \'Sandwiches\' }
@@ -18,15 +18,8 @@ class OpennmsUser < Inspec.resource(1)
     end
   '
 
-  def initialize(name, port = 8980, auth = 'admin:admin')
-    parsed_url = Addressable::URI.parse("http://#{auth}@localhost:#{port}/opennms/rest/users/#{name}").normalize.to_str
-    begin
-      req = RestClient.get(parsed_url)
-    rescue StandardError
-      @exists = false
-      return
-    end
-    doc = REXML::Document.new(req)
+  def initialize(name, auth = 'admin:admin')
+    doc = REXML::Document.new(inspec.http("http://localhost:8980/opennms/rest/users/#{name}", auth: { user: (auth.split(':')[0] || 'admin'), pass: auth.split(':')[1] || 'admin' }).body)
     u_el = doc.elements['/user']
     @exists = !u_el.nil?
     return unless @exists

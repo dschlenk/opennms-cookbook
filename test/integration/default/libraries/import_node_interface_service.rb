@@ -10,22 +10,15 @@ class ImportNodeInterfaceService < Inspec.resource(1)
   '
 
   example '
-    describe import_node_interface_service(\'service\', \'ip_addr\', \'foreign_source_name\', \'foreign_id\', 1243) do
+    describe import_node_interface_service(\'service\', \'ip_addr\', \'foreign_source_name\', \'foreign_id\') do
       it { should exist }
       its(\'categories\') { should eq %w(Servers Test) }
       its(\'meta_data\') { should eq([{ \'context\' => \'foo\', \'key\' => \'bar\', \'value\' => \'baz\'}, { \'context\' => \'foofoo\', \'key\' => \'barbar\', \'value\' => \'bazbaz\' }])}
     end
   '
 
-  def initialize(service, ip_addr, foreign_source_name, foreign_id, port = 8980)
-    parsed_url = Addressable::URI.parse("http://admin:admin@localhost:#{port}/opennms/rest/requisitions/#{foreign_source_name}/nodes/#{foreign_id}/interfaces/#{ip_addr}/services/#{service}").normalize.to_str
-    begin
-      service = RestClient.get(parsed_url)
-    rescue StandardError
-      @exists = false
-      return
-    end
-    doc = REXML::Document.new(service)
+  def initialize(service, ip_addr, foreign_source_name, foreign_id)
+    doc = REXML::Document.new(inspec.http("http://localhost:8980/opennms/rest/requisitions/#{foreign_source_name}/nodes/#{foreign_id}/interfaces/#{ip_addr}/services/#{service}", auth: { user: 'admin', pass: 'admin' }).body)
     s_el = doc.elements['/monitored-service']
     @exists = !s_el.nil?
     if @exists

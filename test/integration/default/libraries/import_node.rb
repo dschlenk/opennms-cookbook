@@ -10,7 +10,7 @@ class ImportNode < Inspec.resource(1)
   '
 
   example '
-    describe import_node(\'foreign_id\', \'foreign_source_name\', 1241) do
+    describe import_node(\'foreign_id\', \'foreign_source_name\') do
       it { should exist }
       its(\'node_label\') { should eq \'nodeA\' }
       its(\'parent_foreign_source\') { should eq \'foreign_source_name\' }
@@ -24,16 +24,8 @@ class ImportNode < Inspec.resource(1)
     end
   '
 
-  def initialize(id, foreign_source_name, port = 8980)
-    parsed_url = Addressable::URI.parse("http://admin:admin@localhost:#{port}/opennms/rest/requisitions/#{foreign_source_name}/nodes/#{id}").normalize.to_str
-    begin
-      node = RestClient.get(parsed_url)
-    rescue StandardError
-      puts "node #{id} in #{foreign_source_name} not found"
-      @exists = false
-      return
-    end
-    doc = REXML::Document.new(node)
+  def initialize(id, foreign_source_name)
+    doc = REXML::Document.new(inspec.http("http://localhost:8980/opennms/rest/requisitions/#{foreign_source_name}/nodes/#{id}", auth: { user: 'admin', pass: 'admin' }).body)
     n_el = doc.elements["/node[@foreign-id = '#{id}']"]
     @exists = !n_el.nil?
     if @exists

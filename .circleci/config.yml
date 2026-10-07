@@ -21,7 +21,7 @@ jobs:
   integration:
     machine:
       image: ubuntu-2404:current
-    parallelism: 30
+    parallelism: 40
     steps:
       - checkout
       - run:

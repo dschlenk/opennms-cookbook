@@ -10,17 +10,15 @@ class Policy < Inspec.resource(1)
   '
 
   example '
-    describe policy(\'name\', \'foreign_source\', 1239) do
+    describe policy(\'name\', \'foreign_source\') do
       it { should exist }
       its(\'class_name\') { should eq \'org.opennms.netmgt.provision.persist.policies.NodeCategorySettingPolicy\' }
       its(\'parameters\') { should eq \'category\' => \'Test\', \'matchBehavior\' => \'ALL_PARAMETERS\' }
     end
   '
 
-  def initialize(name, foreign_source, port = 8980)
-    parsed_url = Addressable::URI.parse("http://admin:admin@localhost:#{port}/opennms/rest/foreignSources/#{foreign_source}").normalize.to_str
-    fs = RestClient.get(parsed_url)
-    doc = REXML::Document.new(fs)
+  def initialize(name, foreign_source)
+    doc = REXML::Document.new(inspec.http("http://localhost:8980/opennms/rest/foreighSources/#{foreign_source}", auth: { user: 'admin', pass: 'admin' }).body)
     p_el = doc.elements["/foreign-source[@name = '#{foreign_source}']/policies/policy[@name = '#{name}']"]
     @exists = !p_el.nil?
     if @exists

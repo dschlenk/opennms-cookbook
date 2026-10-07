@@ -1,5 +1,5 @@
 control 'user_mod' do
-  describe opennms_user('jimmy', 1235) do
+  describe opennms_user('jimmy') do
     it { should exist }
     its('full_name') { should eq 'Jimmy Jam' }
     its('user_comments') { should eq 'The Time' }
@@ -13,7 +13,7 @@ control 'user_mod' do
     its('status') { should cmp 200 }
   end
 
-  describe opennms_user('johnny', 1235) do
+  describe opennms_user('johnny') do
     it { should_not exist }
   end
 end
