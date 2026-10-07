@@ -121,9 +121,6 @@ suites:
   - name: kafka
     provisioner:
       policyfile: policyfiles/kafka.rb
-    driver:
-      ports:
-        - 1250:8980/tcp
     verifier:
       inspec_tests:
         - path: test/integration/default
