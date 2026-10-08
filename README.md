@@ -13,8 +13,8 @@ The balance of the version follows semantic versioning - minor version bumps for
 ## Requirements
 
 * Chef or Cinc version 18.5.0 or later
-* EL 9
-* the public `postgresql` cookbook maintained by `sous-chefs`
+* EL 9 or 10
+* the public `postgresql` cookbook maintained by `sous-chefs` or a suitable existing postgres instance
 * a compatible java runtime
 * A Chef vault item that contains `postgres` credentials for the PostgreSQL server that will be used by OpenNMS Horizon
 
@@ -138,7 +138,7 @@ This results in file `$OPENNMS_HOME/etc/featuresBoot.d/kafka_producer.boot` with
 
 ### RRDTool
 
-RRDTool is the default time series engine in OpenNMS Horizon 34. JRobin is deprecated. The `rrdtool` recipe still exists to prevent breaking existing run lists, but it no longer contains any resources. It does still enable `storeByGroup`, however.
+RRDTool is the default time series engine in OpenNMS Horizon 34, and JRobin support was removed in 35. The `rrdtool` recipe still exists to prevent breaking existing run lists, but it no longer contains any resources. It does still enable `storeByGroup`, however.
 
 ### Kafka Producer
 
@@ -178,18 +178,6 @@ A few other recipes exist that aren't listed here. They are included by others w
 ## Custom Resources
 
 A number of [custom resources are documented separately](documentation/README.md)
-
-### Provisioning Requisitions
-
-These custom resources use the OpenNMS REST interface. As such, OpenNMS has to be running for the resources to converge. (I used the term 'import' rather than the correct term 'requisition'. I can type 'import' a lot faster than 'requisition').
-
-* `opennms_foreign_source`: create a new foreign source optionally defining a scan interval (defaults to '1d').
-* `opennms_service_detector`: add a service detector to a foreign source. Supports updating and deleting.
-* `opennms_policy`: add a policy to a foreign source.
-* `opennms_import`: Defines a requisition for a foreign source. This and all import\* custom resources include an option to synchronize the requisition - sync\_import.
-* `opennms_import_node`: Add a node to a requisition including categories (array of strings) and assets (key/value hash pairs).
-* `opennms_import_node_interface`: Add an interface to a node in a requisition.
-* `opennms_import_node_interface_service`: Add a service to an interface on a node in a requisition.
 
 ### Custom Resources Wishlist
 
@@ -357,7 +345,7 @@ Do you actually populate the building column in assets or site field in provisio
 
 ### etc/snmp-adhoc-graph.properties
 
-Similar to other \*-graph.properties files, you can change the image format used in adhoc graphs by setting the attribute `node['opennms']['snmp_adhoc_graph']['image_format']` to `gif` or `jpg` rather than the default `png`. Note that the intersection of formats supported by both jrobin and rrdtool is `png`, though.
+Similar to other \*-graph.properties files, you can change the image format used in adhoc graphs by setting the attribute `node['opennms']['snmp_adhoc_graph']['image_format']` to `gif` or `jpg` rather thae the default `png`. This assumes you are not using backshift for graphs (which is the default).
 
 ### etc/xmpp-configuration.xml
 
@@ -391,7 +379,7 @@ See the template and default attributes source for more details on using these t
 
 ## Copyright and License
 
-Copyright 2014-2025 ConvergeOne Holding Corp.
+Copyright 2014-2026 ConvergeOne Holding Corp.
 
 Released under Apache 2.0 license. See LICENSE for details.
 
