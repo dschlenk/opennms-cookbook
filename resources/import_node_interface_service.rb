@@ -25,13 +25,6 @@ load_current_value do |new_resource|
     end
     categories node_category
   end
-  unless service.elements['asset'].nil?
-    node_assets = {}
-    service.each_element('asset') do |asset|
-      node_assets[asset.attributes['key'].to_s] = asset.attributes['value'].to_s
-    end
-    assets node_assets
-  end
   unless service.elements['meta-data'].nil?
     meta_datas = []
     service.each_element('meta-data') do |data|
@@ -80,8 +73,7 @@ action :create do
       unless new_resource.categories.nil?
         service.elements.delete_all 'category'
         # find the sibling to insert before
-        b = service.elements['asset']
-        b = service.elements['meta-data'] if b.nil?
+        b = service.elements['meta-data']
         new_resource.categories.each do |category|
           if b.nil?
             service.add_element 'category', 'name' => category
@@ -100,8 +92,8 @@ action :create do
       end
     end
     model_import(new_resource.foreign_source_name).message model_import_root.to_s
-    if !new_resource.sync_import.nil? && new_resource.sync_import
-      model_import_sync(new_resource.foreign_source_name, true)
+    if new_resource.sync_import
+      model_import_sync(new_resource.foreign_source_name, true, new_resource.sync_wait_periods, new_resource.sync_wait_secs)
     end
   end
 end

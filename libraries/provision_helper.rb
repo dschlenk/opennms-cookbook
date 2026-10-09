@@ -184,7 +184,7 @@ module Opennms
           end
         end
 
-        def model_import_sync(name, rescan)
+        def model_import_sync(name, rescan, retries = 3, retry_delay = 10)
           url = "#{resturl}/requisitions/#{name}/import"
           url += '?rescanExisting=false' if !rescan.nil? && rescan == false
           with_run_context(:root) do
@@ -194,8 +194,8 @@ module Opennms
               action :nothing
               delayed_action :put
               message ''
-              retries 3
-              retry_delay 10
+              retries retries
+              retry_delay retry_delay
               sensitive true
             end if find_resource(:http_request, "sync opennms_import #{name}").nil?
           end

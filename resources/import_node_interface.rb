@@ -1,7 +1,9 @@
+require 'resolv'
+
 use 'partial/_import_node'
 unified_mode true
 
-property :ip_addr, String, identity: true
+property :ip_addr, String, identity: true, name_property: true, callbacks: { 'should be a valid IPv4 or IPv6 address' => ->(p) { p =~ Resolv::IPv4::Regex || p =~ Resolv::IPv6::Regex } }
 property :foreign_id, String, required: true, identity: true
 property :status, Integer
 property :managed, [true, false], default: false
@@ -10,7 +12,7 @@ property :sync_existing, [true, false], default: false, desired_state: false
 
 load_current_value do |new_resource|
   model_import = REXML::Document.new(model_import(new_resource.foreign_source_name).message).root unless model_import(new_resource.foreign_source_name).nil?
-  Chef::Log.debug "Missing requisition #{new_resource.foreign_source_name}." unless model_import.nil?
+  Chef::Log.debug "Missing requisition #{new_resource.foreign_source_name}." if model_import.nil?
   if model_import.nil?
     ro_model_import_init(new_resource.foreign_source_name, node['opennms']['properties']['jetty']['port'], admin_secret_from_vault('password'))
     model_import = REXML::Document.new(ro_model_import(new_resource.foreign_source_name).message).root
@@ -20,9 +22,8 @@ load_current_value do |new_resource|
   interface = node_el.elements["interface[@ip-addr = '#{new_resource.name}']"] unless node_el.nil?
   current_value_does_not_exist! if interface.nil?
   unless interface.attributes['status'].nil?
-    sym = 'status' if interface.attributes['status'].nil?
+    sym = 'status'
     status_value = interface.attributes['status']
-
     if new_resource.send(sym).is_a?(Integer)
       value = begin
         Integer(status_value)
@@ -30,7 +31,7 @@ load_current_value do |new_resource|
                 status_value
       end
       send(sym, value)
-    elsif interface.attributes['status'].nil?
+    else
       status interface.attributes['status']
     end
   end
@@ -64,7 +65,9 @@ action_class do
 end
 
 action :create do
+  changed = false
   converge_if_changed do
+    changed = true
     model_import_init(new_resource.foreign_source_name)
     raise Chef::Exceptions::ValidationFailed "No requisition named #{new_resource.foreign_source_name} found. Create it with an opennms_import[#{new_resource.foreign_source_name}] resource." if model_import(new_resource.foreign_source_name).nil?
     model_import_root = REXML::Document.new(model_import(new_resource.foreign_source_name).message).root unless model_import(new_resource.foreign_source_name).nil?
@@ -126,7 +129,12 @@ action :create do
     end
     model_import(new_resource.foreign_source_name).message model_import_root.to_s
     if !new_resource.sync_import.nil? && new_resource.sync_import
-      model_import_sync(new_resource.foreign_source_name, true)
+      model_import_sync(new_resource.foreign_source_name, true, new_resource.sync_wait_periods, new_resource.sync_wait_secs)
+    end
+  end
+  if !changed && new_resource.sync_existing
+    converge_by "syncing existing node interface #{new_resource.name} in foreign source #{new_resource.foreign_source_name}" do
+      model_import_sync(new_resource.foreign_source_name, true, new_resource.sync_wait_periods, new_resource.sync_wait_secs)
     end
   end
 end

@@ -154,7 +154,7 @@ action :create do
     Chef::Log.debug("model import message body now #{model_import.to_s}")
     model_import(new_resource.foreign_source_name).message model_import.to_s
     if !new_resource.sync_import.nil? && new_resource.sync_import
-      model_import_sync(new_resource.foreign_source_name, true)
+      model_import_sync(new_resource.foreign_source_name, true, new_resource.sync_wait_periods, new_resource.sync_wait_secs)
     end
   end
 end
@@ -168,13 +168,14 @@ action :create_if_missing do
 end
 
 action :delete do
-  model_import = REXML::Document.new(model_import(new_resource.name).message).root unless model_import(new_resource.name).nil?
+  model_import_init(new_resource.foreign_source_name)
+  model_import = REXML::Document.new(model_import(new_resource.foreign_source_name).message).root unless model_import(new_resource.foreign_source_name).nil?
   import_node = model_import.elements["node[@foreign-id = '#{new_resource.foreign_id}']"] unless model_import.nil?
   unless import_node.nil?
     converge_by "Removing node #{new_resource.foreign_id} from #{new_resource.foreign_source_name}" do
       model_import_node_delete(new_resource.foreign_source_name, new_resource.foreign_id)
       if !new_resource.sync_import.nil? && new_resource.sync_import
-        model_import_sync(new_resource.foreign_source_name, true)
+        model_import_sync(new_resource.foreign_source_name, true, new_resource.sync_wait_periods, new_resource.sync_wait_secs)
       end
     end
   end
