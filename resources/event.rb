@@ -2,8 +2,8 @@ unified_mode true
 
 property :uei, String, name_property: true, identity: true
 # relative path to file from $ONMS_HOME/etc, typically starts with `events/`
-property :file, String, identity: true, required: true
-property :source_name, String, alias: true
+property :source_name, String, identity: true, required: true
+deprecated_property_alias :file, :source_name
 # Array of hashes that contain key mename or vbnumber with a string value and mevalue or vbvalue with an array of string values. 'mename' indicates 'maskelement' while 'vbnumber' indicates 'varbind'. All vbnumber/vbvalue hashes must follow the mename/mevalue hashes.
 # ex: [
 #      {'mename' => 'id', 'mevalue' => ['.1.3.6.1.4.1.9.10.14']},
@@ -158,8 +158,7 @@ end
 
 include Opennms::Cookbook::ConfigHelpers::Event::EventconfSourceRubyBlock
 load_current_value do |new_resource|
-  resources(service: 'opennms').run_action(:start) unless shell_out('systemctl is-active --quiet opennms').exitstatus == 0
-  source_name = source_name_from_file(new_resource.file)
+  source_name = source_name_from_file(new_resource.source_name)
   current_value_does_not_exist! unless eventconf_source_exist?(source_name)
   eventconf_source_resource_init(source_name, new_resource.eventconf_position)
   eventfile = Opennms::Cookbook::ConfigHelpers::Event::EventDefinitionFile.new
@@ -175,7 +174,7 @@ end
 
 action :create do
   converge_if_changed do
-    source_name = source_name_from_file(new_resource.file)
+    source_name = source_name_from_file(new_resource.source_name)
     if node.run_state['opennms']['eventconf_sources'].nil? || node.run_state['opennms']['eventconf_sources'][source_name].nil?
       eventconf_source_resource_init(source_name, new_resource.eventconf_position)
     end
@@ -202,7 +201,7 @@ end
 
 action :create_if_missing do
   resources(service: 'opennms').run_action(:start) unless shell_out('systemctl is-active --quiet opennms').exitstatus == 0
-  source_name = source_name_from_file(new_resource.file)
+  source_name = source_name_from_file(new_resource.source_name)
   if !eventconf_source_exist?(source_name)
     run_action(:create)
   else
@@ -216,7 +215,7 @@ end
 
 action :update do
   converge_if_changed(:priority, :event_label, :descr, :logmsg, :logmsg_dest, :logmsg_notify, :collection_group, :severity, :operinstruct, :autoaction, :varbindsdecode, :parameters, :operaction, :autoacknowledge, :loggroup, :tticket, :forward, :script, :mouseovertext, :alarm_data, :filters) do
-    source_name = source_name_from_file(new_resource.file)
+    source_name = source_name_from_file(new_resource.source_name)
     raise Chef::Exceptions::CurrentValueDoesNotExist, 'action :update called for non-existent eventconf source' unless eventconf_source_exist?(source_name)
     eventfile = Opennms::Cookbook::ConfigHelpers::Event::EventDefinitionFile.new
     eventfile.load!(node.run_state['opennms']['eventconf_sources'][source_name]['definition'])
@@ -251,16 +250,18 @@ end
 
 action :delete do
   resources(service: 'opennms').run_action(:start) unless shell_out('systemctl is-active --quiet opennms').exitstatus == 0
-  source_name = source_name_from_file(new_resource.file)
+  source_name = source_name_from_file(new_resource.source_name)
   if eventconf_source_exist?(source_name)
     eventconf_source_resource_init(source_name, new_resource.eventconf_position)
     eventfile = Opennms::Cookbook::ConfigHelpers::Event::EventDefinitionFile.new
     eventfile.load!(node.run_state['opennms']['eventconf_sources'][source_name]['definition'])
     event = eventfile.entry(new_resource.uei, new_resource.mask)
     unless event.nil?
-      eventfile.remove(event)
-      node.run_state['opennms']['eventconf_sources'][source_name]['definition'] = eventfile.to_xml
-      mark_changed(source_name)
+      converge_by "removing event definition for '#{new_resource.name}' from eventconf source '#{source_name}'" do
+        eventfile.remove(event)
+        node.run_state['opennms']['eventconf_sources'][source_name]['definition'] = eventfile.to_xml
+        mark_changed(source_name)
+      end
     end
   end
 end

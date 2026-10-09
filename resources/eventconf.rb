@@ -1,7 +1,8 @@
 include Opennms::Cookbook::ConfigHelpers::Event::EventconfSourceRubyBlock
 unified_mode true
 
-property :event_file, String, name_property: true, identity: true
+property :source_name, String, name_property: true, identity: true
+deprecated_property_alias :event_file, :source_name
 property :source_type, String, equal_to: %w(cookbook_file template remote_file), default: 'cookbook_file', desired_state: false
 property :source, String, desired_state: false
 property :source_properties, Hash, desired_state: false
@@ -14,14 +15,14 @@ end
 
 load_current_value do |new_resource|
   resources(service: 'opennms').run_action(:start) unless shell_out('systemctl is-active --quiet opennms').exitstatus == 0
-  source_name = source_name_from_file(new_resource.event_file)
+  source_name = source_name_from_file(new_resource.source_name)
   current_value_does_not_exist! unless eventconf_source_exist?(source_name)
 end
 
 action :create do
-  source_name = source_name_from_file(new_resource.event_file)
+  source_name = source_name_from_file(new_resource.source_name)
   eventconf_source_resource_init(source_name, new_resource.position)
-  desired_definition = new_definition(source_name, new_resource.source_type, new_resource.source, new_resource.source_properties, new_resource.variables)
+  desired_definition = new_definition(source_name, new_resource.source_type, new_resource.source || new_resource.source_name, new_resource.source_properties, new_resource.variables)
   if content_changed?(source_name, desired_definition)
     converge_by("create/update eventconf source #{source_name}") do
       node.run_state['opennms']['eventconf_sources'][source_name]['definition'] = desired_definition
@@ -37,7 +38,7 @@ action :create_if_missing do
 end
 
 action :delete do
-  source_name = source_name_from_file(new_resource.event_file)
+  source_name = source_name_from_file(new_resource.source_name)
   if eventconf_source_exist?(source_name)
     converge_by("delete eventconf source #{source_name}") do
       delete_source(source_name)

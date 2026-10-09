@@ -40,7 +40,7 @@ module Opennms
           end
 
           def eventconf_source_resource(source_name)
-            return unless eventconf_source_resource_exist?
+            return unless eventconf_source_resource_exist?(source_name)
             find_resource!(:ruby_block, block_name(source_name))
           end
 
@@ -121,7 +121,7 @@ module Opennms
                       content_type: :json,
                       accept: :json,
                     })
-                  raise "Unable to delete source #{source_name} with id #{source['id']} via API. Is OpenNMS running?" unless response.code == 200
+                  raise "Unable to delete source #{source_name} with id #{source['id']} via API. Is OpenNMS running?" unless [200, 204].include?(response.code)
                 end
                 action :nothing
                 delayed_action :run
@@ -140,7 +140,7 @@ module Opennms
                 content_type: "multipart/form-data; boundary=#{boundary}",
                 accept: :json,
               })
-            raise "Unable to update content via API for eventconf source #{source_name}. Is OpenNMS running?" unless response.code == 200
+            raise "Unable to update content via API for eventconf source #{source_name}. Is OpenNMS running?" unless [200, 204].include?(response.code)
           end
 
           private
@@ -216,49 +216,48 @@ module Opennms
               end
               body << "--#{boundary}--\r\n"
               upload_eventconf(body, boundary, source_name)
-              eventconf_source_resource_create(source_name, position)
-            else
-              begin
-                response = RestClient::Request.execute(
-                  method: :get,
-                  url: "#{restv2url}/eventconf/sources/#{node.run_state['opennms']['eventconf_sources'][source_name]['id']}/events/download",
-                  user: 'admin',
-                  password: admin_secret_from_vault('password')
-                )
-                node.run_state['opennms']['eventconf_sources'][source_name]['definition'] = if response.code == 204
-                                                                                              '<events xmlns="http://xmlns.opennms.org/xsd/eventconf"/>'
-                                                                                            else
-                                                                                              response.body
-                                                                                            end
-              rescue => e
-                # At least as of 36.0.4 if the source exists but has no events, you still get a 404.
-                # I think they did this to work around the fact that technically it's invalid to have an eventconf file without at least one event
-                if "#{e}" == '404 Not Found'
-                  node.run_state['opennms']['eventconf_sources'][source_name]['definition'] = '<events xmlns="http://xmlns.opennms.org/xsd/eventconf"/>'
-                else
-                  raise "Unknown error retrieving source definition: #{e}"
-                end
+              node.run_state['opennms']['eventconf_sources'][source_name] = current_source(source_name)
+            end
+            begin
+              response = RestClient::Request.execute(
+                method: :get,
+                url: "#{restv2url}/eventconf/sources/#{node.run_state['opennms']['eventconf_sources'][source_name]['id']}/events/download",
+                user: 'admin',
+                password: admin_secret_from_vault('password')
+              )
+              node.run_state['opennms']['eventconf_sources'][source_name]['definition'] = if response.code == 204
+                                                                                            '<events xmlns="http://xmlns.opennms.org/xsd/eventconf"/>'
+                                                                                          else
+                                                                                            response.body
+                                                                                          end
+            rescue => e
+              # At least as of 36.0.4 if the source exists but has no events, you still get a 404.
+              # I think they did this to work around the fact that technically it's invalid to have an eventconf file without at least one event
+              if "#{e}" == '404 Not Found'
+                node.run_state['opennms']['eventconf_sources'][source_name]['definition'] = '<events xmlns="http://xmlns.opennms.org/xsd/eventconf"/>'
+              else
+                raise "Unknown error retrieving source definition: #{e}"
               end
-              r = self
-              with_run_context :root do
-                declare_resource(:ruby_block, block_name(source_name)) do
-                  block do
-                    require 'securerandom'
-                    require 'rest-client'
-                    boundary = "----RubyMultipart#{SecureRandom.hex(16)}"
-                    body = ''
-                    body << "--#{boundary}\r\n"
-                    body << %(Content-Disposition: form-data; name="upload"; filename="#{source_name}.xml"\r\n)
-                    body << "Content-Type: application/xml\r\n"
-                    body << "\r\n"
-                    body << node.run_state['opennms']['eventconf_sources'][source_name]['definition']
-                    body << "\r\n"
-                    body << "--#{boundary}--\r\n"
-                    r.upload_eventconf(body, boundary, source_name)
-                  end
-                  action :nothing
-                  delayed_action :nothing # set to :run in resource when create/update
+            end
+            r = self
+            with_run_context :root do
+              declare_resource(:ruby_block, block_name(source_name)) do
+                block do
+                  require 'securerandom'
+                  require 'rest-client'
+                  boundary = "----RubyMultipart#{SecureRandom.hex(16)}"
+                  body = ''
+                  body << "--#{boundary}\r\n"
+                  body << %(Content-Disposition: form-data; name="upload"; filename="#{source_name}.xml"\r\n)
+                  body << "Content-Type: application/xml\r\n"
+                  body << "\r\n"
+                  body << node.run_state['opennms']['eventconf_sources'][source_name]['definition']
+                  body << "\r\n"
+                  body << "--#{boundary}--\r\n"
+                  r.upload_eventconf(body, boundary, source_name)
                 end
+                action :nothing
+                delayed_action :nothing # set to :run in resource when create/update
               end
             end
           end
@@ -571,7 +570,7 @@ module Opennms
               descr.add_text(e.descr)
               lm = event.add_element('logmsg')
               lm.attributes['notify'] = e.logmsg_notify unless e.logmsg_notify.nil?
-              lm.attributes['dest'] = e.logmsg_dest
+              lm.attributes['dest'] = e.logmsg_dest unless e.logmsg_dest.nil?
               lm.add_text(e.logmsg)
               e.collection_group.each do |cgroup|
                 cg = event.add_element('collectionGroup')
@@ -662,7 +661,7 @@ module Opennms
                   update_field = alarm_data.add_element('update-field')
                   update_field.attributes['field-name'] = uf['field_name']
                   update_field.attributes['update-on-reduction'] = uf['update_on_reduction'] unless uf['update_on_reduction'].nil?
-                  update_field.attriubtes['value-expression'] = uf['value_expression'] unless uf['value_expression'].nil?
+                  update_field.attributes['value-expression'] = uf['value_expression'] unless uf['value_expression'].nil?
                 end unless e.alarm_data['update_fields'].nil?
                 unless e.alarm_data['managed_object_type'].nil?
                   alarm_data.add_element('managed-object').attributes['type'] = e.alarm_data['managed_object_type']
@@ -869,7 +868,7 @@ module Opennms
               update_fields = []
               ad_el.elements.each('update-field') do |uf|
                 fn = uf.attributes['field-name']
-                uor = !(uf.attributes['update-on-reduction'] == 'false')
+                uor = uf.attributes['update-on-reduction']
                 if uor.nil?
                   update_fields.push 'field_name' => fn
                 else
@@ -981,7 +980,8 @@ module Opennms
                            script.eql?(evtdef.script) &&
                            mouseovertext.eql?(evtdef.mouseovertext) &&
                            alarm_data.eql?(evtdef.alarm_data) &&
-                           filters.eql?(evtdef.filters)
+                           filters.eql?(evtdef.filters) &&
+                           priority.eql?(evtdef.priority)
             false
           end
 
