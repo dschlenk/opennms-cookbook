@@ -62,7 +62,7 @@ module Opennms
           foreign_source = Opennms::Cookbook::Provision::ForeignSource.new(name, url)
           with_run_context(:root) do
             declare_resource(:http_request, "RO opennms_foreign_source POST #{name}") do
-              url "http://localhost:#{port}/opennms/rest}/foreignSources"
+              url "http://localhost:#{port}/opennms/rest/foreignSources"
               headers({ 'Content-Type' => 'application/xml', 'Authorization' => "Basic #{Base64.strict_encode64("admin:#{adminpw}")}" })
               action :nothing
               delayed_action :nothing
@@ -203,9 +203,9 @@ module Opennms
 
         def model_import_node_delete(fsname, fsid)
           node_url = "#{resturl}/requisitions/#{fsname}/nodes/#{fsid}"
-          Chef::Log.debug "model_import_node_delete url: #{url}"
+          Chef::Log.debug "model_import_node_delete url: #{node_url}"
           with_run_context(:root) do
-            declare_resource(:http_request, "opennms_import_node  DELETE #{fsname}") do
+            declare_resource(:http_request, "opennms_import_node DELETE #{fsname} / #{fsid}") do
               url node_url
               headers({ 'Content-Type' => 'application/xml', 'Authorization' => "Basic #{Base64.strict_encode64("admin:#{admin_secret_from_vault('password')}")}" })
               action :nothing

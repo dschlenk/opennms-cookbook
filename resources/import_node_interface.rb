@@ -8,10 +8,11 @@ property :foreign_id, String, required: true, identity: true
 property :status, Integer
 property :managed, [true, false], default: false
 property :snmp_primary, String, equal_to: %w(P S N)
-property :sync_existing, [true, false], default: false, desired_state: false
+property :sync_existing, [true, false], default: false, desired_state: false, deprecated: 'This property is deprecated and is no longer operational. It will be removed in a future release.'
 
 load_current_value do |new_resource|
-  model_import = REXML::Document.new(model_import(new_resource.foreign_source_name).message).root unless model_import(new_resource.foreign_source_name).nil?
+  mi = model_import(new_resource.foreign_source_name)
+  model_import = REXML::Document.new(mi.message).root unless mi.nil?
   Chef::Log.debug "Missing requisition #{new_resource.foreign_source_name}." if model_import.nil?
   if model_import.nil?
     ro_model_import_init(new_resource.foreign_source_name, node['opennms']['properties']['jetty']['port'], admin_secret_from_vault('password'))
@@ -65,9 +66,7 @@ action_class do
 end
 
 action :create do
-  changed = false
   converge_if_changed do
-    changed = true
     model_import_init(new_resource.foreign_source_name)
     raise Chef::Exceptions::ValidationFailed "No requisition named #{new_resource.foreign_source_name} found. Create it with an opennms_import[#{new_resource.foreign_source_name}] resource." if model_import(new_resource.foreign_source_name).nil?
     model_import_root = REXML::Document.new(model_import(new_resource.foreign_source_name).message).root unless model_import(new_resource.foreign_source_name).nil?
@@ -109,7 +108,7 @@ action :create do
       end
       unless new_resource.categories.nil?
         interface_el.elements.delete_all 'category'
-        b = interface_el.elements['meta-data'] if b.nil?
+        b = interface_el.elements['meta-data']
         new_resource.categories.each do |category|
           if b.nil?
             interface_el.add_element 'category', 'name' => category
@@ -128,12 +127,7 @@ action :create do
       end
     end
     model_import(new_resource.foreign_source_name).message model_import_root.to_s
-    if !new_resource.sync_import.nil? && new_resource.sync_import
-      model_import_sync(new_resource.foreign_source_name, true, new_resource.sync_wait_periods, new_resource.sync_wait_secs)
-    end
-  end
-  if !changed && new_resource.sync_existing
-    converge_by "syncing existing node interface #{new_resource.name} in foreign source #{new_resource.foreign_source_name}" do
+    if new_resource.sync_import
       model_import_sync(new_resource.foreign_source_name, true, new_resource.sync_wait_periods, new_resource.sync_wait_secs)
     end
   end

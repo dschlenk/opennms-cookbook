@@ -11,7 +11,8 @@ property :building, String
 property :assets, Hash, callbacks: { 'should be a hash with key/value pairs that are both strings' => ->(p) { !p.any? { |k, v| !k.is_a?(String) || !v.is_a?(String) } } }
 
 load_current_value do |new_resource|
-  model_import = REXML::Document.new(model_import(new_resource.foreign_source_name).message).root unless model_import(new_resource.foreign_source_name).nil?
+  mi = model_import(new_resource.foreign_source_name)
+  model_import = REXML::Document.new(mi.message).root unless mi.nil?
   if model_import.nil?
     ro_model_import_init(new_resource.foreign_source_name, node['opennms']['properties']['jetty']['port'], admin_secret_from_vault('password'))
     model_import = REXML::Document.new(ro_model_import(new_resource.foreign_source_name).message).root
@@ -153,7 +154,7 @@ action :create do
     end
     Chef::Log.debug("model import message body now #{model_import.to_s}")
     model_import(new_resource.foreign_source_name).message model_import.to_s
-    if !new_resource.sync_import.nil? && new_resource.sync_import
+    if new_resource.sync_import
       model_import_sync(new_resource.foreign_source_name, true, new_resource.sync_wait_periods, new_resource.sync_wait_secs)
     end
   end
@@ -174,7 +175,7 @@ action :delete do
   unless import_node.nil?
     converge_by "Removing node #{new_resource.foreign_id} from #{new_resource.foreign_source_name}" do
       model_import_node_delete(new_resource.foreign_source_name, new_resource.foreign_id)
-      if !new_resource.sync_import.nil? && new_resource.sync_import
+      if new_resource.sync_import
         model_import_sync(new_resource.foreign_source_name, true, new_resource.sync_wait_periods, new_resource.sync_wait_secs)
       end
     end

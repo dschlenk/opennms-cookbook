@@ -37,6 +37,8 @@ action :create do
 end
 
 action :sync do
-  model_import_init(new_resource.import_name)
-  model_import_sync(new_resource.import_name, true, new_resource.sync_wait_periods, new_resource.sync_wait_secs)
+  converge_by "syncing import #{new_resource.import_name}" do
+    model_import_init(new_resource.import_name)
+    model_import_sync(new_resource.import_name, true, new_resource.sync_wait_periods, new_resource.sync_wait_secs)
+  end
 end
