@@ -71,7 +71,7 @@ module Opennms
             when 'template'
               template tempfile do
                 sensitive true
-                source source
+                source "#{source}.erb"
                 owner node['opennms']['username']
                 group node['opennms']['groupname']
                 mode '664'
