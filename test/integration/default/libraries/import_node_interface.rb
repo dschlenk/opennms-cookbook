@@ -20,7 +20,11 @@ class ImportNodeInterface < Inspec.resource(1)
   '
 
   def initialize(ip_addr, foreign_source_name, foreign_id)
-    doc = REXML::Document.new(inspec.http("http://localhost:8980/opennms/rest/requisitions/#{foreign_source_name}/nodes/#{foreign_id}/interfaces/#{ip_addr}", auth: { user: 'admin', pass: 'admin' }).body)
+    url = "http://localhost:8980/opennms/rest/requisitions/#{foreign_source_name}/nodes/#{foreign_id}/interfaces/#{ip_addr}"
+    response = inspec.http(url, auth: { user: 'admin', pass: 'admin' })
+    @exists = false
+    return if response.status == 404
+    doc = REXML::Document.new(response.body)
     i_el = doc.elements['/interface']
     @exists = !i_el.nil?
     if @exists

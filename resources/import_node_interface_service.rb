@@ -98,3 +98,30 @@ action :create do
     end
   end
 end
+
+action :create_if_missing do
+  name = new_resource.service_name
+  model_import = model_import_for_read(new_resource.foreign_source_name, node['opennms']['properties']['jetty']['port'])
+  model_import_root = REXML::Document.new(model_import.message).root unless model_import.nil?
+  node_el = model_import_root.elements["node[@foreign-id = '#{new_resource.foreign_id}']"] unless model_import_root.nil?
+  interface_el = node_el.elements["interface[@ip-addr = '#{new_resource.ip_addr}']"] unless node_el.nil?
+  service = interface_el.elements["monitored-service[@service-name = '#{name}']"] unless interface_el.nil?
+  run_action(:create) if service.nil?
+end
+
+action :delete do
+  name = new_resource.service_name
+  model_import = model_import_for_read(new_resource.foreign_source_name, node['opennms']['properties']['jetty']['port'])
+  model_import_root = REXML::Document.new(model_import.message).root unless model_import.nil?
+  node_el = model_import_root.elements["node[@foreign-id = '#{new_resource.foreign_id}']"] unless model_import_root.nil?
+  interface_el = node_el.elements["interface[@ip-addr = '#{new_resource.ip_addr}']"] unless node_el.nil?
+  service = interface_el.elements["monitored-service[@service-name = '#{name}']"] unless interface_el.nil?
+  unless service.nil?
+    converge_by "Removing service #{name} from interface #{new_resource.ip_addr} in node #{new_resource.foreign_id} in #{new_resource.foreign_source_name}" do
+      model_import_node_service_delete(new_resource.foreign_source_name, new_resource.foreign_id, new_resource.ip_addr, name)
+      if new_resource.sync_import
+        model_import_sync(new_resource.foreign_source_name, true, new_resource.sync_wait_periods, new_resource.sync_wait_secs)
+      end
+    end
+  end
+end

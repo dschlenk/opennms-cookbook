@@ -20,7 +20,7 @@ load_current_value do |new_resource|
   end
   current_value_does_not_exist! if model_import.nil?
   node_el = model_import.elements["node[@foreign-id = '#{new_resource.foreign_id}']"] unless model_import.nil?
-  interface = node_el.elements["interface[@ip-addr = '#{new_resource.name}']"] unless node_el.nil?
+  interface = node_el.elements["interface[@ip-addr = '#{new_resource.ip_addr}']"] unless node_el.nil?
   current_value_does_not_exist! if interface.nil?
   unless interface.attributes['status'].nil?
     sym = 'status'
@@ -72,10 +72,10 @@ action :create do
     model_import_root = REXML::Document.new(model_import(new_resource.foreign_source_name).message).root unless model_import(new_resource.foreign_source_name).nil?
     node_el = model_import_root.elements["node[@foreign-id = '#{new_resource.foreign_id}']"] unless model_import_root.nil?
     raise Chef::Exceptions::ValidationFailed "No node with foreign ID #{new_resource.foreign_id} found. Create one with an opennms_import_node resource." if node_el.nil?
-    interface_el = node_el.elements["interface[@ip-addr = '#{new_resource.name}']"] unless node_el.nil?
+    interface_el = node_el.elements["interface[@ip-addr = '#{new_resource.ip_addr}']"] unless node_el.nil?
     if interface_el.nil?
       i_el = REXML::Element.new('interface')
-      i_el.attributes['ip-addr'] = new_resource.name
+      i_el.attributes['ip-addr'] = new_resource.ip_addr
       unless new_resource.status.nil?
         i_el.attributes['status'] = new_resource.status
       end
@@ -129,6 +129,29 @@ action :create do
     model_import(new_resource.foreign_source_name).message model_import_root.to_s
     if new_resource.sync_import
       model_import_sync(new_resource.foreign_source_name, true, new_resource.sync_wait_periods, new_resource.sync_wait_secs)
+    end
+  end
+end
+
+action :create_if_missing do
+  model_import = model_import_for_read(new_resource.foreign_source_name, node['opennms']['properties']['jetty']['port'])
+  model_import_root = REXML::Document.new(model_import.message).root unless model_import.nil?
+  node_el = model_import_root.elements["node[@foreign-id = '#{new_resource.foreign_id}']"] unless model_import_root.nil?
+  interface_el = node_el.elements["interface[@ip-addr = '#{new_resource.ip_addr}']"] unless node_el.nil?
+  run_action(:create) if interface_el.nil?
+end
+
+action :delete do
+  model_import = model_import_for_read(new_resource.foreign_source_name, node['opennms']['properties']['jetty']['port'])
+  model_import_root = REXML::Document.new(model_import.message).root unless model_import.nil?
+  node_el = model_import_root.elements["node[@foreign-id = '#{new_resource.foreign_id}']"] unless model_import_root.nil?
+  interface_el = node_el.elements["interface[@ip-addr = '#{new_resource.ip_addr}']"] unless node_el.nil?
+  unless interface_el.nil?
+    converge_by "Removing interface #{new_resource.ip_addr} from node #{new_resource.foreign_id} in #{new_resource.foreign_source_name}" do
+      model_import_node_interface_delete(new_resource.foreign_source_name, new_resource.foreign_id, new_resource.ip_addr)
+      if new_resource.sync_import
+        model_import_sync(new_resource.foreign_source_name, true, new_resource.sync_wait_periods, new_resource.sync_wait_secs)
+      end
     end
   end
 end

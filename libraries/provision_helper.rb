@@ -138,6 +138,13 @@ module Opennms
           find_resource!(:http_request, "RO opennms_import POST #{name}")
         end
 
+        def model_import_for_read(name, port)
+          model_import(name) || begin
+            ro_model_import_init(name, port, admin_secret_from_vault('password'))
+            ro_model_import(name)
+          end
+        end
+
         private
 
         def model_import_exist?(name)
@@ -207,6 +214,34 @@ module Opennms
           with_run_context(:root) do
             declare_resource(:http_request, "opennms_import_node DELETE #{fsname} / #{fsid}") do
               url node_url
+              headers({ 'Content-Type' => 'application/xml', 'Authorization' => "Basic #{Base64.strict_encode64("admin:#{admin_secret_from_vault('password')}")}" })
+              action :nothing
+              delayed_action :delete
+              sensitive true
+            end
+          end
+        end
+
+        def model_import_node_interface_delete(fsname, fsid, ip_addr)
+          iface_url = "#{resturl}/requisitions/#{fsname}/nodes/#{fsid}/interfaces/#{ip_addr}"
+          Chef::Log.debug "model_import_node_interface_delete url: #{iface_url}"
+          with_run_context(:root) do
+            declare_resource(:http_request, "opennms_import_node_interface DELETE #{fsname} / #{fsid} / #{ip_addr}") do
+              url iface_url
+              headers({ 'Content-Type' => 'application/xml', 'Authorization' => "Basic #{Base64.strict_encode64("admin:#{admin_secret_from_vault('password')}")}" })
+              action :nothing
+              delayed_action :delete
+              sensitive true
+            end
+          end
+        end
+
+        def model_import_node_service_delete(fsname, fsid, ip_addr, service_name)
+          svc_url = "#{resturl}/requisitions/#{fsname}/nodes/#{fsid}/interfaces/#{ip_addr}/services/#{service_name}"
+          Chef::Log.debug "model_import_node_service_delete url: #{svc_url}"
+          with_run_context(:root) do
+            declare_resource(:http_request, "opennms_import_node_service DELETE #{fsname} / #{fsid} / #{ip_addr} / #{service_name}") do
+              url svc_url
               headers({ 'Content-Type' => 'application/xml', 'Authorization' => "Basic #{Base64.strict_encode64("admin:#{admin_secret_from_vault('password')}")}" })
               action :nothing
               delayed_action :delete

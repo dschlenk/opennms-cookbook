@@ -129,7 +129,9 @@ Add an interface to a node in a requisition.
 
 ### Actions for opennms\_import\_node\_interface
 
-* `:create` - Default. Creates an interface for the node with the given `foreign_id` in the requisition if it does not exist, and updates the `status`, `managed`, `snmp_primary`, `categories`, and `meta_data` of an existing interface. Synchronizes the requisition if `sync_import` is `true`, or if `sync_existing` is `true` and no changes were made.
+* `:create` - Default. Creates an interface for the node with the given `foreign_id` in the requisition if it does not exist, and updates the `status`, `managed`, `snmp_primary`, `categories`, and `meta_data` of an existing interface. Synchronizes the requisition if `sync_import` is `true` and changes are made.
+* `:create_if_missing` - Creates the interface if it does not exist. Existing interfaces are left unchanged. Synchronizes the requisition if `sync_import` is `true` and changes are made.
+* `:delete` - Deletes the interface from the node if it exists. Synchronizes the requisition if `sync_import` is `true` and the interface is removed.
 
 ### Properties for opennms\_import\_node\_interface
 
@@ -141,7 +143,7 @@ Add an interface to a node in a requisition.
 | `status` | | Integer | | |
 | `managed` | | Boolean | | Whether the interface is managed. Defaults to `false`. |
 | `snmp_primary` | | String | | Whether the interface is the primary SNMP interface. Must be `P`, `S`, or `N`. |
-| `sync_existing` | | Boolean | | Synchronize the requisition even if the interface is unchanged. Defaults to `false`. |
+| `sync_existing` | | Boolean | | Deprecated. This property no longer has any effect. It will be removed in a future release. |
 | `categories` | | Array | | Array of strings. |
 | `meta_data` | | Array or Hash | | Array of hashes with string `context`, `key`, and `value` entries, or hash of metadata keys with `type` and `context` hashes. Defaults to an empty array. |
 | `sync_import` | | Boolean | | Synchronize the requisition on converge. Defaults to `false`. |
@@ -158,7 +160,9 @@ Add a service to an interface on a node in a requisition.
 
 ### Actions for opennms\_import\_node\_interface\_service
 
-* `:create` - Default. Creates a monitored service on the interface for the node with the given `foreign_id` in the requisition if it does not exist, and updates the `categories` and `meta_data` of an existing service.
+* `:create` - Default. Creates a monitored service on the interface for the node with the given `foreign_id` in the requisition if it does not exist, and updates the `categories` and `meta_data` of an existing service. Synchronizes the requisition if `sync_import` is `true` and changes are made.
+* `:create_if_missing` - Creates the service if it does not exist. Existing services are left unchanged. Synchronizes the requisition if `sync_import` is `true` and changes are made.
+* `:delete` - Deletes the service from the interface if it exists. Synchronizes the requisition if `sync_import` is `true` and the service is removed.
 
 ### Properties for opennms\_import\_node\_interface\_service
 

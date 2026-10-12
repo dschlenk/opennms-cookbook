@@ -25,7 +25,11 @@ class ImportNode < Inspec.resource(1)
   '
 
   def initialize(id, foreign_source_name)
-    doc = REXML::Document.new(inspec.http("http://localhost:8980/opennms/rest/requisitions/#{foreign_source_name}/nodes/#{id}", auth: { user: 'admin', pass: 'admin' }).body)
+    url = "http://localhost:8980/opennms/rest/requisitions/#{foreign_source_name}/nodes/#{id}"
+    response = inspec.http(url, auth: { user: 'admin', pass: 'admin' })
+    @exists = false
+    return if response.status == 404
+    doc = REXML::Document.new(response.body)
     n_el = doc.elements["/node[@foreign-id = '#{id}']"]
     @exists = !n_el.nil?
     if @exists
