@@ -19,7 +19,7 @@ control 'import_node_interface' do
   describe import_node_interface('10.0.0.4', 'dry-source', 'interfaceTestNodeID') do
     it { should exist }
     its('managed') { should be true }
-    its('snmp_primary') { should eq 'P' }
+    its('snmp_primary') { should eq 'N' }
     its('categories') { should eq %w(Servers Test) }
     its('meta_data') { should eq([{ 'context' => 'foo', 'key' => 'bar', 'value' => 'baz' }, { 'context' => 'foofoo', 'key' => 'barbar', 'value' => 'bazbaz' }]) }
   end
