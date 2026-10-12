@@ -3,7 +3,7 @@ unified_mode true
 property :uei, String, name_property: true, identity: true
 # relative path to file from $ONMS_HOME/etc, typically starts with `events/`
 property :source_name, String, identity: true, required: true
-deprecated_property_alias :file, :source_name
+deprecated_property_alias :file, :source_name, 'Eventconf definitions moved from files to the database accessible via API in Horizon 35 resulting in the renaming of this property. This property alias will be removed in a future release.'
 # Array of hashes that contain key mename or vbnumber with a string value and mevalue or vbvalue with an array of string values. 'mename' indicates 'maskelement' while 'vbnumber' indicates 'varbind'. All vbnumber/vbvalue hashes must follow the mename/mevalue hashes.
 # ex: [
 #      {'mename' => 'id', 'mevalue' => ['.1.3.6.1.4.1.9.10.14']},

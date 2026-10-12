@@ -2,7 +2,7 @@ include Opennms::Cookbook::ConfigHelpers::Event::EventconfSourceRubyBlock
 unified_mode true
 
 property :source_name, String, name_property: true, identity: true
-deprecated_property_alias :event_file, :source_name
+deprecated_property_alias :event_file, :source_name, 'Eventconf definitions moved from files to the database accessible via API in Horizon 35 resulting in the renaming of this property. This property alias will be removed in a future release.'
 property :source_type, String, equal_to: %w(cookbook_file template remote_file), default: 'cookbook_file', desired_state: false
 property :source, String, desired_state: false
 property :source_properties, Hash, desired_state: false
