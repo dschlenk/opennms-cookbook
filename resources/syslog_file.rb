@@ -1,6 +1,8 @@
 include Opennms::XmlHelper
 include Opennms::Cookbook::Syslog::ConfigurationTemplate
 
+unified_mode true
+
 property :filename, String, name_property: true
 property :position, String, equal_to: %w(bottom top), desired_state: false
 

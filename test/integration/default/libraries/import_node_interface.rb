@@ -10,7 +10,7 @@ class ImportNodeInterface < Inspec.resource(1)
   '
 
   example '
-    describe import_node_interface(\'ip_addr\', \'foreign_source_name\', \'foreign_id\', 1242) do
+    describe import_node_interface(\'ip_addr\', \'foreign_source_name\', \'foreign_id\') do
       it { should exist }
       its(\'managed\') { should be true }
       its(\'snmp_primary\') { should eq \'P\' }
@@ -19,15 +19,12 @@ class ImportNodeInterface < Inspec.resource(1)
     end
   '
 
-  def initialize(ip_addr, foreign_source_name, foreign_id, port = 8980)
-    parsed_url = Addressable::URI.parse("http://admin:admin@localhost:#{port}/opennms/rest/requisitions/#{foreign_source_name}/nodes/#{foreign_id}/interfaces/#{ip_addr}").normalize.to_str
-    begin
-      interface = RestClient.get(parsed_url)
-    rescue StandardError
-      @exists = false
-      return
-    end
-    doc = REXML::Document.new(interface)
+  def initialize(ip_addr, foreign_source_name, foreign_id)
+    url = "http://localhost:8980/opennms/rest/requisitions/#{foreign_source_name}/nodes/#{foreign_id}/interfaces/#{ip_addr}"
+    response = inspec.http(url, auth: { user: 'admin', pass: 'admin' })
+    @exists = false
+    return if response.status == 404
+    doc = REXML::Document.new(response.body)
     i_el = doc.elements['/interface']
     @exists = !i_el.nil?
     if @exists

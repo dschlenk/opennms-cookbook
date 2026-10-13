@@ -1,9 +1,22 @@
 # OpenNMS Cookbook Changes
 
+## 35.0.0
+
+* breaking: supports Horizon 35
+* minor: eventconf and event resources adapted to work with API transparently
+* minor: action parity for provisioniong resources
+* minor: support for EL 10 added
+* bugfix: several provisioning resource bugs found and fixed
+
+## 34.1.0
+
+* breaking: replace management of Trapd via template with custom resources
+* bugfix: lint
+
 ## 34.0.1
 
-* add back management of log4j2.xml
-* move more testing to CI
+* minor: add back management of log4j2.xml
+* minor: move more testing to CI
 
 ## 34.0.0
 
@@ -171,7 +184,7 @@
 
 ### Bug Fixes
 
-* correctly use mask existence in identity of events 
+* correctly use mask existence in identity of events
 * attempt to deal with bogus gzip handling in rest calls
 * fix bug in editing of poller services
 * misc test improvements

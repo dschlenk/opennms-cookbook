@@ -1,4 +1,7 @@
 include Opennms::Rbac
+
+unified_mode true
+
 property :user_id, String, name_property: true
 property :full_name, String
 property :user_comments, String

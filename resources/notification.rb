@@ -1,3 +1,5 @@
+unified_mode true
+
 property :notification_name, String, name_property: true
 # required for new
 property :status, String, equal_to: %w(on off)

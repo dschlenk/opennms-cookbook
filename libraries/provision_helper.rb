@@ -62,7 +62,7 @@ module Opennms
           foreign_source = Opennms::Cookbook::Provision::ForeignSource.new(name, url)
           with_run_context(:root) do
             declare_resource(:http_request, "RO opennms_foreign_source POST #{name}") do
-              url "http://localhost:#{port}/opennms/rest}/foreignSources"
+              url "http://localhost:#{port}/opennms/rest/foreignSources"
               headers({ 'Content-Type' => 'application/xml', 'Authorization' => "Basic #{Base64.strict_encode64("admin:#{adminpw}")}" })
               action :nothing
               delayed_action :nothing
@@ -138,6 +138,13 @@ module Opennms
           find_resource!(:http_request, "RO opennms_import POST #{name}")
         end
 
+        def model_import_for_read(name, port)
+          model_import(name) || begin
+            ro_model_import_init(name, port, admin_secret_from_vault('password'))
+            ro_model_import(name)
+          end
+        end
+
         private
 
         def model_import_exist?(name)
@@ -184,7 +191,7 @@ module Opennms
           end
         end
 
-        def model_import_sync(name, rescan)
+        def model_import_sync(name, rescan, retries = 3, retry_delay = 10)
           url = "#{resturl}/requisitions/#{name}/import"
           url += '?rescanExisting=false' if !rescan.nil? && rescan == false
           with_run_context(:root) do
@@ -194,8 +201,8 @@ module Opennms
               action :nothing
               delayed_action :put
               message ''
-              retries 3
-              retry_delay 10
+              retries retries
+              retry_delay retry_delay
               sensitive true
             end if find_resource(:http_request, "sync opennms_import #{name}").nil?
           end
@@ -203,10 +210,38 @@ module Opennms
 
         def model_import_node_delete(fsname, fsid)
           node_url = "#{resturl}/requisitions/#{fsname}/nodes/#{fsid}"
-          Chef::Log.debug "model_import_node_delete url: #{url}"
+          Chef::Log.debug "model_import_node_delete url: #{node_url}"
           with_run_context(:root) do
-            declare_resource(:http_request, "opennms_import_node  DELETE #{fsname}") do
+            declare_resource(:http_request, "opennms_import_node DELETE #{fsname} / #{fsid}") do
               url node_url
+              headers({ 'Content-Type' => 'application/xml', 'Authorization' => "Basic #{Base64.strict_encode64("admin:#{admin_secret_from_vault('password')}")}" })
+              action :nothing
+              delayed_action :delete
+              sensitive true
+            end
+          end
+        end
+
+        def model_import_node_interface_delete(fsname, fsid, ip_addr)
+          iface_url = "#{resturl}/requisitions/#{fsname}/nodes/#{fsid}/interfaces/#{ip_addr}"
+          Chef::Log.debug "model_import_node_interface_delete url: #{iface_url}"
+          with_run_context(:root) do
+            declare_resource(:http_request, "opennms_import_node_interface DELETE #{fsname} / #{fsid} / #{ip_addr}") do
+              url iface_url
+              headers({ 'Content-Type' => 'application/xml', 'Authorization' => "Basic #{Base64.strict_encode64("admin:#{admin_secret_from_vault('password')}")}" })
+              action :nothing
+              delayed_action :delete
+              sensitive true
+            end
+          end
+        end
+
+        def model_import_node_service_delete(fsname, fsid, ip_addr, service_name)
+          svc_url = "#{resturl}/requisitions/#{fsname}/nodes/#{fsid}/interfaces/#{ip_addr}/services/#{service_name}"
+          Chef::Log.debug "model_import_node_service_delete url: #{svc_url}"
+          with_run_context(:root) do
+            declare_resource(:http_request, "opennms_import_node_service DELETE #{fsname} / #{fsid} / #{ip_addr} / #{service_name}") do
+              url svc_url
               headers({ 'Content-Type' => 'application/xml', 'Authorization' => "Basic #{Base64.strict_encode64("admin:#{admin_secret_from_vault('password')}")}" })
               action :nothing
               delayed_action :delete

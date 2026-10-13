@@ -58,6 +58,26 @@ template "#{onms_home}/etc/service-configuration.xml" do
                 bsmd: node['opennms']['services']['bsmd'],
                 ticketer: node['opennms']['services']['ticketer'],
                 discovery: node['opennms']['services']['discovery'],
+                manager: node['opennms']['services']['manager'],
+                eventd: node['opennms']['services']['eventd'],
+                alarmd: node['opennms']['services']['alarmd'],
+                queued: node['opennms']['services']['queued'],
+                actiond: node['opennms']['services']['actiond'],
+                notifd: node['opennms']['services']['notifd'],
+                scriptd: node['opennms']['services']['scriptd'],
+                rtcd: node['opennms']['services']['rtcd'],
+                pollerd: node['opennms']['services']['pollerd'],
+                enlinkd: node['opennms']['services']['enlinkd'],
+                collectd: node['opennms']['services']['collectd'],
+                vacuumd: node['opennms']['services']['vacuumd'],
+                translator: node['opennms']['services']['translator'],
+                passive_statusd: node['opennms']['services']['passive_statusd'],
+                statsd: node['opennms']['services']['statsd'],
+                provisiond: node['opennms']['services']['provisiond'],
+                ackd: node['opennms']['services']['ackd'],
+                jetty: node['opennms']['services']['jetty'],
+                ksm: node['opennms']['services']['ksm'],
+                trapd: node['opennms']['services']['trapd'],
               }
             }
   action node['opennms']['templates'] ? :create : :nothing
@@ -395,20 +415,6 @@ template "#{onms_home}/etc/syslog-northbounder-configuration.xml" do
     message_format: node['opennms']['syslog_north']['message_format'],
     destination: node['opennms']['syslog_north']['destination'],
     uei: node['opennms']['syslog_north']['uei']
-  )
-  action node['opennms']['templates'] ? :create : :nothing
-end
-
-template "#{onms_home}/etc/trapd-configuration.xml" do
-  cookbook node['opennms']['trapd']['cookbook']
-  source 'trapd-configuration.xml.erb'
-  mode '0664'
-  owner node['opennms']['username']
-  group node['opennms']['groupname']
-  notifies :restart, 'service[opennms]'
-  variables(
-    port: node['opennms']['trapd']['port'],
-    new_suspect: node['opennms']['trapd']['new_suspect']
   )
   action node['opennms']['templates'] ? :create : :nothing
 end

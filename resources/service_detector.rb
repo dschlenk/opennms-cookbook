@@ -3,6 +3,8 @@ include Opennms::XmlHelper
 include Opennms::Rbac
 require 'nokogiri'
 
+unified_mode true
+
 property :service_name, String, name_property: true
 property :class_name, String
 property :foreign_source_name, String, identity: true

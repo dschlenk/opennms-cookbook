@@ -4,6 +4,7 @@ driver:
   privileged: true
   chef_image: cincproject/cinc
   chef_version: 18
+  pull_platform_image: true
 
 transport:
   name: dokken
@@ -35,9 +36,17 @@ verifier:
   name: inspec
 
 platforms:
-  - name: oraclelinux-9
+  - name: preinstalled-34-oraclelinux-9
     driver:
       image: c1og/opennms-34-oraclelinux-9
+      pid_one_command: /usr/lib/systemd/systemd
+  - name: preinstalled-oraclelinux-9
+    driver:
+      image: c1og/opennms-35-oraclelinux-9
+      pid_one_command: /usr/lib/systemd/systemd
+  - name: oraclelinux-9
+    driver:
+      image: dokken/oraclelinux-9
       pid_one_command: /usr/lib/systemd/systemd
     lifecycle:
       pre_converge:
@@ -56,18 +65,45 @@ platforms:
                 let i+=${wait};
               done;
             '
-
+  - name: preinstalled-oraclelinux-10
+    driver:
+      image: c1og/opennms-35-oraclelinux-10
+      pid_one_command: /usr/lib/systemd/systemd
+  - name: oraclelinux-10
+    driver:
+      image: 
+      pid_one_command: /usr/lib/systemd/systemd
+    lifecycle:
+      pre_converge:
+        - remote: |
+            bash -c 'declare i=0;
+              declare wait=5;
+              declare timeout=300;
+              while true; do
+                dnf -y install libxcrypt-compat hostname dmidecode iproute && break;
+                if [ ${i} -ge ${timeout} ]; then
+                  echo "Timed out after ${i}s waiting for dnf to complete";
+                  exit 1;
+                fi;
+                echo "Waited ${i}/${timeout}s for dnf to complete, retrying in ${wait} seconds"
+                sleep ${wait};
+                let i+=${wait};
+              done;
+            '
 suites:
   - name: recommended
-    driver:
-      image: dokken/oraclelinux-9
-      ports:
-        - 1234:8980/tcp
+    lifecycle:
+      pre_converge:
+        - remote: rm -f /opt/opennms/etc/scv.jce
     verifier:
       inspec_tests:
         - path: test/integration/default
         - path: test/integration/recommended
         - path: test/integration/user
+    excludes:
+      - preinstalled-34-oraclelinux-9
+      - preinstalled-oraclelinux-9
+      - preinstalled-oraclelinux-10
     attributes:
       opennms:
         rrdtool:
@@ -82,14 +118,14 @@ suites:
   - name: kafka
     provisioner:
       policyfile: policyfiles/kafka.rb
-    driver:
-      image: dokken/oraclelinux-9
-      ports:
-        - 1250:8980/tcp
     verifier:
       inspec_tests:
         - path: test/integration/default
         - path: test/integration/kafka
+    excludes:
+      - preinstalled-34-oraclelinux-9
+      - preinstalled-oraclelinux-9
+      - preinstalled-oraclelinux-10
     attributes:
       kafka:
         broker:
@@ -97,11 +133,11 @@ suites:
           hostname: 127.0.0.1
         init_style: systemd
         version: 3.9.1
-        checksum: ''
+        checksum: ""
         sha512_checksum: 1ea204ba73411737a275429ca976d440f007ff0957b90b19be41dc5a4bae52617267769be9f0b5791714d0b3c4c760605bd426faea39edd90763585523fa2cfe
         scala_version: 2.13
-        jvm_performance_opts: ''
-        gc_log_opts: ''
+        jvm_performance_opts: ""
+        gc_log_opts: ""
         automatic_start: true
       opennms:
         kafka:
@@ -116,15 +152,21 @@ suites:
             vault: creds
         templates: true
   - name: upgrade
-    driver:
-      image: c1og/opennms-33-oraclelinux-9
     verifier:
       inspec_tests:
         - path: test/integration/default
         - path: test/integration/upgrade
+    excludes:
+      - oraclelinux-9
+      - oraclelinux-10
+      - preinstalled-oraclelinux-9
+      - preinstalled-oraclelinux-10
   - name: no_upgrade
-    driver:
-      image: c1og/opennms-33-oraclelinux-9
+    excludes:
+      - oraclelinux-9
+      - oraclelinux-10
+      - preinstalled-oraclelinux-9
+      - preinstalled-oraclelinux-10
     provisioner:
       policyfile: policyfiles/no_upgrade.rb
     verifier:
@@ -134,20 +176,29 @@ suites:
       opennms:
         upgrade: false
   - name: default
-    driver:
-      image: dokken/oraclelinux-9
-      ports:
-        - 8980:8980/tcp
+    excludes:
+      - preinstalled-34-oraclelinux-9
+      - preinstalled-oraclelinux-9
+      - preinstalled-oraclelinux-10
   - name: plugins
+    excludes:
+      - oraclelinux-9
+      - oraclelinux-10
+      - preinstalled-34-oraclelinux-9
     attributes:
       opennms:
         plugin:
-          addl: 
+          addl:
             - opennms-plugin-protocol-nsclient
             - opennms-plugin-provisioning-snmp-hardware-inventory
             - opennms-plugin-provisioning-snmp-asset
             - opennms-plugin-northbounder-jms
   - name: avail_category
+    excludes:
+      - oraclelinux-9
+      - oraclelinux-10
+      - preinstalled-34-oraclelinux-9
+      - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/avail_category.rb
     verifier:
@@ -155,6 +206,11 @@ suites:
         - path: test/integration/default
         - path: test/integration/avail_category
   - name: avail_view_section
+    excludes:
+      - oraclelinux-9
+      - oraclelinux-10
+      - preinstalled-34-oraclelinux-9
+      - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/avail_view_section.rb
     verifier:
@@ -162,6 +218,11 @@ suites:
         - path: test/integration/default
         - path: test/integration/avail_view_section
   - name: avail_view_section_mod
+    excludes:
+      - oraclelinux-9
+      - oraclelinux-10
+      - preinstalled-34-oraclelinux-9
+      - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/avail_view_section_mod.rb
     verifier:
@@ -169,6 +230,11 @@ suites:
         - path: test/integration/default
         - path: test/integration/avail_view_section_mod
   - name: collection_graph
+    excludes:
+      - oraclelinux-9
+      - oraclelinux-10
+      - preinstalled-34-oraclelinux-9
+      - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/collection_graph.rb
     verifier:
@@ -176,6 +242,11 @@ suites:
         - path: test/integration/default
         - path: test/integration/collection_graph
   - name: collection_graph_file
+    excludes:
+      - oraclelinux-9
+      - oraclelinux-10
+      - preinstalled-34-oraclelinux-9
+      - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/collection_graph_file.rb
     verifier:
@@ -183,6 +254,11 @@ suites:
         - path: test/integration/default
         - path: test/integration/collection_graph_file
   - name: collection_package
+    excludes:
+      - oraclelinux-9
+      - oraclelinux-10
+      - preinstalled-34-oraclelinux-9
+      - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/collection_package.rb
     verifier:
@@ -190,6 +266,11 @@ suites:
         - path: test/integration/default
         - path: test/integration/collection_package
   - name: collection_package_delete
+    excludes:
+      - oraclelinux-9
+      - oraclelinux-10
+      - preinstalled-34-oraclelinux-9
+      - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/collection_package_delete.rb
     verifier:
@@ -197,6 +278,11 @@ suites:
         - path: test/integration/default
         - path: test/integration/collection_package_delete
   - name: collection_package_update
+    excludes:
+      - oraclelinux-9
+      - oraclelinux-10
+      - preinstalled-34-oraclelinux-9
+      - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/collection_package_update.rb
     verifier:
@@ -204,6 +290,11 @@ suites:
         - path: test/integration/default
         - path: test/integration/collection_package_update
   - name: collection_package_update_excludes
+    excludes:
+      - oraclelinux-9
+      - oraclelinux-10
+      - preinstalled-34-oraclelinux-9
+      - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/collection_package_update_excludes.rb
     verifier:
@@ -211,6 +302,11 @@ suites:
         - path: test/integration/default
         - path: test/integration/collection_package_update_excludes
   - name: collection_package_update_ifaliasdomain
+    excludes:
+      - oraclelinux-9
+      - oraclelinux-10
+      - preinstalled-34-oraclelinux-9
+      - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/collection_package_update_ifaliasdomain.rb
     verifier:
@@ -218,6 +314,11 @@ suites:
         - path: test/integration/default
         - path: test/integration/collection_package_update_ifaliasdomain
   - name: collection_package_update_includes
+    excludes:
+      - oraclelinux-9
+      - oraclelinux-10
+      - preinstalled-34-oraclelinux-9
+      - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/collection_package_update_includes.rb
     verifier:
@@ -225,6 +326,11 @@ suites:
         - path: test/integration/default
         - path: test/integration/collection_package_update_includes
   - name: collection_package_update_outage_calendars
+    excludes:
+      - oraclelinux-9
+      - oraclelinux-10
+      - preinstalled-34-oraclelinux-9
+      - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/collection_package_update_outage_calendars.rb
     verifier:
@@ -232,6 +338,11 @@ suites:
         - path: test/integration/default
         - path: test/integration/collection_package_update_outage_calendars
   - name: collection_package_update_sbifalias
+    excludes:
+      - oraclelinux-9
+      - oraclelinux-10
+      - preinstalled-34-oraclelinux-9
+      - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/collection_package_update_sbifalias.rb
     verifier:
@@ -239,6 +350,11 @@ suites:
         - path: test/integration/default
         - path: test/integration/collection_package_update_sbifalias
   - name: collection_package_update_specifics
+    excludes:
+      - oraclelinux-9
+      - oraclelinux-10
+      - preinstalled-34-oraclelinux-9
+      - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/collection_package_update_specifics.rb
     verifier:
@@ -246,6 +362,11 @@ suites:
         - path: test/integration/default
         - path: test/integration/collection_package_update_specifics
   - name: collection_package_update_urls
+    excludes:
+      - oraclelinux-9
+      - oraclelinux-10
+      - preinstalled-34-oraclelinux-9
+      - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/collection_package_update_urls.rb
     verifier:
@@ -253,6 +374,11 @@ suites:
         - path: test/integration/default
         - path: test/integration/collection_package_update_urls
   - name: collection_service
+    excludes:
+      - oraclelinux-9
+      - oraclelinux-10
+      - preinstalled-34-oraclelinux-9
+      - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/collection_service.rb
     verifier:
@@ -260,6 +386,11 @@ suites:
         - path: test/integration/default
         - path: test/integration/collection_service
   - name: correlation
+    excludes:
+      - oraclelinux-9
+      - oraclelinux-10
+      - preinstalled-34-oraclelinux-9
+      - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/correlation.rb
     verifier:
@@ -267,6 +398,11 @@ suites:
         - path: test/integration/default
         - path: test/integration/correlation
   - name: correlation_edit
+    excludes:
+      - oraclelinux-9
+      - oraclelinux-10
+      - preinstalled-34-oraclelinux-9
+      - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/correlation_edit.rb
     verifier:
@@ -274,6 +410,11 @@ suites:
         - path: test/integration/default
         - path: test/integration/correlation_edit
   - name: dashlet
+    excludes:
+      - oraclelinux-9
+      - oraclelinux-10
+      - preinstalled-34-oraclelinux-9
+      - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/dashlet.rb
     verifier:
@@ -281,6 +422,11 @@ suites:
         - path: test/integration/default
         - path: test/integration/dashlet
   - name: dashlet_update
+    excludes:
+      - oraclelinux-9
+      - oraclelinux-10
+      - preinstalled-34-oraclelinux-9
+      - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/dashlet_update.rb
     verifier:
@@ -288,6 +434,11 @@ suites:
         - path: test/integration/default
         - path: test/integration/dashlet_update
   - name: destination_path
+    excludes:
+      - oraclelinux-9
+      - oraclelinux-10
+      - preinstalled-34-oraclelinux-9
+      - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/destination_path.rb
     verifier:
@@ -295,6 +446,11 @@ suites:
         - path: test/integration/default
         - path: test/integration/destination_path
   - name: disco_range
+    excludes:
+      - oraclelinux-9
+      - oraclelinux-10
+      - preinstalled-34-oraclelinux-9
+      - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/disco_range.rb
     verifier:
@@ -302,6 +458,11 @@ suites:
         - path: test/integration/default
         - path: test/integration/disco_range
   - name: disco_specific
+    excludes:
+      - oraclelinux-9
+      - oraclelinux-10
+      - preinstalled-34-oraclelinux-9
+      - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/disco_specific.rb
     verifier:
@@ -309,6 +470,11 @@ suites:
         - path: test/integration/default
         - path: test/integration/disco_specific
   - name: disco_url
+    excludes:
+      - oraclelinux-9
+      - oraclelinux-10
+      - preinstalled-34-oraclelinux-9
+      - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/disco_url.rb
     verifier:
@@ -316,6 +482,11 @@ suites:
         - path: test/integration/default
         - path: test/integration/disco_url
   - name: eventconf
+    excludes:
+      - oraclelinux-9
+      - oraclelinux-10
+      - preinstalled-34-oraclelinux-9
+      - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/eventconf.rb
     verifier:
@@ -323,6 +494,11 @@ suites:
         - path: test/integration/default
         - path: test/integration/eventconf
   - name: event
+    excludes:
+      - oraclelinux-9
+      - oraclelinux-10
+      - preinstalled-34-oraclelinux-9
+      - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/event.rb
     verifier:
@@ -330,6 +506,11 @@ suites:
         - path: test/integration/default
         - path: test/integration/event
   - name: event_add_parameters
+    excludes:
+      - oraclelinux-9
+      - oraclelinux-10
+      - preinstalled-34-oraclelinux-9
+      - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/event_add_parameters.rb
     verifier:
@@ -337,6 +518,11 @@ suites:
         - path: test/integration/default
         - path: test/integration/event_add_parameters
   - name: event_change_parameters
+    excludes:
+      - oraclelinux-9
+      - oraclelinux-10
+      - preinstalled-34-oraclelinux-9
+      - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/event_change_parameters.rb
     verifier:
@@ -344,6 +530,11 @@ suites:
         - path: test/integration/default
         - path: test/integration/event_change_parameters
   - name: event_descr
+    excludes:
+      - oraclelinux-9
+      - oraclelinux-10
+      - preinstalled-34-oraclelinux-9
+      - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/event_descr.rb
     verifier:
@@ -351,6 +542,11 @@ suites:
         - path: test/integration/default
         - path: test/integration/event_descr
   - name: event_edit_alarm_data
+    excludes:
+      - oraclelinux-9
+      - oraclelinux-10
+      - preinstalled-34-oraclelinux-9
+      - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/event_edit_alarm_data.rb
     verifier:
@@ -358,6 +554,11 @@ suites:
         - path: test/integration/default
         - path: test/integration/event_edit_alarm_data
   - name: event_edit_autoaction
+    excludes:
+      - oraclelinux-9
+      - oraclelinux-10
+      - preinstalled-34-oraclelinux-9
+      - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/event_edit_autoaction.rb
     verifier:
@@ -365,6 +566,11 @@ suites:
         - path: test/integration/default
         - path: test/integration/event_edit_autoaction
   - name: event_edit_forward
+    excludes:
+      - oraclelinux-9
+      - oraclelinux-10
+      - preinstalled-34-oraclelinux-9
+      - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/event_edit_forward.rb
     verifier:
@@ -372,6 +578,11 @@ suites:
         - path: test/integration/default
         - path: test/integration/event_edit_forward
   - name: event_edit_mouseovertext
+    excludes:
+      - oraclelinux-9
+      - oraclelinux-10
+      - preinstalled-34-oraclelinux-9
+      - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/event_edit_mouseovertext.rb
     verifier:
@@ -379,6 +590,11 @@ suites:
         - path: test/integration/default
         - path: test/integration/event_edit_mouseovertext
   - name: event_edit_operinstruct
+    excludes:
+      - oraclelinux-9
+      - oraclelinux-10
+      - preinstalled-34-oraclelinux-9
+      - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/event_edit_operinstruct.rb
     verifier:
@@ -386,6 +602,11 @@ suites:
         - path: test/integration/default
         - path: test/integration/event_edit_operinstruct
   - name: event_edit_script
+    excludes:
+      - oraclelinux-9
+      - oraclelinux-10
+      - preinstalled-34-oraclelinux-9
+      - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/event_edit_script.rb
     verifier:
@@ -393,6 +614,11 @@ suites:
         - path: test/integration/default
         - path: test/integration/event_edit_script
   - name: event_edit_tticket
+    excludes:
+      - oraclelinux-9
+      - oraclelinux-10
+      - preinstalled-34-oraclelinux-9
+      - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/event_edit_tticket.rb
     verifier:
@@ -400,6 +626,11 @@ suites:
         - path: test/integration/default
         - path: test/integration/event_edit_tticket
   - name: event_edit_varbindsdecode
+    excludes:
+      - oraclelinux-9
+      - oraclelinux-10
+      - preinstalled-34-oraclelinux-9
+      - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/event_edit_varbindsdecode.rb
     verifier:
@@ -407,6 +638,11 @@ suites:
         - path: test/integration/default
         - path: test/integration/event_edit_varbindsdecode
   - name: event_event_label
+    excludes:
+      - oraclelinux-9
+      - oraclelinux-10
+      - preinstalled-34-oraclelinux-9
+      - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/event_label.rb
     verifier:
@@ -414,6 +650,11 @@ suites:
         - path: test/integration/default
         - path: test/integration/event_label
   - name: event_logmsg
+    excludes:
+      - oraclelinux-9
+      - oraclelinux-10
+      - preinstalled-34-oraclelinux-9
+      - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/event_logmsg.rb
     verifier:
@@ -421,6 +662,11 @@ suites:
         - path: test/integration/default
         - path: test/integration/event_logmsg
   - name: event_logmsg_dest
+    excludes:
+      - oraclelinux-9
+      - oraclelinux-10
+      - preinstalled-34-oraclelinux-9
+      - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/event_logmsg_dest.rb
     verifier:
@@ -428,6 +674,11 @@ suites:
         - path: test/integration/default
         - path: test/integration/event_logmsg_dest
   - name: event_logmsg_notify
+    excludes:
+      - oraclelinux-9
+      - oraclelinux-10
+      - preinstalled-34-oraclelinux-9
+      - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/event_logmsg_notify.rb
     verifier:
@@ -435,6 +686,11 @@ suites:
         - path: test/integration/default
         - path: test/integration/event_logmsg_notify
   - name: event_noop
+    excludes:
+      - oraclelinux-9
+      - oraclelinux-10
+      - preinstalled-34-oraclelinux-9
+      - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/event_noop.rb
     verifier:
@@ -442,6 +698,11 @@ suites:
         - path: test/integration/default
         - path: test/integration/event_noop
   - name: event_remove_add_alarm_data
+    excludes:
+      - oraclelinux-9
+      - oraclelinux-10
+      - preinstalled-34-oraclelinux-9
+      - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/event_remove_add_alarm_data.rb
     verifier:
@@ -449,6 +710,11 @@ suites:
         - path: test/integration/default
         - path: test/integration/event_remove_add_alarm_data
   - name: event_remove_add_autoaction
+    excludes:
+      - oraclelinux-9
+      - oraclelinux-10
+      - preinstalled-34-oraclelinux-9
+      - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/event_remove_add_autoaction.rb
     verifier:
@@ -456,6 +722,11 @@ suites:
         - path: test/integration/default
         - path: test/integration/event_remove_add_autoaction
   - name: event_remove_add_forward
+    excludes:
+      - oraclelinux-9
+      - oraclelinux-10
+      - preinstalled-34-oraclelinux-9
+      - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/event_remove_add_forward.rb
     verifier:
@@ -463,6 +734,11 @@ suites:
         - path: test/integration/default
         - path: test/integration/event_remove_add_forward
   - name: event_remove_add_script
+    excludes:
+      - oraclelinux-9
+      - oraclelinux-10
+      - preinstalled-34-oraclelinux-9
+      - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/event_remove_add_script.rb
     verifier:
@@ -470,6 +746,11 @@ suites:
         - path: test/integration/default
         - path: test/integration/event_remove_add_script
   - name: event_remove_add_tticket
+    excludes:
+      - oraclelinux-9
+      - oraclelinux-10
+      - preinstalled-34-oraclelinux-9
+      - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/event_remove_add_tticket.rb
     verifier:
@@ -477,6 +758,11 @@ suites:
         - path: test/integration/default
         - path: test/integration/event_remove_add_tticket
   - name: event_remove_add_varbindsdecode
+    excludes:
+      - oraclelinux-9
+      - oraclelinux-10
+      - preinstalled-34-oraclelinux-9
+      - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/event_remove_add_varbindsdecode.rb
     verifier:
@@ -484,6 +770,11 @@ suites:
         - path: test/integration/default
         - path: test/integration/event_remove_add_varbindsdecode
   - name: event_remove_alarm_data
+    excludes:
+      - oraclelinux-9
+      - oraclelinux-10
+      - preinstalled-34-oraclelinux-9
+      - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/event_remove_alarm_data.rb
     verifier:
@@ -491,6 +782,11 @@ suites:
         - path: test/integration/default
         - path: test/integration/event_remove_alarm_data
   - name: event_remove_autoaction
+    excludes:
+      - oraclelinux-9
+      - oraclelinux-10
+      - preinstalled-34-oraclelinux-9
+      - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/event_remove_autoaction.rb
     verifier:
@@ -498,6 +794,11 @@ suites:
         - path: test/integration/default
         - path: test/integration/event_remove_autoaction
   - name: event_remove_forward
+    excludes:
+      - oraclelinux-9
+      - oraclelinux-10
+      - preinstalled-34-oraclelinux-9
+      - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/event_remove_forward.rb
     verifier:
@@ -505,6 +806,11 @@ suites:
         - path: test/integration/default
         - path: test/integration/event_remove_forward
   - name: event_remove_script
+    excludes:
+      - oraclelinux-9
+      - oraclelinux-10
+      - preinstalled-34-oraclelinux-9
+      - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/event_remove_script.rb
     verifier:
@@ -512,6 +818,11 @@ suites:
         - path: test/integration/default
         - path: test/integration/event_remove_script
   - name: event_remove_tticket
+    excludes:
+      - oraclelinux-9
+      - oraclelinux-10
+      - preinstalled-34-oraclelinux-9
+      - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/event_remove_tticket.rb
     verifier:
@@ -519,6 +830,11 @@ suites:
         - path: test/integration/default
         - path: test/integration/event_remove_tticket
   - name: event_remove_varbindsdecode
+    excludes:
+      - oraclelinux-9
+      - oraclelinux-10
+      - preinstalled-34-oraclelinux-9
+      - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/event_remove_varbindsdecode.rb
     verifier:
@@ -526,6 +842,11 @@ suites:
         - path: test/integration/default
         - path: test/integration/event_remove_varbindsdecode
   - name: event_severity
+    excludes:
+      - oraclelinux-9
+      - oraclelinux-10
+      - preinstalled-34-oraclelinux-9
+      - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/event_severity.rb
     verifier:
@@ -533,6 +854,11 @@ suites:
         - path: test/integration/default
         - path: test/integration/event_severity
   - name: expression
+    excludes:
+      - oraclelinux-9
+      - oraclelinux-10
+      - preinstalled-34-oraclelinux-9
+      - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/expression.rb
     verifier:
@@ -540,6 +866,11 @@ suites:
         - path: test/integration/default
         - path: test/integration/expression
   - name: expression_change_descr
+    excludes:
+      - oraclelinux-9
+      - oraclelinux-10
+      - preinstalled-34-oraclelinux-9
+      - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/expression_change_descr.rb
     verifier:
@@ -547,6 +878,11 @@ suites:
         - path: test/integration/default
         - path: test/integration/expression_change_descr
   - name: expression_change_rearm
+    excludes:
+      - oraclelinux-9
+      - oraclelinux-10
+      - preinstalled-34-oraclelinux-9
+      - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/expression_change_rearm.rb
     verifier:
@@ -554,6 +890,11 @@ suites:
         - path: test/integration/default
         - path: test/integration/expression_change_rearm
   - name: expression_change_relaxed
+    excludes:
+      - oraclelinux-9
+      - oraclelinux-10
+      - preinstalled-34-oraclelinux-9
+      - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/expression_change_relaxed.rb
     verifier:
@@ -561,6 +902,11 @@ suites:
         - path: test/integration/default
         - path: test/integration/expression_change_relaxed
   - name: expression_change_trigger
+    excludes:
+      - oraclelinux-9
+      - oraclelinux-10
+      - preinstalled-34-oraclelinux-9
+      - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/expression_change_trigger.rb
     verifier:
@@ -568,6 +914,11 @@ suites:
         - path: test/integration/default
         - path: test/integration/expression_change_trigger
   - name: expression_change_value
+    excludes:
+      - oraclelinux-9
+      - oraclelinux-10
+      - preinstalled-34-oraclelinux-9
+      - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/expression_change_value.rb
     verifier:
@@ -575,6 +926,11 @@ suites:
         - path: test/integration/default
         - path: test/integration/expression_change_value
   - name: expression_delete
+    excludes:
+      - oraclelinux-9
+      - oraclelinux-10
+      - preinstalled-34-oraclelinux-9
+      - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/expression_delete.rb
     verifier:
@@ -582,9 +938,11 @@ suites:
         - path: test/integration/default
         - path: test/integration/expression_delete
   - name: foreign_source
-    driver:
-      ports:
-        - 1237:8980/tcp
+    excludes:
+      - oraclelinux-9
+      - oraclelinux-10
+      - preinstalled-34-oraclelinux-9
+      - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/foreign_source.rb
     verifier:
@@ -592,6 +950,11 @@ suites:
         - path: test/integration/default
         - path: test/integration/foreign_source
   - name: group
+    excludes:
+      - oraclelinux-9
+      - oraclelinux-10
+      - preinstalled-34-oraclelinux-9
+      - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/group.rb
     verifier:
@@ -599,9 +962,11 @@ suites:
         - path: test/integration/default
         - path: test/integration/group
   - name: opennms_import
-    driver:
-      ports:
-        - 1240:8980/tcp
+    excludes:
+      - oraclelinux-9
+      - oraclelinux-10
+      - preinstalled-34-oraclelinux-9
+      - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/import.rb
     verifier:
@@ -609,9 +974,11 @@ suites:
         - path: test/integration/default
         - path: test/integration/import
   - name: opennms_import_node
-    driver:
-      ports:
-        - 1241:8980/tcp
+    excludes:
+      - oraclelinux-9
+      - oraclelinux-10
+      - preinstalled-34-oraclelinux-9
+      - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/import_node.rb
     verifier:
@@ -619,9 +986,11 @@ suites:
         - path: test/integration/default
         - path: test/integration/import_node
   - name: opennms_import_node_interface
-    driver:
-      ports:
-        - 1242:8980/tcp
+    excludes:
+      - oraclelinux-9
+      - oraclelinux-10
+      - preinstalled-34-oraclelinux-9
+      - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/import_node_interface.rb
     verifier:
@@ -629,9 +998,11 @@ suites:
         - path: test/integration/default
         - path: test/integration/import_node_interface
   - name: opennms_import_node_interface_service
-    driver:
-      ports:
-        - 1243:8980/tcp
+    excludes:
+      - oraclelinux-9
+      - oraclelinux-10
+      - preinstalled-34-oraclelinux-9
+      - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/import_node_interface_service.rb
     verifier:
@@ -639,6 +1010,11 @@ suites:
         - path: test/integration/default
         - path: test/integration/import_node_interface_service
   - name: jdbc_collection
+    excludes:
+      - oraclelinux-9
+      - oraclelinux-10
+      - preinstalled-34-oraclelinux-9
+      - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/jdbc_collection.rb
     verifier:
@@ -646,6 +1022,11 @@ suites:
         - path: test/integration/default
         - path: test/integration/jdbc_collection
   - name: jdbc_collection_edit
+    excludes:
+      - oraclelinux-9
+      - oraclelinux-10
+      - preinstalled-34-oraclelinux-9
+      - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/jdbc_collection_edit.rb
     verifier:
@@ -653,6 +1034,11 @@ suites:
         - path: test/integration/default
         - path: test/integration/jdbc_collection_edit
   - name: jdbc_collection_delete
+    excludes:
+      - oraclelinux-9
+      - oraclelinux-10
+      - preinstalled-34-oraclelinux-9
+      - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/jdbc_collection_delete.rb
     verifier:
@@ -660,6 +1046,11 @@ suites:
         - path: test/integration/default
         - path: test/integration/jdbc_collection_delete
   - name: jdbc_query
+    excludes:
+      - oraclelinux-9
+      - oraclelinux-10
+      - preinstalled-34-oraclelinux-9
+      - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/jdbc_query.rb
     verifier:
@@ -667,6 +1058,11 @@ suites:
         - path: test/integration/default
         - path: test/integration/jdbc_query
   - name: jdbc_query_edit
+    excludes:
+      - oraclelinux-9
+      - oraclelinux-10
+      - preinstalled-34-oraclelinux-9
+      - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/jdbc_query_edit.rb
     verifier:
@@ -674,6 +1070,11 @@ suites:
         - path: test/integration/default
         - path: test/integration/jdbc_query_edit
   - name: jdbc_query_delete
+    excludes:
+      - oraclelinux-9
+      - oraclelinux-10
+      - preinstalled-34-oraclelinux-9
+      - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/jdbc_query_delete.rb
     verifier:
@@ -681,6 +1082,11 @@ suites:
         - path: test/integration/default
         - path: test/integration/jdbc_query_delete
   - name: jdbc_collection_service
+    excludes:
+      - oraclelinux-9
+      - oraclelinux-10
+      - preinstalled-34-oraclelinux-9
+      - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/jdbc_collection_service.rb
     verifier:
@@ -688,6 +1094,11 @@ suites:
         - path: test/integration/default
         - path: test/integration/jdbc_collection_service
   - name: jdbc_collection_service_edit
+    excludes:
+      - oraclelinux-9
+      - oraclelinux-10
+      - preinstalled-34-oraclelinux-9
+      - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/jdbc_collection_service_edit.rb
     verifier:
@@ -695,6 +1106,11 @@ suites:
         - path: test/integration/default
         - path: test/integration/jdbc_collection_service_edit
   - name: jdbc_collection_service_noop
+    excludes:
+      - oraclelinux-9
+      - oraclelinux-10
+      - preinstalled-34-oraclelinux-9
+      - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/jdbc_collection_service_noop.rb
     verifier:
@@ -702,6 +1118,11 @@ suites:
         - path: test/integration/default
         - path: test/integration/jdbc_collection_service_noop
   - name: jdbc_collection_service_delete
+    excludes:
+      - oraclelinux-9
+      - oraclelinux-10
+      - preinstalled-34-oraclelinux-9
+      - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/jdbc_collection_service_delete.rb
     verifier:
@@ -709,6 +1130,11 @@ suites:
         - path: test/integration/default
         - path: test/integration/jdbc_collection_service_delete
   - name: jms_nb_destination
+    excludes:
+      - oraclelinux-9
+      - oraclelinux-10
+      - preinstalled-34-oraclelinux-9
+      - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/jms_nb_destination.rb
     verifier:
@@ -716,6 +1142,11 @@ suites:
         - path: test/integration/default
         - path: test/integration/jms_nb_destination
   - name: jms_nb_destination_delete
+    excludes:
+      - oraclelinux-9
+      - oraclelinux-10
+      - preinstalled-34-oraclelinux-9
+      - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/jms_nb_destination_delete.rb
     verifier:
@@ -723,6 +1154,11 @@ suites:
         - path: test/integration/default
         - path: test/integration/jms_nb_destination_delete
   - name: jmx
+    excludes:
+      - oraclelinux-9
+      - oraclelinux-10
+      - preinstalled-34-oraclelinux-9
+      - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/jmx.rb
     verifier:
@@ -730,6 +1166,11 @@ suites:
         - path: test/integration/default
         - path: test/integration/jmx
   - name: notifd_autoack
+    excludes:
+      - oraclelinux-9
+      - oraclelinux-10
+      - preinstalled-34-oraclelinux-9
+      - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/notifd_autoack.rb
     verifier:
@@ -737,6 +1178,11 @@ suites:
         - path: test/integration/default
         - path: test/integration/notifd_autoack
   - name: notification
+    excludes:
+      - oraclelinux-9
+      - oraclelinux-10
+      - preinstalled-34-oraclelinux-9
+      - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/notification.rb
     verifier:
@@ -744,6 +1190,11 @@ suites:
         - path: test/integration/default
         - path: test/integration/notification
   - name: notification_command
+    excludes:
+      - oraclelinux-9
+      - oraclelinux-10
+      - preinstalled-34-oraclelinux-9
+      - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/notification_command.rb
     verifier:
@@ -751,6 +1202,11 @@ suites:
         - path: test/integration/default
         - path: test/integration/notification_command
   - name: poller
+    excludes:
+      - oraclelinux-9
+      - oraclelinux-10
+      - preinstalled-34-oraclelinux-9
+      - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/poller.rb
     verifier:
@@ -758,6 +1214,11 @@ suites:
         - path: test/integration/default
         - path: test/integration/poller
   - name: poller_edit
+    excludes:
+      - oraclelinux-9
+      - oraclelinux-10
+      - preinstalled-34-oraclelinux-9
+      - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/poller_edit.rb
     verifier:
@@ -765,6 +1226,11 @@ suites:
         - path: test/integration/default
         - path: test/integration/poller_edit
   - name: poller_delete
+    excludes:
+      - oraclelinux-9
+      - oraclelinux-10
+      - preinstalled-34-oraclelinux-9
+      - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/poller_delete.rb
     verifier:
@@ -772,6 +1238,11 @@ suites:
         - path: test/integration/default
         - path: test/integration/poller_delete
   - name: poller_remove_parms
+    excludes:
+      - oraclelinux-9
+      - oraclelinux-10
+      - preinstalled-34-oraclelinux-9
+      - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/poller_remove_parms.rb
     verifier:
@@ -779,9 +1250,11 @@ suites:
         - path: test/integration/default
         - path: test/integration/poller_remove_parms
   - name: policy
-    driver:
-      ports:
-        - 1239:8980/tcp
+    excludes:
+      - oraclelinux-9
+      - oraclelinux-10
+      - preinstalled-34-oraclelinux-9
+      - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/policy.rb
     verifier:
@@ -789,6 +1262,11 @@ suites:
         - path: test/integration/default
         - path: test/integration/policy
   - name: resource_type
+    excludes:
+      - oraclelinux-9
+      - oraclelinux-10
+      - preinstalled-34-oraclelinux-9
+      - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/resource_type.rb
     verifier:
@@ -796,6 +1274,11 @@ suites:
         - path: test/integration/default
         - path: test/integration/resource_type
   - name: response_graph
+    excludes:
+      - oraclelinux-9
+      - oraclelinux-10
+      - preinstalled-34-oraclelinux-9
+      - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/response_graph.rb
     verifier:
@@ -803,6 +1286,11 @@ suites:
         - path: test/integration/default
         - path: test/integration/response_graph
   - name: role
+    excludes:
+      - oraclelinux-9
+      - oraclelinux-10
+      - preinstalled-34-oraclelinux-9
+      - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/role.rb
     verifier:
@@ -810,6 +1298,11 @@ suites:
         - path: test/integration/default
         - path: test/integration/role
   - name: scriptd
+    excludes:
+      - oraclelinux-9
+      - oraclelinux-10
+      - preinstalled-34-oraclelinux-9
+      - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/scriptd.rb
     verifier:
@@ -817,9 +1310,11 @@ suites:
         - path: test/integration/default
         - path: test/integration/script
   - name: send_event
-    driver:
-      ports:
-        - 1236:8980/tcp
+    excludes:
+      - oraclelinux-9
+      - oraclelinux-10
+      - preinstalled-34-oraclelinux-9
+      - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/send_event.rb
     verifier:
@@ -827,9 +1322,11 @@ suites:
         - path: test/integration/default
         - path: test/integration/send_event
   - name: service_detector
-    driver:
-      ports:
-        - 1238:8980/tcp
+    excludes:
+      - oraclelinux-9
+      - oraclelinux-10
+      - preinstalled-34-oraclelinux-9
+      - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/service_detector.rb
     verifier:
@@ -837,9 +1334,11 @@ suites:
         - path: test/integration/default
         - path: test/integration/service_detector
   - name: service_detector_delete
-    driver:
-      ports:
-        - 1244:8980/tcp
+    excludes:
+      - oraclelinux-9
+      - oraclelinux-10
+      - preinstalled-34-oraclelinux-9
+      - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/service_detector_delete.rb
     verifier:
@@ -847,9 +1346,11 @@ suites:
         - path: test/integration/default
         - path: test/integration/service_detector_delete
   - name: service_detector_edit
-    driver:
-      ports:
-        - 1245:8980/tcp
+    excludes:
+      - oraclelinux-9
+      - oraclelinux-10
+      - preinstalled-34-oraclelinux-9
+      - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/service_detector_edit.rb
     verifier:
@@ -857,9 +1358,11 @@ suites:
         - path: test/integration/default
         - path: test/integration/service_detector_edit
   - name: service_detector_noop
-    driver:
-      ports:
-        - 1246:8980/tcp
+    excludes:
+      - oraclelinux-9
+      - oraclelinux-10
+      - preinstalled-34-oraclelinux-9
+      - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/service_detector_noop.rb
     verifier:
@@ -867,6 +1370,11 @@ suites:
         - path: test/integration/default
         - path: test/integration/service_detector_noop
   - name: snmp_collection
+    excludes:
+      - oraclelinux-9
+      - oraclelinux-10
+      - preinstalled-34-oraclelinux-9
+      - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/snmp_collection.rb
     verifier:
@@ -874,6 +1382,11 @@ suites:
         - path: test/integration/default
         - path: test/integration/snmp_collection
   - name: snmp_collection_group
+    excludes:
+      - oraclelinux-9
+      - oraclelinux-10
+      - preinstalled-34-oraclelinux-9
+      - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/snmp_collection_group.rb
     verifier:
@@ -881,6 +1394,11 @@ suites:
         - path: test/integration/default
         - path: test/integration/snmp_collection_group
   - name: snmp_collection_group_edit
+    excludes:
+      - oraclelinux-9
+      - oraclelinux-10
+      - preinstalled-34-oraclelinux-9
+      - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/snmp_collection_group_edit.rb
     verifier:
@@ -888,6 +1406,11 @@ suites:
         - path: test/integration/default
         - path: test/integration/snmp_collection_group_edit
   - name: snmp_collection_group_delete
+    excludes:
+      - oraclelinux-9
+      - oraclelinux-10
+      - preinstalled-34-oraclelinux-9
+      - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/snmp_collection_group_delete.rb
     verifier:
@@ -895,6 +1418,11 @@ suites:
         - path: test/integration/default
         - path: test/integration/snmp_collection_group_delete
   - name: snmp_collection_service
+    excludes:
+      - oraclelinux-9
+      - oraclelinux-10
+      - preinstalled-34-oraclelinux-9
+      - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/snmp_collection_service.rb
     verifier:
@@ -902,6 +1430,11 @@ suites:
         - path: test/integration/default
         - path: test/integration/snmp_collection_service
   - name: snmp_config_definition
+    excludes:
+      - oraclelinux-9
+      - oraclelinux-10
+      - preinstalled-34-oraclelinux-9
+      - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/snmp_config_definition.rb
     verifier:
@@ -909,6 +1442,11 @@ suites:
         - path: test/integration/default
         - path: test/integration/snmp_config_definition
   - name: snmp_config_definition_update
+    excludes:
+      - oraclelinux-9
+      - oraclelinux-10
+      - preinstalled-34-oraclelinux-9
+      - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/snmp_config_definition_update.rb
     verifier:
@@ -916,6 +1454,11 @@ suites:
         - path: test/integration/default
         - path: test/integration/snmp_config_definition_update
   - name: snmp_config_definition_delete
+    excludes:
+      - oraclelinux-9
+      - oraclelinux-10
+      - preinstalled-34-oraclelinux-9
+      - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/snmp_config_definition_delete.rb
     verifier:
@@ -923,6 +1466,11 @@ suites:
         - path: test/integration/default
         - path: test/integration/snmp_config_definition_delete
   - name: snmp_config_profile
+    excludes:
+      - oraclelinux-9
+      - oraclelinux-10
+      - preinstalled-34-oraclelinux-9
+      - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/snmp_config_profile.rb
     verifier:
@@ -930,6 +1478,11 @@ suites:
         - path: test/integration/default
         - path: test/integration/snmp_config_profile
   - name: snmp_config_profile_update
+    excludes:
+      - oraclelinux-9
+      - oraclelinux-10
+      - preinstalled-34-oraclelinux-9
+      - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/snmp_config_profile_update.rb
     verifier:
@@ -937,6 +1490,11 @@ suites:
         - path: test/integration/default
         - path: test/integration/snmp_config_profile_update
   - name: snmp_config_profile_delete
+    excludes:
+      - oraclelinux-9
+      - oraclelinux-10
+      - preinstalled-34-oraclelinux-9
+      - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/snmp_config_profile_delete.rb
     verifier:
@@ -944,6 +1502,11 @@ suites:
         - path: test/integration/default
         - path: test/integration/snmp_config_profile_delete
   - name: statsd
+    excludes:
+      - oraclelinux-9
+      - oraclelinux-10
+      - preinstalled-34-oraclelinux-9
+      - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/statsd.rb
     verifier:
@@ -951,6 +1514,11 @@ suites:
         - path: test/integration/default
         - path: test/integration/statsd
   - name: surveillance_view
+    excludes:
+      - oraclelinux-9
+      - oraclelinux-10
+      - preinstalled-34-oraclelinux-9
+      - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/surveillance_view.rb
     verifier:
@@ -958,6 +1526,11 @@ suites:
         - path: test/integration/default
         - path: test/integration/surveillance_view
   - name: surveillance_view_mod
+    excludes:
+      - oraclelinux-9
+      - oraclelinux-10
+      - preinstalled-34-oraclelinux-9
+      - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/surveillance_view_mod.rb
     verifier:
@@ -965,6 +1538,11 @@ suites:
         - path: test/integration/default
         - path: test/integration/surveillance_view_mod
   - name: syslog_file
+    excludes:
+      - oraclelinux-9
+      - oraclelinux-10
+      - preinstalled-34-oraclelinux-9
+      - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/syslog_file.rb
     verifier:
@@ -972,6 +1550,11 @@ suites:
         - path: test/integration/default
         - path: test/integration/syslog_file
   - name: system_def
+    excludes:
+      - oraclelinux-9
+      - oraclelinux-10
+      - preinstalled-34-oraclelinux-9
+      - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/system_def.rb
     verifier:
@@ -979,6 +1562,11 @@ suites:
         - path: test/integration/default
         - path: test/integration/system_def
   - name: threshd_package
+    excludes:
+      - oraclelinux-9
+      - oraclelinux-10
+      - preinstalled-34-oraclelinux-9
+      - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/threshd_package.rb
     verifier:
@@ -986,6 +1574,11 @@ suites:
         - path: test/integration/default
         - path: test/integration/threshd_package
   - name: threshd_service
+    excludes:
+      - oraclelinux-9
+      - oraclelinux-10
+      - preinstalled-34-oraclelinux-9
+      - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/threshd_service.rb
     verifier:
@@ -993,6 +1586,11 @@ suites:
         - path: test/integration/default
         - path: test/integration/threshd_service
   - name: threshold
+    excludes:
+      - oraclelinux-9
+      - oraclelinux-10
+      - preinstalled-34-oraclelinux-9
+      - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/threshold.rb
     verifier:
@@ -1000,6 +1598,11 @@ suites:
         - path: test/integration/default
         - path: test/integration/threshold
   - name: threshold_change_descr
+    excludes:
+      - oraclelinux-9
+      - oraclelinux-10
+      - preinstalled-34-oraclelinux-9
+      - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/threshold_change_descr.rb
     verifier:
@@ -1007,6 +1610,11 @@ suites:
         - path: test/integration/default
         - path: test/integration/threshold_change_descr
   - name: threshold_change_dslabel
+    excludes:
+      - oraclelinux-9
+      - oraclelinux-10
+      - preinstalled-34-oraclelinux-9
+      - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/threshold_change_dslabel.rb
     verifier:
@@ -1014,6 +1622,11 @@ suites:
         - path: test/integration/default
         - path: test/integration/threshold_change_dslabel
   - name: threshold_change_rearm
+    excludes:
+      - oraclelinux-9
+      - oraclelinux-10
+      - preinstalled-34-oraclelinux-9
+      - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/threshold_change_rearm.rb
     verifier:
@@ -1021,6 +1634,11 @@ suites:
         - path: test/integration/default
         - path: test/integration/threshold_change_rearm
   - name: threshold_change_trigger
+    excludes:
+      - oraclelinux-9
+      - oraclelinux-10
+      - preinstalled-34-oraclelinux-9
+      - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/threshold_change_trigger.rb
     verifier:
@@ -1028,6 +1646,11 @@ suites:
         - path: test/integration/default
         - path: test/integration/threshold_change_trigger
   - name: threshold_change_value
+    excludes:
+      - oraclelinux-9
+      - oraclelinux-10
+      - preinstalled-34-oraclelinux-9
+      - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/threshold_change_value.rb
     verifier:
@@ -1035,6 +1658,11 @@ suites:
         - path: test/integration/default
         - path: test/integration/threshold_change_value
   - name: threshold_common
+    excludes:
+      - oraclelinux-9
+      - oraclelinux-10
+      - preinstalled-34-oraclelinux-9
+      - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/threshold_common.rb
     verifier:
@@ -1042,6 +1670,11 @@ suites:
         - path: test/integration/default
         - path: test/integration/threshold_common
   - name: threshold_delete
+    excludes:
+      - oraclelinux-9
+      - oraclelinux-10
+      - preinstalled-34-oraclelinux-9
+      - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/threshold_delete.rb
     verifier:
@@ -1049,33 +1682,59 @@ suites:
         - path: test/integration/default
         - path: test/integration/threshold_delete
   - name: translation_specs
+    excludes:
+      - oraclelinux-9
+      - oraclelinux-10
+      - preinstalled-34-oraclelinux-9
+      - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/translation_specs.rb
     verifier:
       inspec_tests:
         - path: test/integration/default
         - path: test/integration/translation_specs
+  - name: trapd
+    excludes:
+      - oraclelinux-9
+      - oraclelinux-10
+      - preinstalled-34-oraclelinux-9
+      - preinstalled-oraclelinux-9
+    provisioner:
+      policyfile: policyfiles/trapd.rb
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
+        - test/integration/trapd
   - name: user
+    excludes:
+      - oraclelinux-9
+      - oraclelinux-10
+      - preinstalled-34-oraclelinux-9
+      - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/user.rb
     verifier:
       inspec_tests:
         - path: test/integration/default
         - path: test/integration/user
-    driver:
-      ports:
-        - 1234:8980/tcp
   - name: user_mod
+    excludes:
+      - oraclelinux-9
+      - oraclelinux-10
+      - preinstalled-34-oraclelinux-9
+      - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/user_mod.rb
     verifier:
       inspec_tests:
         - path: test/integration/default
         - path: test/integration/user_mod
-    driver:
-      ports:
-        - 1235:8980/tcp
   - name: wallboard
+    excludes:
+      - oraclelinux-9
+      - oraclelinux-10
+      - preinstalled-34-oraclelinux-9
+      - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/wallboard.rb
     verifier:
@@ -1083,6 +1742,11 @@ suites:
         - path: test/integration/default
         - path: test/integration/wallboard
   - name: wallboard_mod
+    excludes:
+      - oraclelinux-9
+      - oraclelinux-10
+      - preinstalled-34-oraclelinux-9
+      - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/wallboard_mod.rb
     verifier:
@@ -1090,6 +1754,11 @@ suites:
         - path: test/integration/default
         - path: test/integration/wallboard_mod
   - name: wsman_collection
+    excludes:
+      - oraclelinux-9
+      - oraclelinux-10
+      - preinstalled-34-oraclelinux-9
+      - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/wsman_collection.rb
     verifier:
@@ -1097,6 +1766,11 @@ suites:
         - path: test/integration/default
         - path: test/integration/wsman_collection
   - name: wsman_collection_service
+    excludes:
+      - oraclelinux-9
+      - oraclelinux-10
+      - preinstalled-34-oraclelinux-9
+      - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/wsman_collection_service.rb
     verifier:
@@ -1104,6 +1778,11 @@ suites:
         - path: test/integration/default
         - path: test/integration/wsman_collection_service
   - name: wsman_group
+    excludes:
+      - oraclelinux-9
+      - oraclelinux-10
+      - preinstalled-34-oraclelinux-9
+      - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/wsman_group.rb
     verifier:
@@ -1111,6 +1790,11 @@ suites:
         - path: test/integration/default
         - path: test/integration/wsman_group
   - name: wsman_system_definition
+    excludes:
+      - oraclelinux-9
+      - oraclelinux-10
+      - preinstalled-34-oraclelinux-9
+      - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/wsman_system_definition.rb
     verifier:
@@ -1118,6 +1802,11 @@ suites:
         - path: test/integration/default
         - path: test/integration/wsman_system_definition
   - name: xml_collection
+    excludes:
+      - oraclelinux-9
+      - oraclelinux-10
+      - preinstalled-34-oraclelinux-9
+      - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/xml_collection.rb
     verifier:
@@ -1125,6 +1814,11 @@ suites:
         - path: test/integration/default
         - path: test/integration/xml_collection
   - name: xml_source
+    excludes:
+      - oraclelinux-9
+      - oraclelinux-10
+      - preinstalled-34-oraclelinux-9
+      - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/xml_source.rb
     verifier:
@@ -1132,6 +1826,11 @@ suites:
         - path: test/integration/default
         - path: test/integration/xml_source
   - name: xml_source_delete
+    excludes:
+      - oraclelinux-9
+      - oraclelinux-10
+      - preinstalled-34-oraclelinux-9
+      - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/xml_source_delete.rb
     verifier:
@@ -1139,6 +1838,11 @@ suites:
         - path: test/integration/default
         - path: test/integration/xml_source_delete
   - name: xml_group
+    excludes:
+      - oraclelinux-9
+      - oraclelinux-10
+      - preinstalled-34-oraclelinux-9
+      - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/xml_group.rb
     verifier:
@@ -1146,6 +1850,11 @@ suites:
         - path: test/integration/default
         - path: test/integration/xml_group
   - name: xml_group_delete
+    excludes:
+      - oraclelinux-9
+      - oraclelinux-10
+      - preinstalled-34-oraclelinux-9
+      - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/xml_group_delete.rb
     verifier:
@@ -1153,6 +1862,11 @@ suites:
         - path: test/integration/default
         - path: test/integration/xml_group_delete
   - name: xml_collection_service
+    excludes:
+      - oraclelinux-9
+      - oraclelinux-10
+      - preinstalled-34-oraclelinux-9
+      - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/xml_collection_service.rb
     verifier:
@@ -1160,6 +1874,11 @@ suites:
         - path: test/integration/default
         - path: test/integration/xml_collection_service
   - name: xml_collection_service_change_interval
+    excludes:
+      - oraclelinux-9
+      - oraclelinux-10
+      - preinstalled-34-oraclelinux-9
+      - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/xml_collection_service_change_interval.rb
     verifier:
@@ -1167,6 +1886,11 @@ suites:
         - path: test/integration/default
         - path: test/integration/xml_collection_service_change_interval
   - name: xml_collection_service_change_nothing
+    excludes:
+      - oraclelinux-9
+      - oraclelinux-10
+      - preinstalled-34-oraclelinux-9
+      - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/xml_collection_service_change_nothing.rb
     verifier:
@@ -1174,6 +1898,11 @@ suites:
         - path: test/integration/default
         - path: test/integration/xml_collection_service_change_nothing
   - name: xml_collection_service_change_port
+    excludes:
+      - oraclelinux-9
+      - oraclelinux-10
+      - preinstalled-34-oraclelinux-9
+      - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/xml_collection_service_change_port.rb
     verifier:
@@ -1181,6 +1910,11 @@ suites:
         - path: test/integration/default
         - path: test/integration/xml_collection_service_change_port
   - name: xml_collection_service_change_retrycount
+    excludes:
+      - oraclelinux-9
+      - oraclelinux-10
+      - preinstalled-34-oraclelinux-9
+      - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/xml_collection_service_change_retrycount.rb
     verifier:
@@ -1188,6 +1922,11 @@ suites:
         - path: test/integration/default
         - path: test/integration/xml_collection_service_change_retrycount
   - name: xml_collection_service_change_status
+    excludes:
+      - oraclelinux-9
+      - oraclelinux-10
+      - preinstalled-34-oraclelinux-9
+      - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/xml_collection_service_change_status.rb
     verifier:
@@ -1195,6 +1934,11 @@ suites:
         - path: test/integration/default
         - path: test/integration/xml_collection_service_change_status
   - name: xml_collection_service_change_threshold
+    excludes:
+      - oraclelinux-9
+      - oraclelinux-10
+      - preinstalled-34-oraclelinux-9
+      - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/xml_collection_service_change_threshold.rb
     verifier:
@@ -1202,6 +1946,11 @@ suites:
         - path: test/integration/default
         - path: test/integration/xml_collection_service_change_threshold
   - name: xml_collection_service_change_timeout
+    excludes:
+      - oraclelinux-9
+      - oraclelinux-10
+      - preinstalled-34-oraclelinux-9
+      - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/xml_collection_service_change_timeout.rb
     verifier:
@@ -1209,6 +1958,11 @@ suites:
         - path: test/integration/default
         - path: test/integration/xml_collection_service_change_timeout
   - name: xml_collection_service_change_userdefined
+    excludes:
+      - oraclelinux-9
+      - oraclelinux-10
+      - preinstalled-34-oraclelinux-9
+      - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/xml_collection_service_change_userdefined.rb
     verifier:
@@ -1216,6 +1970,11 @@ suites:
         - path: test/integration/default
         - path: test/integration/xml_collection_service_change_userdefined
   - name: xml_collection_service_delete
+    excludes:
+      - oraclelinux-9
+      - oraclelinux-10
+      - preinstalled-34-oraclelinux-9
+      - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/xml_collection_service_delete.rb
     verifier:

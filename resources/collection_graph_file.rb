@@ -1,5 +1,8 @@
 
 include Opennms::XmlHelper
+
+unified_mode true
+
 property :file, String, name_property: true, identity: true
 property :source, String, default: 'cookbook_file', desired_state: false
 

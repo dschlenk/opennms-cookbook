@@ -4,6 +4,8 @@ driver:
   privileged: true
   chef_image: cincproject/cinc
   chef_version: 18
+  pull_platform_image: true
+  pull_chef_image: true
 
 transport:
   name: dokken
@@ -35,6 +37,8 @@ platforms:
     driver:
       image: dokken/oraclelinux-9
       pid_one_command: /usr/lib/systemd/systemd
+      pull_platform_image: true
+      pull_chef_image: true
 
 suites:
   - name: mkimage
@@ -42,5 +46,5 @@ suites:
       policyfile: policyfiles/mkimage.rb
     lifecycle:
       post_verify:
-        - docker commit $(docker ps | grep mkimage | tr -s ' ' | cut -d ' ' -f 1) c1og/opennms-34-oraclelinux-9:latest
-        - docker push c1og/opennms-34-oraclelinux-9:latest
+        - docker commit $(docker ps | grep mkimage | tr -s ' ' | cut -d ' ' -f 1) c1og/opennms-35-oraclelinux-9:latest
+        - docker push c1og/opennms-35-oraclelinux-9:latest

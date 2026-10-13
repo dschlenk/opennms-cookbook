@@ -1,81 +1,47 @@
+include Opennms::Cookbook::ConfigHelpers::Event::EventconfSourceRubyBlock
 unified_mode true
 
-property :event_file, String, name_property: true, identity: true
+property :source_name, String, name_property: true, identity: true
+deprecated_property_alias :event_file, :source_name, 'Eventconf definitions moved from files to the database accessible via API in Horizon 35 resulting in the renaming of this property. This property alias will be removed in a future release.'
 property :source_type, String, equal_to: %w(cookbook_file template remote_file), default: 'cookbook_file', desired_state: false
 property :source, String, desired_state: false
 property :source_properties, Hash, desired_state: false
+property :variables, Hash, desired_state: false
 property :position, String, equal_to: %w(override top bottom), default: 'bottom', desired_state: false
-property :variables, Hash
 
 action_class do
-  include Opennms::Cookbook::ConfigHelpers::Event::EventConfTemplate
+  include Opennms::Cookbook::ConfigHelpers::Event::EventconfSourceRubyBlock
 end
 
-include Opennms::Cookbook::ConfigHelpers::Event::EventConfTemplate
 load_current_value do |new_resource|
-  r = eventconf_resource
-  if r.nil?
-    current_value_does_not_exist! unless ::File.exist?("#{node['opennms']['conf']['home']}/etc/events/#{new_resource.event_file}")
-    ro_eventconf_resource_init
-    r = ro_eventconf_resource
-  end
-  eventconf = r.variables[:eventconf]
-  current_value_does_not_exist! if eventconf.event_files[new_resource.event_file].nil?
-  position eventconf.event_files[new_resource.event_file][:position]
+  resources(service: 'opennms').run_action(:start) unless shell_out('systemctl is-active --quiet opennms').exitstatus == 0
+  source_name = source_name_from_file(new_resource.source_name)
+  current_value_does_not_exist! unless eventconf_source_exist?(source_name)
 end
 
 action :create do
-  # always declare the resource that manages the file
-  case new_resource.source_type
-  when 'cookbook_file'
-    cookbook_file "#{node['opennms']['conf']['home']}/etc/events/#{new_resource.event_file}" do
-      source new_resource.source || new_resource.event_file
-      owner node['opennms']['username']
-      group node['opennms']['groupname']
-      mode '664'
-      new_resource.source_properties.each do |k, v|
-        send(k, v)
-      end unless new_resource.source_properties.nil?
+  source_name = source_name_from_file(new_resource.source_name)
+  eventconf_source_resource_init(source_name, new_resource.position)
+  desired_definition = new_definition(new_resource.source_name, new_resource.source_type, new_resource.source, new_resource.source_properties, new_resource.variables)
+  if content_changed?(source_name, desired_definition)
+    converge_by("create/update eventconf source #{source_name}") do
+      node.run_state['opennms']['eventconf_sources'][source_name]['definition'] = desired_definition
+      mark_changed(source_name)
     end
-  when 'template'
-    template "#{node['opennms']['conf']['home']}/etc/events/#{new_resource.event_file}" do
-      source new_resource.source || "#{new_resource.event_file}.erb"
-      owner node['opennms']['username']
-      group node['opennms']['groupname']
-      mode '664'
-      variables new_resource.variables
-      new_resource.source_properties.each do |k, v|
-        send(k, v)
-      end unless new_resource.source_properties.nil?
-    end
-  when 'remote_file'
-    remote_file "#{node['opennms']['conf']['home']}/etc/events/#{new_resource.event_file}" do
-      source new_resource.source || new_resource.event_file
-      owner node['opennms']['username']
-      group node['opennms']['groupname']
-      mode '664'
-      new_resource.source_properties.each do |k, v|
-        send(k, v)
-      end unless new_resource.source_properties.nil?
-    end
-  end
-  # maybe update eventconf.xml
-  converge_if_changed do
-    eventconf_resource_init
-    eventconf_resource.variables[:eventconf].event_files[new_resource.event_file] = { position: new_resource.position }
   end
 end
 
 action :create_if_missing do
-  run_action(:create) unless ::File.exist?("#{node['opennms']['conf']['home']}/etc/events/#{new_resource.event_file}")
+  converge_if_changed do
+    run_action(:create)
+  end
 end
 
 action :delete do
-  eventconf_resource_init
-  eventconf_resource.variables[:eventconf].event_files.delete(new_resource.event_file)
-  file "#{node['opennms']['conf']['home']}/etc/events/#{new_resource.event_file}" do
-    action :nothing
-    delayed_action :delete
-    notifies :create, "template[#{node['opennms']['conf']['home']}/etc/eventconf.xml]", :immediately
+  source_name = source_name_from_file(new_resource.source_name)
+  if eventconf_source_exist?(source_name)
+    converge_by("delete eventconf source #{source_name}") do
+      delete_source(source_name)
+    end
   end
 end

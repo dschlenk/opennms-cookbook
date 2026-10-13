@@ -1,5 +1,8 @@
 include Opennms::XmlHelper
 include Opennms::Cookbook::Rtc::AvailViewSection
+
+unified_mode true
+
 property :section, String, name_property: true
 # containing view-name, default is the default OpenNMS ships with
 property :view_name, String, default: 'WebConsoleView', identity: true

@@ -5,6 +5,8 @@
 include Opennms::XmlHelper
 include Graph
 
+unified_mode true
+
 property :short_name, String, name_property: true
 property :file, String, identity: true # refers to the name of the file to add the graph def to
 property :long_name, String, required: true

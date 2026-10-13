@@ -1,6 +1,8 @@
 include Opennms::XmlHelper
 include Opennms::Cookbook::View::WallboardTemplate
 
+unified_mode true
+
 property :title, String, name_property: true
 property :wallboard, String, required: true, identity: true
 # 0 on initial :create

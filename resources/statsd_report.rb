@@ -1,6 +1,8 @@
 include Opennms::XmlHelper
 include Opennms::Cookbook::Statsd::StatsdTemplate
 
+unified_mode true
+
 property :report_name, String, name_property: true
 property :package_name, String, required: true, identity: true
 # required for new

@@ -1,7 +1,11 @@
+
 # manage a package in $ONMS_HOME/etc/statsd-configuration.xml
 # You don't define reports here but rather using the statsd_report
 # resource and reference the name of one of these.
-property :package_name, String, required: true, name_property: true
+
+unified_mode true
+
+property :package_name, String, name_property: true
 property :filter, String
 
 include Opennms::XmlHelper

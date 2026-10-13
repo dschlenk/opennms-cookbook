@@ -1,5 +1,5 @@
 control 'user' do
-  describe opennms_user('jimmy', 1234, 'jimmy:abc123') do
+  describe opennms_user('jimmy', 'jimmy:abc123') do
     it { should exist }
     its('full_name') { should eq 'Jimmy John' }
     its('user_comments') { should eq 'Sandwiches' }
@@ -14,7 +14,7 @@ control 'user' do
   end
 
   # minimal
-  describe opennms_user('johnny', 1234, 'jimmy:abc123') do
+  describe opennms_user('johnny', 'jimmy:abc123') do
     it { should exist }
   end
 end

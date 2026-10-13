@@ -1,5 +1,7 @@
 use 'partial/_snmp_config'
 
+unified_mode true
+
 include Opennms::Cookbook::ConfigHelpers::SnmpConfigTemplate
 load_current_value do |_new_resource|
   r = xml_resource

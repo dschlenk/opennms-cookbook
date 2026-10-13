@@ -18,21 +18,24 @@
 #
 
 def yum_attr(branch, platform, attr)
-  node['yum']["opennms-#{branch}-#{platform}"][attr]
+  node['yum']["opennms-#{branch}-#{platform}"][attr] unless node['yum']["opennms-#{branch}-#{platform}"].nil?
 end
 
 branches = node['opennms']['repos']['branches']
 platforms = node['opennms']['repos']['platforms']
 branches.each do |branch|
   platforms.each do |platform|
+    next if platform == 'rhel10' && node['platform_version'].to_i != 10
     skip = false
     if (branch == 'stable' && !node['opennms']['stable']) ||
        ((branch == 'snapshot' || branch == 'obsolete' || branch == 'oldstable') && node['opennms']['stable'])
       skip = true
+    elsif branch == 'oldstable' && !node['opennms']['stable']
+      skip = false
     end
-    # next if skip
     bu = yum_attr(branch, platform, 'baseurl')
     ml = yum_attr(branch, platform, 'url')
+    next if bu.nil? && ml.nil?
     fom = yum_attr(branch, platform, 'failovermethod')
     inc_pkgs = yum_attr(branch, platform, 'includepkgs')
     repo_enabled = yum_attr(branch, platform, 'enabled')
