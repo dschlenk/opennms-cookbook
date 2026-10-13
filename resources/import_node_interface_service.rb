@@ -7,7 +7,8 @@ property :ip_addr, String, required: true, identity: true
 
 load_current_value do |new_resource|
   name = new_resource.service_name
-  model_import_root = REXML::Document.new(model_import(new_resource.foreign_source_name).message).root unless model_import(new_resource.foreign_source_name).nil?
+  mi = model_import(new_resource.foreign_source_name)
+  model_import_root = REXML::Document.new(mi.message).root unless mi.nil?
   if model_import_root.nil?
     ro_model_import_init(new_resource.foreign_source_name, node['opennms']['properties']['jetty']['port'], admin_secret_from_vault('password'))
     model_import_root = REXML::Document.new(ro_model_import(new_resource.foreign_source_name).message).root
@@ -24,13 +25,6 @@ load_current_value do |new_resource|
       node_category.push category.attributes['name'].to_s
     end
     categories node_category
-  end
-  unless service.elements['asset'].nil?
-    node_assets = {}
-    service.each_element('asset') do |asset|
-      node_assets[asset.attributes['key'].to_s] = asset.attributes['value'].to_s
-    end
-    assets node_assets
   end
   unless service.elements['meta-data'].nil?
     meta_datas = []
@@ -80,8 +74,7 @@ action :create do
       unless new_resource.categories.nil?
         service.elements.delete_all 'category'
         # find the sibling to insert before
-        b = service.elements['asset']
-        b = service.elements['meta-data'] if b.nil?
+        b = service.elements['meta-data']
         new_resource.categories.each do |category|
           if b.nil?
             service.add_element 'category', 'name' => category
@@ -100,8 +93,35 @@ action :create do
       end
     end
     model_import(new_resource.foreign_source_name).message model_import_root.to_s
-    if !new_resource.sync_import.nil? && new_resource.sync_import
-      model_import_sync(new_resource.foreign_source_name, true)
+    if new_resource.sync_import
+      model_import_sync(new_resource.foreign_source_name, true, new_resource.sync_wait_periods, new_resource.sync_wait_secs)
+    end
+  end
+end
+
+action :create_if_missing do
+  name = new_resource.service_name
+  model_import = model_import_for_read(new_resource.foreign_source_name, node['opennms']['properties']['jetty']['port'])
+  model_import_root = REXML::Document.new(model_import.message).root unless model_import.nil?
+  node_el = model_import_root.elements["node[@foreign-id = '#{new_resource.foreign_id}']"] unless model_import_root.nil?
+  interface_el = node_el.elements["interface[@ip-addr = '#{new_resource.ip_addr}']"] unless node_el.nil?
+  service = interface_el.elements["monitored-service[@service-name = '#{name}']"] unless interface_el.nil?
+  run_action(:create) if service.nil?
+end
+
+action :delete do
+  name = new_resource.service_name
+  model_import = model_import_for_read(new_resource.foreign_source_name, node['opennms']['properties']['jetty']['port'])
+  model_import_root = REXML::Document.new(model_import.message).root unless model_import.nil?
+  node_el = model_import_root.elements["node[@foreign-id = '#{new_resource.foreign_id}']"] unless model_import_root.nil?
+  interface_el = node_el.elements["interface[@ip-addr = '#{new_resource.ip_addr}']"] unless node_el.nil?
+  service = interface_el.elements["monitored-service[@service-name = '#{name}']"] unless interface_el.nil?
+  unless service.nil?
+    converge_by "Removing service #{name} from interface #{new_resource.ip_addr} in node #{new_resource.foreign_id} in #{new_resource.foreign_source_name}" do
+      model_import_node_service_delete(new_resource.foreign_source_name, new_resource.foreign_id, new_resource.ip_addr, name)
+      if new_resource.sync_import
+        model_import_sync(new_resource.foreign_source_name, true, new_resource.sync_wait_periods, new_resource.sync_wait_secs)
+      end
     end
   end
 end

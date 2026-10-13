@@ -10,20 +10,13 @@ class Import < Inspec.resource(1)
   '
 
   example '
-    describe import(\'group name\', \'foreign source name\', 1240) do
+    describe import(\'group name\', \'foreign source name\') do
       it { should exist }
     end
   '
 
-  def initialize(name, foreign_source, port = 8980)
-    parsed_url = Addressable::URI.parse("http://admin:admin@localhost:#{port}/opennms/rest/requisitions/#{name}").normalize.to_str
-    begin
-      req = RestClient.get(parsed_url)
-    rescue StandardError
-      @exists = false
-      return
-    end
-    doc = REXML::Document.new(req)
+  def initialize(name, foreign_source)
+    doc = REXML::Document.new(inspec.http("http://localhost:8980/opennms/rest/requisitions/#{name}", auth: { user: 'admin', pass: 'admin' }).body)
     i_el = doc.elements["/model-import[@foreign-source = '#{foreign_source}']"]
     @exists = !i_el.nil?
   end

@@ -41,6 +41,7 @@
 ### Provisioning and Discovery
 
 * [opennms\_disco\_range, opennms\_disco\_specific, opennms\_disco\_url](documentation/disco.md)
+* [opennms\_foreign\_source, opennms\_service\_detector, opennms\_policy, opennms\_import, opennms\_import\_node, opennms\_import\_node\_interface, opennms\_import\_node\_interface\_service](documentation/provisioning.md)
 
 ### Presentation
 

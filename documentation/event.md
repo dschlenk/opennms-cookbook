@@ -1,49 +1,51 @@
 # opennms\_event
 
-Manages an event in a file in `$OPENNMS_HOME/etc/events/`, including its presence in `$OPENNMS_HOME/etc/eventconf.xml`. Utilizes the initialized accumulator pattern, so adding new events to an existing file does not require that all events in the file are managed with this resource. It does, however, require that there is only one event in the file with the same identity, which is defined as the composite of the `uei`, `mask`, and `file` properties. Properties using `Array` or `Hash` types must adhere to format specified. Validations are employed to enforce required elements within.
+Manages an event in an eventconf source. Utilizes the initialized accumulator pattern, so adding new events to an existing source does not require that all events in the source are managed with this resource. It does, however, require that there is only one event in the source with the same identity, which is defined as the composite of the `uei`, `mask`, and `source_name` properties. Properties using `Array` or `Hash` types must adhere to format specified. Validations are employed to enforce required elements within.
 
 ## Actions
 
-* `:create` - Default. Adds or updates an `event` element to `file` in `$OPENNMS_HOME/etc/events` in accordance with the properties of the resource, and adds a reference to the file to `$OPENNMS_HOME/etc/eventconf.xml` if one does not yet exist.
+* `:create` - Default. Adds or updates an `event` element to source with `source_name` in accordance with the properties of the resource. Creates the source if one does not yet exist.
+* `:create_if_missing` - Same as `:create` but only takes action if the event does not exist in the source
 * `:update` - Modify an existing event. Identity properties are required. Properties that are `nil` are not updated. Some properties support the use of `false` to indicate that they should be removed if present in the existing event definition.
-* `:delete` - Removes the event matching `uei` and `mask` from the `file`. Also removes the file if no events remain in it, along with the reference to it in the main `eventconf.xml` file.
+* `:delete` - Removes the event matching `uei` and `mask` from the source with `source_name`.
 
 ## Properties
 
-| Name                 | Name? | Type          | Identity? | Required | Allowed Values                                                                     | Notes                          |
-| -------------------- | ----- | ------------- | --------- |--------- | ---------------------------------------------------------------------------------- | ------------------------------ |
-| `uei`                |       | String        |     ✓     |          |                                                                                    | `name` is used if `nil`        |
-| `file`               |       | String        |     ✓     |    ✓     |                                                                                    |                                |
-| `mask`               |       | Array, String |     ✓     |          | `*` or `!` when String                                                             | default `*`                    |
-| `priority`           |       | Integer       |           |          | non-negative Integer                                                               |                                |
-| `event_label`        |       | String        |           |          |                                                                                    | must be present for new events |
-| `descr`              |       | String        |           |          |                                                                                    | must be present for new events |
-| `logmsg`             |       | String        |           |          |                                                                                    | must be present for new events |
-| `logmsg_dest`        |       | String        |           |          | `logndisplay`, `displayonly`, `logonly`, `supress`, `donotpersist`, `discardtraps` | must be present for new events |
-| `logmsg_notify`      |       | true, false   |           |          |                                                                                    |                                |
-| `collection_group`   |       | Array, false  |           |          |                                                                                    |                                |
-| `severity`           |       | String        |           |          |                                                                                    | must be present for new events |
-| `operinstruct`       |       | String        |           |          |                                                                                    |                                |
-| `autoaction`         |       | Array, false  |           |          |                                                                                    |                                |
-| `varbindsdecode`     |       | Array, false  |           |          |                                                                                    |                                |
-| `parameters`         |       | Array, false  |           |          |                                                                                    |                                |
-| `operaction`         |       | Array, false  |           |          |                                                                                    |                                |
-| `autoacknowledge`    |       | Hash, false   |           |          |                                                                                    |                                |
-| `loggroup`           |       | String        |           |          |                                                                                    |                                |
-| `tticket`            |       | Hash, false   |           |          |                                                                                    |                                |
-| `forward`            |       | Array, false  |           |          |                                                                                    |                                |
-| `script`             |       | Array, false  |           |          |                                                                                    |                                |
-| `mouseovertext`      |       | String        |           |          |                                                                                    |                                |
-| `alarm_data`         |       | Hash, false   |           |          |                                                                                    |                                |
-| `filters`            |       | Array, false  |           |          |                                                                                    |                                |
-| `position`           |       | String        |           |          | `top` or `bottom` default `bottom`                                                 | relevant only for `:create`    |
-| `eventconf_position` |       | String        |           |          | `override`, `top`, or `bottom`                                                     | relevant only for `:create`    |
+| Name                 | Name? | Type          | Identity? | Required | Allowed Values                                                                     | Notes                             |
+| -------------------- | ----- | ------------- | --------- |--------- | ---------------------------------------------------------------------------------- | --------------------------------- |
+| `uei`                |       | String        |     ✓     |          |                                                                                    | `name` is used if `nil`           |
+| `source_name`        |       | String        |     ✓     |    ✓     |                                                                                    |                                   |
+| `file`               |       | String        |           |       g   |                                                                                    | deprecated alias of `source_name` |
+| `mask`               |       | Array, String |     ✓     |          | `*` or `!` when String                                                             | default `*`                       |
+| `priority`           |       | Integer       |           |          | non-negative Integer                                                               |                                   |
+| `event_label`        |       | String        |           |          |                                                                                    | must be present for new events    |
+| `descr`              |       | String        |           |          |                                                                                    | must be present for new events    |
+| `logmsg`             |       | String        |           |          |                                                                                    | must be present for new events    |
+| `logmsg_dest`        |       | String        |           |          | `logndisplay`, `displayonly`, `logonly`, `supress`, `donotpersist`, `discardtraps` | must be present for new events    |
+| `logmsg_notify`      |       | true, false   |           |          |                                                                                    |                                   |
+| `collection_group`   |       | Array, false  |           |          |                                                                                    |                                   |
+| `severity`           |       | String        |           |          |                                                                                    | must be present for new events    |
+| `operinstruct`       |       | String        |           |          |                                                                                    |                                   |
+| `autoaction`         |       | Array, false  |           |          |                                                                                    |                                   |
+| `varbindsdecode`     |       | Array, false  |           |          |                                                                                    |                                   |
+| `parameters`         |       | Array, false  |           |          |                                                                                    |                                   |
+| `operaction`         |       | Array, false  |           |          |                                                                                    |                                   |
+| `autoacknowledge`    |       | Hash, false   |           |          |                                                                                    |                                   |
+| `loggroup`           |       | String        |           |          |                                                                                    |                                   |
+| `tticket`            |       | Hash, false   |           |          |                                                                                    |                                   |
+| `forward`            |       | Array, false  |           |          |                                                                                    |                                   |
+| `script`             |       | Array, false  |           |          |                                                                                    |                                   |
+| `mouseovertext`      |       | String        |           |          |                                                                                    |                                   |
+| `alarm_data`         |       | Hash, false   |           |          |                                                                                    |                                   |
+| `filters`            |       | Array, false  |           |          |                                                                                    |                                   |
+| `position`           |       | String        |           |          | `top` or `bottom` default `bottom`                                                 | relevant only for `:create`       |
+| `eventconf_position` |       | String        |           |          | `override`, `top`, or `bottom`                                                     | relevant only for `:create`       |
 
-The `uei` property is populated with the `name` property if not defined. It represents the text value of the `uei` element in the `event` element in `file`.
+The `uei` property is populated with the `name` property if not defined. It represents the text value of the `uei` element in the `event` element in source `source_name`.
 
-The `file` property is the name of the file relative to `$OPENNMS_HOME/etc` that the managed event resides in.
+The `source_name` property is the name of the source that the managed event resides in. It replaces the deprecated `file` property in versions 35+.
 
-The `mask` property can be the string `*` or `!` or an array of hashes where each hash has either keys `mename` and `mevalue` or `vbnumber` and `vbvalue`. The string value `*` means "any" mask. If any event exists with matching `uei` in `file` of a resource with action `:create` and mask `*`, and `:update` of that event will occur. If more than one matching event exists in `file`, the first event in the file is updated. Use `!` with the `:update` action to remove the mask from the first instance of an event in `file` with the matching `uei`.
+The `mask` property can be the string `*` or `!` or an array of hashes where each hash has either keys `mename` and `mevalue` or `vbnumber` and `vbvalue`. The string value `*` means "any" mask. If any event exists with matching `uei` in source `source_name` of a resource with action `:create` and mask `*`, an `:update` of that event will occur. If more than one matching event exists in source `source_name`, the first event in the source is updated. Use `!` with the `:update` action to remove the mask from the first instance of an event in source with `source_name` with the matching `uei`.
 To define a mask in `:create` or `:update`, use an array of hashes that contain key `mename` or `vbnumber` with a string value and `mevalue` or `vbvalue` with an array of string values. 'mename' indicates 'maskelement' while 'vbnumber' indicates 'varbind'.
 
 The `priority` property corresponds to the child element of the same name and must be a non-negative integer.
@@ -116,12 +118,11 @@ Property `alarm_data` defines the alarm configuration for instances of this even
 
 Property `filters` controls the remnant of feature that allowed you to match a regular expression to the named event parameter's value and replace it with a different value. It has been disabled since 2013. Use `false` to remove existing config from an existing event definition, or add/update with an array of hashes each of which contains keys `eventparm` (string), `pattern` (string), `replacement` (string). Enabling it requires editing the eventDaemon application context, which not only requires a restart, but also editing a jar file, and it was disabled for performance reasons.
 
-The `position` property dictates where in the event file a new event will be placed. It is ignored when an existing event is updated.
+The `position` property dictates the position of the event in the source. It is ignored when an existing event is updated.
 
-The `eventconf_position` property dictates where in the main `eventconf.xml` file the `event-file` element is placed relative to files that ship with OpenNMS out of the box and is only relevant for action `:create` when the `file` is not already present in `eventconf.xml`.
-When `eventconf_position` is the default, `bottom`, the file is included after all the other `event-file` elements except for `opennms.catch-all.events.xml`.
-When `eventconf_position` is `top`, the file is included after the internal OpenNMS event files, but before the vendor files included out of the box.
-When `eventconf_position` is `override`, the file is included before the internal OpenNMS event files.
+The `eventconf_position` property dictates the file order of the source relative to existing sources and is only relevant for action `:create` when the source with `source_name` does not exist.
+When `eventconf_position` is the default, `bottom`, the source is included with a file order of the least priority except for `opennms.catch-all.events.xml`.
+When `eventconf_position` is `top` or `override`, the source is included with a file order with the highest priority.
 
 ## Examples
 
