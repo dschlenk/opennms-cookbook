@@ -22,7 +22,7 @@ end
 action :create do
   source_name = source_name_from_file(new_resource.source_name)
   eventconf_source_resource_init(source_name, new_resource.position)
-  desired_definition = new_definition(source_name, new_resource.source_type, new_resource.source || new_resource.source_name, new_resource.source_properties, new_resource.variables)
+  desired_definition = new_definition(new_resource.source_name, new_resource.source_type, new_resource.source, new_resource.source_properties, new_resource.variables)
   if content_changed?(source_name, desired_definition)
     converge_by("create/update eventconf source #{source_name}") do
       node.run_state['opennms']['eventconf_sources'][source_name]['definition'] = desired_definition

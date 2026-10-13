@@ -55,12 +55,12 @@ module Opennms
           end
 
           def new_definition(source_name, source_type, source, source_properties, variables)
-            tempfile = "#{Chef::Config[:file_cache_path]}/#{source_name}.xml"
+            tempfile = "#{Chef::Config[:file_cache_path]}/#{source_name_from_file(source_name)}.xml"
             case source_type
             when 'cookbook_file'
               cookbook_file tempfile do
                 sensitive true
-                source source
+                source source || source_name
                 owner node['opennms']['username']
                 group node['opennms']['groupname']
                 mode '664'
@@ -71,7 +71,7 @@ module Opennms
             when 'template'
               template tempfile do
                 sensitive true
-                source "#{source}.erb"
+                source source || "#{source_name}.erb"
                 owner node['opennms']['username']
                 group node['opennms']['groupname']
                 mode '664'
