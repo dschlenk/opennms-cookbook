@@ -1,7 +1,7 @@
 # Description
 
 A Chef cookbook to manage the installation and configuration of OpenNMS Horizon.
-Current version supports Horizon release 35 on EL (redhat, rocky, oracle, etc) 9.
+Current version supports Horizon release 35 on EL (redhat, rocky, oracle, etc) 9 or 10.
 
 ## Versions
 
