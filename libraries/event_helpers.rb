@@ -195,6 +195,7 @@ module Opennms
           def eventconf_source_resource_create(source_name, position)
             node.run_state['opennms']['eventconf_sources'] = {} if node.run_state['opennms']['eventconf_sources'].nil?
             node.run_state['opennms']['eventconf_sources'][source_name] = current_source(source_name)
+
             if node.run_state['opennms']['eventconf_sources'][source_name].nil?
               require 'securerandom'
               require 'rest-client'
@@ -204,20 +205,21 @@ module Opennms
               body << %(Content-Disposition: form-data; name="upload"; filename="#{source_name}.xml"\r\n)
               body << "Content-Type: application/xml\r\n"
               body << "\r\n"
-              body << '<events xmlns="http://xmlns.opennms.org/xsd/eventconf"/>'
+              body << '<events xmlns="http://opennms.org"/>'
               body << "\r\n"
               if position == 'bottom'
                 body << "--#{boundary}\r\n"
                 body << %(Content-Disposition: form-data; name="upload"; filename=eventconf.xml\r\n)
                 body << "Content-Type: application/xml\r\n"
                 body << "\r\n"
-                body << "<events xmlns=\"http://xmlns.opennms.org/xsd/eventconf\"><event-file>#{source_name.encode(xml: :text)}.xml</event-file></events>"
+                body << "<events xmlns=\"http://opennms.org\"><event-file>#{source_name.encode(xml: :text)}.xml</event-file></events>"
                 body << "\r\n"
               end
               body << "--#{boundary}--\r\n"
               upload_eventconf(body, boundary, source_name)
               node.run_state['opennms']['eventconf_sources'][source_name] = current_source(source_name)
             end
+
             begin
               response = RestClient::Request.execute(
                 method: :get,
@@ -226,38 +228,80 @@ module Opennms
                 password: admin_secret_from_vault('password')
               )
               node.run_state['opennms']['eventconf_sources'][source_name]['definition'] = if response.code == 204
-                                                                                            '<events xmlns="http://xmlns.opennms.org/xsd/eventconf"/>'
+                                                                                            '<events xmlns="http://opennms.org"/>'
                                                                                           else
                                                                                             response.body
                                                                                           end
             rescue => e
-              # At least as of 36.0.4 if the source exists but has no events, you still get a 404.
-              # I think they did this to work around the fact that technically it's invalid to have an eventconf file without at least one event
               if "#{e}" == '404 Not Found'
-                node.run_state['opennms']['eventconf_sources'][source_name]['definition'] = '<events xmlns="http://xmlns.opennms.org/xsd/eventconf"/>'
+                node.run_state['opennms']['eventconf_sources'][source_name]['definition'] = '<events xmlns="http://opennms.org"/>'
               else
                 raise "Unknown error retrieving source definition: #{e}"
               end
             end
+
+            # =================================================================
+            # ACCUMULATE AND BATCH SINGLE TRANSACTION
+            # =================================================================
+
+            # Initialize the global accumulator array
+            node.run_state['opennms_bulk_eventconf'] ||= []
+
+            #  Accumulate this file's specific data payload
+            node.run_state['opennms_bulk_eventconf'] << {
+              name: source_name,
+              definition: node.run_state['opennms']['eventconf_sources'][source_name]['definition']
+            }
+
             r = self
+            with_run_context :root do
+              # Create a single master bulk uploader resource ONLY ONCE per Chef run
+              unless find_resource(:ruby_block, "EXECUTE BULK OPENNMS UPLOAD")
+                declare_resource(:ruby_block, "EXECUTE BULK OPENNMS UPLOAD") do
+                  block do
+                    require 'securerandom'
+                    require 'rest-client'
+
+                    # Fetch all accumulated event configurations from the run_state
+                    payload_batch = node.run_state['opennms_bulk_eventconf']
+                    next if payload_batch.nil? || payload_batch.empty?
+
+                    Chef::Log.info("Executing a SINGLE consolidated multi-part database transaction for #{payload_batch.length} OpenNMS sources...")
+
+                    boundary = "----RubyMultipart#{SecureRandom.hex(16)}"
+                    body = ''
+
+                    # Pack ALL accumulated files into one single HTTP Request payload stream
+                    payload_batch.each do |item|
+                      body << "--#{boundary}\r\n"
+                      body << %(Content-Disposition: form-data; name="upload"; filename="#{item[:name]}.xml"\r\n)
+                      body << "Content-Type: application/xml\r\n"
+                      body << "\r\n"
+                      body << item[:definition]
+                      body << "\r\n"
+                    end
+                    body << "--#{boundary}--\r\n"
+
+                    # Fire one unified transaction to the REST API endpoint
+                    r.upload_eventconf(body, boundary, "CONSOLIDATED_BATCH")
+                  end
+                  action :nothing
+                  delayed_action :nothing # This will be triggered only when needed
+                end
+              end
+            end
+
+            # Create a light legacy tracking pointer block so existing recipes' notification triggers and change detection hooks still align without blowing up
             with_run_context :root do
               declare_resource(:ruby_block, block_name(source_name)) do
                 block do
-                  require 'securerandom'
-                  require 'rest-client'
-                  boundary = "----RubyMultipart#{SecureRandom.hex(16)}"
-                  body = ''
-                  body << "--#{boundary}\r\n"
-                  body << %(Content-Disposition: form-data; name="upload"; filename="#{source_name}.xml"\r\n)
-                  body << "Content-Type: application/xml\r\n"
-                  body << "\r\n"
-                  body << node.run_state['opennms']['eventconf_sources'][source_name]['definition']
-                  body << "\r\n"
-                  body << "--#{boundary}--\r\n"
-                  r.upload_eventconf(body, boundary, source_name)
+                  # Hand off execution to the shared master transaction uploader block
+                  edit_resource(:ruby_block, "EXECUTE BULK OPENNMS UPLOAD") do
+                    action :run
+                  end
                 end
                 action :nothing
-                delayed_action :nothing # set to :run in resource when create/update
+                delayed_action :nothing
               end
             end
           end
