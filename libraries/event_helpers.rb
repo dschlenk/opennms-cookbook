@@ -195,7 +195,6 @@ module Opennms
           def eventconf_source_resource_create(source_name, position)
             node.run_state['opennms']['eventconf_sources'] = {} if node.run_state['opennms']['eventconf_sources'].nil?
             node.run_state['opennms']['eventconf_sources'][source_name] = current_source(source_name)
-
             if node.run_state['opennms']['eventconf_sources'][source_name].nil?
               require 'securerandom'
               require 'rest-client'
@@ -205,21 +204,20 @@ module Opennms
               body << %(Content-Disposition: form-data; name="upload"; filename="#{source_name}.xml"\r\n)
               body << "Content-Type: application/xml\r\n"
               body << "\r\n"
-              body << '<events xmlns="http://opennms.org"/>'
+              body << '<events xmlns="http://xmlns.opennms.org/xsd/eventconf"/>'
               body << "\r\n"
               if position == 'bottom'
                 body << "--#{boundary}\r\n"
                 body << %(Content-Disposition: form-data; name="upload"; filename=eventconf.xml\r\n)
                 body << "Content-Type: application/xml\r\n"
                 body << "\r\n"
-                body << "<events xmlns=\"http://opennms.org\"><event-file>#{source_name.encode(xml: :text)}.xml</event-file></events>"
+                body << "<events xmlns=\"http://xmlns.opennms.org/xsd/eventconf\"><event-file>#{source_name.encode(xml: :text)}.xml</event-file></events>"
                 body << "\r\n"
               end
               body << "--#{boundary}--\r\n"
               upload_eventconf(body, boundary, source_name)
               node.run_state['opennms']['eventconf_sources'][source_name] = current_source(source_name)
             end
-
             begin
               response = RestClient::Request.execute(
                 method: :get,
@@ -228,13 +226,15 @@ module Opennms
                 password: admin_secret_from_vault('password')
               )
               node.run_state['opennms']['eventconf_sources'][source_name]['definition'] = if response.code == 204
-                                                                                            '<events xmlns="http://opennms.org"/>'
+                                                                                            '<events xmlns="http://xmlns.opennms.org/xsd/eventconf"/>'
                                                                                           else
                                                                                             response.body
                                                                                           end
             rescue => e
+              # At least as of 36.0.4 if the source exists but has no events, you still get a 404.
+              # I think they did this to work around the fact that technically it's invalid to have an eventconf file without at least one event
               if "#{e}" == '404 Not Found'
-                node.run_state['opennms']['eventconf_sources'][source_name]['definition'] = '<events xmlns="http://opennms.org"/>'
+                node.run_state['opennms']['eventconf_sources'][source_name]['definition'] = '<events xmlns="http://xmlns.opennms.org/xsd/eventconf"/>'
               else
                 raise "Unknown error retrieving source definition: #{e}"
               end
@@ -301,7 +301,7 @@ module Opennms
                   end
                 end
                 action :nothing
-                delayed_action :nothing
+                delayed_action :nothing # set to :run in resource when create/update
               end
             end
           end
