@@ -1,6 +1,6 @@
 name 'mkimage'
 default_source :supermarket
-run_list 'opennms::postgres', 'openjdk17', 'opennms', 'mkimage'
+run_list 'opennms::postgres', 'openjdk21', 'opennms', 'mkimage'
 cookbook 'opennms', path: '../'
-cookbook 'openjdk17', path: '../test/fixtures/cookbooks/openjdk17'
+cookbook 'openjdk21', path: '../test/fixtures/cookbooks/openjdk21'
 cookbook 'mkimage', path: '../test/fixtures/cookbooks/mkimage'

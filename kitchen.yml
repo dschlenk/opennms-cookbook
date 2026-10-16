@@ -36,13 +36,13 @@ verifier:
   name: inspec
 
 platforms:
-  - name: preinstalled-34-oraclelinux-9
+  - name: preinstalled-35-oraclelinux-9
     driver:
-      image: c1og/opennms-34-oraclelinux-9
+      image: c1og/opennms-35-oraclelinux-9
       pid_one_command: /usr/lib/systemd/systemd
   - name: preinstalled-oraclelinux-9
     driver:
-      image: c1og/opennms-35-oraclelinux-9
+      image: c1og/opennms-36-oraclelinux-9
       pid_one_command: /usr/lib/systemd/systemd
   - name: oraclelinux-9
     driver:
@@ -67,7 +67,7 @@ platforms:
             '
   - name: preinstalled-oraclelinux-10
     driver:
-      image: c1og/opennms-35-oraclelinux-10
+      image: c1og/opennms-36-oraclelinux-10
       pid_one_command: /usr/lib/systemd/systemd
   - name: oraclelinux-10
     driver:
@@ -101,7 +101,7 @@ suites:
         - path: test/integration/recommended
         - path: test/integration/user
     excludes:
-      - preinstalled-34-oraclelinux-9
+      - preinstalled-35-oraclelinux-9
       - preinstalled-oraclelinux-9
       - preinstalled-oraclelinux-10
     attributes:
@@ -123,7 +123,7 @@ suites:
         - path: test/integration/default
         - path: test/integration/kafka
     excludes:
-      - preinstalled-34-oraclelinux-9
+      - preinstalled-35-oraclelinux-9
       - preinstalled-oraclelinux-9
       - preinstalled-oraclelinux-10
     attributes:
@@ -177,14 +177,14 @@ suites:
         upgrade: false
   - name: default
     excludes:
-      - preinstalled-34-oraclelinux-9
+      - preinstalled-35-oraclelinux-9
       - preinstalled-oraclelinux-9
       - preinstalled-oraclelinux-10
   - name: plugins
     excludes:
       - oraclelinux-9
       - oraclelinux-10
-      - preinstalled-34-oraclelinux-9
+      - preinstalled-35-oraclelinux-9
     attributes:
       opennms:
         plugin:
@@ -197,7 +197,7 @@ suites:
     excludes:
       - oraclelinux-9
       - oraclelinux-10
-      - preinstalled-34-oraclelinux-9
+      - preinstalled-35-oraclelinux-9
       - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/avail_category.rb
@@ -209,7 +209,7 @@ suites:
     excludes:
       - oraclelinux-9
       - oraclelinux-10
-      - preinstalled-34-oraclelinux-9
+      - preinstalled-35-oraclelinux-9
       - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/avail_view_section.rb
@@ -221,7 +221,7 @@ suites:
     excludes:
       - oraclelinux-9
       - oraclelinux-10
-      - preinstalled-34-oraclelinux-9
+      - preinstalled-35-oraclelinux-9
       - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/avail_view_section_mod.rb
@@ -233,7 +233,7 @@ suites:
     excludes:
       - oraclelinux-9
       - oraclelinux-10
-      - preinstalled-34-oraclelinux-9
+      - preinstalled-35-oraclelinux-9
       - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/collection_graph.rb
@@ -245,7 +245,7 @@ suites:
     excludes:
       - oraclelinux-9
       - oraclelinux-10
-      - preinstalled-34-oraclelinux-9
+      - preinstalled-35-oraclelinux-9
       - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/collection_graph_file.rb
@@ -257,7 +257,7 @@ suites:
     excludes:
       - oraclelinux-9
       - oraclelinux-10
-      - preinstalled-34-oraclelinux-9
+      - preinstalled-35-oraclelinux-9
       - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/collection_package.rb
@@ -269,7 +269,7 @@ suites:
     excludes:
       - oraclelinux-9
       - oraclelinux-10
-      - preinstalled-34-oraclelinux-9
+      - preinstalled-35-oraclelinux-9
       - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/collection_package_delete.rb
@@ -281,7 +281,7 @@ suites:
     excludes:
       - oraclelinux-9
       - oraclelinux-10
-      - preinstalled-34-oraclelinux-9
+      - preinstalled-35-oraclelinux-9
       - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/collection_package_update.rb
@@ -293,7 +293,7 @@ suites:
     excludes:
       - oraclelinux-9
       - oraclelinux-10
-      - preinstalled-34-oraclelinux-9
+      - preinstalled-35-oraclelinux-9
       - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/collection_package_update_excludes.rb
@@ -305,7 +305,7 @@ suites:
     excludes:
       - oraclelinux-9
       - oraclelinux-10
-      - preinstalled-34-oraclelinux-9
+      - preinstalled-35-oraclelinux-9
       - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/collection_package_update_ifaliasdomain.rb
@@ -317,7 +317,7 @@ suites:
     excludes:
       - oraclelinux-9
       - oraclelinux-10
-      - preinstalled-34-oraclelinux-9
+      - preinstalled-35-oraclelinux-9
       - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/collection_package_update_includes.rb
@@ -329,7 +329,7 @@ suites:
     excludes:
       - oraclelinux-9
       - oraclelinux-10
-      - preinstalled-34-oraclelinux-9
+      - preinstalled-35-oraclelinux-9
       - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/collection_package_update_outage_calendars.rb
@@ -341,7 +341,7 @@ suites:
     excludes:
       - oraclelinux-9
       - oraclelinux-10
-      - preinstalled-34-oraclelinux-9
+      - preinstalled-35-oraclelinux-9
       - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/collection_package_update_sbifalias.rb
@@ -353,7 +353,7 @@ suites:
     excludes:
       - oraclelinux-9
       - oraclelinux-10
-      - preinstalled-34-oraclelinux-9
+      - preinstalled-35-oraclelinux-9
       - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/collection_package_update_specifics.rb
@@ -365,7 +365,7 @@ suites:
     excludes:
       - oraclelinux-9
       - oraclelinux-10
-      - preinstalled-34-oraclelinux-9
+      - preinstalled-35-oraclelinux-9
       - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/collection_package_update_urls.rb
@@ -377,7 +377,7 @@ suites:
     excludes:
       - oraclelinux-9
       - oraclelinux-10
-      - preinstalled-34-oraclelinux-9
+      - preinstalled-35-oraclelinux-9
       - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/collection_service.rb
@@ -389,7 +389,7 @@ suites:
     excludes:
       - oraclelinux-9
       - oraclelinux-10
-      - preinstalled-34-oraclelinux-9
+      - preinstalled-35-oraclelinux-9
       - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/correlation.rb
@@ -401,7 +401,7 @@ suites:
     excludes:
       - oraclelinux-9
       - oraclelinux-10
-      - preinstalled-34-oraclelinux-9
+      - preinstalled-35-oraclelinux-9
       - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/correlation_edit.rb
@@ -413,7 +413,7 @@ suites:
     excludes:
       - oraclelinux-9
       - oraclelinux-10
-      - preinstalled-34-oraclelinux-9
+      - preinstalled-35-oraclelinux-9
       - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/dashlet.rb
@@ -425,7 +425,7 @@ suites:
     excludes:
       - oraclelinux-9
       - oraclelinux-10
-      - preinstalled-34-oraclelinux-9
+      - preinstalled-35-oraclelinux-9
       - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/dashlet_update.rb
@@ -437,7 +437,7 @@ suites:
     excludes:
       - oraclelinux-9
       - oraclelinux-10
-      - preinstalled-34-oraclelinux-9
+      - preinstalled-35-oraclelinux-9
       - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/destination_path.rb
@@ -449,7 +449,7 @@ suites:
     excludes:
       - oraclelinux-9
       - oraclelinux-10
-      - preinstalled-34-oraclelinux-9
+      - preinstalled-35-oraclelinux-9
       - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/disco_range.rb
@@ -461,7 +461,7 @@ suites:
     excludes:
       - oraclelinux-9
       - oraclelinux-10
-      - preinstalled-34-oraclelinux-9
+      - preinstalled-35-oraclelinux-9
       - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/disco_specific.rb
@@ -473,7 +473,7 @@ suites:
     excludes:
       - oraclelinux-9
       - oraclelinux-10
-      - preinstalled-34-oraclelinux-9
+      - preinstalled-35-oraclelinux-9
       - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/disco_url.rb
@@ -485,7 +485,7 @@ suites:
     excludes:
       - oraclelinux-9
       - oraclelinux-10
-      - preinstalled-34-oraclelinux-9
+      - preinstalled-35-oraclelinux-9
       - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/eventconf.rb
@@ -497,7 +497,7 @@ suites:
     excludes:
       - oraclelinux-9
       - oraclelinux-10
-      - preinstalled-34-oraclelinux-9
+      - preinstalled-35-oraclelinux-9
       - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/event.rb
@@ -509,7 +509,7 @@ suites:
     excludes:
       - oraclelinux-9
       - oraclelinux-10
-      - preinstalled-34-oraclelinux-9
+      - preinstalled-35-oraclelinux-9
       - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/event_add_parameters.rb
@@ -521,7 +521,7 @@ suites:
     excludes:
       - oraclelinux-9
       - oraclelinux-10
-      - preinstalled-34-oraclelinux-9
+      - preinstalled-35-oraclelinux-9
       - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/event_change_parameters.rb
@@ -533,7 +533,7 @@ suites:
     excludes:
       - oraclelinux-9
       - oraclelinux-10
-      - preinstalled-34-oraclelinux-9
+      - preinstalled-35-oraclelinux-9
       - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/event_descr.rb
@@ -545,7 +545,7 @@ suites:
     excludes:
       - oraclelinux-9
       - oraclelinux-10
-      - preinstalled-34-oraclelinux-9
+      - preinstalled-35-oraclelinux-9
       - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/event_edit_alarm_data.rb
@@ -557,7 +557,7 @@ suites:
     excludes:
       - oraclelinux-9
       - oraclelinux-10
-      - preinstalled-34-oraclelinux-9
+      - preinstalled-35-oraclelinux-9
       - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/event_edit_autoaction.rb
@@ -569,7 +569,7 @@ suites:
     excludes:
       - oraclelinux-9
       - oraclelinux-10
-      - preinstalled-34-oraclelinux-9
+      - preinstalled-35-oraclelinux-9
       - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/event_edit_forward.rb
@@ -581,7 +581,7 @@ suites:
     excludes:
       - oraclelinux-9
       - oraclelinux-10
-      - preinstalled-34-oraclelinux-9
+      - preinstalled-35-oraclelinux-9
       - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/event_edit_mouseovertext.rb
@@ -593,7 +593,7 @@ suites:
     excludes:
       - oraclelinux-9
       - oraclelinux-10
-      - preinstalled-34-oraclelinux-9
+      - preinstalled-35-oraclelinux-9
       - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/event_edit_operinstruct.rb
@@ -605,7 +605,7 @@ suites:
     excludes:
       - oraclelinux-9
       - oraclelinux-10
-      - preinstalled-34-oraclelinux-9
+      - preinstalled-35-oraclelinux-9
       - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/event_edit_script.rb
@@ -617,7 +617,7 @@ suites:
     excludes:
       - oraclelinux-9
       - oraclelinux-10
-      - preinstalled-34-oraclelinux-9
+      - preinstalled-35-oraclelinux-9
       - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/event_edit_tticket.rb
@@ -629,7 +629,7 @@ suites:
     excludes:
       - oraclelinux-9
       - oraclelinux-10
-      - preinstalled-34-oraclelinux-9
+      - preinstalled-35-oraclelinux-9
       - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/event_edit_varbindsdecode.rb
@@ -641,7 +641,7 @@ suites:
     excludes:
       - oraclelinux-9
       - oraclelinux-10
-      - preinstalled-34-oraclelinux-9
+      - preinstalled-35-oraclelinux-9
       - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/event_label.rb
@@ -653,7 +653,7 @@ suites:
     excludes:
       - oraclelinux-9
       - oraclelinux-10
-      - preinstalled-34-oraclelinux-9
+      - preinstalled-35-oraclelinux-9
       - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/event_logmsg.rb
@@ -665,7 +665,7 @@ suites:
     excludes:
       - oraclelinux-9
       - oraclelinux-10
-      - preinstalled-34-oraclelinux-9
+      - preinstalled-35-oraclelinux-9
       - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/event_logmsg_dest.rb
@@ -677,7 +677,7 @@ suites:
     excludes:
       - oraclelinux-9
       - oraclelinux-10
-      - preinstalled-34-oraclelinux-9
+      - preinstalled-35-oraclelinux-9
       - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/event_logmsg_notify.rb
@@ -689,7 +689,7 @@ suites:
     excludes:
       - oraclelinux-9
       - oraclelinux-10
-      - preinstalled-34-oraclelinux-9
+      - preinstalled-35-oraclelinux-9
       - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/event_noop.rb
@@ -701,7 +701,7 @@ suites:
     excludes:
       - oraclelinux-9
       - oraclelinux-10
-      - preinstalled-34-oraclelinux-9
+      - preinstalled-35-oraclelinux-9
       - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/event_remove_add_alarm_data.rb
@@ -713,7 +713,7 @@ suites:
     excludes:
       - oraclelinux-9
       - oraclelinux-10
-      - preinstalled-34-oraclelinux-9
+      - preinstalled-35-oraclelinux-9
       - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/event_remove_add_autoaction.rb
@@ -725,7 +725,7 @@ suites:
     excludes:
       - oraclelinux-9
       - oraclelinux-10
-      - preinstalled-34-oraclelinux-9
+      - preinstalled-35-oraclelinux-9
       - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/event_remove_add_forward.rb
@@ -737,7 +737,7 @@ suites:
     excludes:
       - oraclelinux-9
       - oraclelinux-10
-      - preinstalled-34-oraclelinux-9
+      - preinstalled-35-oraclelinux-9
       - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/event_remove_add_script.rb
@@ -749,7 +749,7 @@ suites:
     excludes:
       - oraclelinux-9
       - oraclelinux-10
-      - preinstalled-34-oraclelinux-9
+      - preinstalled-35-oraclelinux-9
       - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/event_remove_add_tticket.rb
@@ -761,7 +761,7 @@ suites:
     excludes:
       - oraclelinux-9
       - oraclelinux-10
-      - preinstalled-34-oraclelinux-9
+      - preinstalled-35-oraclelinux-9
       - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/event_remove_add_varbindsdecode.rb
@@ -773,7 +773,7 @@ suites:
     excludes:
       - oraclelinux-9
       - oraclelinux-10
-      - preinstalled-34-oraclelinux-9
+      - preinstalled-35-oraclelinux-9
       - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/event_remove_alarm_data.rb
@@ -785,7 +785,7 @@ suites:
     excludes:
       - oraclelinux-9
       - oraclelinux-10
-      - preinstalled-34-oraclelinux-9
+      - preinstalled-35-oraclelinux-9
       - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/event_remove_autoaction.rb
@@ -797,7 +797,7 @@ suites:
     excludes:
       - oraclelinux-9
       - oraclelinux-10
-      - preinstalled-34-oraclelinux-9
+      - preinstalled-35-oraclelinux-9
       - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/event_remove_forward.rb
@@ -809,7 +809,7 @@ suites:
     excludes:
       - oraclelinux-9
       - oraclelinux-10
-      - preinstalled-34-oraclelinux-9
+      - preinstalled-35-oraclelinux-9
       - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/event_remove_script.rb
@@ -821,7 +821,7 @@ suites:
     excludes:
       - oraclelinux-9
       - oraclelinux-10
-      - preinstalled-34-oraclelinux-9
+      - preinstalled-35-oraclelinux-9
       - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/event_remove_tticket.rb
@@ -833,7 +833,7 @@ suites:
     excludes:
       - oraclelinux-9
       - oraclelinux-10
-      - preinstalled-34-oraclelinux-9
+      - preinstalled-35-oraclelinux-9
       - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/event_remove_varbindsdecode.rb
@@ -845,7 +845,7 @@ suites:
     excludes:
       - oraclelinux-9
       - oraclelinux-10
-      - preinstalled-34-oraclelinux-9
+      - preinstalled-35-oraclelinux-9
       - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/event_severity.rb
@@ -857,7 +857,7 @@ suites:
     excludes:
       - oraclelinux-9
       - oraclelinux-10
-      - preinstalled-34-oraclelinux-9
+      - preinstalled-35-oraclelinux-9
       - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/expression.rb
@@ -869,7 +869,7 @@ suites:
     excludes:
       - oraclelinux-9
       - oraclelinux-10
-      - preinstalled-34-oraclelinux-9
+      - preinstalled-35-oraclelinux-9
       - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/expression_change_descr.rb
@@ -881,7 +881,7 @@ suites:
     excludes:
       - oraclelinux-9
       - oraclelinux-10
-      - preinstalled-34-oraclelinux-9
+      - preinstalled-35-oraclelinux-9
       - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/expression_change_rearm.rb
@@ -893,7 +893,7 @@ suites:
     excludes:
       - oraclelinux-9
       - oraclelinux-10
-      - preinstalled-34-oraclelinux-9
+      - preinstalled-35-oraclelinux-9
       - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/expression_change_relaxed.rb
@@ -905,7 +905,7 @@ suites:
     excludes:
       - oraclelinux-9
       - oraclelinux-10
-      - preinstalled-34-oraclelinux-9
+      - preinstalled-35-oraclelinux-9
       - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/expression_change_trigger.rb
@@ -917,7 +917,7 @@ suites:
     excludes:
       - oraclelinux-9
       - oraclelinux-10
-      - preinstalled-34-oraclelinux-9
+      - preinstalled-35-oraclelinux-9
       - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/expression_change_value.rb
@@ -929,7 +929,7 @@ suites:
     excludes:
       - oraclelinux-9
       - oraclelinux-10
-      - preinstalled-34-oraclelinux-9
+      - preinstalled-35-oraclelinux-9
       - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/expression_delete.rb
@@ -941,7 +941,7 @@ suites:
     excludes:
       - oraclelinux-9
       - oraclelinux-10
-      - preinstalled-34-oraclelinux-9
+      - preinstalled-35-oraclelinux-9
       - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/foreign_source.rb
@@ -953,7 +953,7 @@ suites:
     excludes:
       - oraclelinux-9
       - oraclelinux-10
-      - preinstalled-34-oraclelinux-9
+      - preinstalled-35-oraclelinux-9
       - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/group.rb
@@ -965,7 +965,7 @@ suites:
     excludes:
       - oraclelinux-9
       - oraclelinux-10
-      - preinstalled-34-oraclelinux-9
+      - preinstalled-35-oraclelinux-9
       - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/import.rb
@@ -977,7 +977,7 @@ suites:
     excludes:
       - oraclelinux-9
       - oraclelinux-10
-      - preinstalled-34-oraclelinux-9
+      - preinstalled-35-oraclelinux-9
       - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/import_node.rb
@@ -989,7 +989,7 @@ suites:
     excludes:
       - oraclelinux-9
       - oraclelinux-10
-      - preinstalled-34-oraclelinux-9
+      - preinstalled-35-oraclelinux-9
       - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/import_node_interface.rb
@@ -1001,7 +1001,7 @@ suites:
     excludes:
       - oraclelinux-9
       - oraclelinux-10
-      - preinstalled-34-oraclelinux-9
+      - preinstalled-35-oraclelinux-9
       - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/import_node_interface_service.rb
@@ -1013,7 +1013,7 @@ suites:
     excludes:
       - oraclelinux-9
       - oraclelinux-10
-      - preinstalled-34-oraclelinux-9
+      - preinstalled-35-oraclelinux-9
       - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/jdbc_collection.rb
@@ -1025,7 +1025,7 @@ suites:
     excludes:
       - oraclelinux-9
       - oraclelinux-10
-      - preinstalled-34-oraclelinux-9
+      - preinstalled-35-oraclelinux-9
       - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/jdbc_collection_edit.rb
@@ -1037,7 +1037,7 @@ suites:
     excludes:
       - oraclelinux-9
       - oraclelinux-10
-      - preinstalled-34-oraclelinux-9
+      - preinstalled-35-oraclelinux-9
       - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/jdbc_collection_delete.rb
@@ -1049,7 +1049,7 @@ suites:
     excludes:
       - oraclelinux-9
       - oraclelinux-10
-      - preinstalled-34-oraclelinux-9
+      - preinstalled-35-oraclelinux-9
       - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/jdbc_query.rb
@@ -1061,7 +1061,7 @@ suites:
     excludes:
       - oraclelinux-9
       - oraclelinux-10
-      - preinstalled-34-oraclelinux-9
+      - preinstalled-35-oraclelinux-9
       - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/jdbc_query_edit.rb
@@ -1073,7 +1073,7 @@ suites:
     excludes:
       - oraclelinux-9
       - oraclelinux-10
-      - preinstalled-34-oraclelinux-9
+      - preinstalled-35-oraclelinux-9
       - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/jdbc_query_delete.rb
@@ -1085,7 +1085,7 @@ suites:
     excludes:
       - oraclelinux-9
       - oraclelinux-10
-      - preinstalled-34-oraclelinux-9
+      - preinstalled-35-oraclelinux-9
       - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/jdbc_collection_service.rb
@@ -1097,7 +1097,7 @@ suites:
     excludes:
       - oraclelinux-9
       - oraclelinux-10
-      - preinstalled-34-oraclelinux-9
+      - preinstalled-35-oraclelinux-9
       - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/jdbc_collection_service_edit.rb
@@ -1109,7 +1109,7 @@ suites:
     excludes:
       - oraclelinux-9
       - oraclelinux-10
-      - preinstalled-34-oraclelinux-9
+      - preinstalled-35-oraclelinux-9
       - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/jdbc_collection_service_noop.rb
@@ -1121,7 +1121,7 @@ suites:
     excludes:
       - oraclelinux-9
       - oraclelinux-10
-      - preinstalled-34-oraclelinux-9
+      - preinstalled-35-oraclelinux-9
       - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/jdbc_collection_service_delete.rb
@@ -1133,7 +1133,7 @@ suites:
     excludes:
       - oraclelinux-9
       - oraclelinux-10
-      - preinstalled-34-oraclelinux-9
+      - preinstalled-35-oraclelinux-9
       - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/jms_nb_destination.rb
@@ -1145,7 +1145,7 @@ suites:
     excludes:
       - oraclelinux-9
       - oraclelinux-10
-      - preinstalled-34-oraclelinux-9
+      - preinstalled-35-oraclelinux-9
       - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/jms_nb_destination_delete.rb
@@ -1157,7 +1157,7 @@ suites:
     excludes:
       - oraclelinux-9
       - oraclelinux-10
-      - preinstalled-34-oraclelinux-9
+      - preinstalled-35-oraclelinux-9
       - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/jmx.rb
@@ -1169,7 +1169,7 @@ suites:
     excludes:
       - oraclelinux-9
       - oraclelinux-10
-      - preinstalled-34-oraclelinux-9
+      - preinstalled-35-oraclelinux-9
       - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/notifd_autoack.rb
@@ -1181,7 +1181,7 @@ suites:
     excludes:
       - oraclelinux-9
       - oraclelinux-10
-      - preinstalled-34-oraclelinux-9
+      - preinstalled-35-oraclelinux-9
       - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/notification.rb
@@ -1193,7 +1193,7 @@ suites:
     excludes:
       - oraclelinux-9
       - oraclelinux-10
-      - preinstalled-34-oraclelinux-9
+      - preinstalled-35-oraclelinux-9
       - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/notification_command.rb
@@ -1205,7 +1205,7 @@ suites:
     excludes:
       - oraclelinux-9
       - oraclelinux-10
-      - preinstalled-34-oraclelinux-9
+      - preinstalled-35-oraclelinux-9
       - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/poller.rb
@@ -1217,7 +1217,7 @@ suites:
     excludes:
       - oraclelinux-9
       - oraclelinux-10
-      - preinstalled-34-oraclelinux-9
+      - preinstalled-35-oraclelinux-9
       - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/poller_edit.rb
@@ -1229,7 +1229,7 @@ suites:
     excludes:
       - oraclelinux-9
       - oraclelinux-10
-      - preinstalled-34-oraclelinux-9
+      - preinstalled-35-oraclelinux-9
       - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/poller_delete.rb
@@ -1241,7 +1241,7 @@ suites:
     excludes:
       - oraclelinux-9
       - oraclelinux-10
-      - preinstalled-34-oraclelinux-9
+      - preinstalled-35-oraclelinux-9
       - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/poller_remove_parms.rb
@@ -1253,7 +1253,7 @@ suites:
     excludes:
       - oraclelinux-9
       - oraclelinux-10
-      - preinstalled-34-oraclelinux-9
+      - preinstalled-35-oraclelinux-9
       - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/policy.rb
@@ -1265,7 +1265,7 @@ suites:
     excludes:
       - oraclelinux-9
       - oraclelinux-10
-      - preinstalled-34-oraclelinux-9
+      - preinstalled-35-oraclelinux-9
       - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/resource_type.rb
@@ -1277,7 +1277,7 @@ suites:
     excludes:
       - oraclelinux-9
       - oraclelinux-10
-      - preinstalled-34-oraclelinux-9
+      - preinstalled-35-oraclelinux-9
       - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/response_graph.rb
@@ -1289,7 +1289,7 @@ suites:
     excludes:
       - oraclelinux-9
       - oraclelinux-10
-      - preinstalled-34-oraclelinux-9
+      - preinstalled-35-oraclelinux-9
       - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/role.rb
@@ -1301,7 +1301,7 @@ suites:
     excludes:
       - oraclelinux-9
       - oraclelinux-10
-      - preinstalled-34-oraclelinux-9
+      - preinstalled-35-oraclelinux-9
       - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/scriptd.rb
@@ -1313,7 +1313,7 @@ suites:
     excludes:
       - oraclelinux-9
       - oraclelinux-10
-      - preinstalled-34-oraclelinux-9
+      - preinstalled-35-oraclelinux-9
       - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/send_event.rb
@@ -1325,7 +1325,7 @@ suites:
     excludes:
       - oraclelinux-9
       - oraclelinux-10
-      - preinstalled-34-oraclelinux-9
+      - preinstalled-35-oraclelinux-9
       - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/service_detector.rb
@@ -1337,7 +1337,7 @@ suites:
     excludes:
       - oraclelinux-9
       - oraclelinux-10
-      - preinstalled-34-oraclelinux-9
+      - preinstalled-35-oraclelinux-9
       - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/service_detector_delete.rb
@@ -1349,7 +1349,7 @@ suites:
     excludes:
       - oraclelinux-9
       - oraclelinux-10
-      - preinstalled-34-oraclelinux-9
+      - preinstalled-35-oraclelinux-9
       - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/service_detector_edit.rb
@@ -1361,7 +1361,7 @@ suites:
     excludes:
       - oraclelinux-9
       - oraclelinux-10
-      - preinstalled-34-oraclelinux-9
+      - preinstalled-35-oraclelinux-9
       - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/service_detector_noop.rb
@@ -1373,7 +1373,7 @@ suites:
     excludes:
       - oraclelinux-9
       - oraclelinux-10
-      - preinstalled-34-oraclelinux-9
+      - preinstalled-35-oraclelinux-9
       - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/snmp_collection.rb
@@ -1385,7 +1385,7 @@ suites:
     excludes:
       - oraclelinux-9
       - oraclelinux-10
-      - preinstalled-34-oraclelinux-9
+      - preinstalled-35-oraclelinux-9
       - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/snmp_collection_group.rb
@@ -1397,7 +1397,7 @@ suites:
     excludes:
       - oraclelinux-9
       - oraclelinux-10
-      - preinstalled-34-oraclelinux-9
+      - preinstalled-35-oraclelinux-9
       - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/snmp_collection_group_edit.rb
@@ -1409,7 +1409,7 @@ suites:
     excludes:
       - oraclelinux-9
       - oraclelinux-10
-      - preinstalled-34-oraclelinux-9
+      - preinstalled-35-oraclelinux-9
       - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/snmp_collection_group_delete.rb
@@ -1421,7 +1421,7 @@ suites:
     excludes:
       - oraclelinux-9
       - oraclelinux-10
-      - preinstalled-34-oraclelinux-9
+      - preinstalled-35-oraclelinux-9
       - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/snmp_collection_service.rb
@@ -1433,7 +1433,7 @@ suites:
     excludes:
       - oraclelinux-9
       - oraclelinux-10
-      - preinstalled-34-oraclelinux-9
+      - preinstalled-35-oraclelinux-9
       - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/snmp_config_definition.rb
@@ -1445,7 +1445,7 @@ suites:
     excludes:
       - oraclelinux-9
       - oraclelinux-10
-      - preinstalled-34-oraclelinux-9
+      - preinstalled-35-oraclelinux-9
       - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/snmp_config_definition_update.rb
@@ -1457,7 +1457,7 @@ suites:
     excludes:
       - oraclelinux-9
       - oraclelinux-10
-      - preinstalled-34-oraclelinux-9
+      - preinstalled-35-oraclelinux-9
       - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/snmp_config_definition_delete.rb
@@ -1469,7 +1469,7 @@ suites:
     excludes:
       - oraclelinux-9
       - oraclelinux-10
-      - preinstalled-34-oraclelinux-9
+      - preinstalled-35-oraclelinux-9
       - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/snmp_config_profile.rb
@@ -1481,7 +1481,7 @@ suites:
     excludes:
       - oraclelinux-9
       - oraclelinux-10
-      - preinstalled-34-oraclelinux-9
+      - preinstalled-35-oraclelinux-9
       - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/snmp_config_profile_update.rb
@@ -1493,7 +1493,7 @@ suites:
     excludes:
       - oraclelinux-9
       - oraclelinux-10
-      - preinstalled-34-oraclelinux-9
+      - preinstalled-35-oraclelinux-9
       - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/snmp_config_profile_delete.rb
@@ -1505,7 +1505,7 @@ suites:
     excludes:
       - oraclelinux-9
       - oraclelinux-10
-      - preinstalled-34-oraclelinux-9
+      - preinstalled-35-oraclelinux-9
       - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/statsd.rb
@@ -1517,7 +1517,7 @@ suites:
     excludes:
       - oraclelinux-9
       - oraclelinux-10
-      - preinstalled-34-oraclelinux-9
+      - preinstalled-35-oraclelinux-9
       - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/surveillance_view.rb
@@ -1529,7 +1529,7 @@ suites:
     excludes:
       - oraclelinux-9
       - oraclelinux-10
-      - preinstalled-34-oraclelinux-9
+      - preinstalled-35-oraclelinux-9
       - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/surveillance_view_mod.rb
@@ -1541,7 +1541,7 @@ suites:
     excludes:
       - oraclelinux-9
       - oraclelinux-10
-      - preinstalled-34-oraclelinux-9
+      - preinstalled-35-oraclelinux-9
       - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/syslog_file.rb
@@ -1553,7 +1553,7 @@ suites:
     excludes:
       - oraclelinux-9
       - oraclelinux-10
-      - preinstalled-34-oraclelinux-9
+      - preinstalled-35-oraclelinux-9
       - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/system_def.rb
@@ -1565,7 +1565,7 @@ suites:
     excludes:
       - oraclelinux-9
       - oraclelinux-10
-      - preinstalled-34-oraclelinux-9
+      - preinstalled-35-oraclelinux-9
       - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/threshd_package.rb
@@ -1577,7 +1577,7 @@ suites:
     excludes:
       - oraclelinux-9
       - oraclelinux-10
-      - preinstalled-34-oraclelinux-9
+      - preinstalled-35-oraclelinux-9
       - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/threshd_service.rb
@@ -1589,7 +1589,7 @@ suites:
     excludes:
       - oraclelinux-9
       - oraclelinux-10
-      - preinstalled-34-oraclelinux-9
+      - preinstalled-35-oraclelinux-9
       - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/threshold.rb
@@ -1601,7 +1601,7 @@ suites:
     excludes:
       - oraclelinux-9
       - oraclelinux-10
-      - preinstalled-34-oraclelinux-9
+      - preinstalled-35-oraclelinux-9
       - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/threshold_change_descr.rb
@@ -1613,7 +1613,7 @@ suites:
     excludes:
       - oraclelinux-9
       - oraclelinux-10
-      - preinstalled-34-oraclelinux-9
+      - preinstalled-35-oraclelinux-9
       - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/threshold_change_dslabel.rb
@@ -1625,7 +1625,7 @@ suites:
     excludes:
       - oraclelinux-9
       - oraclelinux-10
-      - preinstalled-34-oraclelinux-9
+      - preinstalled-35-oraclelinux-9
       - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/threshold_change_rearm.rb
@@ -1637,7 +1637,7 @@ suites:
     excludes:
       - oraclelinux-9
       - oraclelinux-10
-      - preinstalled-34-oraclelinux-9
+      - preinstalled-35-oraclelinux-9
       - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/threshold_change_trigger.rb
@@ -1649,7 +1649,7 @@ suites:
     excludes:
       - oraclelinux-9
       - oraclelinux-10
-      - preinstalled-34-oraclelinux-9
+      - preinstalled-35-oraclelinux-9
       - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/threshold_change_value.rb
@@ -1661,7 +1661,7 @@ suites:
     excludes:
       - oraclelinux-9
       - oraclelinux-10
-      - preinstalled-34-oraclelinux-9
+      - preinstalled-35-oraclelinux-9
       - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/threshold_common.rb
@@ -1673,7 +1673,7 @@ suites:
     excludes:
       - oraclelinux-9
       - oraclelinux-10
-      - preinstalled-34-oraclelinux-9
+      - preinstalled-35-oraclelinux-9
       - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/threshold_delete.rb
@@ -1685,7 +1685,7 @@ suites:
     excludes:
       - oraclelinux-9
       - oraclelinux-10
-      - preinstalled-34-oraclelinux-9
+      - preinstalled-35-oraclelinux-9
       - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/translation_specs.rb
@@ -1697,7 +1697,7 @@ suites:
     excludes:
       - oraclelinux-9
       - oraclelinux-10
-      - preinstalled-34-oraclelinux-9
+      - preinstalled-35-oraclelinux-9
       - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/trapd.rb
@@ -1709,7 +1709,7 @@ suites:
     excludes:
       - oraclelinux-9
       - oraclelinux-10
-      - preinstalled-34-oraclelinux-9
+      - preinstalled-35-oraclelinux-9
       - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/user.rb
@@ -1721,7 +1721,7 @@ suites:
     excludes:
       - oraclelinux-9
       - oraclelinux-10
-      - preinstalled-34-oraclelinux-9
+      - preinstalled-35-oraclelinux-9
       - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/user_mod.rb
@@ -1733,7 +1733,7 @@ suites:
     excludes:
       - oraclelinux-9
       - oraclelinux-10
-      - preinstalled-34-oraclelinux-9
+      - preinstalled-35-oraclelinux-9
       - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/wallboard.rb
@@ -1745,7 +1745,7 @@ suites:
     excludes:
       - oraclelinux-9
       - oraclelinux-10
-      - preinstalled-34-oraclelinux-9
+      - preinstalled-35-oraclelinux-9
       - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/wallboard_mod.rb
@@ -1757,7 +1757,7 @@ suites:
     excludes:
       - oraclelinux-9
       - oraclelinux-10
-      - preinstalled-34-oraclelinux-9
+      - preinstalled-35-oraclelinux-9
       - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/wsman_collection.rb
@@ -1769,7 +1769,7 @@ suites:
     excludes:
       - oraclelinux-9
       - oraclelinux-10
-      - preinstalled-34-oraclelinux-9
+      - preinstalled-35-oraclelinux-9
       - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/wsman_collection_service.rb
@@ -1781,7 +1781,7 @@ suites:
     excludes:
       - oraclelinux-9
       - oraclelinux-10
-      - preinstalled-34-oraclelinux-9
+      - preinstalled-35-oraclelinux-9
       - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/wsman_group.rb
@@ -1793,7 +1793,7 @@ suites:
     excludes:
       - oraclelinux-9
       - oraclelinux-10
-      - preinstalled-34-oraclelinux-9
+      - preinstalled-35-oraclelinux-9
       - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/wsman_system_definition.rb
@@ -1805,7 +1805,7 @@ suites:
     excludes:
       - oraclelinux-9
       - oraclelinux-10
-      - preinstalled-34-oraclelinux-9
+      - preinstalled-35-oraclelinux-9
       - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/xml_collection.rb
@@ -1817,7 +1817,7 @@ suites:
     excludes:
       - oraclelinux-9
       - oraclelinux-10
-      - preinstalled-34-oraclelinux-9
+      - preinstalled-35-oraclelinux-9
       - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/xml_source.rb
@@ -1829,7 +1829,7 @@ suites:
     excludes:
       - oraclelinux-9
       - oraclelinux-10
-      - preinstalled-34-oraclelinux-9
+      - preinstalled-35-oraclelinux-9
       - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/xml_source_delete.rb
@@ -1841,7 +1841,7 @@ suites:
     excludes:
       - oraclelinux-9
       - oraclelinux-10
-      - preinstalled-34-oraclelinux-9
+      - preinstalled-35-oraclelinux-9
       - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/xml_group.rb
@@ -1853,7 +1853,7 @@ suites:
     excludes:
       - oraclelinux-9
       - oraclelinux-10
-      - preinstalled-34-oraclelinux-9
+      - preinstalled-35-oraclelinux-9
       - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/xml_group_delete.rb
@@ -1865,7 +1865,7 @@ suites:
     excludes:
       - oraclelinux-9
       - oraclelinux-10
-      - preinstalled-34-oraclelinux-9
+      - preinstalled-35-oraclelinux-9
       - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/xml_collection_service.rb
@@ -1877,7 +1877,7 @@ suites:
     excludes:
       - oraclelinux-9
       - oraclelinux-10
-      - preinstalled-34-oraclelinux-9
+      - preinstalled-35-oraclelinux-9
       - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/xml_collection_service_change_interval.rb
@@ -1889,7 +1889,7 @@ suites:
     excludes:
       - oraclelinux-9
       - oraclelinux-10
-      - preinstalled-34-oraclelinux-9
+      - preinstalled-35-oraclelinux-9
       - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/xml_collection_service_change_nothing.rb
@@ -1901,7 +1901,7 @@ suites:
     excludes:
       - oraclelinux-9
       - oraclelinux-10
-      - preinstalled-34-oraclelinux-9
+      - preinstalled-35-oraclelinux-9
       - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/xml_collection_service_change_port.rb
@@ -1913,7 +1913,7 @@ suites:
     excludes:
       - oraclelinux-9
       - oraclelinux-10
-      - preinstalled-34-oraclelinux-9
+      - preinstalled-35-oraclelinux-9
       - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/xml_collection_service_change_retrycount.rb
@@ -1925,7 +1925,7 @@ suites:
     excludes:
       - oraclelinux-9
       - oraclelinux-10
-      - preinstalled-34-oraclelinux-9
+      - preinstalled-35-oraclelinux-9
       - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/xml_collection_service_change_status.rb
@@ -1937,7 +1937,7 @@ suites:
     excludes:
       - oraclelinux-9
       - oraclelinux-10
-      - preinstalled-34-oraclelinux-9
+      - preinstalled-35-oraclelinux-9
       - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/xml_collection_service_change_threshold.rb
@@ -1949,7 +1949,7 @@ suites:
     excludes:
       - oraclelinux-9
       - oraclelinux-10
-      - preinstalled-34-oraclelinux-9
+      - preinstalled-35-oraclelinux-9
       - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/xml_collection_service_change_timeout.rb
@@ -1961,7 +1961,7 @@ suites:
     excludes:
       - oraclelinux-9
       - oraclelinux-10
-      - preinstalled-34-oraclelinux-9
+      - preinstalled-35-oraclelinux-9
       - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/xml_collection_service_change_userdefined.rb
@@ -1973,7 +1973,7 @@ suites:
     excludes:
       - oraclelinux-9
       - oraclelinux-10
-      - preinstalled-34-oraclelinux-9
+      - preinstalled-35-oraclelinux-9
       - preinstalled-oraclelinux-9
     provisioner:
       policyfile: policyfiles/xml_collection_service_delete.rb

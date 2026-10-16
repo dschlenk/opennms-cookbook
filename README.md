@@ -1,7 +1,7 @@
 # Description
 
 A Chef cookbook to manage the installation and configuration of OpenNMS Horizon.
-Current version supports Horizon release 35 on EL (redhat, rocky, oracle, etc) 9 or 10.
+Current version supports Horizon release 36 on EL (redhat, rocky, oracle, etc) 9 or 10.
 
 ## Versions
 
@@ -31,7 +31,7 @@ The following dependencies must be satisfied for the `default` recipe to success
 
 #### Java
 
-You'll need to install a compatible Java runtime. Take a look at the fixture cookbook `openjdk17` in `test/fixtures/cookbooks` for an example.
+You'll need to install a compatible Java runtime. Take a look at the fixture cookbook `openjdk21` in `test/fixtures/cookbooks` for an example.
 Set `node['opennms']['jre_path']` to the home directory of a specific runtime if you cannot rely on the algorithm used by the `run_java -s` command to find the correct runtime.
 
 #### Postgres

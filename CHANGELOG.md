@@ -1,5 +1,11 @@
 # OpenNMS Cookbook Changes
 
+## 36.0.0
+
+* breaking: supports Horizon 36
+* breaking: requires JDK 21
+* breaking: requires PostgreSQL 14
+
 ## 35.0.0
 
 * breaking: supports Horizon 35

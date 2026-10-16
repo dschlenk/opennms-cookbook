@@ -1,6 +1,6 @@
 name 'kafka'
 default_source :supermarket
-run_list 'openjdk17', 'kafka_default', 'opennms::postgres', 'opennms'
+run_list 'openjdk21', 'kafka_default', 'opennms::postgres', 'opennms'
 cookbook 'kafka_default', path: '../test/fixtures/cookbooks/kafka_default'
 cookbook 'opennms', path: '../'
-cookbook 'openjdk17', path: '../test/fixtures/cookbooks/openjdk17'
+cookbook 'openjdk21', path: '../test/fixtures/cookbooks/openjdk21'

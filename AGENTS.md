@@ -1,6 +1,6 @@
 # OpenNMS Cookbook - Agent Guide
 
-Chef cookbook for OpenNMS Horizon 33 on EL9 (RHEL/Rocky/Oracle). Cinc/Chef >=18.5, Ruby 3.0.1.
+Chef cookbook for OpenNMS Horizon 36 on EL9 (RHEL/Rocky/Oracle). Cinc/Chef >=18.5, Ruby 3.0.1.
 
 ## Commands
 - Style: `cookstyle` (CI runs cookstyle)
@@ -11,14 +11,14 @@ Chef cookbook for OpenNMS Horizon 33 on EL9 (RHEL/Rocky/Oracle). Cinc/Chef >=18.
 - CI pipeline: docker login → install cinc-workstation 25 → `cinc shell-init bash` → `cinc exec bundle install` → mdl → cookstyle → `kitchen verify default`
 
 ## Architecture
-- Cookbook version matches Horizon major: 33.x supports Horizon 33.x on EL9
+- Cookbook version matches Horizon major: 36.x supports Horizon 36.x on EL9
 - Entry recipes:
   - `opennms::default` installs OpenNMS from official yum repos, runs `runjava -s` if java.conf missing, runs `install -dis` if not configured
   - `opennms::postgres` installs PostgreSQL 15 via PGDG
   - `opennms::rrdtool` switches timeseries to RRDTool
   - `opennms::kafka_producer` enables Kafka producer
 - Attributes in `attributes/default.rb`. Key defaults:
-  - `node['opennms']['version'] = '33.1.8-1'`
+  - `node['opennms']['version'] = '36.0.5-1'`
   - `node['opennms']['conf']['env']['START_TIMEOUT'] = 30` (kitchen overrides to 60)
   - `node['opennms']['upgrade'] = false`
   - `node['opennms']['templates'] = true`
@@ -42,5 +42,5 @@ Chef cookbook for OpenNMS Horizon 33 on EL9 (RHEL/Rocky/Oracle). Cinc/Chef >=18.
 ## Testing
 - Integration tests: InSpec under `test/integration/<suite>/controls/`
 - Suites defined in `kitchen.yml`; many suites for custom resources (e.g., `event`, `policy`, `collection_package`, etc.)
-- Test fixtures: `test/fixtures/cookbooks/openjdk17`, `opennms_resource_tests`
+- Test fixtures: `test/fixtures/cookbooks/openjdk21`, `opennms_resource_tests`
 - Running a single test suite requires dokken/docker; CI uses ubuntu-2404 with docker
