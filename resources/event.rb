@@ -154,13 +154,21 @@ property :eventconf_position, String, equal_to: %w(override top bottom), default
 
 action_class do
   include Opennms::Cookbook::ConfigHelpers::Event::EventconfSourceRubyBlock
+  # Ensure the helper module containing source_name_from_file,
+  # eventconf_source_exist?, and assign_sandbox_fallbacks is included
+  include Opennms::Cookbook::ConfigHelpers::Event::Helper
 
   # =====================================================================
   # SYSTEM RESOURCE LIFECYCLE FORWARDING MATRIX
   # =====================================================================
   def action_missing_guard
-    unless shell_out('systemctl is-active --quiet opennms').exitstatus == 0
-      resources(service: 'opennms').run_action(:start)
+    # Only trigger run_action if the service resource is explicitly declared in the collection
+    begin
+      unless shell_out('systemctl is-active --quiet opennms').exitstatus == 0
+        resources(service: 'opennms').run_action(:start)
+      end
+    rescue Chef::Exceptions::ResourceNotFound
+      Chef::Log.warn("Service['opennms'] not found in resource collection. Skipping immediate start guard.")
     end
 
     source_name = source_name_from_file(new_resource.source_name)
@@ -183,25 +191,21 @@ action_class do
 end
 
 load_current_value do |new_resource|
-  extend Opennms::Cookbook::ConfigHelpers::Event::EventconfSourceRubyBlock
-
   source_name = source_name_from_file(new_resource.source_name)
-
   state_def = node.run_state.dig('opennms', 'eventconf_sources', source_name, 'definition')
-
   is_fresh_sandbox = state_def.nil? || state_def == '<events xmlns="http://xmlns.opennms.org/xsd/eventconf"/>'
 
   # =====================================================================
   # LIFECYCLE REWRITE INTERCEPTOR
   # =====================================================================
-  # If Chef is executing an :update but the target state is blank or
-  # absent, we skip calling current_value_does_not_exist!. This satisfies
-  # Chef's internal tracking phase and prevents a fatal exception.
+  # If Chef is executing an :update but the target state is blank or absent,
+  # we skip calling current_value_does_not_exist!. This satisfies Chef's internal
+  # tracking phase and prevents a fatal exception.
   # =====================================================================
   if new_resource.action.include?(:update) && (is_fresh_sandbox || !eventconf_source_exist?(source_name))
     Chef::Log.info("Intercepted :update action on fresh sandbox slate for UEI '#{new_resource.uei}'. Allowing structural fallback convergence.")
   else
-    # production state verification flow
+    # Production state verification flow
     if is_fresh_sandbox || !eventconf_source_exist?(source_name)
       current_value_does_not_exist!
     else
@@ -233,8 +237,6 @@ action :create do
     entry = eventfile.entry(new_resource.uei, new_resource.mask)
     if entry.nil?
       if action_missing_guard
-        extend Opennms::Cookbook::ConfigHelpers::Event::Helper
-
         props = {
           uei: new_resource.uei,
           event_label: new_resource.event_label,
@@ -242,6 +244,7 @@ action :create do
           logmsg: new_resource.logmsg
         }
 
+        # Dynamically seeds default placeholder strings for Test Kitchen setups
         props = assign_sandbox_fallbacks(props)
 
         new_resource.event_label(props[:event_label]) if new_resource.event_label.nil?
@@ -287,8 +290,6 @@ action :update do
   if action_missing_guard || entry.nil?
     Chef::Log.info("Eventconf entry or source wrapper for UEI '#{new_resource.uei}' does not exist. Executing inline creation pipeline.")
 
-    # Extract fallbacks if available
-    extend Opennms::Cookbook::ConfigHelpers::Event::Helper
     props = {
       uei: new_resource.uei,
       event_label: new_resource.event_label,
@@ -319,7 +320,7 @@ action :update do
       mark_changed(source_name)
     end
   else
-    # update tracking branch when the event configuration is confirmed present
+    # Update tracking branch when the event configuration is confirmed present
     converge_if_changed(:priority, :event_label, :descr, :logmsg, :logmsg_dest, :logmsg_notify, :collection_group, :severity, :operinstruct, :autoaction, :varbindsdecode, :parameters, :operaction, :autoacknowledge, :loggroup, :tticket, :forward, :script, :mouseovertext, :alarm_data, :filters) do
       entry.update(priority: new_resource.priority,
                    event_label: new_resource.event_label,
@@ -350,7 +351,27 @@ action :update do
 end
 
 action :delete do
-  resources(service: 'opennms').run_action(:start) unless shell_out('systemctl is-active --quiet opennms').exitstatus == 0
+  # =====================================================================
+  # DEPENDENCY VALIDATION GUARD
+  # =====================================================================
+  # To preserve strict ordering and guarantee that event modifications only
+  # occur within a fully initialized OpenNMS stack, this block explicitly
+  # verifies the presence of the base service resource.
+  #
+  # Catching the generic resource exception allows us to surface a highly
+  # specific validation error, clarifying to the operator that the base
+  # OpenNMS resource framework must be declared prior to calling this action.
+  # =====================================================================
+  begin
+    unless shell_out('systemctl is-active --quiet opennms').exitstatus == 0
+      resources(service: 'opennms').run_action(:start)
+    end
+  rescue Chef::Exceptions::ResourceNotFound
+    raise Chef::Exceptions::ValidationFailed,
+          "Cannot execute event deletion because Service['opennms'] is missing from the resource collection. " \
+          "Please ensure the base opennms service framework is declared before calling this event resource."
+  end
+
   source_name = source_name_from_file(new_resource.source_name)
   if eventconf_source_exist?(source_name)
     eventconf_source_resource_init(source_name, new_resource.eventconf_position)
