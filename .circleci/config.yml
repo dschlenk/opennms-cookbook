@@ -18,11 +18,11 @@ jobs:
       - run:
           name: cookstyle
           command: cookstyle
+
   integration:
     machine:
       image: ubuntu-2404:current
     parallelism: 30
-    executor:
     steps:
       - checkout
       - run:
@@ -31,20 +31,25 @@ jobs:
             echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USER" --password-stdin
       - run:
           name: install cinc workstation
-          command: curl -L https://omnitruck.cinc.sh/install.sh | sudo bash -s -- -P cinc-workstation -v 25.13.7
-      - run:
-          name: cinc
-          command: cinc shell-init bash
+          command: |
+            curl -L https://omnitruck.cinc.sh/install.sh | sudo bash -s -- -P cinc-workstation -v 25.13.7
+            # Persist Cinc environment variables across all subsequent CircleCI steps
+            echo 'eval "$(cinc shell-init bash)"' >> $BASH_ENV
       - run:
           name: bundler
-          command: cinc exec bundle install --prefer-local
+          command: bundle install --prefer-local
       - run:
           name: kitchen
           command: |
-            kitchen list -b | circleci tests run --command="
-              echo '{\"username\": \"${DOCKER_USER}\", \"password\": \"${DOCKER_PASSWORD}\"}' > .kitchen_creds.json
+            export DOCKER_USER DOCKER_PASSWORD
+
+            # Use circleci tests split to intelligently distribute suites across your 30 containers
+            kitchen list -b | circleci tests split | circleci tests run --command="
+              export DOCKER_USER='$DOCKER_USER'
+              export DOCKER_PASSWORD='$DOCKER_PASSWORD'
               xargs -L 1 kitchen test -d always
             " --verbose
+
 workflows:
   version: 2
   untagged-build:
