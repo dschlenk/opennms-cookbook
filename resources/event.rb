@@ -152,12 +152,10 @@ property :position, String, equal_to: %w(top bottom), default: 'bottom', desired
 # if a new eventconf file is created as a result of this resource executing, this property controls the relative position that the reference to the new file is added to the main eventconf file
 property :eventconf_position, String, equal_to: %w(override top bottom), default: 'bottom', desired_state: false
 
-action_class do
-  include Opennms::Cookbook::ConfigHelpers::Event::EventconfSourceRubyBlock
-  # Ensure the helper module containing source_name_from_file,
-  # eventconf_source_exist?, and assign_sandbox_fallbacks is included
-  include Opennms::Cookbook::ConfigHelpers::Event::Helper
+include Opennms::Cookbook::ConfigHelpers::Event::EventconfSourceRubyBlock
+include Opennms::Cookbook::ConfigHelpers::Event::Helper
 
+action_class do
   # =====================================================================
   # SYSTEM RESOURCE LIFECYCLE FORWARDING MATRIX
   # =====================================================================
