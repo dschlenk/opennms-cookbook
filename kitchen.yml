@@ -1,8 +1,8 @@
 ---
 driver:
   name: dokken
-  registry_username: <%= ENV['DOCKER_USER'] %>
-  registry_password: <%= ENV['DOCKER_PASSWORD'] %>
+  registry_username: "mcomfort"
+  registry_password: "BilinL@96"
 
 transport:
   name: dokken
