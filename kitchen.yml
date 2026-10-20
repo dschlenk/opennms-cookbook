@@ -1,10 +1,8 @@
 ---
 driver:
   name: dokken
-  privileged: true
-  chef_image: cincproject/cinc
-  chef_version: 18
-  pull_platform_image: true
+  registry_username: <%= ENV['DOCKER_USER'] %>
+  registry_password: <%= ENV['DOCKER_PASSWORD'] %>
 
 transport:
   name: dokken
