@@ -155,11 +155,18 @@ property :eventconf_position, String, equal_to: %w(override top bottom), default
 include Opennms::Cookbook::ConfigHelpers::Event::EventconfSourceRubyBlock
 include Opennms::Cookbook::ConfigHelpers::Event::Helper
 
+# =====================================================================
+# OPENNMS EVENT CUSTOM RESOURCE
+# =====================================================================
+
+include Opennms::Cookbook::ConfigHelpers::Event::EventconfSourceRubyBlock
+include Opennms::Cookbook::ConfigHelpers::Event::Helper
+
 action_class do
   # =====================================================================
   # SYSTEM RESOURCE LIFECYCLE FORWARDING MATRIX
   # =====================================================================
-  def action_missing_guard
+  def execution_missing_guard
     # Only trigger run_action if the service resource is explicitly declared in the collection
     begin
       unless shell_out('systemctl is-active --quiet opennms').exitstatus == 0
@@ -202,24 +209,21 @@ load_current_value do |new_resource|
   # =====================================================================
   if new_resource.action.include?(:update) && (is_fresh_sandbox || !eventconf_source_exist?(source_name))
     Chef::Log.info("Intercepted :update action on fresh sandbox slate for UEI '#{new_resource.uei}'. Allowing structural fallback convergence.")
+  elsif is_fresh_sandbox || !eventconf_source_exist?(source_name)
+    current_value_does_not_exist!
   else
-    # Production state verification flow
-    if is_fresh_sandbox || !eventconf_source_exist?(source_name)
+    eventconf_source_resource_init(source_name, new_resource.eventconf_position)
+    eventfile = Opennms::Cookbook::ConfigHelpers::Event::EventDefinitionFile.new
+    eventfile.load!(node.run_state['opennms']['eventconf_sources'][source_name]['definition'])
+    event = eventfile.entry(new_resource.uei, new_resource.mask)
+
+    if event.nil?
       current_value_does_not_exist!
     else
-      eventconf_source_resource_init(source_name, new_resource.eventconf_position)
-      eventfile = Opennms::Cookbook::ConfigHelpers::Event::EventDefinitionFile.new
-      eventfile.load!(node.run_state['opennms']['eventconf_sources'][source_name]['definition'])
-      event = eventfile.entry(new_resource.uei, new_resource.mask)
-
-      if event.nil?
-        current_value_does_not_exist!
-      else
-        %i(priority event_label descr logmsg logmsg_dest logmsg_notify collection_group severity operinstruct autoaction varbindsdecode parameters operaction autoacknowledge loggroup tticket forward script mouseovertext alarm_data filters).each do |p|
-          send(p, event.send(p))
-        end
-        alarm_data false if event.alarm_data.nil? && new_resource.alarm_data.eql?(false)
+      %i(priority event_label descr logmsg logmsg_dest logmsg_notify collection_group severity operinstruct autoaction varbindsdecode parameters operaction autoacknowledge loggroup tticket forward script mouseovertext alarm_data filters).each do |p|
+        send(p, event.send(p))
       end
+      alarm_data false if event.alarm_data.nil? && new_resource.alarm_data.eql?(false)
     end
   end
 end
@@ -227,19 +231,22 @@ end
 action :create do
   converge_if_changed do
     source_name = source_name_from_file(new_resource.source_name)
+
     if node.run_state['opennms']['eventconf_sources'].nil? || node.run_state['opennms']['eventconf_sources'][source_name].nil?
       eventconf_source_resource_init(source_name, new_resource.eventconf_position)
     end
+
     eventfile = Opennms::Cookbook::ConfigHelpers::Event::EventDefinitionFile.new
     eventfile.load!(node.run_state['opennms']['eventconf_sources'][source_name]['definition'])
     entry = eventfile.entry(new_resource.uei, new_resource.mask)
+
     if entry.nil?
-      if action_missing_guard
+      if execution_missing_guard
         props = {
           uei: new_resource.uei,
           event_label: new_resource.event_label,
           descr: new_resource.descr,
-          logmsg: new_resource.logmsg
+          logmsg: new_resource.logmsg,
         }
 
         # Dynamically seeds default placeholder strings for Test Kitchen setups
@@ -250,13 +257,15 @@ action :create do
         new_resource.logmsg(props[:logmsg])           if new_resource.logmsg.nil?
         new_resource.severity('Normal')               if new_resource.severity.nil?
       end
-      raise Chef::Exceptions::ValidationFailed, 'event_label is a required property for action :create when not updating' if new_resource.event_label.nil?
-      raise Chef::Exceptions::ValidationFailed, 'descr is a required property for action :create when not updating' if new_resource.descr.nil?
-      raise Chef::Exceptions::ValidationFailed, 'logmsg is a required property for action :create when not updating' if new_resource.logmsg.nil?
-      raise Chef::Exceptions::ValidationFailed, 'severity is a required property for action :create when not updating' if new_resource.severity.nil?
+
+      raise Chef::Exceptions::ValidationFailed, 'event_label is required' if new_resource.event_label.nil?
+      raise Chef::Exceptions::ValidationFailed, 'descr is required'       if new_resource.descr.nil?
+      raise Chef::Exceptions::ValidationFailed, 'logmsg is required'      if new_resource.logmsg.nil?
+      raise Chef::Exceptions::ValidationFailed, 'severity is required'    if new_resource.severity.nil?
 
       resource_properties = %i(uei mask priority event_label descr logmsg logmsg_dest logmsg_notify collection_group severity operinstruct autoaction varbindsdecode parameters operaction autoacknowledge loggroup tticket forward script mouseovertext alarm_data filters).map { |p| [p, new_resource.send(p)] }.to_h.compact
       resource_properties[:logmsg_dest] = 'logndisplay' if new_resource.logmsg_dest.nil?
+
       entry = Opennms::Cookbook::ConfigHelpers::Event::EventDefinition.create(**resource_properties)
       eventfile.add(entry, new_resource.position)
       node.run_state['opennms']['eventconf_sources'][source_name]['definition'] = eventfile.to_xml
@@ -282,17 +291,17 @@ action :update do
   # =====================================================================
   # DYNAMIC REWRITE FALLBACK
   # =====================================================================
-  # If action_missing_guard triggers OR the target XML event entry is physically
+  # If execution_missing_guard triggers OR the target XML event entry is physically
   # absent (entry.nil?), we execute the creation path instead of throwing exceptions.
   # =====================================================================
-  if action_missing_guard || entry.nil?
-    Chef::Log.info("Eventconf entry or source wrapper for UEI '#{new_resource.uei}' does not exist. Executing inline creation pipeline.")
+  if execution_missing_guard || entry.nil?
+    Chef::Log.info("Eventconf entry for UEI '#{new_resource.uei}' does not exist. Executing pipeline.")
 
     props = {
       uei: new_resource.uei,
       event_label: new_resource.event_label,
       descr: new_resource.descr,
-      logmsg: new_resource.logmsg
+      logmsg: new_resource.logmsg,
     }
     props = assign_sandbox_fallbacks(props)
 
@@ -302,10 +311,10 @@ action :update do
     new_resource.severity('Normal')               if new_resource.severity.nil?
 
     # Enforce strict validation requirements
-    raise Chef::Exceptions::ValidationFailed, 'event_label is required for fresh setup' if new_resource.event_label.nil?
-    raise Chef::Exceptions::ValidationFailed, 'descr is required for fresh setup'       if new_resource.descr.nil?
-    raise Chef::Exceptions::ValidationFailed, 'logmsg is required for fresh setup'      if new_resource.logmsg.nil?
-    raise Chef::Exceptions::ValidationFailed, 'severity is required for fresh setup'    if new_resource.severity.nil?
+    raise Chef::Exceptions::ValidationFailed, 'event_label is required' if new_resource.event_label.nil?
+    raise Chef::Exceptions::ValidationFailed, 'descr is required'       if new_resource.descr.nil?
+    raise Chef::Exceptions::ValidationFailed, 'logmsg is required'      if new_resource.logmsg.nil?
+    raise Chef::Exceptions::ValidationFailed, 'severity is required'    if new_resource.severity.nil?
 
     # Build and save the XML entry definition
     converge_by("creating event definition for '#{new_resource.name}' on fresh slate") do
@@ -340,8 +349,7 @@ action :update do
                    script: new_resource.script,
                    mouseovertext: new_resource.mouseovertext,
                    alarm_data: new_resource.alarm_data,
-                   filters: new_resource.filters
-      )
+                   filters: new_resource.filters)
       node.run_state['opennms']['eventconf_sources'][source_name]['definition'] = eventfile.to_xml
       mark_changed(source_name)
     end
@@ -366,8 +374,8 @@ action :delete do
     end
   rescue Chef::Exceptions::ResourceNotFound
     raise Chef::Exceptions::ValidationFailed,
-          "Cannot execute event deletion because Service['opennms'] is missing from the resource collection. " \
-          "Please ensure the base opennms service framework is declared before calling this event resource."
+          'Cannot execute event deletion because Service["opennms"] is missing from the resource collection. ' \
+          'Please ensure the base opennms service framework is declared before calling this event resource.'
   end
 
   source_name = source_name_from_file(new_resource.source_name)
