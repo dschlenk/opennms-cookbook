@@ -26,7 +26,6 @@ jobs:
       - checkout
       - run:
           name: docker login
-          # Replaced "-p" with "--password-stdin" pipeline to bypass interactive hangs
           command: |
             echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USER" --password-stdin
       - run:
@@ -38,14 +37,13 @@ jobs:
       - run:
           name: bundler
           command: cinc exec bundle install --prefer-local
-      # Injects the dynamic JSON credential file that kitchen.yml expects to see
-      - run:
-          name: generate kitchen-dokken registry credentials
-          command: |
-            echo "{\"username\": \"${DOCKER_USER}\", \"password\": \"${DOCKER_PASSWORD}\"}" > ./.kitchen_creds.json
       - run:
           name: kitchen
-          command: kitchen list -b | circleci tests run --command="xargs -L 1 kitchen test -d always" --verbose
+          command: |
+            kitchen list -b | circleci tests run --command="
+              echo '{\"username\": \"'\"${DOCKER_USER}\"'\", \"password\": \"'\"${DOCKER_PASSWORD}\"'\"}' > .kitchen_creds.json
+              xargs -L 1 kitchen test -d always
+            " --verbose
 workflows:
   version: 2
   untagged-build:
