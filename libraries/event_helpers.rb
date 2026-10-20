@@ -283,7 +283,7 @@ module Opennms
             # Instantly capture metadata for deferred processing at the end of the run
             node.run_state['opennms_bulk_eventconf'] << {
               name: source_name,
-              position: position
+              position: position,
             }
 
             # Provide an immediate baseline structure in the run_state right now
@@ -291,14 +291,14 @@ module Opennms
             node.run_state['opennms'] ||= {}
             node.run_state['opennms']['eventconf_sources'] ||= {}
             node.run_state['opennms']['eventconf_sources'][source_name] ||= {
-              'definition' => '<events xmlns="http://xmlns.opennms.org/xsd/eventconf"/>'
+              'definition' => '<events xmlns="http://xmlns.opennms.org/xsd/eventconf"/>',
             }
 
             r = self
             with_run_context :root do
               # Create a single master bulk uploader resource ONLY ONCE per Chef run
-              unless find_resource(:ruby_block, "EXECUTE BULK OPENNMS UPLOAD")
-                declare_resource(:ruby_block, "EXECUTE BULK OPENNMS UPLOAD") do
+              unless find_resource(:ruby_block, 'EXECUTE BULK OPENNMS UPLOAD')
+                declare_resource(:ruby_block, 'EXECUTE BULK OPENNMS UPLOAD') do
                   block do
                     require 'securerandom'
                     require 'rest-client'
@@ -386,7 +386,7 @@ module Opennms
                       end
                       body << "--#{boundary}--\r\n"
 
-                      r.upload_eventconf(body, boundary, "CONSOLIDATED_BATCH")
+                      r.upload_eventconf(body, boundary, 'CONSOLIDATED_BATCH')
                     end
                   end
                   action :nothing
@@ -531,7 +531,7 @@ module Opennms
               next if raw_file.empty?
 
               # Strip leading 'events/' prefix if present, otherwise keep original
-              event_file = raw_file.start_with?('events/') ? raw_file.sub(/^events\//, '') : raw_file
+              event_file = raw_file.start_with?('events/') ? raw_file.sub(%r{^events/}, '') : raw_file
 
               if target_onms_files.include?(event_file)
                 seen_onms << event_file
