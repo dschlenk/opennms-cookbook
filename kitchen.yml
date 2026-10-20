@@ -1,8 +1,8 @@
 ---
 driver:
   name: dokken
-  registry_username: "mcomfort"
-  registry_password: "BilinL@96"
+  registry_username: <%= ENV['DOCKER_USER'] %>
+  registry_password: <%= ENV['DOCKER_PASSWORD'] %>
 
 transport:
   name: dokken
@@ -37,15 +37,34 @@ platforms:
   - name: preinstalled-34-oraclelinux-9
     driver:
       image: c1og/opennms-34-oraclelinux-9
+      privileged: true
       pid_one_command: /usr/lib/systemd/systemd
+      volumes:
+        - /sys/fs/cgroup:/sys/fs/cgroup:ro
+
   - name: preinstalled-oraclelinux-9
     driver:
       image: c1og/opennms-35-oraclelinux-9
+      privileged: true
       pid_one_command: /usr/lib/systemd/systemd
+      volumes:
+        - /sys/fs/cgroup:/sys/fs/cgroup:ro
+
+  - name: preinstalled-oraclelinux-10
+    driver:
+      image: c1og/opennms-35-oraclelinux-10
+      privileged: true
+      pid_one_command: /usr/lib/systemd/systemd
+      volumes:
+        - /sys/fs/cgroup:/sys/fs/cgroup:ro
+
   - name: oraclelinux-9
     driver:
       image: dokken/oraclelinux-9
+      privileged: true
       pid_one_command: /usr/lib/systemd/systemd
+      volumes:
+        - /sys/fs/cgroup:/sys/fs/cgroup:ro
     lifecycle:
       pre_converge:
         - remote: |
@@ -61,8 +80,7 @@ platforms:
                 echo "Waited ${i}/${timeout}s for dnf to complete, retrying in ${wait} seconds"
                 sleep ${wait};
                 let i+=${wait};
-              done;
-            '
+              done;'
   - name: preinstalled-oraclelinux-10
     driver:
       image: c1og/opennms-35-oraclelinux-10
