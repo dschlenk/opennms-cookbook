@@ -10,11 +10,15 @@ transport:
 provisioner:
   name: dokken
   project_name: cinc
-  download_url: https://omnitruck.cinc.sh/install.sh
   chef_binary: /opt/cinc/bin/cinc-client
-  chef_license: accept-no-persist # until https://github.com/test-kitchen/test-kitchen/pull/1984
+  chef_license: accept-no-persist
+
+  # 🛠️ THE FIX FOR DOKKEN: Force the plugin to download and execute the script inside the container
+  download_url: https://omnitruck.cinc.sh/install.sh
+  chef_omnibus_url: https://omnitruck.cinc.sh/install.sh
   product_name: cinc
   product_version: latest
+
   log_level: <%= ENV['KITCHEN_LOG_LEVEL'] || 'info' %>
   chef_log_level: debug
   clean_dokken_sandbox: <%= ENV['CLEAN_DOCKEN_SANDBOX'] || 'true' %>
@@ -28,9 +32,9 @@ provisioner:
         user_vault: creds
     yum:
       opennms-stable-common:
-        baseurl: <%= ENV['OPENNMS_STABLE_COMMON'] || 'http://yum.opennms.org/stable/common' %>
+        baseurl: <%= ENV['OPENNMS_STABLE_COMMON'] || 'http://opennms.org' %>
       opennms-stable-rhel9:
-        baseurl: <%= ENV['OPENNMS_STABLE_RHEL9'] || 'http://yum.opennms.org/stable/rhel9' %>
+        baseurl: <%= ENV['OPENNMS_STABLE_RHEL9'] || 'http://opennms.org' %>
 
 verifier:
   name: inspec
