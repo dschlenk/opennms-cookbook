@@ -22,6 +22,7 @@ jobs:
     machine:
       image: ubuntu-2404:current
     parallelism: 30
+    executor:
     steps:
       - checkout
       - run:
@@ -41,7 +42,7 @@ jobs:
           name: kitchen
           command: |
             kitchen list -b | circleci tests run --command="
-              echo '{\"username\": \"'\"${DOCKER_USER}\"'\", \"password\": \"'\"${DOCKER_PASSWORD}\"'\"}' > .kitchen_creds.json
+              echo '{\"username\": \"${DOCKER_USER}\", \"password\": \"${DOCKER_PASSWORD}\"}' > .kitchen_creds.json
               xargs -L 1 kitchen test -d always
             " --verbose
 workflows:
