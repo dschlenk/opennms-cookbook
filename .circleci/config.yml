@@ -26,7 +26,9 @@ jobs:
       - checkout
       - run:
           name: docker login
-          command: docker login -u $DOCKER_USER -p $DOCKER_PASSWORD
+          # Replaced "-p" with "--password-stdin" pipeline to bypass interactive hangs
+          command: |
+            echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USER" --password-stdin
       - run:
           name: install cinc workstation
           command: curl -L https://omnitruck.cinc.sh/install.sh | sudo bash -s -- -P cinc-workstation -v 25.13.7
@@ -36,9 +38,13 @@ jobs:
       - run:
           name: bundler
           command: cinc exec bundle install --prefer-local
+      # Injects the dynamic JSON credential file that kitchen.yml expects to see
+      - run:
+          name: generate kitchen-dokken registry credentials
+          command: |
+            echo "{\"username\": \"${DOCKER_USER}\", \"password\": \"${DOCKER_PASSWORD}\"}" > ./.kitchen_creds.json
       - run:
           name: kitchen
-            # command: kitchen verify default
           command: kitchen list -b | circleci tests run --command="xargs -L 1 kitchen test -d always" --verbose
 workflows:
   version: 2
