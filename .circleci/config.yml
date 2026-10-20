@@ -43,12 +43,20 @@ jobs:
           command: |
             export DOCKER_USER DOCKER_PASSWORD
 
-            # Use circleci tests split to intelligently distribute suites across your 30 containers
-            kitchen list -b | circleci tests split | circleci tests run --command="
-              export DOCKER_USER='$DOCKER_USER'
-              export DOCKER_PASSWORD='$DOCKER_PASSWORD'
-              xargs -L 1 kitchen test -d always
-            " --verbose
+            # Run kitchen test with '-d never' so it skips automatic cleanup on crash.
+            # If it fails, capture the active process outputs before exiting.
+            if ! kitchen list -b | circleci tests split | xargs -L 1 kitchen test -d never; then
+              echo "=================================================="
+              echo "TEST KITCHEN FAILED! DUMPING CONTAINER LOGS:"
+              echo "=================================================="
+            
+              # Grab the ID of the most recently generated container box
+              LAST_CONTAINER=$(docker ps -a -q -n 1)
+            
+              # Print the output to the console window
+              docker logs "$LAST_CONTAINER"
+              exit 1
+            fi
 
 workflows:
   version: 2

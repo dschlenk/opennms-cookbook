@@ -13,6 +13,8 @@ provisioner:
   download_url: https://omnitruck.cinc.sh/install.sh
   chef_binary: /opt/cinc/bin/cinc-client
   chef_license: accept-no-persist # until https://github.com/test-kitchen/test-kitchen/pull/1984
+  product_name: cinc
+  product_version: latest
   log_level: <%= ENV['KITCHEN_LOG_LEVEL'] || 'info' %>
   chef_log_level: debug
   clean_dokken_sandbox: <%= ENV['CLEAN_DOCKEN_SANDBOX'] || 'true' %>
@@ -49,9 +51,14 @@ platforms:
       pid_one_command: /usr/lib/systemd/systemd
       volumes:
         - /sys/fs/cgroup:/sys/fs/cgroup:ro
+
   - name: preinstalled-oraclelinux-10
     driver:
       image: c1og/opennms-35-oraclelinux-10
+      privileged: true
+      pid_one_command: /usr/lib/systemd/systemd
+      volumes:
+        - /sys/fs/cgroup:/sys/fs/cgroup:ro
 
   - name: oraclelinux-9
     driver:
@@ -75,7 +82,8 @@ platforms:
                 echo "Waited ${i}/${timeout}s for dnf to complete, retrying in ${wait} seconds"
                 sleep ${wait};
                 let i+=${wait};
-              done;'
+              done;
+            '
   - name: preinstalled-oraclelinux-10
     driver:
       image: c1og/opennms-35-oraclelinux-10
