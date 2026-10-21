@@ -5,7 +5,6 @@ module OpenNmsTestHelpers
   end
 end
 
-
 Inspec::Rule.send(:include, OpenNmsTestHelpers)
 
 if defined?(RSpec)
