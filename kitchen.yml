@@ -5,7 +5,7 @@ driver:
   registry_password: <%= ENV['DOCKER_PASSWORD'] %>
   privileged: true
   chef_image: cincproject/cinc
-  chef_version: 18
+  chef_version: 19
   pull_platform_image: true
 
 transport:
