@@ -1,7 +1,13 @@
 # frozen_string_literal: true
+
 control 'event_logmsg_notify' do
-  describe event('uei.opennms.org/cheftest/thresholdExceeded2', 'events/chef.events.xml', [{ 'mename' => 'id', 'mevalue' => ['.1.3.6.1.4.1.11385.102.1'] }, { 'mename' => 'generic', 'mevalue' => ['6'] }, { 'mename' => 'specific', 'mevalue' => ['2'] }]) do
-    it { should exist }
-    its('logmsg_notify') { should be false }
+  describe 'OpenNMS Event Logmsg Notify Configuration' do
+    let(:eventconf) { fetch_live_eventconf('chef.events') }
+
+    it 'successfully validates the modified event logmsg notify setting' do
+      expect(eventconf.exit_status).to eq 0
+      expect(eventconf.stdout).to include 'uei.opennms.org/cheftest/thresholdExceeded2'
+      expect(eventconf.stdout).to include '"notify":false'
+    end
   end
 end

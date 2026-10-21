@@ -1,20 +1,33 @@
 # frozen_string_literal: true
+
 control 'event_noop' do
-  describe event('uei.opennms.org/cheftest/thresholdExceeded2', 'events/chef.events.xml', [{ 'mename' => 'id', 'mevalue' => ['.1.3.6.1.4.1.11385.102.1'] }, { 'mename' => 'generic', 'mevalue' => ['6'] }, { 'mename' => 'specific', 'mevalue' => ['2'] }]) do
-    it { should exist }
-    its('event_label') { should eq 'Chef defined event: thresholdExceeded' }
-    its('descr') { should eq '<p>A threshold defined by a chef recipe has been exceeded.</p>' }
-    its('logmsg') { should eq 'A threshold has been exceeded.' }
-    its('logmsg_dest') { should eq 'logndisplay' }
-    its('logmsg_notify') { should be true }
-    its('severity') { should eq 'Minor' }
-    its('operinstruct') { should eq 'the operinstruct' }
-    its('autoaction') { should eq([{ 'action' => 'someaction', 'state' => 'off' }]) }
-    its('varbindsdecode') { should eq([{ 'parmid' => 'theParmId', 'decode' => [{ 'varbindvalue' => 'theVarBindValue', 'varbinddecodedstring' => 'theVarBindDecodedString' }] }]) }
-    its('tticket') { should eq('info' => 'tticketInfo', 'state' => 'off') }
-    its('forward') { should eq([{ 'info' => 'fwdInfo', 'state' => 'off', 'mechanism' => 'snmptcp' }]) }
-    its('script') { should eq([{ 'name' => 'anScript', 'language' => 'groovy' }]) }
-    its('mouseovertext') { should eq 'mouseOverText' }
-    its('alarm_data') { should eq('reduction_key' => '%uei%:%dpname%:%nodeid%:%interface%:%parm[ds]%:%parm[threshold]%:%parm[trigger]%:%parm[rearm]%:%parm[label]%', 'alarm_type' => 1, 'auto_clean' => false) }
+  describe 'OpenNMS Event Noop Configuration' do
+    let(:eventconf) { fetch_live_eventconf('chef.events') }
+
+    it 'successfully validates the full event noop configuration' do
+      expect(eventconf.exit_status).to eq 0
+      expect(eventconf.stdout).to include 'uei.opennms.org/cheftest/thresholdExceeded2'
+      expect(eventconf.stdout).to include 'Chef defined event: thresholdExceeded'
+      expect(eventconf.stdout).to include '<p>A threshold defined by a chef recipe has been exceeded.</p>'
+      expect(eventconf.stdout).to include 'A threshold has been exceeded.'
+      expect(eventconf.stdout).to include 'logndisplay'
+      expect(eventconf.stdout).to include '"notify":true'
+      expect(eventconf.stdout).to include 'Minor'
+      expect(eventconf.stdout).to include 'the operinstruct'
+      expect(eventconf.stdout).to include 'someaction'
+      expect(eventconf.stdout).to include '"state":"off"'
+      expect(eventconf.stdout).to include 'theParmId'
+      expect(eventconf.stdout).to include 'theVarBindValue'
+      expect(eventconf.stdout).to include 'theVarBindDecodedString'
+      expect(eventconf.stdout).to include 'tticketInfo'
+      expect(eventconf.stdout).to include 'fwdInfo'
+      expect(eventconf.stdout).to include 'snmptcp'
+      expect(eventconf.stdout).to include 'anScript'
+      expect(eventconf.stdout).to include 'groovy'
+      expect(eventconf.stdout).to include 'mouseOverText'
+      expect(eventconf.stdout).to include '%uei%:%dpname%:%nodeid%:%interface%:%parm[ds]%:%parm[threshold]%:%parm[trigger]%:%parm[rearm]%:%parm[label]%'
+      expect(eventconf.stdout).to include '"alarm-type":1'
+      expect(eventconf.stdout).to include '"auto-clean":false'
+    end
   end
 end

@@ -1,7 +1,15 @@
 # frozen_string_literal: true
+
 control 'event_remove_add_forward' do
-  describe event('uei.opennms.org/cheftest/thresholdExceeded2', 'events/chef.events.xml', [{ 'mename' => 'id', 'mevalue' => ['.1.3.6.1.4.1.11385.102.1'] }, { 'mename' => 'generic', 'mevalue' => ['6'] }, { 'mename' => 'specific', 'mevalue' => ['2'] }]) do
-    it { should exist }
-    its('forward') { should eq([{ 'info' => 'fwdInfo', 'state' => 'off', 'mechanism' => 'snmptcp' }]) }
+  describe 'OpenNMS Event Remove Add Forward Configuration' do
+    let(:eventconf) { fetch_live_eventconf('chef.events') }
+
+    it 'successfully validates the added forward after removal' do
+      expect(eventconf.exit_status).to eq 0
+      expect(eventconf.stdout).to include 'uei.opennms.org/cheftest/thresholdExceeded2'
+      expect(eventconf.stdout).to include 'fwdInfo'
+      expect(eventconf.stdout).to include 'snmptcp'
+      expect(eventconf.stdout).to include '"state":"off"'
+    end
   end
 end

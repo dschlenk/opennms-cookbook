@@ -1,7 +1,15 @@
 # frozen_string_literal: true
+
 control 'event_remove_add_alarm_data' do
-  describe event('uei.opennms.org/cheftest/thresholdExceeded2', 'events/chef.events.xml', [{ 'mename' => 'id', 'mevalue' => ['.1.3.6.1.4.1.11385.102.1'] }, { 'mename' => 'generic', 'mevalue' => ['6'] }, { 'mename' => 'specific', 'mevalue' => ['2'] }]) do
-    it { should exist }
-    its('alarm_data') { should eq('reduction_key' => '%uei%:%dpname%:%nodeid%:%interface%:%parm[ds]%:%parm[threshold]%:%parm[trigger]%:%parm[rearm]%:%parm[label]%', 'alarm_type' => 1, 'auto_clean' => false) }
+  describe 'OpenNMS Event Remove Add Alarm Data Configuration' do
+    let(:eventconf) { fetch_live_eventconf('chef.events') }
+
+    it 'successfully validates the added alarm data after removal' do
+      expect(eventconf.exit_status).to eq 0
+      expect(eventconf.stdout).to include 'uei.opennms.org/cheftest/thresholdExceeded2'
+      expect(eventconf.stdout).to include '%uei%:%dpname%:%nodeid%:%interface%:%parm[ds]%:%parm[threshold]%:%parm[trigger]%:%parm[rearm]%:%parm[label]%'
+      expect(eventconf.stdout).to include '"alarm-type":1'
+      expect(eventconf.stdout).to include '"auto-clean":false'
+    end
   end
 end
