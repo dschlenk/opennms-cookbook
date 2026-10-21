@@ -7,4 +7,3 @@ control 'event_edit_forward' do
     its('forward') { should eq([{ 'info' => 'fwdInfo', 'state' => 'off', 'mechanism' => 'snmpudp' }]) }
   end
 end
-
