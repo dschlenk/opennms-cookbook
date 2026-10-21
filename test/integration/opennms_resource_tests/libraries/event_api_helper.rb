@@ -8,5 +8,4 @@ module OpenNmsTestHelpers
   end
 end
 
-# Inject the helper module into the InSpec execution context
-Inspec::Resource.send(:include, OpenNmsTestHelpers)
+Inspec::Rule.send(:include, OpenNmsTestHelpers)

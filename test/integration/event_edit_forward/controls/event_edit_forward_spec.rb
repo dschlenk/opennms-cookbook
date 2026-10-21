@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 control 'event_edit_forward' do
   describe fetch_live_eventconf('chef.events') do
     its('exit_status') { should eq 0 }
