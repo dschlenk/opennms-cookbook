@@ -1,10 +1,14 @@
 # frozen_string_literal: true
 
 control 'event_edit_alarm_data' do
-  describe fetch_live_eventconf('chef.events') do
-    its('exit_status') { should eq 0 }
-    its('stdout') { should include 'uei.opennms.org/cheftest/thresholdExceeded2' }
-    its('stdout') { should include '%uei%:%dpname%:%nodeid%:%interface%:%parm[ds]%:%parm[threshold]%:%parm[trigger]%:%parm[rearm]%:%parm[label]%aids' }
-    its('stdout') { should include '"alarm-type":2' }
+  describe 'OpenNMS Event Alarm Data Configuration' do
+    let(:eventconf) { fetch_live_eventconf('chef.events') }
+
+    it 'successfully validates modified alarm data' do
+      expect(eventconf.exit_status).to eq 0
+      expect(eventconf.stdout).to include 'uei.opennms.org/cheftest/thresholdExceeded2'
+      expect(eventconf.stdout).to include '%uei%:%dpname%:%nodeid%:%interface%:%parm[ds]%:%parm[threshold]%:%parm[trigger]%:%parm[rearm]%:%parm[label]%aids'
+      expect(eventconf.stdout).to include '"alarm-type":2'
+    end
   end
 end
