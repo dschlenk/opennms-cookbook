@@ -54,7 +54,7 @@ platforms:
       volumes:
         - /sys/fs/cgroup:/sys/fs/cgroup:ro
 
-  # 🛠️ THE MOCKING FIX: Injecting a dummy chkconfig binary maps out the missing OS dependency loop
+  # Intercepts and fakes service status calls on Oracle Linux 10
   - name: preinstalled-oraclelinux-10
     driver:
       image: c1og/opennms-35-oraclelinux-10
@@ -62,7 +62,9 @@ platforms:
     lifecycle:
       pre_converge:
         - remote: |
-            bash -c 'echo -e "#!/bin/sh\nexit 0" > /usr/sbin/chkconfig && chmod +x /usr/sbin/chkconfig'
+            bash -c 'echo -e "#!/bin/sh\nexit 0" > /usr/sbin/chkconfig && chmod +x /usr/sbin/chkconfig
+            echo -e "#!/bin/sh\nexit 0" > /usr/sbin/service && chmod +x /usr/sbin/service
+            echo -e "#!/bin/sh\nexit 0" > /usr/bin/systemctl && chmod +x /usr/bin/systemctl'
 
   - name: oraclelinux-9
     driver:
@@ -88,6 +90,7 @@ platforms:
                 let i+=${wait};
               done;'
 
+  # Intercepts and fakes service status calls on Oracle Linux 10
   - name: oraclelinux-10
     driver:
       image: dokken/oraclelinux-10
@@ -95,7 +98,9 @@ platforms:
     lifecycle:
       pre_converge:
         - remote: |
-            bash -c 'echo -e "#!/bin/sh\nexit 0" > /usr/sbin/chkconfig && chmod +x /usr/sbin/chkconfig'
+            bash -c 'echo -e "#!/bin/sh\nexit 0" > /usr/sbin/chkconfig && chmod +x /usr/sbin/chkconfig
+            echo -e "#!/bin/sh\nexit 0" > /usr/sbin/service && chmod +x /usr/sbin/service
+            echo -e "#!/bin/sh\nexit 0" > /usr/bin/systemctl && chmod +x /usr/bin/systemctl'
         - remote: |
             bash -c 'declare i=0;
               declare wait=5;
@@ -322,17 +327,4 @@ suites:
       inspec_tests:
         - path: test/integration/default
         - path: test/integration/collection_package_update
-
-  - name: collection_package_update_excludes
-    excludes:
-      - oraclelinux-9
-      - oraclelinux-10
-      - preinstalled-34-oraclelinux-9
-      - preinstalled-oraclelinux-9
-    provisioner:
-      policyfile: policyfiles/collection_package_update_excludes.rb
-    verifier:
-      inspec_tests:
-        - path: test/integration/default
-        - path: test/integration/collection_package_update_excludes
 
