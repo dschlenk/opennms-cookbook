@@ -42,65 +42,39 @@ platforms:
     driver:
       image: c1og/opennms-34-oraclelinux-9
       privileged: true
+      cgroupns_host: true
       pid_one_command: /usr/lib/systemd/systemd
       volumes:
-        - /sys/fs/cgroup:/sys/fs/cgroup:ro
+        - /sys/fs/cgroup:/sys/fs/cgroup:rw
 
   - name: preinstalled-oraclelinux-9
     driver:
       image: c1og/opennms-35-oraclelinux-9
       privileged: true
+      cgroupns_host: true
       pid_one_command: /usr/lib/systemd/systemd
       volumes:
-        - /sys/fs/cgroup:/sys/fs/cgroup:ro
+        - /sys/fs/cgroup:/sys/fs/cgroup:rw
 
   - name: preinstalled-oraclelinux-10
     driver:
       image: c1og/opennms-35-oraclelinux-10
-      pid_one_command: /bin/sh -c "while true; do sleep 3600; done"
-    lifecycle:
-      pre_converge:
-        - remote: |
-            bash -c '
-            # Mock paths for chkconfig
-            echo -e "#!/bin/sh\nexit 0" > /sbin/chkconfig && chmod +x /sbin/chkconfig
-            echo -e "#!/bin/sh\nexit 0" > /usr/sbin/chkconfig && chmod +x /usr/sbin/chkconfig
-            
-            # Mock paths for service binary calls (Ensures /sbin/service intercepts perfectly)
-            echo -e "#!/bin/sh\nexit 0" > /sbin/service && chmod +x /sbin/service
-            echo -e "#!/bin/sh\nexit 0" > /usr/sbin/service && chmod +x /usr/sbin/service
-            
-            # Mock paths for systemctl
-            echo -e "#!/bin/sh\nexit 0" > /bin/systemctl && chmod +x /bin/systemctl
-            echo -e "#!/bin/sh\nexit 0" > /usr/bin/systemctl && chmod +x /usr/bin/systemctl
-            
-            # Satisfy InSpec service verification checks
-            mkdir -p /usr/lib/systemd/system
-            echo -e "[Unit]\nDescription=OpenNMS\n[Service]\nExecStart=/bin/true\n[Install]\nWantedBy=multi-user.target" > /usr/lib/systemd/system/opennms.service'
+      privileged: true
+      cgroupns_host: true
+      pid_one_command: /usr/lib/systemd/systemd
+      volumes:
+        - /sys/fs/cgroup:/sys/fs/cgroup:rw
 
   - name: oraclelinux-10
     driver:
       image: dokken/oraclelinux-10
-      pid_one_command: /bin/sh -c "while true; do sleep 3600; done"
+      privileged: true
+      cgroupns_host: true
+      pid_one_command: /usr/lib/systemd/systemd
+      volumes:
+        - /sys/fs/cgroup:/sys/fs/cgroup:rw
     lifecycle:
       pre_converge:
-        - remote: |
-            bash -c '
-            # Mock paths for chkconfig
-            echo -e "#!/bin/sh\nexit 0" > /sbin/chkconfig && chmod +x /sbin/chkconfig
-            echo -e "#!/bin/sh\nexit 0" > /usr/sbin/chkconfig && chmod +x /usr/sbin/chkconfig
-            
-            # Mock paths for service binary calls (Ensures /sbin/service intercepts perfectly)
-            echo -e "#!/bin/sh\nexit 0" > /sbin/service && chmod +x /sbin/service
-            echo -e "#!/bin/sh\nexit 0" > /usr/sbin/service && chmod +x /usr/sbin/service
-            
-            # Mock paths for systemctl
-            echo -e "#!/bin/sh\nexit 0" > /bin/systemctl && chmod +x /bin/systemctl
-            echo -e "#!/bin/sh\nexit 0" > /usr/bin/systemctl && chmod +x /usr/bin/systemctl
-            
-            # Satisfy InSpec service verification checks
-            mkdir -p /usr/lib/systemd/system
-            echo -e "[Unit]\nDescription=OpenNMS\n[Service]\nExecStart=/bin/true\n[Install]\nWantedBy=multi-user.target" > /usr/lib/systemd/system/opennms.service'
         - remote: |
             bash -c 'declare i=0;
               declare wait=5;
