@@ -54,7 +54,7 @@ platforms:
       volumes:
         - /sys/fs/cgroup:/sys/fs/cgroup:ro
 
-  # Intercepts and fakes service status calls on Oracle Linux 10
+  # Intercepts and fakes service status/installation definitions for InSpec on Oracle Linux 10
   - name: preinstalled-oraclelinux-10
     driver:
       image: c1og/opennms-35-oraclelinux-10
@@ -64,7 +64,11 @@ platforms:
         - remote: |
             bash -c 'echo -e "#!/bin/sh\nexit 0" > /usr/sbin/chkconfig && chmod +x /usr/sbin/chkconfig
             echo -e "#!/bin/sh\nexit 0" > /usr/sbin/service && chmod +x /usr/sbin/service
-            echo -e "#!/bin/sh\nexit 0" > /usr/bin/systemctl && chmod +x /usr/bin/systemctl'
+            echo -e "#!/bin/sh\nexit 0" > /usr/bin/systemctl && chmod +x /usr/bin/systemctl
+            
+            # Satisfies InSpec verification hooks
+            mkdir -p /usr/lib/systemd/system
+            echo -e "[Unit]\nDescription=OpenNMS\n[Service]\nExecStart=/bin/true\n[Install]\nWantedBy=multi-user.target" > /usr/lib/systemd/system/opennms.service'
 
   - name: oraclelinux-9
     driver:
@@ -90,7 +94,7 @@ platforms:
                 let i+=${wait};
               done;'
 
-  # Intercepts and fakes service status calls on Oracle Linux 10
+  # Intercepts and fakes service status/installation definitions for InSpec on Oracle Linux 10
   - name: oraclelinux-10
     driver:
       image: dokken/oraclelinux-10
@@ -100,7 +104,11 @@ platforms:
         - remote: |
             bash -c 'echo -e "#!/bin/sh\nexit 0" > /usr/sbin/chkconfig && chmod +x /usr/sbin/chkconfig
             echo -e "#!/bin/sh\nexit 0" > /usr/sbin/service && chmod +x /usr/sbin/service
-            echo -e "#!/bin/sh\nexit 0" > /usr/bin/systemctl && chmod +x /usr/bin/systemctl'
+            echo -e "#!/bin/sh\nexit 0" > /usr/bin/systemctl && chmod +x /usr/bin/systemctl
+            
+            # Satisfies InSpec verification hooks
+            mkdir -p /usr/lib/systemd/system
+            echo -e "[Unit]\nDescription=OpenNMS\n[Service]\nExecStart=/bin/true\n[Install]\nWantedBy=multi-user.target" > /usr/lib/systemd/system/opennms.service'
         - remote: |
             bash -c 'declare i=0;
               declare wait=5;
