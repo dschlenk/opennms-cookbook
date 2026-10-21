@@ -14,6 +14,7 @@ transport:
 provisioner:
   name: dokken
   project_name: cinc
+  download_url: https://omnitruck.cinc.sh/install.sh
   chef_binary: /opt/cinc/bin/cinc-client
   chef_license: accept-no-persist
   # Removed the automated product fields that break Chef 18's setup loop
@@ -57,17 +58,7 @@ platforms:
   - name: preinstalled-oraclelinux-10
     driver:
       image: c1og/opennms-35-oraclelinux-10
-      privileged: true
-      pid_one_command: /usr/lib/systemd/systemd
-      volumes:
-        - /sys/fs/cgroup:/sys/fs/cgroup:ro
-    # Manually inject the client before converge starts
-    lifecycle:
-      pre_converge:
-        - remote: |
-            bash -c 'if [ ! -f /opt/cinc/bin/cinc-client ]; then
-              curl -L https://cinc.sh | bash -s -- -P cinc;
-            fi'
+      pid_one_command: /bin/sh -c "while true; do sleep 3600; done"
 
   - name: oraclelinux-9
     driver:
@@ -96,33 +87,7 @@ platforms:
   - name: oraclelinux-10
     driver:
       image: dokken/oraclelinux-10
-      privileged: true
-      pid_one_command: /usr/lib/systemd/systemd
-      volumes:
-        - /sys/fs/cgroup:/sys/fs/cgroup:ro
-    lifecycle:
-      pre_converge:
-        - remote: |
-            bash -c 'declare i=0;
-              declare wait=5;
-              declare timeout=300;
-              while true; do
-                dnf -y install libxcrypt-compat hostname dmidecode iproute && break;
-                if [ ${i} -ge ${timeout} ]; then
-                  echo "Timed out after ${i}s waiting for dnf to complete";
-                  exit 1;
-                fi;
-                echo "Waited ${i}/${timeout}s for dnf to complete, retrying in ${wait} seconds"
-                sleep ${wait};
-                let i+=${wait};
-              done;'
-  - name: oraclelinux-10
-    driver:
-      image: dokken/oraclelinux-10
-      privileged: true
-      pid_one_command: /usr/lib/systemd/systemd
-      volumes:
-        - /sys/fs/cgroup:/sys/fs/cgroup:ro
+      pid_one_command: /bin/sh -c "while true; do sleep 3600; done"
     lifecycle:
       pre_converge:
         - remote: |
