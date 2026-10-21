@@ -5,7 +5,7 @@ driver:
   registry_password: <%= ENV['DOCKER_PASSWORD'] %>
   privileged: true
   chef_image: cincproject/cinc
-  chef_version: 19
+  chef_version: 18
   pull_platform_image: true
 
 transport:
@@ -14,11 +14,9 @@ transport:
 provisioner:
   name: dokken
   project_name: cinc
-  download_url: https://omnitruck.cinc.sh/install.sh
   chef_binary: /opt/cinc/bin/cinc-client
-  chef_license: accept-no-persist # until https://github.com/test-kitchen/test-kitchen/pull/1984
-  product_name: cinc
-  product_version: latest
+  chef_license: accept-no-persist
+  # Removed the automated product fields that break Chef 18's setup loop
   log_level: <%= ENV['KITCHEN_LOG_LEVEL'] || 'info' %>
   chef_log_level: debug
   clean_dokken_sandbox: <%= ENV['CLEAN_DOCKEN_SANDBOX'] || 'true' %>
@@ -63,6 +61,13 @@ platforms:
       pid_one_command: /usr/lib/systemd/systemd
       volumes:
         - /sys/fs/cgroup:/sys/fs/cgroup:ro
+    # Manually inject the client before converge starts
+    lifecycle:
+      pre_converge:
+        - remote: |
+            bash -c 'if [ ! -f /opt/cinc/bin/cinc-client ]; then
+              curl -L https://cinc.sh | bash -s -- -P cinc;
+            fi'
 
   - name: oraclelinux-9
     driver:
@@ -88,6 +93,29 @@ platforms:
                 let i+=${wait};
               done;'
 
+  - name: oraclelinux-10
+    driver:
+      image: dokken/oraclelinux-10
+      privileged: true
+      pid_one_command: /usr/lib/systemd/systemd
+      volumes:
+        - /sys/fs/cgroup:/sys/fs/cgroup:ro
+    lifecycle:
+      pre_converge:
+        - remote: |
+            bash -c 'declare i=0;
+              declare wait=5;
+              declare timeout=300;
+              while true; do
+                dnf -y install libxcrypt-compat hostname dmidecode iproute && break;
+                if [ ${i} -ge ${timeout} ]; then
+                  echo "Timed out after ${i}s waiting for dnf to complete";
+                  exit 1;
+                fi;
+                echo "Waited ${i}/${timeout}s for dnf to complete, retrying in ${wait} seconds"
+                sleep ${wait};
+                let i+=${wait};
+              done;'
   - name: oraclelinux-10
     driver:
       image: dokken/oraclelinux-10
