@@ -34,7 +34,7 @@ jobs:
           name: install cinc workstation
           command: |
             # Pointing back to the valid omnitruck script installer address
-            curl -L https://cinc.sh | sudo bash -s -- -P cinc-workstation -v 25.13.7
+            curl -L https://omnitruck.cinc.sh/install.sh  | sudo bash -s -- -P cinc-workstation -v 25.13.7
             # Persist Cinc environment variables across all subsequent CircleCI steps
             echo 'eval "$(cinc shell-init bash)"' >> $BASH_ENV
       - run:
