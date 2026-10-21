@@ -286,7 +286,6 @@ action :create_if_missing do
   end
 end
 
-
 action :update do
   source_name = source_name_from_file(new_resource.source_name)
 
