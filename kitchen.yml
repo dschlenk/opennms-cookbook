@@ -14,8 +14,9 @@ transport:
 provisioner:
   name: dokken
   project_name: cinc
+  download_url: https://omnitruck.cinc.sh/install.sh
   chef_binary: /opt/cinc/bin/cinc-client
-  chef_license: accept-no-persist
+  chef_license: accept-no-persist # until https://github.com/test-kitchen/test-kitchen/pull/1984
   log_level: <%= ENV['KITCHEN_LOG_LEVEL'] || 'info' %>
   chef_log_level: debug
   clean_dokken_sandbox: <%= ENV['CLEAN_DOCKEN_SANDBOX'] || 'true' %>
@@ -53,10 +54,15 @@ platforms:
       volumes:
         - /sys/fs/cgroup:/sys/fs/cgroup:ro
 
+  # 🛠️ THE MOCKING FIX: Injecting a dummy chkconfig binary maps out the missing OS dependency loop
   - name: preinstalled-oraclelinux-10
     driver:
       image: c1og/opennms-35-oraclelinux-10
       pid_one_command: /bin/sh -c "while true; do sleep 3600; done"
+    lifecycle:
+      pre_converge:
+        - remote: |
+            bash -c 'echo -e "#!/bin/sh\nexit 0" > /usr/sbin/chkconfig && chmod +x /usr/sbin/chkconfig'
 
   - name: oraclelinux-9
     driver:
@@ -89,6 +95,8 @@ platforms:
     lifecycle:
       pre_converge:
         - remote: |
+            bash -c 'echo -e "#!/bin/sh\nexit 0" > /usr/sbin/chkconfig && chmod +x /usr/sbin/chkconfig'
+        - remote: |
             bash -c 'declare i=0;
               declare wait=5;
               declare timeout=300;
@@ -118,8 +126,6 @@ suites:
       - preinstalled-oraclelinux-9
       - preinstalled-oraclelinux-10
     attributes:
-      postgresql:
-        init_style: "none"
       opennms:
         rrdtool:
           enabled: true
@@ -142,8 +148,6 @@ suites:
       - preinstalled-oraclelinux-9
       - preinstalled-oraclelinux-10
     attributes:
-      postgresql:
-        init_style: "none"
       kafka:
         broker:
           zookeeper.connect: localhost:2181
@@ -192,8 +196,6 @@ suites:
       inspec_tests:
         - path: test/integration/no_upgrade
     attributes:
-      postgresql:
-        init_style: "none"
       opennms:
         upgrade: false
 
@@ -202,9 +204,6 @@ suites:
       - preinstalled-34-oraclelinux-9
       - preinstalled-oraclelinux-9
       - preinstalled-oraclelinux-10
-    attributes:
-      postgresql:
-        init_style: "none"
 
   - name: plugins
     excludes:
@@ -212,8 +211,6 @@ suites:
       - oraclelinux-10
       - preinstalled-34-oraclelinux-9
     attributes:
-      postgresql:
-        init_style: "none"
       opennms:
         plugin:
           addl:
@@ -234,9 +231,6 @@ suites:
       inspec_tests:
         - path: test/integration/default
         - path: test/integration/avail_category
-    attributes:
-      postgresql:
-        init_style: "none"
 
   - name: avail_view_section
     excludes:
@@ -250,9 +244,6 @@ suites:
       inspec_tests:
         - path: test/integration/default
         - path: test/integration/avail_view_section
-    attributes:
-      postgresql:
-        init_style: "none"
 
   - name: avail_view_section_mod
     excludes:
@@ -266,9 +257,6 @@ suites:
       inspec_tests:
         - path: test/integration/default
         - path: test/integration/avail_view_section_mod
-    attributes:
-      postgresql:
-        init_style: "none"
 
   - name: collection_graph
     excludes:
@@ -282,9 +270,6 @@ suites:
       inspec_tests:
         - path: test/integration/default
         - path: test/integration/collection_graph
-    attributes:
-      postgresql:
-        init_style: "none"
 
   - name: collection_graph_file
     excludes:
@@ -298,9 +283,6 @@ suites:
       inspec_tests:
         - path: test/integration/default
         - path: test/integration/collection_graph_file
-    attributes:
-      postgresql:
-        init_style: "none"
 
   - name: collection_package
     excludes:
@@ -314,9 +296,6 @@ suites:
       inspec_tests:
         - path: test/integration/default
         - path: test/integration/collection_package
-    attributes:
-      postgresql:
-        init_style: "none"
 
   - name: collection_package_delete
     excludes:
@@ -330,9 +309,6 @@ suites:
       inspec_tests:
         - path: test/integration/default
         - path: test/integration/collection_package_delete
-    attributes:
-      postgresql:
-        init_style: "none"
 
   - name: collection_package_update
     excludes:
@@ -346,9 +322,6 @@ suites:
       inspec_tests:
         - path: test/integration/default
         - path: test/integration/collection_package_update
-    attributes:
-      postgresql:
-        init_style: "none"
 
   - name: collection_package_update_excludes
     excludes:
@@ -362,6 +335,4 @@ suites:
       inspec_tests:
         - path: test/integration/default
         - path: test/integration/collection_package_update_excludes
-      attributes:
-        postgresql:
-          init_style: "none"
+
