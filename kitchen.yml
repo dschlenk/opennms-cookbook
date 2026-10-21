@@ -3,6 +3,10 @@ driver:
   name: dokken
   registry_username: <%= ENV['DOCKER_USER'] %>
   registry_password: <%= ENV['DOCKER_PASSWORD'] %>
+  privileged: true
+  chef_image: cincproject/cinc
+  chef_version: 18
+  pull_platform_image: true
 
 transport:
   name: dokken
@@ -10,15 +14,11 @@ transport:
 provisioner:
   name: dokken
   project_name: cinc
-  chef_binary: /opt/cinc/bin/cinc-client
-  chef_license: accept-no-persist
-
-  # 🛠️ THE FIX FOR DOKKEN: Force the plugin to download and execute the script inside the container
   download_url: https://omnitruck.cinc.sh/install.sh
-  chef_omnibus_url: https://omnitruck.cinc.sh/install.sh
+  chef_binary: /opt/cinc/bin/cinc-client
+  chef_license: accept-no-persist # until https://github.com/test-kitchen/test-kitchen/pull/1984
   product_name: cinc
   product_version: latest
-
   log_level: <%= ENV['KITCHEN_LOG_LEVEL'] || 'info' %>
   chef_log_level: debug
   clean_dokken_sandbox: <%= ENV['CLEAN_DOCKEN_SANDBOX'] || 'true' %>
@@ -32,9 +32,9 @@ provisioner:
         user_vault: creds
     yum:
       opennms-stable-common:
-        baseurl: <%= ENV['OPENNMS_STABLE_COMMON'] || 'http://opennms.org' %>
+        baseurl: <%= ENV['OPENNMS_STABLE_COMMON'] || 'http://yum.opennms.org/stable/common' %>
       opennms-stable-rhel9:
-        baseurl: <%= ENV['OPENNMS_STABLE_RHEL9'] || 'http://opennms.org' %>
+        baseurl: <%= ENV['OPENNMS_STABLE_RHEL9'] || 'http://yum.opennms.org/stable/rhel9' %>
 
 verifier:
   name: inspec
@@ -56,10 +56,13 @@ platforms:
       volumes:
         - /sys/fs/cgroup:/sys/fs/cgroup:ro
 
-  # Stripping systemd flags on Oracle Linux 10 allows the Cinc installer to install without crashing
   - name: preinstalled-oraclelinux-10
     driver:
       image: c1og/opennms-35-oraclelinux-10
+      privileged: true
+      pid_one_command: /usr/lib/systemd/systemd
+      volumes:
+        - /sys/fs/cgroup:/sys/fs/cgroup:ro
 
   - name: oraclelinux-9
     driver:
@@ -85,14 +88,13 @@ platforms:
                 let i+=${wait};
               done;'
 
-  - name: preinstalled-oraclelinux-10
-    driver:
-      image: c1og/opennms-35-oraclelinux-10
-      pid_one_command: /usr/lib/systemd/systemd
   - name: oraclelinux-10
     driver:
-      image: 
+      image: dokken/oraclelinux-10
+      privileged: true
       pid_one_command: /usr/lib/systemd/systemd
+      volumes:
+        - /sys/fs/cgroup:/sys/fs/cgroup:ro
     lifecycle:
       pre_converge:
         - remote: |
@@ -108,8 +110,8 @@ platforms:
                 echo "Waited ${i}/${timeout}s for dnf to complete, retrying in ${wait} seconds"
                 sleep ${wait};
                 let i+=${wait};
-              done;
-            '
+              done;'
+
 suites:
   - name: recommended
     lifecycle:
@@ -171,6 +173,7 @@ suites:
           admin:
             vault: creds
         templates: true
+
   - name: upgrade
     verifier:
       inspec_tests:
@@ -181,6 +184,7 @@ suites:
       - oraclelinux-10
       - preinstalled-oraclelinux-9
       - preinstalled-oraclelinux-10
+
   - name: no_upgrade
     excludes:
       - oraclelinux-9
@@ -195,11 +199,13 @@ suites:
     attributes:
       opennms:
         upgrade: false
+
   - name: default
     excludes:
       - preinstalled-34-oraclelinux-9
       - preinstalled-oraclelinux-9
       - preinstalled-oraclelinux-10
+
   - name: plugins
     excludes:
       - oraclelinux-9
@@ -213,6 +219,7 @@ suites:
             - opennms-plugin-provisioning-snmp-hardware-inventory
             - opennms-plugin-provisioning-snmp-asset
             - opennms-plugin-northbounder-jms
+
   - name: avail_category
     excludes:
       - oraclelinux-9
@@ -225,6 +232,7 @@ suites:
       inspec_tests:
         - path: test/integration/default
         - path: test/integration/avail_category
+
   - name: avail_view_section
     excludes:
       - oraclelinux-9
@@ -237,6 +245,7 @@ suites:
       inspec_tests:
         - path: test/integration/default
         - path: test/integration/avail_view_section
+
   - name: avail_view_section_mod
     excludes:
       - oraclelinux-9
@@ -249,6 +258,7 @@ suites:
       inspec_tests:
         - path: test/integration/default
         - path: test/integration/avail_view_section_mod
+
   - name: collection_graph
     excludes:
       - oraclelinux-9
@@ -261,6 +271,7 @@ suites:
       inspec_tests:
         - path: test/integration/default
         - path: test/integration/collection_graph
+
   - name: collection_graph_file
     excludes:
       - oraclelinux-9
@@ -273,6 +284,7 @@ suites:
       inspec_tests:
         - path: test/integration/default
         - path: test/integration/collection_graph_file
+
   - name: collection_package
     excludes:
       - oraclelinux-9
@@ -285,6 +297,7 @@ suites:
       inspec_tests:
         - path: test/integration/default
         - path: test/integration/collection_package
+
   - name: collection_package_delete
     excludes:
       - oraclelinux-9
@@ -297,6 +310,7 @@ suites:
       inspec_tests:
         - path: test/integration/default
         - path: test/integration/collection_package_delete
+
   - name: collection_package_update
     excludes:
       - oraclelinux-9
@@ -309,6 +323,7 @@ suites:
       inspec_tests:
         - path: test/integration/default
         - path: test/integration/collection_package_update
+
   - name: collection_package_update_excludes
     excludes:
       - oraclelinux-9
@@ -321,6 +336,7 @@ suites:
       inspec_tests:
         - path: test/integration/default
         - path: test/integration/collection_package_update_excludes
+
   - name: collection_package_update_ifaliasdomain
     excludes:
       - oraclelinux-9
@@ -333,6 +349,7 @@ suites:
       inspec_tests:
         - path: test/integration/default
         - path: test/integration/collection_package_update_ifaliasdomain
+
   - name: collection_package_update_includes
     excludes:
       - oraclelinux-9
