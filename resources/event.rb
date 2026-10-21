@@ -182,6 +182,10 @@ action_class do
     # Secure guard check against uninitialized definition strings on a fresh slate
     state_def = node.run_state.dig('opennms', 'eventconf_sources', source_name, 'definition')
 
+    # Note: On a pristine sandbox container, the OpenNMS REST API initializes a clean
+    # registry layout by returning a structurally empty XML skeleton with the root node tag
+    # rather than an completely blank string (""). Checking explicitly for this string
+    # prevents the underlying REXML parser from crashing on empty document layouts.
     return true if state_def.nil? || state_def == '<events xmlns="http://xmlns.opennms.org/xsd/eventconf"/>'
 
     eventfile = Opennms::Cookbook::ConfigHelpers::Event::EventDefinitionFile.new

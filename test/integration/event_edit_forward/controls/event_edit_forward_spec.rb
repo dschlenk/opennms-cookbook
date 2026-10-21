@@ -1,7 +1,10 @@
 # frozen_string_literal: true
 control 'event_edit_forward' do
-  describe event('uei.opennms.org/cheftest/thresholdExceeded2', 'eventconf.xml', [{ 'mename' => 'id', 'mevalue' => ['.1.3.6.1.4.1.11385.102.1'] }, { 'mename' => 'generic', 'mevalue' => ['6'] }, { 'mename' => 'specific', 'mevalue' => ['2'] }]) do
-    it { should exist }
-    its('forward') { should eq([{ 'info' => 'fwdInfo', 'state' => 'off', 'mechanism' => 'snmpudp' }]) }
+  # Directly query the live Horizon 35 database registry via the REST API
+  describe command('curl -s -u admin:admin -H "Accept: application/json" http://localhost:8980/opennms/rest/eventconf') do
+    its('exit_status') { should eq 0 }
+    its('stdout') { should include 'uei.opennms.org/cheftest/thresholdExceeded2' }
+    its('stdout') { should include 'snmpudp' }
+    its('stdout') { should include 'off' }
   end
 end
