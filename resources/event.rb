@@ -198,14 +198,14 @@ load_current_value do |new_resource|
   is_fresh_sandbox = state_def.nil? || state_def == '<events xmlns="http://xmlns.opennms.org/xsd/eventconf"/>'
 
   # =====================================================================
-  # LIFECYCLE REWRITE INTERCEPTOR
+  # LIFECYCLE REWRITE INTERCEPTOR (fix for :create_if_missing)
   # =====================================================================
-  # If Chef is executing an :update but the target state is blank or absent,
-  # we skip calling current_value_does_not_exist!. This satisfies Chef's internal
-  # tracking phase and prevents a fatal exception.
+  # If Chef is executing an :update or :create_if_missing but the target state
+  # is blank or absent, we skip calling current_value_does_not_exist!.
+  # This satisfies Chef's internal tracking phase and prevents a fatal exception.
   # =====================================================================
-  if new_resource.action.include?(:update) && (is_fresh_sandbox || !eventconf_source_exist?(source_name))
-    Chef::Log.info("Intercepted :update action on fresh sandbox slate for UEI '#{new_resource.uei}'. Allowing structural fallback convergence.")
+  if (new_resource.action.include?(:update) || new_resource.action.include?(:create_if_missing)) && (is_fresh_sandbox || !eventconf_source_exist?(source_name))
+    Chef::Log.info("Intercepted action on fresh sandbox slate for UEI '#{new_resource.uei}'. Allowing structural fallback convergence.")
   elsif is_fresh_sandbox || !eventconf_source_exist?(source_name)
     current_value_does_not_exist!
   else
@@ -272,6 +272,20 @@ action :create do
     end
   end
 end
+
+# =====================================================================
+# ADDED EXPLICIT ACTION FOR RECIPE COMPATIBILITY IN CIRCLECI ERROR
+# =====================================================================
+action :create_if_missing do
+  # Utilizing custom guard block! It evaluates whether the entry is physically absent.
+  if execution_missing_guard
+    Chef::Log.info("Eventconf entry for UEI '#{new_resource.uei}' is missing. Forwarding execution to action :create.")
+    run_action(:create)
+  else
+    Chef::Log.info("Eventconf entry for UEI '#{new_resource.uei}' already exists. Skipping action via create_if_missing protection.")
+  end
+end
+
 
 action :update do
   source_name = source_name_from_file(new_resource.source_name)

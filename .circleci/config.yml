@@ -22,6 +22,7 @@ jobs:
   integration:
     machine:
       image: ubuntu-2404:current
+    resource_class: large  # Upgrades memory to 8GB RAM to fix the OpenNMS Java OOM crash
     parallelism: 30
     steps:
       - checkout
@@ -32,7 +33,8 @@ jobs:
       - run:
           name: install cinc workstation
           command: |
-            curl -L https://omnitruck.cinc.sh/install.sh | sudo bash -s -- -P cinc-workstation -v 25.13.7
+            # Pointing back to the valid omnitruck script installer address
+            curl -L https://cinc.sh | sudo bash -s -- -P cinc-workstation -v 25.13.7
             # Persist Cinc environment variables across all subsequent CircleCI steps
             echo 'eval "$(cinc shell-init bash)"' >> $BASH_ENV
       - run:

@@ -360,7 +360,7 @@ module Opennms
                         if source_object.nil?
                           # If the source file doesn't exist on the server yet (e.g., a fresh OpenNMS install),
                           # seed an empty template so the multipart upload can safely create it.
-                          local_definitions[name] = '<events xmlns="http://opennms.org"/>'
+                          local_definitions[name] = '<events xmlns="http://xmlns.opennms.org/xsd/eventconf"/>'
                         else
                           begin
                             response = RestClient::Request.execute(
@@ -371,9 +371,9 @@ module Opennms
                               timeout: 30,
                               open_timeout: 10
                             )
-                            local_definitions[name] = response.code == 204 ? '<events xmlns="http://opennms.org"/>' : response.body
+                            local_definitions[name] = response.code == 204 ? '<events xmlns="http://xmlns.opennms.org/xsd/eventconf"/>' : response.body
                           rescue => e
-                            local_definitions[name] = '<events xmlns="http://opennms.org"/>'
+                            local_definitions[name] = '<events xmlns="http://xmlns.opennms.org/xsd/eventconf"/>'
                           end
                         end
 
