@@ -69,7 +69,7 @@ class OpenNmsEventApi < Inspec.resource(1)
     events = []
     if obj.is_a?(Hash)
       obj.each do |k, v|
-        if %w[event events].include?(k.to_s)
+        if %w(event events).include?(k.to_s)
           v.is_a?(Array) ? events.concat(v) : events.push(v)
         else
           events.concat(find_all_events(v))
