@@ -6,7 +6,7 @@ class OpenNmsEventApi < Inspec.resource(1)
   attr_reader :event_data
 
   def initialize(uei, _file = nil)
-    # Horizon 35+ Fix: Drop source_name filtering and fetch the entire flat dataset
+    # Horizon 35+ Fix: Query the centralized endpoint listing natively using port 8980
     payload = fetch_live_eventconf_json
 
     # Dynamic scan: extract all sub-arrays or object trees regardless of OpenNMS wrapper structure
@@ -44,9 +44,9 @@ class OpenNmsEventApi < Inspec.resource(1)
     event_data.key?(keys.first) || event_data.key?(keys.first.downcase) || super
   end
 
-  # Horizon 35+: Drop the source_name file suffix completely
+  # Horizon 35+: Use the correct default port 8980 and hit the modern /api/v2 namespace
   def fetch_live_eventconf
-    inspec.command("curl -s -u admin:admin -H 'Accept: application/json' http://localhost:8090/opennms/rest/eventconf")
+    inspec.command("curl -s -u admin:admin -H 'Accept: application/json' http://localhost:8980/opennms/api/v2/eventconf")
   end
 
   def fetch_live_eventconf_json
@@ -71,7 +71,8 @@ class OpenNmsEventApi < Inspec.resource(1)
     events = []
     if obj.is_a?(Hash)
       obj.each do |k, v|
-        if %w(event events).include?(k.to_s)
+        # Horizon 35+ API encapsulates the internal properties under 'event' or 'events' loops
+        if %w(event events event_list eventList).include?(k.to_s)
           v.is_a?(Array) ? events.concat(v) : events.push(v)
         else
           events.concat(find_all_events(v))

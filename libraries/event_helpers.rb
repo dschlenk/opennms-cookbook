@@ -148,18 +148,17 @@ module Opennms
             with_run_context :root do
               declare_resource(:ruby_block, "DELETE #{source_name}") do
                 block do
-                  # ===================================================
-                  # NETWORK TIMEOUT GUARD
-                  # ===================================================
-                  # Explicitly adding network timeouts to prevent hangs.
-                  # Without explicit values, RestClient can sit open
-                  # indefinitely on dead sockets. Setting this to 10s
-                  # connect and 30s read ensures Chef fails fast instead
-                  # of stalling if the OpenNMS daemon slows down.
-                  # ===================================================
+                  # ===================================================================
+                  # SAFE BASE URL PARSING FOR HORIZON 35+ ON DELETE
+                  # ===================================================================
+                  uri = URI.parse(r.restv2url)
+                  base_url = "#{uri.scheme}://#{uri.host}:#{uri.port}/opennms"
+                  # ===================================================================
+
                   response = RestClient::Request.execute(
                     method: :delete,
-                    url: "#{r.restv2url}/eventconf/sources",
+                    # Target the verified API layout endpoint path
+                    url: "#{base_url}/api/v2/eventconf/sources",
                     user: 'admin',
                     password: r.admin_secret_from_vault('password'),
                     payload: "{ \"sourceIds\": [ #{source['id']} ] }",
@@ -179,17 +178,17 @@ module Opennms
 
           def upload_eventconf(body, boundary, source_name)
             # ===================================================================
-            # HORIZON 35+ API NAMESPACE REALIGNMENT
+            # SAFE BASE URL PARSING FOR HORIZON 35+
             # ===================================================================
-            # Horizon 35+ exposes the programmatic event uploader exclusively under
-            # the /api/v2/ namespace. We derive this dynamically from 'restv2url'
-            # to safely avoid manual port/host maintenance across different test pools.
+            # We extract the root server protocol, host, and /opennms context.
+            # This avoids duplicating '/api/v2' if it's already in 'restv2url'.
             # ===================================================================
-            api_base_url = restv2url.sub(%r{/rest$}, '')
+            uri = URI.parse(restv2url)
+            base_url = "#{uri.scheme}://#{uri.host}:#{uri.port}/opennms"
 
             response = RestClient::Request.execute(
               method: :post,
-              url: "#{api_base_url}/api/v2/eventconf/upload",
+              url: "#{base_url}/api/v2/eventconf/upload",
               user: 'admin',
               password: admin_secret_from_vault('password'),
               payload: body,
@@ -232,16 +231,24 @@ module Opennms
           # ===================================================================
           def current_source(source_name)
             offset = 0
-            limit = 100 # Query larger batches to scan through database configurations quickly
+            limit = 100
             source = nil
             processed_records = 0
 
+            # ===================================================================
+            # SAFE BASE URL PARSING FOR HORIZON 35+
+            # ===================================================================
+            # Prevents /api/v2 or /rest from accidentally repeating in the string
+            # ===================================================================
+            uri = URI.parse(restv2url)
+            base_url = "#{uri.scheme}://#{uri.host}:#{uri.port}/opennms"
+
             begin
               loop do
-                # Horizon 35+ Update: Query the flat /eventconf endpoint directly
+                # Query the correct endpoint targeting sources with integrated server side filters
                 resp = RestClient::Request.execute(
                   method: :get,
-                  url: "#{restv2url}/eventconf?limit=#{limit}&offset=#{offset}",
+                  url: "#{base_url}/api/v2/eventconf/filter/sources?filter=#{source_name}&limit=#{limit}&offset=#{offset}",
                   headers: { 'Authorization' => "Basic #{Base64.strict_encode64("admin:#{admin_secret_from_vault('password')}")}" },
                   timeout: 30,
                   open_timeout: 10
@@ -250,39 +257,30 @@ module Opennms
 
                 ro = JSON.parse(resp.body) || {}
 
-                # Horizon 35+ database responses flatten event listings into a clean array
-                page_items = ro['event'] || ro['events'] || ro || []
-                page_items = [page_items] if page_items.is_a?(Hash)
-
+                # OpenNMS Horizon 35+ wraps paginated source lists under 'eventConfSourceList'
+                page_items = ro['eventConfSourceList'] || []
                 break if page_items.empty?
 
-                # Find if any active database event entry maps back to target source tracker
-                match = page_items.find { |e| e['source_name'] == source_name || e['source'] == source_name }
+                # Find the exact structural match out of the batch
+                match = page_items.find { |s| s['name'] == source_name }
                 if match
                   source = match
                   break
                 end
 
-                # Break safely if navigating a non-paginated hash response structure
-                break unless ro.is_a?(Hash) && ro.key?('totalRecords')
-
+                # Track pagination boundaries safely
                 processed_records += page_items.size
                 break if processed_records >= ro['totalRecords'].to_i
 
                 offset += limit
               end
             rescue => e
-              # Soft log warning fallback for local testing sandboxes to prevent strict compile stalls
               Chef::Log.warn("Unable to resolve direct source row tracking for #{source_name}: #{e}. Proceeding with clean default allocation.")
             end
             source
           end
 
           def eventconf_source_resource_create(source_name, position)
-            # =================================================================
-            # ACCUMULATE AND BATCH SINGLE TRANSACTION
-            # =================================================================
-
             # Initialize the global accumulator array
             node.run_state['opennms_bulk_eventconf'] ||= []
 
@@ -292,8 +290,6 @@ module Opennms
               position: position,
             }
 
-            # Provide an immediate baseline structure in the run_state right now
-            # so downstream custom resource actions don't crash looking for it mid-run.
             node.run_state['opennms'] ||= {}
             node.run_state['opennms']['eventconf_sources'] ||= {}
             node.run_state['opennms']['eventconf_sources'][source_name] ||= {
@@ -302,12 +298,12 @@ module Opennms
 
             r = self
             with_run_context :root do
-              # Create a single master bulk uploader resource ONLY ONCE per Chef run
               unless find_resource(:ruby_block, 'EXECUTE BULK OPENNMS UPLOAD')
                 declare_resource(:ruby_block, 'EXECUTE BULK OPENNMS UPLOAD') do
                   block do
                     require 'securerandom'
                     require 'rest-client'
+                    require 'uri'
 
                     payload_batch = r.node.run_state['opennms_bulk_eventconf']
 
@@ -317,24 +313,30 @@ module Opennms
                         case item[:position].to_s.downcase
                         when 'top'    then 0
                         when 'bottom' then 2
-                        else               1 # Default / unpositioned / middle
+                        else               1
                         end
                       end
 
                       Chef::Log.info("Executing optimized bulk processing for #{payload_batch.length} items...")
 
-                      # Pull down all existing database configurations once
+                      # ===================================================================
+                      # SAFE BASE URL PARSING FOR HORIZON 35+
+                      # ===================================================================
+                      uri = URI.parse(r.restv2url)
+                      base_url = "#{uri.scheme}://#{uri.host}:#{uri.port}/opennms"
+                      # ===================================================================
+
                       all_sources_cache = {}
                       offset = 0
-                      limit = 100 # Maximize limits to clear network traffic fast
+                      limit = 100
                       processed_records = 0
 
                       begin
                         loop do
                           resp = RestClient::Request.execute(
                             method: :get,
-                            # Horizon 35+ Update: Query the central dynamic eventconf dataset listing
-                            url: "#{r.restv2url}/eventconf?limit=#{limit}&offset=#{offset}",
+                            # Query the correct programmatic source tracker endpoint cleanly
+                            url: "#{base_url}/api/v2/eventconf/filter/sources?limit=#{limit}&offset=#{offset}",
                             headers: { 'Authorization' => "Basic #{Base64.strict_encode64("admin:#{r.admin_secret_from_vault('password')}")}" },
                             timeout: 60,
                             open_timeout: 10
@@ -342,22 +344,18 @@ module Opennms
                           break if resp.code == 204
                           ro = JSON.parse(resp.body) || {}
 
-                          page_items = ro['event'] || ro['events'] || ro || []
-                          page_items = [page_items] if page_items.is_a?(Hash)
+                          # Correctly target the event configuration files array
+                          page_items = ro['eventConfSourceList'] || []
                           break if page_items.empty?
 
-                          page_items.each do |e|
-                            src_name = e['source_name'] || e['source']
-                            all_sources_cache[src_name] = e if src_name
-                          end
+                          page_items.each { |s| all_sources_cache[s['name']] = s if s['name'] }
 
-                          break unless ro.is_a?(Hash) && ro.key?('totalRecords')
                           processed_records += page_items.size
                           break if processed_records >= ro['totalRecords'].to_i
                           offset += limit
                         end
                       rescue => e
-                        Chef::Log.warn("Could not pre-populate modern database event cache: #{e}. Proceeding carefully...")
+                        Chef::Log.warn("Could not pre-populate source cache safely: #{e}. Proceeding carefully...")
                       end
 
                       boundary = "----RubyMultipart#{SecureRandom.hex(16)}"
@@ -366,20 +364,16 @@ module Opennms
 
                       payload_batch.each do |item|
                         name = item[:name]
-
-                        # Read instantly from memory cache instead of making an API call!
                         source_object = all_sources_cache[name]
 
                         if source_object.nil?
-                          # If the source file doesn't exist on the server yet (e.g., a fresh OpenNMS install),
-                          # seed an empty template so the multipart upload can safely create it.
                           local_definitions[name] = '<events xmlns="http://xmlns.opennms.org/xsd/eventconf"/>'
                         else
                           begin
                             response = RestClient::Request.execute(
                               method: :get,
-                              # Horizon 35+ Update: Pull the explicit event XML payload by database entity ID path
-                              url: "#{r.restv2url}/eventconf/events/#{source_object['id']}/download",
+                              # Target the actual configuration file stream endpoint path
+                              url: "#{base_url}/api/v2/eventconf/sources/#{source_object['id']}/events/download",
                               user: 'admin',
                               password: r.admin_secret_from_vault('password'),
                               timeout: 30,
@@ -408,7 +402,6 @@ module Opennms
               end
             end
 
-            # Create a light legacy tracking pointer block so existing recipes' notification triggers and change detection hooks still align without blowing up
             with_run_context :root do
               declare_resource(:ruby_block, block_name(source_name)) do
                 block do
