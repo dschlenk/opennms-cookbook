@@ -21,22 +21,18 @@ class OpenNmsEventApi < Inspec.resource(1)
   # ===================================================================
   # Automatic Dot-Notation Traversal & Nil-Safe Property Fallback
   # ===================================================================
-  def method_missing(name, *args)
-    return nil if event_data.nil?
+  def method_missing(name, *_args)
+    return if event_data.nil?
 
     # Handle string dot-notation smoothly (e.g., 'alarmData.reductionKey')
     keys = name.to_s.split('.')
 
-    result = keys.reduce(event_data) do |memo, key|
+    keys.reduce(event_data) do |memo, key|
       if memo.is_a?(Hash)
         # Check standard key first, then fallback to lowercase/camelCase variants
         memo[key] || memo[key.downcase] || memo[camelize(key)]
-      else
-        nil
       end
     end
-
-    result
   end
 
   def respond_to_missing?(method_name, include_private = false)
@@ -63,6 +59,6 @@ class OpenNmsEventApi < Inspec.resource(1)
   private
 
   def camelize(str)
-    str.split('_').inject { |memo, word| memo + word.capitalize }
+    str.split('_').inject { |acc, elem| acc + elem.capitalize }
   end
 end
