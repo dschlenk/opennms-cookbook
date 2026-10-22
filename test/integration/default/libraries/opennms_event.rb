@@ -8,10 +8,10 @@ class OpenNmsEventApi < Inspec.resource(1)
   def initialize(uei, _file = nil)
     payload = fetch_live_eventconf_json
 
-    events = payload['event'] || payload['events'] || payload || []
-    events = [events] if events.is_a?(Hash)
+    # Dynamic scan: extract all sub-arrays or object trees regardless of OpenNMS wrapper structure
+    all_events = find_all_events(payload)
 
-    @event_data = events.find { |e| e['uei'] == uei }
+    @event_data = all_events.find { |e| e.is_a?(Hash) && e['uei'] == uei }
   end
 
   def exist?
@@ -31,6 +31,8 @@ class OpenNmsEventApi < Inspec.resource(1)
       if memo.is_a?(Hash)
         # Check standard key first, then fallback to lowercase/camelCase variants
         memo[key] || memo[key.downcase] || memo[camelize(key)]
+      elsif memo.is_a?(Array) && key.match?(/^\d+$/)
+        memo[key.to_i]
       end
     end
   end
@@ -60,5 +62,22 @@ class OpenNmsEventApi < Inspec.resource(1)
 
   def camelize(str)
     str.split('_').inject { |acc, elem| acc + elem.capitalize }
+  end
+
+  # Recursively crawl the dynamic payload map to collect any event elements safely
+  def find_all_events(obj)
+    events = []
+    if obj.is_a?(Hash)
+      obj.each do |k, v|
+        if %w[event events].include?(k.to_s)
+          v.is_a?(Array) ? events.concat(v) : events.push(v)
+        else
+          events.concat(find_all_events(v))
+        end
+      end
+    elsif obj.is_a?(Array)
+      obj.each { |item| events.concat(find_all_events(item)) }
+    end
+    events
   end
 end

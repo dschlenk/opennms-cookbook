@@ -3,8 +3,9 @@
 control 'event_add_parameters' do
   title 'OpenNMS Event Parameters Fallback Validation'
 
-  # Horizon 35+ use the registered resource name 'opennms_event' without arguments
-  events_data = opennms_event.fetch_live_eventconf_json
+  # Pass nil arguments to initialize the resource object on port 8090 without raising an ArgumentError
+  api_helper = opennms_event(nil, nil)
+  events_data = api_helper.fetch_live_eventconf_json
 
   # Normalize standard response array paths for Horizon 35 database payloads
   events_list = events_data['event'] || events_data['events'] || events_data || []

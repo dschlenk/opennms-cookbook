@@ -264,7 +264,7 @@ control 'OpenNMS Live Event REST API - chef6.events parameters' do
     it { should exist }
     its('eventLabel')              { should eq 'Chef defined event: parametersTest' }
     its('descr')                   { should include 'parameters.' }
-    MenuContext                    { should eq 'parameters test.' }
+    # FIXED: Removed stray object constant mapping typo lines from compilation block
     its('logmsg.content')          { should eq 'parameters test.' }
     its('logmsg.dest')             { should eq 'logndisplay' }
     its('logmsg.notify')           { should be true }
@@ -351,6 +351,7 @@ control 'OpenNMS Live Event REST API - chef.events file actions' do
     its('logmsg.notify')           { should be true }
     its('severity')                { should eq 'Minor' }
   end
+
   describe opennms_event('noop_create_if_missing', 'events/chef.events.xml') do
     it { should_not exist }
   end
