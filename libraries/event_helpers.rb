@@ -179,11 +179,17 @@ module Opennms
 
           def upload_eventconf(body, boundary, source_name)
             # ===================================================================
-            # HORIZON 35+ :Target the modernized database configuration import endpoint
+            # HORIZON 35+ API NAMESPACE REALIGNMENT
             # ===================================================================
+            # Horizon 35+ exposes the programmatic event uploader exclusively under
+            # the /api/v2/ namespace. We derive this dynamically from 'restv2url'
+            # to safely avoid manual port/host maintenance across different test pools.
+            # ===================================================================
+            api_base_url = restv2url.sub(%r{/rest$}, '')
+
             response = RestClient::Request.execute(
               method: :post,
-              url: "#{restv2url}/eventconf/import",
+              url: "#{api_base_url}/api/v2/eventconf/upload",
               user: 'admin',
               password: admin_secret_from_vault('password'),
               payload: body,
@@ -194,7 +200,7 @@ module Opennms
                 accept: :json,
               }
             )
-            raise "Unable to update database content via API for eventconf source #{source_name}. Is OpenNMS running?" unless [200, 204].include?(response.code)
+            raise "Unable to update content via API for eventconf source #{source_name}. Is OpenNMS running?" unless [200, 204].include?(response.code)
           end
 
           private
@@ -317,7 +323,7 @@ module Opennms
 
                       Chef::Log.info("Executing optimized bulk processing for #{payload_batch.length} items...")
 
-                      # Pull down all existing sources once
+                      # Pull down all existing database configurations once
                       all_sources_cache = {}
                       offset = 0
                       limit = 100 # Maximize limits to clear network traffic fast
@@ -327,24 +333,31 @@ module Opennms
                         loop do
                           resp = RestClient::Request.execute(
                             method: :get,
-                            url: "#{r.restv2url}/eventconf/sources?limit=#{limit}&offset=#{offset}",
+                            # Horizon 35+ Update: Query the central dynamic eventconf dataset listing
+                            url: "#{r.restv2url}/eventconf?limit=#{limit}&offset=#{offset}",
                             headers: { 'Authorization' => "Basic #{Base64.strict_encode64("admin:#{r.admin_secret_from_vault('password')}")}" },
                             timeout: 60,
                             open_timeout: 10
                           )
                           break if resp.code == 204
                           ro = JSON.parse(resp.body) || {}
-                          page_items = ro['eventConfSourceList'] || []
+
+                          page_items = ro['event'] || ro['events'] || ro || []
+                          page_items = [page_items] if page_items.is_a?(Hash)
                           break if page_items.empty?
 
-                          page_items.each { |s| all_sources_cache[s['name']] = s if s['name'] }
+                          page_items.each do |e|
+                            src_name = e['source_name'] || e['source']
+                            all_sources_cache[src_name] = e if src_name
+                          end
 
+                          break unless ro.is_a?(Hash) && ro.key?('totalRecords')
                           processed_records += page_items.size
                           break if processed_records >= ro['totalRecords'].to_i
                           offset += limit
                         end
                       rescue => e
-                        Chef::Log.warn("Could not pre-populate source cache: #{e}. Proceeding carefully...")
+                        Chef::Log.warn("Could not pre-populate modern database event cache: #{e}. Proceeding carefully...")
                       end
 
                       boundary = "----RubyMultipart#{SecureRandom.hex(16)}"
@@ -365,7 +378,8 @@ module Opennms
                           begin
                             response = RestClient::Request.execute(
                               method: :get,
-                              url: "#{r.restv2url}/eventconf/sources/#{source_object['id']}/events/download",
+                              # Horizon 35+ Update: Pull the explicit event XML payload by database entity ID path
+                              url: "#{r.restv2url}/eventconf/events/#{source_object['id']}/download",
                               user: 'admin',
                               password: r.admin_secret_from_vault('password'),
                               timeout: 30,
