@@ -4,13 +4,14 @@ class OpenNmsEventApi < Inspec.resource(1)
   name 'opennms_event'
 
   attr_reader :event_data
+
   def initialize(uei, file)
     source_name = file.sub(%r{^events/}, '').sub(/\.xml$/, '')
 
     payload = fetch_live_eventconf_json(source_name)
     events = payload['event'] || payload['events'] || []
 
-    # Handle API variance: if there's only 1 event, it might return a Hash instead of an Array
+    # if there's only 1 event, it might return a Hash instead of an Array
     events = [events] if events.is_a?(Hash)
 
     @event_data = events.find { |e| e['uei'] == uei }
@@ -30,7 +31,7 @@ class OpenNmsEventApi < Inspec.resource(1)
   end
 
   def fetch_live_eventconf(source_name)
-    inspec.command("curl -s -u admin:admin -H 'Accept: application/json' http://localhost:8980/opennms/rest/eventconf/#{source_name}")
+    inspec.command("curl -s -u admin:admin -H 'Accept: application/json' http://localhost:8090/opennms/rest/eventconf/#{source_name}")
   end
 
   def fetch_live_eventconf_json(source_name)
