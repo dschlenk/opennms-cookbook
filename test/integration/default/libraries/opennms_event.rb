@@ -5,11 +5,9 @@ class OpenNmsEventApi < Inspec.resource(1)
 
   attr_reader :event_data
 
-  def initialize(uei, file = nil)
-    # Extract the clean file identifier (e.g., 'events/chef.events.xml' -> 'chef.events')
-    source_name = file&.sub(%r{^events/}, '')&.sub(/\.xml$/, '')
-
-    payload = fetch_live_eventconf_json(source_name)
+  def initialize(uei, _file = nil)
+    # Horizon 35+ Fix: Drop source_name filtering and fetch the entire flat dataset
+    payload = fetch_live_eventconf_json
 
     # Dynamic scan: extract all sub-arrays or object trees regardless of OpenNMS wrapper structure
     all_events = find_all_events(payload)
@@ -46,14 +44,13 @@ class OpenNmsEventApi < Inspec.resource(1)
     event_data.key?(keys.first) || event_data.key?(keys.first.downcase) || super
   end
 
-  def fetch_live_eventconf(source_name = nil)
-    # Dynamically target the explicit file sub-endpoint if a file parameter was supplied
-    url_suffix = source_name.nil? || source_name.empty? ? '' : "/#{source_name}"
-    inspec.command("curl -s -u admin:admin -H 'Accept: application/json' http://localhost:8090/opennms/rest/eventconf#{url_suffix}")
+  # Horizon 35+: Drop the source_name file suffix completely
+  def fetch_live_eventconf
+    inspec.command("curl -s -u admin:admin -H 'Accept: application/json' http://localhost:8090/opennms/rest/eventconf")
   end
 
-  def fetch_live_eventconf_json(source_name = nil)
-    cmd = fetch_live_eventconf(source_name)
+  def fetch_live_eventconf_json
+    cmd = fetch_live_eventconf
     return {} unless cmd.exit_status.zero?
 
     begin
