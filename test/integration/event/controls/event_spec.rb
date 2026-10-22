@@ -4,7 +4,7 @@ control 'uei.opennms.org/cheftest/thresholdExceeded configurations' do
   title 'OpenNMS Live Event REST API'
 
   events_data = opennms_event_api.fetch_live_eventconf_json('chef.events')
-  events_list = events_data.dig('events') || []
+  events_list = events_data['events'] || []
 
   describe opennms_event_api.fetch_live_eventconf('chef.events') do
     its('exit_status') { should eq 0 }
@@ -16,13 +16,13 @@ control 'uei.opennms.org/cheftest/thresholdExceeded configurations' do
     it { should_not be_nil }
     its(['eventLabel']) { should eq 'Chef defined event: thresholdExceeded' }
     its(['descr']) { should include 'A threshold defined by a chef recipe has been exceeded.' }
-    its(['logmsg', 'content']) { should eq 'A threshold has been exceeded.' }
-    its(['logmsg', 'dest']) { should eq 'logndisplay' }
-    its(['logmsg', 'notify']) { should be true }
+    its(%w(logmsg content)) { should eq 'A threshold has been exceeded.' }
+    its(%w(logmsg dest)) { should eq 'logndisplay' }
+    its(%w(logmsg notify)) { should be true }
     its(['severity']) { should eq 'Minor' }
-    its(['alarmData', 'reductionKey']) { should eq '%uei%:%dpname%:%nodeid%:%interface%:%parm[ds]%:%parm[threshold]%:%parm[trigger]%:%parm[rearm]%:%parm[label]%' }
-    its(['alarmData', 'alarmType']) { should eq 1 }
-    its(['alarmData', 'autoClean']) { should be false }
+    its(%w(alarmData reductionKey)) { should eq '%uei%:%dpname%:%nodeid%:%interface%:%parm[ds]%:%parm[threshold]%:%parm[trigger]%:%parm[rearm]%:%parm[label]%' }
+    its(%w(alarmData alarmType)) { should eq 1 }
+    its(%w(alarmData autoClean)) { should be false }
   end
 
   describe 'Event uei.opennms.org/cheftest/thresholdExceeded2' do
@@ -31,14 +31,14 @@ control 'uei.opennms.org/cheftest/thresholdExceeded configurations' do
     it { should_not be_nil }
     its(['eventLabel']) { should eq 'Chef defined event: thresholdExceeded' }
     its(['descr']) { should include 'A threshold defined by a chef recipe has been exceeded.' }
-    its(['logmsg', 'content']) { should eq 'A threshold has been exceeded.' }
-    its(['logmsg', 'dest']) { should eq 'logndisplay' }
-    its(['logmsg', 'notify']) { should be true }
+    its(%w(logmsg content)) { should eq 'A threshold has been exceeded.' }
+    its(%w(logmsg dest)) { should eq 'logndisplay' }
+    its(%w(logmsg notify)) { should be true }
     its(['severity']) { should eq 'Minor' }
     its(['operinstruct']) { should eq 'the operinstruct' }
     its(['mouseovertext']) { should eq 'mouseOverText' }
-    its(['tticket', 'content']) { should eq 'tticketInfo' }
-    its(['tticket', 'state']) { should eq 'off' }
+    its(%w(tticket content)) { should eq 'tticketInfo' }
+    its(%w(tticket state)) { should eq 'off' }
 
     it 'contains the required mask elements' do
       mask_elements = subject.dig('mask', 'maskelement') || []
@@ -72,9 +72,9 @@ control 'uei.opennms.org/cheftest/thresholdExceeded configurations' do
     it { should_not be_nil }
     its(['eventLabel']) { should eq 'Chef defined event: thresholdExceeded3' }
     its(['descr']) { should include 'A threshold defined by a chef recipe has been exceeded3.' }
-    its(['logmsg', 'content']) { should eq 'A threshold has been exceeded3.' }
-    its(['logmsg', 'dest']) { should eq 'logndisplay' }
-    its(['logmsg', 'notify']) { should be true }
+    its(%w(logmsg content)) { should eq 'A threshold has been exceeded3.' }
+    its(%w(logmsg dest)) { should eq 'logndisplay' }
+    its(%w(logmsg notify)) { should be true }
     its(['severity']) { should eq 'Minor' }
     its(['operinstruct']) { should eq 'the operinstruct' }
     its(['mouseovertext']) { should eq 'mouseOverText' }
@@ -85,7 +85,7 @@ control 'uei.opennms.org/cheftest/thresholdExceeded 4 and 5 configurations' do
   title 'OpenNMS Live Event REST API - chef.events'
 
   events_data = opennms_event_api.fetch_live_eventconf_json('chef.events')
-  events_list = events_data.dig('events') || []
+  events_list = events_data['events'] || []
 
   describe 'Event uei.opennms.org/cheftest/thresholdExceeded4' do
     subject { events_list.find { |e| e['uei'] == 'uei.opennms.org/cheftest/thresholdExceeded4' } }
@@ -93,17 +93,17 @@ control 'uei.opennms.org/cheftest/thresholdExceeded 4 and 5 configurations' do
     it { should_not be_nil }
     its(['eventLabel']) { should eq 'Chef defined event: thresholdExceeded4' }
     its(['descr']) { should include 'A threshold defined by a chef recipe has been exceeded4.' }
-    its(['logmsg', 'content']) { should eq 'A threshold has been exceeded4.' }
-    its(['logmsg', 'dest']) { should eq 'logndisplay' }
-    its(['logmsg', 'notify']) { should be true }
+    its(%w(logmsg content)) { should eq 'A threshold has been exceeded4.' }
+    its(%w(logmsg dest)) { should eq 'logndisplay' }
+    its(%w(logmsg notify)) { should be true }
     its(['severity']) { should eq 'Minor' }
     its(['operinstruct']) { should eq 'the operinstruct' }
     its(['mouseovertext']) { should eq 'mouseOverText' }
-    its(['tticket', 'content']) { should eq 'tticketInfo' }
-    its(['tticket', 'state']) { should eq 'off' }
-    its(['alarmData', 'reductionKey']) { should eq '%uei%:%dpname%:%nodeid%:%interface%:%parm[ds]%:%parm[threshold]%:%parm[trigger]%:%parm[rearm]%:%parm[label]%' }
-    its(['alarmData', 'alarmType']) { should eq 1 }
-    its(['alarmData', 'autoClean']) { should be false }
+    its(%w(tticket content)) { should eq 'tticketInfo' }
+    its(%w(tticket state)) { should eq 'off' }
+    its(%w(alarmData reductionKey)) { should eq '%uei%:%dpname%:%nodeid%:%interface%:%parm[ds]%:%parm[threshold]%:%parm[trigger]%:%parm[rearm]%:%parm[label]%' }
+    its(%w(alarmData alarmType)) { should eq 1 }
+    its(%w(alarmData autoClean)) { should be false }
 
     it 'contains the required mask elements' do
       mask_elements = subject.dig('mask', 'maskelement') || []
@@ -128,17 +128,17 @@ control 'uei.opennms.org/cheftest/thresholdExceeded 4 and 5 configurations' do
     it { should_not be_nil }
     its(['eventLabel']) { should eq 'Chef defined event: thresholdExceeded5' }
     its(['descr']) { should include 'A threshold defined by a chef recipe has been exceeded4.' }
-    its(['logmsg', 'content']) { should eq 'A threshold has been exceeded4.' }
-    its(['logmsg', 'dest']) { should eq 'logndisplay' }
-    its(['logmsg', 'notify']) { should be true }
+    its(%w(logmsg content)) { should eq 'A threshold has been exceeded4.' }
+    its(%w(logmsg dest)) { should eq 'logndisplay' }
+    its(%w(logmsg notify)) { should be true }
     its(['severity']) { should eq 'Minor' }
     its(['operinstruct']) { should eq 'the operinstruct' }
     its(['mouseovertext']) { should eq 'mouseOverText' }
-    its(['tticket', 'content']) { should eq 'tticketInfo' }
-    its(['tticket', 'state']) { should eq 'off' }
-    its(['alarmData', 'reductionKey']) { should eq '%uei%:%dpname%:%nodeid%:%interface%:%parm[ds]%:%parm[threshold]%:%parm[trigger]%:%parm[rearm]%:%parm[label]%' }
-    its(['alarmData', 'alarmType']) { should eq 1 }
-    its(['alarmData', 'autoClean']) { should be false }
+    its(%w(tticket content)) { should eq 'tticketInfo' }
+    its(%w(tticket state)) { should eq 'off' }
+    its(%w(alarmData reductionKey)) { should eq '%uei%:%dpname%:%nodeid%:%interface%:%parm[ds]%:%parm[threshold]%:%parm[trigger]%:%parm[rearm]%:%parm[label]%' }
+    its(%w(alarmData alarmType)) { should eq 1 }
+    its(%w(alarmData autoClean)) { should be false }
 
     it 'contains the required mask elements including vbnumber and vbvalue arrays' do
       mask_elements = subject.dig('mask', 'maskelement') || []
@@ -163,7 +163,7 @@ control 'uei.opennms.org/anUeiForANewThingInANewFile absence verification' do
   title 'OpenNMS Live Event REST API - chef2.events'
 
   events_data = opennms_event_api.fetch_live_eventconf_json('chef2.events')
-  events_list = events_data.dig('events') || []
+  events_list = events_data['events'] || []
 
   describe 'Event uei.opennms.org/anUeiForANewThingInANewFile' do
     subject { events_list.find { |e| e['uei'] == 'uei.opennms.org/anUeiForANewThingInANewFile' } }
@@ -176,7 +176,7 @@ control 'OpenNMS Live Event REST API - chef3.events' do
   title 'chef3.events validation'
 
   events_data = opennms_event_api.fetch_live_eventconf_json('chef3.events')
-  events_list = events_data.dig('events') || []
+  events_list = events_data['events'] || []
 
   describe opennms_event_api.fetch_live_eventconf('chef3.events') do
     its('exit_status') { should eq 0 }
@@ -194,13 +194,13 @@ control 'OpenNMS Live Event REST API - chef3.events' do
     it { should_not be_nil }
     its(['eventLabel']) { should eq 'Chef defined event: thresholdExceeded' }
     its(['descr']) { should include 'A threshold defined by a chef recipe has been exceeded.' }
-    its(['logmsg', 'content']) { should eq 'A threshold has been exceeded.' }
-    its(['logmsg', 'dest']) { should eq 'logndisplay' }
-    its(['logmsg', 'notify']) { should be true }
+    its(%w(logmsg content)) { should eq 'A threshold has been exceeded.' }
+    its(%w(logmsg dest)) { should eq 'logndisplay' }
+    its(%w(logmsg notify)) { should be true }
     its(['severity']) { should eq 'Minor' }
-    its(['alarmData', 'reductionKey']) { should eq '%uei%:%dpname%:%nodeid%:%interface%:%parm[ds]%:%parm[threshold]%:%parm[trigger]%:%parm[rearm]%:%parm[label]%' }
-    its(['alarmData', 'alarmType']) { should eq 1 }
-    its(['alarmData', 'autoClean']) { should be false }
+    its(%w(alarmData reductionKey)) { should eq '%uei%:%dpname%:%nodeid%:%interface%:%parm[ds]%:%parm[threshold]%:%parm[trigger]%:%parm[rearm]%:%parm[label]%' }
+    its(%w(alarmData alarmType)) { should eq 1 }
+    its(%w(alarmData autoClean)) { should be false }
   end
 end
 
@@ -208,7 +208,7 @@ control 'OpenNMS Live Event REST API - chef4.events' do
   title 'chef4.events validation'
 
   events_data = opennms_event_api.fetch_live_eventconf_json('chef4.events')
-  events_list = events_data.dig('events') || []
+  events_list = events_data['events'] || []
 
   describe opennms_event_api.fetch_live_eventconf('chef4.events') do
     its('exit_status') { should eq 0 }
@@ -226,13 +226,13 @@ control 'OpenNMS Live Event REST API - chef4.events' do
     it { should_not be_nil }
     its(['eventLabel']) { should eq 'Chef defined event: thresholdExceeded' }
     its(['descr']) { should include 'A threshold defined by a chef recipe has been exceeded.' }
-    its(['logmsg', 'content']) { should eq 'A threshold has been exceeded.' }
-    its(['logmsg', 'dest']) { should eq 'logndisplay' }
-    its(['logmsg', 'notify']) { should be true }
+    its(%w(logmsg content)) { should eq 'A threshold has been exceeded.' }
+    its(%w(logmsg dest)) { should eq 'logndisplay' }
+    its(%w(logmsg notify)) { should be true }
     its(['severity']) { should eq 'Minor' }
-    its(['alarmData', 'reductionKey']) { should eq '%uei%:%dpname%:%nodeid%:%interface%:%parm[ds]%:%parm[threshold]%:%parm[trigger]%:%parm[rearm]%:%parm[label]%' }
-    its(['alarmData', 'alarmType']) { should eq 1 }
-    its(['alarmData', 'autoClean']) { should be false }
+    its(%w(alarmData reductionKey)) { should eq '%uei%:%dpname%:%nodeid%:%interface%:%parm[ds]%:%parm[threshold]%:%parm[trigger]%:%parm[rearm]%:%parm[label]%' }
+    its(%w(alarmData alarmType)) { should eq 1 }
+    its(%w(alarmData autoClean)) { should be false }
   end
 end
 
@@ -240,7 +240,7 @@ control 'OpenNMS Live Event REST API - chef4.events extensions' do
   title 'chef4.events validations'
 
   events_data = opennms_event_api.fetch_live_eventconf_json('chef4.events')
-  events_list = events_data.dig('events') || []
+  events_list = events_data['events'] || []
 
   describe 'Event uei.opennms.org/fillerForANewThingInANewFile2' do
     subject { events_list.find { |e| e['uei'] == 'uei.opennms.org/fillerForANewThingInANewFile2' } }
@@ -248,13 +248,13 @@ control 'OpenNMS Live Event REST API - chef4.events extensions' do
     it { should_not be_nil }
     its(['eventLabel']) { should eq 'Chef defined event: thresholdExceeded' }
     its(['descr']) { should include 'A threshold defined by a chef recipe has been exceeded.' }
-    its(['logmsg', 'content']) { should eq 'A threshold has been exceeded.' }
-    its(['logmsg', 'dest']) { should eq 'logndisplay' }
-    its(['logmsg', 'notify']) { should be true }
+    its(%w(logmsg content)) { should eq 'A threshold has been exceeded.' }
+    its(%w(logmsg dest)) { should eq 'logndisplay' }
+    its(%w(logmsg notify)) { should be true }
     its(['severity']) { should eq 'Minor' }
-    its(['alarmData', 'reductionKey']) { should eq '%uei%:%dpname%:%nodeid%:%interface%:%parm[ds]%:%parm[threshold]%:%parm[trigger]%:%parm[rearm]%:%parm[label]%' }
-    its(['alarmData', 'alarmType']) { should eq 1 }
-    its(['alarmData', 'autoClean']) { should be false }
+    its(%w(alarmData reductionKey)) { should eq '%uei%:%dpname%:%nodeid%:%interface%:%parm[ds]%:%parm[threshold]%:%parm[trigger]%:%parm[rearm]%:%parm[label]%' }
+    its(%w(alarmData alarmType)) { should eq 1 }
+    its(%w(alarmData autoClean)) { should be false }
   end
 
   describe 'Event uei.opennms.org/eventTopFileTop' do
@@ -263,11 +263,11 @@ control 'OpenNMS Live Event REST API - chef4.events extensions' do
     it { should_not be_nil }
     its(['eventLabel']) { should eq 'Chef defined event: thresholdExceeded' }
     its(['descr']) { should include 'A threshold defined by a chef recipe has been exceeded.' }
-    its(['logmsg', 'content']) { should eq 'A threshold has been exceeded.' }
-    its(['logmsg', 'dest']) { should eq 'logndisplay' }
-    its(['logmsg', 'notify']) { should be true }
+    its(%w(logmsg content)) { should eq 'A threshold has been exceeded.' }
+    its(%w(logmsg dest)) { should eq 'logndisplay' }
+    its(%w(logmsg notify)) { should be true }
     its(['severity']) { should eq 'Minor' }
-    its(['alarmData', 'reductionKey']) { should eq '%uei%:%dpname%:%nodeid%:%interface%:%parm[ds]%:%parm[threshold]%:%parm[trigger]%:%parm[rearm]%:%parm[label]%' }
+    its(%w(alarmData reductionKey)) { should eq '%uei%:%dpname%:%nodeid%:%interface%:%parm[ds]%:%parm[threshold]%:%parm[trigger]%:%parm[rearm]%:%parm[label]%' }
   end
 
   describe 'Event uei.opennms.org/eventBottomFileTop' do
@@ -276,11 +276,11 @@ control 'OpenNMS Live Event REST API - chef4.events extensions' do
     it { should_not be_nil }
     its(['eventLabel']) { should eq 'Chef defined event: thresholdExceeded' }
     its(['descr']) { should include 'A threshold defined by a chef recipe has been exceeded.' }
-    its(['logmsg', 'content']) { should eq 'A threshold has been exceeded.' }
-    its(['logmsg', 'dest']) { should eq 'logndisplay' }
-    its(['logmsg', 'notify']) { should be true }
+    its(%w(logmsg content)) { should eq 'A threshold has been exceeded.' }
+    its(%w(logmsg dest)) { should eq 'logndisplay' }
+    its(%w(logmsg notify)) { should be true }
     its(['severity']) { should eq 'Minor' }
-    its(['alarmData', 'reductionKey']) { should eq '%uei%:%dpname%:%nodeid%:%interface%:%parm[ds]%:%parm[threshold]%:%parm[trigger]%:%parm[rearm]%:%parm[label]%' }
+    its(%w(alarmData reductionKey)) { should eq '%uei%:%dpname%:%nodeid%:%interface%:%parm[ds]%:%parm[threshold]%:%parm[trigger]%:%parm[rearm]%:%parm[label]%' }
   end
 end
 
@@ -288,7 +288,7 @@ control 'OpenNMS Live Event REST API - chef5.events collection group' do
   title 'chef5.events validations'
 
   events_data = opennms_event_api.fetch_live_eventconf_json('chef5.events')
-  events_list = events_data.dig('events') || []
+  events_list = events_data['events'] || []
 
   describe 'Event uei.opennms.org/collectionGroupTest' do
     subject { events_list.find { |e| e['uei'] == 'uei.opennms.org/collectionGroupTest' } }
@@ -296,9 +296,9 @@ control 'OpenNMS Live Event REST API - chef5.events collection group' do
     it { should_not be_nil }
     its(['eventLabel']) { should eq 'Chef defined event: thresholdExceeded' }
     its(['descr']) { should include 'collection group test.' }
-    its(['logmsg', 'content']) { should eq 'A collection group test.' }
-    its(['logmsg', 'dest']) { should eq 'logndisplay' }
-    its(['logmsg', 'notify']) { should be true }
+    its(%w(logmsg content)) { should eq 'A collection group test.' }
+    its(%w(logmsg dest)) { should eq 'logndisplay' }
+    its(%w(logmsg notify)) { should be true }
     its(['severity']) { should eq 'Indeterminate' }
 
     it 'contains the correct collectionGroup attributes' do
@@ -334,7 +334,7 @@ control 'OpenNMS Live Event REST API - chef6.events parameters' do
   title 'chef6.events validations'
 
   events_data = opennms_event_api.fetch_live_eventconf_json('chef6.events')
-  events_list = events_data.dig('events') || []
+  events_list = events_data['events'] || []
 
   describe 'Event uei.opennms.org/parametersTest' do
     subject { events_list.find { |e| e['uei'] == 'uei.opennms.org/parametersTest' } }
@@ -342,9 +342,9 @@ control 'OpenNMS Live Event REST API - chef6.events parameters' do
     it { should_not be_nil }
     its(['eventLabel']) { should eq 'Chef defined event: parametersTest' }
     its(['descr']) { should include 'parameters.' }
-    its(['logmsg', 'content']) { should eq 'parameters test.' }
-    its(['logmsg', 'dest']) { should eq 'logndisplay' }
-    its(['logmsg', 'notify']) { should be true }
+    its(%w(logmsg content)) { should eq 'parameters test.' }
+    its(%w(logmsg dest)) { should eq 'logndisplay' }
+    its(%w(logmsg notify)) { should be true }
     its(['severity']) { should eq 'Critical' }
 
     it 'contains the requested nested parameter mappings' do
@@ -363,7 +363,7 @@ control 'OpenNMS Live Event REST API - chef6.events extensions' do
   title 'chef6.events structural validations'
 
   events_data = opennms_event_api.fetch_live_eventconf_json('chef6.events')
-  events_list = events_data.dig('events') || []
+  events_list = events_data['events'] || []
 
   describe 'Event uei.opennms.org/operactionTest' do
     subject { events_list.find { |e| e['uei'] == 'uei.opennms.org/operactionTest' } }
@@ -371,9 +371,9 @@ control 'OpenNMS Live Event REST API - chef6.events extensions' do
     it { should_not be_nil }
     its(['eventLabel']) { should eq 'Chef defined event: operactionTest' }
     its(['descr']) { should include 'operactionTest.' }
-    its(['logmsg', 'content']) { should eq 'operactionTest test.' }
-    its(['logmsg', 'dest']) { should eq 'logndisplay' }
-    its(['logmsg', 'notify']) { should be true }
+    its(%w(logmsg content)) { should eq 'operactionTest test.' }
+    its(%w(logmsg dest)) { should eq 'logndisplay' }
+    its(%w(logmsg notify)) { should be true }
     its(['severity']) { should eq 'Warning' }
 
     it 'contains the correct operaction configurations' do
@@ -393,12 +393,12 @@ control 'OpenNMS Live Event REST API - chef6.events extensions' do
     it { should_not be_nil }
     its(['eventLabel']) { should eq 'Chef defined event: autoackTest' }
     its(['descr']) { should include 'autoackTest.' }
-    its(['logmsg', 'content']) { should eq 'autoackTest test.' }
-    its(['logmsg', 'dest']) { should eq 'logndisplay' }
-    its(['logmsg', 'notify']) { should be true }
+    its(%w(logmsg content)) { should eq 'autoackTest test.' }
+    its(%w(logmsg dest)) { should eq 'logndisplay' }
+    its(%w(logmsg notify)) { should be true }
     its(['severity']) { should eq 'Minor' }
-    its(['autoacknowledge', 'content']) { should eq 'please do not wake me up when the computer breaks' }
-    its(['autoacknowledge', 'state']) { should eq 'off' }
+    its(%w(autoacknowledge content)) { should eq 'please do not wake me up when the computer breaks' }
+    its(%w(autoacknowledge state)) { should eq 'off' }
   end
 
   describe 'Event uei.opennms.org/filters' do
@@ -407,9 +407,9 @@ control 'OpenNMS Live Event REST API - chef6.events extensions' do
     it { should_not be_nil }
     its(['eventLabel']) { should eq 'Chef defined event: filters' }
     its(['descr']) { should include 'filters.' }
-    its(['logmsg', 'content']) { should eq 'filters test.' }
-    its(['logmsg', 'dest']) { should eq 'logndisplay' }
-    its(['logmsg', 'notify']) { should be true }
+    its(%w(logmsg content)) { should eq 'filters test.' }
+    its(%w(logmsg dest)) { should eq 'logndisplay' }
+    its(%w(logmsg notify)) { should be true }
     its(['severity']) { should eq 'Major' }
 
     it 'contains the correct eventFilter configurations' do
@@ -432,7 +432,7 @@ control 'OpenNMS Live Event REST API - chef.events file actions' do
   title 'chef.events file creation state validations'
 
   events_data = opennms_event_api.fetch_live_eventconf_json('chef.events')
-  events_list = events_data.dig('events') || []
+  events_list = events_data['events'] || []
 
   describe 'Event create_if_missing' do
     subject { events_list.find { |e| e['uei'] == 'create_if_missing' } }
@@ -440,9 +440,9 @@ control 'OpenNMS Live Event REST API - chef.events file actions' do
     it { should_not be_nil }
     its(['eventLabel']) { should eq 'Chef defined event: createifmissing' }
     its(['descr']) { should include 'Trying to create a file if its missing.' }
-    its(['logmsg', 'content']) { should eq 'creating file if its missing.' }
-    its(['logmsg', 'dest']) { should eq 'logndisplay' }
-    its(['logmsg', 'notify']) { should be true }
+    its(%w(logmsg content)) { should eq 'creating file if its missing.' }
+    its(%w(logmsg dest)) { should eq 'logndisplay' }
+    its(%w(logmsg notify)) { should be true }
     its(['severity']) { should eq 'Minor' }
   end
 
@@ -452,4 +452,3 @@ control 'OpenNMS Live Event REST API - chef.events file actions' do
     it { should be_nil }
   end
 end
-
