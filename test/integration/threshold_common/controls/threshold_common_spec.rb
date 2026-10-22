@@ -22,24 +22,24 @@ control 'threshold_common' do
     its('rrd_repository') { should eq '/opt/opennms/share/rrd/response' }
   end
 
-  describe event('uei.opennms.org/thresholdTest/testThresholdExceeded', 'events/chef-threshold.events.xml') do
+  describe opennms_event('uei.opennms.org/thresholdTest/testThresholdExceeded', 'events/chef-threshold.events.xml') do
     it { should exist }
-    its(%w(eventLabel)) { should eq 'Chef defined event: testThresholdExceeded' }
-    its(%w(descr))      { should eq '<p>A threshold defined by a chef recipe that tests thresholds has been exceeded.</p>' }
-    its(%w(logmsg content)) { should eq 'Chef test threshold exceeded.' }
-    its(%w(logmsg dest))    { should eq 'logndisplay' }
-    its(%w(logmsg notify))  { should be true }
-    its(%w(severity))       { should eq 'Minor' }
+    its('eventLabel')     { should eq 'Chef defined event: testThresholdExceeded' }
+    its('descr')          { should eq '<p>A threshold defined by a chef recipe that tests thresholds has been exceeded.</p>' }
+    its('logmsg.content') { should eq 'Chef test threshold exceeded.' }
+    its('logmsg.dest')    { should eq 'logndisplay' }
+    its('logmsg.notify')  { should be true }
+    its('severity')       { should eq 'Minor' }
   end
 
-  describe event('uei.opennms.org/thresholdTest/testThresholdRearmed', 'events/chef-threshold.events.xml') do
+  describe opennms_event('uei.opennms.org/thresholdTest/testThresholdRearmed', 'events/chef-threshold.events.xml') do
     it { should exist }
-    its(%w(eventLabel)) { should eq 'Chef defined event: testThresholdRearmed' }
-    its(%w(descr))      { should eq '<p>A threshold defined by a chef recipe that tests thresholds has been rearmed.</p>' }
-    its(%w(logmsg content)) { should eq 'Chef test threshold rearmed.' }
-    its(%w(logmsg dest))    { should eq 'logndisplay' }
-    its(%w(logmsg notify))  { should be true }
-    its(%w(severity))       { should eq 'Normal' }
+    its('eventLabel')     { should eq 'Chef defined event: testThresholdRearmed' }
+    its('descr')          { should eq '<p>A threshold defined by a chef recipe that tests thresholds has been rearmed.</p>' }
+    its('logmsg.content') { should eq 'Chef test threshold rearmed.' }
+    its('logmsg.dest')    { should eq 'logndisplay' }
+    its('logmsg.notify')  { should be true }
+    its('severity')       { should eq 'Normal' }
   end
 
   describe threshold_group('mib2') do

@@ -3,9 +3,9 @@
 control 'event_remove_add_tticket' do
   title 'OpenNMS Event Remove and Add Trouble Ticket Validation'
 
-  describe event('uei.opennms.org/cheftest/thresholdExceeded2', 'events/chef.events.xml') do
+  describe opennms_event('uei.opennms.org/cheftest/thresholdExceeded2', 'events/chef.events.xml') do
     it { should exist }
-    its(%w(tticket content)) { should eq 'tticketInfo' }
-    its(%w(tticket state))   { should eq 'on' }
+    its('tticket.content') { should eq 'tticketInfo' }
+    its('tticket.state')   { should eq 'on' }
   end
 end

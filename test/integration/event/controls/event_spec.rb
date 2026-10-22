@@ -3,7 +3,7 @@
 control 'uei.opennms.org/cheftest/thresholdExceeded configurations' do
   title 'OpenNMS Live Event REST API'
 
-  describe event('uei.opennms.org/cheftest/thresholdExceeded', 'events/chef.events.xml') do
+  describe opennms_event('uei.opennms.org/cheftest/thresholdExceeded', 'events/chef.events.xml') do
     it { should exist }
     its(%w(eventLabel)) { should eq 'Chef defined event: thresholdExceeded' }
     its(%w(descr))      { should include 'A threshold defined by a chef recipe has been exceeded.' }
@@ -16,7 +16,7 @@ control 'uei.opennms.org/cheftest/thresholdExceeded configurations' do
     its(%w(alarmData autoClean))    { should be false }
   end
 
-  describe event('uei.opennms.org/cheftest/thresholdExceeded2', 'events/chef.events.xml') do
+  describe opennms_event('uei.opennms.org/cheftest/thresholdExceeded2', 'events/chef.events.xml') do
     it { should exist }
     its(%w(eventLabel)) { should eq 'Chef defined event: thresholdExceeded' }
     its(%w(descr))      { should include 'A threshold defined by a chef recipe has been exceeded.' }
@@ -55,7 +55,7 @@ control 'uei.opennms.org/cheftest/thresholdExceeded configurations' do
     end
   end
 
-  describe event('uei.opennms.org/cheftest/thresholdExceeded3', 'events/chef.events.xml') do
+  describe opennms_event('uei.opennms.org/cheftest/thresholdExceeded3', 'events/chef.events.xml') do
     it { should exist }
     its(%w(eventLabel)) { should eq 'Chef defined event: thresholdExceeded3' }
     its(%w(descr))      { should include 'A threshold defined by a chef recipe has been exceeded3.' }
@@ -71,7 +71,7 @@ end
 control 'uei.opennms.org/cheftest/thresholdExceeded 4 and 5 configurations' do
   title 'OpenNMS Live Event REST API - chef.events'
 
-  describe event('uei.opennms.org/cheftest/thresholdExceeded4', 'events/chef.events.xml') do
+  describe opennms_event('uei.opennms.org/cheftest/thresholdExceeded4', 'events/chef.events.xml') do
     it { should exist }
     its(%w(eventLabel)) { should eq 'Chef defined event: thresholdExceeded4' }
     its(%w(descr))      { should include 'A threshold defined by a chef recipe has been exceeded4.' }
@@ -104,7 +104,7 @@ control 'uei.opennms.org/cheftest/thresholdExceeded 4 and 5 configurations' do
     end
   end
 
-  describe event('uei.opennms.org/cheftest/thresholdExceeded5', 'events/chef.events.xml') do
+  describe opennms_event('uei.opennms.org/cheftest/thresholdExceeded5', 'events/chef.events.xml') do
     it { should exist }
     its(%w(eventLabel)) { should eq 'Chef defined event: thresholdExceeded5' }
     its(%w(descr))      { should include 'A threshold defined by a chef recipe has been exceeded4.' }
@@ -142,7 +142,7 @@ end
 control 'uei.opennms.org/anUeiForANewThingInANewFile absence verification' do
   title 'OpenNMS Live Event REST API - chef2.events'
 
-  describe event('uei.opennms.org/anUeiForANewThingInANewFile', 'events/chef2.events.xml') do
+  describe opennms_event('uei.opennms.org/anUeiForANewThingInANewFile', 'events/chef2.events.xml') do
     it { should_not exist }
   end
 end
@@ -150,7 +150,7 @@ end
 control 'OpenNMS Live Event REST API - chef3.events' do
   title 'chef3.events validation'
 
-  describe event('uei.opennms.org/anUeiForANewThingInANewFileWithPositionTop', 'events/chef3.events.xml') do
+  describe opennms_event('uei.opennms.org/anUeiForANewThingInANewFileWithPositionTop', 'events/chef3.events.xml') do
     it { should exist }
     its(%w(eventLabel)) { should eq 'Chef defined event: thresholdExceeded' }
     its(%w(descr))      { should include 'A threshold defined by a chef recipe has been exceeded.' }
@@ -167,7 +167,7 @@ end
 control 'OpenNMS Live Event REST API - chef4.events' do
   title 'chef4.events validation'
 
-  describe event('uei.opennms.org/fillerForANewThingInANewFile1', 'events/chef4.events.xml') do
+  describe opennms_event('uei.opennms.org/fillerForANewThingInANewFile1', 'events/chef4.events.xml') do
     it { should exist }
     its(%w(eventLabel)) { should eq 'Chef defined event: thresholdExceeded' }
     its(%w(descr))      { should include 'A threshold defined by a chef recipe has been exceeded.' }
@@ -182,7 +182,7 @@ control 'OpenNMS Live Event REST API - chef4.events' do
 end
 control 'OpenNMS Live Event REST API - chef4.events extensions' do
   title 'chef4.events validations'
-  describe event('uei.opennms.org/fillerForANewThingInANewFile2', 'events/chef4.events.xml') do
+  describe opennms_event('uei.opennms.org/fillerForANewThingInANewFile2', 'events/chef4.events.xml') do
     it { should exist }
     its(%w(eventLabel)) { should eq 'Chef defined event: thresholdExceeded' }
     its(%w(descr))      { should include 'A threshold defined by a chef recipe has been exceeded.' }
@@ -194,7 +194,7 @@ control 'OpenNMS Live Event REST API - chef4.events extensions' do
     its(%w(alarmData alarmType))    { should eq 1 }
     its(%w(alarmData autoClean))    { should be false }
   end
-  describe event('uei.opennms.org/eventTopFileTop', 'events/chef4.events.xml') do
+  describe opennms_event('uei.opennms.org/eventTopFileTop', 'events/chef4.events.xml') do
     it { should exist }
     its(%w(eventLabel)) { should eq 'Chef defined event: thresholdExceeded' }
     its(%w(descr))      { should include 'A threshold defined by a chef recipe has been exceeded.' }
@@ -204,7 +204,7 @@ control 'OpenNMS Live Event REST API - chef4.events extensions' do
     its(%w(severity))       { should eq 'Minor' }
     its(%w(alarmData reductionKey)) { should eq '%uei%:%dpname%:%nodeid%:%interface%:%parm[ds]%:%parm[threshold]%:%parm[trigger]%:%parm[rearm]%:%parm[label]%' }
   end
-  describe event('uei.opennms.org/eventBottomFileTop', 'events/chef4.events.xml') do
+  describe opennms_event('uei.opennms.org/eventBottomFileTop', 'events/chef4.events.xml') do
     it { should exist }
     its(%w(eventLabel)) { should eq 'Chef defined event: thresholdExceeded' }
     its(%w(descr))      { should include 'A threshold defined by a chef recipe has been exceeded.' }
@@ -217,7 +217,7 @@ control 'OpenNMS Live Event REST API - chef4.events extensions' do
 end
 control 'OpenNMS Live Event REST API - chef5.events collection group' do
   title 'chef5.events validations'
-  describe event('uei.opennms.org/collectionGroupTest', 'events/chef5.events.xml') do
+  describe opennms_event('uei.opennms.org/collectionGroupTest', 'events/chef5.events.xml') do
     it { should exist }
     its(%w(eventLabel)) { should eq 'Chef defined event: thresholdExceeded' }
     its(%w(descr))      { should include 'collection group test.' }
@@ -252,7 +252,7 @@ control 'OpenNMS Live Event REST API - chef5.events collection group' do
 end
 control 'OpenNMS Live Event REST API - chef6.events parameters' do
   title 'chef6.events validations'
-  describe event('uei.opennms.org/parametersTest', 'events/chef6.events.xml') do
+  describe opennms_event('uei.opennms.org/parametersTest', 'events/chef6.events.xml') do
     it { should exist }
     its(%w(eventLabel)) { should eq 'Chef defined event: parametersTest' }
     its(%w(descr))      { should include 'parameters.' }
@@ -273,7 +273,7 @@ control 'OpenNMS Live Event REST API - chef6.events parameters' do
 end
 control 'OpenNMS Live Event REST API - chef6.events extensions' do
   title 'chef6.events structural validations'
-  describe event('uei.opennms.org/operactionTest', 'events/chef6.events.xml') do
+  describe opennms_event('uei.opennms.org/operactionTest', 'events/chef6.events.xml') do
     it { should exist }
     its(%w(eventLabel)) { should eq 'Chef defined event: operactionTest' }
     its(%w(descr))      { should include 'operactionTest.' }
@@ -291,7 +291,7 @@ control 'OpenNMS Live Event REST API - chef6.events extensions' do
                                                   )
     end
   end
-  describe event('uei.opennms.org/autoackTest', 'events/chef6.events.xml') do
+  describe opennms_event('uei.opennms.org/autoackTest', 'events/chef6.events.xml') do
     it { should exist }
     its(%w(eventLabel)) { should eq 'Chef defined event: autoackTest' }
     its(%w(descr))      { should include 'autoackTest.' }
@@ -302,7 +302,7 @@ control 'OpenNMS Live Event REST API - chef6.events extensions' do
     its(%w(autoacknowledge content)) { should eq 'please do not wake me up when the computer breaks' }
     its(%w(autoacknowledge state))   { should eq 'off' }
   end
-  describe event('uei.opennms.org/filters', 'events/chef6.events.xml') do
+  describe opennms_event('uei.opennms.org/filters', 'events/chef6.events.xml') do
     it { should exist }
     its(%w(eventLabel)) { should eq 'Chef defined event: filters' }
     its(%w(descr))      { should include 'filters.' }
@@ -326,7 +326,7 @@ control 'OpenNMS Live Event REST API - chef6.events extensions' do
 end
 control 'OpenNMS Live Event REST API - chef.events file actions' do
   title 'chef.events file creation state validations'
-  describe event('create_if_missing', 'events/chef.events.xml') do
+  describe opennms_event('create_if_missing', 'events/chef.events.xml') do
     it { should exist }
     its(%w(eventLabel)) { should eq 'Chef defined event: createifmissing' }
     its(%w(descr))      { should include 'Trying to create a file if its missing.' }
@@ -335,7 +335,7 @@ control 'OpenNMS Live Event REST API - chef.events file actions' do
     its(%w(logmsg notify))  { should be true }
     its(%w(severity))       { should eq 'Minor' }
   end
-  describe event('noop_create_if_missing', 'events/chef.events.xml') do
+  describe opennms_event('noop_create_if_missing', 'events/chef.events.xml') do
     it { should_not exist }
   end
 end

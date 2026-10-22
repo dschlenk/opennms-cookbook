@@ -1,14 +1,17 @@
 # frozen_string_literal: true
 
 class OpenNmsEventApi < Inspec.resource(1)
-  name 'event'
+  name 'opennms_event'
 
   attr_reader :event_data
   def initialize(uei, file)
     source_name = file.sub(%r{^events/}, '').sub(/\.xml$/, '')
 
     payload = fetch_live_eventconf_json(source_name)
-    events = payload['events'] || []
+    events = payload['event'] || payload['events'] || []
+
+    # Handle API variance: if there's only 1 event, it might return a Hash instead of an Array
+    events = [events] if events.is_a?(Hash)
 
     @event_data = events.find { |e| e['uei'] == uei }
   end
@@ -20,6 +23,10 @@ class OpenNmsEventApi < Inspec.resource(1)
   def method_missing(name)
     return if event_data.nil?
     event_data[name.to_s]
+  end
+
+  def respond_to_missing?(*args)
+    true
   end
 
   def fetch_live_eventconf(source_name)

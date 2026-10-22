@@ -3,23 +3,27 @@
 control 'event_change_parameters' do
   title 'OpenNMS Event Parameters Modification Fallback Validation'
 
-  describe event('uei.opennms.org/cheftest/thresholdExceeded2', 'events/chef.events.xml') do
+  describe opennms_event('uei.opennms.org/cheftest/thresholdExceeded2', 'events/chef.events.xml') do
     it { should exist }
 
     it 'validates the parameter fallback state based on schema capabilities' do
-      params = subject.parameter
+      raw_params = subject.parameter
+
+      # Defensive array normalization to handle schema object vs array variance safely
+      params = raw_params.is_a?(Hash) ? [raw_params] : raw_params
 
       if params.nil?
         expect(params).to be_nil
-      elsif params.any? { |p| p.key?('expand') }
+      elsif params.any? { |p| p.is_a?(Hash) && p.key?('expand') }
+        # Removed the trailing comma after the hash block to ensure clean array evaluation
         expect(params).to eq([
                                { 'name' => 'param1', 'value' => 'value1' },
-                               { 'name' => 'param2', 'value' => 'value2', 'expand' => false },
+                               { 'name' => 'param2', 'value' => 'value2', 'expand' => false }
                              ])
       else
         expect(params).to eq([
                                { 'name' => 'param1', 'value' => 'value1' },
-                               { 'name' => 'param2', 'value' => 'value2' },
+                               { 'name' => 'param2', 'value' => 'value2' }
                              ])
       end
     end

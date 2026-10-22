@@ -3,7 +3,7 @@
 control 'event_edit_mouseovertext' do
   title 'OpenNMS Event Mouseovertext Configuration'
 
-  describe event('uei.opennms.org/cheftest/thresholdExceeded2', 'events/chef.events.xml') do
+  describe opennms_event('uei.opennms.org/cheftest/thresholdExceeded2', 'events/chef.events.xml') do
     it { should exist }
     its(%w(mouseovertext)) { should eq 'mouseOverTexted' }
   end
