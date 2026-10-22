@@ -14,12 +14,12 @@ control 'event_change_parameters' do
       elsif params.any? { |p| p.key?('expand') }
         expect(params).to eq([
                                { 'name' => 'param1', 'value' => 'value1' },
-                               { 'name' => 'param2', 'value' => 'value2', 'expand' => false }
+                               { 'name' => 'param2', 'value' => 'value2', 'expand' => false },
                              ])
       else
         expect(params).to eq([
                                { 'name' => 'param1', 'value' => 'value1' },
-                               { 'name' => 'param2', 'value' => 'value2' }
+                               { 'name' => 'param2', 'value' => 'value2' },
                              ])
       end
     end

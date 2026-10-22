@@ -20,14 +20,15 @@ control 'event_add_parameters' do
         # > 16 supports parameters with expand attribute
         expect(params).to eq([
                                { 'name' => 'param1', 'value' => 'paramValue1' },
-                               { 'name' => 'param2', 'value' => 'paramValue2', 'expand' => true }
+                               { 'name' => 'param2', 'value' => 'paramValue2', 'expand' => true },
                              ])
       else
         # except 17 didn't have the expand attribute
         expect(params).to eq([
                                { 'name' => 'param1', 'value' => 'paramValue1' },
-                               { 'name' => 'param2', 'value' => 'paramValue2' }
+                               { 'name' => 'param2', 'value' => 'paramValue2' },
                              ])
+
       end
     end
   end

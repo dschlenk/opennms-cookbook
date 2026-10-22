@@ -18,7 +18,7 @@ class OpenNmsEventApi < Inspec.resource(1)
   end
 
   def method_missing(name)
-    return nil if event_data.nil?
+    return if event_data.nil?
     event_data[name.to_s]
   end
 
