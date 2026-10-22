@@ -203,26 +203,19 @@ control 'OpenNMS Live Event REST API - chef3.events' do
     its(%w(alarmData autoClean)) { should be false }
   end
 end
-
 control 'OpenNMS Live Event REST API - chef4.events' do
   title 'chef4.events validation'
-
   events_data = opennms_event_api.fetch_live_eventconf_json('chef4.events')
   events_list = events_data['events'] || []
-
   describe opennms_event_api.fetch_live_eventconf('chef4.events') do
     its('exit_status') { should eq 0 }
   end
-
   describe 'chef4.events global profile data' do
     subject { events_data }
-
     its(['position']) { should eq 27 }
   end
-
   describe 'Event uei.opennms.org/fillerForANewThingInANewFile1' do
     subject { events_list.find { |e| e['uei'] == 'uei.opennms.org/fillerForANewThingInANewFile1' } }
-
     it { should_not be_nil }
     its(['eventLabel']) { should eq 'Chef defined event: thresholdExceeded' }
     its(['descr']) { should include 'A threshold defined by a chef recipe has been exceeded.' }
@@ -235,16 +228,12 @@ control 'OpenNMS Live Event REST API - chef4.events' do
     its(%w(alarmData autoClean)) { should be false }
   end
 end
-
 control 'OpenNMS Live Event REST API - chef4.events extensions' do
   title 'chef4.events validations'
-
   events_data = opennms_event_api.fetch_live_eventconf_json('chef4.events')
   events_list = events_data['events'] || []
-
   describe 'Event uei.opennms.org/fillerForANewThingInANewFile2' do
     subject { events_list.find { |e| e['uei'] == 'uei.opennms.org/fillerForANewThingInANewFile2' } }
-
     it { should_not be_nil }
     its(['eventLabel']) { should eq 'Chef defined event: thresholdExceeded' }
     its(['descr']) { should include 'A threshold defined by a chef recipe has been exceeded.' }
@@ -256,10 +245,8 @@ control 'OpenNMS Live Event REST API - chef4.events extensions' do
     its(%w(alarmData alarmType)) { should eq 1 }
     its(%w(alarmData autoClean)) { should be false }
   end
-
   describe 'Event uei.opennms.org/eventTopFileTop' do
     subject { events_list.find { |e| e['uei'] == 'uei.opennms.org/eventTopFileTop' } }
-
     it { should_not be_nil }
     its(['eventLabel']) { should eq 'Chef defined event: thresholdExceeded' }
     its(['descr']) { should include 'A threshold defined by a chef recipe has been exceeded.' }
@@ -269,10 +256,8 @@ control 'OpenNMS Live Event REST API - chef4.events extensions' do
     its(['severity']) { should eq 'Minor' }
     its(%w(alarmData reductionKey)) { should eq '%uei%:%dpname%:%nodeid%:%interface%:%parm[ds]%:%parm[threshold]%:%parm[trigger]%:%parm[rearm]%:%parm[label]%' }
   end
-
   describe 'Event uei.opennms.org/eventBottomFileTop' do
     subject { events_list.find { |e| e['uei'] == 'uei.opennms.org/eventBottomFileTop' } }
-
     it { should_not be_nil }
     its(['eventLabel']) { should eq 'Chef defined event: thresholdExceeded' }
     its(['descr']) { should include 'A threshold defined by a chef recipe has been exceeded.' }
@@ -283,16 +268,12 @@ control 'OpenNMS Live Event REST API - chef4.events extensions' do
     its(%w(alarmData reductionKey)) { should eq '%uei%:%dpname%:%nodeid%:%interface%:%parm[ds]%:%parm[threshold]%:%parm[trigger]%:%parm[rearm]%:%parm[label]%' }
   end
 end
-
 control 'OpenNMS Live Event REST API - chef5.events collection group' do
   title 'chef5.events validations'
-
   events_data = opennms_event_api.fetch_live_eventconf_json('chef5.events')
   events_list = events_data['events'] || []
-
   describe 'Event uei.opennms.org/collectionGroupTest' do
     subject { events_list.find { |e| e['uei'] == 'uei.opennms.org/collectionGroupTest' } }
-
     it { should_not be_nil }
     its(['eventLabel']) { should eq 'Chef defined event: thresholdExceeded' }
     its(['descr']) { should include 'collection group test.' }
@@ -300,7 +281,6 @@ control 'OpenNMS Live Event REST API - chef5.events collection group' do
     its(%w(logmsg dest)) { should eq 'logndisplay' }
     its(%w(logmsg notify)) { should be true }
     its(['severity']) { should eq 'Indeterminate' }
-
     it 'contains the correct collectionGroup attributes' do
       expect(subject['collectionGroup']).to include(
                                               hash_including(
@@ -310,11 +290,9 @@ control 'OpenNMS Live Event REST API - chef5.events collection group' do
                                               )
                                             )
     end
-
     it 'validates nested metric mappings inside the collection group' do
       group = (subject['collectionGroup'] || []).find { |g| g['name'] == 'nodeGroup' }
       expect(group).not_to be_nil
-
       expect(group['collections']).to include(
                                         hash_including(
                                           'name' => 'TIME',
@@ -322,23 +300,18 @@ control 'OpenNMS Live Event REST API - chef5.events collection group' do
                                           'paramValues' => hash_including('primary' => 1, 'secondary' => 2)
                                         )
                                       )
-
       expect(group.dig('rrd', 'step')).to eq 60
       expect(group.dig('rrd', 'heartbeat')).to eq 120
       expect(group.dig('rrd', 'rra')).to include('RRA:AVERAGE:0.5:1:8928')
     end
   end
 end
-
 control 'OpenNMS Live Event REST API - chef6.events parameters' do
   title 'chef6.events validations'
-
   events_data = opennms_event_api.fetch_live_eventconf_json('chef6.events')
   events_list = events_data['events'] || []
-
   describe 'Event uei.opennms.org/parametersTest' do
     subject { events_list.find { |e| e['uei'] == 'uei.opennms.org/parametersTest' } }
-
     it { should_not be_nil }
     its(['eventLabel']) { should eq 'Chef defined event: parametersTest' }
     its(['descr']) { should include 'parameters.' }
@@ -346,7 +319,6 @@ control 'OpenNMS Live Event REST API - chef6.events parameters' do
     its(%w(logmsg dest)) { should eq 'logndisplay' }
     its(%w(logmsg notify)) { should be true }
     its(['severity']) { should eq 'Critical' }
-
     it 'contains the requested nested parameter mappings' do
       expect(subject['parameter']).to include(
                                         hash_including(
@@ -358,16 +330,12 @@ control 'OpenNMS Live Event REST API - chef6.events parameters' do
     end
   end
 end
-
 control 'OpenNMS Live Event REST API - chef6.events extensions' do
   title 'chef6.events structural validations'
-
   events_data = opennms_event_api.fetch_live_eventconf_json('chef6.events')
   events_list = events_data['events'] || []
-
   describe 'Event uei.opennms.org/operactionTest' do
     subject { events_list.find { |e| e['uei'] == 'uei.opennms.org/operactionTest' } }
-
     it { should_not be_nil }
     its(['eventLabel']) { should eq 'Chef defined event: operactionTest' }
     its(['descr']) { should include 'operactionTest.' }
@@ -375,7 +343,6 @@ control 'OpenNMS Live Event REST API - chef6.events extensions' do
     its(%w(logmsg dest)) { should eq 'logndisplay' }
     its(%w(logmsg notify)) { should be true }
     its(['severity']) { should eq 'Warning' }
-
     it 'contains the correct operaction configurations' do
       expect(subject['operaction']).to include(
                                          hash_including(
@@ -386,10 +353,8 @@ control 'OpenNMS Live Event REST API - chef6.events extensions' do
                                        )
     end
   end
-
   describe 'Event uei.opennms.org/autoackTest' do
     subject { events_list.find { |e| e['uei'] == 'uei.opennms.org/autoackTest' } }
-
     it { should_not be_nil }
     its(['eventLabel']) { should eq 'Chef defined event: autoackTest' }
     its(['descr']) { should include 'autoackTest.' }
@@ -400,10 +365,8 @@ control 'OpenNMS Live Event REST API - chef6.events extensions' do
     its(%w(autoacknowledge content)) { should eq 'please do not wake me up when the computer breaks' }
     its(%w(autoacknowledge state)) { should eq 'off' }
   end
-
   describe 'Event uei.opennms.org/filters' do
     subject { events_list.find { |e| e['uei'] == 'uei.opennms.org/filters' } }
-
     it { should_not be_nil }
     its(['eventLabel']) { should eq 'Chef defined event: filters' }
     its(['descr']) { should include 'filters.' }
@@ -411,7 +374,6 @@ control 'OpenNMS Live Event REST API - chef6.events extensions' do
     its(%w(logmsg dest)) { should eq 'logndisplay' }
     its(%w(logmsg notify)) { should be true }
     its(['severity']) { should eq 'Major' }
-
     it 'contains the correct eventFilter configurations' do
       expect(subject['eventFilter']).to include(
                                           hash_including(
@@ -422,21 +384,16 @@ control 'OpenNMS Live Event REST API - chef6.events extensions' do
                                         )
     end
   end
-
   only_if('NMS-19814 is resolved') do
     false
   end
 end
-
 control 'OpenNMS Live Event REST API - chef.events file actions' do
   title 'chef.events file creation state validations'
-
   events_data = opennms_event_api.fetch_live_eventconf_json('chef.events')
   events_list = events_data['events'] || []
-
   describe 'Event create_if_missing' do
     subject { events_list.find { |e| e['uei'] == 'create_if_missing' } }
-
     it { should_not be_nil }
     its(['eventLabel']) { should eq 'Chef defined event: createifmissing' }
     its(['descr']) { should include 'Trying to create a file if its missing.' }
@@ -445,10 +402,8 @@ control 'OpenNMS Live Event REST API - chef.events file actions' do
     its(%w(logmsg notify)) { should be true }
     its(['severity']) { should eq 'Minor' }
   end
-
   describe 'Event noop_create_if_missing' do
     subject { events_list.find { |e| e['uei'] == 'noop_create_if_missing' } }
-
     it { should be_nil }
   end
 end
