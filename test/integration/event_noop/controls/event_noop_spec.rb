@@ -1,33 +1,31 @@
 # frozen_string_literal: true
 
 control 'event_noop' do
-  describe 'OpenNMS Event Noop Configuration' do
-    let(:eventconf) { fetch_live_eventconf('chef.events') }
+  title 'OpenNMS Event Noop Baseline Validation'
 
-    it 'successfully validates the full event noop configuration' do
-      expect(eventconf.exit_status).to eq 0
-      expect(eventconf.stdout).to include 'uei.opennms.org/cheftest/thresholdExceeded2'
-      expect(eventconf.stdout).to include 'Chef defined event: thresholdExceeded'
-      expect(eventconf.stdout).to include '<p>A threshold defined by a chef recipe has been exceeded.</p>'
-      expect(eventconf.stdout).to include 'A threshold has been exceeded.'
-      expect(eventconf.stdout).to include 'logndisplay'
-      expect(eventconf.stdout).to include '"notify":true'
-      expect(eventconf.stdout).to include 'Minor'
-      expect(eventconf.stdout).to include 'the operinstruct'
-      expect(eventconf.stdout).to include 'someaction'
-      expect(eventconf.stdout).to include '"state":"off"'
-      expect(eventconf.stdout).to include 'theParmId'
-      expect(eventconf.stdout).to include 'theVarBindValue'
-      expect(eventconf.stdout).to include 'theVarBindDecodedString'
-      expect(eventconf.stdout).to include 'tticketInfo'
-      expect(eventconf.stdout).to include 'fwdInfo'
-      expect(eventconf.stdout).to include 'snmptcp'
-      expect(eventconf.stdout).to include 'anScript'
-      expect(eventconf.stdout).to include 'groovy'
-      expect(eventconf.stdout).to include 'mouseOverText'
-      expect(eventconf.stdout).to include '%uei%:%dpname%:%nodeid%:%interface%:%parm[ds]%:%parm[threshold]%:%parm[trigger]%:%parm[rearm]%:%parm[label]%'
-      expect(eventconf.stdout).to include '"alarm-type":1'
-      expect(eventconf.stdout).to include '"auto-clean":false'
-    end
+  events_data = opennms_event_api.fetch_live_eventconf_json('chef.events')
+  events_list = events_data.dig('events') || []
+
+  describe 'Event uei.opennms.org/cheftest/thresholdExceeded2' do
+    subject { events_list.find { |e| e['uei'] == 'uei.opennms.org/cheftest/thresholdExceeded2' } }
+
+    it { should_not be_nil }
+    its(['eventLabel']) { should eq 'Chef defined event: thresholdExceeded' }
+    its(['descr']) { should eq '<p>A threshold defined by a chef recipe has been exceeded.</p>' }
+    its(['logmsg', 'content']) { should eq 'A threshold has been exceeded.' }
+    its(['logmsg', 'dest']) { should eq 'logndisplay' }
+    its(['logmsg', 'notify']) { should be true }
+    its(['severity']) { should eq 'Minor' }
+    its(['operinstruct']) { should eq 'the operinstruct' }
+    its(['autoaction']) { should eq([{ 'content' => 'someaction', 'state' => 'off' }]) }
+    its(['varbindsdecode']) { should eq([{ 'parmid' => 'theParmId', 'decode' => [{ 'varbindvalue' => 'theVarBindValue', 'varbinddecodedstring' => 'theVarBindDecodedString' }] }]) }
+    its(['tticket', 'content']) { should eq 'tticketInfo' }
+    its(['tticket', 'state']) { should eq 'off' }
+    its(['forward']) { should eq([{ 'content' => 'fwdInfo', 'state' => 'off', 'mechanism' => 'snmptcp' }]) }
+    its(['script']) { should eq([{ 'content' => 'anScript', 'language' => 'groovy' }]) }
+    its(['mouseovertext']) { should eq 'mouseOverText' }
+    its(['alarmData', 'reductionKey']) { should eq '%uei%:%dpname%:%nodeid%:%interface%:%parm[ds]%:%parm[threshold]%:%parm[trigger]%:%parm[rearm]%:%parm[label]%' }
+    its(['alarmData', 'alarmType']) { should eq 1 }
+    its(['alarmData', 'autoClean']) { should be false }
   end
 end

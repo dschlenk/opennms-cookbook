@@ -1,13 +1,15 @@
 # frozen_string_literal: true
 
 control 'event_logmsg_dest' do
-  describe 'OpenNMS Event Logmsg Destination Configuration' do
-    let(:eventconf) { fetch_live_eventconf('chef.events') }
+  title 'OpenNMS Event Logmsg Destination Validation'
 
-    it 'successfully validates the modified event logmsg destination' do
-      expect(eventconf.exit_status).to eq 0
-      expect(eventconf.stdout).to include 'uei.opennms.org/cheftest/thresholdExceeded2'
-      expect(eventconf.stdout).to include 'discardtraps'
-    end
+  events_data = opennms_event_api.fetch_live_eventconf_json('chef.events')
+  events_list = events_data.dig('events') || []
+
+  describe 'Event uei.opennms.org/cheftest/thresholdExceeded2' do
+    subject { events_list.find { |e| e['uei'] == 'uei.opennms.org/cheftest/thresholdExceeded2' } }
+
+    it { should_not be_nil }
+    its(['logmsg', 'dest']) { should eq 'discardtraps' }
   end
 end

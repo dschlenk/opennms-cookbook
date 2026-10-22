@@ -1,336 +1,318 @@
 # frozen_string_literal: true
 
 control 'uei.opennms.org/cheftest/thresholdExceeded configurations' do
-  describe 'OpenNMS Live Event REST API' do
-    # Fetch the live JSON using the library helper method
-    let(:api_response) { fetch_live_eventconf('chef.events') }
+  title 'OpenNMS Live Event REST API'
 
-    # Parse the stdout payload into a Ruby hash if the API call succeeded
-    let(:events_data) do
-      return {} unless api_response.exit_status == 0
-      JSON.parse(api_response.stdout)
+  events_data = opennms_event_api.fetch_live_eventconf_json('chef.events')
+  events_list = events_data.dig('events') || []
+
+  describe opennms_event_api.fetch_live_eventconf('chef.events') do
+    its('exit_status') { should eq 0 }
+  end
+
+  describe 'Event uei.opennms.org/cheftest/thresholdExceeded' do
+    subject { events_list.find { |e| e['uei'] == 'uei.opennms.org/cheftest/thresholdExceeded' } }
+
+    it { should_not be_nil }
+    its(['eventLabel']) { should eq 'Chef defined event: thresholdExceeded' }
+    its(['descr']) { should include 'A threshold defined by a chef recipe has been exceeded.' }
+    its(['logmsg', 'content']) { should eq 'A threshold has been exceeded.' }
+    its(['logmsg', 'dest']) { should eq 'logndisplay' }
+    its(['logmsg', 'notify']) { should be true }
+    its(['severity']) { should eq 'Minor' }
+    its(['alarmData', 'reductionKey']) { should eq '%uei%:%dpname%:%nodeid%:%interface%:%parm[ds]%:%parm[threshold]%:%parm[trigger]%:%parm[rearm]%:%parm[label]%' }
+    its(['alarmData', 'alarmType']) { should eq 1 }
+    its(['alarmData', 'autoClean']) { should be false }
+  end
+
+  describe 'Event uei.opennms.org/cheftest/thresholdExceeded2' do
+    subject { events_list.find { |e| e['uei'] == 'uei.opennms.org/cheftest/thresholdExceeded2' } }
+
+    it { should_not be_nil }
+    its(['eventLabel']) { should eq 'Chef defined event: thresholdExceeded' }
+    its(['descr']) { should include 'A threshold defined by a chef recipe has been exceeded.' }
+    its(['logmsg', 'content']) { should eq 'A threshold has been exceeded.' }
+    its(['logmsg', 'dest']) { should eq 'logndisplay' }
+    its(['logmsg', 'notify']) { should be true }
+    its(['severity']) { should eq 'Minor' }
+    its(['operinstruct']) { should eq 'the operinstruct' }
+    its(['mouseovertext']) { should eq 'mouseOverText' }
+    its(['tticket', 'content']) { should eq 'tticketInfo' }
+    its(['tticket', 'state']) { should eq 'off' }
+
+    it 'contains the required mask elements' do
+      mask_elements = subject.dig('mask', 'maskelement') || []
+      expect(mask_elements).to include(
+                                 hash_including('mename' => 'id', 'mevalue' => ['.1.3.6.1.4.1.11385.102.1']),
+                                 hash_including('mename' => 'generic', 'mevalue' => ['6']),
+                                 hash_including('mename' => 'specific', 'mevalue' => ['2'])
+                               )
     end
 
-    # Safely dig down to the array of event definitions returned by OpenNMS
-    let(:events_list) { events_data.dig('events') || [] }
-
-    it 'connects to the OpenNMS REST API successfully' do
-      expect(api_response.exit_status).to eq 0
+    it 'contains the required autoaction' do
+      expect(subject['autoaction']).to include(hash_including('content' => 'someaction', 'state' => 'off'))
     end
 
-    # --- TEST CASE 1 ---
-    it 'validates thresholdExceeded configuration' do
-      evt = events_list.find { |e| e['uei'] == 'uei.opennms.org/cheftest/thresholdExceeded' }
-      expect(evt).not_to be_nil
-
-      expect(evt['eventLabel']).to eq 'Chef defined event: thresholdExceeded'
-      expect(evt['descr']).to include 'A threshold defined by a chef recipe has been exceeded.'
-      expect(evt.dig('logmsg', 'content')).to eq 'A threshold has been exceeded.'
-      expect(evt.dig('logmsg', 'dest')).to eq 'logndisplay'
-      expect(evt.dig('logmsg', 'notify')).to be true
-      expect(evt['severity']).to eq 'Minor'
-      expect(evt.dig('alarmData', 'reductionKey')).to eq '%uei%:%dpname%:%nodeid%:%interface%:%parm[ds]%:%parm[threshold]%:%parm[trigger]%:%parm[rearm]%:%parm[label]%'
-      expect(evt.dig('alarmData', 'alarmType')).to eq 1
-      expect(evt.dig('alarmData', 'autoClean')).to be false
+    it 'contains the required varbindsdecode' do
+      expect(subject['varbindsdecode']).to include(hash_including('parmid' => 'theParmId'))
     end
 
-    # --- TEST CASE 2 ---
-    it 'validates thresholdExceeded2 configuration' do
-      evt = events_list.find { |e| e['uei'] == 'uei.opennms.org/cheftest/thresholdExceeded2' }
-      expect(evt).not_to be_nil
-
-      expect(evt['eventLabel']).to eq 'Chef defined event: thresholdExceeded'
-      expect(evt['descr']).to include 'A threshold defined by a chef recipe has been exceeded.'
-      expect(evt.dig('logmsg', 'content')).to eq 'A threshold has been exceeded.'
-      expect(evt.dig('logmsg', 'dest')).to eq 'logndisplay'
-      expect(evt.dig('logmsg', 'notify')).to be true
-      expect(evt['severity']).to eq 'Minor'
-      expect(evt['operinstruct']).to eq 'the operinstruct'
-      expect(evt['mouseovertext']).to eq 'mouseOverText'
-
-      # Mask elements
-      expect(evt.dig('mask', 'maskelement')).to include(
-                                                  hash_including('mename' => 'id', 'mevalue' => ['.1.3.6.1.4.1.11385.102.1']),
-                                                  hash_including('mename' => 'generic', 'mevalue' => ['6']),
-                                                  hash_including('mename' => 'specific', 'mevalue' => ['2'])
-                                                )
-
-      # Complex structures
-      expect(evt['autoaction']).to include(hash_including('content' => 'someaction', 'state' => 'off'))
-      expect(evt['varbindsdecode']).to include(hash_including('parmid' => 'theParmId'))
-      expect(evt.dig('tticket', 'content')).to eq 'tticketInfo'
-      expect(evt.dig('tticket', 'state')).to eq 'off'
-      expect(evt['forward']).to include(hash_including('content' => 'fwdInfo', 'state' => 'off', 'mechanism' => 'snmptcp'))
-      expect(evt['script']).to include(hash_including('content' => 'anScript', 'language' => 'groovy'))
+    it 'contains the required forward payload' do
+      expect(subject['forward']).to include(hash_including('content' => 'fwdInfo', 'state' => 'off', 'mechanism' => 'snmptcp'))
     end
 
-    # --- TEST CASE 3 ---
-    it 'validates thresholdExceeded3 configuration' do
-      evt = events_list.find { |e| e['uei'] == 'uei.opennms.org/cheftest/thresholdExceeded3' }
-      expect(evt).not_to be_nil
-
-      expect(evt['eventLabel']).to eq 'Chef defined event: thresholdExceeded3'
-      expect(evt['descr']).to include 'A threshold defined by a chef recipe has been exceeded3.'
-      expect(evt.dig('logmsg', 'content')).to eq 'A threshold has been exceeded3.'
-      expect(evt.dig('logmsg', 'dest')).to eq 'logndisplay'
-      expect(evt.dig('logmsg', 'notify')).to be true
-      expect(evt['severity']).to eq 'Minor'
-      expect(evt['operinstruct']).to eq 'the operinstruct'
-      expect(evt['mouseovertext']).to eq 'mouseOverText'
+    it 'contains the required script payload' do
+      expect(subject['script']).to include(hash_including('content' => 'anScript', 'language' => 'groovy'))
     end
+  end
+
+  describe 'Event uei.opennms.org/cheftest/thresholdExceeded3' do
+    subject { events_list.find { |e| e['uei'] == 'uei.opennms.org/cheftest/thresholdExceeded3' } }
+
+    it { should_not be_nil }
+    its(['eventLabel']) { should eq 'Chef defined event: thresholdExceeded3' }
+    its(['descr']) { should include 'A threshold defined by a chef recipe has been exceeded3.' }
+    its(['logmsg', 'content']) { should eq 'A threshold has been exceeded3.' }
+    its(['logmsg', 'dest']) { should eq 'logndisplay' }
+    its(['logmsg', 'notify']) { should be true }
+    its(['severity']) { should eq 'Minor' }
+    its(['operinstruct']) { should eq 'the operinstruct' }
+    its(['mouseovertext']) { should eq 'mouseOverText' }
   end
 end
 
 control 'uei.opennms.org/cheftest/thresholdExceeded 4 and 5 configurations' do
-  describe 'OpenNMS Live Event REST API - chef.events' do
-    let(:api_response) { fetch_live_eventconf('chef.events') }
+  title 'OpenNMS Live Event REST API - chef.events'
 
-    let(:events_data) do
-      return {} unless api_response.exit_status == 0
-      JSON.parse(api_response.stdout)
+  events_data = opennms_event_api.fetch_live_eventconf_json('chef.events')
+  events_list = events_data.dig('events') || []
+
+  describe 'Event uei.opennms.org/cheftest/thresholdExceeded4' do
+    subject { events_list.find { |e| e['uei'] == 'uei.opennms.org/cheftest/thresholdExceeded4' } }
+
+    it { should_not be_nil }
+    its(['eventLabel']) { should eq 'Chef defined event: thresholdExceeded4' }
+    its(['descr']) { should include 'A threshold defined by a chef recipe has been exceeded4.' }
+    its(['logmsg', 'content']) { should eq 'A threshold has been exceeded4.' }
+    its(['logmsg', 'dest']) { should eq 'logndisplay' }
+    its(['logmsg', 'notify']) { should be true }
+    its(['severity']) { should eq 'Minor' }
+    its(['operinstruct']) { should eq 'the operinstruct' }
+    its(['mouseovertext']) { should eq 'mouseOverText' }
+    its(['tticket', 'content']) { should eq 'tticketInfo' }
+    its(['tticket', 'state']) { should eq 'off' }
+    its(['alarmData', 'reductionKey']) { should eq '%uei%:%dpname%:%nodeid%:%interface%:%parm[ds]%:%parm[threshold]%:%parm[trigger]%:%parm[rearm]%:%parm[label]%' }
+    its(['alarmData', 'alarmType']) { should eq 1 }
+    its(['alarmData', 'autoClean']) { should be false }
+
+    it 'contains the required mask elements' do
+      mask_elements = subject.dig('mask', 'maskelement') || []
+      expect(mask_elements).to include(
+                                 hash_including('mename' => 'id', 'mevalue' => ['.1.3.6.1.4.1.11385.102.1']),
+                                 hash_including('mename' => 'generic', 'mevalue' => ['6']),
+                                 hash_including('mename' => 'specific', 'mevalue' => ['2'])
+                               )
     end
 
-    let(:events_list) { events_data.dig('events') || [] }
+    it 'contains the required complex structures' do
+      expect(subject['autoaction']).to include(hash_including('content' => 'someaction', 'state' => 'off'))
+      expect(subject['varbindsdecode']).to include(hash_including('parmid' => 'theParmId'))
+      expect(subject['forward']).to include(hash_including('content' => 'fwdInfo', 'state' => 'off', 'mechanism' => 'snmptcp'))
+      expect(subject['script']).to include(hash_including('content' => 'anScript', 'language' => 'groovy'))
+    end
+  end
 
-    # --- TEST CASE 4 ---
-    it 'validates thresholdExceeded4 configuration' do
-      evt = events_list.find { |e| e['uei'] == 'uei.opennms.org/cheftest/thresholdExceeded4' }
-      expect(evt).not_to be_nil
+  describe 'Event uei.opennms.org/cheftest/thresholdExceeded5' do
+    subject { events_list.find { |e| e['uei'] == 'uei.opennms.org/cheftest/thresholdExceeded5' } }
 
-      expect(evt['eventLabel']).to eq 'Chef defined event: thresholdExceeded4'
-      expect(evt['descr']).to include 'A threshold defined by a chef recipe has been exceeded4.'
-      expect(evt.dig('logmsg', 'content')).to eq 'A threshold has been exceeded4.'
-      expect(evt.dig('logmsg', 'dest')).to eq 'logndisplay'
-      expect(evt.dig('logmsg', 'notify')).to be true
-      expect(evt['severity']).to eq 'Minor'
-      expect(evt['operinstruct']).to eq 'the operinstruct'
-      expect(evt['mouseovertext']).to eq 'mouseOverText'
+    it { should_not be_nil }
+    its(['eventLabel']) { should eq 'Chef defined event: thresholdExceeded5' }
+    its(['descr']) { should include 'A threshold defined by a chef recipe has been exceeded4.' }
+    its(['logmsg', 'content']) { should eq 'A threshold has been exceeded4.' }
+    its(['logmsg', 'dest']) { should eq 'logndisplay' }
+    its(['logmsg', 'notify']) { should be true }
+    its(['severity']) { should eq 'Minor' }
+    its(['operinstruct']) { should eq 'the operinstruct' }
+    its(['mouseovertext']) { should eq 'mouseOverText' }
+    its(['tticket', 'content']) { should eq 'tticketInfo' }
+    its(['tticket', 'state']) { should eq 'off' }
+    its(['alarmData', 'reductionKey']) { should eq '%uei%:%dpname%:%nodeid%:%interface%:%parm[ds]%:%parm[threshold]%:%parm[trigger]%:%parm[rearm]%:%parm[label]%' }
+    its(['alarmData', 'alarmType']) { should eq 1 }
+    its(['alarmData', 'autoClean']) { should be false }
 
-      # Mask elements
-      expect(evt.dig('mask', 'maskelement')).to include(
-                                                  hash_including('mename' => 'id', 'mevalue' => ['.1.3.6.1.4.1.11385.102.1']),
-                                                  hash_including('mename' => 'generic', 'mevalue' => ['6']),
-                                                  hash_including('mename' => 'specific', 'mevalue' => ['2'])
-                                                )
-
-      # Complex structures
-      expect(evt['autoaction']).to include(hash_including('content' => 'someaction', 'state' => 'off'))
-      expect(evt['varbindsdecode']).to include(hash_including('parmid' => 'theParmId'))
-      expect(evt.dig('tticket', 'content')).to eq 'tticketInfo'
-      expect(evt.dig('tticket', 'state')).to eq 'off'
-      expect(evt['forward']).to include(hash_including('content' => 'fwdInfo', 'state' => 'off', 'mechanism' => 'snmptcp'))
-      expect(evt['script']).to include(hash_including('content' => 'anScript', 'language' => 'groovy'))
-      expect(evt.dig('alarmData', 'reductionKey')).to eq '%uei%:%dpname%:%nodeid%:%interface%:%parm[ds]%:%parm[threshold]%:%parm[trigger]%:%parm[rearm]%:%parm[label]%'
-      expect(evt.dig('alarmData', 'alarmType')).to eq 1
-      expect(evt.dig('alarmData', 'autoClean')).to be false
+    it 'contains the required mask elements including vbnumber and vbvalue arrays' do
+      mask_elements = subject.dig('mask', 'maskelement') || []
+      expect(mask_elements).to include(
+                                 hash_including('mename' => 'id', 'mevalue' => ['.1.3.6.1.4.1.11385.102.1']),
+                                 hash_including('mename' => 'generic', 'mevalue' => ['6']),
+                                 hash_including('mename' => 'specific', 'mevalue' => ['2']),
+                                 hash_including('vbnumber' => '1', 'vbvalue' => %w(1 2 3))
+                               )
     end
 
-    # --- TEST CASE 5 ---
-    it 'validates thresholdExceeded5 configuration' do
-      evt = events_list.find { |e| e['uei'] == 'uei.opennms.org/cheftest/thresholdExceeded5' }
-      expect(evt).not_to be_nil
-
-      expect(evt['eventLabel']).to eq 'Chef defined event: thresholdExceeded5'
-      expect(evt['descr']).to include 'A threshold defined by a chef recipe has been exceeded4.'
-      expect(evt.dig('logmsg', 'content')).to eq 'A threshold has been exceeded4.'
-      expect(evt.dig('logmsg', 'dest')).to eq 'logndisplay'
-      expect(evt.dig('logmsg', 'notify')).to be true
-      expect(evt['severity']).to eq 'Minor'
-      expect(evt['operinstruct']).to eq 'the operinstruct'
-      expect(evt['mouseovertext']).to eq 'mouseOverText'
-
-      # Mask elements including the vbnumber and vbvalue arrays
-      expect(evt.dig('mask', 'maskelement')).to include(
-                                                  hash_including('mename' => 'id', 'mevalue' => ['.1.3.6.1.4.1.11385.102.1']),
-                                                  hash_including('mename' => 'generic', 'mevalue' => ['6']),
-                                                  hash_including('mename' => 'specific', 'mevalue' => ['2']),
-                                                  hash_including('vbnumber' => '1', 'vbvalue' => %w(1 2 3))
-                                                )
-
-      # Complex structures
-      expect(evt['autoaction']).to include(hash_including('content' => 'someaction', 'state' => 'off'))
-      expect(evt['varbindsdecode']).to include(hash_including('parmid' => 'theParmId'))
-      expect(evt.dig('tticket', 'content')).to eq 'tticketInfo'
-      expect(evt.dig('tticket', 'state')).to eq 'off'
-      expect(evt['forward']).to include(hash_including('content' => 'fwdInfo', 'state' => 'off', 'mechanism' => 'snmptcp'))
-      expect(evt['script']).to include(hash_including('content' => 'anScript', 'language' => 'groovy'))
-      expect(evt.dig('alarmData', 'reductionKey')).to eq '%uei%:%dpname%:%nodeid%:%interface%:%parm[ds]%:%parm[threshold]%:%parm[trigger]%:%parm[rearm]%:%parm[label]%'
-      expect(evt.dig('alarmData', 'alarmType')).to eq 1
-      expect(evt.dig('alarmData', 'autoClean')).to be false
+    it 'contains the required complex structures' do
+      expect(subject['autoaction']).to include(hash_including('content' => 'someaction', 'state' => 'off'))
+      expect(subject['varbindsdecode']).to include(hash_including('parmid' => 'theParmId'))
+      expect(subject['forward']).to include(hash_including('content' => 'fwdInfo', 'state' => 'off', 'mechanism' => 'snmptcp'))
+      expect(subject['script']).to include(hash_including('content' => 'anScript', 'language' => 'groovy'))
     end
   end
 end
 
 control 'uei.opennms.org/anUeiForANewThingInANewFile absence verification' do
-  describe 'OpenNMS Live Event REST API - chef2.events' do
-    let(:api_response) { fetch_live_eventconf('chef2.events') }
+  title 'OpenNMS Live Event REST API - chef2.events'
 
-    let(:events_data) do
-      return {} unless api_response.exit_status == 0
-      JSON.parse(api_response.stdout)
-    end
+  events_data = opennms_event_api.fetch_live_eventconf_json('chef2.events')
+  events_list = events_data.dig('events') || []
 
-    let(:events_list) { events_data.dig('events') || [] }
+  describe 'Event uei.opennms.org/anUeiForANewThingInANewFile' do
+    subject { events_list.find { |e| e['uei'] == 'uei.opennms.org/anUeiForANewThingInANewFile' } }
 
-    it 'verifies that the event entry does not exist' do
-      evt = events_list.find { |e| e['uei'] == 'uei.opennms.org/anUeiForANewThingInANewFile' }
-      expect(evt).to be_nil
-    end
+    it { should be_nil }
   end
 end
 
 control 'OpenNMS Live Event REST API - chef3.events' do
-  describe 'chef3.events validation' do
-    let(:api_response) { fetch_live_eventconf('chef3.events') }
+  title 'chef3.events validation'
 
-    let(:events_data) do
-      return {} unless api_response.exit_status == 0
-      JSON.parse(api_response.stdout)
-    end
+  events_data = opennms_event_api.fetch_live_eventconf_json('chef3.events')
+  events_list = events_data.dig('events') || []
 
-    let(:events_list) { events_data.dig('events') || [] }
+  describe opennms_event_api.fetch_live_eventconf('chef3.events') do
+    its('exit_status') { should eq 0 }
+  end
 
-    it 'verifies that the chef3.events profile configuration exists and sits at the correct position' do
-      expect(api_response.exit_status).to eq 0
-      # Validates global position block mapping if returned by the endpoint structure
-      expect(events_data['position']).to eq 26
-    end
+  describe 'chef3.events global profile data' do
+    subject { events_data }
 
-    it 'validates anUeiForANewThingInANewFileWithPositionTop configuration' do
-      evt = events_list.find { |e| e['uei'] == 'uei.opennms.org/anUeiForANewThingInANewFileWithPositionTop' }
-      expect(evt).not_to be_nil
+    its(['position']) { should eq 26 }
+  end
 
-      expect(evt['eventLabel']).to eq 'Chef defined event: thresholdExceeded'
-      expect(evt['descr']).to include 'A threshold defined by a chef recipe has been exceeded.'
-      expect(evt.dig('logmsg', 'content')).to eq 'A threshold has been exceeded.'
-      expect(evt.dig('logmsg', 'dest')).to eq 'logndisplay'
-      expect(evt.dig('logmsg', 'notify')).to be true
-      expect(evt['severity']).to eq 'Minor'
-      expect(evt.dig('alarmData', 'reductionKey')).to eq '%uei%:%dpname%:%nodeid%:%interface%:%parm[ds]%:%parm[threshold]%:%parm[trigger]%:%parm[rearm]%:%parm[label]%'
-      expect(evt.dig('alarmData', 'alarmType')).to eq 1
-      expect(evt.dig('alarmData', 'autoClean')).to be false
-    end
+  describe 'Event uei.opennms.org/anUeiForANewThingInANewFileWithPositionTop' do
+    subject { events_list.find { |e| e['uei'] == 'uei.opennms.org/anUeiForANewThingInANewFileWithPositionTop' } }
+
+    it { should_not be_nil }
+    its(['eventLabel']) { should eq 'Chef defined event: thresholdExceeded' }
+    its(['descr']) { should include 'A threshold defined by a chef recipe has been exceeded.' }
+    its(['logmsg', 'content']) { should eq 'A threshold has been exceeded.' }
+    its(['logmsg', 'dest']) { should eq 'logndisplay' }
+    its(['logmsg', 'notify']) { should be true }
+    its(['severity']) { should eq 'Minor' }
+    its(['alarmData', 'reductionKey']) { should eq '%uei%:%dpname%:%nodeid%:%interface%:%parm[ds]%:%parm[threshold]%:%parm[trigger]%:%parm[rearm]%:%parm[label]%' }
+    its(['alarmData', 'alarmType']) { should eq 1 }
+    its(['alarmData', 'autoClean']) { should be false }
   end
 end
 
 control 'OpenNMS Live Event REST API - chef4.events' do
-  describe 'chef4.events validation' do
-    let(:api_response) { fetch_live_eventconf('chef4.events') }
+  title 'chef4.events validation'
 
-    let(:events_data) do
-      return {} unless api_response.exit_status == 0
-      JSON.parse(api_response.stdout)
-    end
+  events_data = opennms_event_api.fetch_live_eventconf_json('chef4.events')
+  events_list = events_data.dig('events') || []
 
-    let(:events_list) { events_data.dig('events') || [] }
+  describe opennms_event_api.fetch_live_eventconf('chef4.events') do
+    its('exit_status') { should eq 0 }
+  end
 
-    it 'verifies that the chef4.events profile configuration exists and sits at the correct position' do
-      expect(api_response.exit_status).to eq 0
-      expect(events_data['position']).to eq 27
-    end
+  describe 'chef4.events global profile data' do
+    subject { events_data }
 
-    it 'validates fillerForANewThingInANewFile1 configuration' do
-      evt = events_list.find { |e| e['uei'] == 'uei.opennms.org/fillerForANewThingInANewFile1' }
-      expect(evt).not_to be_nil
+    its(['position']) { should eq 27 }
+  end
 
-      expect(evt['eventLabel']).to eq 'Chef defined event: thresholdExceeded'
-      expect(evt['descr']).to include 'A threshold defined by a chef recipe has been exceeded.'
-      expect(evt.dig('logmsg', 'content')).to eq 'A threshold has been exceeded.'
-      expect(evt.dig('logmsg', 'dest')).to eq 'logndisplay'
-      expect(evt.dig('logmsg', 'notify')).to be true
-      expect(evt['severity']).to eq 'Minor'
-      expect(evt.dig('alarmData', 'reductionKey')).to eq '%uei%:%dpname%:%nodeid%:%interface%:%parm[ds]%:%parm[threshold]%:%parm[trigger]%:%parm[rearm]%:%parm[label]%'
-      expect(evt.dig('alarmData', 'alarmType')).to eq 1
-      expect(evt.dig('alarmData', 'autoClean')).to be false
-    end
+  describe 'Event uei.opennms.org/fillerForANewThingInANewFile1' do
+    subject { events_list.find { |e| e['uei'] == 'uei.opennms.org/fillerForANewThingInANewFile1' } }
+
+    it { should_not be_nil }
+    its(['eventLabel']) { should eq 'Chef defined event: thresholdExceeded' }
+    its(['descr']) { should include 'A threshold defined by a chef recipe has been exceeded.' }
+    its(['logmsg', 'content']) { should eq 'A threshold has been exceeded.' }
+    its(['logmsg', 'dest']) { should eq 'logndisplay' }
+    its(['logmsg', 'notify']) { should be true }
+    its(['severity']) { should eq 'Minor' }
+    its(['alarmData', 'reductionKey']) { should eq '%uei%:%dpname%:%nodeid%:%interface%:%parm[ds]%:%parm[threshold]%:%parm[trigger]%:%parm[rearm]%:%parm[label]%' }
+    its(['alarmData', 'alarmType']) { should eq 1 }
+    its(['alarmData', 'autoClean']) { should be false }
   end
 end
 
 control 'OpenNMS Live Event REST API - chef4.events extensions' do
-  describe 'chef4.events validations' do
-    let(:api_response) { fetch_live_eventconf('chef4.events') }
+  title 'chef4.events validations'
 
-    let(:events_data) do
-      return {} unless api_response.exit_status == 0
-      JSON.parse(api_response.stdout)
-    end
+  events_data = opennms_event_api.fetch_live_eventconf_json('chef4.events')
+  events_list = events_data.dig('events') || []
 
-    let(:events_list) { events_data.dig('events') || [] }
+  describe 'Event uei.opennms.org/fillerForANewThingInANewFile2' do
+    subject { events_list.find { |e| e['uei'] == 'uei.opennms.org/fillerForANewThingInANewFile2' } }
 
-    it 'validates fillerForANewThingInANewFile2 configuration' do
-      evt = events_list.find { |e| e['uei'] == 'uei.opennms.org/fillerForANewThingInANewFile2' }
-      expect(evt).not_to be_nil
+    it { should_not be_nil }
+    its(['eventLabel']) { should eq 'Chef defined event: thresholdExceeded' }
+    its(['descr']) { should include 'A threshold defined by a chef recipe has been exceeded.' }
+    its(['logmsg', 'content']) { should eq 'A threshold has been exceeded.' }
+    its(['logmsg', 'dest']) { should eq 'logndisplay' }
+    its(['logmsg', 'notify']) { should be true }
+    its(['severity']) { should eq 'Minor' }
+    its(['alarmData', 'reductionKey']) { should eq '%uei%:%dpname%:%nodeid%:%interface%:%parm[ds]%:%parm[threshold]%:%parm[trigger]%:%parm[rearm]%:%parm[label]%' }
+    its(['alarmData', 'alarmType']) { should eq 1 }
+    its(['alarmData', 'autoClean']) { should be false }
+  end
 
-      expect(evt['eventLabel']).to eq 'Chef defined event: thresholdExceeded'
-      expect(evt['descr']).to include 'A threshold defined by a chef recipe has been exceeded.'
-      expect(evt.dig('logmsg', 'content')).to eq 'A threshold has been exceeded.'
-      expect(evt.dig('logmsg', 'dest')).to eq 'logndisplay'
-      expect(evt.dig('logmsg', 'notify')).to be true
-      expect(evt['severity']).to eq 'Minor'
-      expect(evt.dig('alarmData', 'reductionKey')).to eq '%uei%:%dpname%:%nodeid%:%interface%:%parm[ds]%:%parm[threshold]%:%parm[trigger]%:%parm[rearm]%:%parm[label]%'
-      expect(evt.dig('alarmData', 'alarmType')).to eq 1
-      expect(evt.dig('alarmData', 'autoClean')).to be false
-    end
+  describe 'Event uei.opennms.org/eventTopFileTop' do
+    subject { events_list.find { |e| e['uei'] == 'uei.opennms.org/eventTopFileTop' } }
 
-    it 'validates eventTopFileTop configuration' do
-      evt = events_list.find { |e| e['uei'] == 'uei.opennms.org/eventTopFileTop' }
-      expect(evt).not_to be_nil
+    it { should_not be_nil }
+    its(['eventLabel']) { should eq 'Chef defined event: thresholdExceeded' }
+    its(['descr']) { should include 'A threshold defined by a chef recipe has been exceeded.' }
+    its(['logmsg', 'content']) { should eq 'A threshold has been exceeded.' }
+    its(['logmsg', 'dest']) { should eq 'logndisplay' }
+    its(['logmsg', 'notify']) { should be true }
+    its(['severity']) { should eq 'Minor' }
+    its(['alarmData', 'reductionKey']) { should eq '%uei%:%dpname%:%nodeid%:%interface%:%parm[ds]%:%parm[threshold]%:%parm[trigger]%:%parm[rearm]%:%parm[label]%' }
+  end
 
-      expect(evt['eventLabel']).to eq 'Chef defined event: thresholdExceeded'
-      expect(evt['descr']).to include 'A threshold defined by a chef recipe has been exceeded.'
-      expect(evt.dig('logmsg', 'content')).to eq 'A threshold has been exceeded.'
-      expect(evt.dig('logmsg', 'dest')).to eq 'logndisplay'
-      expect(evt.dig('logmsg', 'notify')).to be true
-      expect(evt['severity']).to eq 'Minor'
-      expect(evt.dig('alarmData', 'reductionKey')).to eq '%uei%:%dpname%:%nodeid%:%interface%:%parm[ds]%:%parm[threshold]%:%parm[trigger]%:%parm[rearm]%:%parm[label]%'
-    end
+  describe 'Event uei.opennms.org/eventBottomFileTop' do
+    subject { events_list.find { |e| e['uei'] == 'uei.opennms.org/eventBottomFileTop' } }
 
-    it 'validates eventBottomFileTop configuration' do
-      evt = events_list.find { |e| e['uei'] == 'uei.opennms.org/eventBottomFileTop' }
-      expect(evt).not_to be_nil
-
-      expect(evt['eventLabel']).to eq 'Chef defined event: thresholdExceeded'
-      expect(evt['descr']).to include 'A threshold defined by a chef recipe has been exceeded.'
-      expect(evt.dig('logmsg', 'content')).to eq 'A threshold has been exceeded.'
-      expect(evt.dig('logmsg', 'dest')).to eq 'logndisplay'
-      expect(evt.dig('logmsg', 'notify')).to be true
-      expect(evt['severity']).to eq 'Minor'
-      expect(evt.dig('alarmData', 'reductionKey')).to eq '%uei%:%dpname%:%nodeid%:%interface%:%parm[ds]%:%parm[threshold]%:%parm[trigger]%:%parm[rearm]%:%parm[label]%'
-    end
+    it { should_not be_nil }
+    its(['eventLabel']) { should eq 'Chef defined event: thresholdExceeded' }
+    its(['descr']) { should include 'A threshold defined by a chef recipe has been exceeded.' }
+    its(['logmsg', 'content']) { should eq 'A threshold has been exceeded.' }
+    its(['logmsg', 'dest']) { should eq 'logndisplay' }
+    its(['logmsg', 'notify']) { should be true }
+    its(['severity']) { should eq 'Minor' }
+    its(['alarmData', 'reductionKey']) { should eq '%uei%:%dpname%:%nodeid%:%interface%:%parm[ds]%:%parm[threshold]%:%parm[trigger]%:%parm[rearm]%:%parm[label]%' }
   end
 end
 
 control 'OpenNMS Live Event REST API - chef5.events collection group' do
-  describe 'chef5.events validations' do
-    let(:api_response) { fetch_live_eventconf('chef5.events') }
+  title 'chef5.events validations'
 
-    let(:events_data) do
-      return {} unless api_response.exit_status == 0
-      JSON.parse(api_response.stdout)
+  events_data = opennms_event_api.fetch_live_eventconf_json('chef5.events')
+  events_list = events_data.dig('events') || []
+
+  describe 'Event uei.opennms.org/collectionGroupTest' do
+    subject { events_list.find { |e| e['uei'] == 'uei.opennms.org/collectionGroupTest' } }
+
+    it { should_not be_nil }
+    its(['eventLabel']) { should eq 'Chef defined event: thresholdExceeded' }
+    its(['descr']) { should include 'collection group test.' }
+    its(['logmsg', 'content']) { should eq 'A collection group test.' }
+    its(['logmsg', 'dest']) { should eq 'logndisplay' }
+    its(['logmsg', 'notify']) { should be true }
+    its(['severity']) { should eq 'Indeterminate' }
+
+    it 'contains the correct collectionGroup attributes' do
+      expect(subject['collectionGroup']).to include(
+                                              hash_including(
+                                                'name' => 'nodeGroup',
+                                                'resourceType' => 'nodeSnmp',
+                                                'instance' => 'instanceParmName'
+                                              )
+                                            )
     end
 
-    let(:events_list) { events_data.dig('events') || [] }
-
-    it 'validates collectionGroupTest configuration and nested metric mapping' do
-      evt = events_list.find { |e| e['uei'] == 'uei.opennms.org/collectionGroupTest' }
-      expect(evt).not_to be_nil
-
-      expect(evt['eventLabel']).to eq 'Chef defined event: thresholdExceeded'
-      expect(evt['descr']).to include 'collection group test.'
-      expect(evt.dig('logmsg', 'content')).to eq 'A collection group test.'
-      expect(evt.dig('logmsg', 'dest')).to eq 'logndisplay'
-      expect(evt.dig('logmsg', 'notify')).to be true
-      expect(evt['severity']).to eq 'Indeterminate'
-
-      expect(evt['collectionGroup']).to include(
-                                          hash_including(
-                                            'name' => 'nodeGroup',
-                                            'resourceType' => 'nodeSnmp',
-                                            'instance' => 'instanceParmName'
-                                          )
-                                        )
-
-      group = evt['collectionGroup']&.find { |g| g['name'] == 'nodeGroup' }
+    it 'validates nested metric mappings inside the collection group' do
+      group = (subject['collectionGroup'] || []).find { |g| g['name'] == 'nodeGroup' }
       expect(group).not_to be_nil
 
       expect(group['collections']).to include(
@@ -349,106 +331,95 @@ control 'OpenNMS Live Event REST API - chef5.events collection group' do
 end
 
 control 'OpenNMS Live Event REST API - chef6.events parameters' do
-  describe 'chef6.events validations' do
-    let(:api_response) { fetch_live_eventconf('chef6.events') }
+  title 'chef6.events validations'
 
-    let(:events_data) do
-      return {} unless api_response.exit_status == 0
-      JSON.parse(api_response.stdout)
-    end
+  events_data = opennms_event_api.fetch_live_eventconf_json('chef6.events')
+  events_list = events_data.dig('events') || []
 
-    let(:events_list) { events_data.dig('events') || [] }
+  describe 'Event uei.opennms.org/parametersTest' do
+    subject { events_list.find { |e| e['uei'] == 'uei.opennms.org/parametersTest' } }
 
-    it 'validates parametersTest configuration and specific parameter array blocks' do
-      evt = events_list.find { |e| e['uei'] == 'uei.opennms.org/parametersTest' }
-      expect(evt).not_to be_nil
+    it { should_not be_nil }
+    its(['eventLabel']) { should eq 'Chef defined event: parametersTest' }
+    its(['descr']) { should include 'parameters.' }
+    its(['logmsg', 'content']) { should eq 'parameters test.' }
+    its(['logmsg', 'dest']) { should eq 'logndisplay' }
+    its(['logmsg', 'notify']) { should be true }
+    its(['severity']) { should eq 'Critical' }
 
-      expect(evt['eventLabel']).to eq 'Chef defined event: parametersTest'
-      expect(evt['descr']).to include 'parameters.'
-      expect(evt.dig('logmsg', 'content')).to eq 'parameters test.'
-      expect(evt.dig('logmsg', 'dest')).to eq 'logndisplay'
-      expect(evt.dig('logmsg', 'notify')).to be true
-      expect(evt['severity']).to eq 'Critical'
-
-      # Validates nested parameter mappings in OpenNMS API schema syntax
-      expect(evt['parameter']).to include(
-                                    hash_including(
-                                      'name' => 'paramName',
-                                      'value' => 'someString',
-                                      'expand' => true
-                                    )
-                                  )
+    it 'contains the requested nested parameter mappings' do
+      expect(subject['parameter']).to include(
+                                        hash_including(
+                                          'name' => 'paramName',
+                                          'value' => 'someString',
+                                          'expand' => true
+                                        )
+                                      )
     end
   end
 end
 
 control 'OpenNMS Live Event REST API - chef6.events extensions' do
-  describe 'chef6.events structural validations' do
-    let(:api_response) { fetch_live_eventconf('chef6.events') }
+  title 'chef6.events structural validations'
 
-    let(:events_data) do
-      return {} unless api_response.exit_status == 0
-      JSON.parse(api_response.stdout)
+  events_data = opennms_event_api.fetch_live_eventconf_json('chef6.events')
+  events_list = events_data.dig('events') || []
+
+  describe 'Event uei.opennms.org/operactionTest' do
+    subject { events_list.find { |e| e['uei'] == 'uei.opennms.org/operactionTest' } }
+
+    it { should_not be_nil }
+    its(['eventLabel']) { should eq 'Chef defined event: operactionTest' }
+    its(['descr']) { should include 'operactionTest.' }
+    its(['logmsg', 'content']) { should eq 'operactionTest test.' }
+    its(['logmsg', 'dest']) { should eq 'logndisplay' }
+    its(['logmsg', 'notify']) { should be true }
+    its(['severity']) { should eq 'Warning' }
+
+    it 'contains the correct operaction configurations' do
+      expect(subject['operaction']).to include(
+                                         hash_including(
+                                           'content' => 'string',
+                                           'state' => 'off',
+                                           'menutext' => 'help me'
+                                         )
+                                       )
     end
+  end
 
-    let(:events_list) { events_data.dig('events') || [] }
+  describe 'Event uei.opennms.org/autoackTest' do
+    subject { events_list.find { |e| e['uei'] == 'uei.opennms.org/autoackTest' } }
 
-    it 'validates operactionTest configuration' do
-      evt = events_list.find { |e| e['uei'] == 'uei.opennms.org/operactionTest' }
-      expect(evt).not_to be_nil
+    it { should_not be_nil }
+    its(['eventLabel']) { should eq 'Chef defined event: autoackTest' }
+    its(['descr']) { should include 'autoackTest.' }
+    its(['logmsg', 'content']) { should eq 'autoackTest test.' }
+    its(['logmsg', 'dest']) { should eq 'logndisplay' }
+    its(['logmsg', 'notify']) { should be true }
+    its(['severity']) { should eq 'Minor' }
+    its(['autoacknowledge', 'content']) { should eq 'please do not wake me up when the computer breaks' }
+    its(['autoacknowledge', 'state']) { should eq 'off' }
+  end
 
-      expect(evt['eventLabel']).to eq 'Chef defined event: operactionTest'
-      expect(evt['descr']).to include 'operactionTest.'
-      expect(evt.dig('logmsg', 'content')).to eq 'operactionTest test.'
-      expect(evt.dig('logmsg', 'dest')).to eq 'logndisplay'
-      expect(evt.dig('logmsg', 'notify')).to be true
-      expect(evt['severity']).to eq 'Warning'
+  describe 'Event uei.opennms.org/filters' do
+    subject { events_list.find { |e| e['uei'] == 'uei.opennms.org/filters' } }
 
-      # Matches OpenNMS camelCase structure for operaction arrays
-      expect(evt['operaction']).to include(
-                                     hash_including(
-                                       'content' => 'string',
-                                       'state' => 'off',
-                                       'menutext' => 'help me'
-                                     )
-                                   )
-    end
+    it { should_not be_nil }
+    its(['eventLabel']) { should eq 'Chef defined event: filters' }
+    its(['descr']) { should include 'filters.' }
+    its(['logmsg', 'content']) { should eq 'filters test.' }
+    its(['logmsg', 'dest']) { should eq 'logndisplay' }
+    its(['logmsg', 'notify']) { should be true }
+    its(['severity']) { should eq 'Major' }
 
-    it 'validates autoackTest configuration' do
-      evt = events_list.find { |e| e['uei'] == 'uei.opennms.org/autoackTest' }
-      expect(evt).not_to be_nil
-
-      expect(evt['eventLabel']).to eq 'Chef defined event: autoackTest'
-      expect(evt['descr']).to include 'autoackTest.'
-      expect(evt.dig('logmsg', 'content')).to eq 'autoackTest test.'
-      expect(evt.dig('logmsg', 'dest')).to eq 'logndisplay'
-      expect(evt.dig('logmsg', 'notify')).to be true
-      expect(evt['severity']).to eq 'Minor'
-
-      # Matches JSON parsing of autoacknowledge object fields
-      expect(evt.dig('autoacknowledge', 'content')).to eq 'please do not wake me up when the computer breaks'
-      expect(evt.dig('autoacknowledge', 'state')).to eq 'off'
-    end
-
-    it 'validates filters configuration' do
-      evt = events_list.find { |e| e['uei'] == 'uei.opennms.org/filters' }
-      expect(evt).not_to be_nil
-
-      expect(evt['eventLabel']).to eq 'Chef defined event: filters'
-      expect(evt['descr']).to include 'filters.'
-      expect(evt.dig('logmsg', 'content')).to eq 'filters test.'
-      expect(evt.dig('logmsg', 'dest')).to eq 'logndisplay'
-      expect(evt.dig('logmsg', 'notify')).to be true
-      expect(evt['severity']).to eq 'Major'
-
-      # Matches lowerCamelCase array for eventFilters schema properties
-      expect(evt['eventFilter']).to include(
-                                      hash_including(
-                                        'eventparm' => 'one',
-                                        'pattern' => '/^one&two{;t|hreehalo$/',
-                                        'replacement' => 'poop'
-                                      )
-                                    )
+    it 'contains the correct eventFilter configurations' do
+      expect(subject['eventFilter']).to include(
+                                          hash_including(
+                                            'eventparm' => 'one',
+                                            'pattern' => '/^one&two{;t|hree}$/',
+                                            'replacement' => 'REPLACED'
+                                          )
+                                        )
     end
   end
 
@@ -458,31 +429,27 @@ control 'OpenNMS Live Event REST API - chef6.events extensions' do
 end
 
 control 'OpenNMS Live Event REST API - chef.events file actions' do
-  describe 'chef.events file creation state validations' do
-    let(:api_response) { fetch_live_eventconf('chef.events') }
+  title 'chef.events file creation state validations'
 
-    let(:events_data) do
-      return {} unless api_response.exit_status == 0
-      JSON.parse(api_response.stdout)
-    end
+  events_data = opennms_event_api.fetch_live_eventconf_json('chef.events')
+  events_list = events_data.dig('events') || []
 
-    let(:events_list) { events_data.dig('events') || [] }
+  describe 'Event create_if_missing' do
+    subject { events_list.find { |e| e['uei'] == 'create_if_missing' } }
 
-    it 'validates create_if_missing event entry' do
-      evt = events_list.find { |e| e['uei'] == 'create_if_missing' }
-      expect(evt).not_to be_nil
+    it { should_not be_nil }
+    its(['eventLabel']) { should eq 'Chef defined event: createifmissing' }
+    its(['descr']) { should include 'Trying to create a file if its missing.' }
+    its(['logmsg', 'content']) { should eq 'creating file if its missing.' }
+    its(['logmsg', 'dest']) { should eq 'logndisplay' }
+    its(['logmsg', 'notify']) { should be true }
+    its(['severity']) { should eq 'Minor' }
+  end
 
-      expect(evt['eventLabel']).to eq 'Chef defined event: createifmissing'
-      expect(evt['descr']).to include 'Trying to create a file if its missing.'
-      expect(evt.dig('logmsg', 'content')).to eq 'creating file if its missing.'
-      expect(evt.dig('logmsg', 'dest')).to eq 'logndisplay'
-      expect(evt.dig('logmsg', 'notify')).to be true
-      expect(evt['severity']).to eq 'Minor'
-    end
+  describe 'Event noop_create_if_missing' do
+    subject { events_list.find { |e| e['uei'] == 'noop_create_if_missing' } }
 
-    it 'verifies that noop_create_if_missing entry does not exist' do
-      evt = events_list.find { |e| e['uei'] == 'noop_create_if_missing' }
-      expect(evt).to be_nil
-    end
+    it { should be_nil }
   end
 end
+
