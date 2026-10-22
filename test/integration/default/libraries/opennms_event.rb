@@ -5,13 +5,12 @@ class OpenNmsEventApi < Inspec.resource(1)
 
   attr_reader :event_data
 
-  def initialize(uei, file)
-    source_name = file.sub(%r{^events/}, '').sub(/\.xml$/, '')
+  # Horizon 35+ API no longer looks up by file/source_name.
+  # We only need the UEI to find the event.
+  def initialize(uei, _file = nil)
+    payload = fetch_live_eventconf_json
 
-    payload = fetch_live_eventconf_json(source_name)
-    events = payload['event'] || payload['events'] || []
-
-    # if there's only 1 event, it might return a Hash instead of an Array
+    events = payload['event'] || payload['events'] || payload || []
     events = [events] if events.is_a?(Hash)
 
     @event_data = events.find { |e| e['uei'] == uei }
@@ -30,12 +29,12 @@ class OpenNmsEventApi < Inspec.resource(1)
     super
   end
 
-  def fetch_live_eventconf(source_name)
-    inspec.command("curl -s -u admin:admin -H 'Accept: application/json' http://localhost:8090/opennms/rest/eventconf/#{source_name}")
+  def fetch_live_eventconf
+    inspec.command("curl -s -u admin:admin -H 'Accept: application/json' http://localhost:8090/opennms/rest/eventconf")
   end
 
-  def fetch_live_eventconf_json(source_name)
-    cmd = fetch_live_eventconf(source_name)
+  def fetch_live_eventconf_json
+    cmd = fetch_live_eventconf
     return {} unless cmd.exit_status.zero?
 
     begin

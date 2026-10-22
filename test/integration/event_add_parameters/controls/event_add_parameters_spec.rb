@@ -3,8 +3,12 @@
 control 'event_add_parameters' do
   title 'OpenNMS Event Parameters Fallback Validation'
 
-  events_data = opennms_event_api.fetch_live_eventconf_json('chef.events')
-  events_list = events_data['events'] || []
+  # Horizon 35+ use the registered resource name 'opennms_event' without arguments
+  events_data = opennms_event.fetch_live_eventconf_json
+
+  # Normalize standard response array paths for Horizon 35 database payloads
+  events_list = events_data['event'] || events_data['events'] || events_data || []
+  events_list = [events_list] if events_list.is_a?(Hash)
 
   describe 'Event uei.opennms.org/cheftest/thresholdExceeded2' do
     subject { events_list.find { |e| e['uei'] == 'uei.opennms.org/cheftest/thresholdExceeded2' } }
