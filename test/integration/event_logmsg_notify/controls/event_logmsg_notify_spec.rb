@@ -10,6 +10,6 @@ control 'event_logmsg_notify' do
     subject { events_list.find { |e| e['uei'] == 'uei.opennms.org/cheftest/thresholdExceeded2' } }
 
     it { should_not be_nil }
-    its(['logmsg', 'notify']) { should be false }
+    its(%w[logmsg notify]) { should be false }
   end
 end

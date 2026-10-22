@@ -10,6 +10,6 @@ control 'event_logmsg_dest' do
     subject { events_list.find { |e| e['uei'] == 'uei.opennms.org/cheftest/thresholdExceeded2' } }
 
     it { should_not be_nil }
-    its(['logmsg', 'dest']) { should eq 'discardtraps' }
+    its(%w[logmsg dest]) { should eq 'discardtraps' }
   end
 end

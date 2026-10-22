@@ -10,7 +10,7 @@ control 'event_edit_tticket' do
     subject { events_list.find { |e| e['uei'] == 'uei.opennms.org/cheftest/thresholdExceeded2' } }
 
     it { should_not be_nil }
-    its(['tticket', 'content']) { should eq 'tticketInfo' }
-    its(['tticket', 'state']) { should eq 'on' }
+    its(%w[tticket content]) { should eq 'tticketInfo' }
+    its(%w[tticket state]) { should eq 'on' }
   end
 end
