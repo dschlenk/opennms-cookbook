@@ -25,8 +25,8 @@ class OpenNmsEventApi < Inspec.resource(1)
     event_data[name.to_s]
   end
 
-  def respond_to_missing?(*args)
-    true
+  def respond_to_missing?(*)
+    super
   end
 
   def fetch_live_eventconf(source_name)
