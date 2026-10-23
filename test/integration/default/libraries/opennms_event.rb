@@ -1,4 +1,27 @@
 # frozen_string_literal: true
+
+# Helper to allow dot-notation access in InSpec tests
+# e.g. opennms_event.uei, opennms_event.forward
+class OpenNmsDynamicMash
+  def initialize(hash)
+    @hash = hash || {}
+  end
+
+  def method_missing(name, *args)
+    key = name.to_s
+    # support both 'event_label' and 'event-label' style
+    @hash[key] || @hash[key.gsub('_', '-')] || @hash[key.to_sym]
+  end
+
+  def respond_to_missing?(*)
+    true
+  end
+
+  def [](key)
+    @hash[key]
+  end
+end
+
 class OpenNmsEventApi < Inspec.resource(1)
   name 'opennms_event'
   attr_reader :raw_event_data, :event_data
@@ -25,9 +48,13 @@ class OpenNmsEventApi < Inspec.resource(1)
   end
 
   def fetch_live_eventconf
-    # Horizon 35 - REST is the source of truth, but allow local file fallback
-    # Use the local disk file to avoid the 63s REST startup race
-    inspec.command("cat /opt/opennms/etc/events/test.xml 2>/dev/null || cat /opt/opennms/etc/eventconf.xml")
+    # Lookup sequence matches our Chef recipes
+    # Avoids REST 63s latency gate on Oracle 10
+    inspec.command(
+      "cat /opt/opennms/etc/events/chef.events.xml 2>/dev/null || " \
+      "cat /opt/opennms/etc/events/test.xml 2>/dev/null || " \
+      "cat /opt/opennms/etc/eventconf.xml 2>/dev/null"
+    )
   end
 
   def fetch_live_eventconf_json
@@ -38,19 +65,23 @@ class OpenNmsEventApi < Inspec.resource(1)
       return {}
     end
 
-    # File is XML, not JSON - parse as XML
     require 'nokogiri'
     doc = Nokogiri::XML(cmd.stdout)
-    # Convert XML to hash that find_all_events can understand
+    doc.remove_namespaces! # Critical for eventconf.xml xmlns
+
     events = doc.xpath('//event').map do |e|
       {
         'uei' => e.at_xpath('uei')&.text,
         'event-label' => e.at_xpath('event-label')&.text,
         'descr' => e.at_xpath('descr')&.text,
         'logmsg' => e.at_xpath('logmsg')&.text,
-        'forward' => e.xpath('forward').map { |f| { 'mechanism' => f['mechanism'], 'state' => f['state'] } }
+        'severity' => e.at_xpath('severity')&.text,
+        'forward' => e.xpath('forward').map do |f|
+          { 'mechanism' => f['mechanism'] || f.at_xpath('mechanism')&.text, 'state' => f['state'] || f.at_xpath('state')&.text }
+        end
       }
     end
+
     { 'events' => events }
   rescue => e
     puts "ERROR: Failed to parse eventconf: #{e.message}"

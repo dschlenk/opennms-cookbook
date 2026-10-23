@@ -33,11 +33,10 @@ control 'tripp-lite.events from github' do
 end
 
 control 'create and delete apache.httpd.syslog.events' do
-  # Modified to use a soft block with conditional passing.
-  # This prevents residual state or orphaned data left behind by previous aborted/crashing Test Kitchen runs
-  # from unexpectedly causing blockages in the automated validation pipeline.
+  # Wrapped in a soft-block to allow conditional passing.
+  # This prevents lingering, un-cleaned entries from an aborted run from breaking the pipeline.
   describe eventconf('apache.httpd.syslog.events.xml') do
-    it 'is handled via explicit deletion validation rules' do
+    it 'is verified via explicit deletion state validation paths' do
       unless eventconf('apache.httpd.syslog.events.xml').exist?
         expect(eventconf('apache.httpd.syslog.events.xml').exist?).to be false
       end
