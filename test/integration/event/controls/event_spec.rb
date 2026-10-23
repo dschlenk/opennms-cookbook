@@ -280,9 +280,6 @@ control 'OpenNMS Live Event REST API - chef6.events parameters' do
   end
 end
 
-
-
-
 control 'OpenNMS Live Event REST API - chef6.events extensions' do
   title 'chef6.events structural validations'
 
