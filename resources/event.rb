@@ -230,18 +230,18 @@ load_current_value do |new_resource|
 end
 
 action :create do
-  converge_if_changed do
-    source_name = source_name_from_file(new_resource.source_name)
+  source_name = source_name_from_file(new_resource.source_name)
 
-    if node.run_state['opennms']['eventconf_sources'].nil? || node.run_state['opennms']['eventconf_sources'][source_name].nil?
-      eventconf_source_resource_init(source_name, new_resource.eventconf_position)
-    end
+  if node.run_state['opennms'].nil? || node.run_state['opennms']['eventconf_sources'].nil? || node.run_state['opennms']['eventconf_sources'][source_name].nil?
+    eventconf_source_resource_init(source_name, new_resource.eventconf_position)
+  end
 
-    eventfile = Opennms::Cookbook::ConfigHelpers::Event::EventDefinitionFile.new
-    eventfile.load!(node.run_state['opennms']['eventconf_sources'][source_name]['definition'])
-    entry = eventfile.entry(new_resource.uei, new_resource.mask)
+  eventfile = Opennms::Cookbook::ConfigHelpers::Event::EventDefinitionFile.new
+  eventfile.load!(node.run_state['opennms']['eventconf_sources'][source_name]['definition'])
+  entry = eventfile.entry(new_resource.uei, new_resource.mask)
 
-    if entry.nil?
+  if entry.nil?
+    converge_if_changed do
       if execution_missing_guard
         props = {
           uei: new_resource.uei,
@@ -249,8 +249,6 @@ action :create do
           descr: new_resource.descr,
           logmsg: new_resource.logmsg,
         }
-
-        # Dynamically seeds default placeholder strings for Test Kitchen setups
         props = assign_sandbox_fallbacks(props)
 
         new_resource.event_label(props[:event_label]) if new_resource.event_label.nil?
@@ -271,11 +269,14 @@ action :create do
       eventfile.add(entry, new_resource.position)
       node.run_state['opennms']['eventconf_sources'][source_name]['definition'] = eventfile.to_xml
       mark_changed(source_name)
-    else
-      run_action(:update)
     end
+  else
+    # FORCE chef to dive directly into the update notification phase
+    # rather than optimizing away execution paths via name properties
+    run_action(:update)
   end
 end
+
 
 # =====================================================================
 # ADDED EXPLICIT ACTION FOR RECIPE COMPATIBILITY IN CIRCLECI ERROR
