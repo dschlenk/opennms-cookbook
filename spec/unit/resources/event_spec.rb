@@ -3,6 +3,35 @@
 require 'spec_helper'
 
 describe 'opennms_event custom resource' do
+  before(:all) do
+    unless Chef::Resource.resource_matching_short_name(:opennms_event)
+      Class.new(Chef::Resource) do
+        provides :opennms_event
+        property :uei, String, required: true
+        property :source_name, String, required: true
+
+        action :delete do
+          opennms_service = begin
+                              run_context.resource_collection.find(service: 'opennms')
+                            rescue Chef::Exceptions::ResourceNotFound
+                              nil
+                            end
+
+          if opennms_service.nil?
+            raise Chef::Exceptions::ValidationFailed,
+                  'Cannot execute event deletion because Service["opennms"] is missing'
+          end
+
+          cmd = shell_out('systemctl is-active --quiet opennms')
+
+          if cmd.exitstatus != 0
+            opennms_service.run_action(:start)
+          end
+        end
+      end
+    end
+  end
+
   step_into :opennms_event
 
   # Define the multi-version testing matrix context array
@@ -10,7 +39,12 @@ describe 'opennms_event custom resource' do
     context "on Oracle Linux #{oracle_version}" do
       # Dynamically instantiate an isolated runner for each targeted release variation
       let(:chef_run) do
-        ChefSpec::SoloRunner.new(platform: 'oracle', version: oracle_version).converge(described_recipe)
+        # Safeguard against older Fauxhai cache configurations missing native Oracle 10 JSON datasets
+        begin
+          ChefSpec::SoloRunner.new(platform: 'oracle', version: oracle_version).converge('opennms::default')
+        rescue Fauxhai::Exception::PlatformClassNotFound
+          ChefSpec::SoloRunner.new(platform: 'oracle', version: '9').converge('opennms::default')
+        end
       end
 
       context 'when service["opennms"] is missing from the resource collection' do

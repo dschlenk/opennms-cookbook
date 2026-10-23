@@ -35,4 +35,10 @@ RSpec.configure do |config|
   config.log_level = :error
   config.platform = 'oracle'
   config.version = '10'
+
+  # Point ChefSpec directly to your local cookbook directories
+  config.cookbook_path = [
+    File.expand_path('../..', __dir__),
+    File.expand_path('../libraries', __dir__)
+  ]
 end

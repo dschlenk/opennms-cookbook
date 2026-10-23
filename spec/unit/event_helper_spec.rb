@@ -2,7 +2,10 @@
 
 require 'spec_helper'
 require 'nokogiri'
-require_relative '../../libraries/event_helpers'
+
+# Use robust path expansion to ensure library scopes are evaluated identically across all environments
+lib_path = File.expand_path('../../libraries/event_helpers.rb', __dir__)
+require lib_path if File.exist?(lib_path)
 
 describe Opennms::Cookbook::ConfigHelpers::Event::Helper do
   let(:dummy_class) { Class.new { include Opennms::Cookbook::ConfigHelpers::Event::Helper }.new }

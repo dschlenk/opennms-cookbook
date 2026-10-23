@@ -13,11 +13,10 @@ module Opennms
           end
 
           def is_positive_i?(s)
-            begin
-              Integer(s)
-            rescue
-              false
-            end
+            val = Integer(s)
+            val > 0
+          rescue ArgumentError, TypeError
+            false
           end
 
           def element_multiline_text(element, xpath)
