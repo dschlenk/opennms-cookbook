@@ -8,8 +8,13 @@ describe 'opennms::default' do
 
     # Mock your library class
     stub_const('Opennms::XmlHelper', Class.new do
-      def self.parse(*); {}; end
-      def self.write(*); true; end
+      def self.parse(*)
+        {}
+      end
+
+      def self.write(*)
+        true
+      end
     end)
 
     allow_any_instance_of(Chef::Recipe).to receive(:upgrade).and_return(true)
