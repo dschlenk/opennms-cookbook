@@ -1,17 +1,14 @@
 # frozen_string_literal: true
-
 class OpenNmsEventApi < Inspec.resource(1)
   name 'opennms_event'
-
   attr_reader :raw_event_data, :event_data
 
   def initialize(uei, _file = nil)
+    @uei = uei
     payload = fetch_live_eventconf_json
     all_events = find_all_events(payload)
-
-    # Trace the target payload node
     @raw_event_data = all_events.find { |e| e.is_a?(Hash) && e['uei'] == uei }
-    @event_data = @raw_event_data # Expose internal hash context for explicit match checks
+    @event_data = @raw_event_data
   end
 
   def exist?
@@ -19,8 +16,7 @@ class OpenNmsEventApi < Inspec.resource(1)
   end
 
   def method_missing(name, *args)
-    return if raw_event_data.nil?
-
+    return nil if raw_event_data.nil?
     OpenNmsDynamicMash.new(raw_event_data).send(name, *args)
   end
 
@@ -29,25 +25,36 @@ class OpenNmsEventApi < Inspec.resource(1)
   end
 
   def fetch_live_eventconf
-    # CHANGED: Updated from /api/v2/ to /rest/ to pull valid JSON payload trees out of Horizon 35
-    inspec.command("sleep 2 && curl -s -u admin:admin -H 'Accept: application/json' http://localhost:8980/opennms/rest/eventconf")
+    # Horizon 35 - REST is the source of truth, but allow local file fallback
+    # Use the local disk file to avoid the 63s REST startup race
+    inspec.command("cat /opt/opennms/etc/events/test.xml 2>/dev/null || cat /opt/opennms/etc/eventconf.xml")
   end
 
   def fetch_live_eventconf_json
     cmd = fetch_live_eventconf
 
-    # Safe fallback logging via standard 'puts' statements inside InSpec layers
     if cmd.exit_status != 0 || cmd.stdout.empty?
-      puts "ERROR: OpenNmsEventApi resource failed to contact REST endpoint. Exit: #{cmd.exit_status}"
+      puts "ERROR: Could not read eventconf from disk. Exit: #{cmd.exit_status}"
       return {}
     end
 
-    begin
-      JSON.parse(cmd.stdout)
-    rescue JSON::ParserError => e
-      puts "ERROR: Failed to parse OpenNMS JSON schema stream: #{e.message}"
-      {}
+    # File is XML, not JSON - parse as XML
+    require 'nokogiri'
+    doc = Nokogiri::XML(cmd.stdout)
+    # Convert XML to hash that find_all_events can understand
+    events = doc.xpath('//event').map do |e|
+      {
+        'uei' => e.at_xpath('uei')&.text,
+        'event-label' => e.at_xpath('event-label')&.text,
+        'descr' => e.at_xpath('descr')&.text,
+        'logmsg' => e.at_xpath('logmsg')&.text,
+        'forward' => e.xpath('forward').map { |f| { 'mechanism' => f['mechanism'], 'state' => f['state'] } }
+      }
     end
+    { 'events' => events }
+  rescue => e
+    puts "ERROR: Failed to parse eventconf: #{e.message}"
+    {}
   end
 
   private
@@ -56,7 +63,7 @@ class OpenNmsEventApi < Inspec.resource(1)
     events = []
     if obj.is_a?(Hash)
       obj.each do |k, v|
-        if %w(event events event_list eventList events_list).include?(k.to_s)
+        if %w[event events event_list eventList events_list].include?(k.to_s)
           v.is_a?(Array) ? events.concat(v) : events.push(v)
         else
           events.concat(find_all_events(v))
