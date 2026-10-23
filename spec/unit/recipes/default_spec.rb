@@ -3,9 +3,16 @@ require 'spec_helper'
 
 describe 'opennms::default' do
   before do
-    # Tell Chef "this cookbook has no dependencies" so it never looks for postgresql
     allow_any_instance_of(Chef::Cookbook::Metadata).to receive(:dependencies).and_return({})
     allow_any_instance_of(Chef::Cookbook::Metadata).to receive(:eager_load_libraries).and_return(false)
+
+    # Mock your library class
+    stub_const('Opennms::XmlHelper', Class.new do
+      def self.parse(*); {}; end
+      def self.write(*); true; end
+    end)
+
+    allow_any_instance_of(Chef::Recipe).to receive(:upgrade).and_return(true)
   end
 
   %w(9 10).each do |oracle_version|

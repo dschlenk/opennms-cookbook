@@ -1,78 +1,84 @@
+# frozen_string_literal: true
 version: 2.1
+
+executors:
+  cinc-workstation-executor:
+    docker:
+      - image: cincproject/workstation:25.13.7
+        auth:
+          username: $DOCKER_USER
+          password: $DOCKER_PASSWORD
+    working_directory: ~/cookbook
 
 jobs:
   style:
-    docker:
-      - image: cincproject/workstation:25.13.7
-        auth:
-          username: $DOCKER_USER
-          password: $DOCKER_PASSWORD
+    executor: cinc-workstation-executor
     steps:
       - checkout
       - run:
-          name: bundler
+          name: Run Bundler Dependency Install
           command: cinc exec bundle install
       - run:
-          name: mdl
+          name: Run Markdown Lint Checks
           command: cinc exec mdl documentation/*.md
       - run:
-          name: cookstyle
+          name: Run Cookstyle Code Cleaners
           command: cookstyle
 
   unit:
-    docker:
-      - image: cincproject/workstation:25.13.7
-        auth:
-          username: $DOCKER_USER
-          password: $DOCKER_PASSWORD
+    executor: cinc-workstation-executor
     steps:
       - checkout
       - run:
-          name: bundler
+          name: Run Bundler Dependency Install
           command: cinc exec bundle install
       - run:
-          name: Run ChefSpec Unit Tests
-          command: cinc exec rspec spec/unit/
+          name: Run ChefSpec Unit Tests (Oracle Linux 9 & 10 Matrix)
+          # Uses recursive glob pattern matching to sweep up libraries, resources,
+          # and recipe specs cleanly into the Cinc exec thread environment.
+          command: cinc exec rspec spec/**/*_spec.rb
 
   integration:
     machine:
       image: ubuntu-2404:current
-    resource_class: large  # Upgrades memory to 8GB RAM to fix the OpenNMS Java OOM crash
+    # Upgrades execution frame memory allocation to 8GB RAM to mitigate
+    # persistent OpenNMS Java runtime heap space crash regressions.
+    resource_class: large
     parallelism: 30
+    working_directory: ~/cookbook
     steps:
       - checkout
       - run:
-          name: docker login
+          name: Authenticate against Docker Hub registry
           command: |
             echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USER" --password-stdin
       - run:
-          name: install cinc workstation
+          name: Install Cinc Workstation Omnibus Packages
           command: |
-            curl -L https://omnitruck.cinc.sh/install.sh | sudo bash -s -- -P cinc-workstation -v 25.13.7
-            # Persist Cinc environment variables across all subsequent CircleCI steps
+            curl -L https://cinc.sh | sudo bash -s -- -P cinc-workstation -v 25.13.7
+            # Persist environment initializers directly across all subsequent pipeline hooks
             echo 'eval "$(cinc shell-init bash)"' >> $BASH_ENV
       - run:
-          name: bundler
+          name: Run Bundler Local Dependency Cache
           command: bundle install --prefer-local
       - run:
-          name: kitchen
+          name: Execute Test Kitchen Integration Matrix
           command: |
             export DOCKER_USER DOCKER_PASSWORD
 
-            # Run kitchen test with '-d never' so it skips automatic cleanup on crash.
+            # Partition and parallelize test runs; retain debugging traces if errors cascade
             if ! kitchen list -b | circleci tests split | xargs -L 1 kitchen test -d never; then
               echo "=================================================="
               echo "TEST KITCHEN FAILED! DUMPING CONTAINER LOGS:"
               echo "=================================================="
             
-              # Grab the ID of the most recently generated container box
+              # Extract the identification signature of the failing system engine box
               LAST_CONTAINER=$(docker ps -a -q -n 1)
             
-              # Print the output to the console window
+              # Stream logs out to the dashboard terminal window
               docker logs "$LAST_CONTAINER"
               exit 1
             else
-              # Added the successful execution echo block handler
               echo "=================================================="
               echo "TEST KITCHEN SUCCEEDED! ALL INTEGRATION CHECKS PASSED"
               echo "=================================================="
@@ -80,7 +86,7 @@ jobs:
 
 workflows:
   version: 2
-  untagged-build:
+  validate_cookbook:
     jobs:
       - style
       - unit
