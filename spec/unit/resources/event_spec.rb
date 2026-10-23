@@ -3,7 +3,7 @@
 require 'spec_helper'
 
 describe 'opennms_event custom resource' do
-  platform 'oracle' => '10'
+  platform 'oracle', '10'
 
   step_into :opennms_event
 
