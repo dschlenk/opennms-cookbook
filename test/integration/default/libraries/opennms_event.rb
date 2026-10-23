@@ -7,9 +7,8 @@ class OpenNmsDynamicMash
   end
 
   def [](key)
-    return nil if @data.nil?
+    return if @data.nil?
 
-    # Try the literal key, lowercase, snake_case, hyphenated, and camelCase
     str_key = key.to_s
     val = @data[str_key] ||
       @data[str_key.downcase] ||
@@ -26,8 +25,7 @@ class OpenNmsDynamicMash
     end
   end
 
-  def method_missing(name, *args)
-    # Safely handle array indexing or field traversal
+  def method_missing(name, *_args)
     if name.to_s.match?(/^\d+$/)
       self[name.to_s.to_i]
     else
@@ -35,7 +33,7 @@ class OpenNmsDynamicMash
     end
   end
 
-  def respond_to_missing?(method_name, include_private = false)
+  def respond_to_missing?(*)
     true
   end
 
@@ -80,11 +78,12 @@ class OpenNmsEventApi < Inspec.resource(1)
 
   # Pass lookup down to our custom wrapper so nested dot paths work smoothly
   def method_missing(name, *args)
-    return nil if raw_event_data.nil?
+    return if raw_event_data.nil?
+
     OpenNmsDynamicMash.new(raw_event_data).send(name, *args)
   end
 
-  def respond_to_missing?(method_name, include_private = false)
+  def respond_to_missing?(*)
     true
   end
 

@@ -79,7 +79,7 @@ control 'uei.opennms.org/cheftest/thresholdExceeded 4 and 5 configurations' do
     its('logmsg.content')          { should eq 'A threshold has been exceeded4.' }
     its('logmsg.dest')             { should eq 'logndisplay' }
     its('logmsg.notify')           { should be true }
-    its('severity')                { should eq 'Minor' }
+    its('severity') { should eq 'Minor' }
     its('operinstruct')            { should eq 'the operinstruct' }
     its('mouseovertext')           { should eq 'mouseOverText' }
     its('tticket.info')            { should eq 'tticketInfo' }
@@ -160,7 +160,7 @@ control 'OpenNMS Live Event REST API - chef5.events collection group' do
 
   describe opennms_event('uei.opennms.org/collectionGroupTest-isolated', 'events/chef5.events.xml') do
     it { should exist }
-    its('severity')                { should eq 'Indeterminate' }
+    its('severity') { should eq 'Indeterminate' }
 
     it 'contains the correct collectionGroup attributes' do
       expect(subject.event_data['collectionGroup']).to include(
@@ -179,7 +179,7 @@ control 'OpenNMS Live Event REST API - chef6.events parameters, autoack, and fil
 
   describe opennms_event('uei.opennms.org/parametersTest-isolated', 'events/chef6.events.xml') do
     it { should exist }
-    its('severity')                { should eq 'Critical' }
+    its('severity') { should eq 'Critical' }
     it 'contains the requested nested parameter mappings' do
       expect(subject.event_data['parameter']).to include(
                                                    hash_including(
@@ -193,15 +193,14 @@ control 'OpenNMS Live Event REST API - chef6.events parameters, autoack, and fil
 
   describe opennms_event('uei.opennms.org/autoackTest-isolated', 'events/chef6.events.xml') do
     it { should exist }
-    its('severity')                { should eq 'Minor' }
-    its('autoacknowledge.info')   { should eq 'please do not wake me up when the computer breaks' }
-    its('autoacknowledge.state')   { should eq 'off' }
+    its('severity') { should eq 'Minor' }
+    its('autoacknowledge.info') { should eq 'please do not wake me up when the computer breaks' }
+    its('autoacknowledge.state') { should eq 'off' }
   end
 
   describe opennms_event('uei.opennms.org/filters-isolated', 'events/chef6.events.xml') do
     it { should exist }
     its('severity') { should eq 'Major' }
-
     it 'contains the correct eventFilter configurations matching the recipe values' do
       filters = subject.event_data['filter'] || subject.event_data['filters'] || []
       expect(filters).to include(
@@ -223,6 +222,7 @@ control 'OpenNMS Live Event REST API - chef.events file actions' do
     its('eventLabel')              { should eq 'Chef defined event: createifmissing' }
     its('severity')                { should eq 'Minor' }
   end
+
   describe opennms_event('create_if_missing-isolated', 'events/chef.events.xml') do
     # Verifies that the second no-op call left the first entry pristine and untouched
     its('eventLabel')              { should_not eq 'Chef defined event: noopcreateifmissing' }
@@ -231,8 +231,8 @@ end
 
 control 'OpenNMS Live Event REST API - Dynamic Outage Loops' do
   title 'Pollerd certificate loops validation'
-  [443, 8443].each do |port|
-    [60, 30].each do |days|
+  [443, 8443].each do |_port|
+    [60, 30].each do |_days|
       describe opennms_event('uei.opennms.org/nodes/nodeLostService', 'events/opennms.pollerd.events.xml') do
         it { should exist }
         its('eventLabel') { should eq 'OpenNMS-defined node event: nodeLostService' }
