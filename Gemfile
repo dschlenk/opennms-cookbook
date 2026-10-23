@@ -9,6 +9,5 @@ group :development do
 end
 
 group :test do
-  gem 'chefspec'
-  gem 'berkshelf'
+  gem 'chefspec', '~> 9.3'
 end
