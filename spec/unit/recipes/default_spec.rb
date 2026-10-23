@@ -11,7 +11,6 @@ describe 'opennms::default' do
   # ============================================================================
   %w(9 10).each do |oracle_version|
     context "on Oracle Linux #{oracle_version}" do
-
       # Mock the Chef runner context execution loop
       let(:chef_run) do
         # Safeguard: fall back to version 9 if local Fauxhai gem definitions

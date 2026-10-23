@@ -45,7 +45,6 @@ class OpenNmsEventApi < Inspec.resource(1)
     doc = Nokogiri::XML(cmd.stdout)
     doc.remove_namespaces! # Strips out the xmlns tags so the XPath lookups work cleanly
     events = doc.xpath('//event').map do |e|
-
       {
         'uei' => e.at_xpath('uei')&.text,
         'event-label' => e.at_xpath('event-label')&.text,
