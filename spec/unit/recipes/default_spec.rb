@@ -10,26 +10,30 @@ describe 'opennms::default' do
   # system releases to catch any platform-specific logic errors.
   # ============================================================================
 
-  # Stub out external cookbook recipe dependencies that are missing from
-  # the test environment tree because Berkshelf resolution hooks are skipped.
   before do
+    # Stub out downstream cookbook lookups (like postgresql, java, yum) to prevent
+    # CookbookNotFound compiler failures when Berkshelf resolution hooks are skipped.
     allow_any_instance_of(Chef::RunContext).to receive(:include_recipe).and_call_original
-    %w(opennms::postgres openjdk17 openjdk17::default opennms::packages opennms::send_events opennms::rrdtool opennms::kafka_producer opennms::base_templates opennms::adminpw opennms::default_resources opennms::templates).each do |recipe|
+
+    %w(
+      postgresql::default postgresql::server postgresql
+      java::default java yum::default yum openjdk17 openjdk17::default
+      opennms::postgres opennms::packages opennms::send_events
+      opennms::rrdtool opennms::kafka_producer opennms::base_templates
+      opennms::adminpw opennms::default_resources opennms::templates
+    ).each do |recipe|
       allow_any_instance_of(Chef::RunContext).to receive(:include_recipe).with(recipe).and_return(true)
     end
   end
 
   %w(9 10).each do |oracle_version|
     context "on Oracle Linux #{oracle_version}" do
-
       # Mock the Chef runner context execution loop
       let(:chef_run) do
-        # Safeguard: fall back to version 9 if local Fauxhai gem definitions
-        # lack the native Oracle Linux 10 mock data layout profiles.
+        # Safeguard: fall back to version 9 if local Fauxhai gem definitions lack the native Oracle Linux 10 mock data layout profiles.
         begin
           ChefSpec::SoloRunner.new(platform: 'oracle', version: oracle_version).converge(described_recipe)
-        rescue Fauxhai::Exception::PlatformNotFound
-          # Corrected exception name to prevent NameError constant failure crashes
+        rescue Fauxhai::Exception::InvalidPlatform
           ChefSpec::SoloRunner.new(platform: 'oracle', version: '9').converge(described_recipe)
         end
       end
