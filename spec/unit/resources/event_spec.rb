@@ -1,8 +1,10 @@
 # frozen_string_literal: true
+
 require 'spec_helper'
 
 describe 'opennms_event custom resource' do
-  platform 'oracle', version: '10'
+  platform 'oracle' => '10'
+
   step_into :opennms_event
 
   context 'when service["opennms"] is missing from the resource collection' do

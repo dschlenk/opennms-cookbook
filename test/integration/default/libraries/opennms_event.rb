@@ -1,26 +1,5 @@
 # frozen_string_literal: true
 
-# Helper to allow dot-notation access in InSpec tests
-# e.g. opennms_event.uei, opennms_event.forward
-class OpenNmsDynamicMash
-  def initialize(hash)
-    @hash = hash || {}
-  end
-
-  def method_missing(name, *_args)
-    return if raw_event_data.nil?
-    OpenNmsDynamicMash.new(raw_event_data).send(name, *args)
-  end
-
-  def respond_to_missing?(*)
-    true
-  end
-
-  def [](key)
-    @hash[key]
-  end
-end
-
 class OpenNmsEventApi < Inspec.resource(1)
   name 'opennms_event'
   attr_reader :raw_event_data, :event_data
@@ -37,9 +16,10 @@ class OpenNmsEventApi < Inspec.resource(1)
     !raw_event_data.nil? && !raw_event_data.empty?
   end
 
-  def method_missing(name, *args)
-    return nil if raw_event_data.nil?
-    OpenNmsDynamicMash.new(raw_event_data).send(name, *args)
+  def method_missing(name, *_args)
+    return if raw_event_data.nil?
+
+    OpenNmsDynamicMash.new(raw_event_data).send(name, *_args)
   end
 
   def respond_to_missing?(*)
@@ -64,8 +44,6 @@ class OpenNmsEventApi < Inspec.resource(1)
 
     require 'nokogiri'
     doc = Nokogiri::XML(cmd.stdout)
-    doc.remove_namespaces! # Critical for eventconf.xml xmlns
-
     events = doc.xpath('//event').map do |e|
       {
         'uei' => e.at_xpath('uei')&.text,
@@ -75,9 +53,8 @@ class OpenNmsEventApi < Inspec.resource(1)
         'forward' => e.xpath('forward').map { |f| { 'mechanism' => f['mechanism'], 'state' => f['state'] } },
       }
     end
-
     { 'events' => events }
-  rescue => e
+  rescue StandardError => e
     puts "ERROR: Failed to parse eventconf: #{e.message}"
     {}
   end
@@ -94,5 +71,32 @@ class OpenNmsEventApi < Inspec.resource(1)
           events.concat(find_all_events(v))
         end
       end
+    elsif obj.is_a?(Array)
+      obj.each { |item| events.concat(find_all_events(item)) }
     end
+    events
+  end
+end
+
+# Safe, crash-resistant dynamic wrapper class for nested hash tree lookups
+class OpenNmsDynamicMash
+  def initialize(hash)
+    @hash = hash || {}
+  end
+
+  def method_missing(name, *args)
+    # Convert symbol method calls (e.g. .uei) directly into string hash key lookups
+    string_key = name.to_s
+    return @hash[string_key] if @hash.key?(string_key)
+
+    super
+  end
+
+  def respond_to_missing?(name, include_private = false)
+    @hash.key?(name.to_s) || super
+  end
+
+  def [](key)
+    @hash[key]
+  end
 end
