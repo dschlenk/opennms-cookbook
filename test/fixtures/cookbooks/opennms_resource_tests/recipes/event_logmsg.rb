@@ -6,5 +6,5 @@ opennms_event 'change logmsg of thresholdExceeded2' do
   file 'events/chef.events.xml'
   logmsg 'A thresholds has been exceeded.'
   notifies :run, 'opennms_send_event[restart_Eventd]'
- notifies :run, 'ruby_block[EXECUTE BULK OPENNMS UPLOAD]', :delayed
+  notifies :run, 'ruby_block[EXECUTE BULK OPENNMS UPLOAD]', :delayed
 end
