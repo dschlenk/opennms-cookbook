@@ -1,7 +1,7 @@
 # frozen_string_literal: true
+
 require 'spec_helper'
 require 'nokogiri'
-require 'uri'
 require_relative '../../libraries/config_helpers'
 
 describe Opennms::Cookbook::ConfigHelpers::Event::Helper do
@@ -20,6 +20,7 @@ describe Opennms::Cookbook::ConfigHelpers::Event::Helper do
 
       it 'correctly injects placeholder properties without crashing' do
         result = dummy_class.assign_sandbox_fallbacks(input_properties)
+
         expect(result[:event_label]).to eq('Generated Label for Test_event')
         expect(result[:descr]).to include('Sandbox placeholder description')
         expect(result[:logmsg]).to include('Log message tracking')
@@ -38,6 +39,7 @@ describe Opennms::Cookbook::ConfigHelpers::Event::Helper do
 
       it 'preserves the existing production data values' do
         result = dummy_class.assign_sandbox_fallbacks(input_properties)
+
         expect(result[:event_label]).to eq('My Custom Label')
         expect(result[:descr]).to eq('My Custom Description')
         expect(result[:logmsg]).to eq('My Custom Log')
@@ -76,7 +78,9 @@ describe Opennms::Cookbook::ConfigHelpers::Event::Helper do
     it 'transforms raw Nokogiri XML node structures into comparable Ruby hashes' do
       xml_raw = '<events xmlns="http://opennms.org"><event><uei>uei.test</uei></event></events>'
       node = Nokogiri::XML(xml_raw).root
+
       result = ruby_block_class.send(:xml_to_hash, node)
+
       expect(result[:name]).to eq('events')
       expect(result[:children].first[:name]).to eq('event')
     end

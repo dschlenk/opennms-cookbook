@@ -38,7 +38,9 @@ describe 'opennms_event custom resource' do
     end
 
     before do
-      allow_any_instance_of(Chef::Resource).to receive(:shell_out).with('systemctl is-active --quiet opennms').and_return(double(exitstatus: 1, stdout: '', stderr: ''))
+      allow_any_instance_of(Chef::Resource).to receive(:shell_out)
+                                                 .with('systemctl is-active --quiet opennms')
+                                                 .and_return(double(exitstatus: 1, stdout: '', stderr: ''))
     end
 
     it 'successfully intercepts the lifecycle and runs the action' do
