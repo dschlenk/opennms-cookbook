@@ -8,9 +8,9 @@ control 'event_logmsg_notify' do
   raw_events = events_data['event'] || events_data['events'] || []
   events_list = raw_events.is_a?(Hash) ? [raw_events] : raw_events
 
-  describe 'Event uei.opennms.org/cheftest/thresholdExceeded2' do
+  describe 'Event uei.opennms.org/cheftest/thresholdExceeded2-event_logmsg_notify' do
     # Pinpoint the exact event entry from the live payload list
-    subject { events_list.find { |e| e['uei'] == 'uei.opennms.org/cheftest/thresholdExceeded2' } }
+    subject { events_list.find { |e| e['uei'] == 'uei.opennms.org/cheftest/thresholdExceeded2-event_logmsg_notify' } }
 
     it { should_not be_nil }
 

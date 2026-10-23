@@ -11,8 +11,8 @@ control 'event_add_parameters' do
   events_list = events_data['event'] || events_data['events'] || events_data || []
   events_list = [events_list] if events_list.is_a?(Hash)
 
-  describe 'Event uei.opennms.org/cheftest/thresholdExceeded2' do
-    subject { events_list.find { |e| e['uei'] == 'uei.opennms.org/cheftest/thresholdExceeded2' } }
+  describe 'Event uei.opennms.org/cheftest/thresholdExceeded2-event_add_parameters' do
+    subject { events_list.find { |e| e['uei'] == 'uei.opennms.org/cheftest/thresholdExceeded2-event_add_parameters' } }
 
     it { should_not be_nil }
 
