@@ -5,4 +5,5 @@ opennms_event 'remove autoaction' do
   file 'events/chef.events.xml'
   notifies :run, 'opennms_send_event[restart_Eventd]'
   autoaction []
+  notifies :run, 'ruby_block[EXECUTE BULK OPENNMS UPLOAD]', :delayed
 end

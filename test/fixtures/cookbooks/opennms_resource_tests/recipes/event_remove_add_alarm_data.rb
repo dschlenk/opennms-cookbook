@@ -6,4 +6,5 @@ opennms_event 'add alarm-data back to TE2' do
   file 'events/chef.events.xml'
   alarm_data 'reduction_key' => '%uei%:%dpname%:%nodeid%:%interface%:%parm[ds]%:%parm[threshold]%:%parm[trigger]%:%parm[rearm]%:%parm[label]%', 'alarm_type' => 1, 'auto_clean' => false
   notifies :run, 'opennms_send_event[restart_Eventd]'
+  notifies :run, 'ruby_block[EXECUTE BULK OPENNMS UPLOAD]', :delayed
 end

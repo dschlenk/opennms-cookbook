@@ -5,4 +5,5 @@ opennms_event 'add varbindsdecode back' do
   file 'events/chef.events.xml'
   varbindsdecode [{ 'parmid' => 'theParmId', 'decode' => [{ 'varbindvalue' => 'theVarBindValue', 'varbinddecodedstring' => 'theVarBindDecodedString' }] }]
   notifies :run, 'opennms_send_event[restart_Eventd]'
+  notifies :run, 'ruby_block[EXECUTE BULK OPENNMS UPLOAD]', :delayed
 end

@@ -5,4 +5,5 @@ opennms_event 'remove varbindsdecode' do
   file 'events/chef.events.xml'
   varbindsdecode []
   notifies :run, 'opennms_send_event[restart_Eventd]'
+  notifies :run, 'ruby_block[EXECUTE BULK OPENNMS UPLOAD]', :delayed
 end

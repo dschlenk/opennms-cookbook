@@ -6,4 +6,5 @@ opennms_event 'change parameters' do
   file 'events/chef.events.xml'
   parameters [{ 'name' => 'param1', 'value' => 'value1' }, { 'name' => 'param2', 'value' => 'value2', 'expand' => false }]
   notifies :run, 'opennms_send_event[restart_Eventd]'
+  notifies :run, 'ruby_block[EXECUTE BULK OPENNMS UPLOAD]', :delayed
 end

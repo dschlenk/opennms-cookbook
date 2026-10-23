@@ -5,4 +5,5 @@ opennms_event 'add forward back' do
   file 'events/chef.events.xml'
   forward [{ 'info' => 'fwdInfo', 'state' => 'off', 'mechanism' => 'snmptcp' }]
   notifies :run, 'opennms_send_event[restart_Eventd]'
+  notifies :run, 'ruby_block[EXECUTE BULK OPENNMS UPLOAD]', :delayed
 end

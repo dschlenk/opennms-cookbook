@@ -6,4 +6,5 @@ opennms_event 'change descr of thresholdExceeded2' do
   file 'events/chef.events.xml'
   descr '<p>A thresholds defined by a chef recipe has been exceeded.</p>'
   notifies :run, 'opennms_send_event[restart_Eventd]'
+  notifies :run, 'ruby_block[EXECUTE BULK OPENNMS UPLOAD]', :delayed
 end

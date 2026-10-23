@@ -5,4 +5,5 @@ opennms_event 'put tticket back' do
   file 'events/chef.events.xml'
   tticket 'info' => 'tticketInfo', 'state' => 'on'
   notifies :run, 'opennms_send_event[restart_Eventd]'
+  notifies :run, 'ruby_block[EXECUTE BULK OPENNMS UPLOAD]', :delayed
 end

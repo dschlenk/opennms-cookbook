@@ -6,4 +6,5 @@ opennms_event 'change severity of TE2' do
   file 'events/chef.events.xml'
   severity 'Warning'
   notifies :run, 'opennms_send_event[restart_Eventd]'
+  notifies :run, 'ruby_block[EXECUTE BULK OPENNMS UPLOAD]', :delayed
 end

@@ -10,6 +10,7 @@ opennms_event 'uei.opennms.org/cheftest/thresholdExceeded' do
   severity 'Minor'
   position 'top'
   alarm_data 'reduction_key' => '%uei%:%dpname%:%nodeid%:%interface%:%parm[ds]%:%parm[threshold]%:%parm[trigger]%:%parm[rearm]%:%parm[label]%', 'alarm_type' => 1, 'auto_clean' => false
+  notifies :run, 'ruby_block[EXECUTE BULK OPENNMS UPLOAD]', :delayed
 end
 
 opennms_event 'initial thresholdExceeded2' do
@@ -30,6 +31,7 @@ opennms_event 'initial thresholdExceeded2' do
   script [{ 'name' => 'anScript', 'language' => 'groovy' }]
   mouseovertext 'mouseOverText'
   alarm_data 'reduction_key' => '%uei%:%dpname%:%nodeid%:%interface%:%parm[ds]%:%parm[threshold]%:%parm[trigger]%:%parm[rearm]%:%parm[label]%', 'alarm_type' => 1, 'auto_clean' => false
+  notifies :run, 'ruby_block[EXECUTE BULK OPENNMS UPLOAD]', :delayed
 end
 
 opennms_event 'new event at the top' do
@@ -51,6 +53,7 @@ opennms_event 'new event at the top' do
   mouseovertext 'mouseOverText'
   alarm_data 'reduction_key' => '%uei%:%dpname%:%nodeid%:%interface%:%parm[ds]%:%parm[threshold]%:%parm[trigger]%:%parm[rearm]%:%parm[label]%', 'alarm_type' => 1, 'auto_clean' => false
   position 'top'
+  notifies :run, 'ruby_block[EXECUTE BULK OPENNMS UPLOAD]', :delayed
 end
 
 opennms_event 'new event at the bottom of existing file' do
@@ -72,6 +75,7 @@ opennms_event 'new event at the bottom of existing file' do
   mouseovertext 'mouseOverText'
   alarm_data 'reduction_key' => '%uei%:%dpname%:%nodeid%:%interface%:%parm[ds]%:%parm[threshold]%:%parm[trigger]%:%parm[rearm]%:%parm[label]%', 'alarm_type' => 1, 'auto_clean' => false
   position 'bottom'
+  notifies :run, 'ruby_block[EXECUTE BULK OPENNMS UPLOAD]', :delayed
 end
 
 opennms_event 'new event with diverse mask' do
@@ -92,6 +96,7 @@ opennms_event 'new event with diverse mask' do
   script [{ 'name' => 'anScript', 'language' => 'groovy' }]
   mouseovertext 'mouseOverText'
   alarm_data 'reduction_key' => '%uei%:%dpname%:%nodeid%:%interface%:%parm[ds]%:%parm[threshold]%:%parm[trigger]%:%parm[rearm]%:%parm[label]%', 'alarm_type' => 1, 'auto_clean' => false
+  notifies :run, 'ruby_block[EXECUTE BULK OPENNMS UPLOAD]', :delayed
 end
 
 opennms_event 'uei.opennms.org/anUeiForANewThingInANewFile-absent' do
@@ -103,6 +108,7 @@ opennms_event 'uei.opennms.org/anUeiForANewThingInANewFile-absent' do
   logmsg_notify true
   severity 'Minor'
   alarm_data 'reduction_key' => '%uei%:%dpname%:%nodeid%:%interface%:%parm[ds]%:%parm[threshold]%:%parm[trigger]%:%parm[rearm]%:%parm[label]%', 'alarm_type' => 1, 'auto_clean' => false
+  notifies :run, 'ruby_block[EXECUTE BULK OPENNMS UPLOAD]', :delayed
 end
 
 opennms_event 'uei.opennms.org/anUeiForANewThingInANewFile-absent' do
@@ -121,6 +127,7 @@ opennms_event 'uei.opennms.org/anUeiForANewThingInANewFileWithPositionTop-isolat
   logmsg_notify true
   severity 'Minor'
   alarm_data 'reduction_key' => '%uei%:%dpname%:%nodeid%:%interface%:%parm[ds]%:%parm[threshold]%:%parm[trigger]%:%parm[rearm]%:%parm[label]%', 'alarm_type' => 1, 'auto_clean' => false
+  notifies :run, 'ruby_block[EXECUTE BULK OPENNMS UPLOAD]', :delayed
 end
 
 opennms_event 'uei.opennms.org/fillerForANewThingInANewFile1-isolated' do
@@ -133,6 +140,7 @@ opennms_event 'uei.opennms.org/fillerForANewThingInANewFile1-isolated' do
   severity 'Minor'
   alarm_data 'reduction_key' => '%uei%:%dpname%:%nodeid%:%interface%:%parm[ds]%:%parm[threshold]%:%parm[trigger]%:%parm[rearm]%:%parm[label]%', 'alarm_type' => 1, 'auto_clean' => false
   eventconf_position 'top'
+  notifies :run, 'ruby_block[EXECUTE BULK OPENNMS UPLOAD]', :delayed
 end
 
 opennms_event 'uei.opennms.org/fillerForANewThingInANewFile2-isolated' do
@@ -145,6 +153,7 @@ opennms_event 'uei.opennms.org/fillerForANewThingInANewFile2-isolated' do
   severity 'Minor'
   alarm_data 'reduction_key' => '%uei%:%dpname%:%nodeid%:%interface%:%parm[ds]%:%parm[threshold]%:%parm[trigger]%:%parm[rearm]%:%parm[label]%', 'alarm_type' => 1, 'auto_clean' => false
   eventconf_position 'top'
+  notifies :run, 'ruby_block[EXECUTE BULK OPENNMS UPLOAD]', :delayed
 end
 
 opennms_event 'uei.opennms.org/eventTopFileTop-isolated' do
@@ -158,6 +167,7 @@ opennms_event 'uei.opennms.org/eventTopFileTop-isolated' do
   alarm_data 'reduction_key' => '%uei%:%dpname%:%nodeid%:%interface%:%parm[ds]%:%parm[threshold]%:%parm[trigger]%:%parm[rearm]%:%parm[label]%', 'alarm_type' => 1, 'auto_clean' => false
   position 'top'
   eventconf_position 'top'
+  notifies :run, 'ruby_block[EXECUTE BULK OPENNMS UPLOAD]', :delayed
 end
 
 opennms_event 'uei.opennms.org/eventBottomFileTop-isolated' do
@@ -171,6 +181,7 @@ opennms_event 'uei.opennms.org/eventBottomFileTop-isolated' do
   alarm_data 'reduction_key' => '%uei%:%dpname%:%nodeid%:%interface%:%parm[ds]%:%parm[threshold]%:%parm[trigger]%:%parm[rearm]%:%parm[label]%', 'alarm_type' => 1, 'auto_clean' => false
   position 'bottom'
   eventconf_position 'top'
+  notifies :run, 'ruby_block[EXECUTE BULK OPENNMS UPLOAD]', :delayed
 end
 
 opennms_event 'uei.opennms.org/collectionGroupTest-isolated' do
@@ -195,6 +206,7 @@ opennms_event 'uei.opennms.org/collectionGroupTest-isolated' do
                        },
                      },
                    ]
+  notifies :run, 'ruby_block[EXECUTE BULK OPENNMS UPLOAD]', :delayed
 end
 
 opennms_event 'uei.opennms.org/parametersTest-isolated' do
@@ -208,6 +220,7 @@ opennms_event 'uei.opennms.org/parametersTest-isolated' do
   position 'bottom'
   eventconf_position 'top'
   parameters [{ 'name' => 'paramName', 'value' => 'someString', 'expand' => true }]
+  notifies :run, 'ruby_block[EXECUTE BULK OPENNMS UPLOAD]', :delayed
 end
 
 opennms_event 'uei.opennms.org/operactionTest-isolated' do
@@ -221,6 +234,7 @@ opennms_event 'uei.opennms.org/operactionTest-isolated' do
   position 'top'
   eventconf_position 'override'
   operaction [{ 'action' => 'string', 'state' => 'off', 'menutext' => 'help me' }]
+  notifies :run, 'ruby_block[EXECUTE BULK OPENNMS UPLOAD]', :delayed
 end
 
 opennms_event 'uei.opennms.org/autoackTest-isolated' do
@@ -234,6 +248,7 @@ opennms_event 'uei.opennms.org/autoackTest-isolated' do
   position 'bottom'
   eventconf_position 'override'
   autoacknowledge 'info' => 'please do not wake me up when the computer breaks', 'state' => 'off'
+  notifies :run, 'ruby_block[EXECUTE BULK OPENNMS UPLOAD]', :delayed
 end
 
 opennms_event 'uei.opennms.org/filters-isolated' do
@@ -247,6 +262,7 @@ opennms_event 'uei.opennms.org/filters-isolated' do
   position 'bottom'
   eventconf_position 'bottom'
   filters [{ 'eventparm' => 'one', 'pattern' => '/^one&two{;t|hree😇$/', 'replacement' => '💩' }]
+  notifies :run, 'ruby_block[EXECUTE BULK OPENNMS UPLOAD]', :delayed
 end
 
 opennms_event 'create_if_missing-isolated' do
@@ -258,6 +274,7 @@ opennms_event 'create_if_missing-isolated' do
   logmsg_notify true
   severity 'Minor'
   action :create_if_missing
+  notifies :run, 'ruby_block[EXECUTE BULK OPENNMS UPLOAD]', :delayed
 end
 
 opennms_event 'noop_create_if_missing-isolated' do
@@ -270,6 +287,7 @@ opennms_event 'noop_create_if_missing-isolated' do
   logmsg_notify true
   severity 'Minor'
   action :create_if_missing
+  notifies :run, 'ruby_block[EXECUTE BULK OPENNMS UPLOAD]', :delayed
 end
 
 [443, 8443].each do |port|
@@ -278,6 +296,7 @@ end
       uei 'uei.opennms.org/nodes/nodeLostService'
       position 'top'
       file 'events/opennms.pollerd.events.xml'
+
       if days == 30
         mask [{ 'mename' => 'uei', 'mevalue' => ['uei.opennms.org/nodes/nodeLostService'] },
               { 'mename' => 'service', 'mevalue' => ["TLS-Cert-Expire-#{port}"] }]
@@ -285,10 +304,12 @@ end
         mask [{ 'mename' => 'uei', 'mevalue' => ['uei.opennms.org/nodes/nodeLostService'] },
               { 'mename' => 'service', 'mevalue' => ["TLS-Cert-Expire-#{port}-#{days}"] }]
       end
+
       event_label 'OpenNMS-defined node event: nodeLostService'
       descr 'A %service% outage was identified on interface %interface% because of the following condition: %parm[eventReason]%. A new Outage record has been created and service level availability calculations will be impacted until this outage is resolved.'
       logmsg '%service% outage identified on interface %interface% with reason code: %parm[eventReason]%.'
       logmsg_dest 'logndisplay'
+
       if days <= 30
         severity 'Critical'
       elsif days == 60
@@ -296,7 +317,9 @@ end
       else
         severity 'Minor'
       end
+
       alarm_data false
+      notifies :run, 'ruby_block[EXECUTE BULK OPENNMS UPLOAD]', :delayed
     end
   end
 end

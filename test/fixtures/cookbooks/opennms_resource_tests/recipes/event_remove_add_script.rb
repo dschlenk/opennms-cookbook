@@ -5,4 +5,5 @@ opennms_event 'put script back' do
   file 'events/chef.events.xml'
   script [{ 'name' => 'anScript', 'language' => 'groovy' }]
   notifies :run, 'opennms_send_event[restart_Eventd]'
+  notifies :run, 'ruby_block[EXECUTE BULK OPENNMS UPLOAD]', :delayed
 end

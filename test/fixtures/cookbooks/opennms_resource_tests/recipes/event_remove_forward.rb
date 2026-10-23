@@ -5,4 +5,5 @@ opennms_event 'remove forward' do
   file 'events/chef.events.xml'
   forward []
   notifies :run, 'opennms_send_event[restart_Eventd]'
+  notifies :run, 'ruby_block[EXECUTE BULK OPENNMS UPLOAD]', :delayed
 end
