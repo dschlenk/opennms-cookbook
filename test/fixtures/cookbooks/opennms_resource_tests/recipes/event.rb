@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 opennms_event 'uei.opennms.org/cheftest/thresholdExceeded' do
   file 'events/chef.events.xml'
   event_label 'Chef defined event: thresholdExceeded'
@@ -11,7 +13,7 @@ opennms_event 'uei.opennms.org/cheftest/thresholdExceeded' do
 end
 
 opennms_event 'initial thresholdExceeded2' do
-  uei 'uei.opennms.org/cheftest/thresholdExceeded2'
+  uei 'uei.opennms.org/cheftest/thresholdExceeded2-script'
   file 'events/chef.events.xml'
   event_label 'Chef defined event: thresholdExceeded'
   descr '<p>A threshold defined by a chef recipe has been exceeded.</p>'
@@ -30,7 +32,6 @@ opennms_event 'initial thresholdExceeded2' do
   alarm_data 'reduction_key' => '%uei%:%dpname%:%nodeid%:%interface%:%parm[ds]%:%parm[threshold]%:%parm[trigger]%:%parm[rearm]%:%parm[label]%', 'alarm_type' => 1, 'auto_clean' => false
 end
 
-# new event at the top of an existing file
 opennms_event 'new event at the top' do
   uei 'uei.opennms.org/cheftest/thresholdExceeded3'
   file 'events/chef.events.xml'
@@ -53,7 +54,7 @@ opennms_event 'new event at the top' do
 end
 
 opennms_event 'new event at the bottom of existing file' do
-  uei 'uei.opennms.org/cheftest/thresholdExceeded4'
+  uei 'uei.opennms.org/cheftest/thresholdExceeded4-complex'
   file 'events/chef.events.xml'
   event_label 'Chef defined event: thresholdExceeded4'
   descr '<p>A threshold defined by a chef recipe has been exceeded4.</p>'
@@ -73,9 +74,8 @@ opennms_event 'new event at the bottom of existing file' do
   position 'bottom'
 end
 
-# new event with complex mask
 opennms_event 'new event with diverse mask' do
-  uei 'uei.opennms.org/cheftest/thresholdExceeded5'
+  uei 'uei.opennms.org/cheftest/thresholdExceeded5-arrays'
   file 'events/chef.events.xml'
   event_label 'Chef defined event: thresholdExceeded5'
   descr '<p>A threshold defined by a chef recipe has been exceeded4.</p>'
@@ -94,8 +94,7 @@ opennms_event 'new event with diverse mask' do
   alarm_data 'reduction_key' => '%uei%:%dpname%:%nodeid%:%interface%:%parm[ds]%:%parm[threshold]%:%parm[trigger]%:%parm[rearm]%:%parm[label]%', 'alarm_type' => 1, 'auto_clean' => false
 end
 
-# new event in new file
-opennms_event 'uei.opennms.org/anUeiForANewThingInANewFile' do
+opennms_event 'uei.opennms.org/anUeiForANewThingInANewFile-absent' do
   file 'events/chef2.events.xml'
   event_label 'Chef defined event: thresholdExceeded'
   descr '<p>A threshold defined by a chef recipe has been exceeded.</p>'
@@ -106,14 +105,12 @@ opennms_event 'uei.opennms.org/anUeiForANewThingInANewFile' do
   alarm_data 'reduction_key' => '%uei%:%dpname%:%nodeid%:%interface%:%parm[ds]%:%parm[threshold]%:%parm[trigger]%:%parm[rearm]%:%parm[label]%', 'alarm_type' => 1, 'auto_clean' => false
 end
 
-# test delete
-opennms_event 'uei.opennms.org/anUeiForANewThingInANewFile' do
+opennms_event 'uei.opennms.org/anUeiForANewThingInANewFile-absent' do
   file 'events/chef2.events.xml'
   action :delete
 end
 
-# Test position top and eventconf_position top
-opennms_event 'uei.opennms.org/anUeiForANewThingInANewFileWithPositionTop' do
+opennms_event 'uei.opennms.org/anUeiForANewThingInANewFileWithPositionTop-isolated' do
   file 'events/chef3.events.xml'
   position 'top'
   eventconf_position 'top'
@@ -126,9 +123,7 @@ opennms_event 'uei.opennms.org/anUeiForANewThingInANewFileWithPositionTop' do
   alarm_data 'reduction_key' => '%uei%:%dpname%:%nodeid%:%interface%:%parm[ds]%:%parm[threshold]%:%parm[trigger]%:%parm[rearm]%:%parm[label]%', 'alarm_type' => 1, 'auto_clean' => false
 end
 
-# Test position top and eventconf_position bottom
-# this one should be index 2
-opennms_event 'uei.opennms.org/fillerForANewThingInANewFile1' do
+opennms_event 'uei.opennms.org/fillerForANewThingInANewFile1-isolated' do
   file 'events/chef4.events.xml'
   event_label 'Chef defined event: thresholdExceeded'
   descr '<p>A threshold defined by a chef recipe has been exceeded.</p>'
@@ -140,8 +135,7 @@ opennms_event 'uei.opennms.org/fillerForANewThingInANewFile1' do
   eventconf_position 'top'
 end
 
-# this one should be index 3
-opennms_event 'uei.opennms.org/fillerForANewThingInANewFile2' do
+opennms_event 'uei.opennms.org/fillerForANewThingInANewFile2-isolated' do
   file 'events/chef4.events.xml'
   event_label 'Chef defined event: thresholdExceeded'
   descr '<p>A threshold defined by a chef recipe has been exceeded.</p>'
@@ -153,8 +147,7 @@ opennms_event 'uei.opennms.org/fillerForANewThingInANewFile2' do
   eventconf_position 'top'
 end
 
-# this one should be index 1
-opennms_event 'uei.opennms.org/eventTopFileTop' do
+opennms_event 'uei.opennms.org/eventTopFileTop-isolated' do
   file 'events/chef4.events.xml'
   event_label 'Chef defined event: thresholdExceeded'
   descr '<p>A threshold defined by a chef recipe has been exceeded.</p>'
@@ -167,8 +160,7 @@ opennms_event 'uei.opennms.org/eventTopFileTop' do
   eventconf_position 'top'
 end
 
-# this one should be index 4
-opennms_event 'uei.opennms.org/eventBottomFileTop' do
+opennms_event 'uei.opennms.org/eventBottomFileTop-isolated' do
   file 'events/chef4.events.xml'
   event_label 'Chef defined event: thresholdExceeded'
   descr '<p>A threshold defined by a chef recipe has been exceeded.</p>'
@@ -181,7 +173,7 @@ opennms_event 'uei.opennms.org/eventBottomFileTop' do
   eventconf_position 'top'
 end
 
-opennms_event 'uei.opennms.org/collectionGroupTest' do
+opennms_event 'uei.opennms.org/collectionGroupTest-isolated' do
   file 'events/chef5.events.xml'
   event_label 'Chef defined event: thresholdExceeded'
   descr '<p>collection group test.</p>'
@@ -192,23 +184,23 @@ opennms_event 'uei.opennms.org/collectionGroupTest' do
   position 'bottom'
   eventconf_position 'top'
   collection_group [
-    {
-      'name' => 'nodeGroup',
-      'resource_type' => 'nodeSnmp',
-      'instance' => 'instanceParmName',
-      'collections' => [ { 'name' => 'TIME', 'type' => 'counter', 'param_values' => { 'primary' => 1, 'secondary' => 2 } }],
-      'rrd' => {
-        'rra' => [ 'RRA:AVERAGE:0.5:1:8928' ],
-        'step' => 60, 'heartbeat' => 120
-      },
-    },
-  ]
+                     {
+                       'name' => 'nodeGroup',
+                       'resource_type' => 'nodeSnmp',
+                       'instance' => 'instanceParmName',
+                       'collections' => [ { 'name' => 'TIME', 'type' => 'counter', 'param_values' => { 'primary' => 1, 'secondary' => 2 } }],
+                       'rrd' => {
+                         'rra' => [ 'RRA:AVERAGE:0.5:1:8928' ],
+                         'step' => 60, 'heartbeat' => 120
+                       },
+                     },
+                   ]
 end
 
-opennms_event 'uei.opennms.org/parametersTest' do
+opennms_event 'uei.opennms.org/parametersTest-isolated' do
   file 'events/chef6.events.xml'
   event_label 'Chef defined event: parametersTest'
-  descr '<p>parameters.</p>'
+  descr 'parameters.'
   logmsg 'parameters test.'
   logmsg_dest 'logndisplay'
   logmsg_notify true
@@ -218,10 +210,10 @@ opennms_event 'uei.opennms.org/parametersTest' do
   parameters [{ 'name' => 'paramName', 'value' => 'someString', 'expand' => true }]
 end
 
-opennms_event 'uei.opennms.org/operactionTest' do
+opennms_event 'uei.opennms.org/operactionTest-isolated' do
   file 'events/chef6.events.xml'
   event_label 'Chef defined event: operactionTest'
-  descr '<p>operactionTest.</p>'
+  descr 'operactionTest.'
   logmsg 'operactionTest test.'
   logmsg_dest 'logndisplay'
   logmsg_notify true
@@ -231,10 +223,10 @@ opennms_event 'uei.opennms.org/operactionTest' do
   operaction [{ 'action' => 'string', 'state' => 'off', 'menutext' => 'help me' }]
 end
 
-opennms_event 'uei.opennms.org/autoackTest' do
+opennms_event 'uei.opennms.org/autoackTest-isolated' do
   file 'events/chef6.events.xml'
   event_label 'Chef defined event: autoackTest'
-  descr '<p>autoackTest.</p>'
+  descr 'autoackTest.'
   logmsg 'autoackTest test.'
   logmsg_dest 'logndisplay'
   logmsg_notify true
@@ -244,10 +236,10 @@ opennms_event 'uei.opennms.org/autoackTest' do
   autoacknowledge 'info' => 'please do not wake me up when the computer breaks', 'state' => 'off'
 end
 
-opennms_event 'uei.opennms.org/filters' do
+opennms_event 'uei.opennms.org/filters-isolated' do
   file 'events/chef6.events.xml'
   event_label 'Chef defined event: filters'
-  descr '<p>filters.</p>'
+  descr 'filters.'
   logmsg 'filters test.'
   logmsg_dest 'logndisplay'
   logmsg_notify true
@@ -257,10 +249,10 @@ opennms_event 'uei.opennms.org/filters' do
   filters [{ 'eventparm' => 'one', 'pattern' => '/^one&two{;t|hree😇$/', 'replacement' => '💩' }]
 end
 
-opennms_event 'create_if_missing' do
+opennms_event 'create_if_missing-isolated' do
   file 'events/chef.events.xml'
   event_label 'Chef defined event: createifmissing'
-  descr '<p>Trying to create a file if its missing.</p>'
+  descr 'Trying to create a file if its missing.'
   logmsg 'creating file if its missing.'
   logmsg_dest 'logndisplay'
   logmsg_notify true
@@ -268,11 +260,11 @@ opennms_event 'create_if_missing' do
   action :create_if_missing
 end
 
-opennms_event 'noop_create_if_missing' do
-  uei 'create_if_missing'
+opennms_event 'noop_create_if_missing-isolated' do
+  uei 'create_if_missing-isolated'
   file 'events/chef.events.xml'
   event_label 'Chef defined event: noopcreateifmissing'
-  descr '<p>Trying to create create if missing that does nothing.</p>'
+  descr 'Trying to create create if missing that does nothing.'
   logmsg 'creating create if missing that does nothing.'
   logmsg_dest 'logndisplay'
   logmsg_notify true
