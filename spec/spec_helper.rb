@@ -1,5 +1,10 @@
 # frozen_string_literal: true
 
+begin
+  gem 'json', '< 3.0'
+rescue Gem::LoadError
+end
+
 require 'json'
 
 unless JSON.respond_to?(:create_id=)
