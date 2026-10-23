@@ -16,7 +16,7 @@ class OpenNmsEventApi < Inspec.resource(1)
     !raw_event_data.nil? && !raw_event_data.empty?
   end
 
-  def method_missing(name, *_args)
+  def method_missing(name, *args)
     return if raw_event_data.nil?
 
     OpenNmsDynamicMash.new(raw_event_data).send(name, *_args)

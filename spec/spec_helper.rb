@@ -1,10 +1,17 @@
 # frozen_string_literal: true
 
+require 'json'
+
+unless JSON.respond_to?(:create_id=)
+  module JSON
+    def self.create_id=(*)
+      nil
+    end
+  end
+end
+
 require 'chefspec'
 
-# FSafely attempt to load Berkshelf dependencies.
-# If the gem is missing in the slim workspace container, fallback gracefully
-# to keep the rspec execution suite from throwing fatal exceptions.
 begin
   require 'chefspec/berkshelf'
 rescue LoadError
