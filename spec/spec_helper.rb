@@ -20,8 +20,6 @@ end
 
 require 'chefspec'
 
-# Only attempt to require and initialize the Berkshelf solver extension
-# if a valid Berksfile physically exists at the cookbook root directory.
 if File.exist?(File.expand_path('../Berksfile', __dir__))
   begin
     require 'chefspec/berkshelf'
