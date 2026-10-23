@@ -1,4 +1,7 @@
+# frozen_string_literal: true
+
 include_recipe 'opennms_resource_tests::event'
+
 # test update event_label
 opennms_event 'change event-label on thresholdExceeded2' do
   uei 'uei.opennms.org/cheftest/thresholdExceeded2-event_label'
@@ -6,5 +9,4 @@ opennms_event 'change event-label on thresholdExceeded2' do
   file 'events/chef.events.xml'
   event_label 'Chef definedd event: thresholdExceeded'
   notifies :run, 'opennms_send_event[restart_Eventd]'
-  notifies :run, 'ruby_block[EXECUTE BULK OPENNMS UPLOAD]', :delayed
 end

@@ -1,50 +1,93 @@
 # frozen_string_literal: true
 
-class OpenNmsEventApi < Inspec.resource(1)
-  name 'opennms_event'
-
-  attr_reader :event_data
-
-  def initialize(uei, _file = nil)
-    # Horizon 35+ Fix: Query the centralized endpoint listing natively using port 8980
-    payload = fetch_live_eventconf_json
-
-    # Dynamic scan: extract all sub-arrays or object trees regardless of OpenNMS wrapper structure
-    all_events = find_all_events(payload)
-
-    @event_data = all_events.find { |e| e.is_a?(Hash) && e['uei'] == uei }
+# Unified wrapper class to ensure nested hashes also support flexible lookup keys
+class OpenNmsDynamicMash
+  def initialize(hash)
+    @data = hash || {}
   end
 
-  def exist?
-    !event_data.nil? && !event_data.empty?
+  def [](key)
+    return nil if @data.nil?
+
+    # Try the literal key, lowercase, snake_case, hyphenated, and camelCase
+    str_key = key.to_s
+    val = @data[str_key] ||
+      @data[str_key.downcase] ||
+      @data[snake_case(str_key)] ||
+      @data[hyphenate(str_key)] ||
+      @data[camelize(str_key)]
+
+    if val.is_a?(Hash)
+      OpenNmsDynamicMash.new(val)
+    elsif val.is_a?(Array)
+      val.map { |item| item.is_a?(Hash) ? OpenNmsDynamicMash.new(item) : item }
+    else
+      val
+    end
   end
 
-  # ===================================================================
-  # Automatic Dot-Notation Traversal & Nil-Safe Property Fallback
-  # ===================================================================
-  def method_missing(name, *_args)
-    return if event_data.nil?
-
-    # Handle string dot-notation smoothly (e.g., 'alarmData.reductionKey')
-    keys = name.to_s.split('.')
-
-    keys.reduce(event_data) do |memo, key|
-      if memo.is_a?(Hash)
-        # Check standard key first, then fallback to lowercase/camelCase variants
-        memo[key] || memo[key.downcase] || memo[camelize(key)]
-      elsif memo.is_a?(Array) && key.match?(/^\d+$/)
-        memo[key.to_i]
-      end
+  def method_missing(name, *args)
+    # Safely handle array indexing or field traversal
+    if name.to_s.match?(/^\d+$/)
+      self[name.to_s.to_i]
+    else
+      self[name]
     end
   end
 
   def respond_to_missing?(method_name, include_private = false)
-    return true if event_data.nil?
-    keys = method_name.to_s.split('.')
-    event_data.key?(keys.first) || event_data.key?(keys.first.downcase) || super
+    true
   end
 
-  # Horizon 35+: Use the correct default port 8980 and hit the modern /api/v2 namespace
+  def nil?
+    @data.empty?
+  end
+
+  def empty?
+    @data.empty?
+  end
+
+  private
+
+  def snake_case(str)
+    str.gsub(/([A-Z]+)([A-Z][a-z])/, '\1_\2').gsub(/([a-z\d])([A-Z])/, '\1_\2').tr('-', '_').downcase
+  end
+
+  def hyphenate(str)
+    snake_case(str).tr('_', '-')
+  end
+
+  def camelize(str)
+    components = str.split(/[_-]/)
+    components.first.downcase + components[1..-1].map(&:capitalize).join('')
+  end
+end
+
+class OpenNmsEventApi < Inspec.resource(1)
+  name 'opennms_event'
+
+  attr_reader :raw_event_data
+
+  def initialize(uei, _file = nil)
+    payload = fetch_live_eventconf_json
+    all_events = find_all_events(payload)
+    @raw_event_data = all_events.find { |e| e.is_a?(Hash) && e['uei'] == uei }
+  end
+
+  def exist?
+    !raw_event_data.nil? && !raw_event_data.empty?
+  end
+
+  # Pass lookup down to our custom wrapper so nested dot paths work smoothly
+  def method_missing(name, *args)
+    return nil if raw_event_data.nil?
+    OpenNmsDynamicMash.new(raw_event_data).send(name, *args)
+  end
+
+  def respond_to_missing?(method_name, include_private = false)
+    true
+  end
+
   def fetch_live_eventconf
     inspec.command("curl -s -u admin:admin -H 'Accept: application/json' http://localhost:8980/opennms/api/v2/eventconf")
   end
@@ -62,16 +105,10 @@ class OpenNmsEventApi < Inspec.resource(1)
 
   private
 
-  def camelize(str)
-    str.split('_').inject { |acc, elem| acc + elem.capitalize }
-  end
-
-  # Recursively crawl the dynamic payload map to collect any event elements safely
   def find_all_events(obj)
     events = []
     if obj.is_a?(Hash)
       obj.each do |k, v|
-        # Horizon 35+ API encapsulates the internal properties under 'event' or 'events' loops
         if %w(event events event_list eventList).include?(k.to_s)
           v.is_a?(Array) ? events.concat(v) : events.push(v)
         else

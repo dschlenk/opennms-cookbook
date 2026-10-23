@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 include_recipe 'opennms_resource_tests::event'
 
 # test remove alarm_data
@@ -7,5 +9,4 @@ opennms_event 'remove alarm_data of TE2' do
   file 'events/chef.events.xml'
   alarm_data false
   notifies :run, 'opennms_send_event[restart_Eventd]'
-  notifies :run, 'ruby_block[EXECUTE BULK OPENNMS UPLOAD]', :delayed
 end

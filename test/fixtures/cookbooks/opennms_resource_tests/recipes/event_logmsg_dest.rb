@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 include_recipe 'opennms_resource_tests::event'
 
 # test update logmsg_dest
@@ -7,5 +9,4 @@ opennms_event 'change dest of logmsg of thresholdExceeded2' do
   file 'events/chef.events.xml'
   logmsg_dest 'discardtraps'
   notifies :run, 'opennms_send_event[restart_Eventd]'
-  notifies :run, 'ruby_block[EXECUTE BULK OPENNMS UPLOAD]', :delayed
 end

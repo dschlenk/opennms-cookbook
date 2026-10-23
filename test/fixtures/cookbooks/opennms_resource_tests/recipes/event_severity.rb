@@ -1,4 +1,7 @@
+# frozen_string_literal: true
+
 include_recipe 'opennms_resource_tests::event'
+
 # test update severity
 opennms_event 'change severity of TE2' do
   uei 'uei.opennms.org/cheftest/thresholdExceeded2-event_severity'
@@ -6,5 +9,4 @@ opennms_event 'change severity of TE2' do
   file 'events/chef.events.xml'
   severity 'Warning'
   notifies :run, 'opennms_send_event[restart_Eventd]'
-  notifies :run, 'ruby_block[EXECUTE BULK OPENNMS UPLOAD]', :delayed
 end

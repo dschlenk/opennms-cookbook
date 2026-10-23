@@ -1,4 +1,5 @@
 include_recipe 'opennms_resource_tests::event'
+
 # test update descr
 opennms_event 'change descr of thresholdExceeded2' do
   uei 'uei.opennms.org/cheftest/thresholdExceeded2-event_descr'
@@ -6,5 +7,4 @@ opennms_event 'change descr of thresholdExceeded2' do
   file 'events/chef.events.xml'
   descr '<p>A thresholds defined by a chef recipe has been exceeded.</p>'
   notifies :run, 'opennms_send_event[restart_Eventd]'
-  notifies :run, 'ruby_block[EXECUTE BULK OPENNMS UPLOAD]', :delayed
 end

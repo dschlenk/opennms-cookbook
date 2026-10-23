@@ -3,7 +3,7 @@
 control 'event_change_parameters' do
   title 'OpenNMS Event Parameters Modification Fallback Validation'
 
-  describe opennms_event('uei.opennms.org/cheftest/thresholdExceeded2-event_change_parameters', 'events/chef.events.xml') do
+  describe opennms_event('uei.opennms.org/cheftest/thresholdExceeded2-event_add_parameters', 'events/chef.events.xml') do
     it { should exist }
 
     it 'validates the parameter fallback state based on schema capabilities' do

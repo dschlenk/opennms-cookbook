@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 include_recipe 'opennms_resource_tests::event'
 
 opennms_event 'add parameters' do
@@ -6,5 +8,4 @@ opennms_event 'add parameters' do
   file 'events/chef.events.xml'
   parameters [{ 'name' => 'param1', 'value' => 'paramValue1' }, { 'name' => 'param2', 'value' => 'paramValue2', 'expand' => true }]
   notifies :run, 'opennms_send_event[restart_Eventd]'
-  notifies :run, 'ruby_block[EXECUTE BULK OPENNMS UPLOAD]', :delayed
 end

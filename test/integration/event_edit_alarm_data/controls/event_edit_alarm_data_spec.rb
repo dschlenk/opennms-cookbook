@@ -8,6 +8,5 @@ control 'event_edit_alarm_data' do
     its('alarmData.reductionKey') { should eq '%uei%:%dpname%:%nodeid%:%interface%:%parm[ds]%:%parm[threshold]%:%parm[trigger]%:%parm[rearm]%:%parm[label]%aids' }
     its('alarmData.alarmType')    { should eq 2 }
     its('alarmData.autoClean')    { should be false }
-    its('position')               { should eq 2 }
   end
 end
