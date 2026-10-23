@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 require 'nokogiri'
-require_relative '../../libraries/config_helpers'
+require_relative '../../libraries/event_helpers'
 
 describe Opennms::Cookbook::ConfigHelpers::Event::Helper do
   let(:dummy_class) { Class.new { include Opennms::Cookbook::ConfigHelpers::Event::Helper }.new }

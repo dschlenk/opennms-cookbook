@@ -17,10 +17,7 @@ describe 'opennms_event custom resource' do
     end
 
     it 'raises a clear validation error' do
-      expect { chef_run }.to raise_error(
-                               Chef::Exceptions::ValidationFailed,
-                               /Cannot execute event deletion because Service\["opennms"\] is missing/
-                             )
+      expect { chef_run }.to raise_error(Chef::Exceptions::ValidationFailed, /Cannot execute event deletion because Service\["opennms"\] is missing/)
     end
   end
 
@@ -39,8 +36,8 @@ describe 'opennms_event custom resource' do
 
     before do
       allow_any_instance_of(Chef::Resource).to receive(:shell_out)
-                                                 .with('systemctl is-active --quiet opennms')
-                                                 .and_return(double(exitstatus: 1, stdout: '', stderr: ''))
+        .with('systemctl is-active --quiet opennms')
+        .and_return(double(exitstatus: 1, stdout: '', stderr: ''))
     end
 
     it 'successfully intercepts the lifecycle and runs the action' do
