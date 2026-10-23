@@ -40,16 +40,7 @@ opennms_event 'new event at the top' do
   logmsg 'A threshold has been exceeded3.'
   logmsg_dest 'logndisplay'
   logmsg_notify true
-  mask [{ 'mename' => 'id', 'mevalue' => ['.1.3.6.1.4.1.11385.102.1'] }, { 'mename' => 'generic', 'mevalue' => ['6'] }, { 'mename' => 'specific', 'mevalue' => ['2'] }]
   severity 'Minor'
-  operinstruct 'the operinstruct'
-  autoaction [{ 'action' => 'someaction', 'state' => 'off' }]
-  varbindsdecode [{ 'parmid' => 'theParmId', 'decode' => [{ 'varbindvalue' => 'theVarBindValue', 'varbinddecodedstring' => 'theVarBindDecodedString' }] }]
-  tticket 'info' => 'tticketInfo', 'state' => 'off'
-  forward [{ 'info' => 'fwdInfo', 'state' => 'off', 'mechanism' => 'snmptcp' }]
-  script [{ 'name' => 'anScript', 'language' => 'groovy' }]
-  mouseovertext 'mouseOverText'
-  alarm_data 'reduction_key' => '%uei%:%dpname%:%nodeid%:%interface%:%parm[ds]%:%parm[threshold]%:%parm[trigger]%:%parm[rearm]%:%parm[label]%', 'alarm_type' => 1, 'auto_clean' => false
   position 'top'
 end
 

@@ -136,6 +136,9 @@ control 'OpenNMS Live Event REST API - chef3.events and chef4.events position va
   describe opennms_event('uei.opennms.org/anUeiForANewThingInANewFileWithPositionTop-isolated', 'events/chef3.events.xml') do
     it { should exist }
     its('severity')                { should eq 'Minor' }
+    its('alarmData.reductionKey')  { should eq '%uei%:%dpname%:%nodeid%:%interface%:%parm[ds]%:%parm[threshold]%:%parm[trigger]%:%parm[rearm]%:%parm[label]%' }
+    its('alarmData.alarmType')     { should eq 1 }
+    its('alarmData.autoClean')     { should be false }
   end
 
   describe opennms_event('uei.opennms.org/fillerForANewThingInANewFile1-isolated', 'events/chef4.events.xml') do
@@ -216,6 +219,7 @@ end
 
 control 'OpenNMS Live Event REST API - chef.events file actions' do
   title 'chef.events file creation state validations'
+
   describe opennms_event('create_if_missing-isolated', 'events/chef.events.xml') do
     it { should exist }
     # Verifies that create_if_missing successfully populated pristine properties
@@ -233,6 +237,7 @@ control 'OpenNMS Live Event REST API - Dynamic Outage Loops' do
   title 'Pollerd certificate loops validation'
   [443, 8443].each do |_port|
     [60, 30].each do |_days|
+
       describe opennms_event('uei.opennms.org/nodes/nodeLostService', 'events/opennms.pollerd.events.xml') do
         it { should exist }
         its('eventLabel') { should eq 'OpenNMS-defined node event: nodeLostService' }
