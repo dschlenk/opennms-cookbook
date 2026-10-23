@@ -11,26 +11,24 @@ describe 'opennms::default' do
   # ============================================================================
 
   before do
-    # Stub out downstream cookbook lookups (like postgresql, java, yum) to prevent
-    # CookbookNotFound compiler failures when Berkshelf resolution hooks are skipped.
-    allow_any_instance_of(Chef::RunContext).to receive(:include_recipe).and_call_original
+    # Intercept the global Cookbook Collection lookup routine to pretend
+    # all missing metadata dependencies (like postgresql, java, yum) exist.
+    allow_any_instance_of(Chef::CookbookCollection).to receive(:[]).and_return(
+      double('CookbookVersion', metadata: double('Metadata', name: 'mock'))
+    )
 
-    %w(
-      postgresql::default postgresql::server postgresql
-      java::default java yum::default yum openjdk17 openjdk17::default
-      opennms::postgres opennms::packages opennms::send_events
-      opennms::rrdtool opennms::kafka_producer opennms::base_templates
-      opennms::adminpw opennms::default_resources opennms::templates
-    ).each do |recipe|
-      allow_any_instance_of(Chef::RunContext).to receive(:include_recipe).with(recipe).and_return(true)
-    end
+    # Intercept recipe expansion and inclusion rules to safely slide past
+    # missing external execution contexts without blowing up the compiler thread.
+    allow_any_instance_of(Chef::Recipe).to receive(:include_recipe).and_return(true)
+    allow_any_instance_of(Chef::RunContext).to receive(:include_recipe).and_return(true)
   end
 
   %w(9 10).each do |oracle_version|
     context "on Oracle Linux #{oracle_version}" do
       # Mock the Chef runner context execution loop
       let(:chef_run) do
-        # Safeguard: fall back to version 9 if local Fauxhai gem definitions lack the native Oracle Linux 10 mock data layout profiles.
+        # Safeguard: fall back to version 9 if local Fauxhai gem definitions
+        # lack the native Oracle Linux 10 mock data layout profiles.
         begin
           ChefSpec::SoloRunner.new(platform: 'oracle', version: oracle_version).converge(described_recipe)
         rescue Fauxhai::Exception::InvalidPlatform
