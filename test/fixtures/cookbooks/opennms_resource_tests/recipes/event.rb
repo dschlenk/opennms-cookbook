@@ -1,4 +1,6 @@
 # frozen_string_literal: true
+#
+include_recipe 'opennms::event'
 
 opennms_event 'uei.opennms.org/cheftest/thresholdExceeded' do
   file 'events/chef.events.xml'
