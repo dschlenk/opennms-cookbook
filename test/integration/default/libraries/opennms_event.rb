@@ -29,24 +29,23 @@ class OpenNmsEventApi < Inspec.resource(1)
   end
 
   def fetch_live_eventconf
-    # Added a 2-second sleep fallback directly into the curl loop to give Eventd
-    # enough breathing room to re-read new bulk XML document cache stream.
+    # Targets the exact database-backed endpoint for Horizon 35+ validation matrices
     inspec.command("sleep 2 && curl -s -u admin:admin -H 'Accept: application/json' http://localhost:8980/opennms/api/v2/eventconf")
   end
 
   def fetch_live_eventconf_json
     cmd = fetch_live_eventconf
 
-    # If curl failed completely, log it clearly to the test console output
+    # Safe fallback logging via standard 'puts' statements inside InSpec layers
     if cmd.exit_status != 0 || cmd.stdout.empty?
-      Logger.error("OpenNmsEventApi resource failed to contact REST endpoint. Exit: #{cmd.exit_status}")
+      puts "ERROR: OpenNmsEventApi resource failed to contact REST endpoint. Exit: #{cmd.exit_status}"
       return {}
     end
 
     begin
       JSON.parse(cmd.stdout)
     rescue JSON::ParserError => e
-      Logger.error("Failed to parse OpenNMS JSON schema stream: #{e.message}")
+      puts "ERROR: Failed to parse OpenNMS JSON schema stream: #{e.message}"
       {}
     end
   end
