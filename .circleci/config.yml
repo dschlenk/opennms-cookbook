@@ -19,6 +19,21 @@ jobs:
           name: cookstyle
           command: cookstyle
 
+  unit:
+    docker:
+      - image: cincproject/workstation:25.13.7
+        auth:
+          username: $DOCKER_USER
+          password: $DOCKER_PASSWORD
+    steps:
+      - checkout
+      - run:
+          name: bundler
+          command: cinc exec bundle install
+      - run:
+          name: Run ChefSpec Unit Tests
+          command: cinc exec rspec spec/unit/
+
   integration:
     machine:
       image: ubuntu-2404:current
@@ -33,7 +48,7 @@ jobs:
       - run:
           name: install cinc workstation
           command: |
-            curl -L https://omnitruck.cinc.sh/install.sh  | sudo bash -s -- -P cinc-workstation -v 25.13.7
+            curl -L https://omnitruck.cinc.sh/install.sh | sudo bash -s -- -P cinc-workstation -v 25.13.7
             # Persist Cinc environment variables across all subsequent CircleCI steps
             echo 'eval "$(cinc shell-init bash)"' >> $BASH_ENV
       - run:
@@ -45,7 +60,6 @@ jobs:
             export DOCKER_USER DOCKER_PASSWORD
 
             # Run kitchen test with '-d never' so it skips automatic cleanup on crash.
-            # If it fails, capture the active process outputs before exiting.
             if ! kitchen list -b | circleci tests split | xargs -L 1 kitchen test -d never; then
               echo "=================================================="
               echo "TEST KITCHEN FAILED! DUMPING CONTAINER LOGS:"
@@ -57,6 +71,11 @@ jobs:
               # Print the output to the console window
               docker logs "$LAST_CONTAINER"
               exit 1
+            else
+              # Added the successful execution echo block handler
+              echo "=================================================="
+              echo "TEST KITCHEN SUCCEEDED! ALL INTEGRATION CHECKS PASSED"
+              echo "=================================================="
             fi
 
 workflows:
@@ -64,4 +83,7 @@ workflows:
   untagged-build:
     jobs:
       - style
-      - integration
+      - unit
+      - integration:
+          requires:
+            - unit

@@ -7,10 +7,9 @@ class OpenNmsDynamicMash
     @hash = hash || {}
   end
 
-  def method_missing(name, *args)
-    key = name.to_s
-    # support both 'event_label' and 'event-label' style
-    @hash[key] || @hash[key.gsub('_', '-')] || @hash[key.to_sym]
+  def method_missing(name, *_args)
+    return if raw_event_data.nil?
+    OpenNmsDynamicMash.new(raw_event_data).send(name, *args)
   end
 
   def respond_to_missing?(*)
@@ -48,12 +47,10 @@ class OpenNmsEventApi < Inspec.resource(1)
   end
 
   def fetch_live_eventconf
-    # Lookup sequence matches our Chef recipes
-    # Avoids REST 63s latency gate on Oracle 10
     inspec.command(
-      "cat /opt/opennms/etc/events/chef.events.xml 2>/dev/null || " \
-      "cat /opt/opennms/etc/events/test.xml 2>/dev/null || " \
-      "cat /opt/opennms/etc/eventconf.xml 2>/dev/null"
+      'cat /opt/opennms/etc/events/chef.events.xml 2>/dev/null || ' \
+      'cat /opt/opennms/etc/events/test.xml 2>/dev/null || ' \
+      'cat /opt/opennms/etc/eventconf.xml 2>/dev/null'
     )
   end
 
@@ -75,10 +72,7 @@ class OpenNmsEventApi < Inspec.resource(1)
         'event-label' => e.at_xpath('event-label')&.text,
         'descr' => e.at_xpath('descr')&.text,
         'logmsg' => e.at_xpath('logmsg')&.text,
-        'severity' => e.at_xpath('severity')&.text,
-        'forward' => e.xpath('forward').map do |f|
-          { 'mechanism' => f['mechanism'] || f.at_xpath('mechanism')&.text, 'state' => f['state'] || f.at_xpath('state')&.text }
-        end
+        'forward' => e.xpath('forward').map { |f| { 'mechanism' => f['mechanism'], 'state' => f['state'] } },
       }
     end
 
@@ -94,15 +88,11 @@ class OpenNmsEventApi < Inspec.resource(1)
     events = []
     if obj.is_a?(Hash)
       obj.each do |k, v|
-        if %w[event events event_list eventList events_list].include?(k.to_s)
+        if %w(event events event_list eventList events_list).include?(k.to_s)
           v.is_a?(Array) ? events.concat(v) : events.push(v)
         else
           events.concat(find_all_events(v))
         end
       end
-    elsif obj.is_a?(Array)
-      obj.each { |item| events.concat(find_all_events(item)) }
     end
-    events
-  end
 end

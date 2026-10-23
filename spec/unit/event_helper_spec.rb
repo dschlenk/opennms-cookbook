@@ -49,9 +49,14 @@ describe Opennms::Cookbook::ConfigHelpers::Event::Helper do
     let(:url_parser_class) do
       Class.new do
         include Opennms::Cookbook::ConfigHelpers::Event::EventconfSourceRubyBlock
-        # Must be a structurally valid URL with port and api path to test stripping
-        def restv2url; 'http://127.0.0.1:8980/opennms/api/v2/events'; end
-        def admin_secret_from_vault(key); 'mocked_password'; end
+
+        def restv2url
+          'http://127.0.0.1:8980/opennms/api/v2/events'
+        end
+
+        def admin_secret_from_vault(_key)
+          'mocked_password'
+        end
       end.new
     end
 
