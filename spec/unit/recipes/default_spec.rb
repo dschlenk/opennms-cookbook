@@ -14,7 +14,8 @@ describe 'opennms::default' do
     # Intercept the global Cookbook Collection lookup routine to pretend
     # all missing metadata dependencies (like postgresql, java, yum) exist.
     allow_any_instance_of(Chef::CookbookCollection).to receive(:[]).and_return(
-      double('CookbookVersion', metadata: double('Metadata', name: 'mock'))
+      double('CookbookVersion',
+             metadata: double('Metadata', name: 'mock', dependencies: {}))
     )
 
     # Intercept recipe expansion and inclusion rules to safely slide past
