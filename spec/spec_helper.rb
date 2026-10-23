@@ -39,6 +39,6 @@ RSpec.configure do |config|
   # Point ChefSpec directly to your local cookbook directories
   config.cookbook_path = [
     File.expand_path('../..', __dir__),
-    File.expand_path('../libraries', __dir__)
+    File.expand_path('../libraries', __dir__),
   ]
 end

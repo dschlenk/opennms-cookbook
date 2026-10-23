@@ -22,6 +22,7 @@ describe 'opennms_event custom resource' do
                   'Cannot execute event deletion because Service["opennms"] is missing'
           end
 
+          # Use instance level method check safely
           cmd = shell_out('systemctl is-active --quiet opennms')
 
           if cmd.exitstatus != 0
@@ -78,6 +79,11 @@ describe 'opennms_event custom resource' do
         end
 
         before do
+          # Standardize the global shell stubbing pattern across Chef internals
+          allow_any_instance_of(Chef::Provider).to receive(:shell_out)
+            .with('systemctl is-active --quiet opennms')
+            .and_return(double(exitstatus: 1, stdout: '', stderr: ''))
+
           allow_any_instance_of(Chef::Resource).to receive(:shell_out)
             .with('systemctl is-active --quiet opennms')
             .and_return(double(exitstatus: 1, stdout: '', stderr: ''))
