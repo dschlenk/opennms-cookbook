@@ -277,7 +277,6 @@ action :create do
   end
 end
 
-
 # =====================================================================
 # ADDED EXPLICIT ACTION FOR RECIPE COMPATIBILITY IN CIRCLECI ERROR
 # =====================================================================
