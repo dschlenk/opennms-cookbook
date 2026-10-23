@@ -237,7 +237,6 @@ control 'OpenNMS Live Event REST API - Dynamic Outage Loops' do
   title 'Pollerd certificate loops validation'
   [443, 8443].each do |_port|
     [60, 30].each do |_days|
-
       describe opennms_event('uei.opennms.org/nodes/nodeLostService', 'events/opennms.pollerd.events.xml') do
         it { should exist }
         its('eventLabel') { should eq 'OpenNMS-defined node event: nodeLostService' }

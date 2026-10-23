@@ -11,10 +11,10 @@ class OpenNmsDynamicMash
 
     str_key = key.to_s
     val = @data[str_key] ||
-      @data[str_key.downcase] ||
-      @data[snake_case(str_key)] ||
-      @data[hyphenate(str_key)] ||
-      @data[camelize(str_key)]
+          @data[str_key.downcase] ||
+          @data[snake_case(str_key)] ||
+          @data[hyphenate(str_key)] ||
+          @data[camelize(str_key)]
 
     if val.is_a?(Hash)
       OpenNmsDynamicMash.new(val)
