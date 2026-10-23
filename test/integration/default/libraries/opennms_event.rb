@@ -29,8 +29,8 @@ class OpenNmsEventApi < Inspec.resource(1)
   end
 
   def fetch_live_eventconf
-    # Targets the exact database-backed endpoint for Horizon 35+ validation matrices
-    inspec.command("sleep 2 && curl -s -u admin:admin -H 'Accept: application/json' http://localhost:8980/opennms/api/v2/eventconf")
+    # CHANGED: Updated from /api/v2/ to /rest/ to pull valid JSON payload trees out of Horizon 35
+    inspec.command("sleep 2 && curl -s -u admin:admin -H 'Accept: application/json' http://localhost:8980/opennms/rest/eventconf")
   end
 
   def fetch_live_eventconf_json
