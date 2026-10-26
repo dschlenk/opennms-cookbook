@@ -50,6 +50,7 @@ template "#{onms_home}/etc/service-configuration.xml" do
   notifies :restart, 'service[opennms]'
   variables lazy {
               {
+                services: node['opennms']['services'],
                 snmp_poller: node['opennms']['services']['snmp_poller'],
                 correlator: node['opennms']['services']['correlator'],
                 syslogd: node['opennms']['services']['syslogd'],
@@ -283,19 +284,6 @@ template "#{onms_home}/etc/jcifs.properties" do
   action node['opennms']['templates'] ? :create : :nothing
 end
 
-template "#{onms_home}/etc/microblog-configuration.xml" do
-  cookbook node['opennms']['microblog']['cookbook']
-  source 'microblog-configuration.xml.erb'
-  mode '0664'
-  owner node['opennms']['username']
-  group node['opennms']['groupname']
-  notifies :restart, 'service[opennms]'
-  variables(
-    default_profile: node['opennms']['microblog']['default_profile']
-  )
-  action node['opennms']['templates'] ? :create : :nothing
-end
-
 template "#{onms_home}/etc/modemConfig.properties" do
   cookbook node['opennms']['modem']['cookbook']
   source 'modemConfig.properties.erb'
@@ -466,28 +454,6 @@ template "#{onms_home}/etc/vmware-datacollection-config.xml" do
     default_vm4: node['opennms']['vmware']['default_vm4'],
     default_hostsystem5: node['opennms']['vmware']['default_hostsystem5'],
     default_vm5: node['opennms']['vmware']['default_vm5']
-  )
-  action node['opennms']['templates'] ? :create : :nothing
-end
-
-template "#{onms_home}/etc/xmpp-configuration.properties" do
-  cookbook node['opennms']['xmpp']['cookbook']
-  source 'xmpp-configuration.properties.erb'
-  mode '0664'
-  owner node['opennms']['username']
-  group node['opennms']['groupname']
-  notifies :restart, 'service[opennms]'
-  variables(
-    server: node['opennms']['xmpp']['server'],
-    service_name: node['opennms']['xmpp']['service_name'],
-    port: node['opennms']['xmpp']['port'],
-    tls: node['opennms']['xmpp']['tls'],
-    sasl: node['opennms']['xmpp']['sasl'],
-    self_signed_certs: node['opennms']['xmpp']['self_signed_certs'],
-    truststore_password: node['opennms']['xmpp']['truststore_password'],
-    debug: node['opennms']['xmpp']['debug'],
-    user: node['opennms']['xmpp']['user'],
-    pass: node['opennms']['xmpp']['pass']
   )
   action node['opennms']['templates'] ? :create : :nothing
 end
