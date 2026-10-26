@@ -53,7 +53,6 @@ default['opennms']['upgrade_dirs'] = [
 ]
 # populate this with the names of additional packages you want installed.
 # examples:
-# * opennms-plugin-northbounder-jms
 # * opennms-plugin-provisioning-snmp-asset
 # * opennms-plugin-provisioning-snmp-hardware-inventory
 # * opennms-plugin-provisioning-wsman-asset

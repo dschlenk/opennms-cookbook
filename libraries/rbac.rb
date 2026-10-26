@@ -10,7 +10,7 @@ module Opennms::Rbac
     adminpw = nil
     if secret.eql?('password')
       # cache adminpw in run_state since it's oft-used
-      adminpw = node.run_state['opennms']['admin_password'] || 'admin'
+      adminpw = node.run_state.dig('opennms', 'admin_password') || 'admin'
       # if you're finding this comment it's probably because things involving the admin password are really slow
       # and that's because you didn't set a non-default password in a Chef vault, so every time Chef
       # needs to use the admin password, it's desperately checking the vault for one. You should set one.

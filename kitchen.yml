@@ -192,7 +192,6 @@ suites:
             - opennms-plugin-protocol-nsclient
             - opennms-plugin-provisioning-snmp-hardware-inventory
             - opennms-plugin-provisioning-snmp-asset
-            - opennms-plugin-northbounder-jms
   - name: avail_category
     excludes:
       - oraclelinux-9

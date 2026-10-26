@@ -1,4 +1,4 @@
-%w(opennms-core opennms-webapp-jetty opennms-plugin-protocol-nsclient opennms-plugin-provisioning-snmp-hardware-inventory opennms-plugin-provisioning-snmp-asset opennms-plugin-northbounder-jms).each do |p|
+%w(opennms-core opennms-webapp-jetty opennms-plugin-protocol-nsclient opennms-plugin-provisioning-snmp-hardware-inventory opennms-plugin-provisioning-snmp-asset).each do |p|
   describe package(p) do
     it { should be_installed }
     its('version') { should eq '36.0.5-1' }
