@@ -39,12 +39,29 @@ platforms:
       pid_one_command: /usr/lib/systemd/systemd
       pull_platform_image: true
       pull_chef_image: true
+  - name: oraclelinux-10
+    driver:
+      image: dokken/oraclelinux-10
+      pid_one_command: /usr/lib/systemd/systemd
+      pull_platform_image: true
+      pull_chef_image: true
 
 suites:
-  - name: mkimage
+  - name: mkimage-9
     provisioner:
       policyfile: policyfiles/mkimage.rb
+    excludes:
+      - oraclelinux-10
     lifecycle:
       post_verify:
         - docker commit $(docker ps | grep mkimage | tr -s ' ' | cut -d ' ' -f 1) c1og/opennms-36-oraclelinux-9:latest
         - docker push c1og/opennms-36-oraclelinux-9:latest
+  - name: mkimage-10
+    provisioner:
+      policyfile: policyfiles/mkimage.rb
+    excludes:
+      - oraclelinux-9
+    lifecycle:
+      post_verify:
+        - docker commit $(docker ps | grep mkimage | tr -s ' ' | cut -d ' ' -f 1) c1og/opennms-36-oraclelinux-10:latest
+        - docker push c1og/opennms-36-oraclelinux-10:latest
