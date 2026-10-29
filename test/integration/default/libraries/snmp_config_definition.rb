@@ -1,3 +1,6 @@
+# frozen_string_literal: true
+require 'rexml/document'
+
 class SnmpConfigDefinition < Inspec.resource(1)
   name 'snmp_config_definition'
 
@@ -26,34 +29,80 @@ class SnmpConfigDefinition < Inspec.resource(1)
     end
   '
 
+  # On OpenNMS 36 the snmp config is stored in the database and served by the
+  # v2 REST API's download endpoint; on older versions it lives in
+  # /opt/opennms/etc/snmp-config.xml
+  XML_URL = 'http://localhost:8980/opennms/api/v2/snmp-config/download?format=xml'
+
   def initialize(config)
+    @config = config
+    doc = xml_document
+    if doc.nil?
+      from_file(config)
+    else
+      fill_from_document(doc, config)
+    end
+  end
+
+  def exist?
+    @exists
+  end
+
+  def method_missing(param)
+    @params[param]
+  end
+
+  private
+
+  def xml_document
+    response = inspec.http(XML_URL, auth: { user: 'admin', pass: 'admin' })
+    return unless response.status == 200
+
+    REXML::Document.new(response.body)
+  rescue StandardError
+    nil
+  end
+
+  def from_file(config)
     doc = REXML::Document.new(inspec.file('/opt/opennms/etc/snmp-config.xml').content)
+    fill_from_document(doc, config)
+  end
+
+  # A stored definition matches the given config when every attribute in the
+  # config equals the stored value (string comparison, as in the file world)
+  # and location and profile-label match
+  def definition_matches?(def_el, config)
+    def_el.attributes['port'].to_s == config['port'].to_s \
+      && def_el.attributes['retry'].to_s == config['retry_count'].to_s \
+      && def_el.attributes['timeout'].to_s == config['timeout'].to_s \
+      && def_el.attributes['read-community'].to_s == config['read_community'].to_s \
+      && def_el.attributes['write-community'].to_s == config['write_community'].to_s \
+      && def_el.attributes['proxy-host'].to_s == config['proxy_host'].to_s \
+      && def_el.attributes['version'].to_s == config['version'].to_s \
+      && def_el.attributes['max-vars-per-pdu'].to_s == config['max_vars_per_pdu'].to_s \
+      && def_el.attributes['max-repetitions'].to_s == config['max_repetitions'].to_s \
+      && def_el.attributes['max-request-size'].to_s == config['max_request_size'].to_s \
+      && def_el.attributes['security-name'].to_s == config['security_name'].to_s \
+      && def_el.attributes['security-level'].to_s == config['security_level'].to_s \
+      && def_el.attributes['auth-passphrase'].to_s == config['auth_passphrase'].to_s \
+      && def_el.attributes['auth-protocol'].to_s == config['auth_protocol'].to_s \
+      && def_el.attributes['engine-id'].to_s == config['engine_id'].to_s \
+      && def_el.attributes['context-engine-id'].to_s == config['context_engine_id'].to_s \
+      && def_el.attributes['context-name'].to_s == config['context_name'].to_s \
+      && def_el.attributes['privacy-passphrase'].to_s == config['privacy_passphrase'].to_s \
+      && def_el.attributes['privacy-protocol'].to_s == config['privacy_protocol'].to_s \
+      && def_el.attributes['enterprise-id'].to_s == config['enterprise_id'].to_s \
+      && def_el.attributes['location'].to_s == config['location'].to_s \
+      && def_el.attributes['profile-label'].to_s == config['profile_label'].to_s
+  end
+
+  def fill_from_document(doc, config)
     d = nil
     doc.elements.each('/snmp-config/definition') do |def_el|
-      next unless def_el.attributes['port'].to_s == config['port'].to_s\
-      && def_el.attributes['retry'].to_s == config['retry_count'].to_s\
-      && def_el.attributes['timeout'].to_s == config['timeout'].to_s\
-      && def_el.attributes['read-community'].to_s == config['read_community'].to_s\
-      && def_el.attributes['write-community'].to_s == config['write_community'].to_s\
-      && def_el.attributes['proxy-host'].to_s == config['proxy_host'].to_s\
-      && def_el.attributes['version'].to_s == config['version'].to_s\
-      && def_el.attributes['max-vars-per-pdu'].to_s == config['max_vars_per_pdu'].to_s\
-      && def_el.attributes['max-repetitions'].to_s == config['max_repetitions'].to_s\
-      && def_el.attributes['max-request-size'].to_s == config['max_request_size'].to_s\
-      && def_el.attributes['security-name'].to_s == config['security_name'].to_s\
-      && def_el.attributes['security-level'].to_s == config['security_level'].to_s\
-      && def_el.attributes['auth-passphrase'].to_s == config['auth_passphrase'].to_s\
-      && def_el.attributes['auth-protocol'].to_s == config['auth_protocol'].to_s\
-      && def_el.attributes['engine-id'].to_s == config['engine_id'].to_s\
-      && def_el.attributes['context-engine-id'].to_s == config['context_engine_id'].to_s\
-      && def_el.attributes['context-name'].to_s == config['context_name'].to_s\
-      && def_el.attributes['privacy-passphrase'].to_s == config['privacy_passphrase'].to_s\
-      && def_el.attributes['privacy-protocol'].to_s == config['privacy_protocol'].to_s\
-      && def_el.attributes['enterprise-id'].to_s == config['enterprise_id'].to_s\
-      && def_el.attributes['location'].to_s == config['location'].to_s\
-      && def_el.attributes['profile-label'].to_s == config['profile_label'].to_s
-      d = def_el
-      break
+      if definition_matches?(def_el, config)
+        d = def_el
+        break
+      end
     end
     @exists = !d.nil?
     return unless @exists
@@ -76,13 +125,5 @@ class SnmpConfigDefinition < Inspec.resource(1)
         @params[:ip_matches].push i.texts.collect(&:value).join('')
       end
     end
-  end
-
-  def exist?
-    @exists
-  end
-
-  def method_missing(param)
-    @params[param]
   end
 end

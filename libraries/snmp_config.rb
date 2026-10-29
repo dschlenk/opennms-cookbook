@@ -1,3 +1,9 @@
+# frozen_string_literal: true
+
+require 'base64'
+require 'rest-client'
+require 'rexml/document'
+
 module Opennms
   module Cookbook
     module ConfigHelpers
@@ -8,7 +14,7 @@ module Opennms
 
         def xml_resource
           return unless xml_resource_exist?
-          find_resource!(:template, "#{node['opennms']['conf']['home']}/etc/snmp-config.xml")
+          find_resource!(:template, xml_template_path)
         end
 
         def ro_xml_resource_init
@@ -20,27 +26,121 @@ module Opennms
           find_resource!(:template, "RO #{node['opennms']['conf']['home']}/etc/snmp-config.xml")
         end
 
+        # On OpenNMS 36 the snmp-config is stored in the database and managed via the
+        # v2 REST API instead of $OPENNMS_HOME/etc/snmp-config.xml
+        def snmp_config_v36?
+          node['opennms']['version'].to_i >= 36
+        end
+
+        # The snmp-config template resource: on OpenNMS 36 a scratch copy in the
+        # file cache that is rendered and uploaded to the v2 API; on earlier
+        # versions the real $OPENNMS_HOME/etc/snmp-config.xml
+        def xml_template_path
+          if snmp_config_v36?
+            "#{Chef::Config[:file_cache_path]}/snmp-config.xml"
+          else
+            "#{node['opennms']['conf']['home']}/etc/snmp-config.xml"
+          end
+        end
+
+        # The accumulated snmp config for this run: the result of a single
+        # download (GET /snmp-config/download?format=xml) parsed into a
+        # SnmpConfigFile, cached in the run state and shared by all resources,
+        # so mutations made by earlier resources are visible to later ones
+        def snmp_config_file
+          node.run_state['opennms_snmp_config_file'] ||=
+            Opennms::Cookbook::ConfigHelpers::SnmpConfig::SnmpConfigFile.load(snmp_config_document_xml)
+        end
+
+        # The pristine download, kept for the dirty check in
+        # snmp_config_update_file: a run whose mutations net out to no change
+        # uploads nothing
+        def snmp_config_file_original
+          node.run_state['opennms_snmp_config_file_original'] ||=
+            Opennms::Cookbook::ConfigHelpers::SnmpConfig::SnmpConfigFile.load(snmp_config_document_xml)
+        end
+
+        # Read-modify-write of the accumulated snmp config: yield it for
+        # mutation, then, only if the accumulated document differs from the
+        # pristine download, make sure the end-of-run upload resource (POST
+        # /snmp-config/upload/xml) exists. The upload is declared on the first
+        # net change only, so a fully idempotent run makes exactly one API
+        # call (the download)
+        def snmp_config_update_file
+          file = snmp_config_file
+          yield file
+          snmp_config_upload_resource_ensure if snmp_config_file_original != file
+          file
+        end
+
         private
 
+        def snmp_config_document_xml
+          node.run_state['opennms_snmp_config_xml'] ||= begin
+            response = RestClient.get("#{restv2url}/snmp-config/download?format=xml", snmp_config_api_headers)
+            response.body
+          end
+        end
+
+        def snmp_config_api_headers
+          { 'Authorization' => "Basic #{Base64.strict_encode64("admin:#{admin_secret_from_vault('password')}")}" }
+        end
+
+        # The http_request resource that uploads the accumulated document at the
+        # end of the run, declared on the first net change only. The message is
+        # a lazy block that the http_request provider evaluates when the
+        # delayed POST runs, so it reads the rendered file as written by the
+        # delayed template create that runs just before it; a run without a net
+        # change never declares the resource and never posts
+        def snmp_config_upload_resource_ensure
+          return unless find_resource(:http_request, 'snmp config upload').nil?
+
+          upload_url = "#{restv2url}/snmp-config/upload/xml"
+          with_run_context :root do
+            declare_resource(:http_request, 'snmp config upload') do
+              url upload_url
+              headers 'Authorization' => "Basic #{Base64.strict_encode64("admin:#{admin_secret_from_vault('password')}")}",
+                      'Content-Type' => "multipart/form-data; boundary=#{Opennms::Cookbook::ConfigHelpers::SnmpConfig::UPLOAD_BOUNDARY}"
+              message lazy { Opennms::Cookbook::ConfigHelpers::SnmpConfig.snmp_config_upload_body(::File.read(xml_template_path)) }
+              sensitive true
+              action :nothing
+              delayed_action :post
+            end
+          end
+        end
+
         def xml_resource_exist?
-          !find_resource(:template, "#{node['opennms']['conf']['home']}/etc/snmp-config.xml").nil?
+          !find_resource(:template, xml_template_path).nil?
         rescue Chef::Exceptions::ResourceNotFound
           false
         end
 
         def xml_resource_create
-          snmp_config = Opennms::Cookbook::ConfigHelpers::SnmpConfig::SnmpConfigFile.new
-          snmp_config.read!("#{node['opennms']['conf']['home']}/etc/snmp-config.xml") if ::File.exist?("#{node['opennms']['conf']['home']}/etc/snmp-config.xml")
-          with_run_context :root do
-            declare_resource(:template, "#{node['opennms']['conf']['home']}/etc/snmp-config.xml") do
-              source 'snmp-config.xml.erb'
-              cookbook 'opennms'
-              owner node['opennms']['username']
-              group node['opennms']['groupname']
-              mode '0600'
-              variables(snmp_config: snmp_config)
-              action :nothing
-              delayed_action :create
+          if snmp_config_v36?
+            with_run_context :root do
+              declare_resource(:template, xml_template_path) do
+                source 'snmp-config.xml.erb'
+                cookbook 'opennms'
+                mode '0600'
+                variables(snmp_config: snmp_config_file)
+                action :nothing
+                delayed_action :create
+              end
+            end
+          else
+            snmp_config = Opennms::Cookbook::ConfigHelpers::SnmpConfig::SnmpConfigFile.new
+            snmp_config.read!("#{node['opennms']['conf']['home']}/etc/snmp-config.xml") if ::File.exist?("#{node['opennms']['conf']['home']}/etc/snmp-config.xml")
+            with_run_context :root do
+              declare_resource(:template, "#{node['opennms']['conf']['home']}/etc/snmp-config.xml") do
+                source 'snmp-config.xml.erb'
+                cookbook 'opennms'
+                owner node['opennms']['username']
+                group node['opennms']['groupname']
+                mode '0600'
+                variables(snmp_config: snmp_config)
+                action :nothing
+                delayed_action :create
+              end
             end
           end
         end
@@ -71,6 +171,23 @@ module Opennms
       end
 
       module SnmpConfig
+        # the fixed boundary for the multipart body of POST /snmp-config/upload/xml
+        UPLOAD_BOUNDARY = 'opennms-snmp-config-xml-upload'
+
+        # The multipart body for POST /snmp-config/upload/xml: a single form
+        # field 'upload' carrying the XML document as a file part
+        def self.snmp_config_upload_body(xml)
+          boundary = UPLOAD_BOUNDARY
+          body = +''
+          body << "--#{boundary}\r\n"
+          body << "Content-Disposition: form-data; name=\"upload\"; filename=\"snmp-config.xml\"\r\n"
+          body << "Content-Type: application/xml\r\n"
+          body << "\r\n"
+          body << "#{xml}\r\n"
+          body << "--#{boundary}--\r\n"
+          body
+        end
+
         module Helper
           def self.attributes_from_properties(r1, r2)
             v1v2 = true
@@ -148,7 +265,7 @@ module Opennms
         class SnmpConfig
           attr_accessor :version, :port, :read_community, :write_community, :timeout, :retry_count, :proxy_host, :max_vars_per_pdu, :max_repetitions, :max_request_size, :ttl, :encrypted, :security_name, :security_level, :auth_passphrase, :auth_protocol, :engine_id, :context_engine_id, :context_name, :privacy_passphrase, :privacy_protocol, :enterprise_id
           def to_s
-            "version='#{@version}', port='#{@port}', read_community='#{@read_community}', write_community='#{@write_community}', timeout='#{@timeout}', retry_count='#{@retry_count}', proxy_host='#{@proxy_host}', max_vars_per_pdu='#{@max_vars_per_pdu}', max_repetitions='#{@max_repetitions}', max_request_size='#{@max_request_size}', ttl='#{@ttl}', encrypted='#{@encrypted}', security_name='#{@security_name}', security_level'#{@security_level}', auth_passphrase='#{@auth_passphrase}', auth_protocol='#{@auth_protocol}', engine_id='#{@engine_id}', context_engine_id='#{@context_engine_id}', context_name='#{@context_name}', privacy_passphrase='#{@privacy_passphrase}', privacy_protocol='#{@privacy_protocol}', enterprise_id='#{@enterprise_id}'"
+            "version='#{@version}', port='#{@port}', read_community='#{@read_community}', write_community='#{@write_community}', timeout='#{@timeout}', retry_count='#{@retry_count}', proxy_host='#{@proxy_host}', max_vars_per_pdu='#{@max_vars_per_pdu}', max_repetitions='#{@max_repetitions}', max_request_size='#{@max_request_size}', ttl='#{@ttl}', encrypted='#{@encrypted}', security_name='#{@security_name}', security_level='#{@security_level}', auth_passphrase='#{@auth_passphrase}', auth_protocol='#{@auth_protocol}', engine_id='#{@engine_id}', context_engine_id='#{@context_engine_id}', context_name='#{@context_name}', privacy_passphrase='#{@privacy_passphrase}', privacy_protocol='#{@privacy_protocol}', enterprise_id='#{@enterprise_id}'"
           end
         end
 
@@ -165,12 +282,15 @@ module Opennms
             super + ", definitions count='#{@definitions.length}', profiles count='#{@profiles.length}'"
           end
 
-          def read!(file = 'snmp-config.xml', _sort = false)
-            raise ArgumentError, "File #{file} does not exist" unless ::File.exist?(file)
+          # Parse the given XML document into a new config; the shared core of
+          # read!
+          def self.load(content)
+            snmp_config = new
+            snmp_config.parse!(content)
+          end
 
-            f = ::File.new(file, 'r')
-            doc = REXML::Document.new f
-            f.close
+          def parse!(content)
+            doc = REXML::Document.new(content)
             sc = doc.elements['/snmp-config']
             unless sc.nil?
               if sc.has_attributes?
@@ -207,6 +327,12 @@ module Opennms
               end
             end
             self
+          end
+
+          def read!(file = 'snmp-config.xml', _sort = false)
+            raise ArgumentError, "File #{file} does not exist" unless ::File.exist?(file)
+
+            parse!(::File.read(file))
           end
 
           def add_definition(definition)
@@ -287,6 +413,19 @@ module Opennms
             snmp_config.read!(file, sort: sort)
             snmp_config
           end
+
+          # Structural equality of two parsed configs: the root attributes plus
+          # the definitions and the profiles. The definition and profile
+          # classes' own eql? implementations do the element-wise comparison.
+          # Used to decide whether a run's mutations changed the accumulated
+          # document
+          def eql?(other)
+            return false unless self.class.eql?(other.class)
+            return true if version.eql?(other.version) && port.eql?(other.port) && read_community.eql?(other.read_community) && write_community.eql?(other.write_community) && timeout.eql?(other.timeout) && retry_count.eql?(other.retry_count) && proxy_host.eql?(other.proxy_host) && max_vars_per_pdu.eql?(other.max_vars_per_pdu) && max_repetitions.eql?(other.max_repetitions) && max_request_size.eql?(other.max_request_size) && ttl.eql?(other.ttl) && encrypted.eql?(other.encrypted) && security_name.eql?(other.security_name) && security_level.eql?(other.security_level) && auth_passphrase.eql?(other.auth_passphrase) && auth_protocol.eql?(other.auth_protocol) && engine_id.eql?(other.engine_id) && context_engine_id.eql?(other.context_engine_id) && context_name.eql?(other.context_name) && privacy_passphrase.eql?(other.privacy_passphrase) && privacy_protocol.eql?(other.privacy_protocol) && enterprise_id.eql?(other.enterprise_id) && definitions.eql?(other.definitions) && profiles.eql?(other.profiles)
+            false
+          end
+
+          alias_method :==, :eql?
         end
 
         class SnmpConfigFileDefinition < SnmpConfig

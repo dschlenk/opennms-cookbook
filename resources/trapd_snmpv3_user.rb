@@ -1,4 +1,5 @@
 include Opennms::Cookbook::Trapd::ConfigTemplate
+include Opennms::Rbac
 unified_mode true
 
 provides :opennms_trapd_snmpv3_user
@@ -68,8 +69,8 @@ action :create do
     cfg = config_from_resource(r)
     u = cfg.user_for_identity(new_resource.engine_id, new_resource.security_name, new_resource.security_level, new_resource.auth_protocol, new_resource.privacy_protocol)
     if u
-      u['authPassphrase'] = new_resource.auth_passphrase if new_resource.auth_passphrase
-      u['privacyPassphrase'] = new_resource.privacy_passphrase if new_resource.privacy_passphrase
+      u.auth_passphrase = new_resource.auth_passphrase if new_resource.auth_passphrase
+      u.privacy_passphrase = new_resource.privacy_passphrase if new_resource.privacy_passphrase
     else
       cfg.add_snmpv3_user(
         Opennms::Cookbook::Trapd::Snmpv3User.new(
@@ -83,6 +84,7 @@ action :create do
         )
       )
     end
+    update_trapd_resource(cfg)
   end
 end
 
@@ -103,6 +105,7 @@ action :delete do
       cfg = config_from_resource(r)
       u = cfg.user_for_identity(new_resource.engine_id, new_resource.security_name, new_resource.security_level, new_resource.auth_protocol, new_resource.privacy_protocol)
       cfg.remove_snmpv3_user(u)
+      update_trapd_resource(cfg)
     end
   end
 end

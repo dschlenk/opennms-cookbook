@@ -33,13 +33,19 @@ property :specifics, Array
 property :ip_matches, Array
 
 include Opennms::Cookbook::ConfigHelpers::SnmpConfigTemplate
+include Opennms::Rbac
 load_current_value do |new_resource|
-  r = xml_resource
-  if r.nil?
-    ro_xml_resource_init
-    r = ro_xml_resource
+  if snmp_config_v36?
+    raise Chef::Exceptions::ValidationFailed, "opennms_snmp_config_definition[#{new_resource.name}]: encrypted is not supported on OpenNMS 36, the snmp config is stored in the database and passphrases are never stored encrypted" if new_resource.encrypted
+    snmp_config = snmp_config_file
+  else
+    r = xml_resource
+    if r.nil?
+      ro_xml_resource_init
+      r = ro_xml_resource
+    end
+    snmp_config = r.variables[:snmp_config]
   end
-  snmp_config = r.variables[:snmp_config]
   definition = snmp_config.definition(new_resource.port, new_resource.retry_count, new_resource.timeout, new_resource.read_community, new_resource.write_community, new_resource.proxy_host, new_resource.version, new_resource.max_vars_per_pdu, new_resource.max_repetitions, new_resource.max_request_size, new_resource.ttl, new_resource.encrypted, new_resource.security_name, new_resource.security_level, new_resource.auth_passphrase, new_resource.auth_protocol, new_resource.engine_id, new_resource.context_engine_id, new_resource.context_name, new_resource.privacy_passphrase, new_resource.privacy_protocol, new_resource.enterprise_id, new_resource.location, new_resource.profile_label)
   current_value_does_not_exist! if definition.nil?
   %i(port read_community write_community retry_count timeout proxy_host version max_vars_per_pdu max_repetitions max_request_size ttl encrypted security_name security_level auth_passphrase auth_protocol engine_id context_engine_id context_name privacy_passphrase privacy_protocol enterprise_id location profile_label ranges specifics ip_matches).each do |p|
@@ -50,25 +56,51 @@ end
 action :add do
   converge_if_changed do
     xml_resource_init
-    snmp_config = xml_resource.variables[:snmp_config]
-    definition = Opennms::Cookbook::ConfigHelpers::SnmpConfig::SnmpConfigFileDefinition.new
-    Opennms::Cookbook::ConfigHelpers::SnmpConfig::Helper.attributes_from_properties(definition, new_resource)
-    definition.location = new_resource.location
-    definition.profile_label = new_resource.profile_label
-    definition.ranges = new_resource.ranges
-    definition.specifics = new_resource.specifics
-    definition.ip_matches = new_resource.ip_matches
-    snmp_config.add_definition(definition)
+    if snmp_config_v36?
+      snmp_config_update_file do |snmp_config|
+        definition = Opennms::Cookbook::ConfigHelpers::SnmpConfig::SnmpConfigFileDefinition.new
+        Opennms::Cookbook::ConfigHelpers::SnmpConfig::Helper.attributes_from_properties(definition, new_resource)
+        definition.location = new_resource.location
+        definition.profile_label = new_resource.profile_label
+        definition.ranges = new_resource.ranges
+        definition.specifics = new_resource.specifics
+        definition.ip_matches = new_resource.ip_matches
+        snmp_config.add_definition(definition)
+      end
+    else
+      snmp_config = xml_resource.variables[:snmp_config]
+      definition = Opennms::Cookbook::ConfigHelpers::SnmpConfig::SnmpConfigFileDefinition.new
+      Opennms::Cookbook::ConfigHelpers::SnmpConfig::Helper.attributes_from_properties(definition, new_resource)
+      definition.location = new_resource.location
+      definition.profile_label = new_resource.profile_label
+      definition.ranges = new_resource.ranges
+      definition.specifics = new_resource.specifics
+      definition.ip_matches = new_resource.ip_matches
+      snmp_config.add_definition(definition)
+    end
   end
 end
 
 action(:create) { run_action(:add) }
 
 action :delete do
-  xml_resource_init
-  snmp_config = xml_resource.variables[:snmp_config]
+  snmp_config = if snmp_config_v36?
+                  snmp_config_file
+                else
+                  xml_resource_init
+                  xml_resource.variables[:snmp_config]
+                end
   definition = snmp_config.definition(new_resource.port, new_resource.retry_count, new_resource.timeout, new_resource.read_community, new_resource.write_community, new_resource.proxy_host, new_resource.version, new_resource.max_vars_per_pdu, new_resource.max_repetitions, new_resource.max_request_size, new_resource.ttl, new_resource.encrypted, new_resource.security_name, new_resource.security_level, new_resource.auth_passphrase, new_resource.auth_protocol, new_resource.engine_id, new_resource.context_engine_id, new_resource.context_name, new_resource.privacy_passphrase, new_resource.privacy_protocol, new_resource.enterprise_id, new_resource.location, new_resource.profile_label)
-  converge_by("Removing SNMP config definition #{new_resource.name}") do
-    snmp_config.remove_definition(definition)
-  end unless definition.nil?
+  unless definition.nil?
+    converge_by("Removing SNMP config definition #{new_resource.name}") do
+      if snmp_config_v36?
+        xml_resource_init
+        snmp_config_update_file do |snmp_config_file|
+          snmp_config_file.remove_definition(definition)
+        end
+      else
+        snmp_config.remove_definition(definition)
+      end
+    end
+  end
 end

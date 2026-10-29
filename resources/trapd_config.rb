@@ -1,4 +1,5 @@
 include Opennms::Cookbook::Trapd::ConfigTemplate
+include Opennms::Rbac
 unified_mode true
 
 provides :opennms_trapd_config
@@ -48,5 +49,6 @@ action :create do
     cfg.batch_size = new_resource.batch_size
     cfg.batch_interval = new_resource.batch_interval
     cfg.use_address_from_varbind = new_resource.use_address_from_varbind unless new_resource.use_address_from_varbind.nil?
+    update_trapd_resource(cfg)
   end
 end

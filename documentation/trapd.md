@@ -1,5 +1,15 @@
 # Trapd Resources
 
+## OpenNMS 36
+
+On OpenNMS 36 and later the trapd config is stored in the database and managed through the v2 REST API (`/opennms/api/v2/trapd`) instead of the `trapd-configuration.xml` template. The file-based management is still used on earlier versions.
+
+- Changes are accumulated during the run on a single `http_request` resource and applied with one `PUT /config` at the end of the run, so `opennms_trapd_config` and `opennms_trapd_snmpv3_user` resources in the same run converge on the same document without clobbering each other.
+- The API replaces the whole stored document on every write. Resources therefore read the current config (as a cleartext XML download) before applying their changes, and passphrases are never sent back in masked form.
+- An `opennms_trapd_config` resource applies all of its properties to the document (properties left unset take their resource defaults). The exception is `use_address_from_varbind`: when it is not set, the current server-side value is kept.
+- `opennms_trapd_snmpv3_user` users are correlated with the stable `id` the server assigns when a user is first persisted, so existing users keep their identity (and passphrases) across updates.
+- A user that is created and deleted in the same run converges on every run: the create resource re-adds the absent user and the delete resource removes it again. The final state is stable.
+
 ## opennms\_trapd\_config
 
 Manages the OpenNMS Trapd configuration.

@@ -16,12 +16,12 @@ end
 
 describe snmp_config_definition('profile_label' => 'foo') do
   it { should exist }
-  its('ranges') { should eq ['10.1.1.2' => '10.1.1.3'] }
+  its('ranges') { should eq [{ '10.1.1.2' => '10.1.1.3' }] }
   its('specifics') { should eq ['10.1.1.4'] }
 end
 
 describe snmp_config_definition('profile_label' => 'foo', 'location' => 'bar') do
   it { should exist }
-  its('ranges') { should eq ['10.3.1.2' => '10.3.1.3'] }
+  its('ranges') { should eq [{ '10.3.1.2' => '10.3.1.3' }] }
   its('specifics') { should eq ['10.3.1.4'] }
 end

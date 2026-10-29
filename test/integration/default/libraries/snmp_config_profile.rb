@@ -1,3 +1,6 @@
+# frozen_string_literal: true
+require 'rexml/document'
+
 class SnmpConfigProfile < Inspec.resource(1)
   name 'snmp_config_profile'
 
@@ -23,12 +26,49 @@ class SnmpConfigProfile < Inspec.resource(1)
     end
   '
 
+  # On OpenNMS 36 the snmp config is stored in the database and served by the
+  # v2 REST API's download endpoint; on older versions it lives in
+  # /opt/opennms/etc/snmp-config.xml
+  XML_URL = 'http://localhost:8980/opennms/api/v2/snmp-config/download?format=xml'
+
   def initialize(label)
     @label = label
+    doc = xml_document
+    if doc.nil?
+      from_file(label)
+    else
+      fill_from_document(doc, label)
+    end
+  end
+
+  def exist?
+    @exists
+  end
+
+  def method_missing(param)
+    @params[param]
+  end
+
+  private
+
+  def xml_document
+    response = inspec.http(XML_URL, auth: { user: 'admin', pass: 'admin' })
+    return unless response.status == 200
+
+    REXML::Document.new(response.body)
+  rescue StandardError
+    nil
+  end
+
+  def from_file(label)
     doc = REXML::Document.new(inspec.file('/opt/opennms/etc/snmp-config.xml').content)
+    fill_from_document(doc, label)
+  end
+
+  def fill_from_document(doc, label)
     p = nil
-    doc.each_element("/snmp-config/profiles/profile[label/text()[contains(., '#{@label}')]]") do |mp|
-      if mp.elements['label'].texts.collect(&:value).join('').strip == @label
+    doc.each_element("/snmp-config/profiles/profile[label/text()[contains(., '#{label}')]]") do |mp|
+      if mp.elements['label'].texts.collect(&:value).join('').strip == label
         p = mp
         break
       end
@@ -59,13 +99,5 @@ class SnmpConfigProfile < Inspec.resource(1)
     @params[:privacy_protocol] = p.attributes['privacy-protocol'] unless p.attributes['privacy-protocol'].nil?
     @params[:enterprise_id] = p.attributes['enterprise-id'] unless p.attributes['enterprise-id'].nil?
     @params[:filter] = p.elements['filter'].texts.collect(&:value).join('').strip unless p.elements['filter'].nil?
-  end
-
-  def exist?
-    @exists
-  end
-
-  def method_missing(param)
-    @params[param]
   end
 end

@@ -1,6 +1,12 @@
 # opennms\_snmp\_config
 
-An instance of this resource should be defined when using any of the other `opennms_snmp_config_*` resources. It controls the top level attributes of the `snmp-config` element in `$OPENNMS_HOME/etc/snmp-config.xml` and initializes the template variables used by the other `opennms_snmp_config` custom resources.
+An instance of this resource must be defined when using any of the other `opennms_snmp_config_*` resources. It controls the default attributes used by OpenNMS for interfaces that don't match a definition.
+
+On OpenNMS 36 and later the snmp config is stored in the database and managed through the v2 REST API instead of `$OPENNMS_HOME/etc/snmp-config.xml`. The config is downloaded once per run as XML and, only if a resource changed it in the run, uploaded once at the end of the run: at most two API calls per run, one on a fully idempotent run. The download is accumulated in memory and the same file-based semantics as on earlier versions apply to it.
+
+* `:create` rewrites the root attributes of the accumulated document: attributes set on the resource are written and attributes that are not set are cleared, exactly like the file on earlier versions. An instance without any properties set therefore never converges. A partial instance (e.g. only `timeout`) converges whenever a declared attribute differs from the stored value and rewrites the whole root, clearing every attribute it does not declare (e.g. the values that a fresh 36 installation seeds into the database from the stale `snmp-config.xml` shipped in the package); it is idempotent once the declared attributes match.
+* On every converging run the accumulated document is rendered with the `snmp-config.xml.erb` template into a scratch file in the file cache that the upload reads, so the run output also shows that template as updated.
+* `encrypted` is not stored in the database and is rejected on OpenNMS 36: passphrases are never stored encrypted.
 
 ## Uses
 
@@ -8,7 +14,7 @@ An instance of this resource should be defined when using any of the other `open
 
 ## Actions
 
-* `:create` - Default. Creates template resource, initializes variables used in the template with existing values, and manages the top level element attributes that all definitions and profiles inherit from.
+* `:create` - Default. Manages the default configuration values that definitions and profiles inherit from.
 
 ## Properties
 
@@ -54,7 +60,7 @@ opennms_snmp_config 'default' do
 end
 ```
 
-resulting in the following config:
+which results in the following config:
 
 ```xml
 <snmp-config xmlns="http://xmlns.opennms.org/xsd/config/snmp" version="v2c" read-community="public" timeout="1800" retry="1"/>

@@ -1,6 +1,16 @@
 # opennms\_snmp\_config\_definition
 
-Manage `definition` elements and children in `$OPENNMS_HOME/etc/snmp-config.xml`. This resource uses the initialized accumulator pattern. The content of the current file is loaded into the template variables when the required `opennms_snmp_config` resource is executed. Instances of this resource modify those variables. As a result, to remove a definition entry from the file that was added outside of Chef, a resource matching that entry must be called with the `:delete` action.
+Manage SNMP config definitions. This resource uses the initialized accumulator pattern. The content of the current config is loaded into `run_state` when the required `opennms_snmp_config` resource is executed. Instances of this resource modify that state. As a result, a definition entry that was added outside of Chef can be removed with a resource matching its identity with the `:delete` action.
+
+## Changes in OpenNMS 36
+
+On OpenNMS 36 and later definitions are stored in the database and managed through the v2 REST API instead of the `snmp-config.xml` file. The config is downloaded once per run and, only if anything changed in the run, uploaded once at the end of the run (see [opennms\_snmp\_config](snmp_config.md)). The download is accumulated in memory and the same file-based semantics as on earlier versions apply to it:
+
+* `:add` (`:create`) matches the stored definition by its full identity — every attribute from the properties table plus `location` and `profile_label`; the selectors are not part of the identity. If a stored definition matches, the declared interface selectors (`ranges`, `specifics`, `ip_matches`) are union-merged into it; otherwise the definition is added as declared. Nothing is purged from other definitions, overlapping definitions can coexist, and a single definition may carry all three kinds of selectors.
+* If the stored definition the resource matches carries more selectors than the declaration (because they were added by another resource or outside of Chef), the resource converges and reports changes on every run; the merge itself is a no-op and does not by itself trigger the end-of-run upload.
+* Definitions without any SNMP attributes are valid and stored as-is (e.g. selectors plus `profile_label` only).
+* `:delete` matches the stored definition by the same full identity and removes the whole definition, including all of its selectors — not just the declared ones. To remove a definition that was added outside of Chef, declare the attributes of the stored definition: every attribute that is not declared must be absent from it. If several stored definitions match the declared identity, the resource raises an error, as on earlier versions.
+* `encrypted` is not stored in the database and is rejected on OpenNMS 36.
 
 ## Uses
 
@@ -12,7 +22,7 @@ Manage `definition` elements and children in `$OPENNMS_HOME/etc/snmp-config.xml`
 
 ## Actions
 
-* `:add` - Default. Creates template resource, initializes variables used in the template with existing values, and manages the top level element attributes that all definitions and profiles inherit from.
+* `:add` - Default. Creates or updates the definition.
 * `:create` - Alias of `:add`.
 * `:delete` - Removes a definition matching this resource if found in the current config file.
 

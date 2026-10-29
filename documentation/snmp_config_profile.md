@@ -1,6 +1,14 @@
 # opennms\_snmp\_config\_profile
 
-Manage `profile` elements and children in `$OPENNMS_HOME/etc/snmp-config.xml`. This resource uses the initialized accumulator pattern. The content of the current file is loaded into the template variables when the required `opennms_snmp_config` resource is executed. Instances of this resource modify those variables. As a result, to remove a profile entry from the file that was added outside of Chef, a resource matching that entry must be called with the `:delete` action.
+Manage SNMP config profile configurations. This resource uses the initialized accumulator pattern. The content of the current SNMP config is loaded into `run_state` when the required `opennms_snmp_config` resource is executed. Instances of this resource modify that state, which is then updated at the end of the Chef run. As a result, to remove a profile entry from the file that was added outside of Chef, a resource matching that entry must be called with the `:delete` action.
+
+## OpenNMS 36
+
+On OpenNMS 36 and later profiles are stored in the database and managed through the v2 REST API instead of the `snmp-config.xml` file. The config is downloaded once per run and, only if anything changed in the run, uploaded once at the end of the run (see [opennms\_snmp\_config](snmp_config.md)). The download is accumulated in memory and the same file-based semantics as on earlier versions apply to it:
+
+* `:add` (`:create`) **replaces the entire profile row** with the same label: attributes that are not set on the resource are cleared. If the same label is declared by more than one resource in a run list, the last declaration wins, and on every run the earlier declarations revert the row and the later ones re-apply it, so all of them report changes on every run (the resulting state is stable).
+* `:delete` removes the profile with the label; if the profile does not exist the resource does nothing. Nothing checks for definitions that reference the label: deleting a profile leaves definitions with the same `profile_label` in place.
+* `encrypted` is not stored in the database and is rejected on OpenNMS 36.
 
 ## Uses
 

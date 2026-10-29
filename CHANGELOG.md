@@ -5,6 +5,8 @@
 * breaking: supports Horizon 36
 * breaking: requires JDK 21
 * breaking: requires PostgreSQL 14
+* breaking: on Horizon 36 the snmp-config custom resources (`opennms_snmp_config`, `opennms_snmp_config_definition`, `opennms_snmp_config_profile`) manage the database-backed snmp config via the v2 REST API instead of `$OPENNMS_HOME/etc/snmp-config.xml`; the whole config is downloaded once per run as XML, accumulated in memory, and uploaded once at the end of the run only if anything changed (at most two API calls per run, one on a fully idempotent run); file-based management is kept for earlier versions
+* breaking: on Horizon 36 the trapd custom resources (`opennms_trapd_config`, `opennms_trapd_snmpv3_user`) manage the database-backed trapd config via the v2 REST API instead of the `trapd-configuration.xml` template; file-based management is kept for earlier versions
 
 ## 35.0.0
 

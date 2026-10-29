@@ -50,8 +50,15 @@ module Opennms
 
         def trapd_resource_create
           config = Opennms::Cookbook::Trapd::Config.new
+          # The declare_resource block below is evaluated in the context of
+          # the declared http_request resource, which cannot call cookbook
+          # helpers, so url/headers must be computed here.
+          put_url = nil
+          auth = nil
           if node['opennms']['version'].to_i >= 36
-            config.read!("#{restv2url}/trapd/download?format=xml", { 'Authorization' => "Basic #{Base64.strict_encode64("admin:#{admin_secret_from_vault('password')}")}" })
+            put_url = "#{restv2url}/trapd/config"
+            auth = "Basic #{Base64.strict_encode64("admin:#{admin_secret_from_vault('password')}")}"
+            config.read!("#{restv2url}/trapd/download?format=xml", { 'Authorization' => auth })
           elsif ::File.exist?("#{node['opennms']['conf']['home']}/etc/trapd-configuration.xml")
             config.read!("file://#{node['opennms']['conf']['home']}/etc/trapd-configuration.xml")
           else
@@ -59,10 +66,9 @@ module Opennms
           end
           with_run_context :root do
             if node['opennms']['version'].to_i >= 36
-              require 'json'
               declare_resource(:http_request, 'trapd config PUT') do
-                url "#{restv2url}/trapd/config"
-                headers({ 'Content-Type' => 'application/json', 'Authorization' => "Basic #{Base64.strict_encode64("admin:#{admin_secret_from_vault('password')}")}" })
+                url put_url
+                headers({ 'Content-Type' => 'application/json', 'Authorization' => auth })
                 message config.to_json
                 sensitive true
                 action :nothing
@@ -95,19 +101,22 @@ module Opennms
 
         def ro_trapd_resource_create
           config = Opennms::Cookbook::Trapd::Config.new
+          put_url = nil
+          auth = nil
           if node['opennms']['version'].to_i >= 36
-            config.read!("#{restv2url}/trapd/download?format=xml", { 'Authorization' => "Basic #{Base64.strict_encode64("admin:#{admin_secret_from_vault('password')}")}" })
+            put_url = "#{restv2url}/trapd/config"
+            auth = "Basic #{Base64.strict_encode64("admin:#{admin_secret_from_vault('password')}")}"
+            config.read!("#{restv2url}/trapd/download?format=xml", { 'Authorization' => auth })
           else
             config.read!("file://#{node['opennms']['conf']['home']}/etc/trapd-configuration.xml")
           end
           with_run_context :root do
             if node['opennms']['version'].to_i >= 36
               declare_resource(:http_request, 'RO trapd config PUT') do
-                url "#{restv2url}/trapd/config"
+                url put_url
                 message config.to_json
-                headers({ 'Content-Type' => 'application/json', 'Authorization' => "Basic #{Base64.strict_encode64("admin:#{admin_secret_from_vault('password')}")}" })
+                headers({ 'Content-Type' => 'application/json', 'Authorization' => auth })
                 action :nothing
-                delayed_action :put
               end
             else
               declare_resource(:template, "RO #{node['opennms']['conf']['home']}/etc/trapd-configuration.xml") do
@@ -127,32 +136,10 @@ module Opennms
 
         def config_from_resource(resource)
           if node['opennms']['version'].to_i >= 36
-            config = Opennms::Cookbook::Trapd::Config.new
-            config.snmp_trap_address = resource.message['snmp_trap_address']
-            config.snmp_trap_port = resource.message['snmp_trap_port']
-            config.new_suspect_on_trap = resource.message['new_suspect_on_trap']
-            config.include_raw_message = resource.message['include_raw_message']
-            config.threads = resource.message['threads']
-            config.queue_size = resource.message['queue_size']
-            config.batch_size = resource.message['batch_size']
-            config.batch_interval = resource.message['batch_interval']
-            config.use_address_from_varbind = resource.message['use_address_from_varbind']
-            config.snmpv3_users = resource.message['snmpv3_users'].map do |user|
-              Opennms::Cookbook::Trapd::ConfigTemplate::Snmpv3User.new(
-                id: user['id'],
-                engine_id: user['engine_id'],
-                security_name: user['security_name'],
-                security_level: user['security_level'],
-                auth_protocol: user['auth_protocol'],
-                auth_passphrase: user['auth_passphrase'],
-                privacy_protocol: user['privacy_protocol'],
-                privacy_passphrase: user['privacy_passphrase']
-              )
-            end
+            Opennms::Cookbook::Trapd::Config.from_json(resource.message)
           else
-            config = resource.variables[:config]
+            resource.variables[:config]
           end
-          config
         end
       end
 
@@ -197,7 +184,7 @@ module Opennms
               id: user_node.at_xpath('@id')&.value,
               engine_id: user_node.at_xpath('@engine-id')&.value,
               security_name: user_node.at_xpath('@security-name')&.value,
-              security_level: user_node.at_xpath('@security-level')&.value.to_i,
+              security_level: user_node.at_xpath('@security-level')&.value&.to_i,
               auth_protocol: user_node.at_xpath('@auth-protocol')&.value,
               auth_passphrase: user_node.at_xpath('@auth-passphrase')&.value,
               privacy_protocol: user_node.at_xpath('@privacy-protocol')&.value,
@@ -263,10 +250,68 @@ module Opennms
           end
         end
 
+        # Serialize as the JSON document expected by api/v2/trapd/config.
+        # The API replaces the whole stored document, so every field is
+        # always sent. Unset boolean fields map to their effective default
+        # (false); unset numeric fields are sent as null so the API
+        # applies its own defaults.
+        def to_json
+          require 'json'
+          JSON.generate(
+            'snmpTrapAddress' => @snmp_trap_address,
+            'snmpTrapPort' => @snmp_trap_port&.to_i,
+            'newSuspectOnTrap' => api_boolean(@new_suspect_on_trap),
+            'includeRawMessage' => api_boolean(@include_raw_message),
+            'threads' => @threads&.to_i,
+            'queueSize' => @queue_size&.to_i,
+            'batchSize' => @batch_size&.to_i,
+            'batchInterval' => @batch_interval&.to_i,
+            'useAddressFromVarbind' => api_boolean(@use_address_from_varbind),
+            'snmpv3User' => @snmpv3_users.map(&:to_api_hash)
+          )
+        end
+
+        # Parse an api/v2/trapd JSON document into the same internal
+        # representation read! produces (string scalars, 'true'/'false'
+        # booleans, Snmpv3User objects with integer security levels).
+        def self.from_json(json)
+          require 'json'
+          config = new
+          data = JSON.parse(json)
+          config.snmp_trap_address = data['snmpTrapAddress']
+          config.snmp_trap_port = data['snmpTrapPort']&.to_s
+          config.new_suspect_on_trap = data['newSuspectOnTrap'].nil? ? nil : data['newSuspectOnTrap'].to_s
+          config.include_raw_message = data['includeRawMessage'].nil? ? nil : data['includeRawMessage'].to_s
+          config.threads = data['threads']&.to_s
+          config.queue_size = data['queueSize']&.to_s
+          config.batch_size = data['batchSize']&.to_s
+          config.batch_interval = data['batchInterval']&.to_s
+          config.use_address_from_varbind = data['useAddressFromVarbind'].nil? ? nil : data['useAddressFromVarbind'].to_s
+          config.snmpv3_users = (data['snmpv3User'] || []).map do |user|
+            Snmpv3User.new(
+              id: user['id'],
+              engine_id: user['engineId'],
+              security_name: user['securityName'],
+              security_level: user['securityLevel']&.to_i,
+              auth_protocol: user['authProtocol'],
+              auth_passphrase: user['authPassphrase'],
+              privacy_protocol: user['privacyProtocol'],
+              privacy_passphrase: user['privacyPassphrase']
+            )
+          end
+          config
+        end
+
         def self.read(url = 'file:///opt/opennms/etc/trapd-configuration.xml')
           config = Config.new
           config.read!(url)
           config
+        end
+
+        private
+
+        def api_boolean(value)
+          value == true || value == 'true'
         end
       end
 
@@ -290,6 +335,24 @@ module Opennms
 
         def identity
           "#{@engine_id}:#{@security_name}:#{@security_level}:#{@auth_protocol}:#{@privacy_protocol}"
+        end
+
+        # Serialize as an entry of the snmpv3User list in the
+        # api/v2/trapd JSON document. The server-assigned id is included
+        # when present so the API can correlate the user across
+        # read/write cycles; new users are sent without one and get an id
+        # at persist time.
+        def to_api_hash
+          hash = {}
+          hash['id'] = @id unless @id.nil?
+          hash['engineId'] = @engine_id
+          hash['securityName'] = @security_name
+          hash['securityLevel'] = @security_level
+          hash['authProtocol'] = @auth_protocol
+          hash['authPassphrase'] = @auth_passphrase
+          hash['privacyProtocol'] = @privacy_protocol
+          hash['privacyPassphrase'] = @privacy_passphrase
+          hash
         end
       end
     end

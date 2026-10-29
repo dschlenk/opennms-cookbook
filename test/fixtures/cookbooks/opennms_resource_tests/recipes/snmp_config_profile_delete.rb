@@ -4,7 +4,8 @@ opennms_snmp_config_profile 'foo' do
   action :delete
 end
 
-# only the properties involved in identity need be present
+# the stored definitions carry no SNMP attributes, so the full attribute
+# identity is just the profile label (and location)
 opennms_snmp_config_definition 'uses profile foo' do
   profile_label 'foo'
   action :delete
