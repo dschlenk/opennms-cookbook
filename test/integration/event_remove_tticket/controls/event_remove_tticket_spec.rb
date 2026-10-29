@@ -1,7 +1,10 @@
 # frozen_string_literal: true
+
 control 'event_remove_tticket' do
-  describe event('uei.opennms.org/cheftest/thresholdExceeded2', 'events/chef.events.xml', [{ 'mename' => 'id', 'mevalue' => ['.1.3.6.1.4.1.11385.102.1'] }, { 'mename' => 'generic', 'mevalue' => ['6'] }, { 'mename' => 'specific', 'mevalue' => ['2'] }]) do
+  title 'OpenNMS Event Trouble Ticket Removal Verification'
+
+  describe opennms_event('uei.opennms.org/cheftest/thresholdExceeded2-event_remove_tticket', 'events/chef.events.xml') do
     it { should exist }
-    its('tticket') { should be nil }
+    its('tticket') { should be_nil }
   end
 end

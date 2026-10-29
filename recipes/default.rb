@@ -64,6 +64,11 @@ directory '/etc/systemd/system/opennms.service.d' do
   mode '755'
 end
 
+execute 'reload systemd' do
+  action :nothing
+  command '/usr/bin/systemctl daemon-reload'
+end
+
 start_timeout = node['opennms']['conf']['env']['START_TIMEOUT'].to_i * 10 + 30
 file '/etc/systemd/system/opennms.service.d/timeout.conf' do
   owner 'root'
@@ -90,9 +95,20 @@ service 'opennms' do
   action [:enable, :start]
 end
 
-execute 'reload systemd' do
-  action :nothing
-  command '/usr/bin/systemctl daemon-reload'
+ruby_block 'wait for opennms to accept traffic' do
+  block do
+    require 'socket'
+    loop do
+      begin
+        # Attempt connection to the main OpenNMS web port
+        TCPSocket.new('localhost', 8980).close
+        break
+      rescue Errno::ECONNREFUSED, Errno::EHOSTUNREACH
+        Chef::Log.info('Waiting for OpenNMS API port 8980 to wake up...')
+        sleep 5
+      end
+    end
+  end
 end
 
 include_recipe 'opennms::adminpw'

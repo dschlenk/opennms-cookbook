@@ -1,48 +1,95 @@
+# frozen_string_literal: true
 version: 2.1
 
-jobs:
-  style:
+executors:
+  cinc-workstation-executor:
     docker:
       - image: cincproject/workstation:25.13.7
         auth:
           username: $DOCKER_USER
           password: $DOCKER_PASSWORD
+    working_directory: ~/cookbook
+
+jobs:
+  style:
+    executor: cinc-workstation-executor
     steps:
       - checkout
       - run:
-          name: bundler
+          name: Run Bundler Dependency Install
           command: cinc exec bundle install
       - run:
-          name: mdl
+          name: Run Markdown Lint Checks
           command: cinc exec mdl documentation/*.md
       - run:
-          name: cookstyle
+          name: Run Cookstyle Code Cleaners
           command: cookstyle
+
+  unit:
+    executor: cinc-workstation-executor
+    steps:
+      - checkout
+      - run:
+          name: Run Bundler Dependency Install
+          command: cinc exec bundle install
+      - run:
+          name: Run ChefSpec Unit Tests (Oracle Linux 9 & 10 Matrix)
+          # Uses recursive glob pattern matching to sweep up libraries, resources,
+          # and recipe specs cleanly into the Cinc exec thread environment.
+          command: cinc exec rspec spec/**/*_spec.rb
+
   integration:
     machine:
       image: ubuntu-2404:current
+    # Upgrades execution frame memory allocation to 8GB RAM to mitigate
+    # persistent OpenNMS Java runtime heap space crash regressions.
+    resource_class: large
     parallelism: 30
+    working_directory: ~/cookbook
     steps:
       - checkout
       - run:
-          name: docker login
-          command: docker login -u $DOCKER_USER -p $DOCKER_PASSWORD
+          name: Authenticate against Docker Hub registry
+          command: |
+            echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USER" --password-stdin
       - run:
-          name: install cinc workstation
-          command: curl -L https://omnitruck.cinc.sh/install.sh | sudo bash -s -- -P cinc-workstation -v 25.13.7
+          name: Install Cinc Workstation Omnibus Packages
+          command: |
+            curl -L https://omnitruck.cinc.sh/install.sh | sudo bash -s -- -P cinc-workstation -v 25.13.7
+            # Persist Cinc environment variables across all subsequent CircleCI steps
+            echo 'eval "$(cinc shell-init bash)"' >> $BASH_ENV
       - run:
-          name: cinc
-          command: cinc shell-init bash
+          name: Run Bundler Local Dependency Cache
+          command: bundle install --prefer-local
       - run:
-          name: bundler
-          command: cinc exec bundle install --prefer-local
-      - run:
-          name: kitchen
-            # command: kitchen verify default
-          command: kitchen list -b | circleci tests run --command="xargs -L 1 kitchen test -d always" --verbose
+          name: Execute Test Kitchen Integration Matrix
+          command: |
+            export DOCKER_USER DOCKER_PASSWORD
+
+            # Partition and parallelize test runs; retain debugging traces if errors cascade
+            if ! kitchen list -b | circleci tests split | xargs -L 1 kitchen test -d never; then
+              echo "=================================================="
+              echo "TEST KITCHEN FAILED! DUMPING CONTAINER LOGS:"
+              echo "=================================================="
+            
+              # Extract the identification signature of the failing system engine box
+              LAST_CONTAINER=$(docker ps -a -q -n 1)
+            
+              # Stream logs out to the dashboard terminal window
+              docker logs "$LAST_CONTAINER"
+              exit 1
+            else
+              echo "=================================================="
+              echo "TEST KITCHEN SUCCEEDED! ALL INTEGRATION CHECKS PASSED"
+              echo "=================================================="
+            fi
+
 workflows:
   version: 2
-  untagged-build:
+  validate_cookbook:
     jobs:
       - style
-      - integration
+      - unit
+      - integration:
+          requires:
+            - unit

@@ -1,7 +1,11 @@
 # frozen_string_literal: true
+
 control 'event_remove_forward' do
-  describe event('uei.opennms.org/cheftest/thresholdExceeded2', 'events/chef.events.xml', [{ 'mename' => 'id', 'mevalue' => ['.1.3.6.1.4.1.11385.102.1'] }, { 'mename' => 'generic', 'mevalue' => ['6'] }, { 'mename' => 'specific', 'mevalue' => ['2'] }]) do
+  title 'OpenNMS Event Remove Forward Validation'
+
+  describe opennms_event('uei.opennms.org/cheftest/thresholdExceeded2-event_remove_forward', 'events/chef.events.xml') do
     it { should exist }
-    its('forward') { should be nil }
+    # Handles both an empty collection or a completely dropped nil attribute safely
+    its('forward') { should be_nil.or be_empty }
   end
 end

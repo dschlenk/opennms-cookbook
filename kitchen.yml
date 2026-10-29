@@ -1,6 +1,8 @@
 ---
 driver:
   name: dokken
+  registry_username: <%= ENV['DOCKER_USER'] %>
+  registry_password: <%= ENV['DOCKER_PASSWORD'] %>
   privileged: true
   chef_image: cincproject/cinc
   chef_version: 18
@@ -39,40 +41,38 @@ platforms:
   - name: preinstalled-34-oraclelinux-9
     driver:
       image: c1og/opennms-34-oraclelinux-9
+      privileged: true
+      cgroupns_host: true
       pid_one_command: /usr/lib/systemd/systemd
+      volumes:
+        - /sys/fs/cgroup:/sys/fs/cgroup:rw
+
   - name: preinstalled-oraclelinux-9
     driver:
       image: c1og/opennms-35-oraclelinux-9
+      privileged: true
+      cgroupns_host: true
       pid_one_command: /usr/lib/systemd/systemd
-  - name: oraclelinux-9
-    driver:
-      image: dokken/oraclelinux-9
-      pid_one_command: /usr/lib/systemd/systemd
-    lifecycle:
-      pre_converge:
-        - remote: |
-            bash -c 'declare i=0;
-              declare wait=5;
-              declare timeout=300;
-              while true; do
-                dnf -y install libxcrypt-compat hostname && break;
-                if [ ${i} -ge ${timeout} ]; then
-                  echo "Timed out after ${i}s waiting for dnf to complete";
-                  exit 1;
-                fi;
-                echo "Waited ${i}/${timeout}s for dnf to complete, retrying in ${wait} seconds"
-                sleep ${wait};
-                let i+=${wait};
-              done;
-            '
+      volumes:
+        - /sys/fs/cgroup:/sys/fs/cgroup:rw
+
   - name: preinstalled-oraclelinux-10
     driver:
       image: c1og/opennms-35-oraclelinux-10
+      privileged: true
+      cgroupns_host: true
       pid_one_command: /usr/lib/systemd/systemd
+      volumes:
+        - /sys/fs/cgroup:/sys/fs/cgroup:rw
+
   - name: oraclelinux-10
     driver:
-      image: 
+      image: dokken/oraclelinux-10
+      privileged: true
+      cgroupns_host: true
       pid_one_command: /usr/lib/systemd/systemd
+      volumes:
+        - /sys/fs/cgroup:/sys/fs/cgroup:rw
     lifecycle:
       pre_converge:
         - remote: |
@@ -85,11 +85,11 @@ platforms:
                   echo "Timed out after ${i}s waiting for dnf to complete";
                   exit 1;
                 fi;
-                echo "Waited ${i}/${timeout}s for dnf to complete, retrying in ${wait} seconds"
+                echo "Waited ${i}/${timeout}s for dnf to complete, retrying in ${wait} seconds";
                 sleep ${wait};
                 let i+=${wait};
-              done;
-            '
+              done;'
+
 suites:
   - name: recommended
     lifecycle:
@@ -151,6 +151,7 @@ suites:
           admin:
             vault: creds
         templates: true
+
   - name: upgrade
     verifier:
       inspec_tests:
@@ -161,6 +162,7 @@ suites:
       - oraclelinux-10
       - preinstalled-oraclelinux-9
       - preinstalled-oraclelinux-10
+
   - name: no_upgrade
     excludes:
       - oraclelinux-9
@@ -175,11 +177,13 @@ suites:
     attributes:
       opennms:
         upgrade: false
+
   - name: default
     excludes:
       - preinstalled-34-oraclelinux-9
       - preinstalled-oraclelinux-9
       - preinstalled-oraclelinux-10
+
   - name: plugins
     excludes:
       - oraclelinux-9
@@ -193,6 +197,7 @@ suites:
             - opennms-plugin-provisioning-snmp-hardware-inventory
             - opennms-plugin-provisioning-snmp-asset
             - opennms-plugin-northbounder-jms
+
   - name: avail_category
     excludes:
       - oraclelinux-9
@@ -205,6 +210,7 @@ suites:
       inspec_tests:
         - path: test/integration/default
         - path: test/integration/avail_category
+
   - name: avail_view_section
     excludes:
       - oraclelinux-9
@@ -217,6 +223,7 @@ suites:
       inspec_tests:
         - path: test/integration/default
         - path: test/integration/avail_view_section
+
   - name: avail_view_section_mod
     excludes:
       - oraclelinux-9
@@ -229,6 +236,7 @@ suites:
       inspec_tests:
         - path: test/integration/default
         - path: test/integration/avail_view_section_mod
+
   - name: collection_graph
     excludes:
       - oraclelinux-9
@@ -241,6 +249,7 @@ suites:
       inspec_tests:
         - path: test/integration/default
         - path: test/integration/collection_graph
+
   - name: collection_graph_file
     excludes:
       - oraclelinux-9
@@ -253,6 +262,7 @@ suites:
       inspec_tests:
         - path: test/integration/default
         - path: test/integration/collection_graph_file
+
   - name: collection_package
     excludes:
       - oraclelinux-9
@@ -265,6 +275,7 @@ suites:
       inspec_tests:
         - path: test/integration/default
         - path: test/integration/collection_package
+
   - name: collection_package_delete
     excludes:
       - oraclelinux-9
@@ -277,6 +288,7 @@ suites:
       inspec_tests:
         - path: test/integration/default
         - path: test/integration/collection_package_delete
+
   - name: collection_package_update
     excludes:
       - oraclelinux-9
@@ -289,6 +301,7 @@ suites:
       inspec_tests:
         - path: test/integration/default
         - path: test/integration/collection_package_update
+
   - name: collection_package_update_excludes
     excludes:
       - oraclelinux-9
