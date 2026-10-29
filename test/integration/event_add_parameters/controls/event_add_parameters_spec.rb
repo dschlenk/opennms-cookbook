@@ -3,9 +3,9 @@
 control 'event_add_parameters' do
   title 'OpenNMS Event Parameters Fallback Validation'
 
-  # Instantiate an active helper layer to safely contact the REST API
-  api_helper = opennms_event(nil, nil)
-  events_data = api_helper.fetch_live_eventconf_json
+  # Instantiate an active helper layer using a dummy event context to pull the source matrix
+  api_helper = opennms_event(nil, 'events/chef.events.xml')
+  events_data = api_helper.send(:fetch_live_eventconf_via_api)
 
   # Gracefully fall back if OpenNMS api schema returns empty hashes
   if events_data.nil? || events_data.empty?
@@ -22,7 +22,7 @@ control 'event_add_parameters' do
       it { should_not be_nil }
 
       it 'validates the parameter fallback state based on schema capabilities' do
-        raw_params = subject&.dig('parameter')
+        raw_params = subject&.dig('parameter') || subject&.dig('parameters')
         params = raw_params.is_a?(Hash) ? [raw_params] : raw_params
 
         if params.nil?

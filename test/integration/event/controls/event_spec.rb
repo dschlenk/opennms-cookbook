@@ -3,28 +3,27 @@
 control 'uei.opennms.org/cheftest/thresholdExceeded configurations' do
   title 'OpenNMS Live Event REST API'
 
-  # Base Element Checks
   describe opennms_event('uei.opennms.org/cheftest/thresholdExceeded', 'events/chef.events.xml') do
     it { should exist }
-    its('eventLabel')              { should eq 'Chef defined event: thresholdExceeded' }
+    its('event_label')             { should eq 'Chef defined event: thresholdExceeded' }
     its('descr')                   { should include 'A threshold defined by a chef recipe has been exceeded.' }
-    its('logmsg.content')          { should eq 'A threshold has been exceeded.' }
-    its('logmsg.dest')             { should eq 'logndisplay' }
-    its('logmsg.notify')           { should be true }
+    its('logmsg')                  { should eq 'A threshold has been exceeded.' }
+    its('logmsg_dest')             { should eq 'logndisplay' }
+    its('logmsg_notify')           { should be true }
     its('severity')                { should eq 'Minor' }
-    its('alarmData.reductionKey')  { should eq '%uei%:%dpname%:%nodeid%:%interface%:%parm[ds]%:%parm[threshold]%:%parm[trigger]%:%parm[rearm]%:%parm[label]%' }
-    its('alarmData.alarmType')     { should eq 1 }
-    its('alarmData.autoClean')     { should be false }
+    its('alarm_data.reduction_key') { should eq '%uei%:%dpname%:%nodeid%:%interface%:%parm[ds]%:%parm[threshold]%:%parm[trigger]%:%parm[rearm]%:%parm[label]%' }
+    its('alarm_data.alarm_type')    { should eq 1 }
+    its('alarm_data.auto_clean')    { should be false }
   end
 
   # Script Modifiers Validation Block
   describe opennms_event('uei.opennms.org/cheftest/thresholdExceeded2-script', 'events/chef.events.xml') do
     it { should exist }
-    its('eventLabel')              { should eq 'Chef defined event: thresholdExceeded' }
+    its('event_label')             { should eq 'Chef defined event: thresholdExceeded' }
     its('descr')                   { should include 'A threshold defined by a chef recipe has been exceeded.' }
-    its('logmsg.content')          { should eq 'A threshold has been exceeded.' }
-    its('logmsg.dest')             { should eq 'logndisplay' }
-    its('logmsg.notify')           { should be true }
+    its('logmsg')                  { should eq 'A threshold has been exceeded.' }
+    its('logmsg_dest')             { should eq 'logndisplay' }
+    its('logmsg_notify')           { should be true }
     its('severity')                { should eq 'Minor' }
     its('operinstruct')            { should eq 'the operinstruct' }
     its('mouseovertext')           { should eq 'mouseOverText' }
@@ -32,7 +31,7 @@ control 'uei.opennms.org/cheftest/thresholdExceeded configurations' do
     its('tticket.state')           { should eq 'off' }
 
     it 'contains the required mask elements' do
-      mask_elements = subject.event_data.dig('mask', 'maskelement') || []
+      mask_elements = subject.event_data.dig('mask', 'maskelement') || subject.event_data['mask'] || []
       expect(mask_elements).to include(
                                  hash_including('mename' => 'id', 'mevalue' => ['.1.3.6.1.4.1.11385.102.1']),
                                  hash_including('mename' => 'generic', 'mevalue' => ['6']),
@@ -60,11 +59,11 @@ control 'uei.opennms.org/cheftest/thresholdExceeded configurations' do
   # Structural Top Check
   describe opennms_event('uei.opennms.org/cheftest/thresholdExceeded3', 'events/chef.events.xml') do
     it { should exist }
-    its('eventLabel')              { should eq 'Chef defined event: thresholdExceeded3' }
+    its('event_label')             { should eq 'Chef defined event: thresholdExceeded3' }
     its('descr')                   { should include 'A threshold defined by a chef recipe has been exceeded3.' }
-    its('logmsg.content')          { should eq 'A threshold has been exceeded3.' }
-    its('logmsg.dest')             { should eq 'logndisplay' }
-    its('logmsg.notify')           { should be true }
+    its('logmsg')                  { should eq 'A threshold has been exceeded3.' }
+    its('logmsg_dest')             { should eq 'logndisplay' }
+    its('logmsg_notify')           { should be true }
     its('severity')                { should eq 'Minor' }
   end
 end
@@ -74,19 +73,19 @@ control 'uei.opennms.org/cheftest/thresholdExceeded 4 and 5 configurations' do
 
   describe opennms_event('uei.opennms.org/cheftest/thresholdExceeded4-complex', 'events/chef.events.xml') do
     it { should exist }
-    its('eventLabel')              { should eq 'Chef defined event: thresholdExceeded4' }
+    its('event_label')             { should eq 'Chef defined event: thresholdExceeded4' }
     its('descr')                   { should include 'A threshold defined by a chef recipe has been exceeded4.' }
-    its('logmsg.content')          { should eq 'A threshold has been exceeded4.' }
-    its('logmsg.dest')             { should eq 'logndisplay' }
-    its('logmsg.notify')           { should be true }
-    its('severity') { should eq 'Minor' }
+    its('logmsg')                  { should eq 'A threshold has been exceeded4.' }
+    its('logmsg_dest')             { should eq 'logndisplay' }
+    its('logmsg_notify')           { should be true }
+    its('severity')                { should eq 'Minor' }
     its('operinstruct')            { should eq 'the operinstruct' }
     its('mouseovertext')           { should eq 'mouseOverText' }
     its('tticket.info')            { should eq 'tticketInfo' }
     its('tticket.state')           { should eq 'off' }
-    its('alarmData.reductionKey')  { should eq '%uei%:%dpname%:%nodeid%:%interface%:%parm[ds]%:%parm[threshold]%:%parm[trigger]%:%parm[rearm]%:%parm[label]%' }
-    its('alarmData.alarmType')     { should eq 1 }
-    its('alarmData.autoClean')     { should be false }
+    its('alarm_data.reduction_key') { should eq '%uei%:%dpname%:%nodeid%:%interface%:%parm[ds]%:%parm[threshold]%:%parm[trigger]%:%parm[rearm]%:%parm[label]%' }
+    its('alarm_data.alarm_type')    { should eq 1 }
+    its('alarm_data.auto_clean')    { should be false }
 
     it 'contains the required complex structures matching attributes' do
       expect(subject.event_data['autoaction']).to include(hash_including('action' => 'someaction', 'state' => 'off'))
@@ -98,16 +97,16 @@ control 'uei.opennms.org/cheftest/thresholdExceeded 4 and 5 configurations' do
 
   describe opennms_event('uei.opennms.org/cheftest/thresholdExceeded5-arrays', 'events/chef.events.xml') do
     it { should exist }
-    its('eventLabel')              { should eq 'Chef defined event: thresholdExceeded5' }
+    its('event_label')             { should eq 'Chef defined event: thresholdExceeded5' }
     its('descr')                   { should include 'A threshold defined by a chef recipe has been exceeded4.' }
-    its('logmsg.content')          { should eq 'A threshold has been exceeded4.' }
-    its('logmsg.dest')             { should eq 'logndisplay' }
-    its('logmsg.notify')           { should be true }
+    its('logmsg')                  { should eq 'A threshold has been exceeded4.' }
+    its('logmsg_dest')             { should eq 'logndisplay' }
+    its('logmsg_notify')           { should be true }
     its('severity')                { should eq 'Minor' }
-    its('alarmData.reductionKey')  { should eq '%uei%:%dpname%:%nodeid%:%interface%:%parm[ds]%:%parm[threshold]%:%parm[trigger]%:%parm[rearm]%:%parm[label]%' }
+    its('alarm_data.reduction_key') { should eq '%uei%:%dpname%:%nodeid%:%interface%:%parm[ds]%:%parm[threshold]%:%parm[trigger]%:%parm[rearm]%:%parm[label]%' }
 
     it 'contains the required mask elements including vbnumber and vbvalue arrays' do
-      mask_elements = subject.event_data.dig('mask', 'maskelement') || []
+      mask_elements = subject.event_data.dig('mask', 'maskelement') || subject.event_data['mask'] || []
       varbind_elements = subject.event_data.dig('mask', 'varbind') || []
 
       expect(mask_elements).to include(
@@ -136,9 +135,9 @@ control 'OpenNMS Live Event REST API - chef3.events and chef4.events position va
   describe opennms_event('uei.opennms.org/anUeiForANewThingInANewFileWithPositionTop-isolated', 'events/chef3.events.xml') do
     it { should exist }
     its('severity')                { should eq 'Minor' }
-    its('alarmData.reductionKey')  { should eq '%uei%:%dpname%:%nodeid%:%interface%:%parm[ds]%:%parm[threshold]%:%parm[trigger]%:%parm[rearm]%:%parm[label]%' }
-    its('alarmData.alarmType')     { should eq 1 }
-    its('alarmData.autoClean')     { should be false }
+    its('alarm_data.reduction_key') { should eq '%uei%:%dpname%:%nodeid%:%interface%:%parm[ds]%:%parm[threshold]%:%parm[trigger]%:%parm[rearm]%:%parm[label]%' }
+    its('alarm_data.alarm_type')    { should eq 1 }
+    its('alarm_data.auto_clean')    { should be false }
   end
 
   describe opennms_event('uei.opennms.org/fillerForANewThingInANewFile1-isolated', 'events/chef4.events.xml') do
@@ -166,20 +165,19 @@ control 'OpenNMS Live Event REST API - chef5.events collection group' do
     its('severity') { should eq 'Indeterminate' }
 
     it 'contains the correct collectionGroup attributes' do
-      expect(subject.event_data['collectionGroup']).to include(
-                                                         hash_including(
-                                                           'name' => 'nodeGroup',
-                                                           'resourceType' => 'nodeSnmp',
-                                                           'instance' => 'instanceParmName'
-                                                         )
-                                                       )
+      expect(subject.event_data['collectionGroup'] || subject.event_data['collection_group']).to include(
+                                                                                                   hash_including(
+                                                                                                     'name' => 'nodeGroup',
+                                                                                                     'resourceType' => 'nodeSnmp',
+                                                                                                     'instance' => 'instanceParmName'
+                                                                                                   )
+                                                                                                 )
     end
   end
 end
 
 control 'OpenNMS Live Event REST API - chef6.events parameters, autoack, and filters' do
   title 'chef6.events structural validations'
-
   describe opennms_event('uei.opennms.org/parametersTest-isolated', 'events/chef6.events.xml') do
     it { should exist }
     its('severity') { should eq 'Critical' }
@@ -219,28 +217,24 @@ end
 
 control 'OpenNMS Live Event REST API - chef.events file actions' do
   title 'chef.events file creation state validations'
-
   describe opennms_event('create_if_missing-isolated', 'events/chef.events.xml') do
     it { should exist }
-    # Verifies that create_if_missing successfully populated pristine properties
-    its('eventLabel')              { should eq 'Chef defined event: createifmissing' }
+    its('event_label')             { should eq 'Chef defined event: createifmissing' }
     its('severity')                { should eq 'Minor' }
   end
-
   describe opennms_event('create_if_missing-isolated', 'events/chef.events.xml') do
-    # Verifies that the second no-op call left the first entry pristine and untouched
-    its('eventLabel')              { should_not eq 'Chef defined event: noopcreateifmissing' }
+    its('event_label')             { should_not eq 'Chef defined event: noopcreateifmissing' }
   end
 end
 
 control 'OpenNMS Live Event REST API - Dynamic Outage Loops' do
   title 'Pollerd certificate loops validation'
-  [443, 8443].each do |_port|
+  [443, 8443].each do |port|
     [60, 30].each do |_days|
       describe opennms_event('uei.opennms.org/nodes/nodeLostService', 'events/opennms.pollerd.events.xml') do
         it { should exist }
-        its('eventLabel') { should eq 'OpenNMS-defined node event: nodeLostService' }
-        its('logmsg.dest') { should eq 'logndisplay' }
+        its('event_label') { should eq 'OpenNMS-defined node event: nodeLostService' }
+        its('logmsg_dest') { should eq 'logndisplay' }
       end
     end
   end

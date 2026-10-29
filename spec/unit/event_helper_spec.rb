@@ -79,7 +79,7 @@ describe Opennms::Cookbook::ConfigHelpers::Event::Helper do
     end
 
     it 'transforms raw Nokogiri XML node structures into comparable Ruby hashes' do
-      xml_raw = '<events xmlns="http://opennms.org"><event><uei>uei.test</uei></event></events>'
+      xml_raw = '<events xmlns="http://xmlns.opennms.org/xsd/eventconf"><event><uei>uei.test</uei></event></events>'
       node = Nokogiri::XML(xml_raw).root
 
       result = ruby_block_class.send(:xml_to_hash, node)
