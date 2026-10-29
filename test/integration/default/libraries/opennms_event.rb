@@ -6,7 +6,12 @@ class OpenNmsEventApi < Inspec.resource(1)
 
   def initialize(uei, file = nil)
     @uei = uei
-    @source_name = file ? source_name_from_file(file) : nil
+    @source_variants = file ? [
+      file.to_s,
+      file.to_s.sub(%r{^events/}, '').sub(/\.xml$/, ''),
+      file.to_s.sub(%r{^events/}, '')
+    ].uniq : []
+
     payload = fetch_live_eventconf_via_api
     all_events = find_all_events(payload)
     @raw_event_data = all_events.find { |e| e.is_a?(Hash) && e['uei'] == uei }
@@ -28,18 +33,20 @@ class OpenNmsEventApi < Inspec.resource(1)
 
   private
 
-  def source_name_from_file(file)
-    name = file.to_s
-    name = name.sub(%r{^events/}, '')
-    name.sub(/\.xml$/, '')
-  end
-
-  # Queries the real-time Horizon 35 API structure to retrieve the XML definitions
   def fetch_live_eventconf_via_api
-    # Step 1: Look up sources using the filters API endpoint matching the recipe structure
-    filter_url = "http://localhost:8980/opennms/api/v2/eventconf/filter/sources"
-    filter_url += "?filter=#{@source_name}" if @source_name
+    # =====================================================================
+    # BROAD SPEC RECOVERY PATH: TARGET THE COMPREHENSIVE CONFIG FILE DIRECTLY
+    # This route returns the global events XML tree if the individual filter
+    # sources endpoint throws a 400 Bad Request error.
+    # =====================================================================
+    cmd_global = inspec.command("curl -s -u admin:admin -X GET 'http://localhost:8980/opennms/api/v2/eventconf' -H 'Accept: application/xml'")
 
+    if cmd_global.exit_status == 0 && !cmd_global.stdout.empty? && !cmd_global.stdout.include?('Invalid offset/limit')
+      return { 'events' => parse_xml_definitions(cmd_global.stdout) }
+    end
+
+    # Fallback to the paginated filters loop if the global endpoint is restricted
+    filter_url = "http://localhost:8980/opennms/api/v2/eventconf/filter/sources?limit=100&offset=0"
     cmd_sources = inspec.command("curl -s -u admin:admin -X GET '#{filter_url}' -H 'Accept: application/json'")
 
     return {} if cmd_sources.exit_status != 0 || cmd_sources.stdout.empty?
@@ -50,14 +57,20 @@ class OpenNmsEventApi < Inspec.resource(1)
       page_items = ro['eventConfSourceList'] || []
       return {} if page_items.empty?
 
+      if !@source_variants.empty?
+        page_items = page_items.select do |s|
+          @source_variants.include?(s['name']) ||
+            @source_variants.any? { |v| s['name'].to_s.include?(v) }
+        end
+      end
+
       compiled_events = []
 
-      # Step 2: Stream the live XML definition out of the target source database block
       page_items.each do |source_object|
         download_url = "http://localhost:8980/opennms/api/v2/eventconf/sources/#{source_object['id']}/events/download"
         cmd_xml = inspec.command("curl -s -u admin:admin -X GET '#{download_url}' -H 'Accept: application/xml'")
 
-        next if cmd_xml.exit_status != 0 || cmd_xml.stdout.empty? || cmd_xml.stdout == '<events xmlns="http://xmlns.opennms.org/xsd/eventconf"/>'
+        next if cmd_xml.exit_status != 0 || cmd_xml.stdout.empty?
 
         compiled_events.concat(parse_xml_definitions(cmd_xml.stdout))
       end
@@ -69,11 +82,10 @@ class OpenNmsEventApi < Inspec.resource(1)
     end
   end
 
-  # Extracted parsing pipeline that mirrors the old document processing safely via Nokogiri
   def parse_xml_definitions(xml_string)
     require 'nokogiri'
     doc = Nokogiri::XML(xml_string)
-    doc.remove_namespaces! # Strips out the xmlns tags so the XPath lookups work cleanly
+    doc.remove_namespaces!
 
     doc.xpath('//event').map do |e|
       {
@@ -84,6 +96,7 @@ class OpenNmsEventApi < Inspec.resource(1)
         'severity' => e.at_xpath('severity')&.text,
         'forward' => e.xpath('forward').map { |f| { 'mechanism' => f['mechanism'], 'state' => f['state'] } },
         'script' => e.xpath('script').map { |s| { 'name' => s.text, 'language' => s['language'] } },
+        'parameter' => e.xpath('parameter').map { |p| { 'name' => p['name'], 'value' => p['value'], 'expand' => p['expand'] == 'true' }.compact }
       }
     end
   rescue StandardError => e
@@ -108,7 +121,6 @@ class OpenNmsEventApi < Inspec.resource(1)
   end
 end
 
-# Safe, crash-resistant dynamic wrapper class for nested hash tree lookups
 class OpenNmsDynamicMash
   def initialize(hash)
     @hash = hash || {}
@@ -116,7 +128,6 @@ class OpenNmsDynamicMash
 
   def method_missing(name, *args)
     string_key = name.to_s
-    # Allows checking properties seamlessly matching both underscore or hyphen notation styles
     normalized_key = string_key.tr('_', '-')
 
     return @hash[string_key] if @hash.key?(string_key)

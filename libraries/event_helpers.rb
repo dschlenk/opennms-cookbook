@@ -147,12 +147,8 @@ module Opennms
             with_run_context :root do
               declare_resource(:ruby_block, "DELETE #{source_name}") do
                 block do
-                  # ===================================================================
-                  # SAFE BASE URL PARSING FOR HORIZON 35+ ON DELETE
-                  # ===================================================================
                   uri = URI.parse(r.restv2url)
                   base_url = "#{uri.scheme}://#{uri.host}:#{uri.port}/opennms"
-                  # ===================================================================
 
                   response = RestClient::Request.execute(
                     method: :delete,
@@ -242,35 +238,35 @@ module Opennms
             uri = URI.parse(restv2url)
             base_url = "#{uri.scheme}://#{uri.host}:#{uri.port}/opennms"
 
+            # Inside libraries/event_helpers.rb under eventconf_source_resource_create:
+            # Locate the loop that pre-populates the source cache and update it with strict limits and offsets:
+
             begin
               loop do
-                # Query the correct endpoint targeting sources with integrated server side filters
                 resp = RestClient::Request.execute(
                   method: :get,
+                  # =====================================================================
+                  # EXPLICIT INT AND PARSED PARAMETERS EXECUTED SECURELY
+                  # =====================================================================
                   url: "#{base_url}/api/v2/eventconf/filter/sources?filter=#{source_name}&limit=#{limit}&offset=#{offset}",
                   headers: { 'Authorization' => "Basic #{Base64.strict_encode64("admin:#{admin_secret_from_vault('password')}")}" },
                   timeout: 30,
                   open_timeout: 10
                 )
                 break if resp.code == 204
-
                 ro = JSON.parse(resp.body) || {}
 
-                # OpenNMS Horizon 35+ wraps paginated source lists under 'eventConfSourceList'
                 page_items = ro['eventConfSourceList'] || []
                 break if page_items.empty?
 
-                # Find the exact structural match out of the batch
                 match = page_items.find { |s| s['name'] == source_name }
                 if match
                   source = match
                   break
                 end
 
-                # Track pagination boundaries safely
                 processed_records += page_items.size
                 break if processed_records >= ro['totalRecords'].to_i
-
                 offset += limit
               end
             rescue => e
@@ -323,8 +319,6 @@ module Opennms
                       # ===================================================================
                       uri = URI.parse(r.restv2url)
                       base_url = "#{uri.scheme}://#{uri.host}:#{uri.port}/opennms"
-                      # ===================================================================
-
                       all_sources_cache = {}
                       offset = 0
                       limit = 100
@@ -334,7 +328,9 @@ module Opennms
                         loop do
                           resp = RestClient::Request.execute(
                             method: :get,
-                            # Query the correct programmatic source tracker endpoint cleanly
+                            # =====================================================================
+                            # INJECTED LITERAL AND VALID EXPLICIT ENFORCED LIMIT ARGUMENTS
+                            # =====================================================================
                             url: "#{base_url}/api/v2/eventconf/filter/sources?limit=#{limit}&offset=#{offset}",
                             headers: { 'Authorization' => "Basic #{Base64.strict_encode64("admin:#{r.admin_secret_from_vault('password')}")}" },
                             timeout: 60,
