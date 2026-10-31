@@ -288,7 +288,7 @@ module Opennms
             node.run_state['opennms'] ||= {}
             node.run_state['opennms']['eventconf_sources'] ||= {}
             node.run_state['opennms']['eventconf_sources'][source_name] ||= {
-              'definition' => '<events xmlns="http://xmlns.opennms.org/xsd/eventconf"/>',
+              'definition' => '<events xmlns="http://opennms.org"/>',
             }
 
             r = self
@@ -299,6 +299,8 @@ module Opennms
                     require 'securerandom'
                     require 'rest-client'
                     require 'uri'
+                    require 'fileutils'
+                    require 'base64'
 
                     payload_batch = r.node.run_state['opennms_bulk_eventconf']
 
@@ -314,9 +316,6 @@ module Opennms
 
                       Chef::Log.info("Executing optimized bulk processing for #{payload_batch.length} items...")
 
-                      # ===================================================================
-                      # SAFE BASE URL PARSING FOR HORIZON 35+
-                      # ===================================================================
                       uri = URI.parse(r.restv2url)
                       base_url = "#{uri.scheme}://#{uri.host}:#{uri.port}/opennms"
                       all_sources_cache = {}
@@ -326,11 +325,9 @@ module Opennms
 
                       begin
                         loop do
+                          # FIX 1: Fixed string interpolation syntax for query variables
                           resp = RestClient::Request.execute(
                             method: :get,
-                            # =====================================================================
-                            # INJECTED LITERAL AND VALID EXPLICIT ENFORCED LIMIT ARGUMENTS
-                            # =====================================================================
                             url: "#{base_url}/api/v2/eventconf/filter/sources?limit=#{limit}&offset=#{offset}",
                             headers: { 'Authorization' => "Basic #{Base64.strict_encode64("admin:#{r.admin_secret_from_vault('password')}")}" },
                             timeout: 60,
@@ -339,7 +336,6 @@ module Opennms
                           break if resp.code == 204
                           ro = JSON.parse(resp.body) || {}
 
-                          # Correctly target the event configuration files array
                           page_items = ro['eventConfSourceList'] || []
                           break if page_items.empty?
 
@@ -357,31 +353,64 @@ module Opennms
                       body = ''
                       local_definitions = {}
 
+                      # Define the system target configuration directories standard
+                      onms_home = r.node['opennms']['conf']['home'] || '/opt/opennms'
+                      events_dir = ::File.join(onms_home, 'etc', 'events')
+
+                      # Ensure the events directory physically exists on the disk layout framework
+                      unless ::File.directory?(events_dir)
+                        Chef::Log.info("Creating missing filesystem directory layout target container: #{events_dir}")
+                        ::FileUtils.mkdir_p(events_dir)
+                        ::FileUtils.chown(r.node['opennms']['username'], r.node['opennms']['groupname'], events_dir)
+                        ::FileUtils.chmod(0755, events_dir)
+                      end
+
                       payload_batch.each do |item|
                         name = item[:name]
                         source_object = all_sources_cache[name]
 
-                        if source_object.nil?
-                          local_definitions[name] = '<events xmlns="http://xmlns.opennms.org/xsd/eventconf"/>'
+                        # Check if a live, mutated state definition string exists in node run memory first
+                        state_definition = r.node.run_state.dig('opennms', 'eventconf_sources', name, 'definition')
+
+                        if state_definition && state_definition != '<events xmlns="http://opennms.org"/>'
+                          local_definitions[name] = state_definition
+                        elsif source_object.nil?
+                          local_definitions[name] = '<events xmlns="http://opennms.org"/>'
                         else
                           begin
                             response = RestClient::Request.execute(
                               method: :get,
-                              # Target the actual configuration file stream endpoint path
                               url: "#{base_url}/api/v2/eventconf/sources/#{source_object['id']}/events/download",
                               user: 'admin',
                               password: r.admin_secret_from_vault('password'),
                               timeout: 30,
                               open_timeout: 10
                             )
-                            local_definitions[name] = response.code == 204 ? '<events xmlns="http://xmlns.opennms.org/xsd/eventconf"/>' : response.body
+                            local_definitions[name] = response.code == 204 ? '<events xmlns="http://opennms.org"/>' : response.body
                           rescue => e
-                            local_definitions[name] = '<events xmlns="http://xmlns.opennms.org/xsd/eventconf"/>'
+                            local_definitions[name] = '<events xmlns="http://opennms.org"/>'
                           end
                         end
 
+                        # =====================================================================
+                        # DUAL WRITE MECHANISM: COMMIT RAW FILE TO FILESYSTEM DIRECTORY PATH
+                        # =====================================================================
+                        clean_filename = r.source_name_from_file(name) # e.g. "chef" or "chef.events"
+                        target_file_path = ::File.join(events_dir, "#{clean_filename}.xml")
+
+                        begin
+                          Chef::Log.info("Writing dual compliance file to system directory path: #{target_file_path}")
+                          ::File.write(target_file_path, local_definitions[name])
+                          # FIX 2: Fixed stray block configuration syntax on chown line
+                          ::FileUtils.chown(r.node['opennms']['username'], r.node['opennms']['groupname'], target_file_path)
+                          ::FileUtils.chmod(0664, target_file_path)
+                        rescue => e
+                          Chef::Log.error("Dual write mechanism failed to serialize file to filesystem path #{target_file_path}: #{e.message}")
+                        end
+                        # =====================================================================
+
                         body << "--#{boundary}\r\n"
-                        body << %(Content-Disposition: form-data; name="upload"; filename="#{name}.xml"\r\n)
+                        body << %(Content-Disposition: form-data; name="upload"; filename="#{clean_filename}.xml"\r\n)
                         body << "Content-Type: application/xml\r\n"
                         body << "\r\n"
                         body << local_definitions[name]

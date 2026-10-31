@@ -521,7 +521,6 @@ suites:
   - name: event_add_parameters
     excludes:
       - oraclelinux-9
-      - oraclelinux-10
       - preinstalled-34-oraclelinux-9
       - preinstalled-oraclelinux-9
     provisioner:

@@ -9,7 +9,11 @@ opennms_event 'uei.opennms.org/cheftest/thresholdExceeded' do
   logmsg_notify true
   severity 'Minor'
   position 'top'
-  alarm_data 'reduction_key' => '%uei%:%dpname%:%nodeid%:%interface%:%parm[ds]%:%parm[threshold]%:%parm[trigger]%:%parm[rearm]%:%parm[label]%', 'alarm_type' => 1, 'auto_clean' => false
+  alarm_data(
+    'reduction_key' => '%uei%:%dpname%:%nodeid%:%interface%:%parm[ds]%:%parm[threshold]%:%parm[trigger]%:%parm[rearm]%:%parm[label]%',
+    'alarm_type' => 1,
+    'auto_clean' => false
+  )
 end
 
 opennms_event 'initial thresholdExceeded2' do
@@ -20,7 +24,11 @@ opennms_event 'initial thresholdExceeded2' do
   logmsg 'A threshold has been exceeded.'
   logmsg_dest 'logndisplay'
   logmsg_notify true
-  mask [{ 'mename' => 'id', 'mevalue' => ['.1.3.6.1.4.1.11385.102.1'] }, { 'mename' => 'generic', 'mevalue' => ['6'] }, { 'mename' => 'specific', 'mevalue' => ['2'] }]
+  mask [
+         { 'mename' => 'id', 'mevalue' => ['.1.3.6.1.4.1.11385.102.1'] },
+         { 'mename' => 'generic', 'mevalue' => ['6'] },
+         { 'mename' => 'specific', 'mevalue' => ['2'] }
+       ]
   severity 'Minor'
   operinstruct 'the operinstruct'
   autoaction [{ 'action' => 'someaction', 'state' => 'off' }]
@@ -29,7 +37,11 @@ opennms_event 'initial thresholdExceeded2' do
   forward [{ 'info' => 'fwdInfo', 'state' => 'off', 'mechanism' => 'snmptcp' }]
   script [{ 'name' => 'anScript', 'language' => 'groovy' }]
   mouseovertext 'mouseOverText'
-  alarm_data 'reduction_key' => '%uei%:%dpname%:%nodeid%:%interface%:%parm[ds]%:%parm[threshold]%:%parm[trigger]%:%parm[rearm]%:%parm[label]%', 'alarm_type' => 1, 'auto_clean' => false
+  alarm_data(
+    'reduction_key' => '%uei%:%dpname%:%nodeid%:%interface%:%parm[ds]%:%parm[threshold]%:%parm[trigger]%:%parm[rearm]%:%parm[label]%',
+    'alarm_type' => 1,
+    'auto_clean' => false
+  )
 end
 
 opennms_event 'new event at the top' do
@@ -52,7 +64,11 @@ opennms_event 'new event at the bottom of existing file' do
   logmsg 'A threshold has been exceeded4.'
   logmsg_dest 'logndisplay'
   logmsg_notify true
-  mask [{ 'mename' => 'id', 'mevalue' => ['.1.3.6.1.4.1.11385.102.1'] }, { 'mename' => 'generic', 'mevalue' => ['6'] }, { 'mename' => 'specific', 'mevalue' => ['2'] }]
+  mask [
+         { 'mename' => 'id', 'mevalue' => ['.1.3.6.1.4.1.11385.102.1'] },
+         { 'mename' => 'generic', 'mevalue' => ['6'] },
+         { 'mename' => 'specific', 'mevalue' => ['2'] }
+       ]
   severity 'Minor'
   operinstruct 'the operinstruct'
   autoaction [{ 'action' => 'someaction', 'state' => 'off' }]
@@ -61,7 +77,11 @@ opennms_event 'new event at the bottom of existing file' do
   forward [{ 'info' => 'fwdInfo', 'state' => 'off', 'mechanism' => 'snmptcp' }]
   script [{ 'name' => 'anScript', 'language' => 'groovy' }]
   mouseovertext 'mouseOverText'
-  alarm_data 'reduction_key' => '%uei%:%dpname%:%nodeid%:%interface%:%parm[ds]%:%parm[threshold]%:%parm[trigger]%:%parm[rearm]%:%parm[label]%', 'alarm_type' => 1, 'auto_clean' => false
+  alarm_data(
+    'reduction_key' => '%uei%:%dpname%:%nodeid%:%interface%:%parm[ds]%:%parm[threshold]%:%parm[trigger]%:%parm[rearm]%:%parm[label]%',
+    'alarm_type' => 1,
+    'auto_clean' => false
+  )
   position 'bottom'
 end
 
@@ -73,7 +93,12 @@ opennms_event 'new event with diverse mask' do
   logmsg 'A threshold has been exceeded4.'
   logmsg_dest 'logndisplay'
   logmsg_notify true
-  mask [{ 'mename' => 'id', 'mevalue' => ['.1.3.6.1.4.1.11385.102.1'] }, { 'mename' => 'generic', 'mevalue' => ['6'] }, { 'mename' => 'specific', 'mevalue' => ['2'] }, { 'vbnumber' => '1', 'vbvalue' => %w(1 2 3) }]
+  mask [
+         { 'mename' => 'id', 'mevalue' => ['.1.3.6.1.4.1.11385.102.1'] },
+         { 'mename' => 'generic', 'mevalue' => ['6'] },
+         { 'mename' => 'specific', 'mevalue' => ['2'] },
+         { 'vbnumber' => '1', 'vbvalue' => %w(1 2 3) }
+       ]
   severity 'Minor'
   operinstruct 'the operinstruct'
   autoaction [{ 'action' => 'someaction', 'state' => 'off' }]
@@ -82,7 +107,11 @@ opennms_event 'new event with diverse mask' do
   forward [{ 'info' => 'fwdInfo', 'state' => 'off', 'mechanism' => 'snmptcp' }]
   script [{ 'name' => 'anScript', 'language' => 'groovy' }]
   mouseovertext 'mouseOverText'
-  alarm_data 'reduction_key' => '%uei%:%dpname%:%nodeid%:%interface%:%parm[ds]%:%parm[threshold]%:%parm[trigger]%:%parm[rearm]%:%parm[label]%', 'alarm_type' => 1, 'auto_clean' => false
+  alarm_data(
+    'reduction_key' => '%uei%:%dpname%:%nodeid%:%interface%:%parm[ds]%:%parm[threshold]%:%parm[trigger]%:%parm[rearm]%:%parm[label]%',
+    'alarm_type' => 1,
+    'auto_clean' => false
+  )
 end
 
 opennms_event 'uei.opennms.org/anUeiForANewThingInANewFileWithPositionTop-isolated' do
@@ -95,7 +124,11 @@ opennms_event 'uei.opennms.org/anUeiForANewThingInANewFileWithPositionTop-isolat
   logmsg_dest 'logndisplay'
   logmsg_notify true
   severity 'Minor'
-  alarm_data 'reduction_key' => '%uei%:%dpname%:%nodeid%:%interface%:%parm[ds]%:%parm[threshold]%:%parm[trigger]%:%parm[rearm]%:%parm[label]%', 'alarm_type' => 1, 'auto_clean' => false
+  alarm_data(
+    'reduction_key' => '%uei%:%dpname%:%nodeid%:%interface%:%parm[ds]%:%parm[threshold]%:%parm[trigger]%:%parm[rearm]%:%parm[label]%',
+    'alarm_type' => 1,
+    'auto_clean' => false
+  )
 end
 
 opennms_event 'uei.opennms.org/fillerForANewThingInANewFile1-isolated' do
@@ -106,7 +139,11 @@ opennms_event 'uei.opennms.org/fillerForANewThingInANewFile1-isolated' do
   logmsg_dest 'logndisplay'
   logmsg_notify true
   severity 'Minor'
-  alarm_data 'reduction_key' => '%uei%:%dpname%:%nodeid%:%interface%:%parm[ds]%:%parm[threshold]%:%parm[trigger]%:%parm[rearm]%:%parm[label]%', 'alarm_type' => 1, 'auto_clean' => false
+  alarm_data(
+    'reduction_key' => '%uei%:%dpname%:%nodeid%:%interface%:%parm[ds]%:%parm[threshold]%:%parm[trigger]%:%parm[rearm]%:%parm[label]%',
+    'alarm_type' => 1,
+    'auto_clean' => false
+  )
   eventconf_position 'top'
 end
 
@@ -118,7 +155,11 @@ opennms_event 'uei.opennms.org/fillerForANewThingInANewFile2-isolated' do
   logmsg_dest 'logndisplay'
   logmsg_notify true
   severity 'Minor'
-  alarm_data 'reduction_key' => '%uei%:%dpname%:%nodeid%:%interface%:%parm[ds]%:%parm[threshold]%:%parm[trigger]%:%parm[rearm]%:%parm[label]%', 'alarm_type' => 1, 'auto_clean' => false
+  alarm_data(
+    'reduction_key' => '%uei%:%dpname%:%nodeid%:%interface%:%parm[ds]%:%parm[threshold]%:%parm[trigger]%:%parm[rearm]%:%parm[label]%',
+    'alarm_type' => 1,
+    'auto_clean' => false
+  )
   eventconf_position 'top'
 end
 
@@ -130,7 +171,11 @@ opennms_event 'uei.opennms.org/eventTopFileTop-isolated' do
   logmsg_dest 'logndisplay'
   logmsg_notify true
   severity 'Minor'
-  alarm_data 'reduction_key' => '%uei%:%dpname%:%nodeid%:%interface%:%parm[ds]%:%parm[threshold]%:%parm[trigger]%:%parm[rearm]%:%parm[label]%', 'alarm_type' => 1, 'auto_clean' => false
+  alarm_data(
+    'reduction_key' => '%uei%:%dpname%:%nodeid%:%interface%:%parm[ds]%:%parm[threshold]%:%parm[trigger]%:%parm[rearm]%:%parm[label]%',
+    'alarm_type' => 1,
+    'auto_clean' => false
+  )
   position 'top'
   eventconf_position 'top'
 end
@@ -143,7 +188,11 @@ opennms_event 'uei.opennms.org/eventBottomFileTop-isolated' do
   logmsg_dest 'logndisplay'
   logmsg_notify true
   severity 'Minor'
-  alarm_data 'reduction_key' => '%uei%:%dpname%:%nodeid%:%interface%:%parm[ds]%:%parm[threshold]%:%parm[trigger]%:%parm[rearm]%:%parm[label]%', 'alarm_type' => 1, 'auto_clean' => false
+  alarm_data(
+    'reduction_key' => '%uei%:%dpname%:%nodeid%:%interface%:%parm[ds]%:%parm[threshold]%:%parm[trigger]%:%parm[rearm]%:%parm[label]%',
+    'alarm_type' => 1,
+    'auto_clean' => false
+  )
   position 'bottom'
   eventconf_position 'top'
 end
@@ -163,12 +212,13 @@ opennms_event 'uei.opennms.org/collectionGroupTest-isolated' do
                        'name' => 'nodeGroup',
                        'resource_type' => 'nodeSnmp',
                        'instance' => 'instanceParmName',
-                       'collections' => [ { 'name' => 'TIME', 'type' => 'counter', 'param_values' => { 'primary' => 1, 'secondary' => 2 } }],
+                       'collections' => [{ 'name' => 'TIME', 'type' => 'counter', 'param_values' => { 'primary' => 1, 'secondary' => 2 } }],
                        'rrd' => {
-                         'rra' => [ 'RRA:AVERAGE:0.5:1:8928' ],
-                         'step' => 60, 'heartbeat' => 120
-                       },
-                     },
+                         'rra' => ['RRA:AVERAGE:0.5:1:8928'],
+                         'step' => 60,
+                         'heartbeat' => 120
+                       }
+                     }
                    ]
 end
 
@@ -246,12 +296,18 @@ opennms_event 'noop_create_if_missing-isolated' do
   severity 'Minor'
   action :create_if_missing
 end
-##############################################
-# INITIAL BASELINE TEST
-##############################################
+
+#=====================================================================
+# INITIAL BASELINE TESTS
+#=====================================================================
+
 opennms_event 'initial description baseline' do
   uei 'uei.opennms.org/cheftest/thresholdExceeded2-event_descr'
-  mask [{ 'mename' => 'id', 'mevalue' => ['.1.3.6.1.4.1.11385.102.1'] }, { 'mename' => 'generic', 'mevalue' => ['6'] }, { 'mename' => 'specific', 'mevalue' => ['2'] }]
+  mask [
+         { 'mename' => 'id', 'mevalue' => ['.1.3.6.1.4.1.11385.102.1'] },
+         { 'mename' => 'generic', 'mevalue' => ['6'] },
+         { 'mename' => 'specific', 'mevalue' => ['2'] }
+       ]
   source_name 'events/chef.events.xml'
   event_label 'Chef defined event: thresholdExceeded'
   descr 'This is the original baseline description text that will be updated.'
@@ -262,7 +318,11 @@ end
 
 opennms_event 'initial alarm_data baseline' do
   uei 'uei.opennms.org/cheftest/thresholdExceeded2-event_edit_alarm_data'
-  mask [{ 'mename' => 'id', 'mevalue' => ['.1.3.6.1.4.1.11385.102.1'] }, { 'mename' => 'generic', 'mevalue' => ['6'] }, { 'mename' => 'specific', 'mevalue' => ['2'] }]
+  mask [
+         { 'mename' => 'id', 'mevalue' => ['.1.3.6.1.4.1.11385.102.1'] },
+         { 'mename' => 'generic', 'mevalue' => ['6'] },
+         { 'mename' => 'specific', 'mevalue' => ['2'] }
+       ]
   source_name 'events/chef.events.xml'
   event_label 'Chef defined event: thresholdExceeded'
   descr 'Baseline description.'
@@ -273,7 +333,11 @@ end
 
 opennms_event 'initial autoaction baseline' do
   uei 'uei.opennms.org/cheftest/thresholdExceeded2-event_edit_autoaction'
-  mask [{ 'mename' => 'id', 'mevalue' => ['.1.3.6.1.4.1.11385.102.1'] }, { 'mename' => 'generic', 'mevalue' => ['6'] }, { 'mename' => 'specific', 'mevalue' => ['2'] }]
+  mask [
+         { 'mename' => 'id', 'mevalue' => ['.1.3.6.1.4.1.11385.102.1'] },
+         { 'mename' => 'generic', 'mevalue' => ['6'] },
+         { 'mename' => 'specific', 'mevalue' => ['2'] }
+       ]
   source_name 'events/chef.events.xml'
   event_label 'Chef defined event: thresholdExceeded'
   descr 'Baseline autoaction event.'
@@ -294,7 +358,11 @@ end
 
 opennms_event 'initial mouseovertext baseline' do
   uei 'uei.opennms.org/cheftest/thresholdExceeded2-event_edit_mouseovertext'
-  mask [{ 'mename' => 'id', 'mevalue' => ['.1.3.6.1.4.1.11385.102.1'] }, { 'mename' => 'generic', 'mevalue' => ['6'] }, { 'mename' => 'specific', 'mevalue' => ['2'] }]
+  mask [
+         { 'mename' => 'id', 'mevalue' => ['.1.3.6.1.4.1.11385.102.1'] },
+         { 'mename' => 'generic', 'mevalue' => ['6'] },
+         { 'mename' => 'specific', 'mevalue' => ['2'] }
+       ]
   source_name 'events/chef.events.xml'
   event_label 'Chef defined event: thresholdExceeded'
   descr 'Baseline mouseover event.'
@@ -305,7 +373,11 @@ end
 
 opennms_event 'initial operinstruct baseline' do
   uei 'uei.opennms.org/cheftest/thresholdExceeded2-event_edit_operinstruct'
-  mask [{ 'mename' => 'id', 'mevalue' => ['.1.3.6.1.4.1.11385.102.1'] }, { 'mename' => 'generic', 'mevalue' => ['6'] }, { 'mename' => 'specific', 'mevalue' => ['2'] }]
+  mask [
+         { 'mename' => 'id', 'mevalue' => ['.1.3.6.1.4.1.11385.102.1'] },
+         { 'mename' => 'generic', 'mevalue' => ['6'] },
+         { 'mename' => 'specific', 'mevalue' => ['2'] }
+       ]
   source_name 'events/chef.events.xml'
   event_label 'Chef defined event: thresholdExceeded'
   descr 'Baseline operinstruct event.'
@@ -316,7 +388,11 @@ end
 
 opennms_event 'initial script baseline' do
   uei 'uei.opennms.org/cheftest/thresholdExceeded2-event_edit_script'
-  mask [{ 'mename' => 'id', 'mevalue' => ['.1.3.6.1.4.1.11385.102.1'] }, { 'mename' => 'generic', 'mevalue' => ['6'] }, { 'mename' => 'specific', 'mevalue' => ['2'] }]
+  mask [
+         { 'mename' => 'id', 'mevalue' => ['.1.3.6.1.4.1.11385.102.1'] },
+         { 'mename' => 'generic', 'mevalue' => ['6'] },
+         { 'mename' => 'specific', 'mevalue' => ['2'] }
+       ]
   source_name 'events/chef.events.xml'
   event_label 'Chef defined event: thresholdExceeded'
   descr 'Baseline script event.'
@@ -327,7 +403,11 @@ end
 
 opennms_event 'initial tticket baseline' do
   uei 'uei.opennms.org/cheftest/thresholdExceeded2-event_edit_tticket'
-  mask [{ 'mename' => 'id', 'mevalue' => ['.1.3.6.1.4.1.11385.102.1'] }, { 'mename' => 'generic', 'mevalue' => ['6'] }, { 'mename' => 'specific', 'mevalue' => ['2'] }]
+  mask [
+         { 'mename' => 'id', 'mevalue' => ['.1.3.6.1.4.1.11385.102.1'] },
+         { 'mename' => 'generic', 'mevalue' => ['6'] },
+         { 'mename' => 'specific', 'mevalue' => ['2'] }
+       ]
   source_name 'events/chef.events.xml'
   event_label 'Chef defined event: thresholdExceeded'
   descr 'Baseline trouble ticket event.'
@@ -338,7 +418,11 @@ end
 
 opennms_event 'initial varbindsdecode baseline' do
   uei 'uei.opennms.org/cheftest/thresholdExceeded2-event_edit_varbindsdecode'
-  mask [{ 'mename' => 'id', 'mevalue' => ['.1.3.6.1.4.1.11385.102.1'] }, { 'mename' => 'generic', 'mevalue' => ['6'] }, { 'mename' => 'specific', 'mevalue' => ['2'] }]
+  mask [
+         { 'mename' => 'id', 'mevalue' => ['.1.3.6.1.4.1.11385.102.1'] },
+         { 'mename' => 'generic', 'mevalue' => ['6'] },
+         { 'mename' => 'specific', 'mevalue' => ['2'] }
+       ]
   source_name 'events/chef.events.xml'
   event_label 'Chef defined event: thresholdExceeded'
   descr 'Baseline varbindsdecode event.'
@@ -349,7 +433,11 @@ end
 
 opennms_event 'initial event_label baseline' do
   uei 'uei.opennms.org/cheftest/thresholdExceeded2-event_label'
-  mask [{ 'mename' => 'id', 'mevalue' => ['.1.3.6.1.4.1.11385.102.1'] }, { 'mename' => 'generic', 'mevalue' => ['6'] }, { 'mename' => 'specific', 'mevalue' => ['2'] }]
+  mask [
+         { 'mename' => 'id', 'mevalue' => ['.1.3.6.1.4.1.11385.102.1'] },
+         { 'mename' => 'generic', 'mevalue' => ['6'] },
+         { 'mename' => 'specific', 'mevalue' => ['2'] }
+       ]
   source_name 'events/chef.events.xml'
   event_label 'Old Event Label'
   descr 'Baseline event_label event.'
@@ -359,7 +447,11 @@ end
 
 opennms_event 'initial logmsg baseline' do
   uei 'uei.opennms.org/cheftest/thresholdExceeded2-event_logmsg'
-  mask [{ 'mename' => 'id', 'mevalue' => ['.1.3.6.1.4.1.11385.102.1'] }, { 'mename' => 'generic', 'mevalue' => ['6'] }, { 'mename' => 'specific', 'mevalue' => ['2'] }]
+  mask [
+         { 'mename' => 'id', 'mevalue' => ['.1.3.6.1.4.1.11385.102.1'] },
+         { 'mename' => 'generic', 'mevalue' => ['6'] },
+         { 'mename' => 'specific', 'mevalue' => ['2'] }
+       ]
   source_name 'events/chef.events.xml'
   event_label 'Chef defined event: thresholdExceeded'
   descr 'Baseline event.'
@@ -370,7 +462,11 @@ end
 
 opennms_event 'initial logmsg_dest baseline' do
   uei 'uei.opennms.org/cheftest/thresholdExceeded2-event_logmsg_dest'
-  mask [{ 'mename' => 'id', 'mevalue' => ['.1.3.6.1.4.1.11385.102.1'] }, { 'mename' => 'generic', 'mevalue' => ['6'] }, { 'mename' => 'specific', 'mevalue' => ['2'] }]
+  mask [
+         { 'mename' => 'id', 'mevalue' => ['.1.3.6.1.4.1.11385.102.1'] },
+         { 'mename' => 'generic', 'mevalue' => ['6'] },
+         { 'mename' => 'specific', 'mevalue' => ['2'] }
+       ]
   source_name 'events/chef.events.xml'
   event_label 'Chef defined event: thresholdExceeded'
   descr 'Baseline logmsg destination event.'
@@ -381,7 +477,11 @@ end
 
 opennms_event 'initial logmsg_notify baseline' do
   uei 'uei.opennms.org/cheftest/thresholdExceeded2-event_logmsg_notify'
-  mask [{ 'mename' => 'id', 'mevalue' => ['.1.3.6.1.4.1.11385.102.1'] }, { 'mename' => 'generic', 'mevalue' => ['6'] }, { 'mename' => 'specific', 'mevalue' => ['2'] }]
+  mask [
+         { 'mename' => 'id', 'mevalue' => ['.1.3.6.1.4.1.11385.102.1'] },
+         { 'mename' => 'generic', 'mevalue' => ['6'] },
+         { 'mename' => 'specific', 'mevalue' => ['2'] }
+       ]
   source_name 'events/chef.events.xml'
   event_label 'Chef defined event: thresholdExceeded'
   descr 'Baseline logmsg notify event.'
@@ -392,7 +492,11 @@ end
 
 opennms_event 'initial rich baseline for noop' do
   uei 'uei.opennms.org/cheftest/thresholdExceeded2-event_noop'
-  mask [{ 'mename' => 'id', 'mevalue' => ['.1.3.6.1.4.1.11385.102.1'] }, { 'mename' => 'generic', 'mevalue' => ['6'] }, { 'mename' => 'specific', 'mevalue' => ['2'] }]
+  mask [
+         { 'mename' => 'id', 'mevalue' => ['.1.3.6.1.4.1.11385.102.1'] },
+         { 'mename' => 'generic', 'mevalue' => ['6'] },
+         { 'mename' => 'specific', 'mevalue' => ['2'] }
+       ]
   source_name 'events/chef.events.xml'
   event_label 'Chef defined event: thresholdExceeded'
   descr 'A threshold defined by a chef recipe has been exceeded.'
@@ -407,12 +511,20 @@ opennms_event 'initial rich baseline for noop' do
   forward [{ 'info' => 'fwdInfo', 'state' => 'off', 'mechanism' => 'snmptcp' }]
   script [{ 'name' => 'anScript', 'language' => 'groovy' }]
   mouseovertext 'mouseOverText'
-  alarm_data 'reduction_key' => '%uei%:%dpname%:%nodeid%:%interface%:%parm[ds]%:%parm[threshold]%:%parm[trigger]%:%parm[rearm]%:%parm[label]%', 'alarm_type' => 1, 'auto_clean' => false
+  alarm_data(
+    'reduction_key' => '%uei%:%dpname%:%nodeid%:%interface%:%parm[ds]%:%parm[threshold]%:%parm[trigger]%:%parm[rearm]%:%parm[label]%',
+    'alarm_type' => 1,
+    'auto_clean' => false
+  )
 end
 
 opennms_event 'initial baseline for remove_add_alarm_data' do
   uei 'uei.opennms.org/cheftest/thresholdExceeded2-event_remove_add_alarm_data'
-  mask [{ 'mename' => 'id', 'mevalue' => ['.1.3.6.1.4.1.11385.102.1'] }, { 'mename' => 'generic', 'mevalue' => ['6'] }, { 'mename' => 'specific', 'mevalue' => ['2'] }]
+  mask [
+         { 'mename' => 'id', 'mevalue' => ['.1.3.6.1.4.1.11385.102.1'] },
+         { 'mename' => 'generic', 'mevalue' => ['6'] },
+         { 'mename' => 'specific', 'mevalue' => ['2'] }
+       ]
   source_name 'events/chef.events.xml'
   event_label 'Chef defined event: thresholdExceeded'
   descr 'Baseline alarm data event.'
@@ -423,7 +535,11 @@ end
 
 opennms_event 'initial baseline for remove_add_autoaction' do
   uei 'uei.opennms.org/cheftest/thresholdExceeded2-event_remove_add_autoaction'
-  mask [{ 'mename' => 'id', 'mevalue' => ['.1.3.6.1.4.1.11385.102.1'] }, { 'mename' => 'generic', 'mevalue' => ['6'] }, { 'mename' => 'specific', 'mevalue' => ['2'] }]
+  mask [
+         { 'mename' => 'id', 'mevalue' => ['.1.3.6.1.4.1.11385.102.1'] },
+         { 'mename' => 'generic', 'mevalue' => ['6'] },
+         { 'mename' => 'specific', 'mevalue' => ['2'] }
+       ]
   source_name 'events/chef.events.xml'
   event_label 'Chef defined event: thresholdExceeded'
   descr 'Baseline autoaction event.'
@@ -434,7 +550,11 @@ end
 
 opennms_event 'initial baseline for remove_add_forward' do
   uei 'uei.opennms.org/cheftest/thresholdExceeded2-event_remove_add_forward'
-  mask [{ 'mename' => 'id', 'mevalue' => ['.1.3.6.1.4.1.11385.102.1'] }, { 'mename' => 'generic', 'mevalue' => ['6'] }, { 'mename' => 'specific', 'mevalue' => ['2'] }]
+  mask [
+         { 'mename' => 'id', 'mevalue' => ['.1.3.6.1.4.1.11385.102.1'] },
+         { 'mename' => 'generic', 'mevalue' => ['6'] },
+         { 'mename' => 'specific', 'mevalue' => ['2'] }
+       ]
   source_name 'events/chef.events.xml'
   event_label 'Chef defined event: thresholdExceeded'
   descr 'Baseline forward mechanism event.'
@@ -445,7 +565,11 @@ end
 
 opennms_event 'initial baseline for remove_add_script' do
   uei 'uei.opennms.org/cheftest/thresholdExceeded2-event_remove_add_script'
-  mask [{ 'mename' => 'id', 'mevalue' => ['.1.3.6.1.4.1.11385.102.1'] }, { 'mename' => 'generic', 'mevalue' => ['6'] }, { 'mename' => 'specific', 'mevalue' => ['2'] }]
+  mask [
+         { 'mename' => 'id', 'mevalue' => ['.1.3.6.1.4.1.11385.102.1'] },
+         { 'mename' => 'generic', 'mevalue' => ['6'] },
+         { 'mename' => 'specific', 'mevalue' => ['2'] }
+       ]
   source_name 'events/chef.events.xml'
   event_label 'Chef defined event: thresholdExceeded'
   descr 'Baseline script element event.'
@@ -456,7 +580,11 @@ end
 
 opennms_event 'initial baseline for remove_add_tticket' do
   uei 'uei.opennms.org/cheftest/thresholdExceeded2-event_remove_add_tticket'
-  mask [{ 'mename' => 'id', 'mevalue' => ['.1.3.6.1.4.1.11385.102.1'] }, { 'mename' => 'generic', 'mevalue' => ['6'] }, { 'mename' => 'specific', 'mevalue' => ['2'] }]
+  mask [
+         { 'mename' => 'id', 'mevalue' => ['.1.3.6.1.4.1.11385.102.1'] },
+         { 'mename' => 'generic', 'mevalue' => ['6'] },
+         { 'mename' => 'specific', 'mevalue' => ['2'] }
+       ]
   source_name 'events/chef.events.xml'
   event_label 'Chef defined event: thresholdExceeded'
   descr 'Baseline tticket element event.'
@@ -467,7 +595,11 @@ end
 
 opennms_event 'initial baseline for remove_add_varbindsdecode' do
   uei 'uei.opennms.org/cheftest/thresholdExceeded2-event_remove_add_varbindsdecode'
-  mask [{ 'mename' => 'id', 'mevalue' => ['.1.3.6.1.4.1.11385.102.1'] }, { 'mename' => 'generic', 'mevalue' => ['6'] }, { 'mename' => 'specific', 'mevalue' => ['2'] }]
+  mask [
+         { 'mename' => 'id', 'mevalue' => ['.1.3.6.1.4.1.11385.102.1'] },
+         { 'mename' => 'generic', 'mevalue' => ['6'] },
+         { 'mename' => 'specific', 'mevalue' => ['2'] }
+       ]
   source_name 'events/chef.events.xml'
   event_label 'Chef defined event: thresholdExceeded'
   descr 'Baseline varbindsdecode element event.'
@@ -478,7 +610,11 @@ end
 
 opennms_event 'initial populated baseline for remove_alarm_data' do
   uei 'uei.opennms.org/cheftest/thresholdExceeded2-event_remove_alarm_data'
-  mask [{ 'mename' => 'id', 'mevalue' => ['.1.3.6.1.4.1.11385.102.1'] }, { 'mename' => 'generic', 'mevalue' => ['6'] }, { 'mename' => 'specific', 'mevalue' => ['2'] }]
+  mask [
+         { 'mename' => 'id', 'mevalue' => ['.1.3.6.1.4.1.11385.102.1'] },
+         { 'mename' => 'generic', 'mevalue' => ['6'] },
+         { 'mename' => 'specific', 'mevalue' => ['2'] }
+       ]
   source_name 'events/chef.events.xml'
   event_label 'Chef defined event: thresholdExceeded'
   descr 'Baseline alarm data cleanup event.'
@@ -489,7 +625,11 @@ end
 
 opennms_event 'initial populated baseline for remove_autoaction' do
   uei 'uei.opennms.org/cheftest/thresholdExceeded2-event_remove_autoaction'
-  mask [{ 'mename' => 'id', 'mevalue' => ['.1.3.6.1.4.1.11385.102.1'] }, { 'mename' => 'generic', 'mevalue' => ['6'] }, { 'mename' => 'specific', 'mevalue' => ['2'] }]
+  mask [
+         { 'mename' => 'id', 'mevalue' => ['.1.3.6.1.4.1.11385.102.1'] },
+         { 'mename' => 'generic', 'mevalue' => ['6'] },
+         { 'mename' => 'specific', 'mevalue' => ['2'] }
+       ]
   source_name 'events/chef.events.xml'
   event_label 'Chef defined event: thresholdExceeded'
   descr 'Baseline autoaction cleanup event.'
@@ -500,7 +640,11 @@ end
 
 opennms_event 'initial populated baseline for remove_forward' do
   uei 'uei.opennms.org/cheftest/thresholdExceeded2-event_remove_forward'
-  mask [{ 'mename' => 'id', 'mevalue' => ['.1.3.6.1.4.1.11385.102.1'] }, { 'mename' => 'generic', 'mevalue' => ['6'] }, { 'mename' => 'specific', 'mevalue' => ['2'] }]
+  mask [
+         { 'mename' => 'id', 'mevalue' => ['.1.3.6.1.4.1.11385.102.1'] },
+         { 'mename' => 'generic', 'mevalue' => ['6'] },
+         { 'mename' => 'specific', 'mevalue' => ['2'] }
+       ]
   source_name 'events/chef.events.xml'
   event_label 'Chef defined event: thresholdExceeded'
   descr 'Baseline forward mechanism cleanup event.'
@@ -511,7 +655,11 @@ end
 
 opennms_event 'initial populated baseline for remove_script' do
   uei 'uei.opennms.org/cheftest/thresholdExceeded2-event_remove_script'
-  mask [{ 'mename' => 'id', 'mevalue' => ['.1.3.6.1.4.1.11385.102.1'] }, { 'mename' => 'generic', 'mevalue' => ['6'] }, { 'mename' => 'specific', 'mevalue' => ['2'] }]
+  mask [
+         { 'mename' => 'id', 'mevalue' => ['.1.3.6.1.4.1.11385.102.1'] },
+         { 'mename' => 'generic', 'mevalue' => ['6'] },
+         { 'mename' => 'specific', 'mevalue' => ['2'] }
+       ]
   source_name 'events/chef.events.xml'
   event_label 'Chef defined event: thresholdExceeded'
   descr 'Baseline script element cleanup event.'
@@ -522,7 +670,11 @@ end
 
 opennms_event 'initial populated baseline for remove_tticket' do
   uei 'uei.opennms.org/cheftest/thresholdExceeded2-event_remove_tticket'
-  mask [{ 'mename' => 'id', 'mevalue' => ['.1.3.6.1.4.1.11385.102.1'] }, { 'mename' => 'generic', 'mevalue' => ['6'] }, { 'mename' => 'specific', 'mevalue' => ['2'] }]
+  mask [
+         { 'mename' => 'id', 'mevalue' => ['.1.3.6.1.4.1.11385.102.1'] },
+         { 'mename' => 'generic', 'mevalue' => ['6'] },
+         { 'mename' => 'specific', 'mevalue' => ['2'] }
+       ]
   source_name 'events/chef.events.xml'
   event_label 'Chef defined event: thresholdExceeded'
   descr 'Baseline trouble ticket cleanup event.'
@@ -533,7 +685,11 @@ end
 
 opennms_event 'initial populated baseline for remove_varbindsdecode' do
   uei 'uei.opennms.org/cheftest/thresholdExceeded2-event_remove_varbindsdecode'
-  mask [{ 'mename' => 'id', 'mevalue' => ['.1.3.6.1.4.1.11385.102.1'] }, { 'mename' => 'generic', 'mevalue' => ['6'] }, { 'mename' => 'specific', 'mevalue' => ['2'] }]
+  mask [
+         { 'mename' => 'id', 'mevalue' => ['.1.3.6.1.4.1.11385.102.1'] },
+         { 'mename' => 'generic', 'mevalue' => ['6'] },
+         { 'mename' => 'specific', 'mevalue' => ['2'] }
+       ]
   source_name 'events/chef.events.xml'
   event_label 'Chef defined event: thresholdExceeded'
   descr 'Baseline varbindsdecode cleanup event.'
@@ -544,13 +700,21 @@ end
 
 opennms_event 'initial baseline for event_severity' do
   uei 'uei.opennms.org/cheftest/thresholdExceeded2-event_severity'
-  mask [{ 'mename' => 'id', 'mevalue' => ['.1.3.6.1.4.1.11385.102.1'] }, { 'mename' => 'generic', 'mevalue' => ['6'] }, { 'mename' => 'specific', 'mevalue' => ['2'] }]
+  mask [
+         { 'mename' => 'id', 'mevalue' => ['.1.3.6.1.4.1.11385.102.1'] },
+         { 'mename' => 'generic', 'mevalue' => ['6'] },
+         { 'mename' => 'specific', 'mevalue' => ['2'] }
+       ]
   source_name 'events/chef.events.xml'
   event_label 'Chef defined event: thresholdExceeded'
   descr 'Baseline severity event.'
   logmsg 'A threshold has been exceeded.'
   severity 'Minor'
 end
+
+#=====================================================================
+# DYNAMIC OUTAGE MATRIX LOOPS
+#=====================================================================
 
 [443, 8443].each do |port|
   [60, 30].each do |days|
@@ -559,11 +723,15 @@ end
       position 'top'
       source_name 'events/opennms.pollerd.events.xml'
       if days == 30
-        mask [{ 'mename' => 'uei', 'mevalue' => ['uei.opennms.org/nodes/nodeLostService'] },
-              { 'mename' => 'service', 'mevalue' => ["TLS-Cert-Expire-#{port}"] }]
+        mask [
+               { 'mename' => 'uei', 'mevalue' => ['uei.opennms.org/nodes/nodeLostService'] },
+               { 'mename' => 'service', 'mevalue' => ["TLS-Cert-Expire-#{port}"] }
+             ]
       else
-        mask [{ 'mename' => 'uei', 'mevalue' => ['uei.opennms.org/nodes/nodeLostService'] },
-              { 'mename' => 'service', 'mevalue' => ["TLS-Cert-Expire-#{port}-#{days}"] }]
+        mask [
+               { 'mename' => 'uei', 'mevalue' => ['uei.opennms.org/nodes/nodeLostService'] },
+               { 'mename' => 'service', 'mevalue' => ["TLS-Cert-Expire-#{port}-#{days}"] }
+             ]
       end
       event_label 'OpenNMS-defined node event: nodeLostService'
       descr 'A %service% outage was identified on interface %interface% because of the following condition: %parm[eventReason]%. A new Outage record has been created and service level availability calculations will be impacted until this outage is resolved.'
