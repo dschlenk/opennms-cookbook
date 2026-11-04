@@ -1,10 +1,9 @@
 # frozen_string_literal: true
-#
+
 control 'event_add_parameters' do
   title 'OpenNMS Event Parameters Configuration'
 
   describe opennms_event('uei.opennms.org/cheftest/thresholdExceeded2-event_add_parameters', 'events/chef.events.xml') do
-
     it 'contains the updated event parameters configuration' do
       expect(subject).to_not be_nil
       raw_params = subject['parameter'] || subject['parameters']
