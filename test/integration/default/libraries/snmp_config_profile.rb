@@ -31,12 +31,24 @@ class SnmpConfigProfile < Inspec.resource(1)
   # /opt/opennms/etc/snmp-config.xml
   XML_URL = 'http://localhost:8980/opennms/api/v2/snmp-config/download?format=xml'
 
+  # The numeric attributes the OpenNMS 36 server stores materialized on
+  # upload: an unset profile attribute is stored as the root element's value,
+  # or as the schema default when the root does not declare the attribute,
+  # which is indistinguishable from an unset attribute and reported as nil on
+  # documents served by the v2 API; the pre-36 file path stays strict
+  MATERIALIZED_ATTRIBUTES = {
+    'max-vars-per-pdu' => 10,
+    'max-repetitions' => 2,
+    'max-request-size' => 65535,
+  }.freeze
+
   def initialize(label)
     @label = label
     doc = xml_document
     if doc.nil?
       from_file(label)
     else
+      @materialized = true
       fill_from_document(doc, label)
     end
   end
@@ -65,7 +77,23 @@ class SnmpConfigProfile < Inspec.resource(1)
     fill_from_document(doc, label)
   end
 
+  # The stored value of a profile attribute, normalized for the server
+  # materialization on documents served by the v2 API (see
+  # MATERIALIZED_ATTRIBUTES)
+  def attribute_value(profile, xml_attr)
+    value = profile.attributes[xml_attr]
+    return if value.nil?
+    return if @materialized && value.to_s == effective_value(xml_attr)
+
+    value
+  end
+
+  def effective_value(xml_attr)
+    (@root && @root.attributes[xml_attr]) || MATERIALIZED_ATTRIBUTES[xml_attr].to_s
+  end
+
   def fill_from_document(doc, label)
+    @root = doc.elements['/snmp-config']
     p = nil
     doc.each_element("/snmp-config/profiles/profile[label/text()[contains(., '#{label}')]]") do |mp|
       if mp.elements['label'].texts.collect(&:value).join('').strip == label
@@ -83,9 +111,9 @@ class SnmpConfigProfile < Inspec.resource(1)
     @params[:timeout] = p.attributes['timeout'].to_i unless p.attributes['timeout'].nil?
     @params[:proxy_host] = p.attributes['proxy-host'] unless p.attributes['proxy-host'].nil?
     @params[:version] = p.attributes['version'] unless p.attributes['version'].nil?
-    @params[:max_vars_per_pdu] = p.attributes['max-vars-per-pdu'].to_i unless p.attributes['max-vars-per-pdu'].nil?
-    @params[:max_repetitions] = p.attributes['max-repetitions'].to_i unless p.attributes['max-repetitions'].nil?
-    @params[:max_request_size] = p.attributes['max-request-size'].to_i unless p.attributes['max-request-size'].nil?
+    @params[:max_vars_per_pdu] = attribute_value(p, 'max-vars-per-pdu')&.to_i
+    @params[:max_repetitions] = attribute_value(p, 'max-repetitions')&.to_i
+    @params[:max_request_size] = attribute_value(p, 'max-request-size')&.to_i
     @params[:ttl] = p.attributes['ttl'].to_i unless p.attributes['ttl'].nil?
     @params[:encrypted] = p.attributes['encrypted'].downcase == 'true' unless p.attributes['encrypted'].nil?
     @params[:security_name] = p.attributes['security-name'] unless p.attributes['security-name'].nil?

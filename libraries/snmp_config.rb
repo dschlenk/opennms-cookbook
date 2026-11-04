@@ -49,7 +49,7 @@ module Opennms
         # so mutations made by earlier resources are visible to later ones
         def snmp_config_file
           node.run_state['opennms_snmp_config_file'] ||=
-            Opennms::Cookbook::ConfigHelpers::SnmpConfig::SnmpConfigFile.load(snmp_config_document_xml)
+            Opennms::Cookbook::ConfigHelpers::SnmpConfig::SnmpConfigFile.load(snmp_config_document_xml, materialized: true)
         end
 
         # The pristine download, kept for the dirty check in
@@ -57,7 +57,7 @@ module Opennms
         # uploads nothing
         def snmp_config_file_original
           node.run_state['opennms_snmp_config_file_original'] ||=
-            Opennms::Cookbook::ConfigHelpers::SnmpConfig::SnmpConfigFile.load(snmp_config_document_xml)
+            Opennms::Cookbook::ConfigHelpers::SnmpConfig::SnmpConfigFile.load(snmp_config_document_xml, materialized: true)
         end
 
         # Read-modify-write of the accumulated snmp config: yield it for
@@ -174,6 +174,18 @@ module Opennms
         # the fixed boundary for the multipart body of POST /snmp-config/upload/xml
         UPLOAD_BOUNDARY = 'opennms-snmp-config-xml-upload'
 
+        # The numeric attributes the OpenNMS 36 server stores materialized on
+        # upload: a definition or profile attribute that is unset in the
+        # uploaded document is stored as the root element's value, or as the
+        # schema default when the root element does not declare the attribute
+        # (upstream is still deciding what the correct behavior is). A stored
+        # value that equals that effective default is indistinguishable from
+        # an unset attribute, so identity matching treats it as unset on
+        # documents served by the v2 API. Each entry maps the attribute name
+        # to its position in the definition()/match? argument list and the
+        # schema default
+        MATERIALIZED_ATTRIBUTES = { max_vars_per_pdu: [7, 10], max_repetitions: [8, 2], max_request_size: [9, 65_535] }.freeze
+
         # The multipart body for POST /snmp-config/upload/xml: a single form
         # field 'upload' carrying the XML document as a file part
         def self.snmp_config_upload_body(xml)
@@ -272,6 +284,11 @@ module Opennms
         class SnmpConfigFile < SnmpConfig
           include Opennms::Cookbook::ConfigHelpers::SnmpConfig::Helper
           attr_accessor :definitions, :profiles
+          # true when the document was served by the v2 API download endpoint,
+          # whose server stores unset attributes materialized (see
+          # MATERIALIZED_ATTRIBUTES); documents parsed from local files keep
+          # the strict pre-36 identity
+          attr_accessor :materialized
 
           def initialize
             @definitions = []
@@ -283,9 +300,11 @@ module Opennms
           end
 
           # Parse the given XML document into a new config; the shared core of
-          # read!
-          def self.load(content)
+          # read!. materialized marks a document served by the v2 API (see
+          # MATERIALIZED_ATTRIBUTES)
+          def self.load(content, materialized: false)
             snmp_config = new
+            snmp_config.materialized = materialized
             snmp_config.parse!(content)
           end
 
@@ -391,13 +410,36 @@ module Opennms
             # if not found return nil
             # raise an error if more than one found
             # return the single item left in the list via pop
-            definition = @definitions.select { |dd| dd.match?(port, retry_count, timeout, read_community, write_community, proxy_host, version, max_vars_per_pdu, max_repetitions, max_request_size, ttl, encrypted, security_name, security_level, auth_passphrase, auth_protocol, engine_id, context_engine_id, context_name, privacy_passphrase, privacy_protocol, enterprise_id, location, profile_label) }
+            identity = [port, retry_count, timeout, read_community, write_community, proxy_host, version, max_vars_per_pdu, max_repetitions, max_request_size, ttl, encrypted, security_name, security_level, auth_passphrase, auth_protocol, engine_id, context_engine_id, context_name, privacy_passphrase, privacy_protocol, enterprise_id, location, profile_label]
+            definition = @definitions.select { |dd| definition_matches_identity?(dd, identity) }
 
             return if definition.empty?
 
             raise SnmpConfigDefinitionDuplicateEntry, "Duplicate SNMP Config Definition found matching #{definition}" unless definition.one?
 
             definition.pop
+          end
+
+          # Identity matching of a stored definition against a declared
+          # identity. On a document served by the v2 API (materialized), the
+          # server stores the unset max-vars-per-pdu, max-repetitions and
+          # max-request-size materialized as the root element's value or the
+          # schema default, which is indistinguishable from an unset
+          # attribute: an unset declared attribute therefore also matches the
+          # materialized stored value, while every set declared attribute
+          # always matches strictly. Documents parsed from files keep the
+          # strict pre-36 semantics
+          def definition_matches_identity?(dd, identity)
+            return dd.match?(*identity) unless materialized
+
+            effective = identity.dup
+            MATERIALIZED_ATTRIBUTES.each do |attribute, (position, schema_default)|
+              stored = dd.send(attribute)
+              next unless identity[position].nil? && !stored.nil? && stored == (send(attribute) || schema_default)
+
+              effective[position] = stored
+            end
+            dd.match?(*effective)
           end
 
           def profile(label)

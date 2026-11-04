@@ -34,12 +34,26 @@ class SnmpConfigDefinition < Inspec.resource(1)
   # /opt/opennms/etc/snmp-config.xml
   XML_URL = 'http://localhost:8980/opennms/api/v2/snmp-config/download?format=xml'
 
+  # The numeric attributes the OpenNMS 36 server stores materialized on
+  # upload: an unset definition attribute is stored as the root element's
+  # value, or as the schema default when the root does not declare the
+  # attribute, so an undeclared attribute matches the materialized value on a
+  # document served by the v2 API; the pre-36 file path stays strict. Each
+  # entry maps the XML attribute name to the config key and the schema
+  # default
+  MATERIALIZED_ATTRIBUTES = {
+    'max-vars-per-pdu' => %w(max_vars_per_pdu 10),
+    'max-repetitions' => %w(max_repetitions 2),
+    'max-request-size' => %w(max_request_size 65535),
+  }.freeze
+
   def initialize(config)
     @config = config
     doc = xml_document
     if doc.nil?
       from_file(config)
     else
+      @materialized = true
       fill_from_document(doc, config)
     end
   end
@@ -79,9 +93,9 @@ class SnmpConfigDefinition < Inspec.resource(1)
       && def_el.attributes['write-community'].to_s == config['write_community'].to_s \
       && def_el.attributes['proxy-host'].to_s == config['proxy_host'].to_s \
       && def_el.attributes['version'].to_s == config['version'].to_s \
-      && def_el.attributes['max-vars-per-pdu'].to_s == config['max_vars_per_pdu'].to_s \
-      && def_el.attributes['max-repetitions'].to_s == config['max_repetitions'].to_s \
-      && def_el.attributes['max-request-size'].to_s == config['max_request_size'].to_s \
+      && attribute_matches?(def_el, 'max-vars-per-pdu', config) \
+      && attribute_matches?(def_el, 'max-repetitions', config) \
+      && attribute_matches?(def_el, 'max-request-size', config) \
       && def_el.attributes['security-name'].to_s == config['security_name'].to_s \
       && def_el.attributes['security-level'].to_s == config['security_level'].to_s \
       && def_el.attributes['auth-passphrase'].to_s == config['auth_passphrase'].to_s \
@@ -96,7 +110,25 @@ class SnmpConfigDefinition < Inspec.resource(1)
       && def_el.attributes['profile-label'].to_s == config['profile_label'].to_s
   end
 
+  # The stored value of a server-materialized attribute matches the declared
+  # one: a set declared value matches strictly; an undeclared value also
+  # matches the materialized value (the root element's value or the schema
+  # default) on documents served by the v2 API, where the stored value is
+  # indistinguishable from an unset attribute
+  def attribute_matches?(def_el, xml_attr, config)
+    stored = def_el.attributes[xml_attr]
+    declared = config[MATERIALIZED_ATTRIBUTES[xml_attr][0]]
+    return stored.to_s == declared.to_s unless @materialized && declared.nil?
+
+    stored.nil? || stored.to_s == effective_value(xml_attr)
+  end
+
+  def effective_value(xml_attr)
+    (@root && @root.attributes[xml_attr]) || MATERIALIZED_ATTRIBUTES[xml_attr][1]
+  end
+
   def fill_from_document(doc, config)
+    @root = doc.elements['/snmp-config']
     d = nil
     doc.elements.each('/snmp-config/definition') do |def_el|
       if definition_matches?(def_el, config)
