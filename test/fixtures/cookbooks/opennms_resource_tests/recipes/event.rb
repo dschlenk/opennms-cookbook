@@ -296,10 +296,9 @@ opennms_event 'noop_create_if_missing-isolated' do
   severity 'Minor'
   action :create_if_missing
 end
+
 #=====================================================================
-
-INITIAL BASELINE TESTS
-
+# INITIAL BASELINE TESTS
 #=====================================================================
 opennms_event 'initial description baseline' do
   uei 'uei.opennms.org/cheftest/thresholdExceeded2-event_descr'
