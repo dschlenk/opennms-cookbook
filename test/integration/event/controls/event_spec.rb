@@ -135,7 +135,7 @@ control 'uei.opennms.org/cheftest/thresholdExceeded 4 and 5 configurations' do
                                  hash_including('mename' => 'specific', 'mevalue' => ['2'])
                                )
       expect(varbind_elements).to include(
-                                    hash_including('vbnumber' => '1', 'vbvalue' => %w[1 2 3])
+                                    hash_including('vbnumber' => '1', 'vbvalue' => %w(1 2 3))
                                   )
     end
   end
@@ -207,7 +207,6 @@ end
 
 control 'OpenNMS Live Event REST API - chef6.events parameters, autoack, and filters' do
   title 'chef6.events structural validations'
-
   describe opennms_event('uei.opennms.org/parametersTest-isolated', 'events/chef6.events.xml') do
     it 'validates base state values' do
       expect(subject).to_not be_nil
@@ -268,7 +267,7 @@ end
 
 control 'OpenNMS Live Event REST API - Dynamic Outage Loops' do
   title 'Pollerd certificate loops validation'
-  [443, 8443].each do |port|
+  [443, 8443].each do |_port|
     [60, 30].each do |_days|
       describe opennms_event('uei.opennms.org/nodes/nodeLostService', 'events/opennms.pollerd.events.xml') do
         it 'validates out-of-the-box system configurations dynamically generated looping rules' do

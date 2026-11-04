@@ -6,13 +6,18 @@ class OpenNmsEventApi < Inspec.resource(1)
 
   def initialize(uei, file = nil)
     @uei = uei
-    @source_variants = file ? [
-      file.to_s,
-      file.to_s.sub(%r{^events/}, ''),
-      file.to_s.sub(%r{^events/}, '').sub(/\.xml$/, ''),
-      "#{file.to_s.sub(%r{^events/}, '').sub(/\.events\.xml$/, '')}.events",
-      file.to_s.split('/').last
-    ].uniq : []
+    @source_variants = if file
+                         [
+                           file.to_s,
+                           file.to_s.sub(%r{^events/}, ''),
+                           file.to_s.sub(%r{^events/}, '').sub(/\.xml$/, ''),
+                           "#{file.to_s.sub(%r{^events/}, '').sub(/\.events\.xml$/, '')}.events",
+                           file.to_s.split('/').last,
+                         ]
+                       else
+                         []
+                       end
+    @source_variants = @source_variants.uniq
 
     payload = fetch_live_eventconf_via_api
     all_events = find_all_events(payload)
@@ -31,17 +36,17 @@ class OpenNmsEventApi < Inspec.resource(1)
     return true if name == :empty? && raw_event_data.nil?
     return false if name == :empty?
 
-    return nil if raw_event_data.nil?
+    return if raw_event_data.nil?
     OpenNmsDynamicMash.new(raw_event_data).send(name, *args, &block)
   end
 
-  def respond_to_missing?(name, include_private = false)
-    %i[exist? exists? empty?].include?(name) || true
+  def respond_to_missing?(name, _include_private = false)
+    %i(exist? exists? empty?).include?(name) || true
   end
 
   # Allow direct index lookup directly on the resource level (e.g. subject['uei'])
   def [](key)
-    return nil if raw_event_data.nil?
+    return if raw_event_data.nil?
     raw_event_data[key] || raw_event_data[key.to_s.tr('_', '-')]
   end
 
@@ -83,11 +88,11 @@ class OpenNmsEventApi < Inspec.resource(1)
         'severity' => e.at_xpath('severity')&.text,
         'forward' => e.xpath('forward').map { |f| { 'mechanism' => f['mechanism'], 'state' => f['state'] } },
         'script' => e.xpath('script').map { |s| { 'name' => s.text, 'language' => s['language'] } },
-        'parameter' => e.xpath('parameter').map { |p|
+        'parameter' => e.xpath('parameter').map do |p|
           h = { 'name' => p['name'], 'value' => p['value'] }
           h['expand'] = true if p['expand'] == 'true'
           h
-        }
+        end,
       }
     end
   rescue StandardError => e
@@ -99,7 +104,7 @@ class OpenNmsEventApi < Inspec.resource(1)
     events = []
     if obj.is_a?(Hash)
       obj.each do |k, v|
-        if %w[event events event_list eventList events_list].include?(k.to_s)
+        if %w(event events event_list eventList events_list).include?(k.to_s)
           v.is_a?(Array) ? events.concat(v) : events.push(v)
         else
           events.concat(find_all_events(v))

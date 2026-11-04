@@ -1,5 +1,5 @@
 # frozen_string_literal: true
-
+#
 control 'event_add_parameters' do
   title 'OpenNMS Event Parameters Configuration'
 

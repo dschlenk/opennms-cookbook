@@ -7,11 +7,11 @@ opennms_event 'add parameters' do
   mask [
          { 'mename' => 'id', 'mevalue' => ['.1.3.6.1.4.1.11385.102.1'] },
          { 'mename' => 'generic', 'mevalue' => ['6'] },
-         { 'mename' => 'specific', 'mevalue' => ['2'] }
+         { 'mename' => 'specific', 'mevalue' => ['2'] },
        ]
   source_name 'events/chef.events.xml'
   parameters [
                { 'name' => 'param1', 'value' => 'paramValue1' },
-               { 'name' => 'param2', 'value' => 'paramValue2', 'expand' => true }
+               { 'name' => 'param2', 'value' => 'paramValue2', 'expand' => true },
              ]
 end
