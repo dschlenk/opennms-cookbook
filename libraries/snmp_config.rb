@@ -341,7 +341,7 @@ module Opennms
                   attrs_from_attributes(profile, p)
                 end
                 profile.label = p.elements['label'].texts.join('').strip unless p.elements['label'].nil?
-                profile.filter = p.elements['filter'].texts.join('').strip unless p.elements['filter'].nil?
+                profile.filter = p.elements['filter'].texts.join('').strip unless p.elements['filter'].nil? || p.elements['filter'].texts.join('').empty?
                 @profiles.push(profile)
               end
             end

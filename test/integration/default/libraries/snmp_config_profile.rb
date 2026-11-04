@@ -126,6 +126,6 @@ class SnmpConfigProfile < Inspec.resource(1)
     @params[:privacy_passphrase] = p.attributes['privacy-passphrase'] unless p.attributes['privacy-passphrase'].nil?
     @params[:privacy_protocol] = p.attributes['privacy-protocol'] unless p.attributes['privacy-protocol'].nil?
     @params[:enterprise_id] = p.attributes['enterprise-id'] unless p.attributes['enterprise-id'].nil?
-    @params[:filter] = p.elements['filter'].texts.collect(&:value).join('').strip unless p.elements['filter'].nil?
+    @params[:filter] = p.elements['filter'].texts.collect(&:value).join('').strip unless p.elements['filter'].nil? || p.elements['filter'].texts.collect(&:value).join('').empty?
   end
 end
