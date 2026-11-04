@@ -189,7 +189,6 @@ suites:
       opennms:
         plugin:
           addl:
-            - opennms-plugin-protocol-nsclient
             - opennms-plugin-provisioning-snmp-hardware-inventory
             - opennms-plugin-provisioning-snmp-asset
   - name: avail_category
