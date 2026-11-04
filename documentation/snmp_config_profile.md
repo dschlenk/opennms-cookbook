@@ -8,7 +8,7 @@ On OpenNMS 36 and later profiles are stored in the database and managed through 
 
 * `:add` (`:create`) **replaces the entire profile row** with the same label: attributes that are not set on the resource are cleared. If the same label is declared by more than one resource in a run list, the last declaration wins, and on every run the earlier declarations revert the row and the later ones re-apply it, so all of them report changes on every run (the resulting state is stable).
 * `:delete` removes the profile with the label; if the profile does not exist the resource does nothing. Nothing checks for definitions that reference the label: deleting a profile leaves definitions with the same `profile_label` in place.
-* The upload does not preserve the document byte for byte: the server stores the unset `max_vars_per_pdu`, `max_repetitions` and `max_request_size` of a profile materialized as the root element's value (see [opennms\_snmp\_config](snmp_config.md)), or as the schema default (`10`, `2`, `65535`) when the root element does not declare the attribute. The profile's identity is its label, so this does not affect matching.
+* The upload does not preserve the document byte for byte: the server stores the unset `max_vars_per_pdu`, `max_repetitions` and `max_request_size` of a profile materialized as the root element's value (see [opennms\_snmp\_config](snmp_config.md)), or as the schema default (`10`, `2`, `65535`) when the root element does not declare the attribute, and stores a `filter` element on every profile whether it was present or not, treating an empty filter as no filter. The profile's identity is its label, so this does not affect matching.
 * `encrypted` is not stored in the database and is rejected on OpenNMS 36.
 
 ## Uses
