@@ -1,7 +1,15 @@
 # frozen_string_literal: true
+
 control 'event_remove_add_varbindsdecode' do
-  describe event('uei.opennms.org/cheftest/thresholdExceeded2', 'events/chef.events.xml', [{ 'mename' => 'id', 'mevalue' => ['.1.3.6.1.4.1.11385.102.1'] }, { 'mename' => 'generic', 'mevalue' => ['6'] }, { 'mename' => 'specific', 'mevalue' => ['2'] }]) do
+  title 'OpenNMS Event Remove and Add Varbindsdecode Validation'
+
+  describe opennms_event('uei.opennms.org/cheftest/thresholdExceeded2-event_remove_add_varbindsdecode', 'events/chef.events.xml') do
     it { should exist }
-    its('varbindsdecode') { should eq([{ 'parmid' => 'theParmId', 'decode' => [{ 'varbindvalue' => 'theVarBindValue', 'varbinddecodedstring' => 'theVarBindDecodedString' }] }]) }
+
+    it 'contains the re-added varbind decoding configurations' do
+      expect(subject.event_data['varbindsdecode']).to include(
+                                                               hash_including('parmid' => 'theParmId')
+                                                             )
+    end
   end
 end

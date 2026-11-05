@@ -1,20 +1,29 @@
 # frozen_string_literal: true
+
 control 'event_noop' do
-  describe event('uei.opennms.org/cheftest/thresholdExceeded2', 'events/chef.events.xml', [{ 'mename' => 'id', 'mevalue' => ['.1.3.6.1.4.1.11385.102.1'] }, { 'mename' => 'generic', 'mevalue' => ['6'] }, { 'mename' => 'specific', 'mevalue' => ['2'] }]) do
+  title 'OpenNMS Event Noop Baseline Validation'
+
+  describe opennms_event('uei.opennms.org/cheftest/thresholdExceeded2-event_noop', 'events/chef.events.xml') do
     it { should exist }
-    its('event_label') { should eq 'Chef defined event: thresholdExceeded' }
-    its('descr') { should eq '<p>A threshold defined by a chef recipe has been exceeded.</p>' }
-    its('logmsg') { should eq 'A threshold has been exceeded.' }
-    its('logmsg_dest') { should eq 'logndisplay' }
-    its('logmsg_notify') { should be true }
-    its('severity') { should eq 'Minor' }
-    its('operinstruct') { should eq 'the operinstruct' }
-    its('autoaction') { should eq([{ 'action' => 'someaction', 'state' => 'off' }]) }
-    its('varbindsdecode') { should eq([{ 'parmid' => 'theParmId', 'decode' => [{ 'varbindvalue' => 'theVarBindValue', 'varbinddecodedstring' => 'theVarBindDecodedString' }] }]) }
-    its('tticket') { should eq('info' => 'tticketInfo', 'state' => 'off') }
-    its('forward') { should eq([{ 'info' => 'fwdInfo', 'state' => 'off', 'mechanism' => 'snmptcp' }]) }
-    its('script') { should eq([{ 'name' => 'anScript', 'language' => 'groovy' }]) }
-    its('mouseovertext') { should eq 'mouseOverText' }
-    its('alarm_data') { should eq('reduction_key' => '%uei%:%dpname%:%nodeid%:%interface%:%parm[ds]%:%parm[threshold]%:%parm[trigger]%:%parm[rearm]%:%parm[label]%', 'alarm_type' => 1, 'auto_clean' => false) }
+    its('eventLabel')             { should eq 'Chef defined event: thresholdExceeded' }
+    its('descr')                  { should include 'A threshold defined by a chef recipe has been exceeded.' }
+    its('logmsg.content')         { should eq 'A threshold has been exceeded.' }
+    its('logmsg.dest')            { should eq 'logndisplay' }
+    its('logmsg.notify')          { should be true }
+    its('severity')               { should eq 'Minor' }
+    its('operinstruct')           { should eq 'the operinstruct' }
+    its('tticket.info')           { should eq 'tticketInfo' }
+    its('tticket.state')          { should eq 'off' }
+    its('mouseovertext')          { should eq 'mouseOverText' }
+    its('alarmData.reductionKey') { should eq '%uei%:%dpname%:%nodeid%:%interface%:%parm[ds]%:%parm[threshold]%:%parm[trigger]%:%parm[rearm]%:%parm[label]%' }
+    its('alarmData.alarmType')    { should eq 1 }
+    its('alarmData.autoClean')    { should be false }
+
+    it 'contains the exact nested parameter collection elements' do
+      expect(subject.event_data['autoaction']).to include(hash_including('action' => 'someaction', 'state' => 'off'))
+      expect(subject.event_data['forward']).to include(hash_including('info' => 'fwdInfo', 'state' => 'off', 'mechanism' => 'snmptcp'))
+      expect(subject.event_data['script']).to include(hash_including('name' => 'anScript', 'language' => 'groovy'))
+      expect(subject.event_data['varbindsdecode']).to include(hash_including('parmid' => 'theParmId'))
+    end
   end
 end

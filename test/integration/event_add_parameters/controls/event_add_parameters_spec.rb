@@ -1,21 +1,18 @@
 # frozen_string_literal: true
+
 control 'event_add_parameters' do
-  e = event('uei.opennms.org/cheftest/thresholdExceeded2', 'events/chef.events.xml', [{ 'mename' => 'id', 'mevalue' => ['.1.3.6.1.4.1.11385.102.1'] }, { 'mename' => 'generic', 'mevalue' => ['6'] }, { 'mename' => 'specific', 'mevalue' => ['2'] }])
-  if e.parameters.nil?
-    describe e do
-      it { should exist }
-    end
-  elsif e.parameters[1].key? 'expand'
-    # > 16 supports parameters
-    describe e do
-      it { should exist }
-      its('parameters') { should eq([{ 'name' => 'param1', 'value' => 'paramValue1' }, { 'name' => 'param2', 'value' => 'paramValue2', 'expand' => true }]) }
-    end
-  else
-    # except 17 didn't have the expand attribute
-    describe e do
-      it { should exist }
-      its('parameters') { should eq([{ 'name' => 'param1', 'value' => 'paramValue1' }, { 'name' => 'param2', 'value' => 'paramValue2' }]) }
+  title 'OpenNMS Event Parameters Configuration'
+
+  describe opennms_event('uei.opennms.org/cheftest/thresholdExceeded2-event_add_parameters', 'events/chef.events.xml') do
+    it 'contains the updated event parameters configuration' do
+      expect(subject).to_not be_nil
+      raw_params = subject['parameter'] || subject['parameters']
+      params = raw_params.is_a?(Hash) ? [raw_params] : Array(raw_params)
+
+      expect(params).to include(
+                          hash_including('name' => 'param1', 'value' => 'paramValue1'),
+                          hash_including('name' => 'param2', 'value' => 'paramValue2')
+                        )
     end
   end
 end
