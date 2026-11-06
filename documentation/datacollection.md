@@ -303,7 +303,7 @@ Manages a file in `$OPENNMS_HOME/etc/datacollection/` and inclusion of the group
 
 `exclude_filters` one or more regular expression strings indicating system definitions to not include in the collection with the inclusion of this group
 
-On OpenNMS 36 and later the group is included in the collection as a reference to a database collection source instead of an `include-collection` element in `$OPENNMS_HOME/etc/datacollection-config.xml`. The file is still deployed to `$OPENNMS_HOME/etc/datacollection/` (and removed again by `:delete`), but OpenNMS reads the source from the database; the deployed file seeds the source when it does not exist yet.
+On OpenNMS 36 and later the group is included in the collection as a reference to a database collection source instead of an `include-collection` element in `$OPENNMS_HOME/etc/datacollection-config.xml`. The file is deployed to `$OPENNMS_HOME/etc_archive/datacollection/`, the package's on-disk record of the datacollection files (and removed again by `:delete`), but OpenNMS reads the source from the database; the deployed file seeds the source when it does not exist yet.
 
 * Without `exclude_filters` the group is referenced by its canonical source name, and the include is idempotent.
 * With `exclude_filters` the include is materialized into the collection's `__inline_<collection_name>` source on every converge (see the section above): the declared form is not persisted, so such a group reports changes on every run.

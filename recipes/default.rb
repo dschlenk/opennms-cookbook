@@ -84,50 +84,10 @@ execute 'install' do
   command "#{onms_home}/bin/install -dis"
 end
 
-# bin/opennms -s start probes the JVM with a USR1 status check every
-# STATUS_WAIT (5s) after each attempt. On slow JVM boot (e.g. qemu-emulated
-# x86_64 on arm64) an early probe kills the JVM before it is up. The script
-# sources $HOME/.opennms-dev/opennms.conf after etc/opennms.conf for
-# overrides, so disable the start-wait there and let the JVM boot in the
-# background; systemd (Type=forking with PIDFile) adopts it.
-directory "#{onms_home}/.opennms-dev" do
-  owner node['opennms']['username']
-  group node['opennms']['groupname']
-  mode '700'
-end
-file "#{onms_home}/.opennms-dev/opennms.conf" do
-  owner node['opennms']['username']
-  group node['opennms']['groupname']
-  mode '600'
-  content "START_TIMEOUT=\"0\"\n"
-  action :create
-end
-
-# pidfile directory required by the start script. Normally created by the
-# unit's RuntimeDirectory=opennms, which degraded systemd in containers
-# does not materialize.
-directory '/var/run/opennms' do
-  owner node['opennms']['username']
-  group node['opennms']['groupname']
-  mode '775'
-end
-
 service 'opennms' do
   timeout start_timeout
   supports status: true, restart: true
   action [:enable, :start]
-end
-
-# the start returns as soon as the JVM has been forked, so poll the REST API
-# until the webapp actually serves before anything below touches it
-jetty_port = node['opennms']['properties']['jetty']['port']
-wait_attempts = (start_timeout / 5).to_i
-execute 'wait for opennms' do
-  command "code=000; for i in $(seq 1 #{wait_attempts}); do " \
-          "code=$(curl -s -o /dev/null -w '%{http_code}' 'http://localhost:#{jetty_port}/opennms/api/v2/'); " \
-          'case "$code" in 200|401) exit 0;; esac; sleep 5; done; ' \
-          'echo "OpenNMS REST API not reachable (last HTTP code: $code)" >&2; exit 1'
-  timeout wait_attempts * 10
 end
 
 execute 'reload systemd' do

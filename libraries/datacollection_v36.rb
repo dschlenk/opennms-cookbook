@@ -12,7 +12,9 @@ module Opennms
       # sources and their mib groups, resource types and system definitions)
       # is stored in the database and managed via the v2 REST API
       # (/opennms/api/v2/datacollectionconf) instead of the files under
-      # $OPENNMS_HOME/etc/datacollection.
+      # $OPENNMS_HOME/etc/datacollection. The package ships the group files
+      # as its on-disk record in $OPENNMS_HOME/etc_archive/datacollection,
+      # which is also where this cookbook stages the group files it manages.
       #
       # All datacollection resources (opennms_snmp_collection,
       # opennms_snmp_collection_group, the group path of
@@ -207,10 +209,10 @@ module Opennms
         end
 
         # The @name attribute of a group file deployed under
-        # $OPENNMS_HOME/etc/datacollection, or nil
+        # $OPENNMS_HOME/etc_archive/datacollection, or nil
         def dc_v36_file_at_name(file)
           return if file.nil?
-          path = "#{onms_etc}/datacollection/#{file}"
+          path = "#{onms_etc_archive}/datacollection/#{file}"
           return unless ::File.exist?(path)
           doc = REXML::Document.new(::File.read(path))
           doc.root.attributes['name'] unless doc.root.nil?
@@ -321,7 +323,7 @@ module Opennms
           state = dc_v36_state
           state['file_seeds'].each do |seeded_name, file|
             next if state['deleted'].include?(seeded_name)
-            path = "#{onms_etc}/datacollection/#{file}"
+            path = "#{onms_etc_archive}/datacollection/#{file}"
             next unless ::File.exist?(path)
             xml = ::File.read(path)
             doc = REXML::Document.new(xml)

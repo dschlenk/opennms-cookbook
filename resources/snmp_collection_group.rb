@@ -52,15 +52,12 @@ end
 
 action :create do
   unless new_resource.file.nil?
-    if datacollection_v36?
-      # Horizon 36 no longer ships the etc/datacollection directory; the
-      # file is only seed material for the database-backed collection source
-      declare_resource(:directory, "#{onms_etc}/datacollection") do
-        owner node['opennms']['username']
-        group node['opennms']['groupname']
-        mode '0755'
-      end
-    end
+    # On Horizon 36 the datacollection group files live in the database
+    # and the package ships them, as its on-disk record, in
+    # etc_archive/datacollection; the file staged there is the seed
+    # material for the database-backed collection source. Earlier
+    # versions use etc/datacollection
+    ddir = datacollection_v36? ? "#{onms_etc_archive}/datacollection" : "#{onms_etc}/datacollection"
     if 'cookbook_file'.eql?(new_resource.source)
       rt = :cookbook_file
       s = new_resource.file
@@ -68,7 +65,7 @@ action :create do
       rt = :remote_file
       s = new_resource.source
     end
-    declare_resource(rt, "#{onms_etc}/datacollection/#{new_resource.file}") do
+    declare_resource(rt, "#{ddir}/#{new_resource.file}") do
       source s
       owner node['opennms']['username']
       group node['opennms']['groupname']
@@ -124,15 +121,7 @@ end
 
 action :update do
   unless new_resource.file.nil?
-    if datacollection_v36?
-      # Horizon 36 no longer ships the etc/datacollection directory; the
-      # file is only seed material for the database-backed collection source
-      declare_resource(:directory, "#{onms_etc}/datacollection") do
-        owner node['opennms']['username']
-        group node['opennms']['groupname']
-        mode '0755'
-      end
-    end
+    ddir = datacollection_v36? ? "#{onms_etc_archive}/datacollection" : "#{onms_etc}/datacollection"
     if 'cookbook_file'.eql?(new_resource.source)
       rt = :cookbook_file
       s = new_resource.file
@@ -140,7 +129,7 @@ action :update do
       rt = :remote_file
       s = new_resource.source
     end
-    declare_resource(rt, "#{onms_etc}/datacollection/#{new_resource.file}") do
+    declare_resource(rt, "#{ddir}/#{new_resource.file}") do
       source s
       owner node['opennms']['username']
       group node['opennms']['groupname']
@@ -180,7 +169,7 @@ action :delete do
       end
     end
     unless new_resource.file.nil?
-      declare_resource(:file, "#{onms_etc}/datacollection/#{new_resource.file}") do
+      declare_resource(:file, "#{onms_etc_archive}/datacollection/#{new_resource.file}") do
         action :nothing
         delayed_action :delete
       end

@@ -40,18 +40,6 @@ postgresql_config 'postgresql-server' do
   action :create
 end
 
-# The postgresql service unit expects the unix socket directory that
-# systemd-tmpfiles-setup is supposed to create from
-# /usr/lib/tmpfiles.d/postgresql-15.conf. In container environments that
-# unit can fail at boot and postmaster then exits immediately with
-# "could not create lock file /run/postgresql/.s.PGSQL.5432.lock".
-directory '/run/postgresql' do
-  owner 'postgres'
-  group 'postgres'
-  mode '0755'
-  action :create
-end
-
 postgresql_service 'postgresql' do
   action %i(enable start)
 end

@@ -77,7 +77,7 @@ class SnmpCollectionGroup < Inspec.resource(1)
         @params[:system_def] = intersection.first
       end
     end
-    @params[:file_content] = inspec.file("/opt/opennms/etc/datacollection/#{file}").content if inspec.file("/opt/opennms/etc/datacollection/#{file}").exist?
+    @params[:file_content] = inspec.file("/opt/opennms/etc_archive/datacollection/#{file}").content if inspec.file("/opt/opennms/etc_archive/datacollection/#{file}").exist?
   end
 
   def fill_from_file(group_name, file, collection)
@@ -109,7 +109,7 @@ class SnmpCollectionGroup < Inspec.resource(1)
 
   # The @name attribute of the group file deployed on disk, or nil
   def api_file_at_name(file)
-    fn = "/opt/opennms/etc/datacollection/#{file}"
+    fn = "/opt/opennms/etc_archive/datacollection/#{file}"
     return unless inspec.file(fn).exist?
     doc = REXML::Document.new(inspec.file(fn).content)
     doc.root.attributes['name'] unless doc.root.nil?
@@ -119,7 +119,7 @@ class SnmpCollectionGroup < Inspec.resource(1)
 
   # The systemDef names of a deployed group file, or []
   def file_system_defs(file)
-    fn = "/opt/opennms/etc/datacollection/#{file}"
+    fn = "/opt/opennms/etc_archive/datacollection/#{file}"
     return [] unless inspec.file(fn).exist?
     doc = REXML::Document.new(inspec.file(fn).content)
     system_defs = []

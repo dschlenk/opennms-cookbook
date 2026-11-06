@@ -8,6 +8,10 @@ module Opennms
       "#{onms_home}/etc"
     end
 
+    def onms_etc_archive
+      "#{onms_home}/etc_archive"
+    end
+
     def onms_share
       "#{onms_home}/share"
     end
