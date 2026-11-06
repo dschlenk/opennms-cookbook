@@ -178,6 +178,9 @@ For existing files, if the name attribute of the `datacollection-group` differs 
 For new files, the name attribute of the `datacollection-group` element will match `group_name`.
 If the name of the group in the file is not already included by the `default` SNMP collection in `$OPENNMS_HOME/etc/datacollection-config.xml`, it will be added automatically.
 
+On OpenNMS 36 and later, a `resourceType` managed with `group_name` lives in the database collection source named after the group instead of the `datacollection-group` file, and the source is attached to the `default` collection when it is not included there yet.
+The `file_name` path is unaffected: `resource-types` files in `$OPENNMS_HOME/etc/resource-types.d/` are managed as files on all versions.
+
 #### `resource-types` Resource Types
 
 When `group_name` is not present but `file_name` is, the managed resource type will be present in `$OPENNMS_HOME/etc/resource-types.d/<file_name>` and the root element will be `resource-types`.
@@ -218,6 +221,12 @@ See the [resource\_type.rb](../test/fixtures/cookbooks/opennms_resource_tests/re
 
 Along with the protocol agnostic resources above, the resources `opennms_snmp_collection`, `opennms_snmp_collection_group`, `opennms_snmp_collection_service`, and `opennms_system_def` are available to manage SNMP data collection.
 
+On OpenNMS 36 and later the datacollection config is stored in the database and managed through the v2 REST API (`/opennms/api/v2/datacollectionconf`) instead of the files under `$OPENNMS_HOME/etc/datacollection`. The config and the collection sources it references are downloaded once per run and, only if a resource changed anything in the run, uploaded once at the end of the run in a single batch: at most one download and one upload per run, no upload on a fully idempotent run. The downloads are accumulated in memory and the same file-based semantics as on earlier versions apply to them. Whole-source and whole-profile removals use the granular DELETE endpoints because the upload only upserts.
+
+* Group and file names are matched against the stored source names case-insensitively and ignoring non-alphanumeric characters, so `wmi` matches a source named `WMI` and `netsnmp` matches `Net-SNMP`. A new group takes its group name (or, when it comes with a file, the file's `@name` attribute) as its source name.
+* An include with `exclude_filters` is not representable in the stored config: on upload the server materializes it into a synthetic `__inline_<profile>` source holding the system definitions that survive the filters, and the config holds a plain reference to that source. The declared form of such an include is not persisted, so a run that declares it re-materializes the inline source on every converge (the resulting server state is identical). An include that only restricts the included `system_def` is written as a plain reference: the v2 API does not persist the restriction.
+* A fresh 36 installation seeds the database from the files shipped in the package, so the out-of-the-box groups are present as sources without any file management.
+
 ### opennms\_snmp\_collection\_service
 
 A convenience wrapper of [`opennms_collection_service`](#opennms_collection_service) that automatically sets the `class_name` property to `org.opennms.netmgt.collectd.SnmpCollector`.
@@ -252,6 +261,8 @@ Manages an `snmp-collection` in `$OPENNMS_HOME/etc/datacollection-config.xml`.
 `snmp_stor_flag` defaults to `select` on `:create`
 
 `include_collections` should be an array of hashes with keywords `:data_collection_group` (string, required), `:exclude_filters` (array of strings, optional), `:system_def` (string, optional).
+
+On OpenNMS 36 and later an `snmp-collection` is a profile in the database instead of an element of `$OPENNMS_HOME/etc/datacollection-config.xml`. The same defaults apply: `rrd_step` defaults to 300 and `rras` to the five RRA strings above on `:create` when not specified. `rras` must not be declared as an empty array: a profile whose `rrd` element ends up empty permanently breaks the server's config download. `include_collections` works as described for the section above: plain references for groups, and the materialized `__inline_<profile>` form for includes with `exclude_filters`.
 
 #### Examples for opennms\_snmp\_collection\_service
 
@@ -292,6 +303,13 @@ Manages a file in `$OPENNMS_HOME/etc/datacollection/` and inclusion of the group
 
 `exclude_filters` one or more regular expression strings indicating system definitions to not include in the collection with the inclusion of this group
 
+On OpenNMS 36 and later the group is included in the collection as a reference to a database collection source instead of an `include-collection` element in `$OPENNMS_HOME/etc/datacollection-config.xml`. The file is still deployed to `$OPENNMS_HOME/etc/datacollection/` (and removed again by `:delete`), but OpenNMS reads the source from the database; the deployed file seeds the source when it does not exist yet.
+
+* Without `exclude_filters` the group is referenced by its canonical source name, and the include is idempotent.
+* With `exclude_filters` the include is materialized into the collection's `__inline_<collection_name>` source on every converge (see the section above): the declared form is not persisted, so such a group reports changes on every run.
+* A `system_def` without `exclude_filters` is written as a plain reference: the v2 API does not persist the restriction, so the declared `system_def` is re-asserted on every converge.
+* `:delete` removes the include and the group's source from the database (and the `__inline_<collection_name>` source when it becomes empty) and removes the deployed file.
+
 #### Examples for opennms\_snmp\_collection\_group
 
 See the [snmp\_collection\_group.rb](../test/fixtures/cookbooks/opennms_resource_tests/recipes/snmp_collection_group.rb) test fixture recipe and [integration\ tests](../test/integration/snmp_collection_group/controls/snmp_collection_group_spec.rb) for examples of action `:create`.
@@ -303,6 +321,7 @@ See the [snmp\_collection\_group\_edit.rb](../test/fixtures/cookbooks/opennms_re
 ### opennms\_system\_def
 
 Manages `systemDef` elements in a `datacollection-group` file in `$OPENNMS_HOME/etc/datacollection/`.
+On OpenNMS 36 and later the system definitions live in the database collection source named after the file (see the name matching described in the SNMP section); the file in `$OPENNMS_HOME/etc/datacollection/` is not read or written.
 
 #### Actions for opennms\_system\_def
 

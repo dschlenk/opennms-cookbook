@@ -96,12 +96,15 @@ module Opennms
           return unless find_resource(:http_request, 'snmp config upload').nil?
 
           upload_url = "#{restv2url}/snmp-config/upload/xml"
+          # the lazy block runs in the http_request resource's context, so
+          # the path is read here, in the declaration context
+          path = xml_template_path
           with_run_context :root do
             declare_resource(:http_request, 'snmp config upload') do
               url upload_url
               headers 'Authorization' => "Basic #{Base64.strict_encode64("admin:#{admin_secret_from_vault('password')}")}",
                       'Content-Type' => "multipart/form-data; boundary=#{Opennms::Cookbook::ConfigHelpers::SnmpConfig::UPLOAD_BOUNDARY}"
-              message lazy { Opennms::Cookbook::ConfigHelpers::SnmpConfig.snmp_config_upload_body(::File.read(xml_template_path)) }
+              message lazy { Opennms::Cookbook::ConfigHelpers::SnmpConfig.snmp_config_upload_body(::File.read(path)) }
               sensitive true
               action :nothing
               delayed_action :post

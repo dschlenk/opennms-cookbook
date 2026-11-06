@@ -1,6 +1,8 @@
 include Opennms::XmlHelper
 include Opennms::Cookbook::Collection::ResourceTypeTemplate
 include Opennms::Cookbook::Collection::GroupResourceTypeTemplate
+include Opennms::Cookbook::Collection::DatacollectionV36Template
+include Opennms::Rbac
 
 unified_mode true
 
@@ -47,6 +49,8 @@ action_class do
   include Opennms::Cookbook::Collection::ResourceTypeTemplate
   include Opennms::Cookbook::Collection::GroupResourceTypeTemplate
   include Opennms::Cookbook::Collection::SnmpCollectionTemplate
+  include Opennms::Cookbook::Collection::DatacollectionV36Template
+  include Opennms::Rbac
 end
 
 load_current_value do |new_resource|
@@ -57,20 +61,19 @@ load_current_value do |new_resource|
     file = "#{onms_etc}/datacollection/#{gfn}"
   end
   raise Chef::Exceptions::ValidationFailed, 'Either `group_name` or `file_name` must be defined in `opennms_resource_type`' if file.nil?
-  current_value_does_not_exist! unless ::File.exist?(file)
-  if !new_resource.group_name.nil?
-    r = rtgroup_resource(file)
-    if r.nil?
-      ro_rtgroup_resource_init(file)
-      r = ro_rtgroup_resource(file)
-    end
-    rt = r.variables[:config].resource_type(name: new_resource.type_name)
-    current_value_does_not_exist! if rt.nil?
+  if datacollection_v36? && !new_resource.group_name.nil?
+    canonical = dc_v36_group_canonical(new_resource.group_name, new_resource.group_file_name)
+    rt = dc_v36_resource_type(canonical, new_resource.type_name)
   else
-    r = rt_resource(file)
-    if r.nil?
-      ro_rt_resource_init(file)
-      r = ro_rt_resource(file)
+    current_value_does_not_exist! unless ::File.exist?(file)
+    if !new_resource.group_name.nil?
+      r = rtgroup_resource(file)
+      ro_rtgroup_resource_init(file) if r.nil?
+      r = ro_rtgroup_resource(file) if r.nil?
+    else
+      r = rt_resource(file)
+      ro_rt_resource_init(file) if r.nil?
+      r = ro_rt_resource(file) if r.nil?
     end
     rt = r.variables[:config].resource_type(name: new_resource.type_name)
   end
@@ -118,68 +121,69 @@ load_current_value do |new_resource|
 end
 
 action :create do
-  snmp_resource_init
-  unless new_resource.group_name.nil?
-    dc = snmp_resource.variables[:collections]['default']
-    ics = dc.include_collections.select { |ic| ic[:data_collection_group].eql?(new_resource.group_name) } unless dc.nil?
-    if ics.nil? || ics.empty?
-      snmp_resource.variables[:collections]['default'].include_collections.push({ data_collection_group: new_resource.group_name })
-    end
-  end
-  converge_if_changed do
-    if new_resource.group_name.nil? && !new_resource.file_name.nil?
-      file = "#{onms_etc}/resource-types.d/#{new_resource.file_name}"
-    elsif !new_resource.group_name.nil?
-      gfn = new_resource.group_file_name.nil? ? "#{new_resource.group_name}.xml" : new_resource.group_file_name
-      file = "#{onms_etc}/datacollection/#{gfn}"
-    end
-    if !new_resource.group_name.nil?
-      rtgroup_resource_init(file, new_resource.group_name)
-      config = rtgroup_resource(file).variables[:config]
-    else
-      rt_resource_init(file)
-      config = rt_resource(file).variables[:config]
-    end
-    rt = config.resource_type(name: new_resource.type_name)
-    if rt.nil?
+  if datacollection_v36? && !new_resource.group_name.nil?
+    canonical = dc_v36_group_canonical(new_resource.group_name, new_resource.group_file_name)
+    if dc_v36_resource_type(canonical, new_resource.type_name).nil?
       raise Chef::Exceptions::ValidationFailed, '`label` is a required property for action `:create`' if new_resource.label.nil?
-      rt = { name: new_resource.type_name, label: new_resource.label, resource_label: new_resource.resource_label, persistence_selector_strategy: { class: new_resource.persistence_selector_strategy || 'org.opennms.netmgt.collection.support.PersistAllSelectorStrategy', parameters: new_resource.persistence_selector_strategy_params }, storage_strategy: { class: new_resource.storage_strategy || 'org.opennms.netmgt.collection.support.IndexStorageStrategy', parameters: new_resource.storage_strategy_params } }
-      config.resource_types.push(rt)
+      converge_by("Adding #{new_resource.type_name} to #{new_resource.group_name}") do
+        dc_v36_profile_attach('default', canonical)
+        dc_v36_resource_type_set(canonical, { name: new_resource.type_name,
+                                              label: new_resource.label,
+                                              resource_label: new_resource.resource_label,
+                                              persistence_selector_strategy: { class: new_resource.persistence_selector_strategy || 'org.opennms.netmgt.collection.support.PersistAllSelectorStrategy',
+                                                                                parameters: new_resource.persistence_selector_strategy_params },
+                                              storage_strategy: { class: new_resource.storage_strategy || 'org.opennms.netmgt.collection.support.IndexStorageStrategy',
+                                                                  parameters: new_resource.storage_strategy_params } })
+      end
     else
       run_action(:update)
+    end
+  else
+    # on Horizon 36 this branch is only reached for the file_name flow,
+    # which does not touch the collection config (and the
+    # datacollection-config.xml file does not exist)
+    snmp_resource_init unless datacollection_v36?
+    unless new_resource.group_name.nil?
+      dc = snmp_resource.variables[:collections]['default']
+      ics = dc.include_collections.select { |ic| ic[:data_collection_group].eql?(new_resource.group_name) } unless dc.nil?
+      if ics.nil? || ics.empty?
+        snmp_resource.variables[:collections]['default'].include_collections.push({ data_collection_group: new_resource.group_name })
+      end
+    end
+    converge_if_changed do
+      if new_resource.group_name.nil? && !new_resource.file_name.nil?
+        file = "#{onms_etc}/resource-types.d/#{new_resource.file_name}"
+      elsif !new_resource.group_name.nil?
+        gfn = new_resource.group_file_name.nil? ? "#{new_resource.group_name}.xml" : new_resource.group_file_name
+        file = "#{onms_etc}/datacollection/#{gfn}"
+      end
+      if !new_resource.group_name.nil?
+        rtgroup_resource_init(file, new_resource.group_name)
+        config = rtgroup_resource(file).variables[:config]
+      else
+        rt_resource_init(file)
+        config = rt_resource(file).variables[:config]
+      end
+      rt = config.resource_type(name: new_resource.type_name)
+      if rt.nil?
+        raise Chef::Exceptions::ValidationFailed, '`label` is a required property for action `:create`' if new_resource.label.nil?
+        rt = { name: new_resource.type_name, label: new_resource.label, resource_label: new_resource.resource_label, persistence_selector_strategy: { class: new_resource.persistence_selector_strategy || 'org.opennms.netmgt.collection.support.PersistAllSelectorStrategy', parameters: new_resource.persistence_selector_strategy_params }, storage_strategy: { class: new_resource.storage_strategy || 'org.opennms.netmgt.collection.support.IndexStorageStrategy', parameters: new_resource.storage_strategy_params } }
+        config.resource_types.push(rt)
+      else
+        run_action(:update)
+      end
     end
   end
 end
 
 action :create_if_missing do
-  snmp_resource_init
-  if new_resource.group_name.nil? && !new_resource.file_name.nil?
-    file = "#{onms_etc}/resource-types.d/#{new_resource.file_name}"
-  elsif !new_resource.group_name.nil?
-    gfn = new_resource.group_file_name.nil? ? "#{new_resource.group_name}.xml" : new_resource.group_file_name
-    file = "#{onms_etc}/datacollection/#{gfn}"
-  end
-  if !new_resource.group_name.nil?
-    rtgroup_resource_init(file, new_resource.group_name)
-    config = rtgroup_resource(file).variables[:config]
+  if datacollection_v36? && !new_resource.group_name.nil?
+    canonical = dc_v36_group_canonical(new_resource.group_name, new_resource.group_file_name)
+    run_action(:create) if dc_v36_resource_type(canonical, new_resource.type_name).nil?
   else
-    rt_resource_init(file)
-    config = rt_resource(file).variables[:config]
-  end
-  rt = config.resource_type(name: new_resource.type_name)
-  run_action(:create) if rt.nil?
-end
-
-action :update do
-  snmp_resource_init
-  unless new_resource.group_name.nil?
-    dc = snmp_resource.variables[:collections]['default']
-    ics = dc.include_collections.select { |ic| ic[:data_collection_group].eql?(new_resource.group_name) } unless dc.nil?
-    if ics.nil? || ics.empty?
-      snmp_resource.variables[:collections]['default'].include_collections.push({ data_collection_group: new_resource.group_name })
-    end
-  end
-  converge_if_changed do
+    # on Horizon 36 this branch is only reached for the file_name flow,
+    # which does not touch the collection config
+    snmp_resource_init unless datacollection_v36?
     if new_resource.group_name.nil? && !new_resource.file_name.nil?
       file = "#{onms_etc}/resource-types.d/#{new_resource.file_name}"
     elsif !new_resource.group_name.nil?
@@ -194,29 +198,88 @@ action :update do
       config = rt_resource(file).variables[:config]
     end
     rt = config.resource_type(name: new_resource.type_name)
-    raise Chef::Exceptions::CurrentValueDoesNotExist if rt.nil?
-    config.resource_type_update(name: new_resource.type_name, label: new_resource.label, resource_label: new_resource.resource_label, persistence_selector_strategy: new_resource.persistence_selector_strategy, persistence_selector_strategy_params: new_resource.persistence_selector_strategy_params, storage_strategy: new_resource.storage_strategy, storage_strategy_params: new_resource.storage_strategy_params)
+    run_action(:create) if rt.nil?
+  end
+end
+
+action :update do
+  if datacollection_v36? && !new_resource.group_name.nil?
+    canonical = dc_v36_group_canonical(new_resource.group_name, new_resource.group_file_name)
+    converge_if_changed do
+      dc_v36_profile_attach('default', canonical)
+      current = dc_v36_resource_type(canonical, new_resource.type_name)
+      raise Chef::Exceptions::CurrentValueDoesNotExist, "No resourceType found named #{new_resource.type_name} in #{canonical}" if current.nil?
+      # declared properties override the current values, undeclared ones
+      # keep the current value so the rewritten element is unchanged apart
+      # from the declared deltas
+      rt = { name: new_resource.type_name,
+             label: new_resource.label.nil? ? current[:label] : new_resource.label,
+             resource_label: new_resource.resource_label.nil? ? current[:resource_label] : new_resource.resource_label,
+             persistence_selector_strategy: { class: new_resource.persistence_selector_strategy.nil? ? current[:persistence_selector_strategy][:class] : new_resource.persistence_selector_strategy,
+                                               parameters: new_resource.persistence_selector_strategy_params.nil? ? current[:persistence_selector_strategy][:parameters] : new_resource.persistence_selector_strategy_params },
+             storage_strategy: { class: new_resource.storage_strategy.nil? ? current[:storage_strategy][:class] : new_resource.storage_strategy,
+                                 parameters: new_resource.storage_strategy_params.nil? ? current[:storage_strategy][:parameters] : new_resource.storage_strategy_params } }
+      dc_v36_resource_type_set(canonical, rt)
+    end
+  else
+    # on Horizon 36 this branch is only reached for the file_name flow,
+    # which does not touch the collection config
+    snmp_resource_init unless datacollection_v36?
+    unless new_resource.group_name.nil?
+      dc = snmp_resource.variables[:collections]['default']
+      ics = dc.include_collections.select { |ic| ic[:data_collection_group].eql?(new_resource.group_name) } unless dc.nil?
+      if ics.nil? || ics.empty?
+        snmp_resource.variables[:collections]['default'].include_collections.push({ data_collection_group: new_resource.group_name })
+      end
+    end
+    converge_if_changed do
+      if new_resource.group_name.nil? && !new_resource.file_name.nil?
+        file = "#{onms_etc}/resource-types.d/#{new_resource.file_name}"
+      elsif !new_resource.group_name.nil?
+        gfn = new_resource.group_file_name.nil? ? "#{new_resource.group_name}.xml" : new_resource.group_file_name
+        file = "#{onms_etc}/datacollection/#{gfn}"
+      end
+      if !new_resource.group_name.nil?
+        rtgroup_resource_init(file, new_resource.group_name)
+        config = rtgroup_resource(file).variables[:config]
+      else
+        rt_resource_init(file)
+        config = rt_resource(file).variables[:config]
+      end
+      rt = config.resource_type(name: new_resource.type_name)
+      raise Chef::Exceptions::CurrentValueDoesNotExist if rt.nil?
+      config.resource_type_update(name: new_resource.type_name, label: new_resource.label, resource_label: new_resource.resource_label, persistence_selector_strategy: new_resource.persistence_selector_strategy, persistence_selector_strategy_params: new_resource.persistence_selector_strategy_params, storage_strategy: new_resource.storage_strategy, storage_strategy_params: new_resource.storage_strategy_params)
+    end
   end
 end
 
 action :delete do
-  if new_resource.group_name.nil? && !new_resource.file_name.nil?
-    file = "#{onms_etc}/resource-types.d/#{new_resource.file_name}"
-  elsif !new_resource.group_name.nil?
-    gfn = new_resource.group_file_name.nil? ? "#{new_resource.group_name}.xml" : new_resource.group_file_name
-    file = "#{onms_etc}/datacollection/#{gfn}"
-  end
-  if !new_resource.group_name.nil?
-    rtgroup_resource_init(file, new_resource.group_name)
-    config = rtgroup_resource(file).variables[:config]
+  if datacollection_v36? && !new_resource.group_name.nil?
+    canonical = dc_v36_group_canonical(new_resource.group_name, new_resource.group_file_name)
+    unless dc_v36_resource_type(canonical, new_resource.type_name).nil?
+      converge_by("Removing #{new_resource.type_name} from #{canonical}") do
+        dc_v36_resource_type_delete(canonical, new_resource.type_name)
+      end
+    end
   else
-    rt_resource_init(file)
-    config = rt_resource(file).variables[:config]
-  end
-  rt = config.resource_type(name: new_resource.type_name)
-  unless rt.nil?
-    converge_by "Removing #{new_resource.type_name} from #{file}" do
-      config.resource_type_delete(name: new_resource.type_name)
+    if new_resource.group_name.nil? && !new_resource.file_name.nil?
+      file = "#{onms_etc}/resource-types.d/#{new_resource.file_name}"
+    elsif !new_resource.group_name.nil?
+      gfn = new_resource.group_file_name.nil? ? "#{new_resource.group_name}.xml" : new_resource.group_file_name
+      file = "#{onms_etc}/datacollection/#{gfn}"
+    end
+    if !new_resource.group_name.nil?
+      rtgroup_resource_init(file, new_resource.group_name)
+      config = rtgroup_resource(file).variables[:config]
+    else
+      rt_resource_init(file)
+      config = rt_resource(file).variables[:config]
+    end
+    rt = config.resource_type(name: new_resource.type_name)
+    unless rt.nil?
+      converge_by "Removing #{new_resource.type_name} from #{file}" do
+        config.resource_type_delete(name: new_resource.type_name)
+      end
     end
   end
 end
