@@ -2,6 +2,8 @@
 
 Manages destinations in `$OPENNMS_HOME/etc/jms-northbounder-configuration.xml`. Will restart the OpenNMS service automatically when needed.
 
+On OpenNMS 36 and later this resource is a no-op: the JMS northbounder daemon was removed in Horizon 36, so there is no `jms-northbounder-configuration.xml` to manage. The northbounder may return in a future release.
+
 ## Actions
 
 * `:create` - Default. Adds or updates a JMS destination configuration in `$OPENNMS_HOME/etc/jms-northbounder-configuration.xml`.

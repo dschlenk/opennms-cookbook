@@ -10,6 +10,13 @@ property :destination_type, String, equal_to: %w(QUEUE TOPIC)
 property :message_format, String
 
 load_current_value do |new_resource|
+  # The JMS northbounder daemon was removed in OpenNMS 36, so there is no
+  # jms-northbounder-configuration.xml to manage; the resource is a no-op.
+  # The northbounder may return in a future release
+  if jms_nb_v36?
+    Chef::Log.warn('opennms_jms_nb_destination is a no-op on OpenNMS 36 and later: the JMS northbounder daemon was removed')
+    return
+  end
   res = jms_nb_resource
   if res.nil?
     ro_jms_nb_resource_init
@@ -55,6 +62,7 @@ action_class do
 end
 
 action :create do
+  return if jms_nb_v36?
   ensure_jms_plugin_installed!
   raise Chef::Exceptions::ValidationFailed, 'The destination property must be set and not empty.' if new_resource.destination.nil? || new_resource.destination.strip.empty?
 
@@ -84,6 +92,7 @@ action :create do
 end
 
 action :create_if_missing do
+  return if jms_nb_v36?
   ensure_jms_plugin_installed!
   raise Chef::Exceptions::ValidationFailed, 'The destination property must be set and not empty.' if new_resource.destination.nil? || new_resource.destination.strip.empty?
 
@@ -98,6 +107,7 @@ action :create_if_missing do
 end
 
 action :update do
+  return if jms_nb_v36?
   ensure_jms_plugin_installed!
   raise Chef::Exceptions::ValidationFailed, 'The destination property must be set and not empty.' if new_resource.destination.nil? || new_resource.destination.strip.empty?
 
@@ -119,6 +129,7 @@ action :update do
 end
 
 action :delete do
+  return if jms_nb_v36?
   ensure_jms_plugin_installed!
   raise Chef::Exceptions::ValidationFailed, 'The destination property must be set and not empty.' if new_resource.destination.nil? || new_resource.destination.strip.empty?
 

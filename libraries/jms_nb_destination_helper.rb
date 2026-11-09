@@ -128,6 +128,14 @@ end
 module Opennms
   module Cookbook
     module JmsNbTemplate
+      # On OpenNMS 36 the JMS northbounder daemon was removed, so there is
+      # no jms-northbounder-configuration.xml to manage; the
+      # opennms_jms_nb_destination resource is a no-op. The northbounder
+      # may return in a future release
+      def jms_nb_v36?
+        node['opennms']['version'].to_i >= 36
+      end
+
       def jms_nb_resource_init
         jms_nb_resource_create unless jms_nb_resource_exist?
       end
