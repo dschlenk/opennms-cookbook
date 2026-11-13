@@ -39,7 +39,10 @@ end
 
 action :delete do
   source_name = source_name_from_file(new_resource.source_name)
-  if eventconf_source_exist?(source_name)
+  root_state = run_context.root_run_context.node.run_state
+  pending_create = root_state['opennms_bulk_eventconf']&.any? { |item| item[:name] == source_name }
+
+  if eventconf_source_exist?(source_name) || pending_create
     converge_by("delete eventconf source #{source_name}") do
       delete_source(source_name)
     end
