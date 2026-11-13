@@ -1,7 +1,16 @@
 # frozen_string_literal: true
+
 control 'event_edit_tticket' do
-  describe event('uei.opennms.org/cheftest/thresholdExceeded2', 'events/chef.events.xml', [{ 'mename' => 'id', 'mevalue' => ['.1.3.6.1.4.1.11385.102.1'] }, { 'mename' => 'generic', 'mevalue' => ['6'] }, { 'mename' => 'specific', 'mevalue' => ['2'] }]) do
+  title 'OpenNMS Event Trouble Ticket Configuration'
+
+  describe opennms_event('uei.opennms.org/cheftest/thresholdExceeded2-event_edit_tticket', 'events/chef.events.xml') do
     it { should exist }
-    its('tticket') { should eq('info' => 'tticketInfo', 'state' => 'on') }
+
+    it 'validates the trouble ticket information and state' do
+      tticket = subject['tticket']
+      expect(tticket).not_to be_nil
+      expect(tticket['info']).to eq 'tticketInfo'
+      expect(tticket['state']).to eq 'on'
+    end
   end
 end

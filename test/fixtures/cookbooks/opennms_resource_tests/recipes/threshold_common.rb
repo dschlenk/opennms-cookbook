@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 # need to turn on thresholding on ICMP service first
 opennms_poller_service 'ICMP' do
   package_name 'example1'
@@ -15,35 +16,51 @@ opennms_threshd_package 'cheftest' do
   exclude_ranges [{ 'begin' => '10.0.0.1', 'end' => '10.254.254.254' }]
   include_urls ['file:/opt/opennms/etc/include']
   services [{ 'name' => 'ICMP', 'interval' => 300_000, 'status' => 'on', 'params' => [{ 'thresholding-group' => 'cheftest' }] }]
-  notifies :run, 'opennms_send_event[restart_Threshd]'
 end
 
 opennms_threshold_group 'cheftest' do
   rrd_repository '/opt/opennms/share/rrd/response'
 end
 
-# define events for triggered/rearmed
+#=====================================================================
+# THRESHOLD EVENTS CONFIGURATIONS (DATABASE BULK LAYOUT ALIGNMENT)
+#=====================================================================
+
 opennms_event 'uei.opennms.org/thresholdTest/testThresholdExceeded' do
-  file 'events/chef-threshold.events.xml'
+  source_name 'events/chef.events.xml'
   event_label 'Chef defined event: testThresholdExceeded'
   descr '<p>A threshold defined by a chef recipe that tests thresholds has been exceeded.</p>'
   logmsg 'Chef test threshold exceeded.'
   logmsg_dest 'logndisplay'
   logmsg_notify true
+  mask [
+         { 'mename' => 'id', 'mevalue' => ['.1.3.6.1.4.1.11385.102.1'] },
+         { 'mename' => 'generic', 'mevalue' => ['6'] },
+         { 'mename' => 'specific', 'mevalue' => ['2'] },
+       ]
   severity 'Minor'
-  notifies :run, 'opennms_send_event[restart_Eventd]'
+  eventconf_position 'bottom'
 end
 
 opennms_event 'uei.opennms.org/thresholdTest/testThresholdRearmed' do
-  file 'events/chef-threshold.events.xml'
+  source_name 'events/chef.events.xml'
   event_label 'Chef defined event: testThresholdRearmed'
   descr '<p>A threshold defined by a chef recipe that tests thresholds has been rearmed.</p>'
   logmsg 'Chef test threshold rearmed.'
   logmsg_dest 'logndisplay'
   logmsg_notify true
+  mask [
+         { 'mename' => 'id', 'mevalue' => ['.1.3.6.1.4.1.11385.102.1'] },
+         { 'mename' => 'generic', 'mevalue' => ['6'] },
+         { 'mename' => 'specific', 'mevalue' => ['2'] },
+       ]
   severity 'Normal'
-  notifies :run, 'opennms_send_event[restart_Eventd]'
+  eventconf_position 'bottom'
 end
+
+#=====================================================================
+# THRESHOLD GROUPS MUTATIONS
+#=====================================================================
 
 opennms_threshold_group 'mib2' do
   rrd_repository '/var/opennms/rrd/snmp'

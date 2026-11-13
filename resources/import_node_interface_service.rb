@@ -116,12 +116,16 @@ action :delete do
   node_el = model_import_root.elements["node[@foreign-id = '#{new_resource.foreign_id}']"] unless model_import_root.nil?
   interface_el = node_el.elements["interface[@ip-addr = '#{new_resource.ip_addr}']"] unless node_el.nil?
   service = interface_el.elements["monitored-service[@service-name = '#{name}']"] unless interface_el.nil?
-  unless service.nil?
-    converge_by "Removing service #{name} from interface #{new_resource.ip_addr} in node #{new_resource.foreign_id} in #{new_resource.foreign_source_name}" do
-      model_import_node_service_delete(new_resource.foreign_source_name, new_resource.foreign_id, new_resource.ip_addr, name)
-      if new_resource.sync_import
-        model_import_sync(new_resource.foreign_source_name, true, new_resource.sync_wait_periods, new_resource.sync_wait_secs)
-      end
+  return if service.nil?
+
+  converge_by "Removing service #{name} from interface #{new_resource.ip_addr} in node #{new_resource.foreign_id} in #{new_resource.foreign_source_name}" do
+    interface_el.delete_element(service)
+    writable_mi = model_import(new_resource.foreign_source_name)
+    writable_mi&.message(model_import_root.to_s)
+
+    model_import_node_service_delete(new_resource.foreign_source_name, new_resource.foreign_id, new_resource.ip_addr, name)
+    if new_resource.sync_import
+      model_import_sync(new_resource.foreign_source_name, true, new_resource.sync_wait_periods, new_resource.sync_wait_secs)
     end
   end
 end
